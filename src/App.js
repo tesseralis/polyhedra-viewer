@@ -12,7 +12,7 @@ class App extends Component {
           <img src={logo} className="App-logo" alt="logo" />
           <h2>Welcome to React</h2>
         </div>
-        <x3d width="600px" height="400px">
+        <x3d className="X3d">
           <scene>
             <shape>
               <appearance>
