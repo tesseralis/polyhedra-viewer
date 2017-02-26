@@ -39,7 +39,7 @@ class Polyhedron extends Component {
       <transform>
         <shape>
           <appearance>
-            <material is transparency="0.25"></material>
+            <material is transparency="0.1"></material>
           </appearance>
           <indexedfaceset is
             colorPerVertex="false"
