@@ -1,4 +1,6 @@
 import React, { Component, PropTypes } from 'react';
+import { rgb } from 'd3-color';
+import { schemeSet1 } from 'd3-scale-chromatic';
 
 class Polyhedron extends Component {
 
@@ -11,10 +13,16 @@ class Polyhedron extends Component {
     return list.map(elem => elem.join(innerSep)).join(outerSep);
   }
 
-  renderColor(colors) {
-    // TODO do actual color
+  getColor(n) {
+    const colorMap = { 3: 4, 4: 0, 5: 1, 6: 2, 8: 3, 10: 6 };
+    const asRgb = rgb(schemeSet1[colorMap[n]]);
+    return [asRgb.r, asRgb.g, asRgb.b].map(d => d/255);
+  }
+
+  renderColor(faces) {
+    const colorsPerFace = faces.map(face => this.getColor(face.length));
     return (
-      <color is color={this.props.solid.faces.map(face => '1 0 0').join(', ')}></color>
+      <color is color={this.joinListOfLists(colorsPerFace, ', ', ' ')}></color>
     );
   }
 
@@ -38,7 +46,7 @@ class Polyhedron extends Component {
             coordindex={ this.joinListOfLists(faces, ' -1 ', ' ') }
           >
             { this.renderCoordinates(vertices) }
-            { this.renderColor() }
+            { this.renderColor(faces) }
           </indexedfaceset>
         </shape>
         <shape>
