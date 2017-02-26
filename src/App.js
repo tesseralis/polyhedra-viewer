@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import 'x3dom';
+import 'x3dom/x3dom.css';
 import logo from './logo.svg';
 import './App.css';
 
@@ -10,9 +12,17 @@ class App extends Component {
           <img src={logo} className="App-logo" alt="logo" />
           <h2>Welcome to React</h2>
         </div>
-        <p className="App-intro">
-          To get started, edit <code>src/App.js</code> and save to reload.
-        </p>
+        <x3d width="600px" height="400px">
+          <scene>
+            <shape>
+              <appearance>
+                {/* http://stackoverflow.com/a/33860892 */}
+                <material is diffuseColor="1 0 0"></material>
+              </appearance>
+              <box></box>
+            </shape>
+          </scene>
+        </x3d>
       </div>
     );
   }
