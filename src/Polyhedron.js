@@ -25,19 +25,30 @@ class Polyhedron extends Component {
   }
 
   render() {
+    const { faces, vertices, edges } = this.props.solid;
+
     return (
-      <shape>
-        <appearance>
-          <material is transparency="0.25"></material>
-        </appearance>
-        <indexedfaceset is
-          colorPerVertex="false"
-          coordindex={ this.joinListOfLists(this.props.solid.faces, ' -1 ', ' ') }
-        >
-          { this.renderCoordinates(this.props.solid.vertices) }
-          { this.renderColor() }
-        </indexedfaceset>
-      </shape>
+      <transform>
+        <shape>
+          <appearance>
+            <material is transparency="0.25"></material>
+          </appearance>
+          <indexedfaceset is
+            colorPerVertex="false"
+            coordindex={ this.joinListOfLists(faces, ' -1 ', ' ') }
+          >
+            { this.renderCoordinates(vertices) }
+            { this.renderColor() }
+          </indexedfaceset>
+        </shape>
+        <shape>
+          <indexedlineset is
+            coordindex={ this.joinListOfLists(edges, ' -1 ', ' ') }
+          >
+            { this.renderCoordinates(this.props.solid.vertices) }
+          </indexedlineset>
+        </shape>
+      </transform>
     );
   }
 }
