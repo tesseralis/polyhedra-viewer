@@ -36,7 +36,7 @@ class Polyhedron extends Component {
     const { faces, vertices, edges } = this.props.solid;
 
     return (
-      <transform>
+      <group>
         <shape>
           <appearance>
             <material is transparency="0.1"></material>
@@ -56,7 +56,7 @@ class Polyhedron extends Component {
             { this.renderCoordinates(this.props.solid.vertices) }
           </indexedlineset>
         </shape>
-      </transform>
+      </group>
     );
   }
 }
