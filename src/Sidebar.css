@@ -1,0 +1,19 @@
+.Sidebar {
+  width: 25%;
+  height: 100%;
+  background-color: lightgray;
+  position: absolute;
+  left: 0;
+  top: 0;
+  overflow: scroll;
+  z-index: 100; /* TODO have a list of these */
+}
+
+.Sidebar-list {
+  margin: 0;
+  padding: 0;
+}
+
+.Sidebar-listItem {
+  list-style-type: none; /* TODO css reset? */
+}
