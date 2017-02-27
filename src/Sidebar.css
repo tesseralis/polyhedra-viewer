@@ -1,13 +1,19 @@
 .Sidebar {
-  width: 25%;
   height: 100%;
   position: absolute;
   left: 0;
   top: 0;
-  overflow: scroll;
   z-index: 100; /* TODO have a list of these */
-  background-color: WhiteSmoke;
+
+  display: flex;
+  flex-direction: row;
+}
+
+.Sidebar-content {
+  width: 300px;
   text-align: center;
+  overflow: scroll;
+  background-color: WhiteSmoke;
 }
 
 .Sidebar-homeLink {
@@ -53,4 +59,10 @@
 
 .Sidebar-link:hover {
   background-color: LightGray;
+}
+
+.Sidebar-toggle {
+  margin: 0;
+  padding: 2px;
+  font-size: 16px;
 }

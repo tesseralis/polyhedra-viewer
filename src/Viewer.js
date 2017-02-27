@@ -18,7 +18,7 @@ const Viewer = ({ params }) => {
 
   return (
     <div className="Viewer">
-      <Sidebar polyhedra={polyhedra}/>
+      <Sidebar />
       <X3dScene>
         <Polyhedron solid={solid}/>
       </X3dScene>
