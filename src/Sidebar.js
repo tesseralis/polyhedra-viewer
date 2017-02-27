@@ -8,8 +8,9 @@ import './Sidebar.css';
 
 const Sidebar = ({ polyhedra }) => {
   return (
-    <section className="Sidebar">{
-      polyhedra.groups.map(group => (
+    <section className="Sidebar">
+      <Link to="/" className="Sidebar-homeLink">Home</Link>
+      { polyhedra.groups.map(group => (
         <div className="Sidebar-group" key={group.group_name}>
           <div className="Sidebar-groupHeader">
             <GroupHeader name={group.group_name} />
@@ -25,8 +26,8 @@ const Sidebar = ({ polyhedra }) => {
             ))
           }</ul>
         </div>
-      ))
-    }</section>
+      )) }
+    </section>
   );
 };
 

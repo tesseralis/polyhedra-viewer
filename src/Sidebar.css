@@ -7,6 +7,23 @@
   overflow: scroll;
   z-index: 100; /* TODO have a list of these */
   background-color: WhiteSmoke;
+  text-align: center;
+}
+
+.Sidebar-homeLink {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-bottom: DarkSlateGray 1px solid;
+  padding: 10px;
+  font-size: 20px;
+  color: DarkSlateGray;
+  text-decoration: none;
+}
+
+.Sidebar-homeLink:hover {
+  background-color: LightGray;
 }
 
 .Sidebar-group {
