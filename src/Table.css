@@ -1,6 +1,14 @@
 .Table {
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   text-align: center;
+}
+
+.Table-group {
+  margin: 20px;
+  max-width: 1000px;
 }
 
 .Table-list {

@@ -1,4 +1,6 @@
 .GroupHeader {
-  font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
   margin: 10px 0;
+  font-size: 24px;
+  font-weight: bold;
+  font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
 }
