@@ -17,12 +17,16 @@
   flex-wrap: wrap;
 }
 
-.Table-imageWrapper {
+.Table-link {
   width: 100px;
   height: 100px;
   display: flex;
   justify-content: center;
   overflow: hidden;
+}
+
+.Table-link:hover {
+  background-color: LightGray;
 }
 
 .Table-image {

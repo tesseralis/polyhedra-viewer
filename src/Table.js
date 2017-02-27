@@ -16,11 +16,9 @@ const Table = () => {
               const escapedName = escapeName(polyhedron.name);
               const img = require(`./images/s-${escapedName}.png`);
               return (
-                <div className="Table-imageWrapper" key={polyhedron.name}>
-                  <Link to={escapedName}>
-                    <img className="Table-image" src={img} alt={polyhedron.name}></img>
-                  </Link>
-                </div>
+                <Link key={polyhedron.name} to={escapedName} className="Table-link">
+                  <img className="Table-image" src={img} alt={polyhedron.name}></img>
+                </Link>
               )
             })
           }</div>
