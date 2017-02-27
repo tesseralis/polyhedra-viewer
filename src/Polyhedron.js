@@ -27,8 +27,9 @@ class Polyhedron extends Component {
     // TODO Find a more elegant solution for this
     // We pad the number of points in case we move from a solid with more vertices
     // to one with less, so that x3dom does accidentally map an index to a non-existing point
-    const buffer = _(100).range().map(x => [0, 0, 0]);
+    const buffer = _(100).range().map(x => [0, 0, 0]).value();
     const bufferedPoints = points.concat(buffer);
+    console.log(bufferedPoints);
 
     return (
       <coordinate is point={joinListOfLists(bufferedPoints, ', ', ' ')}></coordinate>
