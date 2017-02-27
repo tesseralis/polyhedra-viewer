@@ -1,8 +1,10 @@
+import _ from 'lodash';
 import React from 'react';
 import { Link } from 'react-router';
 import { escapeName } from './util';
 import GroupHeader from './GroupHeader';
 import './Sidebar.css';
+
 
 const Sidebar = ({ polyhedra }) => {
   return (
@@ -18,7 +20,7 @@ const Sidebar = ({ polyhedra }) => {
                 <Link
                   to={escapeName(polyhedron.name)}
                   className="Sidebar-link"
-                >{polyhedron.name}</Link>
+                >{_.capitalize(polyhedron.name)}</Link>
               </li>
             ))
           }</ul>
