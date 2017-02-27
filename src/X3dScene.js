@@ -9,6 +9,8 @@ export default class X3dScene extends Component {
   componentDidMount() {
     // Reload X3DOM so that it tracks the re-created instance
     x3dom.reload();
+    // Disable double-clicking to change rotation point
+    x3dom.Viewarea.prototype.onDoubleClick = () => {}
   }
 
   render() {
