@@ -1,10 +1,10 @@
 import React from 'react';
 import { Router, Route, browserHistory } from 'react-router';
-import App from './App';
+import Viewer from './Viewer';
 
 const Root = () => (
   <Router history={browserHistory}>
-    <Route path="/(:solid)" component={App} />
+    <Route path="/(:solid)" component={Viewer} />
   </Router>
 );
 

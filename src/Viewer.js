@@ -1,7 +1,7 @@
 import React from 'react';
 import 'x3dom';
 import 'x3dom/x3dom.css';
-import './App.css';
+import './Viewer.css';
 import Polyhedron from './Polyhedron';
 import Sidebar from './Sidebar';
 import polyhedra from './data/polyhedra.json';
@@ -14,13 +14,13 @@ const normalizedPolyhedra = _(polyhedra.groups)
   .fromPairs()
   .value();
 
-const App = ({ params }) => {
+const Viewer = ({ params }) => {
 
   const solidName = params.solid || 'tetrahedron';
   const solid = normalizedPolyhedra[solidName];
 
   return (
-    <div className="App">
+    <div className="Viewer">
       <Sidebar polyhedra={polyhedra}/>
       <x3d className="X3d">
         <scene>
@@ -32,4 +32,4 @@ const App = ({ params }) => {
   );
 }
 
-export default App;
+export default Viewer;

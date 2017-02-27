@@ -13,18 +13,13 @@ const toRgb = hex => {
 };
 
 const colors = schemeSet1.map(color => toRgb(color));
-
 const colorAttr = joinListOfLists(colors, ', ', ' ');
+const colorMap = { 3: 4, 4: 0, 5: 1, 6: 2, 8: 3, 10: 6 };
 
 class Polyhedron extends Component {
 
   static propTypes = {
     solid: PropTypes.object.isRequired
-  }
-
-  getColorIndex(n) {
-    const colorMap = { 3: 4, 4: 0, 5: 1, 6: 2, 8: 3, 10: 6 };
-    return colorMap[n];
   }
 
   renderCoordinates(points) {
@@ -44,7 +39,7 @@ class Polyhedron extends Component {
           </appearance>
           <indexedfaceset is
             colorPerVertex="false"
-            colorindex={ faces.map(face => this.getColorIndex(face.length)).join(' ') }
+            colorindex={ faces.map(face => colorMap[face.length]).join(' ') }
             coordindex={ joinListOfLists(faces, ' -1 ', ' ') }
           >
             { this.renderCoordinates(vertices) }
