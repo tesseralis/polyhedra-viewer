@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import { Link } from 'react-router';
 import { escapeName } from './util';
 import GroupHeader from './GroupHeader';
-import polyhedra from './data/polyhedra.json';
+import { groups } from './data/polyhedra';
 import './Sidebar.css';
 
 
@@ -24,10 +24,10 @@ export default class Sidebar extends Component {
       <div className="Sidebar">
         { this.state.visible && <section className="Sidebar-content">
           <Link to="/" className="Sidebar-homeLink">Home</Link>
-          { polyhedra.groups.map(group => (
-            <div className="Sidebar-group" key={group.group_name}>
+          { groups.map(group => (
+            <div className="Sidebar-group" key={group.name}>
               <div className="Sidebar-groupHeader">
-                <GroupHeader name={group.group_name} />
+                <GroupHeader name={group.name} />
               </div>
               <ul className="Sidebar-list">{
                 group.polyhedra.map(polyhedron => (

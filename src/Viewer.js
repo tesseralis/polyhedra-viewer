@@ -2,19 +2,12 @@ import React from 'react';
 import Polyhedron from './Polyhedron';
 import Sidebar from './Sidebar';
 import X3dScene from './X3dScene';
-import polyhedra from './data/polyhedra.json';
+import { solids } from './data/polyhedra.js';
 import _ from 'lodash';
-
-// TODO replace this logic with normalized data
-const normalizedPolyhedra = _(polyhedra.groups)
-  .flatMap(group => group.polyhedra)
-  .map(polyhedron => [polyhedron.name.replace(/ /g, '-'), polyhedron])
-  .fromPairs()
-  .value();
 
 const Viewer = ({ params }) => {
   const solidName = params.solid || 'tetrahedron';
-  const solid = normalizedPolyhedra[solidName];
+  const solid = solids[solidName];
 
   return (
     <div className="Viewer">
