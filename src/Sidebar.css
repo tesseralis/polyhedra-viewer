@@ -14,7 +14,7 @@
 }
 
 .Sidebar-groupHeader {
-  margin: 10px 0;
+  margin: 10px;
   font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
 }
 
@@ -30,7 +30,7 @@
 /* TODO put the class on the link */
 .Sidebar-listItem a {
   display: block;
-  padding: 5px 0;
+  padding: 5px 10px;
 
   color: DarkSlateGray;
   text-decoration: none;
