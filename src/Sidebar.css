@@ -27,8 +27,7 @@
   list-style-type: none; /* TODO css reset? */
 }
 
-/* TODO put the class on the link */
-.Sidebar-listItem a {
+.Sidebar-link {
   display: block;
   padding: 5px 10px;
 
@@ -36,6 +35,6 @@
   text-decoration: none;
 }
 
-.Sidebar-listItem a:hover {
+.Sidebar-link:hover {
   background-color: LightGray;
 }

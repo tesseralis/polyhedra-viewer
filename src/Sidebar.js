@@ -12,7 +12,10 @@ const Sidebar = ({ polyhedra }) => {
           <ul className="Sidebar-list">{
             group.polyhedra.map(polyhedron => (
               <li key={polyhedron.name} className="Sidebar-listItem">
-                <Link to={escapeName(polyhedron.name)}>{polyhedron.name}</Link>
+                <Link
+                  to={escapeName(polyhedron.name)}
+                  className="Sidebar-link"
+                >{polyhedron.name}</Link>
               </li>
             ))
           }</ul>
