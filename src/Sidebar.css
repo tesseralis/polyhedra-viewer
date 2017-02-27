@@ -1,12 +1,21 @@
 .Sidebar {
   width: 25%;
   height: 100%;
-  background-color: lightgray;
   position: absolute;
   left: 0;
   top: 0;
   overflow: scroll;
   z-index: 100; /* TODO have a list of these */
+  background-color: WhiteSmoke;
+}
+
+.Sidebar-group {
+  padding: 10px 0;
+}
+
+.Sidebar-groupHeader {
+  margin: 10px 0;
+  font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
 }
 
 .Sidebar-list {
@@ -16,4 +25,17 @@
 
 .Sidebar-listItem {
   list-style-type: none; /* TODO css reset? */
+}
+
+/* TODO put the class on the link */
+.Sidebar-listItem a {
+  display: block;
+  padding: 5px 0;
+
+  color: DarkSlateGray;
+  text-decoration: none;
+}
+
+.Sidebar-listItem a:hover {
+  background-color: LightGray;
 }
