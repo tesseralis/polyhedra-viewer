@@ -30,13 +30,13 @@ export default class Sidebar extends Component {
                 <GroupHeader name={group.name} />
               </div>
               <ul className="Sidebar-list">{
-                group.polyhedra.map(polyhedron => (
-                  <li key={polyhedron.name} className="Sidebar-listItem">
+                group.polyhedra.map(polyhedronName => (
+                  <li key={polyhedronName} className="Sidebar-listItem">
                     <Link
-                      to={escapeName(polyhedron.name)}
+                      to={escapeName(polyhedronName)}
                       className="Sidebar-link"
                       activeClassName="isActive"
-                    >{_.capitalize(polyhedron.name)}</Link>
+                    >{_.capitalize(polyhedronName)}</Link>
                   </li>
                 ))
               }</ul>

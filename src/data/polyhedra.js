@@ -15,11 +15,11 @@ const getSolid = (solidName, groupName) =>
 
 export const groups = groupNames.map(groupName => ({
   name: groupName,
-  polyhedra: getSolidNames(groupName).map(solidName => getSolid(solidName, groupName)),
+  polyhedra: getSolidNames(groupName),
 }));
 
 export const solids = _(groups)
-  .flatMap('polyhedra')
-  .map(polyhedron => [escapeName(polyhedron.name), polyhedron])
+  .flatMap(({ name, polyhedra }) =>
+    polyhedra.map(solidName => [escapeName(solidName), getSolid(solidName, name)]))
   .fromPairs()
   .value();

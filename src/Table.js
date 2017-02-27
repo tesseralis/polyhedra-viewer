@@ -12,12 +12,12 @@ const Table = () => {
         <div key={group.name} className="Table-group">
           <GroupHeader name={group.name} />
           <div className="Table-list">{
-            group.polyhedra.map(polyhedron => {
-              const escapedName = escapeName(polyhedron.name);
+            group.polyhedra.map(polyhedronName => {
+              const escapedName = escapeName(polyhedronName);
               const img = require(`./images/s-${escapedName}.png`);
               return (
-                <Link key={polyhedron.name} to={escapedName} className="Table-link">
-                  <img className="Table-image" src={img} alt={polyhedron.name}></img>
+                <Link key={polyhedronName} to={escapedName} className="Table-link">
+                  <img className="Table-image" src={img} alt={polyhedronName}></img>
                 </Link>
               )
             })
