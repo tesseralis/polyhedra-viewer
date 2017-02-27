@@ -1,7 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router';
 import polyhedra from './data/polyhedra.json';
-import { groupDisplay, escapeName } from './util';
+import { escapeName } from './util';
+import GroupHeader from './GroupHeader';
 import './Table.css';
 
 const Table = () => {
@@ -9,7 +10,7 @@ const Table = () => {
     <div className="Table">{
       polyhedra.groups.map(group => (
         <div key={group.group_name}>
-          <h2>{ groupDisplay(group.group_name) }</h2>
+          <GroupHeader name={group.group_name} />
           <div className="Table-list">{
             group.polyhedra.map(polyhedron => {
               const escapedName = escapeName(polyhedron.name);
