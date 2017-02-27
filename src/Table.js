@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router';
-import { groups } from './data/polyhedra.js';
+import { groups } from './data';
 import { escapeName } from './util';
 import GroupHeader from './GroupHeader';
 import './Table.css';

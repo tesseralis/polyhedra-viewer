@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import { Link } from 'react-router';
 import { escapeName } from './util';
 import GroupHeader from './GroupHeader';
-import { groups } from './data/polyhedra';
+import { groups } from './data';
 import './Sidebar.css';
 
 

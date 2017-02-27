@@ -18,7 +18,7 @@ export const groups = groupNames.map(groupName => ({
   polyhedra: getSolidNames(groupName),
 }));
 
-export const solids = _(groups)
+export const polyhedra  = _(groups)
   .flatMap(({ name, polyhedra }) =>
     polyhedra.map(solidName => [escapeName(solidName), getSolid(solidName, name)]))
   .fromPairs()
