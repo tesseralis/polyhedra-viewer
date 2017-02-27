@@ -35,6 +35,7 @@ export default class Sidebar extends Component {
                     <Link
                       to={escapeName(polyhedron.name)}
                       className="Sidebar-link"
+                      activeClassName="isActive"
                     >{_.capitalize(polyhedron.name)}</Link>
                   </li>
                 ))
