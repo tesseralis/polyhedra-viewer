@@ -1,6 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import { rgb } from 'd3-color';
 import { schemeSet1 } from 'd3-scale-chromatic';
+import _ from 'lodash';
 
 // TODO move this to a util file
 const joinListOfLists = (list, outerSep, innerSep) => {
@@ -23,8 +24,14 @@ class Polyhedron extends Component {
   }
 
   renderCoordinates(points) {
+    // TODO Find a more elegant solution for this
+    // We pad the number of points in case we move from a solid with more vertices
+    // to one with less, so that x3dom does accidentally map an index to a non-existing point
+    const buffer = _(100).range().map(x => [0, 0, 0]);
+    const bufferedPoints = points.concat(buffer);
+
     return (
-      <coordinate is point={joinListOfLists(points, ', ', ' ')}></coordinate>
+      <coordinate is point={joinListOfLists(bufferedPoints, ', ', ' ')}></coordinate>
     );
   }
 
