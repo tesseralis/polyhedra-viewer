@@ -1,0 +1,22 @@
+.Table {
+  width: 100%;
+  text-align: center;
+}
+
+.Table-list {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.Table-imageWrapper {
+  width: 100px;
+  height: 100px;
+  display: flex;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.Table-image {
+  height: 100px;
+}
