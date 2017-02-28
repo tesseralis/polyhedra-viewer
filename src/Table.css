@@ -4,6 +4,7 @@
   flex-direction: column;
   align-items: center;
   text-align: center;
+  animation: fadein 1s;
 }
 
 .Table-group {
@@ -31,4 +32,9 @@
 
 .Table-image {
   height: 100px;
+}
+
+@keyframes fadein {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
 }
