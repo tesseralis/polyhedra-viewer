@@ -1,5 +1,4 @@
 import _ from 'lodash';
-import { escapeName } from '../util';
 
 const groupNames = [
   'platonic',
@@ -9,17 +8,11 @@ const groupNames = [
   'johnson',
 ];
 
-const getSolidNames = groupName => require(`./metadata/${groupName}.json`);
-const getSolid = (solidName, groupName) =>
-  require(`./polyhedra/${groupName}/${solidName.replace(/ /g, '_')}.json`);
-
 export const groups = groupNames.map(groupName => ({
   name: groupName,
-  polyhedra: getSolidNames(groupName),
+  polyhedra: require(`./metadata/${groupName}.json`),
 }));
 
-export const polyhedra  = _(groups)
-  .flatMap(({ name, polyhedra }) =>
-    polyhedra.map(solidName => [escapeName(solidName), getSolid(solidName, name)]))
-  .fromPairs()
-  .value();
+export const getSolidData = escapedSolidName => {
+  return require(`./polyhedra/${escapedSolidName.replace(/-/g, '_')}.json`);
+}
