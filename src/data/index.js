@@ -14,5 +14,5 @@ export const groups = groupNames.map(groupName => ({
 }));
 
 export const getSolidData = escapedSolidName => {
-  return require(`./polyhedra/${escapedSolidName.replace(/-/g, '_')}.json`);
+  return require(`./polyhedra/${escapedSolidName}.json`);
 }

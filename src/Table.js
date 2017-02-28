@@ -14,7 +14,7 @@ const Table = () => {
           <div className="Table-list">{
             group.polyhedra.map(polyhedronName => {
               const escapedName = escapeName(polyhedronName);
-              const img = require(`./images/s-${escapedName}.png`);
+              const img = require(`./images/${escapedName}.png`);
               return (
                 <Link key={polyhedronName} to={escapedName} className="Table-link">
                   <img className="Table-image" src={img} alt={polyhedronName}></img>
