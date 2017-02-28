@@ -10,8 +10,7 @@
 }
 
 .Sidebar-content {
-  width: 300px;
-  text-align: center;
+  width: 400px;
   overflow: scroll;
   background-color: WhiteSmoke;
 }
@@ -23,6 +22,8 @@
 
   border-bottom: DarkSlateGray 1px solid;
   padding: 10px;
+  margin-bottom: 8px;
+  font-family: "Andale Mono",AndaleMono,monospace;
   font-size: 20px;
   color: DarkSlateGray;
   text-decoration: none;
@@ -37,7 +38,7 @@
 }
 
 .Sidebar-groupHeader {
-  margin: 10px;
+  margin: 0 12px;
 }
 
 .Sidebar-list {
@@ -47,10 +48,13 @@
 
 .Sidebar-link {
   display: block;
-  padding: 5px 10px;
+  padding: 3px 12px;
 
-  color: DarkSlateGray;
+  color: DimGrey;
   text-decoration: none;
+  line-height: 18px;
+  font-family: "Andale Mono",AndaleMono,monospace;
+  font-size: 14px;
 }
 
 .Sidebar-link:hover {
@@ -58,7 +62,8 @@
 }
 
 .Sidebar-link.isActive {
-  font-weight: bold;
+  color: DarkSlateGray;
+  font-weight: bolder;
 }
 
 .Sidebar-toggle {
