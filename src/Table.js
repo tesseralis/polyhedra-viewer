@@ -10,7 +10,9 @@ const Table = () => {
     <div className="Table">{
       groups.map(group => (
         <div key={group.name} className="Table-group">
-          <GroupHeader name={group.name} />
+          <div className="Table-groupHeader">
+            <GroupHeader name={group.name} />
+          </div>
           <p className="Table-groupDescription">{group.description}</p>
           <div className="Table-list">{
             group.polyhedra.map(polyhedronName => {

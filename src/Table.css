@@ -8,8 +8,12 @@
 }
 
 .Table-group {
-  margin: 20px;
+  margin: 18px;
   max-width: 1000px;
+}
+
+.Table-groupHeader {
+  margin: 5px 0;
 }
 
 .Table-groupDescription {
