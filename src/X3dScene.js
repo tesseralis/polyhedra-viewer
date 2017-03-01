@@ -5,12 +5,13 @@ import x3dom from 'exports?x3dom!x3dom'; // eslint-disable-line import/no-webpac
 import 'x3dom/x3dom.css';
 import './X3dScene.css';
 
+// Disable double-clicking to change rotation point
+x3dom.Viewarea.prototype.onDoubleClick = () => {}
+
 export default class X3dScene extends Component {
   componentDidMount() {
-    // Reload X3DOM so that it tracks the re-created instance
-    x3dom.reload();
-    // Disable double-clicking to change rotation point
-    x3dom.Viewarea.prototype.onDoubleClick = () => {}
+    // Reload X3DOM asynchronously so that it tracks the re-created instance
+    setTimeout(() => x3dom.reload());
   }
 
   render() {
