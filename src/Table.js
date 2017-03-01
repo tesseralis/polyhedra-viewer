@@ -4,6 +4,8 @@ import { Link } from 'react-router';
 import { groups } from './data';
 import { escapeName } from './util';
 import GroupHeader from './GroupHeader';
+import commonStyles from './styles/common';
+
 import styles from './TableStyles';
 
 const Table = () => {
@@ -20,7 +22,11 @@ const Table = () => {
               const escapedName = escapeName(polyhedronName);
               const img = require(`./images/${escapedName}.png`);
               return (
-                <Link key={polyhedronName} to={escapedName} className={css(styles.link)}>
+                <Link
+                  key={polyhedronName}
+                  to={escapedName}
+                  className={css(styles.link, commonStyles.hover)}
+                >
                   <img className={css(styles.image)} src={img} alt={polyhedronName}></img>
                 </Link>
               )

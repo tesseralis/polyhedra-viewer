@@ -64,12 +64,6 @@ const styles = StyleSheet.create({
     padding: 2,
     fontSize: 16,
   },
-
-  hover: {
-    ':hover': {
-      backgroundColor: 'LightGray'
-    }
-  },
 });
 
 export default styles;

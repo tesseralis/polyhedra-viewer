@@ -5,8 +5,8 @@ import { escapeName } from './util';
 import GroupHeader from './GroupHeader';
 import { groups } from './data';
 import { css } from 'aphrodite/no-important';
+import commonStyles from './styles/common';
 import styles from './SidebarStyles';
-
 
 export default class Sidebar extends Component {
   constructor(props) {
@@ -24,7 +24,7 @@ export default class Sidebar extends Component {
     return (
       <div className={css(styles.sidebar)}>
         { this.state.visible && <section className={css(styles.content)}>
-          <Link to="/" className={css(styles.homeLink, styles.hover)}>Home</Link>
+          <Link to="/" className={css(styles.homeLink, commonStyles.hover)}>Home</Link>
           { groups.map(group => (
             <div className={css(styles.group)} key={group.name}>
               <div className={css(styles.groupHeader)}>
@@ -35,7 +35,7 @@ export default class Sidebar extends Component {
                   <li key={polyhedronName}>
                     <Link
                       to={escapeName(polyhedronName)}
-                      className={css(styles.link, styles.hover)}
+                      className={css(styles.link, commonStyles.hover)}
                       activeClassName={css(styles.isActive)}
                     >{_.capitalize(polyhedronName)}</Link>
                   </li>
