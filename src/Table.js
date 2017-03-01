@@ -11,6 +11,7 @@ const Table = () => {
       groups.map(group => (
         <div key={group.name} className="Table-group">
           <GroupHeader name={group.name} />
+          <p className="Table-groupDescription">{group.description}</p>
           <div className="Table-list">{
             group.polyhedra.map(polyhedronName => {
               const escapedName = escapeName(polyhedronName);

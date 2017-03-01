@@ -12,6 +12,13 @@
   max-width: 1000px;
 }
 
+.Table-groupDescription {
+  font-family: "Hoefler Text","Baskerville Old Face",Garamond,"Times New Roman",serif;
+  color: DimGrey;
+  margin: 14px;
+  line-height: 22px;
+}
+
 .Table-list {
   display: flex;
   justify-content: center;
