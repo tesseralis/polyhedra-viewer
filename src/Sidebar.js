@@ -4,7 +4,8 @@ import { Link } from 'react-router';
 import { escapeName } from './util';
 import GroupHeader from './GroupHeader';
 import { groups } from './data';
-import './Sidebar.css';
+import { css } from 'aphrodite/no-important';
+import styles from './SidebarStyles';
 
 
 export default class Sidebar extends Component {
@@ -21,21 +22,21 @@ export default class Sidebar extends Component {
 
   render() {
     return (
-      <div className="Sidebar">
-        { this.state.visible && <section className="Sidebar-content">
-          <Link to="/" className="Sidebar-homeLink">Home</Link>
+      <div className={css(styles.sidebar)}>
+        { this.state.visible && <section className={css(styles.content)}>
+          <Link to="/" className={css(styles.homeLink, styles.hover)}>Home</Link>
           { groups.map(group => (
-            <div className="Sidebar-group" key={group.name}>
-              <div className="Sidebar-groupHeader">
+            <div className={css(styles.group)} key={group.name}>
+              <div className={css(styles.groupHeader)}>
                 <GroupHeader name={group.name} />
               </div>
-              <ul className="Sidebar-list">{
+              <ul>{
                 group.polyhedra.map(polyhedronName => (
-                  <li key={polyhedronName} className="Sidebar-listItem">
+                  <li key={polyhedronName}>
                     <Link
                       to={escapeName(polyhedronName)}
-                      className="Sidebar-link"
-                      activeClassName="isActive"
+                      className={css(styles.link, styles.hover)}
+                      activeClassName={css(styles.isActive)}
                     >{_.capitalize(polyhedronName)}</Link>
                   </li>
                 ))
@@ -45,7 +46,7 @@ export default class Sidebar extends Component {
         </section> }
         <button
           type="button"
-          className="Sidebar-toggle"
+          className={css(styles.toggle)}
           onClick={(e) => this.toggle(e)}
         >⋮</button>
       </div>

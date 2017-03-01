@@ -1,5 +1,6 @@
 import React from 'react';
-import './GroupHeader.css';
+import { StyleSheet, css } from 'aphrodite/no-important';
+import { hoeflerText } from './fonts';
 
 const groupDisplays = {
   platonic: 'Platonic Solids',
@@ -9,8 +10,12 @@ const groupDisplays = {
   johnson: 'Johnson Solids',
 };
 
+const styles = StyleSheet.create({
+  groupHeader: { fontFamily: hoeflerText, fontSize: 22 }
+});
+
 const GroupHeader = ({ name }) => {
-  return <h2 className="GroupHeader">{ groupDisplays[name] || 'Unknown Group' }</h2>;
+  return <h2 className={css(styles.groupHeader)}>{ groupDisplays[name] || 'Unknown Group' }</h2>;
 };
 
 export default GroupHeader;
