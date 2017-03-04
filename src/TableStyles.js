@@ -3,6 +3,7 @@ import { hoeflerText } from './styles/fonts';
 import { fadeIn } from './styles/animations';
 
 const thumbnailSize = 100;
+const maxThumbnailsPerLine = 7;
 
 const styles = StyleSheet.create({
   table: {
@@ -36,6 +37,8 @@ const styles = StyleSheet.create({
     display: 'flex',
     justifyContent: 'center',
     flexWrap: 'wrap',
+    maxWidth: maxThumbnailsPerLine * thumbnailSize,
+    margin: 'auto',
   },
   
   link: {
