@@ -1,5 +1,5 @@
 import { StyleSheet } from 'aphrodite/no-important';
-import { hoeflerText } from './styles/fonts';
+import { hoeflerText, andaleMono } from './styles/fonts';
 import { fadeIn } from './styles/animations';
 
 const thumbnailSize = 100;
@@ -15,6 +15,13 @@ const styles = StyleSheet.create({
 
     animationName: fadeIn,
     animationDuration: '1s',
+  },
+
+  title: {
+    padding: 32,
+    fontFamily: andaleMono,
+    fontSize: 36,
+    fontWeight: 'bold',
   },
   
   group: {

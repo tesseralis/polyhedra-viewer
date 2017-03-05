@@ -11,6 +11,7 @@ import styles from './TableStyles';
 const Table = () => {
   return (
     <div className={css(styles.table)}>
+      <h1 className={css(styles.title)}>Polyhedra Viewer</h1>
       { groups.map(group => (
         <div key={group.name} className={css(styles.group)}>
           <div className={css(styles.groupHeader)}>
