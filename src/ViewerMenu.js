@@ -19,11 +19,14 @@ const styles = StyleSheet.create({
   },
 
   iconWrapper: {
+    padding: 10,
+    // link restyle
     textDecoration: 'none',
+    color: 'black',
+    // button restyle
     background: 'none',
     border: 'none',
     cursor: 'pointer',
-    color: 'black',
   },
 })
 
@@ -48,10 +51,10 @@ export default class ViewerMenu extends Component {
         { isSidebarVisible && <Sidebar /> }
         <div className={css(styles.menuBar)}>
           <Link to="/" className={css(styles.iconWrapper)}>
-            <BigIcon symbol='⌂' />
+            <BigIcon name='home' />
           </Link>
           <button onClick={() => this.toggle()} className={css(styles.iconWrapper)}>
-            <BigIcon symbol='☰' />
+            <BigIcon name='list' />
           </button>
         </div>
       </div>
