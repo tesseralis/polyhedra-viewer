@@ -6,6 +6,7 @@ const styles = StyleSheet.create({
     width: 400,
     overflow: 'scroll',
     backgroundColor: 'WhiteSmoke', // TODO colors file
+    boxShadow: '1px 1px 4px LightGray',
   },
 
   group: {
