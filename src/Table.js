@@ -3,7 +3,7 @@ import { css } from 'aphrodite/no-important';
 import { Link } from 'react-router';
 import { groups } from './data';
 import { escapeName } from './util';
-import GroupHeader from './GroupHeader';
+import GroupHeader from './components/GroupHeader';
 import commonStyles from './styles/common';
 
 import styles from './TableStyles';

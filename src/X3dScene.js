@@ -9,6 +9,16 @@ import 'x3dom/x3dom.css';
 // Disable double-clicking to change rotation point
 x3dom.Viewarea.prototype.onDoubleClick = () => {}
 
+const styles = StyleSheet.create({
+  x3dScene: {
+    width: '100%',
+    height: '100%',
+    padding: 0,
+    margin: 0,
+    border: 'none',
+  }
+});
+
 export default class X3dScene extends Component {
   componentDidMount() {
     // Reload X3DOM asynchronously so that it tracks the re-created instance
@@ -16,16 +26,6 @@ export default class X3dScene extends Component {
   }
 
   render() {
-    const styles = StyleSheet.create({
-      x3dScene: {
-        width: '100%',
-        height: '100%',
-        padding: 0,
-        margin: 0,
-        border: 'none',
-      }
-    });
-
     return (
       <x3d className={css(styles.x3dScene)}>
         <scene>
