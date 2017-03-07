@@ -22,11 +22,22 @@ const styles = StyleSheet.create({
     padding: 10,
     // link restyle
     textDecoration: 'none',
-    color: 'black',
     // button restyle
     background: 'none',
     border: 'none',
     cursor: 'pointer',
+    // color
+    color: 'Gray',
+  },
+
+  hover: {
+    ':hover': {
+      color: 'DimGray',
+    },
+  },
+
+  isActive: {
+    color: 'DarkSlateGray'
   },
 })
 
@@ -46,14 +57,19 @@ export default class ViewerMenu extends Component {
 
   render() {
     const { isSidebarVisible } = this.state
+    const sidebarButtonClass = css(
+      styles.iconWrapper,
+      isSidebarVisible ? styles.isActive : styles.hover
+    )
+
     return (
       <div className={css(styles.viewerMenu)}>
         { isSidebarVisible && <Sidebar /> }
         <div className={css(styles.menuBar)}>
-          <Link to="/" className={css(styles.iconWrapper)}>
+          <Link to="/" className={css(styles.iconWrapper, styles.hover)}>
             <BigIcon name='home' />
           </Link>
-          <button onClick={() => this.toggle()} className={css(styles.iconWrapper)}>
+          <button onClick={() => this.toggle()} className={sidebarButtonClass}>
             <BigIcon name='list' />
           </button>
         </div>
