@@ -1,7 +1,7 @@
 import React from 'react'
 import { css, StyleSheet } from 'aphrodite/no-important'
 
-const size = 60;
+const size = 75;
 const styles = StyleSheet.create({
   bigIcon: {
     display: 'flex',
@@ -10,7 +10,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width: size,
     height: size,
-    fontSize: 48,
+    fontSize: 60,
   }
 })
 

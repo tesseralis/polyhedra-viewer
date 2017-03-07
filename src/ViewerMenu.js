@@ -10,6 +10,7 @@ const styles = StyleSheet.create({
     height: '100%',
     zIndex: 100, // TODO have a list of these
     display: 'flex',
+    opacity: .9,
   },
 
   menuBar: {
