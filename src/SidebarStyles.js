@@ -2,7 +2,7 @@ import { StyleSheet } from 'aphrodite/no-important';
 import { andaleMono } from './styles/fonts';
 
 const styles = StyleSheet.create({
-  content: {
+  sidebar: {
     width: 400,
     overflow: 'scroll',
     backgroundColor: 'WhiteSmoke', // TODO colors file

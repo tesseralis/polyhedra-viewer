@@ -10,7 +10,7 @@ import styles from './SidebarStyles';
 
 const Sidebar = () => {
   return (
-    <section className={css(styles.content)}>
+    <section className={css(styles.sidebar)}>
       { groups.map(group => (
         <div className={css(styles.group)} key={group.name}>
           <div className={css(styles.groupHeader)}>

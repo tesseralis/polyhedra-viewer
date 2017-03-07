@@ -5,13 +5,10 @@ import Sidebar from './Sidebar'
 import BigIcon from './components/BigIcon'
 
 const styles = StyleSheet.create({
-  menu: {
+  viewerMenu: {
     position: 'absolute',
     height: '100%',
-    left: 0,
-    top: 0,
     zIndex: 100, // TODO have a list of these
-
     display: 'flex',
   },
 
@@ -46,7 +43,7 @@ export default class ViewerMenu extends Component {
   render() {
     const { isSidebarVisible } = this.state
     return (
-      <div className={css(styles.menu)}>
+      <div className={css(styles.viewerMenu)}>
         { isSidebarVisible && <Sidebar /> }
         <div className={css(styles.menuBar)}>
           <Link to="/" className={css(styles.iconWrapper)}>
