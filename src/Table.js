@@ -14,9 +14,7 @@ const Table = () => {
       <h1 className={css(styles.title)}>Polyhedra Viewer</h1>
       { groups.map(group => (
         <div key={group.name} className={css(styles.group)}>
-          <div className={css(styles.groupHeader)}>
-            <GroupHeader name={group.name} />
-          </div>
+          <GroupHeader name={group.name} styles={styles.groupHeader} />
           <p className={css(styles.groupDescription)}>{group.description}</p>
           <div className={css(styles.list)}>
             { group.polyhedra.map(polyhedronName => {
