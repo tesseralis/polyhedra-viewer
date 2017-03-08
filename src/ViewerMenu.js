@@ -4,14 +4,24 @@ import { css, StyleSheet } from 'aphrodite/no-important'
 
 import Sidebar from './components/Sidebar'
 import BigIcon from './components/BigIcon'
+import ConfigMenu from './ConfigMenu'
 
 const styles = StyleSheet.create({
   viewerMenu: {
     position: 'absolute',
     height: '100%',
+    width: '100%',
     zIndex: 100, // TODO have a list of these
-    display: 'flex',
     opacity: .9,
+    display: 'flex',
+    justifyContent: 'space-between',
+  },
+
+  leftMenu: {
+    display: 'flex',
+  },
+
+  rightMenu: {
   },
 
   menuBar: {
@@ -40,24 +50,34 @@ const styles = StyleSheet.create({
   isActive: {
     color: 'DarkSlateGray'
   },
+
 })
 
 export default class ViewerMenu extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      isSidebarVisible: false
+      isSidebarVisible: false,
+      isConfigVisible: false,
     }
   }
 
-  toggle() {
-    this.setState((prevState, props) => ({
-      isSidebarVisible: !prevState.isSidebarVisible
+  toggleSidebar() {
+    this.setState(({ isSidebarVisible, ...prevState }, props) => ({
+      ...prevState,
+      isSidebarVisible: !isSidebarVisible,
+    }));
+  }
+
+  toggleConfig() {
+    this.setState(({ isConfigVisible, ...prevState }, props) => ({
+      ...prevState,
+      isConfigVisible: !isConfigVisible,
     }));
   }
 
   render() {
-    const { isSidebarVisible } = this.state
+    const { isSidebarVisible, isConfigVisible } = this.state
     const sidebarButtonClass = css(
       styles.iconWrapper,
       isSidebarVisible ? styles.isActive : styles.hover
@@ -65,14 +85,22 @@ export default class ViewerMenu extends Component {
 
     return (
       <div className={css(styles.viewerMenu)}>
-        { isSidebarVisible && <Sidebar /> }
-        <div className={css(styles.menuBar)}>
-          <Link to="/" className={css(styles.iconWrapper, styles.hover)}>
-            <BigIcon name='home' />
-          </Link>
-          <button onClick={() => this.toggle()} className={sidebarButtonClass}>
-            <BigIcon name='list' />
+        <div className={css(styles.leftMenu)}>
+          { isSidebarVisible && <Sidebar /> }
+          <div className={css(styles.menuBar)}>
+            <Link to="/" className={css(styles.iconWrapper, styles.hover)}>
+              <BigIcon name='home' />
+            </Link>
+            <button onClick={() => this.toggleSidebar()} className={sidebarButtonClass}>
+              <BigIcon name='list' />
+            </button>
+          </div>
+        </div>
+        <div className={css(styles.rightMenu)}>
+          <button onClick={() => this.toggleConfig()} className={css(styles.iconWrapper)}>
+            <BigIcon name='cog' />
           </button>
+          { isConfigVisible && <ConfigMenu /> }
         </div>
       </div>
     )
