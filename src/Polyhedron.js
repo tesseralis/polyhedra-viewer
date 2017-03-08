@@ -45,6 +45,7 @@ export default class Polyhedron extends Component {
             <material is transparency={1 - opacity}></material>
           </appearance>
           <indexedfaceset is
+            solid="false"
             colorPerVertex="false"
             colorindex={ faces.map(face => colorMap[face.length]).join(' ') }
             coordindex={ joinListOfLists(faces, ' -1 ', ' ') }
