@@ -13,9 +13,7 @@ const Sidebar = () => {
     <section className={css(styles.sidebar)}>
       { groups.map(group => (
         <div className={css(styles.group)} key={group.name}>
-          <div className={css(styles.groupHeader)}>
-            <GroupHeader name={group.name} />
-          </div>
+          <GroupHeader name={group.name} styles={styles.groupHeader} />
           <ul>{
             group.polyhedra.map(polyhedronName => (
               <li key={polyhedronName}>

@@ -14,8 +14,10 @@ const styles = StyleSheet.create({
   groupHeader: { fontFamily: hoeflerText, fontSize: 22 }
 });
 
-const GroupHeader = ({ name }) => {
-  return <h2 className={css(styles.groupHeader)}>{ groupDisplays[name] || 'Unknown Group' }</h2>;
+const GroupHeader = ({ name, ...props }) => {
+  return <h2 className={css(styles.groupHeader, props.styles)}>
+    { groupDisplays[name] || 'Unknown Group' }
+  </h2>;
 };
 
 export default GroupHeader;
