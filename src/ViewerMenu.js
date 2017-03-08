@@ -60,39 +60,37 @@ const styles = StyleSheet.create({
 })
 
 export default class ViewerMenu extends Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      isSidebarVisible: false,
-      isConfigVisible: false,
-    }
+  state = {
+    showSidebar: false,
+    showConfig: false,
   }
 
   toggleSidebar() {
-    this.setState(({ isSidebarVisible, ...prevState }, props) => ({
+    this.setState(({ showSidebar, ...prevState }, props) => ({
       ...prevState,
-      isSidebarVisible: !isSidebarVisible,
+      showSidebar: !showSidebar,
     }));
   }
 
   toggleConfig() {
-    this.setState(({ isConfigVisible, ...prevState }, props) => ({
+    this.setState(({ showConfig, ...prevState }, props) => ({
       ...prevState,
-      isConfigVisible: !isConfigVisible,
+      showConfig: !showConfig,
     }));
   }
 
   render() {
-    const { isSidebarVisible, isConfigVisible } = this.state
+    const { showSidebar, showConfig } = this.state
+    const { config, actions } = this.props
     const sidebarButtonClass = css(
       styles.iconWrapper,
-      isSidebarVisible ? styles.isActive : styles.hover
+      showSidebar ? styles.isActive : styles.hover
     )
 
     return (
       <div className={css(styles.viewerMenu)}>
         <div className={css(styles.leftMenu)}>
-          { isSidebarVisible && <Sidebar /> }
+          { showSidebar && <Sidebar /> }
           <div className={css(styles.menuBar)}>
             <Link to="/" className={css(styles.iconWrapper, styles.hover)}>
               <BigIcon name='home' />
@@ -106,7 +104,7 @@ export default class ViewerMenu extends Component {
           <button onClick={() => this.toggleConfig()} className={css(styles.iconWrapper)}>
             <BigIcon name='cog' />
           </button>
-          { isConfigVisible && <ConfigMenu /> }
+          { showConfig && <ConfigMenu config={config} actions={actions} /> }
         </div>
       </div>
     )

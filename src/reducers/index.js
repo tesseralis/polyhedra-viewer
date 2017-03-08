@@ -1,13 +1,8 @@
 import { combineReducers } from 'redux'
-
-const initialState = {}
-
-const reducer = (state = initialState, action) => {
-  return state
-}
+import config from './config'
 
 const rootReducer = combineReducers({
-  reducer
+  config
 })
 
 export default rootReducer
