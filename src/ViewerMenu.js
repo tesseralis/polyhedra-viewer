@@ -15,16 +15,19 @@ const styles = StyleSheet.create({
     opacity: .9,
     display: 'flex',
     justifyContent: 'space-between',
+    pointerEvents: 'none',
   },
 
   leftMenu: {
     display: 'flex',
+    pointerEvents: 'initial',
   },
 
   rightMenu: {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'flex-end',
+    pointerEvents: 'initial',
   },
 
   menuBar: {
