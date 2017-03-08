@@ -1,5 +1,5 @@
 import { StyleSheet } from 'aphrodite/no-important';
-import { andaleMono } from './styles/fonts';
+import { andaleMono } from '../styles/fonts';
 
 const styles = StyleSheet.create({
   sidebar: {

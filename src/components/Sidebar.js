@@ -1,11 +1,11 @@
 import _ from 'lodash';
 import React from 'react';
 import { Link } from 'react-router';
-import { escapeName } from './util';
-import GroupHeader from './components/GroupHeader';
-import { groups } from './data';
 import { css } from 'aphrodite/no-important';
-import commonStyles from './styles/common';
+import { escapeName } from '../util';
+import { groups } from '../data';
+import commonStyles from '../styles/common';
+import GroupHeader from './GroupHeader';
 import styles from './SidebarStyles';
 
 const Sidebar = () => {
