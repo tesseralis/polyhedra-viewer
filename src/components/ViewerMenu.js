@@ -1,7 +1,9 @@
 import React, { Component } from 'react'
 import { Link } from 'react-router'
 import { css, StyleSheet } from 'aphrodite/no-important'
+import _ from 'lodash'
 
+import { toggle } from '../util'
 import Sidebar from './Sidebar'
 import BigIcon from './BigIcon'
 import ConfigMenu from './ConfigMenu'
@@ -65,18 +67,8 @@ export default class ViewerMenu extends Component {
     showConfig: false,
   }
 
-  toggleSidebar() {
-    this.setState(({ showSidebar, ...prevState }, props) => ({
-      ...prevState,
-      showSidebar: !showSidebar,
-    }));
-  }
-
-  toggleConfig() {
-    this.setState(({ showConfig, ...prevState }, props) => ({
-      ...prevState,
-      showConfig: !showConfig,
-    }));
+  toggle(stateProp) {
+    this.setState(prevState => _.update({ ...prevState }, stateProp, toggle))
   }
 
   render() {
@@ -86,6 +78,7 @@ export default class ViewerMenu extends Component {
       styles.iconWrapper,
       showSidebar ? styles.isActive : styles.hover
     )
+    const doToggle = prop => () => this.toggle(prop)
 
     return (
       <div className={css(styles.viewerMenu)}>
@@ -95,13 +88,13 @@ export default class ViewerMenu extends Component {
             <Link to="/" className={css(styles.iconWrapper, styles.hover)}>
               <BigIcon name='home' />
             </Link>
-            <button onClick={() => this.toggleSidebar()} className={sidebarButtonClass}>
+            <button onClick={doToggle('showSidebar')} className={sidebarButtonClass}>
               <BigIcon name='list' />
             </button>
           </div>
         </div>
         <div className={css(styles.rightMenu)}>
-          <button onClick={() => this.toggleConfig()} className={css(styles.iconWrapper)}>
+          <button onClick={doToggle('showConfig')} className={css(styles.iconWrapper)}>
             <BigIcon name='cog' />
           </button>
           { showConfig && <ConfigMenu config={config} actions={actions} /> }

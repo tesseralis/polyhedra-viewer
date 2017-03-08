@@ -1,4 +1,9 @@
 /**
+ * Toggles a boolean
+ */
+export const toggle = b => !b
+
+/**
  * Join a list of lists with an inner and outer separator.
  *
  * Usage:

@@ -5,6 +5,9 @@ import {
   RESET,
 } from '../constants/ActionTypes'
 
+import _ from 'lodash'
+import { toggle } from '../util'
+
 const initialState  = {
   showEdges: true,
   showFaces: true,
@@ -14,20 +17,11 @@ const initialState  = {
 export default function config(state = initialState, action) {
   switch (action.type) {
     case TOGGLE_EDGES:
-      return {
-        ...state,
-        showEdges: !state.showEdges,
-      }
+      return _.update({...state}, 'showEdges', toggle)
     case TOGGLE_FACES:
-      return {
-        ...state,
-        showFaces: !state.showFaces,
-      }
+      return _.update({...state}, 'showFaces', toggle)
     case SET_OPACITY:
-      return {
-        ...state,
-        opacity: action.opacity
-      }
+      return _.set({...state}, 'opacity', action.opacity)
     case RESET:
       return initialState
     default:
