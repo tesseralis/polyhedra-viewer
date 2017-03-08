@@ -1,15 +1,12 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import { browserHistory } from 'react-router'
-import { createStore } from 'redux'
 import 'font-awesome/css/font-awesome.css'
 
+import configureStore from './store/configureStore'
 import Root from './containers/Root'
-import reducer from './reducers'
-import './styles/reset.css'
-import './styles/box-sizing.css'
 
-const store = createStore(reducer)
+const store = configureStore()
 
 ReactDOM.render(
   <Root store={store} history={browserHistory}/>,
