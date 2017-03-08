@@ -3,11 +3,11 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import _ from 'lodash'
 
-import Polyhedron from './Polyhedron'
-import ViewerMenu from './ViewerMenu'
-import X3dScene from './X3dScene'
-import { getSolidData } from './data'
-import * as ConfigActions from './actions'
+import Polyhedron from '../components/Polyhedron'
+import ViewerMenu from '../components/ViewerMenu'
+import X3dScene from '../components/X3dScene'
+import { getSolidData } from '../data'
+import * as ConfigActions from '../actions'
 
 const Viewer = ({ config, actions, params }) => {
   const solidName = params.solid || 'tetrahedron'

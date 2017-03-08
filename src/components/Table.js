@@ -1,10 +1,11 @@
 import React from 'react';
 import { css } from 'aphrodite/no-important';
 import { Link } from 'react-router';
-import { groups } from './data';
-import { escapeName } from './util';
-import GroupHeader from './components/GroupHeader';
-import commonStyles from './styles/common';
+
+import { groups } from '../data';
+import { escapeName } from '../util';
+import commonStyles from '../styles/common';
+import GroupHeader from './GroupHeader';
 
 import styles from './TableStyles';
 
@@ -19,11 +20,11 @@ const Table = () => {
           <div className={css(styles.list)}>
             { group.polyhedra.map(polyhedronName => {
               const escapedName = escapeName(polyhedronName);
-              const img = require(`./images/${escapedName}.png`);
+              const img = require(`../images/${escapedName}.png`);
               return (
                 <Link
                   key={polyhedronName}
-                  to={escapedName}
+                  to={'/' + escapedName}
                   className={css(styles.link, commonStyles.hover)}
                 >
                   <img className={css(styles.image)} src={img} alt={polyhedronName}></img>

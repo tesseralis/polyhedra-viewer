@@ -2,7 +2,8 @@ import React, { Component, PropTypes } from 'react'
 import { rgb } from 'd3-color'
 import { schemeSet1 } from 'd3-scale-chromatic'
 import _ from 'lodash'
-import { joinListOfLists } from './util'
+
+import { joinListOfLists } from '../util'
 
 // Convert the hex color to RGB
 const toRgb = hex => {

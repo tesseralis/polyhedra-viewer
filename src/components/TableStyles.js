@@ -1,6 +1,7 @@
 import { StyleSheet } from 'aphrodite/no-important';
-import { hoeflerText, andaleMono } from './styles/fonts';
-import { fadeIn } from './styles/animations';
+
+import { hoeflerText, andaleMono } from '../styles/fonts';
+import { fadeIn } from '../styles/animations';
 
 const thumbnailSize = 100;
 const maxThumbnailsPerLine = 7;

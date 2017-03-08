@@ -2,8 +2,8 @@ import React, { Component } from 'react'
 import { Link } from 'react-router'
 import { css, StyleSheet } from 'aphrodite/no-important'
 
-import Sidebar from './components/Sidebar'
-import BigIcon from './components/BigIcon'
+import Sidebar from './Sidebar'
+import BigIcon from './BigIcon'
 import ConfigMenu from './ConfigMenu'
 
 const styles = StyleSheet.create({
