@@ -11,8 +11,8 @@ const styles = StyleSheet.create({
 })
 
 const ConfigMenu = ({ config, actions }) => {
-  const { showEdges, showFaces, edgeWidth, opacity } = config
-  const { toggleEdges, toggleFaces, setEdgeWidth, setOpacity, reset } = actions
+  const { showEdges, showFaces, opacity } = config
+  const { toggleEdges, toggleFaces, setOpacity, reset } = actions
   return (
     <form className={css(styles.configMenu)}>
       <label>
@@ -20,17 +20,6 @@ const ConfigMenu = ({ config, actions }) => {
       </label>
       <label>
         Show Faces<input type="checkbox" checked={showFaces} onChange={toggleFaces}/>
-      </label>
-      <label>
-        Edge Width
-        <input
-          type="range"
-          min="1"
-          max="30"
-          step="1"
-          value={edgeWidth}
-          onChange={evt => setEdgeWidth(evt.target.value)}
-        />
       </label>
       <label>
         Opacity

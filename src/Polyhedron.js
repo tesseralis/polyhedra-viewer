@@ -35,7 +35,7 @@ export default class Polyhedron extends Component {
 
   render() {
     const { faces, vertices, edges } = this.props.solid
-    const { showEdges, showFaces, opacity, edgeWidth } = this.props.config
+    const { showEdges, showFaces, opacity } = this.props.config
     // FIXME line width just doesn't work!
 
     return (
@@ -55,9 +55,6 @@ export default class Polyhedron extends Component {
           </indexedfaceset>
         </shape> }
         { showEdges && <shape>
-          <appearance>
-            <lineproperties is linewidthScaleFactor={edgeWidth} />
-          </appearance>
           <indexedlineset is
             coordindex={ joinListOfLists(edges, ' -1 ', ' ') }
           >
