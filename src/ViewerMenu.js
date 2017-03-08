@@ -22,6 +22,9 @@ const styles = StyleSheet.create({
   },
 
   rightMenu: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'flex-end',
   },
 
   menuBar: {
