@@ -3,9 +3,7 @@ import { rgb } from 'd3-color'
 import _ from 'lodash'
 
 import { mapObject } from '../util'
-// TODO is this where we import and use this?
-import { polygons } from '../constants/configOptions'
-import { getColors } from '../reducers/config'
+import polygons from '../constants/polygons'
 
 // Join a list of lists with an inner and outer separator.
 export const joinListOfLists = (list, outerSep, innerSep) => {
@@ -48,8 +46,7 @@ export default class Polyhedron extends Component {
   render() {
     const { solid, config } = this.props
     const { faces, vertices, edges } = solid
-    const { showEdges, showFaces, opacity } = config
-    const colors = getColors(config)
+    const { showEdges, showFaces, opacity, colors } = config
     // FIXME line width just doesn't work!
 
     return (

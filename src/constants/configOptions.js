@@ -1,18 +1,8 @@
 import _ from 'lodash'
 import { schemeSet1 } from 'd3-scale-chromatic'
 
+import polygons, { polygonNames } from './polygons'
 import { mapObject } from '../util'
-
-export const polygons = [3, 4, 5, 6, 8, 10]
-
-const polygonNames = {
-  3: 'triangle',
-  4: 'square',
-  5: 'pentagon',
-  6: 'hexagon',
-  8: 'octagon',
-  10: 'decagon',
-}
 
 const polygonSchemeIdx = { 3: 4, 4: 0, 5: 1, 6: 2, 8: 3, 10: 6 }
 
