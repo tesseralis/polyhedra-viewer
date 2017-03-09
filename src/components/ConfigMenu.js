@@ -1,37 +1,61 @@
 import React from 'react'
 import { css, StyleSheet } from 'aphrodite/no-important'
+import _ from 'lodash'
 
-const styles = StyleSheet.create({
+import { configKeys, configOptions } from '../constants/configOptions'
 
-  configMenu: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'flex-start',
+const getInputValue = (input, el) => {
+  switch(input.type) {
+    case 'checkbox':
+      return el.checked
+    default:
+      return el.value
   }
-})
+}
+
+const getInputProps = (input, value) => {
+  switch (input.type) {
+    case 'checkbox':
+      return { checked: value }
+    case 'range':
+      return {
+        ..._.pick(input, ['min', 'max', 'step']),
+        value,
+      }
+    default:
+      return { value }
+  }
+}
+
+const ConfigInput = ({ input, value, onChange }) => {
+  const inputProps = getInputProps(input, value)
+  return (
+    <input type={input.type} onChange={onChange} {...inputProps} />
+  )
+}
 
 const ConfigMenu = ({ config, actions }) => {
-  const { showEdges, showFaces, opacity } = config
-  const { toggleEdges, toggleFaces, setOpacity, reset } = actions
+  const styles = StyleSheet.create({
+    configMenu: {
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'flex-start',
+    }
+  })
+
+  const { setInputValue, reset } = actions
   return (
     <form className={css(styles.configMenu)}>
-      <label>
-        Show Edges<input type="checkbox" checked={showEdges} onChange={toggleEdges}/>
-      </label>
-      <label>
-        Show Faces<input type="checkbox" checked={showFaces} onChange={toggleFaces}/>
-      </label>
-      <label>
-        Opacity
-        <input
-          type="range"
-          min="0"
-          max="1"
-          step="0.01"
-          value={opacity}
-          onChange={evt => setOpacity(evt.target.value)}
-        />
-      </label>
+      { configKeys.map(key => {
+        const input = configOptions[key]
+        const onChange = evt => setInputValue(key, getInputValue(input, evt.target))
+        return (
+          <label key={key}>
+            { input.display }
+            <ConfigInput input={input} value={config[key]} onChange={onChange} />
+          </label>
+        )
+      })}
       <button type="button" onClick={reset}>Reset</button>
     </form>
   )
