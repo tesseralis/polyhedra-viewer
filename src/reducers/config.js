@@ -1,6 +1,6 @@
 import _ from 'lodash'
 
-import { configOptions } from '../constants/configOptions'
+import { configOptions, polygons, getColorInputKey } from '../constants/configOptions'
 import {
   SET_INPUT_VALUE,
   RESET,
@@ -18,3 +18,8 @@ export default function config(state = initialState, action) {
       return state
   }
 }
+
+export const getColors = (state) => _(polygons)
+  .map(n => [n, state[getColorInputKey(n)]])
+  .fromPairs()
+  .value()

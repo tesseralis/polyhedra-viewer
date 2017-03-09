@@ -1,9 +1,11 @@
 import React, { Component, PropTypes } from 'react'
 import { rgb } from 'd3-color'
-import { schemeSet1 } from 'd3-scale-chromatic'
 import _ from 'lodash'
 
 import { joinListOfLists } from '../util'
+// TODO is this where we import and use this?
+import { polygons } from '../constants/configOptions'
+import { getColors } from '../reducers/config'
 
 // Convert the hex color to RGB
 const toRgb = hex => {
@@ -11,9 +13,14 @@ const toRgb = hex => {
   return [asRgb.r, asRgb.g, asRgb.b].map(d => d/255)
 }
 
-const colors = schemeSet1.map(color => toRgb(color))
-const colorAttr = joinListOfLists(colors, ', ', ' ')
-const colorMap = { 3: 4, 4: 0, 5: 1, 6: 2, 8: 3, 10: 6 }
+const colorIndexForFace = _(polygons)
+  .map((n, i) => [n, i]).fromPairs().value()
+
+const getColorIndex = face => colorIndexForFace[face.length]
+
+const getColorAttr = colors => {
+  return joinListOfLists(polygons.map(n => toRgb(colors[n])), ', ', ' ')
+}
 
 export default class Polyhedron extends Component {
 
@@ -35,8 +42,10 @@ export default class Polyhedron extends Component {
   }
 
   render() {
-    const { faces, vertices, edges } = this.props.solid
-    const { showEdges, showFaces, opacity } = this.props.config
+    const { solid, config } = this.props
+    const { faces, vertices, edges } = solid
+    const { showEdges, showFaces, opacity } = config
+    const colors = getColors(config)
     // FIXME line width just doesn't work!
 
     return (
@@ -48,11 +57,11 @@ export default class Polyhedron extends Component {
           <indexedfaceset is
             solid="false"
             colorPerVertex="false"
-            colorindex={ faces.map(face => colorMap[face.length]).join(' ') }
+            colorindex={ faces.map(getColorIndex).join(' ') }
             coordindex={ joinListOfLists(faces, ' -1 ', ' ') }
           >
             { this.renderCoordinates(vertices) }
-            <color is color={colorAttr}></color>
+            <color is color={getColorAttr(colors)}></color>
           </indexedfaceset>
         </shape> }
         { showEdges && <shape>
