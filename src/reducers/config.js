@@ -1,5 +1,6 @@
 import _ from 'lodash'
 
+import { mapObject } from '../util'
 import { configOptions, polygons, getColorInputKey } from '../constants/configOptions'
 import {
   SET_INPUT_VALUE,
@@ -19,7 +20,4 @@ export default function config(state = initialState, action) {
   }
 }
 
-export const getColors = (state) => _(polygons)
-  .map(n => [n, state[getColorInputKey(n)]])
-  .fromPairs()
-  .value()
+export const getColors = state => mapObject(polygons, n => state[getColorInputKey(n)])

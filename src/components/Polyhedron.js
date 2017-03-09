@@ -2,10 +2,15 @@ import React, { Component, PropTypes } from 'react'
 import { rgb } from 'd3-color'
 import _ from 'lodash'
 
-import { joinListOfLists } from '../util'
+import { mapObject } from '../util'
 // TODO is this where we import and use this?
 import { polygons } from '../constants/configOptions'
 import { getColors } from '../reducers/config'
+
+// Join a list of lists with an inner and outer separator.
+export const joinListOfLists = (list, outerSep, innerSep) => {
+  return list.map(elem => elem.join(innerSep)).join(outerSep);
+}
 
 // Convert the hex color to RGB
 const toRgb = hex => {
@@ -13,8 +18,7 @@ const toRgb = hex => {
   return [asRgb.r, asRgb.g, asRgb.b].map(d => d/255)
 }
 
-const colorIndexForFace = _(polygons)
-  .map((n, i) => [n, i]).fromPairs().value()
+const colorIndexForFace = mapObject(polygons, _.nthArg(1))
 
 const getColorIndex = face => colorIndexForFace[face.length]
 

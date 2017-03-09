@@ -1,16 +1,13 @@
-/**
- * Toggles a boolean
- */
-export const toggle = b => !b
+// Lodash functions
+import _ from 'lodash'
 
-/**
- * Join a list of lists with an inner and outer separator.
- *
- * Usage:
- * joinListOfLists([[1, 0], [0, 1], ', ', ' ') // ==> 1 0, 0 1
- */
-export const joinListOfLists = (list, outerSep, innerSep) => {
-  return list.map(elem => elem.join(innerSep)).join(outerSep);
+export const mapObject = (arr, valueIter=_.identity, keyIter=_.identity) => {
+  keyIter = _.iteratee(keyIter)
+  valueIter = _.iteratee(valueIter)
+  return _(arr)
+    .map((item, i) => [keyIter(item, i), valueIter(item, i)])
+    .fromPairs()
+    .value()
 }
 
 // Polyhedra data functions

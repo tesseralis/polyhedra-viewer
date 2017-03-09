@@ -1,6 +1,8 @@
 import _ from 'lodash'
 import { schemeSet1 } from 'd3-scale-chromatic'
 
+import { mapObject } from '../util'
+
 export const polygons = [3, 4, 5, 6, 8, 10]
 
 const polygonNames = {
@@ -52,7 +54,4 @@ const configOptionsList = [
 export const configKeys = _.map(configOptionsList, 'key')
 
 // TODO can I use normalizr?
-export const configOptions = _(configOptionsList)
-  .map(option => [option.key, option])
-  .fromPairs()
-  .value()
+export const configOptions = mapObject(configOptionsList, _.identity, 'key')

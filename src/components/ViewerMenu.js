@@ -3,7 +3,6 @@ import { Link } from 'react-router'
 import { css, StyleSheet } from 'aphrodite/no-important'
 import _ from 'lodash'
 
-import { toggle } from '../util'
 import Sidebar from './Sidebar'
 import BigIcon from './BigIcon'
 import ConfigMenu from './ConfigMenu'
@@ -68,7 +67,7 @@ export default class ViewerMenu extends Component {
   }
 
   toggle(stateProp) {
-    this.setState(prevState => _.update({ ...prevState }, stateProp, toggle))
+    this.setState(prevState => _.update({ ...prevState }, stateProp, x => !x))
   }
 
   render() {
