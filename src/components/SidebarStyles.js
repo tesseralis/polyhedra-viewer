@@ -1,5 +1,5 @@
-import { StyleSheet } from 'aphrodite/no-important';
-import { andaleMono } from '../styles/fonts';
+import { StyleSheet } from 'aphrodite/no-important'
+import { andaleMono } from '../styles/fonts'
 
 const styles = StyleSheet.create({
   sidebar: {
@@ -32,6 +32,6 @@ const styles = StyleSheet.create({
     color: 'DarkSlateGray',
     fontWeight: 'bolder',
   },
-});
+})
 
-export default styles;
+export default styles

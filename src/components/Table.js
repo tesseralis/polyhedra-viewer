@@ -1,13 +1,13 @@
-import React from 'react';
-import { css } from 'aphrodite/no-important';
-import { Link } from 'react-router';
+import React from 'react'
+import { css } from 'aphrodite/no-important'
+import { Link } from 'react-router'
 
-import { groups } from '../data';
-import { escapeName } from '../util';
-import commonStyles from '../styles/common';
-import GroupHeader from './GroupHeader';
+import { groups } from '../constants/polyhedra'
+import { escapeName } from '../util'
+import commonStyles from '../styles/common'
+import GroupHeader from './GroupHeader'
 
-import styles from './TableStyles';
+import styles from './TableStyles'
 
 const Table = () => {
   return (
@@ -19,8 +19,8 @@ const Table = () => {
           <p className={css(styles.groupDescription)}>{group.description}</p>
           <div className={css(styles.list)}>
             { group.polyhedra.map(polyhedronName => {
-              const escapedName = escapeName(polyhedronName);
-              const img = require(`../images/${escapedName}.png`);
+              const escapedName = escapeName(polyhedronName)
+              const img = require(`../images/${escapedName}.png`)
               return (
                 <Link
                   key={polyhedronName}
@@ -35,7 +35,7 @@ const Table = () => {
         </div>
       )) }
     </div>
-  );
-};
+  )
+}
 
-export default Table;
+export default Table

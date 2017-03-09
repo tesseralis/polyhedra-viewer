@@ -1,12 +1,13 @@
-import _ from 'lodash';
-import React from 'react';
-import { Link } from 'react-router';
-import { css } from 'aphrodite/no-important';
-import { escapeName } from '../util';
-import { groups } from '../data';
-import commonStyles from '../styles/common';
-import GroupHeader from './GroupHeader';
-import styles from './SidebarStyles';
+import _ from 'lodash'
+import React from 'react'
+import { Link } from 'react-router'
+import { css } from 'aphrodite/no-important'
+
+import { escapeName } from '../util'
+import { groups } from '../constants/polyhedra'
+import commonStyles from '../styles/common'
+import GroupHeader from './GroupHeader'
+import styles from './SidebarStyles'
 
 const Sidebar = () => {
   return (
@@ -28,7 +29,7 @@ const Sidebar = () => {
         </div>
       )) }
     </section>
-  );
+  )
 }
 
 export default Sidebar

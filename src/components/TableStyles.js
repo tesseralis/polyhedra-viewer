@@ -1,10 +1,10 @@
-import { StyleSheet } from 'aphrodite/no-important';
+import { StyleSheet } from 'aphrodite/no-important'
 
-import { hoeflerText, andaleMono } from '../styles/fonts';
-import { fadeIn } from '../styles/animations';
+import { hoeflerText, andaleMono } from '../styles/fonts'
+import { fadeIn } from '../styles/animations'
 
-const thumbnailSize = 100;
-const maxThumbnailsPerLine = 7;
+const thumbnailSize = 100
+const maxThumbnailsPerLine = 7
 
 const styles = StyleSheet.create({
   table: {
@@ -60,6 +60,6 @@ const styles = StyleSheet.create({
   image: {
     height: thumbnailSize,
   },
-});
+})
 
-export default styles;
+export default styles

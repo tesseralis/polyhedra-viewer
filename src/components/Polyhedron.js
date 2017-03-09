@@ -7,7 +7,7 @@ import polygons from '../constants/polygons'
 
 // Join a list of lists with an inner and outer separator.
 export const joinListOfLists = (list, outerSep, innerSep) => {
-  return list.map(elem => elem.join(innerSep)).join(outerSep);
+  return list.map(elem => elem.join(innerSep)).join(outerSep)
 }
 
 // Convert the hex color to RGB
