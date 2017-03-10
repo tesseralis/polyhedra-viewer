@@ -2,7 +2,7 @@ import React from 'react'
 import { css, StyleSheet } from 'aphrodite/no-important'
 import _ from 'lodash'
 
-import commonStyles from '../styles/common'
+import { hover } from '../styles/common'
 import { andaleMono } from '../styles/fonts'
 // TODO pass these in?
 import { configKeys, configOptions } from '../constants/configOptions'
@@ -60,6 +60,8 @@ const LabelledInput = ({ input, value, setValue }) => {
 const ResetButton = ({ reset }) => {
   const styles = StyleSheet.create({
     resetButton: {
+      ...hover,
+
       width: 120,
       height: 30,
       marginTop: 10,
@@ -77,7 +79,7 @@ const ResetButton = ({ reset }) => {
     <button
       type="button"
       onClick={reset}
-      className={css(styles.resetButton, commonStyles.hover)}
+      className={css(styles.resetButton)}
     >Reset</button>
   )
 }

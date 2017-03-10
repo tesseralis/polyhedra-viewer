@@ -4,7 +4,6 @@ import { Link } from 'react-router'
 
 import { groups } from '../constants/polyhedra'
 import { escapeName } from '../util'
-import commonStyles from '../styles/common'
 import GroupHeader from './GroupHeader'
 
 import styles from './TableStyles'
@@ -25,7 +24,7 @@ const Table = () => {
                 <Link
                   key={polyhedronName}
                   to={'/' + escapedName}
-                  className={css(styles.link, commonStyles.hover)}
+                  className={css(styles.link)}
                 >
                   <img className={css(styles.image)} src={img} alt={polyhedronName}></img>
                 </Link>

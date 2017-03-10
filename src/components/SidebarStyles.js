@@ -1,5 +1,6 @@
 import { StyleSheet } from 'aphrodite/no-important'
 import { andaleMono } from '../styles/fonts'
+import { hover } from '../styles/common'
 
 const styles = StyleSheet.create({
   sidebar: {
@@ -18,6 +19,7 @@ const styles = StyleSheet.create({
   },
 
   link: {
+    ...hover,
     display: 'block',
     padding: '3px 12px',
 

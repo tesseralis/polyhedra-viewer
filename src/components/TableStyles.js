@@ -2,6 +2,7 @@ import { StyleSheet } from 'aphrodite/no-important'
 
 import { hoeflerText, andaleMono } from '../styles/fonts'
 import { fadeIn } from '../styles/animations'
+import { hover } from '../styles/common'
 
 const thumbnailSize = 100
 const maxThumbnailsPerLine = 7
@@ -50,6 +51,7 @@ const styles = StyleSheet.create({
   },
   
   link: {
+    ...hover,
     width: thumbnailSize,
     height: thumbnailSize,
     display: 'flex',
