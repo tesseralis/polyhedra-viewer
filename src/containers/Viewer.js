@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import _ from 'lodash'
 
 import { getSolidData } from '../constants/polyhedra'
-import * as ConfigActions from '../actions'
+import * as Actions from '../actions'
 import { getPolyhedronConfig, getConfigValues } from '../reducers/config'
 import { getFilteredGroups } from '../reducers/filter'
 
@@ -38,7 +38,7 @@ const mapStateToProps = state => ({
   groups: getFilteredGroups(state.filter),
 })
 
-const mapDispatchToProps = dispatch => bindActionCreators(ConfigActions, dispatch)
+const mapDispatchToProps = dispatch => bindActionCreators(Actions, dispatch)
 
 export default connect(
   mapStateToProps,

@@ -2,7 +2,6 @@ import React from 'react'
 import { css, StyleSheet } from 'aphrodite/no-important'
 import { Link } from 'react-router'
 
-import { groups } from '../constants/polyhedra'
 import { escapeName } from '../util'
 import GroupHeader from './GroupHeader'
 
@@ -84,7 +83,7 @@ const PolyhedronGroup = ({ name, description, polyhedra }) => {
   )
 }
 
-const Table = () => {
+const Table = ({ groups, setFilterText }) => {
   const styles = StyleSheet.create({
     table: {
       width: '100%',
@@ -105,9 +104,11 @@ const Table = () => {
     },
   })
 
+  // FIXME factor out the search input
   return (
     <div className={css(styles.table)}>
       <h1 className={css(styles.title)}>Polyhedra Viewer</h1>
+      <label>Search:<input type="text" onChange={e => setFilterText(e.target.value)} /></label>
       { groups.map(group => <PolyhedronGroup key={group.name} {...group} />) }
     </div>
   )
