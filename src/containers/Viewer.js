@@ -13,8 +13,7 @@ import ConfigMenu from '../components/ConfigMenu'
 import X3dScene from '../components/X3dScene'
 
 const Viewer = ({ polyhedronConfig, params, ...configMenuProps }) => {
-  const solidName = params.solid || 'tetrahedron'
-  const solid = getSolidData(solidName)
+  const solid = getSolidData(params.solid)
 
   return (
     <div>
