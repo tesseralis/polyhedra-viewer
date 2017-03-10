@@ -2,6 +2,7 @@ import React from 'react'
 import { css, StyleSheet } from 'aphrodite/no-important'
 import _ from 'lodash'
 
+import commonStyles from '../styles/common'
 import { andaleMono } from '../styles/fonts'
 import { configKeys, configOptions } from '../constants/configOptions'
 
@@ -35,6 +36,31 @@ const ConfigInput = ({ input, value, onChange }) => {
   )
 }
 
+const ResetButton = ({ reset }) => {
+  const styles = StyleSheet.create({
+    resetButton: {
+      width: 120,
+      height: 30,
+      marginTop: 10,
+
+      background: 'WhiteSmoke',
+      border: '1px Gray solid',
+      borderRadius: 2,
+
+      fontFamily: andaleMono,
+      fontSize: 14,
+    },
+  })
+
+  return (
+    <button
+      type="button"
+      onClick={reset}
+      className={css(styles.resetButton, commonStyles.hover)}
+    >Reset</button>
+  )
+}
+
 const ConfigMenu = ({ config, actions }) => {
   const styles = StyleSheet.create({
     configMenu: {
@@ -42,15 +68,6 @@ const ConfigMenu = ({ config, actions }) => {
       flexDirection: 'column',
       alignItems: 'flex-end',
       padding: 20,
-    },
-
-    resetButton: {
-      margin: '5px 0',
-      background: 'LightGray',
-      border: 'none',
-      width: 120,
-      height: 30,
-      fontFamily: andaleMono,
     },
 
     label: {
@@ -70,7 +87,6 @@ const ConfigMenu = ({ config, actions }) => {
   const { setInputValue, reset } = actions
   return (
     <form className={css(styles.configMenu)}>
-      <button type="button" onClick={reset} className={css(styles.resetButton)}>Reset</button>
       { configKeys.map(key => {
         const input = configOptions[key]
         const onChange = evt => setInputValue(key, getInputValue(input, evt.target))
@@ -81,6 +97,7 @@ const ConfigMenu = ({ config, actions }) => {
           </label>
         )
       })}
+      <ResetButton reset={reset} />
     </form>
   )
 }
