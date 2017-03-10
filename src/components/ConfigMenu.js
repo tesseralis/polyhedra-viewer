@@ -4,7 +4,7 @@ import _ from 'lodash'
 
 import { hover } from '../styles/common'
 import { andaleMono } from '../styles/fonts'
-// TODO pass these in?
+// TODO pass these in as props?
 import { configKeys, configOptions } from '../constants/configOptions'
 
 const getInputValue = (input, el) => {
@@ -97,14 +97,14 @@ const ConfigMenu = ({ configValues, setInputValue, reset }) => {
 
   return (
     <form className={css(styles.configMenu)}>
-      { configKeys.map(key => {
-        const inputProps = {
-          input: configOptions[key],
-          value: configValues[key],
-          setValue: value => setInputValue(key, value)
-        }
-        return <LabelledInput {...inputProps} />
-      }) }
+      { configKeys.map(key => 
+        <LabelledInput
+          key={key}
+          input={configOptions[key]}
+          value={configValues[key]}
+          setValue={value => setInputValue(key, value)}
+        />
+      ) }
       <ResetButton reset={reset} />
     </form>
   )

@@ -7,11 +7,11 @@ import Sidebar from './Sidebar'
 import BigIcon from './BigIcon'
 import ConfigMenu from './ConfigMenu'
 
+import { fullScreen } from '../styles/common'
+
 const styles = StyleSheet.create({
   viewerMenu: {
-    position: 'absolute',
-    height: '100%',
-    width: '100%',
+    ...fullScreen,
     zIndex: 100, // TODO have a list of these
     opacity: .9,
     display: 'flex',
@@ -60,6 +60,7 @@ const styles = StyleSheet.create({
 
 })
 
+// TODO split this into two components?
 export default class ViewerMenu extends Component {
   state = {
     showSidebar: false,

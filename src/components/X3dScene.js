@@ -1,19 +1,18 @@
 import React, { Component } from 'react'
 import { StyleSheet, css } from 'aphrodite/no-important'
 
-// TODO don't rely on this syntax and put this in the webpack config
-// (do this once we've ejected from create-react-app
+// TODO put this in the webpack config when ejecting create-react-app
 import x3dom from 'exports?x3dom!x3dom' // eslint-disable-line import/no-webpack-loader-syntax
 import 'x3dom/x3dom.css'
+
+import { fullScreen } from '../styles/common'
 
 // Disable double-clicking to change rotation point
 x3dom.Viewarea.prototype.onDoubleClick = () => {}
 
 const styles = StyleSheet.create({
   x3dScene: {
-    position: 'absolute',
-    height: '100%',
-    width: '100%',
+    ...fullScreen,
     border: 'none',
   }
 })
