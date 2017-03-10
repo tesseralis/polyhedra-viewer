@@ -4,6 +4,7 @@ import _ from 'lodash'
 
 import commonStyles from '../styles/common'
 import { andaleMono } from '../styles/fonts'
+// TODO pass these in?
 import { configKeys, configOptions } from '../constants/configOptions'
 
 const getInputValue = (input, el) => {
@@ -81,7 +82,7 @@ const ResetButton = ({ reset }) => {
   )
 }
 
-const ConfigMenu = ({ config, actions }) => {
+const ConfigMenu = ({ configValues, setInputValue, reset }) => {
   const styles = StyleSheet.create({
     configMenu: {
       display: 'flex',
@@ -92,13 +93,12 @@ const ConfigMenu = ({ config, actions }) => {
     },
   })
 
-  const { setInputValue, reset } = actions
   return (
     <form className={css(styles.configMenu)}>
       { configKeys.map(key => {
         const inputProps = {
           input: configOptions[key],
-          value: config[key],
+          value: configValues[key],
           setValue: value => setInputValue(key, value)
         }
         return <LabelledInput {...inputProps} />

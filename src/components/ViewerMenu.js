@@ -96,7 +96,7 @@ export default class ViewerMenu extends Component {
           <button onClick={doToggle('showConfig')} className={css(styles.iconWrapper)}>
             <BigIcon name='cog' />
           </button>
-          { showConfig && <ConfigMenu config={config} actions={actions} /> }
+          { showConfig && <ConfigMenu configValues={config} {...actions} /> }
         </div>
       </div>
     )
