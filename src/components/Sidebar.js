@@ -8,17 +8,17 @@ import { groups } from '../constants/polyhedra'
 import GroupHeader from './GroupHeader'
 
 import { andaleMono } from '../styles/fonts'
-import { hover } from '../styles/common'
+import { resetLink, hover } from '../styles/common'
 
 const PolyhedronLink = ({ name }) => {
   const styles = StyleSheet.create({
     link: {
+      ...resetLink,
       ...hover,
       display: 'block',
       padding: '3px 12px',
 
       color: 'DimGrey',
-      textDecoration: 'none',
       lineHeight: '18px',
       fontFamily: andaleMono,
       fontSize: 14,

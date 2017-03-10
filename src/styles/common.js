@@ -9,3 +9,13 @@ export const fullScreen = {
   height: '100%',
   width: '100%',
 }
+
+export const resetButton = {
+  background: 'none',
+  border: 'none',
+  cursor: 'pointer',
+}
+
+export const resetLink = {
+  textDecoration: 'none',
+}

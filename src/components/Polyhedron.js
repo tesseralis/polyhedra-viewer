@@ -47,7 +47,7 @@ export default class Polyhedron extends Component {
     const { solid, config } = this.props
     const { faces, vertices, edges } = solid
     const { showEdges, showFaces, opacity, colors } = config
-    // FIXME line width just doesn't work!
+    // TODO line width doesn't work -- replace with another option
 
     return (
       <group>

@@ -8,7 +8,8 @@ import * as ConfigActions from '../actions'
 import { getPolyhedronConfig, getMenuConfig } from '../reducers/config'
 
 import Polyhedron from '../components/Polyhedron'
-import ViewerMenu from '../components/ViewerMenu'
+import SidebarMenu from '../components/SidebarMenu'
+import ConfigMenu from '../components/ConfigMenu'
 import X3dScene from '../components/X3dScene'
 
 const Viewer = ({ polyhedronConfig, menuConfig, actions, params }) => {
@@ -17,10 +18,11 @@ const Viewer = ({ polyhedronConfig, menuConfig, actions, params }) => {
 
   return (
     <div>
-      <ViewerMenu config={menuConfig} actions={actions} />
       <X3dScene>
         <Polyhedron solid={solid} config={polyhedronConfig} />
       </X3dScene>
+      <SidebarMenu />
+      <ConfigMenu config={menuConfig} actions={actions} />
     </div>
   )
 }

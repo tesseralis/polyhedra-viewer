@@ -1,113 +1,41 @@
-import React from 'react'
+import React, { Component } from 'react'
 import { css, StyleSheet } from 'aphrodite/no-important'
-import _ from 'lodash'
 
-import { hover } from '../styles/common'
-import { andaleMono } from '../styles/fonts'
-// TODO pass these in as props?
-import { configKeys, configOptions } from '../constants/configOptions'
+import BigIcon from './BigIcon'
+import ConfigForm from './ConfigForm'
 
-const getInputValue = (input, el) => {
-  switch(input.type) {
-    case 'checkbox':
-      return el.checked
-    default:
-      return el.value
+import { resetButton } from '../styles/common'
+
+const styles = StyleSheet.create({
+  configMenu: {
+    position: 'fixed',
+    top: '0',
+    right: '0',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'flex-end',
+    pointerEvents: 'initial',
+  },
+
+  toggleButton: { ...resetButton },
+})
+
+export default class ConfigMenu extends Component {
+  state = { show: false }
+
+  // TODO maybe use that state library to make simpler?
+  toggle() { this.setState(({ show }) => ({ show: !show })) }
+
+  render() {
+    const { config, actions } = this.props
+    return (
+      <div className={css(styles.configMenu)}>
+        <button onClick={() => this.toggle()} className={css(styles.toggleButton)}>
+          <BigIcon name='cog' />
+        </button>
+        { this.state.show && <ConfigForm configValues={config} {...actions} /> }
+      </div>
+    )
   }
 }
 
-const getInputProps = (input, value) => {
-  switch (input.type) {
-    case 'checkbox':
-      return { checked: value }
-    case 'range':
-      return {
-        ..._.pick(input, ['min', 'max', 'step']),
-        value,
-      }
-    default:
-      return { value }
-  }
-}
-
-const ConfigInput = ({ input, value, setValue }) => {
-  const inputProps = getInputProps(input, value)
-  const onChange = evt => setValue(getInputValue(input, evt.target))
-  return (
-    <input type={input.type} onChange={onChange} {...inputProps} />
-  )
-}
-
-const LabelledInput = ({ input, value, setValue }) => {
-  const styles = StyleSheet.create({
-    label: {
-      width: '100%',
-      margin: '8px 0',
-      display: 'flex',
-      justifyContent: 'space-between',
-      fontFamily: andaleMono,
-    },
-  })
-
-  return (
-    <label className={css(styles.label)}>
-      { input.display }
-      <ConfigInput input={input} value={value} setValue={setValue} />
-    </label>
-  )
-}
-
-const ResetButton = ({ reset }) => {
-  const styles = StyleSheet.create({
-    resetButton: {
-      ...hover,
-
-      width: 120,
-      height: 30,
-      marginTop: 10,
-
-      background: 'WhiteSmoke',
-      border: '1px Gray solid',
-      borderRadius: 2,
-
-      fontFamily: andaleMono,
-      fontSize: 14,
-    },
-  })
-
-  return (
-    <button
-      type="button"
-      onClick={reset}
-      className={css(styles.resetButton)}
-    >Reset</button>
-  )
-}
-
-const ConfigMenu = ({ configValues, setInputValue, reset }) => {
-  const styles = StyleSheet.create({
-    configMenu: {
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'flex-end',
-      width: 270,
-      padding: 20,
-    },
-  })
-
-  return (
-    <form className={css(styles.configMenu)}>
-      { configKeys.map(key => 
-        <LabelledInput
-          key={key}
-          input={configOptions[key]}
-          value={configValues[key]}
-          setValue={value => setInputValue(key, value)}
-        />
-      ) }
-      <ResetButton reset={reset} />
-    </form>
-  )
-}
-
-export default ConfigMenu
