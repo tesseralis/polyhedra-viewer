@@ -23,4 +23,4 @@ export default function config(state = initialState, action) {
 
 const getColors = state => mapObject(polygons, n => state[getColorInputKey(n)])
 export const getPolyhedronConfig = state => ({ ...state, colors: getColors(state) })
-export const getMenuConfig = _.identity
+export const getConfigValues = _.identity

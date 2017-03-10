@@ -27,13 +27,12 @@ export default class ConfigMenu extends Component {
   toggle() { this.setState(({ show }) => ({ show: !show })) }
 
   render() {
-    const { config, actions } = this.props
     return (
       <div className={css(styles.configMenu)}>
         <button onClick={() => this.toggle()} className={css(styles.toggleButton)}>
           <BigIcon name='cog' />
         </button>
-        { this.state.show && <ConfigForm configValues={config} {...actions} /> }
+        { this.state.show && <ConfigForm {...this.props} /> }
       </div>
     )
   }
