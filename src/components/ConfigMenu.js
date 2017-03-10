@@ -29,10 +29,30 @@ const getInputProps = (input, value) => {
   }
 }
 
-const ConfigInput = ({ input, value, onChange }) => {
+const ConfigInput = ({ input, value, setValue }) => {
   const inputProps = getInputProps(input, value)
+  const onChange = evt => setValue(getInputValue(input, evt.target))
   return (
     <input type={input.type} onChange={onChange} {...inputProps} />
+  )
+}
+
+const LabelledInput = ({ input, value, setValue }) => {
+  const styles = StyleSheet.create({
+    label: {
+      width: '100%',
+      margin: '8px 0',
+      display: 'flex',
+      justifyContent: 'space-between',
+      fontFamily: andaleMono,
+    },
+  })
+
+  return (
+    <label className={css(styles.label)}>
+      { input.display }
+      <ConfigInput input={input} value={value} setValue={setValue} />
+    </label>
   )
 }
 
@@ -67,36 +87,22 @@ const ConfigMenu = ({ config, actions }) => {
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'flex-end',
+      width: 270,
       padding: 20,
     },
-
-    label: {
-      width: '100%',
-      display: 'flex',
-      justifyContent: 'space-between',
-      margin: '5px 0',
-    },
-
-    labelText: {
-      fontFamily: andaleMono,
-      paddingRight: 5,
-    },
-
   })
 
   const { setInputValue, reset } = actions
   return (
     <form className={css(styles.configMenu)}>
       { configKeys.map(key => {
-        const input = configOptions[key]
-        const onChange = evt => setInputValue(key, getInputValue(input, evt.target))
-        return (
-          <label key={key} className={css(styles.label)}>
-            <span className={css(styles.labelText)}>{ input.display }</span>
-            <ConfigInput input={input} value={config[key]} onChange={onChange} />
-          </label>
-        )
-      })}
+        const inputProps = {
+          input: configOptions[key],
+          value: config[key],
+          setValue: value => setInputValue(key, value)
+        }
+        return <LabelledInput {...inputProps} />
+      }) }
       <ResetButton reset={reset} />
     </form>
   )
