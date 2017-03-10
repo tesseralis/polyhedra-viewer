@@ -4,7 +4,6 @@ import { Link } from 'react-router'
 import { css, StyleSheet } from 'aphrodite/no-important'
 
 import { escapeName } from '../util'
-import { groups } from '../constants/polyhedra'
 import GroupHeader from './GroupHeader'
 
 import { andaleMono } from '../styles/fonts'
@@ -68,7 +67,7 @@ const PolyhedronGroup = ({ name, polyhedra }) => {
   )
 }
 
-const Sidebar = () => {
+const Sidebar = ({ groups, setFilterText }) => {
   const styles = StyleSheet.create({
     sidebar: {
       width: 400,
@@ -80,6 +79,7 @@ const Sidebar = () => {
 
   return (
     <section className={css(styles.sidebar)}>
+      <label>Search:<input type="text" onChange={e => setFilterText(e.target.value)} /></label>
       { groups.map(group => <PolyhedronGroup key={group.name} {...group } /> ) }
     </section>
   )
