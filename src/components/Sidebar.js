@@ -1,32 +1,86 @@
 import _ from 'lodash'
 import React from 'react'
 import { Link } from 'react-router'
-import { css } from 'aphrodite/no-important'
+import { css, StyleSheet } from 'aphrodite/no-important'
 
 import { escapeName } from '../util'
 import { groups } from '../constants/polyhedra'
 import GroupHeader from './GroupHeader'
-import styles from './SidebarStyles'
+
+import { andaleMono } from '../styles/fonts'
+import { hover } from '../styles/common'
+
+const PolyhedronLink = ({ name }) => {
+  const styles = StyleSheet.create({
+    link: {
+      ...hover,
+      display: 'block',
+      padding: '3px 12px',
+
+      color: 'DimGrey',
+      textDecoration: 'none',
+      lineHeight: '18px',
+      fontFamily: andaleMono,
+      fontSize: 14,
+    },
+
+    isActive: {
+      color: 'DarkSlateGray',
+      fontWeight: 'bolder',
+    },
+  })
+
+  return (
+    <Link
+      to={escapeName(name)}
+      className={css(styles.link)}
+      activeClassName={css(styles.isActive)}
+    >{_.capitalize(name)}</Link>
+  )
+}
+
+const PolyhedronList = ({ polyhedra }) => {
+  return (
+    <ul>
+      { polyhedra.map(name => (
+        <li key={name}><PolyhedronLink name={name} /></li>
+      )) }
+    </ul>
+  )
+}
+
+const PolyhedronGroup = ({ name, polyhedra }) => {
+  const styles = StyleSheet.create({
+    group: {
+      padding: '10px 0',
+    },
+
+    header: {
+      margin: '5px 12px',
+    }
+  })
+
+  return (
+    <div className={css(styles.group)}>
+      <GroupHeader name={name} styles={styles.header} />
+      <PolyhedronList polyhedra={polyhedra} />
+    </div>
+  )
+}
 
 const Sidebar = () => {
+  const styles = StyleSheet.create({
+    sidebar: {
+      width: 400,
+      overflow: 'scroll',
+      backgroundColor: 'WhiteSmoke', // TODO colors file
+      boxShadow: '1px 1px 4px LightGray',
+    },
+  })
+
   return (
     <section className={css(styles.sidebar)}>
-      { groups.map(group => (
-        <div className={css(styles.group)} key={group.name}>
-          <GroupHeader name={group.name} styles={styles.groupHeader} />
-          <ul>{
-            group.polyhedra.map(polyhedronName => (
-              <li key={polyhedronName}>
-                <Link
-                  to={escapeName(polyhedronName)}
-                  className={css(styles.link)}
-                  activeClassName={css(styles.isActive)}
-                >{_.capitalize(polyhedronName)}</Link>
-              </li>
-            ))
-          }</ul>
-        </div>
-      )) }
+      { groups.map(group => <PolyhedronGroup key={group.name} {...group } /> ) }
     </section>
   )
 }
