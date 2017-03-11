@@ -3,7 +3,7 @@ import React from 'react'
 import { Link } from 'react-router'
 import { css, StyleSheet } from 'aphrodite/no-important'
 
-import { escapeName } from '../util'
+import { escapeName } from '../constants/polyhedra'
 import GroupHeader from './GroupHeader'
 import { andaleMono } from '../styles/fonts'
 import { resetLink, hover } from '../styles/common'

@@ -2,7 +2,7 @@ import React from 'react'
 import { css, StyleSheet } from 'aphrodite/no-important'
 import { Link } from 'react-router'
 
-import { escapeName } from '../util'
+import { escapeName } from '../constants/polyhedra'
 import GroupHeader from './GroupHeader'
 
 import { hoeflerText, andaleMono } from '../styles/fonts'

@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import { getSolidData } from '../constants/polyhedra'
+import { isValidSolid, getSolidData } from '../constants/polyhedra'
 import { getPolyhedronConfig } from '../reducers'
 
 import Polyhedron from '../components/Polyhedron'
@@ -13,7 +13,8 @@ import Sidebar from './Sidebar'
 import ConfigForm from './ConfigForm'
 
 const Viewer = ({ params, polyhedronConfig, groups }) => {
-  const solid = getSolidData(params.solid)
+  // TODO improve this logic
+  const solid = getSolidData(isValidSolid(params.solid) ? params.solid : 'tetrahedron')
 
   return (
     <div>

@@ -10,6 +10,3 @@ export const mapObject = (arr, valueIter=_.identity, keyIter=_.identity) => {
     .value()
 }
 
-// Polyhedra data functions
-
-export const escapeName = name => name.replace(/ /g, '-');

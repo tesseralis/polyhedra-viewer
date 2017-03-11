@@ -22,6 +22,14 @@ export const groups = groupNames.map(groupName => ({
   polyhedra: require(`../data/metadata/${groupName}.json`),
 }))
 
+const allSolidNames = _.flatMap(groups, 'polyhedra')
+
+export const isValidSolid = escapedSolidName => {
+  return allSolidNames.includes(escapedSolidName.replace(/-/g, ' '))
+}
+
 export const getSolidData = escapedSolidName => {
   return require(`../data/polyhedra/${escapedSolidName}.json`)
 }
+
+export const escapeName = name => name.replace(/ /g, '-');
