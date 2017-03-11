@@ -1,11 +1,8 @@
 import React, { Component } from 'react'
 import { Link } from 'react-router'
 import { css, StyleSheet } from 'aphrodite/no-important'
-import _ from 'lodash'
 
 import BigIcon from './BigIcon'
-import Sidebar from '../containers/Sidebar'
-
 import { resetButton, resetLink } from '../styles/common'
 
 const styles = StyleSheet.create({
@@ -35,6 +32,7 @@ export default class SidebarMenu extends Component {
   toggle() { this.setState(({ show }) => ({ show: !show })) }
 
   render() {
+    const Sidebar = this.props.sidebar
     return (
       <div className={css(styles.viewerMenu)}>
         { this.state.show && <Sidebar /> }

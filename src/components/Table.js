@@ -4,7 +4,6 @@ import { Link } from 'react-router'
 
 import { escapeName } from '../util'
 import GroupHeader from './GroupHeader'
-import FilterBar from '../containers/FilterBar'
 
 import { hoeflerText, andaleMono } from '../styles/fonts'
 import { fadeIn } from '../styles/animations'
@@ -84,7 +83,7 @@ const PolyhedronGroup = ({ name, description, polyhedra }) => {
   )
 }
 
-const Table = ({ groups }) => {
+const Table = ({ groups, searchBar: SearchBar }) => {
   const styles = StyleSheet.create({
     table: {
       maxWidth: 900,
@@ -109,7 +108,7 @@ const Table = ({ groups }) => {
   return (
     <div className={css(styles.table)}>
       <h1 className={css(styles.title)}>Polyhedra Viewer</h1>
-      <FilterBar />
+      <SearchBar />
       { groups.map(group => <PolyhedronGroup key={group.name} {...group} />) }
     </div>
   )

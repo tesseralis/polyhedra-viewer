@@ -9,6 +9,8 @@ import SidebarMenu from '../components/SidebarMenu'
 import ConfigMenu from '../components/ConfigMenu'
 import X3dScene from '../components/X3dScene'
 
+import Sidebar from './Sidebar'
+
 const Viewer = ({ params, polyhedronConfig, groups }) => {
   const solid = getSolidData(params.solid)
 
@@ -17,7 +19,7 @@ const Viewer = ({ params, polyhedronConfig, groups }) => {
       <X3dScene>
         <Polyhedron solid={solid} config={polyhedronConfig} />
       </X3dScene>
-      <SidebarMenu />
+      <SidebarMenu sidebar={Sidebar}/>
       <ConfigMenu />
     </div>
   )
