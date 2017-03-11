@@ -12,6 +12,7 @@ const SearchBar = ({ text, setValue }) => {
       alignItems: 'center',
       padding: 10,
       width: '100%',
+      position: 'relative',
     },
     
     input: {

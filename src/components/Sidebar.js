@@ -72,7 +72,13 @@ const Sidebar = ({ groups, searchBar: SearchBar }) => {
       width: 400,
       overflow: 'scroll',
       backgroundColor: 'WhiteSmoke', // TODO colors file
+      // FIXME doesn't work with the fixed-width animation!
       boxShadow: '1px 1px 4px LightGray',
+
+      // FIXME move this out of here!
+      position: 'absolute',
+      top: 0,
+      right: 0,
     },
   })
 
