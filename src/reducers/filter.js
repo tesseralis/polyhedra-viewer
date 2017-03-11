@@ -21,3 +21,5 @@ export const getFilteredGroups = state => groups.map(({ polyhedra, ...group}) =>
   ...group,
   polyhedra: getFilteredPolyhedra(polyhedra, state.text)
 })).filter(({ polyhedra }) => polyhedra.length !== 0)
+
+export const getFilterText = state => state.text

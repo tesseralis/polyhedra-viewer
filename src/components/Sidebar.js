@@ -5,6 +5,7 @@ import { css, StyleSheet } from 'aphrodite/no-important'
 
 import { escapeName } from '../util'
 import GroupHeader from './GroupHeader'
+import FilterBar from '../containers//FilterBar'
 
 import { andaleMono } from '../styles/fonts'
 import { resetLink, hover } from '../styles/common'
@@ -67,7 +68,7 @@ const PolyhedronGroup = ({ name, polyhedra }) => {
   )
 }
 
-const Sidebar = ({ groups, setFilterText }) => {
+const Sidebar = ({ groups }) => {
   const styles = StyleSheet.create({
     sidebar: {
       width: 400,
@@ -79,7 +80,7 @@ const Sidebar = ({ groups, setFilterText }) => {
 
   return (
     <section className={css(styles.sidebar)}>
-      <label>Search:<input type="text" onChange={e => setFilterText(e.target.value)} /></label>
+      <FilterBar />
       { groups.map(group => <PolyhedronGroup key={group.name} {...group } /> ) }
     </section>
   )

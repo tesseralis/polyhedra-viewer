@@ -16,7 +16,7 @@ import X3dScene from '../components/X3dScene'
 const Viewer = ({ params, ...props }) => {
   const solid = getSolidData(params.solid)
   const { polyhedronConfig } = props
-  const { groups, setFilterText } = props
+  const { groups } = props
   // FIXME how to avoid this denesting situation?
   const { configValues, setInputValue, reset } = props
 
@@ -25,7 +25,7 @@ const Viewer = ({ params, ...props }) => {
       <X3dScene>
         <Polyhedron solid={solid} config={polyhedronConfig} />
       </X3dScene>
-      <SidebarMenu groups={groups} setFilterText={setFilterText} />
+      <SidebarMenu groups={groups} />
       <ConfigMenu configValues={configValues} setInputValue={setInputValue} reset={reset} />
     </div>
   )
@@ -44,3 +44,4 @@ export default connect(
   mapStateToProps,
   mapDispatchToProps
 )(Viewer)
+
