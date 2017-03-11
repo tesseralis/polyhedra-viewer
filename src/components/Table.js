@@ -3,9 +3,10 @@ import { css, StyleSheet } from 'aphrodite/no-important'
 import { Link } from 'react-router'
 
 import { escapeName } from '../constants/polyhedra'
+import Title from './Title'
 import GroupHeader from './GroupHeader'
 
-import { hoeflerText, andaleMono } from '../styles/fonts'
+import { hoeflerText } from '../styles/fonts'
 import { fadeIn } from '../styles/animations'
 import { hover } from '../styles/common'
 
@@ -95,17 +96,11 @@ const Table = ({ groups, searchBar: SearchBar }) => {
       animationName: fadeIn,
       animationDuration: '1s',
     },
-  
-    title: {
-      padding: 32,
-      fontFamily: andaleMono,
-      fontSize: 36,
-      fontWeight: 'bold',
-    },
   })
 
   return (
     <div className={css(styles.table)}>
+      <Title>Polyhedra Viewer</Title>
       <h1 className={css(styles.title)}>Polyhedra Viewer</h1>
       <SearchBar />
       { groups.map(group => <PolyhedronGroup key={group.name} {...group} />) }
