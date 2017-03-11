@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { css, StyleSheet } from 'aphrodite/no-important'
 
 import BigIcon from './BigIcon'
-import ConfigForm from './ConfigForm'
+import ConfigForm from '../containers/ConfigForm'
 
 import { resetButton } from '../styles/common'
 
@@ -32,7 +32,7 @@ export default class ConfigMenu extends Component {
         <button onClick={() => this.toggle()} className={css(styles.toggleButton)}>
           <BigIcon name='cog' />
         </button>
-        { this.state.show && <ConfigForm {...this.props} /> }
+        { this.state.show && <ConfigForm /> }
       </div>
     )
   }

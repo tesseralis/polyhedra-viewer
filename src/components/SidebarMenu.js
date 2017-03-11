@@ -4,7 +4,7 @@ import { css, StyleSheet } from 'aphrodite/no-important'
 import _ from 'lodash'
 
 import BigIcon from './BigIcon'
-import Sidebar from './Sidebar'
+import Sidebar from '../containers/Sidebar'
 
 import { resetButton, resetLink } from '../styles/common'
 
@@ -35,10 +35,9 @@ export default class SidebarMenu extends Component {
   toggle() { this.setState(({ show }) => ({ show: !show })) }
 
   render() {
-    const { groups } = this.props
     return (
       <div className={css(styles.viewerMenu)}>
-        { this.state.show && <Sidebar groups={groups} /> }
+        { this.state.show && <Sidebar /> }
         <div className={css(styles.menuBar)}>
           <Link to="/" className={css(styles.homeLink)}>
             <BigIcon name='home' />
