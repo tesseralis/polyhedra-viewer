@@ -1,5 +1,6 @@
 import React from 'react'
 import { css, StyleSheet } from 'aphrodite/no-important'
+import Icon from './Icon'
 
 // TODO generalize for more icons
 const BigIcon = ({ name }) => {
@@ -11,10 +12,9 @@ const BigIcon = ({ name }) => {
     }
   })
 
-  const className = `fa fa-${name} fa-4x`
   return (
     <div className={css(styles.wrapper)}>
-      <i className={className} aria-hidden="true" />
+      <Icon name={name} size={4} />
     </div>
   )
 }

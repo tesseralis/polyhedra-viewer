@@ -2,6 +2,7 @@ import React from 'react'
 import { css, StyleSheet } from 'aphrodite/no-important'
 
 import { andaleMono } from '../styles/fonts'
+import Icon from './Icon'
 
 const SearchBar = ({ text, setValue }) => {
   const styles = StyleSheet.create({
@@ -52,7 +53,7 @@ const SearchBar = ({ text, setValue }) => {
         className={css(styles.input)}
       />
       <span className={css(styles.icon)}>
-        <i className="fa fa-search" aria-hidden="true" />
+        <Icon name="search" />
       </span>
     </label>
   )
