@@ -3,15 +3,15 @@ import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 
 import { setFilterText } from '../actions'
-import { getFilterText } from '../reducers/filter'
+import { getFilterText } from '../reducers'
 import SearchBar from '../components/SearchBar'
 
-const FilterBar = ({ text, setFilterText }) => (
-  <SearchBar text={text} setValue={setFilterText} />
+const FilterBar = ({ filterText, setFilterText }) => (
+  <SearchBar text={filterText} setValue={setFilterText} />
 )
 
 const mapStateToProps = state => ({
-  text: getFilterText(state.filter)
+  filterText: getFilterText(state)
 })
 
 const mapDispatchToProps = dispatch => bindActionCreators({ setFilterText }, dispatch)

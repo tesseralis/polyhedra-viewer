@@ -5,8 +5,7 @@ import _ from 'lodash'
 
 import { getSolidData } from '../constants/polyhedra'
 import * as Actions from '../actions'
-import { getPolyhedronConfig, getConfigValues } from '../reducers/config'
-import { getFilteredGroups } from '../reducers/filter'
+import { getPolyhedronConfig, getConfigValues, getFilteredGroups } from '../reducers'
 
 import Polyhedron from '../components/Polyhedron'
 import SidebarMenu from '../components/SidebarMenu'
@@ -31,11 +30,11 @@ const Viewer = ({ params, ...props }) => {
   )
 }
 
-// FIXME add a reducing function
+// TODO is there something similar to bindActionCreators?
 const mapStateToProps = state => ({
-  polyhedronConfig: getPolyhedronConfig(state.config),
-  configValues: getConfigValues(state.config),
-  groups: getFilteredGroups(state.filter),
+  polyhedronConfig: getPolyhedronConfig(state),
+  configValues: getConfigValues(state),
+  groups: getFilteredGroups(state),
 })
 
 const mapDispatchToProps = dispatch => bindActionCreators(Actions, dispatch)

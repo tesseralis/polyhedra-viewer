@@ -35,11 +35,10 @@ export default class SidebarMenu extends Component {
   toggle() { this.setState(({ show }) => ({ show: !show })) }
 
   render() {
-    // FIXME deduplicate
-    const { groups, setFilterText } = this.props
+    const { groups } = this.props
     return (
       <div className={css(styles.viewerMenu)}>
-        { this.state.show && <Sidebar groups={groups} setFilterText={setFilterText} /> }
+        { this.state.show && <Sidebar groups={groups} /> }
         <div className={css(styles.menuBar)}>
           <Link to="/" className={css(styles.homeLink)}>
             <BigIcon name='home' />
