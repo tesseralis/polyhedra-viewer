@@ -19,7 +19,7 @@ const groupDescriptions = {
 export const groups = groupNames.map(groupName => ({
   name: groupName,
   description: groupDescriptions[groupName],
-  polyhedra: require(`../data/metadata/${groupName}.json`),
+  polyhedra: require(`../data/groups/${groupName}.json`),
 }))
 
 const allSolidNames = _.flatMap(groups, 'polyhedra')
