@@ -43,5 +43,4 @@ const configOptionsList = [
 
 export const configKeys = _.map(configOptionsList, 'key')
 
-// TODO can I use normalizr?
 export const configOptions = mapObject(configOptionsList, _.identity, 'key')

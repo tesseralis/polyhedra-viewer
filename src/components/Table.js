@@ -9,7 +9,6 @@ import { hoeflerText, andaleMono } from '../styles/fonts'
 import { fadeIn } from '../styles/animations'
 import { hover } from '../styles/common'
 
-// TODO don't hardcode this?
 const thumbnailSize = 100
 
 const PolyhedronLink = ({ name }) => {

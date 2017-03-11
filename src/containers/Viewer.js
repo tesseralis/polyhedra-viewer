@@ -13,7 +13,7 @@ import Sidebar from './Sidebar'
 import ConfigForm from './ConfigForm'
 
 const Viewer = ({ params, polyhedronConfig, groups }) => {
-  // TODO improve this logic
+  // TODO improve this rerouting behavior
   const solid = getSolidData(isValidSolid(params.solid) ? params.solid : 'tetrahedron')
 
   return (
