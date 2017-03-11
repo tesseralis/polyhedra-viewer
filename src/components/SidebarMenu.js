@@ -6,7 +6,7 @@ import BigIcon from './BigIcon'
 import { resetButton, resetLink } from '../styles/common'
 
 const styles = StyleSheet.create({
-  viewerMenu: {
+  sidebarMenu: {
     position: 'fixed',
     top: 0,
     left: 0,
@@ -14,6 +14,7 @@ const styles = StyleSheet.create({
     height: '100%',
     // Horizontally align the sidebar and menu bar
     display: 'flex',
+    flexDirection: 'row-reverse',
   },
 
   menuBar: {
@@ -34,8 +35,7 @@ export default class SidebarMenu extends Component {
   render() {
     const Sidebar = this.props.sidebar
     return (
-      <div className={css(styles.viewerMenu)}>
-        { this.state.show && <Sidebar /> }
+      <div className={css(styles.sidebarMenu)}>
         <div className={css(styles.menuBar)}>
           <Link to="/" className={css(styles.homeLink)}>
             <BigIcon name='home' />
@@ -44,6 +44,7 @@ export default class SidebarMenu extends Component {
             <BigIcon name='list' />
           </button>
         </div>
+        { this.state.show && <Sidebar /> }
       </div>
     )
   }
