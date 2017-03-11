@@ -101,7 +101,6 @@ const Table = ({ groups, searchBar: SearchBar }) => {
   return (
     <div className={css(styles.table)}>
       <Title>Polyhedra Viewer</Title>
-      <h1 className={css(styles.title)}>Polyhedra Viewer</h1>
       <SearchBar />
       { groups.map(group => <PolyhedronGroup key={group.name} {...group} />) }
     </div>
