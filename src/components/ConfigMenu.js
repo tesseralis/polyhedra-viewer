@@ -2,7 +2,6 @@ import React, { Component } from 'react'
 import { css, StyleSheet } from 'aphrodite/no-important'
 
 import BigIcon from './BigIcon'
-import ConfigForm from '../containers/ConfigForm'
 
 import { resetButton } from '../styles/common'
 
@@ -27,6 +26,7 @@ export default class ConfigMenu extends Component {
   toggle() { this.setState(({ show }) => ({ show: !show })) }
 
   render() {
+    const ConfigForm = this.props.configForm
     return (
       <div className={css(styles.configMenu)}>
         <button onClick={() => this.toggle()} className={css(styles.toggleButton)}>
