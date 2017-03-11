@@ -14,12 +14,17 @@ export default function filter(state = initialState, action) {
   }
 }
 
-const getFilteredPolyhedra = (polyhedra, filter) =>
+const getFilteredPolyhedra = (polyhedra, filter) => (
   polyhedra.filter(solid => solid.includes(filter.toLowerCase()))
+)
 
-export const getFilteredGroups = state => groups.map(({ polyhedra, ...group}) => ({
-  ...group,
-  polyhedra: getFilteredPolyhedra(polyhedra, state.text)
-})).filter(({ polyhedra }) => polyhedra.length !== 0)
+export const getFilteredGroups = state => {
+  // TODO replace this with selector.js library
+  if (!state.text) return groups
+  return groups.map(({ polyhedra, ...group}) => ({
+    ...group,
+    polyhedra: getFilteredPolyhedra(polyhedra, state.text)
+  })).filter(({ polyhedra }) => polyhedra.length !== 0)
+}
 
 export const getFilterText = state => state.text
