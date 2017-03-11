@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import { Motion, TransitionMotion, spring } from 'react-motion'
 import { css, StyleSheet } from 'aphrodite/no-important'
 
 import BigIcon from './BigIcon'
@@ -27,12 +28,42 @@ export default class ConfigMenu extends Component {
 
   render() {
     const ConfigForm = this.props.configForm
+
+    const willEnter = () => ({ x: 270, opacity: 0 }) 
+    const willLeave = () => ({ x: spring(270), opacity: spring(0) })
+    const configStyle = { key: 'config', style: { x: spring(0), opacity: spring(1) } }
+    const motionStyles = this.state.show ? [configStyle] : []
+
     return (
       <div className={css(styles.configMenu)}>
         <button onClick={() => this.toggle()} className={css(styles.toggleButton)}>
-          <BigIcon name='cog' />
+          <Motion style={{ theta: spring(this.state.show ? 180 : 0) }}>
+          {({ theta }) =>
+            <div style={{ transform: `rotate(${theta}deg)` }}>
+              <BigIcon name='cog' />
+            </div>
+          }
+          </Motion>
         </button>
-        { this.state.show && <ConfigForm /> }
+        <TransitionMotion
+          willEnter={willEnter}
+          willLeave={willLeave}
+          styles={motionStyles}
+        >
+          { interpolatedStyles => <div>
+            { interpolatedStyles.map(config => {
+              return (
+                <div
+                  key={config.key}
+                  style={{
+                    transform: `translateX(${config.style.x}px)`,
+                    opacity: config.style.opacity,
+                  }}
+                ><ConfigForm /></div>
+              )
+            }) }
+          </div> }
+        </TransitionMotion>
       </div>
     )
   }

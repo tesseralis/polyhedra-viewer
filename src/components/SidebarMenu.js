@@ -29,35 +29,20 @@ const styles = StyleSheet.create({
 })
 
 export default class SidebarMenu extends Component {
-  //state = { show: false }
+  state = { show: false }
 
-  sidebar = { key: 'sidebar', x: 400 }
+  toggle() { this.setState(({ show }) => ({ show: !show })) }
 
-  state = { items: [] }
-
-  willLeave() {
-    return { x: spring(0) }
-  }
-
-  willEnter() {
-    return { x: 0 }
-  }
-
-  //toggle() { this.setState(({ show }) => ({ show: !show })) }
-  
-  toggle() {
-    this.setState(prevState => {
-      return prevState.items.length === 0 ? { items: [this.sidebar] } : { items: [] }
-    })
-  }
 
   render() {
     const Sidebar = this.props.sidebar
 
-    const motionStyles = this.state.items.map(item => ({
-      key: item.key,
-      style: { x: spring(item.x) },
-    }))
+    // FIXME don't hardcode sidebar width?
+    const willEnter = () => ({ x: 0 })
+    const willLeave = () => ({ x: spring(0) })
+    const sidebarStyle = { key: 'sidebar', style: { x: spring(400) } }
+    const motionStyles = this.state.show ? [sidebarStyle] : []
+
     return (
       <div className={css(styles.sidebarMenu)}>
         <div className={css(styles.menuBar)}>
@@ -68,7 +53,11 @@ export default class SidebarMenu extends Component {
             <BigIcon name='list' />
           </button>
         </div>
-        <TransitionMotion willEnter={this.willEnter} willLeave={this.willLeave} styles={motionStyles}>
+        <TransitionMotion
+          willEnter={willEnter}
+          willLeave={willLeave}
+          styles={motionStyles}
+        >
           { interpolatedStyles =>
             <div>
               { interpolatedStyles.map(config => {
