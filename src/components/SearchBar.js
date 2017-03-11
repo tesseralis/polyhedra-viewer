@@ -46,6 +46,7 @@ const SearchBar = ({ text, setValue }) => {
     <label className={css(styles.searchBar)}>
       <input
         type="text"
+        placeholder="Search..."
         value={text}
         onChange={e => setValue(e.target.value)}
         className={css(styles.input)}
