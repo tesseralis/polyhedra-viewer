@@ -1,3 +1,5 @@
+import { createSelector } from 'reselect'
+
 import { SET_FILTER_TEXT } from '../constants/ActionTypes'
 import { groups } from '../constants/polyhedra'
 
@@ -14,17 +16,21 @@ export default function filter(state = initialState, action) {
   }
 }
 
+// TODO should I move selectors to their own file?
+
+export const getFilterText = state => state.text
+
 const getFilteredPolyhedra = (polyhedra, filter) => (
   polyhedra.filter(solid => solid.includes(filter.toLowerCase()))
 )
 
-export const getFilteredGroups = state => {
-  // TODO replace this with selector.js library
-  if (!state.text) return groups
-  return groups.map(({ polyhedra, ...group}) => ({
-    ...group,
-    polyhedra: getFilteredPolyhedra(polyhedra, state.text)
-  })).filter(({ polyhedra }) => polyhedra.length !== 0)
-}
+export const getFilteredGroups = createSelector(
+  getFilterText,
+  filterText => {
+    return groups.map(({ polyhedra, ...group}) => ({
+      ...group,
+      polyhedra: getFilteredPolyhedra(polyhedra, filterText)
+    })).filter(({ polyhedra }) => polyhedra.length !== 0)
+  }
+)
 
-export const getFilterText = state => state.text
