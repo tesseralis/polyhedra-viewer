@@ -18,7 +18,7 @@ const groupDescriptions = {
 
 const johnsonSubgroups = [
   'pyramids',
-  'cupolaæ and rotunda',
+  'cupolæ and rotunda',
   'elongated and gyroelongated pyramids',
   'bipyramids',
   'elongated cupolæ and rotundæ',
@@ -39,9 +39,10 @@ const johnsonSubgroups = [
   'others',
 ]
 
+// FIXME come up with a less janky way to store these
 const johnsonSubgroupIndices = {
   'pyramids': 2,
-  'cupolaæ and rotunda': 6,
+  'cupolæ and rotunda': 6,
   'elongated and gyroelongated pyramids': 11,
   'bipyramids': 17,
   'elongated cupolæ and rotundæ': 25,
@@ -62,29 +63,33 @@ const johnsonSubgroupIndices = {
   'others': 92,
 }
 
+const getPolyhedra = groupName => require(`../data/groups/${groupName}.json`)
+
 const getJohnsonPolyhedra = () => {
-  const johnsonSolids = require('../data/groups/johnson.json')
+  const johnsonSolids = getPolyhedra('johnson')
   return johnsonSubgroups.map((subgroupName, i) => ({
     name: subgroupName,
     polyhedra: johnsonSolids.slice(i === 0 ? 0 : johnsonSubgroupIndices[johnsonSubgroups[i-1]], johnsonSubgroupIndices[subgroupName]),
   }))
 }
 
-const getPolyhedra = groupName => {
+const getNestedPolyhedra = groupName => {
   if (groupName === 'johnson') return { groups: getJohnsonPolyhedra() }
-  return { polyhedra: require(`../data/groups/${groupName}.json`) }
+  return { polyhedra: getPolyhedra(groupName) }
 }
 
-// FIXME this breaks search
+const flatGroups = groupNames.map(groupName => ({
+  name: groupName,
+  polyhedra: getPolyhedra(groupName),
+}))
+
 export const groups = groupNames.map(groupName => ({
   name: groupName,
   description: groupDescriptions[groupName],
-  ...getPolyhedra(groupName),
+  ...getNestedPolyhedra(groupName),
 }))
 
-console.log(groups)
-
-const allSolidNames = _.flatMap(groups, 'polyhedra')
+const allSolidNames = _.flatMap(flatGroups, 'polyhedra')
 
 export const isValidSolid = escapedSolidName => {
   return allSolidNames.includes(escapedSolidName.replace(/-/g, ' '))

@@ -1,10 +1,12 @@
 import React from 'react'
 import { css, StyleSheet } from 'aphrodite/no-important'
 import { Link } from 'react-router'
+import _ from 'lodash'
 
 import { escapeName } from '../constants/polyhedra'
 import Title from './Title'
 import GroupHeader from './GroupHeader'
+import SubgroupHeader from './SubgroupHeader'
 
 import { hoeflerText } from '../styles/fonts'
 import { fadeIn } from '../styles/animations'
@@ -37,7 +39,7 @@ const PolyhedronLink = ({ name }) => {
 }
 
 const PolyhedronList = ({ polyhedra }) => {
-  const maxThumbnailsPerLine = 7
+  const maxThumbnailsPerLine = 8
   const styles = StyleSheet.create({
     list: {
       display: 'flex',
@@ -56,9 +58,15 @@ const PolyhedronList = ({ polyhedra }) => {
 }
 
 const Subgroup = ({ name, polyhedra }) => {
+  const styles = StyleSheet.create({
+    subgroup: {
+      margin: '18px 14px',
+    },
+  })
+
   return (
-    <div>
-      <h3>{name}</h3>
+    <div className={css(styles.subgroup)}>
+      <SubgroupHeader name={name} />
       <PolyhedronList polyhedra={polyhedra} />
     </div>
   )
@@ -72,7 +80,7 @@ const PolyhedronGroup = ({ name, description, polyhedra, groups }) => {
     },
     
     header: {
-      margin: '5px 0', // TODO figure out another notation for this?
+      margin: '5px 0',
     },
     
     description: {
@@ -81,6 +89,12 @@ const PolyhedronGroup = ({ name, description, polyhedra, groups }) => {
       margin: 14,
       lineHeight: '22px',
     },
+
+    subgroups: {
+      display: 'flex',
+      flexWrap: 'wrap',
+      justifyContent: 'space-around',
+    }
   })
 
   return (
@@ -88,7 +102,7 @@ const PolyhedronGroup = ({ name, description, polyhedra, groups }) => {
       <GroupHeader name={name} styles={styles.header} />
       <p className={css(styles.description)}>{description}</p>
       { polyhedra && <PolyhedronList polyhedra={polyhedra} /> }
-      { groups && groups.map(group => <Subgroup key={group.name} {...group} />) }
+      { groups && <div className={css(styles.subgroups)}>{groups.map(group => <Subgroup key={group.name} {...group} />)}</div> }
     </div>
   )
 }

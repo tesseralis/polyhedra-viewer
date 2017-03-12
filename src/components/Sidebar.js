@@ -5,6 +5,8 @@ import { css, StyleSheet } from 'aphrodite/no-important'
 
 import { escapeName } from '../constants/polyhedra'
 import GroupHeader from './GroupHeader'
+import SubgroupHeader from './SubgroupHeader'
+
 import { andaleMono } from '../styles/fonts'
 import { resetLink, hover } from '../styles/common'
 
@@ -14,7 +16,7 @@ const PolyhedronLink = ({ name }) => {
       ...resetLink,
       ...hover,
       display: 'block',
-      padding: '3px 12px',
+      padding: '3px 14px',
 
       color: 'DimGrey',
       lineHeight: '18px',
@@ -47,7 +49,26 @@ const PolyhedronList = ({ polyhedra }) => {
   )
 }
 
-const PolyhedronGroup = ({ name, polyhedra }) => {
+const Subgroup = ({ name, polyhedra }) => {
+  const styles = StyleSheet.create({
+    subgroup: {
+      margin: '18px 0',
+    },
+
+    header: {
+      margin: '3px 12px',
+    }
+  })
+
+  return (
+    <div className={css(styles.subgroup)}>
+      <SubgroupHeader name={name} styles={styles.header} />
+      <PolyhedronList polyhedra={polyhedra} />
+    </div>
+  )
+}
+
+const PolyhedronGroup = ({ name, polyhedra, groups }) => {
   const styles = StyleSheet.create({
     group: {
       padding: '10px 0',
@@ -55,13 +76,14 @@ const PolyhedronGroup = ({ name, polyhedra }) => {
 
     header: {
       margin: '5px 12px',
-    }
+    },
   })
 
   return (
     <div className={css(styles.group)}>
       <GroupHeader name={name} styles={styles.header} />
-      <PolyhedronList polyhedra={polyhedra} />
+      { polyhedra && <PolyhedronList polyhedra={polyhedra} /> }
+      { groups && <div className={css(styles.subgroups)}>{groups.map(group => <Subgroup key={group.name} {...group} />)}</div> }
     </div>
   )
 }
