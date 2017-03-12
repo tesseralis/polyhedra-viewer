@@ -23,6 +23,7 @@ const PolyhedronLink = ({ name }) => {
       display: 'flex',
       justifyContent: 'center',
       overflow: 'hidden',
+      borderRadius: 25,
     },
     
     image: {
