@@ -30,7 +30,6 @@ const Viewer = ({ params, polyhedronConfig, groups }) => {
   )
 }
 
-// TODO is there something similar to bindActionCreators?
 const mapStateToProps = state => ({
   polyhedronConfig: getPolyhedronConfig(state),
 })
