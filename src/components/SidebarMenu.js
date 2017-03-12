@@ -5,7 +5,9 @@ import { Link } from 'react-router'
 import { css, StyleSheet } from 'aphrodite/no-important'
 
 import BigIcon from './BigIcon'
-import { fixTopLeft, resetButton, resetLink } from '../styles/common'
+import { fixed, resetButton, resetLink, bigIcon } from '../styles/common'
+
+const fixTopLeft = fixed('top', 'left')
 
 const styles = StyleSheet.create({
   sidebarMenu: {
@@ -24,9 +26,9 @@ const styles = StyleSheet.create({
     overflowY: 'scroll',
   },
 
-  homeLink: { ...resetLink },
+  homeLink: { ...resetLink, ...bigIcon },
 
-  toggleButton: { ...resetButton },
+  toggleButton: { ...resetButton, ...bigIcon },
 })
 
 export default class SidebarMenu extends Component {
