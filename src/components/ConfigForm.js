@@ -2,7 +2,7 @@ import React from 'react'
 import { css, StyleSheet } from 'aphrodite/no-important'
 import _ from 'lodash'
 
-import { hover } from '../styles/common'
+import { hover, transition } from '../styles/common'
 import { andaleMono } from '../styles/fonts'
 // TODO pass these in as props?
 import { configKeys, configOptions } from '../constants/configOptions'
@@ -61,17 +61,23 @@ const ResetButton = ({ reset }) => {
   const styles = StyleSheet.create({
     resetButton: {
       ...hover,
+      ...transition('all', .25),
 
       width: 120,
       height: 30,
-      marginTop: 10,
+      marginTop: 20,
 
       background: 'WhiteSmoke',
-      border: '1px Gray solid',
+      border: '2px LightGray solid',
       borderRadius: 2,
 
       fontFamily: andaleMono,
       fontSize: 14,
+
+      ':focus': {
+        outline: 'none',
+        borderColor: 'Gray',
+      }
     },
   })
 
@@ -91,7 +97,7 @@ const ConfigForm = ({ width, configValues, setInputValue, reset }) => {
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'flex-end',
-      padding: 20,
+      padding: '0 20px',
     },
   })
 
