@@ -1,6 +1,5 @@
 import React from 'react'
 import { StyleSheet } from 'aphrodite/no-important'
-import _ from 'lodash'
 
 import X3dScene from '../components/X3dScene'
 import SidebarMenu from '../components/SidebarMenu'
@@ -23,7 +22,7 @@ const Viewer = ({ solid, polyhedron: Polyhedron, sidebar: Sidebar, configForm: C
     </X3dScene>
     <SidebarMenu sidebar={Sidebar} />
     <ConfigMenu configForm={ConfigForm} />
-    <Title styles={styles.title}>{ _.capitalize(solid.name) }</Title>
+    <Title styles={styles.title} name={solid.name} />
   </div>
 )
 

@@ -1,7 +1,6 @@
 import React from 'react'
 import { css, StyleSheet } from 'aphrodite/no-important'
 import { Link } from 'react-router'
-import _ from 'lodash'
 
 import { escapeName } from '../constants/polyhedra'
 import Title from './Title'
@@ -126,7 +125,7 @@ const Table = ({ groups, searchBar: SearchBar }) => {
 
   return (
     <div className={css(styles.table)}>
-      <Title>Polyhedra Viewer</Title>
+      <Title name="Polyhedra Viewer" />
       <SearchBar />
       { groups.map(group => <PolyhedronGroup key={group.name} {...group} />) }
     </div>
