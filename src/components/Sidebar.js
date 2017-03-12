@@ -66,19 +66,13 @@ const PolyhedronGroup = ({ name, polyhedra }) => {
   )
 }
 
-const Sidebar = ({ groups, searchBar: SearchBar }) => {
+const Sidebar = ({ groups, width, searchBar: SearchBar }) => {
   const styles = StyleSheet.create({
     sidebar: {
-      width: 400,
-      overflow: 'scroll',
+      width,
+      overflowY: 'scroll',
       backgroundColor: 'WhiteSmoke', // TODO colors file
-      // FIXME doesn't work with the fixed-width animation!
-      boxShadow: '1px 1px 4px LightGray',
-
-      // FIXME move this out of here!
-      position: 'absolute',
-      top: 0,
-      right: 0,
+      boxShadow: 'inset -1px -1px 4px LightGray',
     },
   })
 

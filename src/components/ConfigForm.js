@@ -84,13 +84,13 @@ const ResetButton = ({ reset }) => {
   )
 }
 
-const ConfigForm = ({ configValues, setInputValue, reset }) => {
+const ConfigForm = ({ width, configValues, setInputValue, reset }) => {
   const styles = StyleSheet.create({
     configMenu: {
+      width,
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'flex-end',
-      width: 270,
       padding: 20,
     },
   })

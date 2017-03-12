@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
-import { Motion, TransitionMotion, spring } from 'react-motion'
+import { Motion, spring } from 'react-motion'
+import ConditionTransitionMotion from './ConditionTransitionMotion'
 import { css, StyleSheet } from 'aphrodite/no-important'
 
 import BigIcon from './BigIcon'
@@ -28,11 +29,7 @@ export default class ConfigMenu extends Component {
 
   render() {
     const ConfigForm = this.props.configForm
-
-    const willEnter = () => ({ x: 270, opacity: 0 }) 
-    const willLeave = () => ({ x: spring(270), opacity: spring(0) })
-    const configStyle = { key: 'config', style: { x: spring(0), opacity: spring(1) } }
-    const motionStyles = this.state.show ? [configStyle] : []
+    const configFormWidth = 270
 
     return (
       <div className={css(styles.configMenu)}>
@@ -45,25 +42,18 @@ export default class ConfigMenu extends Component {
           }
           </Motion>
         </button>
-        <TransitionMotion
-          willEnter={willEnter}
-          willLeave={willLeave}
-          styles={motionStyles}
+        <ConditionTransitionMotion
+          condition={this.state.show}
+          willEnter={() => ({ x: configFormWidth, opacity: 0 })}
+          willLeave={() => ({ x: spring(configFormWidth), opacity: spring(0) })}
+          style={{ x: spring(0), opacity: spring(1)}}
         >
-          { interpolatedStyles => <div>
-            { interpolatedStyles.map(config => {
-              return (
-                <div
-                  key={config.key}
-                  style={{
-                    transform: `translateX(${config.style.x}px)`,
-                    opacity: config.style.opacity,
-                  }}
-                ><ConfigForm /></div>
-              )
-            }) }
-          </div> }
-        </TransitionMotion>
+          { ({x, opacity}) =>
+            <div style={{ transform: `translateX(${x}px)`, opacity, }}>
+              <ConfigForm width={configFormWidth}/>
+            </div>
+          }
+        </ConditionTransitionMotion>
       </div>
     )
   }
