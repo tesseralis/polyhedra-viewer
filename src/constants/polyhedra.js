@@ -71,7 +71,7 @@ const getJohnsonPolyhedra = () => {
 }
 
 const getPolyhedra = groupName => {
-  if (groupName === 'johnson') return { subgroups: getJohnsonPolyhedra() }
+  if (groupName === 'johnson') return { groups: getJohnsonPolyhedra() }
   return { polyhedra: require(`../data/groups/${groupName}.json`) }
 }
 

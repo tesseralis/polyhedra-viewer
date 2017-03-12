@@ -24,13 +24,21 @@ const getFilteredPolyhedra = (polyhedra, filter) => (
   polyhedra.filter(solid => solid.includes(filter.toLowerCase()))
 )
 
+const filterGroups = (groups, filterText) => groups.map(group => {
+  if (group.groups) {
+    return {
+      ...group,
+      groups: filterGroups(group.groups, filterText),
+    }
+  }
+  return {
+    ...group,
+    polyhedra: getFilteredPolyhedra(group.polyhedra, filterText),
+  }
+}).filter(({ groups, polyhedra }) => (groups && groups.length > 0) || (polyhedra && polyhedra.length > 0))
+
 export const getFilteredGroups = createSelector(
   getFilterText,
-  filterText => {
-    return groups.map(({ polyhedra, ...group}) => ({
-      ...group,
-      polyhedra: getFilteredPolyhedra(polyhedra, filterText)
-    })).filter(({ polyhedra }) => polyhedra.length !== 0)
-  }
+  filterText => filterGroups(groups, filterText)
 )
 
