@@ -8,7 +8,7 @@ An interactive tool that lets you manipulate virtual models of various polyhedra
 * [Antiprisms](http://en.wikipedia.org/wiki/Antiprism)
 * [Johnson Solids](http://en.wikipedia.org/wiki/Johnson_solid)
 
-It was built with (among other things):
+It was built with (among [other things]):
 
 * [React](https://facebook.github.io/react/)
 * [x3dom](http://www.x3dom.org/)
@@ -16,3 +16,4 @@ It was built with (among other things):
 Geometric data taken from George W. Hart's [Virtual Polyhedra].
 
 [Virtual Polyhedra]: http://www.georgehart.com/virtual-polyhedra/vp.html
+[other things]: ./package.json
