@@ -108,7 +108,6 @@ const PolyhedronGroup = ({ name, description, polyhedra, groups }) => {
 }
 
 const Table = ({ groups, searchBar: SearchBar }) => {
-  console.log(groups)
   const styles = StyleSheet.create({
     table: {
       maxWidth: 900,
