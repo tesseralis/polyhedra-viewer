@@ -1,6 +1,5 @@
 import React from 'react'
 import { css, StyleSheet } from 'aphrodite/no-important'
-import _ from 'lodash'
 import { andaleMono } from '../styles/fonts'
 
 const Title = ({ name, ...props }) => {
@@ -13,7 +12,7 @@ const Title = ({ name, ...props }) => {
     },
   })
 
-  return <h1 className={css(styles.title, props.styles)}>{ _.capitalize(name) }</h1>
+  return <h1 className={css(styles.title, props.styles)}>{ name }</h1>
 }
 
 export default Title
