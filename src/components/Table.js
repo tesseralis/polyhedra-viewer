@@ -9,7 +9,7 @@ import SubgroupHeader from './SubgroupHeader'
 
 import { hoeflerText, andaleMono } from '../styles/fonts'
 import { fadeIn } from '../styles/animations'
-import { hover } from '../styles/common'
+import { hover, resetLink } from '../styles/common'
 
 const thumbnailSize = 100
 
@@ -109,15 +109,22 @@ const PolyhedronGroup = ({ name, description, polyhedra, groups }) => {
 
 const Header = () => {
   const styles = StyleSheet.create({
-    header: { padding: 24 },
-    title: { padding: 24 },
+    header: {
+      padding: 20,
+      display: 'flex',
+      alignItems: 'baseline',
+      flexWrap: 'wrap',
+      justifyContent: 'center',
+    },
+    title: { padding: 14 },
     subtitle: { fontFamily: andaleMono },
+    link: { ...resetLink }
   })
   return (
     <header className={css(styles.header)}>
       <Title name="Polyhedra Viewer" styles={styles.title} />
       <p className={css(styles.subtitle)}>
-        a thing by <a target="_blank" href="http://tessenate.me">nfa</a>
+        by <a className={css(styles.link)} target="_blank" href="http://tessenate.me">nfa</a>
       </p>
     </header>
   )
