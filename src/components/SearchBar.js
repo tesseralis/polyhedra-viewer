@@ -5,41 +5,42 @@ import { andaleMono } from '../styles/fonts'
 import { transition } from '../styles/common'
 import Icon from './Icon'
 
-const SearchBar = ({ text, setValue }) => {
-  const styles = StyleSheet.create({
-    searchBar: {
-      display: 'flex',
-      justifyContent: 'left',
-      alignItems: 'center',
-      padding: 10,
-      width: '100%',
-      position: 'relative',
-    },
-    
-    input: {
-      ...transition('border-color', .35),
-      width: '100%',
-      padding: 8,
-      paddingLeft: 30,
+const styles = StyleSheet.create({
+  searchBar: {
+    display: 'flex',
+    justifyContent: 'left',
+    alignItems: 'center',
+    padding: 10,
+    width: '100%',
+    position: 'relative',
+  },
 
-      border: '2px LightGray solid',
-      borderRadius: 28,
+  input: {
+    ...transition('border-color', .35),
+    width: '100%',
+    padding: 8,
+    paddingLeft: 30, // TODO shouldn't do this...
 
-      fontSize: 14,
-      fontFamily: andaleMono,
+    border: '2px LightGray solid',
+    borderRadius: 28,
 
-      ':focus': {
-        outline: 'none',
-        borderColor: 'Gray',
-      }
-    },
+    fontSize: 14,
+    fontFamily: andaleMono,
 
-    icon: {
-      position: 'absolute',
-      padding: 10,
-      color: 'LightGray',
-    },
-  })
+    ':focus': {
+      outline: 'none',
+      borderColor: 'Gray',
+    }
+  },
+
+  icon: {
+    position: 'absolute',
+    padding: 10,
+    color: 'LightGray',
+  },
+})
+
+export default function SearchBar({ text, setValue }) {
 
   // TODO make the icon light up as well;
   // might have to use onFocus/onBlur to do it with aphrodite
@@ -58,5 +59,3 @@ const SearchBar = ({ text, setValue }) => {
     </label>
   )
 }
-
-export default SearchBar
