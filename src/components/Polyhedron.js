@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from 'react'
+import React from 'react'
+import { Motion, spring, presets } from 'react-motion'
 import { rgb } from 'd3-color'
 import _ from 'lodash'
 
@@ -10,69 +11,80 @@ export const joinListOfLists = (list, outerSep, innerSep) => {
   return list.map(elem => elem.join(innerSep)).join(outerSep)
 }
 
+const Coordinates = ({ points }) => {
+  // TODO Find a more elegant solution for this
+  // We pad the number of points in case we move from a solid with more vertices
+  // to one with less, so that x3dom does accidentally map an index to a non-existing point
+  const buffer = _.times(100, _.constant([0, 0, 0]))
+  const bufferedPoints = points.concat(buffer)
+
+  return (
+    <coordinate is point={joinListOfLists(bufferedPoints, ', ', ' ')}></coordinate>
+  )
+}
+
+/* Faces */
+
 // Convert the hex color to RGB
-const toRgb = hex => {
-  const asRgb = rgb(hex)
-  return [asRgb.r, asRgb.g, asRgb.b].map(d => d/255)
-}
-
+const toRgb = hex => ['r', 'g', 'b'].map(_.propertyOf(rgb(hex))).map(d => d/255)
 const colorIndexForFace = mapObject(polygons, _.nthArg(1))
-
 const getColorIndex = face => colorIndexForFace[face.length]
+const polygonColors = colors => polygons.map(n => toRgb(colors[n]))
+const getColorAttr = colors => joinListOfLists(polygonColors(colors), ',', ' ')
 
-const getColorAttr = colors => {
-  return joinListOfLists(polygons.map(n => toRgb(colors[n])), ', ', ' ')
+const Faces = ({ faces, vertices, config }) => {
+  const { opacity, colors } = config
+  return (
+    <shape>
+      <appearance>
+        <material is transparency={1 - opacity}></material>
+      </appearance>
+      <indexedfaceset is
+        solid="false"
+        colorPerVertex="false"
+        colorindex={ faces.map(getColorIndex).join(' ') }
+        coordindex={ joinListOfLists(faces, ' -1 ', ' ') }
+      >
+        <Coordinates points={vertices} />
+        <color is color={getColorAttr(colors)}></color>
+      </indexedfaceset>
+    </shape>
+  )
+  
 }
 
-export default class Polyhedron extends Component {
+/* Edges */
 
-  static propTypes = {
-    solid: PropTypes.object.isRequired,
-    config: PropTypes.object.isRequired,
-  }
-
-  renderCoordinates(points) {
-    // TODO Find a more elegant solution for this
-    // We pad the number of points in case we move from a solid with more vertices
-    // to one with less, so that x3dom does accidentally map an index to a non-existing point
-    const buffer = _.times(100, _.constant([0, 0, 0]))
-    const bufferedPoints = points.concat(buffer)
-
-    return (
-      <coordinate is point={joinListOfLists(bufferedPoints, ', ', ' ')}></coordinate>
-    )
-  }
-
-  render() {
-    const { solid, config } = this.props
-    const { faces, vertices, edges } = solid
-    const { showEdges, showFaces, opacity, colors } = config
-    // TODO line width doesn't work -- replace with another option
-
-    return (
-      <group>
-        { showFaces && <shape>
-          <appearance>
-            <material is transparency={1 - opacity}></material>
-          </appearance>
-          <indexedfaceset is
-            solid="false"
-            colorPerVertex="false"
-            colorindex={ faces.map(getColorIndex).join(' ') }
-            coordindex={ joinListOfLists(faces, ' -1 ', ' ') }
-          >
-            { this.renderCoordinates(vertices) }
-            <color is color={getColorAttr(colors)}></color>
-          </indexedfaceset>
-        </shape> }
-        { showEdges && <shape>
-          <indexedlineset is
-            coordindex={ joinListOfLists(edges, ' -1 ', ' ') }
-          >
-            { this.renderCoordinates(vertices) }
-          </indexedlineset>
-        </shape> }
-      </group>
-    )
-  }
+const Edges = ({ edges, vertices }) => {
+  return (
+    <shape>
+      <indexedlineset is
+        coordindex={ joinListOfLists(edges, ' -1 ', ' ') }
+      >
+      <Coordinates points={vertices} />
+      </indexedlineset>
+    </shape>
+  )
 }
+
+/* Polyhedron */
+
+const getScaleAttr = scale => `${scale} ${scale} ${scale}`
+
+const Polyhedron = ({ solid, config }) => {
+  const { faces, vertices, edges } = solid
+  const { showEdges, showFaces } = config
+
+  return (
+    <Motion defaultStyle={{ scale: 0 }} style={{ scale: spring(1, presets.gentle) }}>
+      { ({ scale }) =>
+        <transform is scale={getScaleAttr(scale)}>
+          { showFaces && <Faces faces={faces} vertices={vertices} config={config} /> }
+          { showEdges && <Edges edges={edges} vertices={vertices} /> }
+        </transform>
+      }
+    </Motion>
+  )
+}
+
+export default Polyhedron

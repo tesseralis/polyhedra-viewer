@@ -16,7 +16,7 @@ export default function filter(state = initialState, action) {
   }
 }
 
-// TODO should I move selectors to their own file?
+// TODO move selectors to their own file when I have enough
 
 export const getFilterText = state => state.text
 

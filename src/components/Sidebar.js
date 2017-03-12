@@ -66,13 +66,14 @@ const PolyhedronGroup = ({ name, polyhedra }) => {
   )
 }
 
-const Sidebar = ({ groups, searchBar: SearchBar }) => {
+const Sidebar = ({ groups, width, searchBar: SearchBar }) => {
   const styles = StyleSheet.create({
     sidebar: {
-      width: 400,
-      overflow: 'scroll',
+      width,
+      height: '100%',
+      overflowY: 'scroll',
       backgroundColor: 'WhiteSmoke', // TODO colors file
-      boxShadow: '1px 1px 4px LightGray',
+      boxShadow: 'inset -1px -1px 4px LightGray',
     },
   })
 

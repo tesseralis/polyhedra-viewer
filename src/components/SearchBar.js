@@ -2,6 +2,7 @@ import React from 'react'
 import { css, StyleSheet } from 'aphrodite/no-important'
 
 import { andaleMono } from '../styles/fonts'
+import { transition } from '../styles/common'
 import Icon from './Icon'
 
 const SearchBar = ({ text, setValue }) => {
@@ -12,9 +13,11 @@ const SearchBar = ({ text, setValue }) => {
       alignItems: 'center',
       padding: 10,
       width: '100%',
+      position: 'relative',
     },
     
     input: {
+      ...transition('border-color', .35),
       width: '100%',
       padding: 8,
       paddingLeft: 30,
@@ -24,9 +27,6 @@ const SearchBar = ({ text, setValue }) => {
 
       fontSize: 14,
       fontFamily: andaleMono,
-
-      // TODO normalize transition function
-      '-webkit-transition': 'border-color .35s',
 
       ':focus': {
         outline: 'none',

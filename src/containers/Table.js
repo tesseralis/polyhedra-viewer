@@ -2,11 +2,11 @@ import { connect } from 'react-redux'
 
 import { getFilteredGroups } from '../reducers'
 import Table from '../components/Table'
-import FilterBar from './FilterBar'
+import SearchBar from './SearchBar'
 
 const mapStateToProps = state => ({
   groups: getFilteredGroups(state),
-  searchBar: FilterBar
+  searchBar: SearchBar
 })
 
 export default connect(mapStateToProps)(Table)

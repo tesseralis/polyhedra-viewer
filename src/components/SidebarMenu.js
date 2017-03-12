@@ -1,30 +1,34 @@
 import React, { Component } from 'react'
+import { Motion, spring } from 'react-motion'
+import ConditionTransitionMotion from './ConditionTransitionMotion'
 import { Link } from 'react-router'
 import { css, StyleSheet } from 'aphrodite/no-important'
 
 import BigIcon from './BigIcon'
-import { resetButton, resetLink } from '../styles/common'
+import { fixed, resetButton, resetLink, bigIcon } from '../styles/common'
+
+const fixTopLeft = fixed('top', 'left')
 
 const styles = StyleSheet.create({
   sidebarMenu: {
-    position: 'fixed',
-    top: 0,
-    left: 0,
-    // Sidebar
-    height: '100%',
-    // Horizontally align the sidebar and menu bar
-    display: 'flex',
-    flexDirection: 'row-reverse',
+    ...fixTopLeft,
   },
 
   menuBar: {
+    ...fixTopLeft,
     display: 'flex',
     flexDirection: 'column',
   },
 
-  homeLink: { ...resetLink },
+  sidebar: {
+    ...fixTopLeft,
+    height: '100%',
+    overflowY: 'scroll',
+  },
 
-  toggleButton: { ...resetButton },
+  homeLink: { ...resetLink, ...bigIcon },
+
+  toggleButton: { ...resetButton, ...bigIcon },
 })
 
 export default class SidebarMenu extends Component {
@@ -34,17 +38,34 @@ export default class SidebarMenu extends Component {
 
   render() {
     const Sidebar = this.props.sidebar
+    const sidebarWidth = 400
+
     return (
       <div className={css(styles.sidebarMenu)}>
-        <div className={css(styles.menuBar)}>
-          <Link to="/" className={css(styles.homeLink)}>
-            <BigIcon name='home' />
-          </Link>
-          <button onClick={() => this.toggle()} className={css(styles.toggleButton)}>
-            <BigIcon name='list' />
-          </button>
-        </div>
-        { this.state.show && <Sidebar /> }
+        <Motion style={{x: spring(this.state.show ? sidebarWidth : 0)}}>
+        { ({ x }) =>
+          <div style={{transform: `translateX(${x}px)`}} className={css(styles.menuBar)}>
+            <Link to="/" className={css(styles.homeLink)}>
+              <BigIcon name='home' />
+            </Link>
+            <button onClick={() => this.toggle()} className={css(styles.toggleButton)}>
+              <BigIcon name='list' />
+            </button>
+          </div>
+        }
+        </Motion>
+        <ConditionTransitionMotion
+          condition={this.state.show}
+          willEnter={() => ({ x: -sidebarWidth })}
+          willLeave={() => ({ x: spring(-sidebarWidth)})}
+          style={{ x: spring(0)}}
+        >
+          { ({x}) => 
+            <div className={css(styles.sidebar)} style={{ transform: `translateX(${x}px)` }} >
+              <Sidebar width={sidebarWidth}/>
+            </div>
+          }
+        </ConditionTransitionMotion>
       </div>
     )
   }
