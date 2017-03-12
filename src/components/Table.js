@@ -86,7 +86,7 @@ const PolyhedronGroup = ({ name, description, polyhedra, groups }) => {
     description: {
       fontFamily: hoeflerText,
       color: 'DimGrey',
-      margin: 14,
+      margin: '14px 0',
       lineHeight: '22px',
     },
 
