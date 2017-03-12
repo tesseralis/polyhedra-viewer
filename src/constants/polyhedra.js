@@ -39,7 +39,7 @@ const johnsonSubgroups = [
   'others',
 ]
 
-// FIXME come up with a less janky way to store these
+// TODO come up with a less janky way to store these
 const johnsonSubgroupIndices = {
   'pyramids': 2,
   'cupolæ and rotunda': 6,
