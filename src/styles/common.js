@@ -4,8 +4,16 @@ export const hover = {
   }
 }
 
+export const transition = (property, duration, ease='') => {
+  const value = `${property} ${duration}s ${ease}`.trim()
+  return {
+    transition: value
+  }
+}
+
 // TODO figure out the place to put this
 export const bigIcon = {
+  ...transition('color', .25),
   padding: 10,
   color: 'Gray',
   ':hover': {
