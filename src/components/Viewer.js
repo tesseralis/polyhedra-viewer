@@ -10,6 +10,7 @@ import { fixed } from '../styles/common'
 
 const styles = StyleSheet.create({
   title: {
+    padding: 36,
     ...fixed('bottom', 'right'),
     maxWidth: '50%',
     textAlign: 'right',

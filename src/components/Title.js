@@ -5,7 +5,6 @@ import { andaleMono } from '../styles/fonts'
 const Title = ({ name, ...props }) => {
   const styles = StyleSheet.create({
     title: {
-      padding: 32,
       fontFamily: andaleMono,
       fontSize: 36,
       fontWeight: 'bold',

@@ -7,7 +7,7 @@ import Title from './Title'
 import GroupHeader from './GroupHeader'
 import SubgroupHeader from './SubgroupHeader'
 
-import { hoeflerText } from '../styles/fonts'
+import { hoeflerText, andaleMono } from '../styles/fonts'
 import { fadeIn } from '../styles/animations'
 import { hover } from '../styles/common'
 
@@ -107,6 +107,22 @@ const PolyhedronGroup = ({ name, description, polyhedra, groups }) => {
   )
 }
 
+const Header = () => {
+  const styles = StyleSheet.create({
+    header: { padding: 24 },
+    title: { padding: 24 },
+    subtitle: { fontFamily: andaleMono },
+  })
+  return (
+    <header className={css(styles.header)}>
+      <Title name="Polyhedra Viewer" styles={styles.title} />
+      <p className={css(styles.subtitle)}>
+        a thing by <a target="_blank" href="http://tessenate.me">nfa</a>
+      </p>
+    </header>
+  )
+}
+
 const Table = ({ groups, searchBar: SearchBar }) => {
   const styles = StyleSheet.create({
     table: {
@@ -124,7 +140,7 @@ const Table = ({ groups, searchBar: SearchBar }) => {
 
   return (
     <div className={css(styles.table)}>
-      <Title name="Polyhedra Viewer" />
+      <Header />
       <SearchBar />
       { groups.map(group => <PolyhedronGroup key={group.name} {...group} />) }
     </div>
