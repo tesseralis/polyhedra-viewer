@@ -2,7 +2,8 @@ import React, { Component } from 'react'
 import { StyleSheet, css } from 'aphrodite/no-important'
 
 // TODO put this in the webpack config when ejecting create-react-app
-import x3dom from 'exports?x3dom!x3dom' // eslint-disable-line import/no-webpack-loader-syntax
+// eslint-disable-next-line import/no-webpack-loader-syntax
+import x3dom from 'exports?x3dom!x3dom'
 import 'x3dom/x3dom.css'
 
 import { fullScreen } from '../styles/common'
