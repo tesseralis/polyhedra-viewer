@@ -1,8 +1,6 @@
 import _ from 'lodash'
 
-import { mapObject } from '../util'
-import polygons from '../constants/polygons'
-import { configOptions, getColorInputKey } from '../constants/configOptions'
+import { configOptions } from '../constants/configOptions'
 import {
   SET_INPUT_VALUE,
   RESET,
@@ -20,7 +18,3 @@ export default function config(state = initialState, action) {
       return state
   }
 }
-
-const getColors = state => mapObject(polygons, n => state[getColorInputKey(n)])
-export const getPolyhedronConfig = state => ({ ...state, colors: getColors(state) })
-export const getConfigValues = _.identity

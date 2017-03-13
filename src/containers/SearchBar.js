@@ -2,7 +2,7 @@ import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 
 import { setFilterText } from '../actions'
-import { getFilterText } from '../reducers'
+import { getFilterText } from '../selectors'
 import SearchBar from '../components/SearchBar'
 
 const mapStateToProps = state => ({

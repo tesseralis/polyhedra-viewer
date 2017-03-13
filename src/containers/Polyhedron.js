@@ -1,6 +1,6 @@
 import { connect } from 'react-redux'
 
-import { getPolyhedronConfig } from '../reducers'
+import { getPolyhedronConfig } from '../selectors'
 
 import Polyhedron from '../components/Polyhedron'
 

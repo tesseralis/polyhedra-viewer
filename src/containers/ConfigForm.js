@@ -2,7 +2,7 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 
 import { configInputs } from '../constants/configOptions'
-import { getConfigValues } from '../reducers'
+import { getConfigValues } from '../selectors'
 import { setInputValue, reset } from '../actions'
 import ConfigForm from '../components/ConfigForm'
 

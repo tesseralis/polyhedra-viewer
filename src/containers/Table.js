@@ -1,6 +1,6 @@
 import { connect } from 'react-redux'
 
-import { getFilteredGroups } from '../reducers'
+import { getFilteredGroups } from '../selectors'
 import Table from '../components/Table'
 import SearchBar from './SearchBar'
 
