@@ -18,8 +18,8 @@ const styles = StyleSheet.create({
   input: {
     ...transition('border-color', .35),
     width: '100%',
-    padding: 8,
-    paddingLeft: 30, // TODO shouldn't do this...
+    height: 36,
+    paddingLeft: 30,
 
     border: '2px LightGray solid',
     borderRadius: 28,
