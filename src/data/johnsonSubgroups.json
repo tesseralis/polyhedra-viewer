@@ -1,0 +1,22 @@
+[
+  { "name": "pyramids", "index": 0 },
+  { "name": "cupolæ and rotunda", "index": 2 },
+  { "name": "elongated and gyroelongated pyramids", "index": 6 },
+  { "name": "bipyramids", "index": 11 },
+  { "name": "elongated cupolæ and rotundæ", "index": 17 },
+  { "name": "bicupolæ", "index": 25 },
+  { "name": "cupola-rotundæ and birotunda", "index": 31 },
+  { "name": "elongated bicupolæ", "index": 34 },
+  { "name": "elongated cupola-rotundæ and birotundæ", "index": 39 },
+  { "name": "gyroelongated bicupolæ, cupola-rotunda, and birotunda", "index": 43 },
+  { "name": "augmented triangular prisms", "index": 48 },
+  { "name": "augmented pentagonal and hexagonal prisms", "index": 51 },
+  { "name": "augmented dodecahedra", "index": 57 },
+  { "name": "diminished icosahedra", "index": 61 },
+  { "name": "augmented truncated tetrahedron and truncated cubes", "index": 64 },
+  { "name": "augmented truncated dodecahedra", "index": 67 },
+  { "name": "gyrate rhombicosidodecahedra", "index": 71 },
+  { "name": "diminished rhombicosidodecahedra", "index": 75 },
+  { "name": "snub antiprisms", "index": 83 },
+  { "name": "others", "index": 85 }
+]
