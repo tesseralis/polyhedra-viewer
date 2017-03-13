@@ -1,6 +1,7 @@
 import React from 'react'
 import { css, StyleSheet } from 'aphrodite/no-important'
 import { Link } from 'react-router'
+import WikiLink from './WikiLink'
 
 import { escapeName } from '../constants/polyhedra'
 import Title from './Title'
@@ -100,7 +101,7 @@ const PolyhedronGroup = ({ name, description, polyhedra, groups }) => {
   return (
     <div className={css(styles.group)}>
       <GroupHeader name={name} styles={styles.header} />
-      <p className={css(styles.description)}>{description}</p>
+      <p className={css(styles.description)}>{description} <WikiLink groupName={name}/></p>
       { polyhedra && <PolyhedronList polyhedra={polyhedra} /> }
       { groups && <div className={css(styles.subgroups)}>{groups.map(group => <Subgroup key={group.name} {...group} />)}</div> }
     </div>
