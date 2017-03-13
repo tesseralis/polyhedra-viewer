@@ -1,12 +1,12 @@
 import React, { Component } from 'react'
 import { Motion, spring } from 'react-motion'
-import ConditionTransitionMotion from './ConditionTransitionMotion'
-import { Link } from 'react-router'
 import { css, StyleSheet } from 'aphrodite/no-important'
 
-import BigIcon from './BigIcon'
-import { fixed, resetButton, resetLink, bigIcon } from '../styles/common'
+import ConditionTransitionMotion from './ConditionTransitionMotion'
+import { IconButton, IconLink } from './menuIcons'
+import { fixed } from '../styles/common'
 
+// Make everything fixed to the top left so that the animations work properly
 const fixTopLeft = fixed('top', 'left')
 
 const styles = StyleSheet.create({
@@ -25,10 +25,6 @@ const styles = StyleSheet.create({
     height: '100%',
     overflowY: 'scroll',
   },
-
-  homeLink: { ...resetLink, ...bigIcon },
-
-  toggleButton: { ...resetButton, ...bigIcon },
 })
 
 export default class SidebarMenu extends Component {
@@ -45,12 +41,8 @@ export default class SidebarMenu extends Component {
         <Motion style={{x: spring(this.state.show ? sidebarWidth : 0)}}>
         { ({ x }) =>
           <div style={{transform: `translateX(${x}px)`}} className={css(styles.menuBar)}>
-            <Link to="/" className={css(styles.homeLink)}>
-              <BigIcon name='home' />
-            </Link>
-            <button onClick={() => this.toggle()} className={css(styles.toggleButton)}>
-              <BigIcon name='list' />
-            </button>
+            <IconLink to="/" name="home" />
+            <IconButton onClick={() => this.toggle()} name="list" />
           </div>
         }
         </Motion>

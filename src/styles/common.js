@@ -11,20 +11,6 @@ export const transition = (property, duration, ease='') => {
   }
 }
 
-// TODO figure out the place to put this
-export const bigIcon = {
-  ...transition('color', .25),
-  padding: 10,
-  color: 'Gray',
-  ':hover': {
-    color: 'DimGray'
-  },
-  ':focus': {
-    outline: 'none',
-    color: 'DarkSlateGray',
-  },
-}
-
 /* Position functions */
 
 export const fullScreen = {
