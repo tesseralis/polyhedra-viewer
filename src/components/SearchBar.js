@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Component } from 'react'
 import { css, StyleSheet } from 'aphrodite/no-important'
 
 import { andaleMono } from '../styles/fonts'
@@ -34,30 +34,45 @@ const styles = StyleSheet.create({
   },
 
   icon: {
+    ...transition('color', .35),
     position: 'absolute',
     top: 10,
     left: 10,
     padding: 10,
     color: 'LightGray',
   },
+
+  iconFocus: {
+    color: 'Gray',
+  }
 })
 
-export default function SearchBar({ text, setValue }) {
+export default class SearchBar extends Component {
+  state = { isFocused: false }
 
-  // TODO make the icon light up as well;
-  // might have to use onFocus/onBlur to do it with aphrodite
-  return (
-    <label className={css(styles.searchBar)}>
-      <input
-        type="text"
-        placeholder="Search..."
-        value={text}
-        onChange={e => setValue(e.target.value)}
-        className={css(styles.input)}
-      />
-      <span className={css(styles.icon)}>
-        <Icon name="search" />
-      </span>
-    </label>
-  )
+  setFocus(value) {
+    this.setState(() => ({ isFocused: value }))
+  }
+
+  render() {
+    const { text, setValue } = this.props
+    const { isFocused } = this.state
+    return (
+      <label className={css(styles.searchBar)}>
+        <input
+          type="text"
+          placeholder="Search..."
+          value={text}
+          onChange={e => setValue(e.target.value)}
+          onFocus={() => this.setFocus(true)}
+          onBlur={() => this.setFocus(false)}
+          className={css(styles.input)}
+        />
+        <span className={css(styles.icon, isFocused && styles.iconFocus)}>
+          <Icon name="search" />
+        </span>
+      </label>
+    )
+  }
 }
+

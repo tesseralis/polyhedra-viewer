@@ -94,7 +94,7 @@ const Sidebar = ({ groups, width, searchBar: SearchBar }) => {
       width,
       height: '100%',
       overflowY: 'scroll',
-      backgroundColor: 'WhiteSmoke', // TODO colors file
+      backgroundColor: 'WhiteSmoke',
       boxShadow: 'inset -1px -1px 4px LightGray',
     },
   })

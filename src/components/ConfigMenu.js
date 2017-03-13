@@ -21,7 +21,6 @@ const styles = StyleSheet.create({
 export default class ConfigMenu extends Component {
   state = { show: false }
 
-  // TODO maybe use that state library to make simpler?
   toggle() { this.setState(({ show }) => ({ show: !show })) }
 
   render() {

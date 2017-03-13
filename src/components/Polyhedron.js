@@ -12,7 +12,6 @@ export const joinListOfLists = (list, outerSep, innerSep) => {
 }
 
 const Coordinates = ({ points }) => {
-  // TODO Find a more elegant solution for this
   // We pad the number of points in case we move from a solid with more vertices
   // to one with less, so that x3dom does accidentally map an index to a non-existing point
   const buffer = _.times(100, _.constant([0, 0, 0]))
