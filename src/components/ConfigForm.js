@@ -4,8 +4,6 @@ import _ from 'lodash'
 
 import { hover, transition } from '../styles/common'
 import { andaleMono } from '../styles/fonts'
-// TODO pass these in as props?
-import { configKeys, configOptions } from '../constants/configOptions'
 
 const getInputValue = (input, el) => {
   switch(input.type) {
@@ -90,7 +88,7 @@ const ResetButton = ({ reset }) => {
   )
 }
 
-const ConfigForm = ({ width, configValues, setInputValue, reset }) => {
+const ConfigForm = ({ width, inputs, inputValues, setInputValue, reset }) => {
   const styles = StyleSheet.create({
     configMenu: {
       width,
@@ -103,11 +101,11 @@ const ConfigForm = ({ width, configValues, setInputValue, reset }) => {
 
   return (
     <form className={css(styles.configMenu)}>
-      { configKeys.map(key => 
+      { inputs.map(({ key, ...input}) => 
         <LabelledInput
           key={key}
-          input={configOptions[key]}
-          value={configValues[key]}
+          input={input}
+          value={inputValues[key]}
           setValue={value => setInputValue(key, value)}
         />
       ) }

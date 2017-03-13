@@ -16,7 +16,7 @@ const colorOptionsList = polygons.map(n => {
   }
 })
 
-const configOptionsList = [
+export const configInputs = [
   {
     key: 'showEdges',
     type: 'checkbox',
@@ -41,6 +41,4 @@ const configOptionsList = [
   display: input.display || _.startCase(input.key),
 }))
 
-export const configKeys = _.map(configOptionsList, 'key')
-
-export const configOptions = mapObject(configOptionsList, _.identity, 'key')
+export const configOptions = mapObject(configInputs, _.identity, 'key')
