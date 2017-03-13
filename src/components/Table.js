@@ -6,7 +6,6 @@ import { escapeName } from '../constants/polyhedra'
 import Title from './Title'
 import GroupHeader from './GroupHeader'
 import SubgroupHeader from './SubgroupHeader'
-import WikiLink from './WikiLink'
 import IconLink from './IconLink'
 
 import { hoeflerText, andaleMono } from '../styles/fonts'
@@ -74,7 +73,7 @@ const Subgroup = ({ name, polyhedra }) => {
   )
 }
 
-const PolyhedronGroup = ({ name, description, polyhedra, groups }) => {
+const PolyhedronGroup = ({ group }) => {
   const styles = StyleSheet.create({
     group: {
       margin: 18,
@@ -92,6 +91,11 @@ const PolyhedronGroup = ({ name, description, polyhedra, groups }) => {
       lineHeight: '22px',
     },
 
+    infoLink: {
+      paddingLeft: 3,
+      fontSize: 13,
+    },
+
     subgroups: {
       display: 'flex',
       flexWrap: 'wrap',
@@ -99,12 +103,19 @@ const PolyhedronGroup = ({ name, description, polyhedra, groups }) => {
     }
   })
 
+  const { display, description, infoLink, polyhedra, groups } = group
+
   return (
     <div className={css(styles.group)}>
-      <GroupHeader name={name} styles={styles.header} />
-      <p className={css(styles.description)}>{description} <WikiLink groupName={name}/></p>
+      <GroupHeader text={display} styles={styles.header} />
+      <p className={css(styles.description)}>
+        {description}
+        <IconLink to={infoLink} name="wikipedia-w" styles={styles.infoLink} />
+      </p>
       { polyhedra && <PolyhedronList polyhedra={polyhedra} /> }
-      { groups && <div className={css(styles.subgroups)}>{groups.map(group => <Subgroup key={group.name} {...group} />)}</div> }
+      { groups && <div className={css(styles.subgroups)}>
+        { groups.map(group => <Subgroup key={group.name} {...group} />) }
+      </div>}
     </div>
   )
 }
@@ -153,7 +164,7 @@ const Table = ({ groups, searchBar: SearchBar }) => {
     <div className={css(styles.table)}>
       <Header />
       <SearchBar />
-      { groups.map(group => <PolyhedronGroup key={group.name} {...group} />) }
+      { groups.map(({ name, ...group}) => <PolyhedronGroup key={name} group={group} />) }
     </div>
   )
 }

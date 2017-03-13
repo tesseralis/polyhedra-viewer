@@ -68,7 +68,8 @@ const Subgroup = ({ name, polyhedra }) => {
   )
 }
 
-const PolyhedronGroup = ({ name, polyhedra, groups }) => {
+const PolyhedronGroup = ({ group }) => {
+  const { display, polyhedra, groups } = group
   const styles = StyleSheet.create({
     group: {
       padding: '10px 0',
@@ -81,7 +82,7 @@ const PolyhedronGroup = ({ name, polyhedra, groups }) => {
 
   return (
     <div className={css(styles.group)}>
-      <GroupHeader name={name} styles={styles.header} />
+      <GroupHeader text={display} styles={styles.header} />
       { polyhedra && <PolyhedronList polyhedra={polyhedra} /> }
       { groups && <div className={css(styles.subgroups)}>{groups.map(group => <Subgroup key={group.name} {...group} />)}</div> }
     </div>
@@ -102,7 +103,7 @@ const Sidebar = ({ groups, width, searchBar: SearchBar }) => {
   return (
     <section className={css(styles.sidebar)}>
       <SearchBar />
-      { groups.map(group => <PolyhedronGroup key={group.name} {...group } /> ) }
+      { groups.map(({name, ...group}) => <PolyhedronGroup key={name} group={group} /> ) }
     </section>
   )
 }
