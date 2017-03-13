@@ -1,7 +1,6 @@
 import React from 'react'
-import { css, StyleSheet } from 'aphrodite/no-important'
-
-import Icon from './Icon'
+import IconLink from './IconLink'
+import { StyleSheet } from 'aphrodite/no-important'
 
 // TODO group this information with the JSON data, not here
 const groupLinks = {
@@ -13,17 +12,9 @@ const groupLinks = {
 }
 
 const styles = StyleSheet.create({
-  link: {
-    color: 'Black',
-    fontSize: 13,
-    padding: '0 2px',
-  },
+  link: { fontSize: 13, paddingLeft: 2 }
 })
 
 export default function WikiLink({groupName}) {
-  return (
-    <a target="_blank" href={groupLinks[groupName]} className={css(styles.link)}>
-      <Icon name="wikipedia-w" />
-    </a>
-  )
+  return <IconLink to={groupLinks[groupName]} name="wikipedia-w" styles={styles.link} />
 }

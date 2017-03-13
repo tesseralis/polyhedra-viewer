@@ -1,12 +1,13 @@
 import React from 'react'
 import { css, StyleSheet } from 'aphrodite/no-important'
 import { Link } from 'react-router'
-import WikiLink from './WikiLink'
 
 import { escapeName } from '../constants/polyhedra'
 import Title from './Title'
 import GroupHeader from './GroupHeader'
 import SubgroupHeader from './SubgroupHeader'
+import WikiLink from './WikiLink'
+import IconLink from './IconLink'
 
 import { hoeflerText, andaleMono } from '../styles/fonts'
 import { fadeIn } from '../styles/animations'
@@ -119,14 +120,16 @@ const Header = () => {
     },
     title: { padding: 14 },
     subtitle: { fontFamily: andaleMono },
-    link: { ...resetLink }
+    authorLink: { ...resetLink },
+    ghLink: { paddingLeft: 5 },
   })
   return (
     <header className={css(styles.header)}>
       <Title name="Polyhedra Viewer" styles={styles.title} />
       <p className={css(styles.subtitle)}>
-        by <a className={css(styles.link)} target="_blank" href="http://tessenate.me">nfa</a>
+        by <a className={css(styles.authorLink)} target="_blank" href="http://tessenate.me">nfa</a>
       </p>
+      <IconLink name="github" to="https://github.com/tessenate/polyhedra-viewer" styles={styles.ghLink} />
     </header>
   )
 }
