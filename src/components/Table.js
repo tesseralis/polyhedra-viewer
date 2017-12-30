@@ -1,43 +1,17 @@
 import React from 'react'
 import { css, StyleSheet } from 'aphrodite/no-important'
-import { Link } from 'react-router'
 
-import { escapeName } from '../constants/polyhedra'
 import Title from './Title'
 import GroupHeader from './GroupHeader'
 import SubgroupHeader from './SubgroupHeader'
 import IconLink from './IconLink'
+import PolyhedronLink from './PolyhedronLink'
 
 import { hoeflerText, andaleMono } from '../styles/fonts'
 import { fadeIn } from '../styles/animations'
-import { hover, resetLink } from '../styles/common'
+import { resetLink } from '../styles/common'
 
 const thumbnailSize = 100
-
-const PolyhedronLink = ({ name }) => {
-  const styles = StyleSheet.create({
-    link: {
-      ...hover,
-      width: thumbnailSize,
-      height: thumbnailSize,
-      display: 'flex',
-      justifyContent: 'center',
-      overflow: 'hidden',
-      borderRadius: 25,
-    },
-    
-    image: {
-      height: thumbnailSize,
-    },
-  })
-  const escapedName = escapeName(name)
-  const img = require(`../images/${escapedName}.png`)
-  return (
-    <Link to={'/' + escapedName} className={css(styles.link)}>
-      <img className={css(styles.image)} src={img} alt={name}></img>
-    </Link>
-  )
-}
 
 const PolyhedronList = ({ polyhedra }) => {
   const maxThumbnailsPerLine = 8
