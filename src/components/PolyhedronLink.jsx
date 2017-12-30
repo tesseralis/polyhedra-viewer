@@ -6,7 +6,8 @@ import { escapeName } from '../constants/polyhedra'
 
 import { hover } from '../styles/common'
 
-const thumbnailSize = 100
+// FIXME this breaks the use in the normal index
+const thumbnailSize = 70
 
 const styles = StyleSheet.create({
   link: {
@@ -18,7 +19,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     borderRadius: 25,
   },
-  
+
   image: {
     height: thumbnailSize,
   },
@@ -29,8 +30,7 @@ export default function PolyhedronList({ name }) {
   const img = require(`../images/${escapedName}.png`)
   return (
     <Link to={'/' + escapedName} className={css(styles.link)}>
-      <img className={css(styles.image)} src={img} alt={name}></img>
+      <img className={css(styles.image)} src={img} alt={name} />
     </Link>
   )
 }
-
