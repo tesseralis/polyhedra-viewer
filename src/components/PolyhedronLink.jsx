@@ -18,6 +18,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     overflow: 'hidden',
     borderRadius: 25,
+    margin: 'auto', // center inside a table
   },
 
   image: {

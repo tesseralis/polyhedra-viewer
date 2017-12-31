@@ -1,93 +1,104 @@
 import React from 'react'
 import * as _ from 'lodash'
 import { css, StyleSheet } from 'aphrodite'
+import PolyhedronTable from './PolyhedronTable'
 
-import johnsonNames from '../data/groups/johnson.json'
-import PolyhedronLink from './PolyhedronLink'
-
-const rawData = [
+const pyramidCuploaeData = [
   // pyramids, cupolae, rotunda
   ['regular', 1, 2, 3, 4, 5, '', 6],
   [7, 8, 9, 18, 19, 20, '', 21],
   ['coplanar', 10, 11, 22, 23, 24, '', 25],
-  [12, 'regular', 13, 27, 28, 30, 32, 34], // TODO ortho/gyro
-  [14, 15, 16, 35, 'semiregular', 38, 40, 42],
+  [
+    12,
+    'regular',
+    13,
+    [27, 'semiregular'],
+    [28, 29],
+    [30, 31],
+    [32, 33],
+    [34, 'semiregular'],
+  ],
+  [14, 15, 16, [35, 36], ['semiregular', 37], [38, 39], [40, 41], [42, 43]],
   ['coplanar', 17, 'regular', 44, 45, 46, 47, 48],
 ]
 
-const tableData = _.zip(...rawData)
-console.log(tableData)
+const pyramidsCupolae = {
+  rows: [
+    'triangular pyramid',
+    'square pyramid',
+    'pentagonal pyramid',
+    'triangular cupola',
+    'square cupola',
+    'pentagonal cupola',
+    'cupola-rotunda',
+    'pentagonal rotunda',
+  ],
+  columns: [
+    '',
+    'elongated',
+    'gyroelongated',
+    { name: 'bi-', sub: ['ortho', 'gyro'] },
+    { name: 'elongated bi-', sub: ['ortho', 'gyro'] },
+    'gyroelongated bi-',
+  ],
+  data: _.zip(...pyramidCuploaeData),
+}
 
-const colNames = [
-  '',
-  'elongated',
-  'gyroelongated',
-  'bi-',
-  'elongated bi-',
-  'gyroelongated bi-',
-]
+const augmentedSolids = {
+  rows: [
+    'triangular prism',
+    'pentagonal prism',
+    'hexagonal prism',
+    'dodecahedron',
+    'truncated tetrahedron',
+    'truncated cube',
+    'truncated dodecahedron',
+  ],
+  columns: [
+    'augmented',
+    { name: 'biaugmented', sub: ['para', 'meta'] },
+    'triaugmented',
+  ],
+  data: [
+    [49, 50, 51],
+    [52, 53],
+    [54, [55, 56], 57],
+    [58, [59, 60], 61],
+    [65],
+    [66, 67],
+    [68, [69, 70], 71],
+  ],
+}
 
-const colGroups = [
-  { name: 'Pyramids', span: 3 },
-  { name: 'Cuploae', span: 3 },
-  { name: '' },
-  { name: 'Rotunda' },
-]
-
-const rowNames = [
-  'Triangular',
-  'Square',
-  'Pentagonal',
-  'Triangular',
-  'Square',
-  'Pentagonal',
-  '',
-  'Pentagonal',
-]
-
-const styles = StyleSheet.create({
-  cell: {
-    verticalAlign: 'middle',
-    textAlign: 'center',
-    fontSize: 10,
-  },
-})
+const rhombicosidodecahedra = {
+  rows: [
+    '',
+    'diminished',
+    'parabidiminished', // FIXME para/meta
+    'metabidiminished',
+    'tridiminished',
+  ],
+  columns: [
+    '',
+    { name: 'gyrate', sub: ['para', 'meta'] },
+    { name: 'bigyrate', sub: ['para', 'meta'] },
+    'trigyrate',
+  ],
+  data: [
+    ['semiregular', 72, [73, 74], 75],
+    [76, [77, 78], 79],
+    [80],
+    [81, 82],
+    [83],
+  ],
+}
 
 export default function PeriodicTable() {
   return (
-    <table>
-      <thead>
-        {/* <tr>
-          <th />
-          {colGroups.map(colGroup => (
-            <th colSpan={colGroup.span || 1}>{colGroup.name}</th>
-          ))}
-        </tr> */}
-        <tr>
-          <th />
-          {colNames.map(col => (
-            <th className={css(styles.cell)} key={col}>
-              {col}
-            </th>
-          ))}
-        </tr>
-      </thead>
-      <tbody>
-        {tableData.map((row, i) => (
-          <tr key={i}>
-            <th className={css(styles.cell)}>{rowNames[i]}</th>
-            {row.map((cell, j) => (
-              <td className={css(styles.cell)} key={j}>
-                {_.isString(cell) ? (
-                  cell
-                ) : (
-                  <PolyhedronLink name={johnsonNames[cell - 1]} />
-                )}
-              </td>
-            ))}
-          </tr>
-        ))}
-      </tbody>
-    </table>
+    <div>
+      <PolyhedronTable {...pyramidsCupolae} />
+      <PolyhedronTable {...augmentedSolids} />
+      <PolyhedronTable {...rhombicosidodecahedra} />
+    </div>
   )
 }
