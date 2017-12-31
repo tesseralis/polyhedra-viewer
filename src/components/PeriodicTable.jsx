@@ -74,7 +74,7 @@ const rhombicosidodecahedra = {
   rows: [
     '',
     'diminished',
-    'parabidiminished', // FIXME para/meta
+    'parabidiminished',
     'metabidiminished',
     'tridiminished',
   ],
@@ -93,9 +93,15 @@ const rhombicosidodecahedra = {
   ],
 }
 
+const styles = StyleSheet.create({
+  wrapper: {
+    display: 'flex',
+  },
+})
+
 export default function PeriodicTable() {
   return (
-    <div>
+    <div className={css(styles.wrapper)}>
       <PolyhedronTable {...pyramidsCupolae} />
       <PolyhedronTable {...augmentedSolids} />
       <PolyhedronTable {...rhombicosidodecahedra} />

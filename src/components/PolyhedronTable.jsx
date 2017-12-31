@@ -6,6 +6,9 @@ import johnsonNames from '../data/groups/johnson.json'
 import PolyhedronLink from './PolyhedronLink'
 
 const styles = StyleSheet.create({
+  table: {
+    margin: 20,
+  },
   cell: {
     verticalAlign: 'middle',
     textAlign: 'center',
@@ -22,7 +25,7 @@ const Cell = ({ cell, colSpan = 1 }) => (
 
 export default function PolyhedronTable({ rows, columns, data }) {
   return (
-    <table>
+    <table className={css(styles.table)}>
       <thead>
         <tr>
           <th />
@@ -35,6 +38,22 @@ export default function PolyhedronTable({ rows, columns, data }) {
               {_.isString(col) ? col : col.name}
             </th>
           ))}
+        </tr>
+        <tr>
+          <th />
+          {_.flatMap(
+            columns,
+            (col, j) =>
+              _.isString(col) ? (
+                <th />
+              ) : (
+                col.sub.map(subCol => (
+                  <th className={css(styles.cell)} key={`${j}-${subCol}`}>
+                    {subCol}
+                  </th>
+                ))
+              ),
+          )}
         </tr>
       </thead>
       <tbody>
