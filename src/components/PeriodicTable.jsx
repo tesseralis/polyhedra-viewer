@@ -179,6 +179,7 @@ const styles = StyleSheet.create({
     display: 'grid',
     gridGap: '25px 40px',
     justifyItems: 'center',
+    alignItems: 'center',
   },
 
   abstract: {
