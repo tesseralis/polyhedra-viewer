@@ -7,7 +7,7 @@ import PolyhedronLink from './PolyhedronLink'
 
 const styles = StyleSheet.create({
   table: {
-    margin: 20,
+    margin: 15,
   },
   cell: {
     verticalAlign: 'middle',
@@ -17,11 +17,70 @@ const styles = StyleSheet.create({
   },
 })
 
-const Cell = ({ cell, colSpan = 1 }) => (
-  <td className={css(styles.cell)} colSpan={colSpan}>
-    {_.isString(cell) ? cell : <PolyhedronLink name={johnsonNames[cell - 1]} />}
-  </td>
-)
+// FIXME I think these are duplicated to a certain extent from the data.
+// Move these over to the "data" section
+const prismNames = {
+  3: 'triangular',
+  4: 'square',
+  5: 'pentagonal',
+  6: 'hexagonal',
+  8: 'octagonal',
+  10: 'decagonal',
+}
+
+const platonicMapping = {
+  T: 'tetrahedron',
+  C: 'cube',
+  O: 'octahedron',
+  D: 'dodecahedron',
+  I: 'icosahedron',
+}
+
+const archimedeanMapping = {
+  tT: 'truncated tetrahedron',
+  aC: 'cuboctahedron',
+  tC: 'truncated cube',
+  tO: 'truncated octahedron',
+  eC: 'rhombicuboctahedron',
+  bC: 'truncated cuboctahedron',
+  sC: 'snub cube',
+  aD: 'icosidodecahedron',
+  tD: 'truncated dodecahedron',
+  tI: 'truncated icosahedron',
+  eD: 'rhombicosidodecahedron',
+  bD: 'truncated icosidodecahedron',
+  sD: 'snub dodecahedron',
+}
+
+const getPolyhedronFor = notation => {
+  const prefix = notation[0]
+  const number = notation.substring(1)
+  if (platonicMapping[notation]) {
+    return platonicMapping[notation]
+  }
+  if (archimedeanMapping[notation]) {
+    return archimedeanMapping[notation]
+  }
+  if (prefix === 'J') {
+    return johnsonNames[number - 1]
+  }
+  if (prefix === 'P') {
+    return `${prismNames[number]} prism`
+  }
+  if (prefix === 'A') {
+    return `${prismNames[number]} antiprism`
+  }
+  return null
+}
+
+const Cell = ({ cell, colSpan = 1 }) => {
+  const polyhedron = getPolyhedronFor(cell)
+  return (
+    <td className={css(styles.cell)} colSpan={colSpan}>
+      {polyhedron ? <PolyhedronLink name={polyhedron} /> : cell}
+    </td>
+  )
+}
 
 export default function PolyhedronTable({ rows, columns, data }) {
   return (
@@ -45,7 +104,7 @@ export default function PolyhedronTable({ rows, columns, data }) {
             columns,
             (col, j) =>
               _.isString(col) ? (
-                <th />
+                <th key={j} />
               ) : (
                 col.sub.map(subCol => (
                   <th className={css(styles.cell)} key={`${j}-${subCol}`}>

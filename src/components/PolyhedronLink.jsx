@@ -7,7 +7,7 @@ import { escapeName } from '../constants/polyhedra'
 import { hover } from '../styles/common'
 
 // FIXME this breaks the use in the normal index
-const thumbnailSize = 70
+const thumbnailSize = 60
 
 const styles = StyleSheet.create({
   link: {
@@ -16,13 +16,14 @@ const styles = StyleSheet.create({
     height: thumbnailSize,
     display: 'flex',
     justifyContent: 'center',
+    alignItems: 'center',
     overflow: 'hidden',
     borderRadius: 25,
     margin: 'auto', // center inside a table
   },
 
   image: {
-    height: thumbnailSize,
+    height: thumbnailSize + 10,
   },
 })
 
