@@ -174,19 +174,47 @@ const other = {
 
 const styles = StyleSheet.create({
   wrapper: {
-    margin: 20,
+    margin: 40,
     display: 'grid',
     gridTemplateColumns: 'repeat(7, auto)',
     gridTemplateRows: 'repeat(3, auto)',
     gridGap: '10px 40px',
   },
 
+  abstract: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+  },
+
+  header: {
+    marginTop: 20,
+    marginBottom: 20,
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+
+  description: {
+    marginBottom: 20,
+    fontSize: 12,
+  },
+
+  // TODO: Come up with a more reusable way to do CSS grid
+  // Is it just me or is Grid not made to work for components?
+  tail: {
+    gridRow: '2 / span 3',
+  },
+
   fullHeight: {
-    gridRow: '1 / span 3',
+    gridRow: '1 / span 4',
   },
 
   doubleHeight: {
     gridRow: '1 / span 2',
+  },
+
+  threeRows: {
+    gridRow: '1 / span 3',
   },
 
   twoColumns: {
@@ -200,36 +228,51 @@ const styles = StyleSheet.create({
   thirdLine: {
     gridRow: '3',
   },
+
+  fourthLine: {
+    gridRow: '4',
+  },
 })
 
 export default function PeriodicTable() {
   return (
     <div className={css(styles.wrapper)}>
-      <div className={css(styles.fullHeight)}>
+      <div className={css(styles.twoColumns, styles.abstract)}>
+        <h1 className={css(styles.header)}>Periodic Table of CRF Polyhedra</h1>
+        <p className={css(styles.description)}>
+          The following is a categorization of the convex, regular-faced (CRF)
+          polyhedra. These include the five Platonic Solids, the thirteen
+          Archimedean Solids, the infinite set of prisms and antiprisms (of
+          which a subset is represented), and the ninety-two Johnson Solids.
+          When a solid is presented in a "repeated" position (e.g. a Platonic
+          solid in the prism table) it is grayed out.
+        </p>
+      </div>
+      <div className={css(styles.tail)}>
         <PolyhedronTable {...platonicArchimedean} />
       </div>
-      <div className={css(styles.fullHeight)}>
+      <div className={css(styles.tail)}>
         <PolyhedronTable {...prisms} />
       </div>
       <div className={css(styles.fullHeight)}>
         <PolyhedronTable {...pyramidsCupolae} />
       </div>
-      <div className={css(styles.doubleHeight)}>
+      <div className={css(styles.threeRows)}>
         <PolyhedronTable {...augmentedSolids} />
       </div>
-      <div className={css(styles.thirdLine)}>
+      <div className={css(styles.fourthLine)}>
         <PolyhedronTable {...diminishedIcosahedra} />
       </div>
-      <div className={css(styles.twoColumns)}>
+      <div className={css(styles.doubleHeight, styles.twoColumns)}>
         <PolyhedronTable {...rhombicosidodecahedra} />
       </div>
-      <div className={css(styles.secondLine)}>
+      <div className={css(styles.thirdLine)}>
         <PolyhedronTable {...snubAntiprisms} />
       </div>
-      <div className={css(styles.secondLine)}>
+      <div className={css(styles.thirdLine)}>
         <PolyhedronTable {...gyrobifastigium} />
       </div>
-      <div className={css(styles.thirdLine, styles.twoColumns)}>
+      <div className={css(styles.fourthLine, styles.twoColumns)}>
         <PolyhedronTable {...other} />
       </div>
     </div>
