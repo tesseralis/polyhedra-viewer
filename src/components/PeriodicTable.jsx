@@ -178,7 +178,7 @@ const styles = StyleSheet.create({
     display: 'grid',
     gridTemplateColumns: 'repeat(7, auto)',
     gridTemplateRows: 'repeat(3, auto)',
-    gridGap: '10px 40px',
+    gridGap: '20px 40px',
   },
 
   abstract: {
