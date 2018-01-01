@@ -11,7 +11,6 @@ const thumbnailSize = 60
 
 const styles = StyleSheet.create({
   link: {
-    ...hover,
     width: thumbnailSize,
     height: thumbnailSize,
     display: 'flex',
@@ -22,16 +21,30 @@ const styles = StyleSheet.create({
     margin: 'auto', // center inside a table
   },
 
+  real: hover,
+
   image: {
     height: thumbnailSize + 10,
   },
+
+  fake: {
+    opacity: 0.25,
+    filter: 'grayscale(50%)',
+  },
 })
 
-export default function PolyhedronList({ name }) {
+export default function PolyhedronLink({ name, isFake }) {
   const escapedName = escapeName(name)
   const img = require(`../images/${escapedName}.png`)
+  if (isFake) {
+    return (
+      <div className={css(styles.link, styles.fake)}>
+        <img className={css(styles.image)} src={img} alt={name} />
+      </div>
+    )
+  }
   return (
-    <Link to={'/' + escapedName} className={css(styles.link)}>
+    <Link to={'/' + escapedName} className={css(styles.link, styles.real)}>
       <img className={css(styles.image)} src={img} alt={name} />
     </Link>
   )

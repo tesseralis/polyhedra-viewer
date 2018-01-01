@@ -41,8 +41,8 @@ const prisms = {
   ],
   columns: ['prism', 'antiprism'],
   data: _.zip(
-    ['P3', 'regular', 'P5', 'P6', 'P8', 'P10'],
-    ['regular', 'A4', 'A5', 'A6', 'A8', 'A10'],
+    ['P3', '!C', 'P5', 'P6', 'P8', 'P10'],
+    ['!O', 'A4', 'A5', 'A6', 'A8', 'A10'],
   ),
 }
 
@@ -67,30 +67,30 @@ const pyramidsCupolae = {
     'gyroelongated bi-',
   ],
   data: _.zip(
-    ['regular', 'J1', 'J2', 'J3', 'J4', 'J5', '', 'J6'],
+    ['!T', 'J1', 'J2', 'J3', 'J4', 'J5', '', 'J6'],
     ['J7', 'J8', 'J9', 'J18', 'J19', 'J20', '', 'J21'],
     ['coplanar', 'J10', 'J11', 'J22', 'J23', 'J24', '', 'J25'],
     [
       'J12',
-      'regular',
+      '!O',
       'J13',
-      ['J27', 'semiregular'],
+      ['J27', '!aC'],
       ['J28', 'J29'],
       ['J30', 'J31'],
       ['J32', 'J33'],
-      ['J34', 'semiregular'],
+      ['J34', '!aD'],
     ],
     [
       'J14',
       'J15',
       'J16',
       ['J35', 'J36'],
-      ['semiregular', 'J37'],
+      ['!eC', 'J37'],
       ['J38', 'J39'],
       ['J40', 'J41'],
       ['J42', 'J43'],
     ],
-    ['coplanar', 'J17', 'regular', 'J44', 'J45', 'J46', 'J47', 'J48'],
+    ['coplanar', 'J17', '!I', 'J44', 'J45', 'J46', 'J47', 'J48'],
   ),
 }
 
@@ -144,7 +144,7 @@ const rhombicosidodecahedra = {
     'trigyrate',
   ],
   data: [
-    ['semiregular', 'J72', ['J73', 'J74'], 'J75'],
+    ['!eD', 'J72', ['J73', 'J74'], 'J75'],
     ['J76', ['J77', 'J78'], 'J79'],
     ['J80'],
     ['J81', 'J82'],
@@ -163,7 +163,7 @@ const snubAntiprisms = {
   caption: 'Snub Antiprisms',
   rows: ['snub'],
   columns: ['disphenoid', 'triangular', 'square antiprism'],
-  data: [['J84', 'regular', 'J85']],
+  data: [['J84', '!I', 'J85']],
 }
 
 const other = {

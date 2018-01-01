@@ -77,10 +77,11 @@ const getPolyhedronFor = notation => {
 }
 
 const Cell = ({ cell, colSpan = 1 }) => {
-  const polyhedron = getPolyhedronFor(cell)
+  const isFake = cell[0] === '!'
+  const polyhedron = getPolyhedronFor(isFake ? cell.substring(1) : cell)
   return (
     <td className={css(styles.cell)} colSpan={colSpan}>
-      {polyhedron ? <PolyhedronLink name={polyhedron} /> : cell}
+      {polyhedron ? <PolyhedronLink isFake={isFake} name={polyhedron} /> : cell}
     </td>
   )
 }
