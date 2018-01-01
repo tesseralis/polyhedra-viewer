@@ -93,18 +93,6 @@ export default function PolyhedronTable({ caption, rows, columns, data }) {
       <thead>
         <tr>
           <th />
-          {columns.map((col, j) => (
-            <th
-              className={css(styles.cell)}
-              key={j}
-              colSpan={_.isString(col) ? 1 : col.sub.length}
-            >
-              {_.isString(col) ? col : col.name}
-            </th>
-          ))}
-        </tr>
-        <tr>
-          <th />
           {_.flatMap(
             columns,
             (col, j) =>
@@ -118,6 +106,18 @@ export default function PolyhedronTable({ caption, rows, columns, data }) {
                 ))
               ),
           )}
+        </tr>
+        <tr>
+          <th />
+          {columns.map((col, j) => (
+            <th
+              className={css(styles.cell)}
+              key={j}
+              colSpan={_.isString(col) ? 1 : col.sub.length}
+            >
+              {_.isString(col) ? col : col.name}
+            </th>
+          ))}
         </tr>
       </thead>
       <tbody>

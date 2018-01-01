@@ -61,8 +61,8 @@ const pyramidsCupolae = {
     '',
     'elongated',
     'gyroelongated',
-    { name: 'bi-', sub: ['ortho', 'gyro'] },
-    { name: 'elongated bi-', sub: ['ortho', 'gyro'] },
+    { name: 'bi-', sub: ['ortho-', 'gyro-'] },
+    { name: 'elongated bi-', sub: ['ortho-', 'gyro-'] },
     'gyroelongated bi-',
   ],
   data: _.zip(
@@ -106,7 +106,7 @@ const augmentedSolids = {
   ],
   columns: [
     'augmented',
-    { name: 'biaugmented', sub: ['para', 'meta'] },
+    { name: 'biaugmented', sub: ['para-', 'meta-'] },
     'triaugmented',
   ],
   data: [
@@ -138,8 +138,8 @@ const rhombicosidodecahedra = {
   ],
   columns: [
     '',
-    { name: 'gyrate', sub: ['para', 'meta'] },
-    { name: 'bigyrate', sub: ['para', 'meta'] },
+    { name: 'gyrate', sub: ['para-', 'meta-'] },
+    { name: 'bigyrate', sub: ['para-', 'meta-'] },
     'trigyrate',
   ],
   data: [
