@@ -4,6 +4,7 @@ import { css, StyleSheet } from 'aphrodite'
 import PolyhedronTable from './PolyhedronTable'
 
 const platonic = {
+  caption: 'Platonic Solids',
   rows: [
     'tetrahedron',
     '',
@@ -19,6 +20,7 @@ const platonic = {
 
 const archimedean = {
   // FIXME figure out some way not to have to repeat these
+  caption: 'Archimedean Solids',
   rows: ['', '', '', '', '', '', ''],
   columns: ['', ''],
   data: _.zip(
@@ -28,6 +30,7 @@ const archimedean = {
 }
 
 const prisms = {
+  caption: 'Prisms and Antiprisms',
   rows: [
     'triangular',
     'square',
@@ -43,34 +46,8 @@ const prisms = {
   ),
 }
 
-const pyramidCuploaeData = [
-  ['regular', 'J1', 'J2', 'J3', 'J4', 'J5', '', 'J6'],
-  ['J7', 'J8', 'J9', 'J18', 'J19', 'J20', '', 'J21'],
-  ['coplanar', 'J10', 'J11', 'J22', 'J23', 'J24', '', 'J25'],
-  [
-    'J12',
-    'regular',
-    'J13',
-    ['J27', 'semiregular'],
-    ['J28', 'J29'],
-    ['J30', 'J31'],
-    ['J32', 'J33'],
-    ['J34', 'semiregular'],
-  ],
-  [
-    'J14',
-    'J15',
-    'J16',
-    ['J35', 'J36'],
-    ['semiregular', 'J37'],
-    ['J38', 'J39'],
-    ['J40', 'J41'],
-    ['J42', 'J43'],
-  ],
-  ['coplanar', 'J17', 'regular', 'J44', 'J45', 'J46', 'J47', 'J48'],
-]
-
 const pyramidsCupolae = {
+  caption: 'Pyramids, Cupoplae, and Rotundae',
   rows: [
     'triangular pyramid',
     'square pyramid',
@@ -89,10 +66,36 @@ const pyramidsCupolae = {
     { name: 'elongated bi-', sub: ['ortho', 'gyro'] },
     'gyroelongated bi-',
   ],
-  data: _.zip(...pyramidCuploaeData),
+  data: _.zip(
+    ['regular', 'J1', 'J2', 'J3', 'J4', 'J5', '', 'J6'],
+    ['J7', 'J8', 'J9', 'J18', 'J19', 'J20', '', 'J21'],
+    ['coplanar', 'J10', 'J11', 'J22', 'J23', 'J24', '', 'J25'],
+    [
+      'J12',
+      'regular',
+      'J13',
+      ['J27', 'semiregular'],
+      ['J28', 'J29'],
+      ['J30', 'J31'],
+      ['J32', 'J33'],
+      ['J34', 'semiregular'],
+    ],
+    [
+      'J14',
+      'J15',
+      'J16',
+      ['J35', 'J36'],
+      ['semiregular', 'J37'],
+      ['J38', 'J39'],
+      ['J40', 'J41'],
+      ['J42', 'J43'],
+    ],
+    ['coplanar', 'J17', 'regular', 'J44', 'J45', 'J46', 'J47', 'J48'],
+  ),
 }
 
 const augmentedSolids = {
+  caption: 'Augmented Polyhedra',
   rows: [
     'triangular prism',
     'pentagonal prism',
@@ -119,12 +122,14 @@ const augmentedSolids = {
 }
 
 const diminishedIcosahedra = {
+  caption: 'Diminished Icosahedra',
   rows: ['icosahedron'],
   columns: ['tridiminished', 'metabidiminished', 'augmented tridiminished'],
   data: [['J63', 'J62', 'J64']],
 }
 
 const rhombicosidodecahedra = {
+  caption: 'Gyrate and Diminished Rhombicosidodecahedra',
   rows: [
     '',
     'diminished',
@@ -148,50 +153,87 @@ const rhombicosidodecahedra = {
 }
 
 const gyrobifastigium = {
+  caption: 'Gyrobifastigium',
   rows: [''],
-  columns: ['gyrobifastigium'],
+  columns: [''],
   data: [['J26']],
 }
 
 const snubAntiprisms = {
+  caption: 'Snub Antiprisms',
   rows: ['snub'],
   columns: ['disphenoid', 'triangular', 'square antiprism'],
   data: [['J84', 'regular', 'J85']],
 }
 
 const other = {
-  rows: ['coronae', 'other'],
-  columns: ['', '', '', ''],
-  data: [['J86', 'J87', 'J88', 'J89'], ['J90', 'J91', 'J92']],
+  caption: 'Other',
+  rows: [''],
+  columns: ['', '', '', '', '', '', ''],
+  data: [['J86', 'J87', 'J88', 'J89', 'J90', 'J91', 'J92']],
 }
 
 const styles = StyleSheet.create({
   wrapper: {
-    display: 'flex',
+    margin: 20,
+    display: 'grid',
+    gridTemplateColumns: 'repeat(7, auto)',
+    gridTemplateRows: 'repeat(3, auto)',
+    gridGap: '10px 40px',
   },
 
-  subWrapper: {
-    display: 'flex',
+  fullHeight: {
+    gridRow: '1 / span 3',
+  },
+
+  doubleHeight: {
+    gridRow: '1 / span 2',
+  },
+
+  twoColumns: {
+    gridColumnEnd: 'span 2',
+  },
+
+  secondLine: {
+    gridRow: '2',
+  },
+
+  thirdLine: {
+    gridRow: '3',
   },
 })
 
 export default function PeriodicTable() {
   return (
     <div className={css(styles.wrapper)}>
-      <PolyhedronTable {...platonic} />
-      <PolyhedronTable {...archimedean} />
-      <PolyhedronTable {...prisms} />
-      <PolyhedronTable {...pyramidsCupolae} />
-      <div>
+      <div className={css(styles.fullHeight)}>
+        <PolyhedronTable {...platonic} />
+      </div>
+      <div className={css(styles.fullHeight)}>
+        <PolyhedronTable {...archimedean} />
+      </div>
+      <div className={css(styles.fullHeight)}>
+        <PolyhedronTable {...prisms} />
+      </div>
+      <div className={css(styles.fullHeight)}>
+        <PolyhedronTable {...pyramidsCupolae} />
+      </div>
+      <div className={css(styles.doubleHeight)}>
         <PolyhedronTable {...augmentedSolids} />
+      </div>
+      <div className={css(styles.thirdLine)}>
         <PolyhedronTable {...diminishedIcosahedra} />
       </div>
-      <div>
+      <div className={css(styles.twoColumns)}>
         <PolyhedronTable {...rhombicosidodecahedra} />
-        <div className={css(styles.subWrapper)}>
-          <PolyhedronTable {...snubAntiprisms} />
-          <PolyhedronTable {...gyrobifastigium} />
-        </div>
+      </div>
+      <div className={css(styles.secondLine)}>
+        <PolyhedronTable {...snubAntiprisms} />
+      </div>
+      <div className={css(styles.secondLine)}>
+        <PolyhedronTable {...gyrobifastigium} />
+      </div>
+      <div className={css(styles.thirdLine, styles.twoColumns)}>
         <PolyhedronTable {...other} />
       </div>
     </div>

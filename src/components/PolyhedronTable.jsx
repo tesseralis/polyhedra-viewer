@@ -7,7 +7,10 @@ import PolyhedronLink from './PolyhedronLink'
 
 const styles = StyleSheet.create({
   table: {
-    margin: 15,
+    // margin: 15,
+  },
+  caption: {
+    fontSize: 14,
   },
   cell: {
     verticalAlign: 'middle',
@@ -82,9 +85,10 @@ const Cell = ({ cell, colSpan = 1 }) => {
   )
 }
 
-export default function PolyhedronTable({ rows, columns, data }) {
+export default function PolyhedronTable({ caption, rows, columns, data }) {
   return (
     <table className={css(styles.table)}>
+      <caption className={css(styles.caption)}>{caption}</caption>
       <thead>
         <tr>
           <th />
