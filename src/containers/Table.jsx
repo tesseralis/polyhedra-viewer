@@ -6,7 +6,7 @@ import SearchBar from './SearchBar'
 
 const mapStateToProps = state => ({
   groups: getFilteredGroups(state),
-  searchBar: SearchBar
+  searchBar: SearchBar,
 })
 
 export default connect(mapStateToProps)(Table)

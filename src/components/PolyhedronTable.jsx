@@ -4,6 +4,7 @@ import { css, StyleSheet } from 'aphrodite'
 
 import johnsonNames from '../data/groups/johnson.json'
 import PolyhedronLink from './PolyhedronLink'
+import { hoeflerText } from '../styles/fonts'
 
 const styles = StyleSheet.create({
   table: {
@@ -11,12 +12,15 @@ const styles = StyleSheet.create({
   },
   caption: {
     fontSize: 14,
+    fontWeight: hoeflerText,
+    marginBottom: 5,
   },
   cell: {
+    maxWidth: 70,
     verticalAlign: 'middle',
     textAlign: 'center',
     fontSize: 10,
-    maxWidth: 70,
+    fontWeight: hoeflerText,
   },
 })
 

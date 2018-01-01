@@ -1,7 +1,9 @@
 import React from 'react'
 import * as _ from 'lodash'
 import { css, StyleSheet } from 'aphrodite'
+
 import PolyhedronTable from './PolyhedronTable'
+import { hoeflerText, andaleMono } from '../styles/fonts'
 
 const platonicArchimedean = {
   caption: 'Platonic and Archimedean Solids',
@@ -46,12 +48,12 @@ const prisms = {
 }
 
 const pyramidsCupolae = {
-  caption: 'Pyramids, Cupoplae, and Rotundae',
+  caption: 'Pyramids, Cupoplæ, and Rotundæ',
   rows: [
     'triangular pyramid',
     'square pyramid',
     'pentagonal pyramid',
-    'fastigium (triangular prism)',
+    'digonal cupola',
     'triangular cupola',
     'square cupola',
     'pentagonal cupola',
@@ -67,9 +69,9 @@ const pyramidsCupolae = {
     'gyroelongated bi-',
   ],
   data: _.zip(
-    ['!T', 'J1', 'J2', '', 'J3', 'J4', 'J5', '', 'J6'],
-    ['J7', 'J8', 'J9', '', 'J18', 'J19', 'J20', '', 'J21'],
-    ['coplanar', 'J10', 'J11', '', 'J22', 'J23', 'J24', '', 'J25'],
+    ['!T', 'J1', 'J2', '!P3', 'J3', 'J4', 'J5', '', 'J6'],
+    ['J7', 'J8', 'J9', 'coplanar', 'J18', 'J19', 'J20', '', 'J21'],
+    ['coplanar', 'J10', 'J11', 'concave', 'J22', 'J23', 'J24', '', 'J25'],
     [
       'J12',
       '!O',
@@ -85,14 +87,14 @@ const pyramidsCupolae = {
       'J14',
       'J15',
       'J16',
-      '',
+      ['coplanar', 'coplanar'],
       ['J35', 'J36'],
       ['!eC', 'J37'],
       ['J38', 'J39'],
       ['J40', 'J41'],
       ['J42', 'J43'],
     ],
-    ['coplanar', 'J17', '!I', '', 'J44', 'J45', 'J46', 'J47', 'J48'],
+    ['coplanar', 'J17', '!I', 'concave', 'J44', 'J45', 'J46', 'J47', 'J48'],
   ),
 }
 
@@ -175,9 +177,9 @@ const other = {
 
 const styles = StyleSheet.create({
   wrapper: {
-    margin: 40,
+    margin: 30,
     display: 'grid',
-    gridGap: '25px 40px',
+    gridGap: '25px 25px',
     justifyItems: 'center',
     alignItems: 'center',
   },
@@ -191,13 +193,23 @@ const styles = StyleSheet.create({
   header: {
     marginTop: 20,
     marginBottom: 20,
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: 'bold',
+    fontFamily: andaleMono,
   },
 
   description: {
-    marginBottom: 20,
     fontSize: 12,
+    fontFamily: hoeflerText,
+    color: 'DimGrey',
+  },
+
+  subheader: {
+    marginLeft: 25,
+    marginRight: 10,
+    transform: 'rotate(-90deg)',
+    overflow: 'hidden',
+    fontFamily: hoeflerText,
   },
 
   // TODO: Come up with a more reusable way to do CSS grid
@@ -239,7 +251,7 @@ export default function PeriodicTable() {
   return (
     <div className={css(styles.wrapper)}>
       <div className={css(styles.twoColumns, styles.abstract)}>
-        <h1 className={css(styles.header)}>Periodic Table of CRF Polyhedra</h1>
+        <h1 className={css(styles.header)}>Periodic Table of Polyhedra</h1>
         <p className={css(styles.description)}>
           The following is a categorization of the convex, regular-faced (CRF)
           polyhedra. These include the five Platonic Solids, the thirteen
@@ -255,6 +267,9 @@ export default function PeriodicTable() {
       <div className={css(styles.tail)}>
         <PolyhedronTable {...prisms} />
       </div>
+      <h2 className={css(styles.fullHeight, styles.subheader)}>
+        Johnson&nbsp;Solids
+      </h2>
       <div className={css(styles.fullHeight)}>
         <PolyhedronTable {...pyramidsCupolae} />
       </div>

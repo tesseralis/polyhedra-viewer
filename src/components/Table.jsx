@@ -27,7 +27,7 @@ const PolyhedronList = ({ polyhedra }) => {
 
   return (
     <div className={css(styles.list)}>
-      { polyhedra.map(name => <PolyhedronLink key={name} name={name} />) }
+      {polyhedra.map(name => <PolyhedronLink key={name} name={name} />)}
     </div>
   )
 }
@@ -53,11 +53,11 @@ const PolyhedronGroup = ({ group }) => {
       margin: 18,
       maxWidth: 1000,
     },
-    
+
     header: {
       margin: '5px 0',
     },
-    
+
     description: {
       fontFamily: hoeflerText,
       color: 'DimGrey',
@@ -74,7 +74,7 @@ const PolyhedronGroup = ({ group }) => {
       display: 'flex',
       flexWrap: 'wrap',
       justifyContent: 'space-around',
-    }
+    },
   })
 
   const { display, description, infoLink, polyhedra, groups } = group
@@ -86,10 +86,12 @@ const PolyhedronGroup = ({ group }) => {
         {description}
         <IconLink to={infoLink} name="wikipedia-w" styles={styles.infoLink} />
       </p>
-      { polyhedra && <PolyhedronList polyhedra={polyhedra} /> }
-      { groups && <div className={css(styles.subgroups)}>
-        { groups.map(group => <Subgroup key={group.name} {...group} />) }
-      </div>}
+      {polyhedra && <PolyhedronList polyhedra={polyhedra} />}
+      {groups && (
+        <div className={css(styles.subgroups)}>
+          {groups.map(group => <Subgroup key={group.name} {...group} />)}
+        </div>
+      )}
     </div>
   )
 }
@@ -112,9 +114,20 @@ const Header = () => {
     <header className={css(styles.header)}>
       <Title name="Polyhedra Viewer" styles={styles.title} />
       <p className={css(styles.subtitle)}>
-        by <a className={css(styles.authorLink)} target="_blank" href="http://tessenate.me">nfa</a>
+        by{' '}
+        <a
+          className={css(styles.authorLink)}
+          target="_blank"
+          href="http://tessenate.me"
+        >
+          nfa
+        </a>
       </p>
-      <IconLink name="github" to="https://github.com/tessenate/polyhedra-viewer" styles={styles.ghLink} />
+      <IconLink
+        name="github"
+        to="https://github.com/tessenate/polyhedra-viewer"
+        styles={styles.ghLink}
+      />
     </header>
   )
 }
@@ -128,7 +141,7 @@ const Table = ({ groups, searchBar: SearchBar }) => {
       flexDirection: 'column',
       alignItems: 'center',
       textAlign: 'center',
-  
+
       animationName: fadeIn,
       animationDuration: '1s',
     },
@@ -138,7 +151,9 @@ const Table = ({ groups, searchBar: SearchBar }) => {
     <div className={css(styles.table)}>
       <Header />
       <SearchBar />
-      { groups.map(({ name, ...group}) => <PolyhedronGroup key={name} group={group} />) }
+      {groups.map(({ name, ...group }) => (
+        <PolyhedronGroup key={name} group={group} />
+      ))}
     </div>
   )
 }
