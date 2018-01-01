@@ -51,6 +51,7 @@ const pyramidsCupolae = {
     'triangular pyramid',
     'square pyramid',
     'pentagonal pyramid',
+    'fastigium (triangular prism)',
     'triangular cupola',
     'square cupola',
     'pentagonal cupola',
@@ -66,13 +67,14 @@ const pyramidsCupolae = {
     'gyroelongated bi-',
   ],
   data: _.zip(
-    ['!T', 'J1', 'J2', 'J3', 'J4', 'J5', '', 'J6'],
-    ['J7', 'J8', 'J9', 'J18', 'J19', 'J20', '', 'J21'],
-    ['coplanar', 'J10', 'J11', 'J22', 'J23', 'J24', '', 'J25'],
+    ['!T', 'J1', 'J2', '', 'J3', 'J4', 'J5', '', 'J6'],
+    ['J7', 'J8', 'J9', '', 'J18', 'J19', 'J20', '', 'J21'],
+    ['coplanar', 'J10', 'J11', '', 'J22', 'J23', 'J24', '', 'J25'],
     [
       'J12',
       '!O',
       'J13',
+      ['coplanar', 'J26'],
       ['J27', '!aC'],
       ['J28', 'J29'],
       ['J30', 'J31'],
@@ -83,13 +85,14 @@ const pyramidsCupolae = {
       'J14',
       'J15',
       'J16',
+      '',
       ['J35', 'J36'],
       ['!eC', 'J37'],
       ['J38', 'J39'],
       ['J40', 'J41'],
       ['J42', 'J43'],
     ],
-    ['coplanar', 'J17', '!I', 'J44', 'J45', 'J46', 'J47', 'J48'],
+    ['coplanar', 'J17', '!I', '', 'J44', 'J45', 'J46', 'J47', 'J48'],
   ),
 }
 
@@ -149,13 +152,6 @@ const rhombicosidodecahedra = {
     ['J81', 'J82'],
     ['J83'],
   ],
-}
-
-const gyrobifastigium = {
-  caption: 'Gyrobifastigium',
-  rows: [''],
-  columns: [''],
-  data: [['J26']],
 }
 
 const snubAntiprisms = {
@@ -261,16 +257,13 @@ export default function PeriodicTable() {
       <div className={css(styles.fourthLine)}>
         <PolyhedronTable {...diminishedIcosahedra} />
       </div>
-      <div className={css(styles.doubleHeight, styles.twoColumns)}>
+      <div className={css(styles.doubleHeight)}>
         <PolyhedronTable {...rhombicosidodecahedra} />
       </div>
       <div className={css(styles.thirdLine)}>
         <PolyhedronTable {...snubAntiprisms} />
       </div>
-      <div className={css(styles.thirdLine)}>
-        <PolyhedronTable {...gyrobifastigium} />
-      </div>
-      <div className={css(styles.fourthLine, styles.twoColumns)}>
+      <div className={css(styles.fourthLine)}>
         <PolyhedronTable {...other} />
       </div>
     </div>

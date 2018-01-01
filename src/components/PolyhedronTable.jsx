@@ -15,7 +15,7 @@ const styles = StyleSheet.create({
   cell: {
     verticalAlign: 'middle',
     textAlign: 'center',
-    fontSize: 12,
+    fontSize: 10,
     maxWidth: 70,
   },
 })
