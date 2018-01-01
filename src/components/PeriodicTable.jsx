@@ -3,30 +3,29 @@ import * as _ from 'lodash'
 import { css, StyleSheet } from 'aphrodite'
 import PolyhedronTable from './PolyhedronTable'
 
-const platonic = {
-  caption: 'Platonic Solids',
+const platonicArchimedean = {
+  caption: 'Platonic and Archimedean Solids',
   rows: [
-    'tetrahedron',
-    '',
-    'cube',
-    'octahedron',
-    '',
-    'dodecahedron',
-    'icosahedron',
+    'platonic',
+    'truncated',
+    'rectified',
+    'cantellated',
+    'bevelled',
+    'snub',
   ],
-  columns: [''],
-  data: _.zip(['T', '', 'C', 'O', '', 'D', 'I']),
-}
-
-const archimedean = {
-  // FIXME figure out some way not to have to repeat these
-  caption: 'Archimedean Solids',
-  rows: ['', '', '', '', '', '', ''],
-  columns: ['', ''],
-  data: _.zip(
-    ['tT', 'aC', 'tC', 'tO', 'aD', 'tD', 'tI'],
-    ['', 'eC', 'bC', 'sC', 'eD', 'bD', 'sD'],
-  ),
+  columns: [
+    { name: '', sub: ['tetrahedron'] },
+    { name: '', sub: ['cube', 'octahedron'] },
+    { name: '', sub: ['dodecahedron', 'icosahedron'] },
+  ],
+  data: [
+    ['T', ['C', 'O'], ['D', 'I']],
+    ['tT', ['tC', 'tO'], ['tD', 'tI']],
+    ['!O', 'aC', 'aD'],
+    ['!aC', 'eC', 'eD'],
+    ['!tO', 'bC', 'bD'],
+    ['!I', 'sC', 'sD'],
+  ],
 }
 
 const prisms = {
@@ -167,7 +166,7 @@ const snubAntiprisms = {
 }
 
 const other = {
-  caption: 'Other',
+  caption: 'Other Johnson Solids',
   rows: [''],
   columns: ['', '', '', '', '', '', ''],
   data: [['J86', 'J87', 'J88', 'J89', 'J90', 'J91', 'J92']],
@@ -207,10 +206,7 @@ export default function PeriodicTable() {
   return (
     <div className={css(styles.wrapper)}>
       <div className={css(styles.fullHeight)}>
-        <PolyhedronTable {...platonic} />
-      </div>
-      <div className={css(styles.fullHeight)}>
-        <PolyhedronTable {...archimedean} />
+        <PolyhedronTable {...platonicArchimedean} />
       </div>
       <div className={css(styles.fullHeight)}>
         <PolyhedronTable {...prisms} />
