@@ -126,8 +126,13 @@ const augmentedSolids = {
 const diminishedIcosahedra = {
   caption: 'Diminished Icosahedra',
   rows: ['icosahedron'],
-  columns: ['tridiminished', 'metabidiminished', 'augmented tridiminished'],
-  data: [['J63', 'J62', 'J64']],
+  columns: [
+    'tridiminished',
+    { name: 'bidiminished', sub: ['para-', 'meta-'] },
+    'diminished',
+    'augmented tridiminished',
+  ],
+  data: [['J63', ['!A5', 'J62'], '!J11', 'J64']],
 }
 
 const rhombicosidodecahedra = {
@@ -173,6 +178,7 @@ const styles = StyleSheet.create({
     margin: 40,
     display: 'grid',
     gridGap: '25px 40px',
+    justifyItems: 'center',
   },
 
   abstract: {
