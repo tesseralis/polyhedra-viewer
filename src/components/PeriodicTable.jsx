@@ -176,9 +176,7 @@ const styles = StyleSheet.create({
   wrapper: {
     margin: 40,
     display: 'grid',
-    gridTemplateColumns: 'repeat(7, auto)',
-    gridTemplateRows: 'repeat(3, auto)',
-    gridGap: '20px 40px',
+    gridGap: '25px 40px',
   },
 
   abstract: {
