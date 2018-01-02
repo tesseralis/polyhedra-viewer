@@ -8,7 +8,7 @@ import { hoeflerText, andaleMono } from '../styles/fonts'
 const platonicArchimedean = {
   caption: 'Platonic and Archimedean Solids',
   rows: [
-    'platonic',
+    'regular',
     'truncated',
     'rectified',
     'cantellated',
@@ -202,6 +202,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontFamily: hoeflerText,
     color: 'DimGrey',
+    lineHeight: '18px',
   },
 
   subheader: {
@@ -210,6 +211,15 @@ const styles = StyleSheet.create({
     transform: 'rotate(-90deg)',
     overflow: 'hidden',
     fontFamily: hoeflerText,
+  },
+
+  wikiLink: {
+    textDecoration: 'none',
+    color: 'MediumBlue',
+
+    ':hover': {
+      textDecoration: 'underline',
+    },
   },
 
   // TODO: Come up with a more reusable way to do CSS grid
@@ -247,18 +257,39 @@ const styles = StyleSheet.create({
   },
 })
 
+const WikiLink = ({ href, children }) => {
+  return (
+    <a className={css(styles.wikiLink)} href={href}>
+      {children}
+    </a>
+  )
+}
+
 export default function PeriodicTable() {
   return (
-    <div className={css(styles.wrapper)}>
+    <main className={css(styles.wrapper)}>
       <div className={css(styles.twoColumns, styles.abstract)}>
         <h1 className={css(styles.header)}>Periodic Table of Polyhedra</h1>
         <p className={css(styles.description)}>
-          The following is a categorization of the convex, regular-faced (CRF)
-          polyhedra. These include the five Platonic Solids, the thirteen
-          Archimedean Solids, the infinite set of prisms and antiprisms (of
-          which a subset is represented), and the ninety-two Johnson Solids.
-          When a solid is presented in a "repeated" position (e.g. a Platonic
-          solid in the prism table) it is grayed out.
+          This table is a categorization of the convex, regular-faced (CRF)
+          polyhedra. These include the five{' '}
+          <WikiLink href="http://en.wikipedia.org/wiki/Platonic_solid">
+            Platonic solids
+          </WikiLink>, the 13{' '}
+          <WikiLink href="http://en.wikipedia.org/wiki/Archimedean_solid">
+            Archimedean solids
+          </WikiLink>, the infinite set of{' '}
+          <WikiLink href="http://en.wikipedia.org/wiki/Prism_(geometry)">
+            prisms
+          </WikiLink>{' '}
+          and{' '}
+          <WikiLink href="http://en.wikipedia.org/wiki/Antiprism">
+            antiprisms
+          </WikiLink>, and the 92{' '}
+          <WikiLink href="http://en.wikipedia.org/wiki/Johnson_solid">
+            Johnson solids
+          </WikiLink>. When a solid is presented in a "repeated" position (e.g.
+          a Platonic solid in the prism section) it is grayed out.
         </p>
       </div>
       <div className={css(styles.tail)}>
@@ -288,6 +319,6 @@ export default function PeriodicTable() {
       <div className={css(styles.fourthLine)}>
         <PolyhedronTable {...other} />
       </div>
-    </div>
+    </main>
   )
 }

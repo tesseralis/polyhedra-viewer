@@ -21,6 +21,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 10,
     fontWeight: hoeflerText,
+    color: 'DimGrey',
   },
 })
 
