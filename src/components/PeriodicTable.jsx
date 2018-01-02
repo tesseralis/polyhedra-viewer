@@ -1,6 +1,6 @@
 import React from 'react'
 import * as _ from 'lodash'
-import { css, StyleSheet } from 'aphrodite'
+import { css, StyleSheet } from 'aphrodite/no-important'
 
 import PolyhedronTable from './PolyhedronTable'
 import { hoeflerText, andaleMono } from '../styles/fonts'
@@ -168,7 +168,7 @@ const snubAntiprisms = {
   data: [['J84', '!I', 'J85']],
 }
 
-const other = {
+const otherJohnson = {
   caption: 'Other Johnson Solids',
   rows: [''],
   columns: ['', '', '', '', '', '', ''],
@@ -176,12 +176,18 @@ const other = {
 }
 
 const styles = StyleSheet.create({
-  wrapper: {
+  grid: {
     margin: 30,
     display: 'grid',
     gridGap: '25px 25px',
     justifyItems: 'center',
     alignItems: 'center',
+    gridTemplateAreas: `
+      "abs   abs   J pyrCup aug  rhombicos"
+      "plato prism J pyrCup aug  rhombicos"
+      "plato prism J pyrCup aug  snub"
+      "plato prism J pyrCup icos other"
+    `,
   },
 
   abstract: {
@@ -221,40 +227,6 @@ const styles = StyleSheet.create({
       textDecoration: 'underline',
     },
   },
-
-  // TODO: Come up with a more reusable way to do CSS grid
-  // Is it just me or is Grid not made to work for components?
-  tail: {
-    gridRow: '2 / span 3',
-  },
-
-  fullHeight: {
-    gridRow: '1 / span 4',
-  },
-
-  doubleHeight: {
-    gridRow: '1 / span 2',
-  },
-
-  threeRows: {
-    gridRow: '1 / span 3',
-  },
-
-  twoColumns: {
-    gridColumnEnd: 'span 2',
-  },
-
-  secondLine: {
-    gridRow: '2',
-  },
-
-  thirdLine: {
-    gridRow: '3',
-  },
-
-  fourthLine: {
-    gridRow: '4',
-  },
 })
 
 const WikiLink = ({ href, children }) => {
@@ -265,10 +237,27 @@ const WikiLink = ({ href, children }) => {
   )
 }
 
+const GridArea = ({ area, children, element = 'div', classes = [] }) => {
+  const El = element
+  return (
+    <El style={{ gridArea: area }} className={css(classes)}>
+      {children}
+    </El>
+  )
+}
+
+const PolyhedronTableArea = ({ area, data }) => {
+  return (
+    <GridArea area={area}>
+      <PolyhedronTable {...data} />
+    </GridArea>
+  )
+}
+
 export default function PeriodicTable() {
   return (
-    <main className={css(styles.wrapper)}>
-      <div className={css(styles.twoColumns, styles.abstract)}>
+    <main className={css(styles.grid)}>
+      <GridArea area="abs" classes={styles.abstract}>
         <h1 className={css(styles.header)}>Periodic Table of Polyhedra</h1>
         <p className={css(styles.description)}>
           This table is a categorization of the convex, regular-faced (CRF)
@@ -291,34 +280,18 @@ export default function PeriodicTable() {
           </WikiLink>. When a solid is presented in a "repeated" position (e.g.
           a Platonic solid in the prism section) it is grayed out.
         </p>
-      </div>
-      <div className={css(styles.tail)}>
-        <PolyhedronTable {...platonicArchimedean} />
-      </div>
-      <div className={css(styles.tail)}>
-        <PolyhedronTable {...prisms} />
-      </div>
-      <h2 className={css(styles.fullHeight, styles.subheader)}>
+      </GridArea>
+      <PolyhedronTableArea area="plato" data={platonicArchimedean} />
+      <PolyhedronTableArea area="prism" data={prisms} />
+      <GridArea area="J" element="h2" classes={styles.subheader}>
         Johnson&nbsp;Solids
-      </h2>
-      <div className={css(styles.fullHeight)}>
-        <PolyhedronTable {...pyramidsCupolae} />
-      </div>
-      <div className={css(styles.threeRows)}>
-        <PolyhedronTable {...augmentedSolids} />
-      </div>
-      <div className={css(styles.fourthLine)}>
-        <PolyhedronTable {...diminishedIcosahedra} />
-      </div>
-      <div className={css(styles.doubleHeight)}>
-        <PolyhedronTable {...rhombicosidodecahedra} />
-      </div>
-      <div className={css(styles.thirdLine)}>
-        <PolyhedronTable {...snubAntiprisms} />
-      </div>
-      <div className={css(styles.fourthLine)}>
-        <PolyhedronTable {...other} />
-      </div>
+      </GridArea>
+      <PolyhedronTableArea area="pyrCup" data={pyramidsCupolae} />
+      <PolyhedronTableArea area="aug" data={augmentedSolids} />
+      <PolyhedronTableArea area="icos" data={diminishedIcosahedra} />
+      <PolyhedronTableArea area="rhombicos" data={rhombicosidodecahedra} />
+      <PolyhedronTableArea area="snub" data={snubAntiprisms} />
+      <PolyhedronTableArea area="other" data={otherJohnson} />
     </main>
   )
 }

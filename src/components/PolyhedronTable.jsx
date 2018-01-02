@@ -1,6 +1,6 @@
 import React from 'react'
 import * as _ from 'lodash'
-import { css, StyleSheet } from 'aphrodite'
+import { css, StyleSheet } from 'aphrodite/no-important'
 
 import PolyhedronLink from './PolyhedronLink'
 import { hoeflerText } from '../styles/fonts'
