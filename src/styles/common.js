@@ -1,13 +1,13 @@
 export const hover = {
   ':hover': {
-    backgroundColor: 'LightGray'
-  }
+    backgroundColor: 'LightGray',
+  },
 }
 
-export const transition = (property, duration, ease='') => {
+export const transition = (property, duration, ease = '') => {
   const value = `${property} ${duration}s ${ease}`.trim()
   return {
-    transition: value
+    transition: value,
   }
 }
 

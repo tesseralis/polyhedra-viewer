@@ -176,10 +176,17 @@ const otherJohnson = {
 }
 
 const styles = StyleSheet.create({
+  wrapper: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    display: 'flex',
+    alignItems: 'center',
+    padding: '0 80px',
+  },
   grid: {
-    margin: 30,
     display: 'grid',
-    gridGap: '25px 25px',
+    gridGap: 25,
     justifyItems: 'center',
     alignItems: 'center',
     gridTemplateAreas: `
@@ -212,8 +219,7 @@ const styles = StyleSheet.create({
   },
 
   subheader: {
-    marginLeft: 25,
-    marginRight: 10,
+    marginLeft: 50,
     transform: 'rotate(-90deg)',
     overflow: 'hidden',
     fontFamily: hoeflerText,
@@ -256,42 +262,44 @@ const PolyhedronTableArea = ({ area, data }) => {
 
 export default function PeriodicTable() {
   return (
-    <main className={css(styles.grid)}>
-      <GridArea area="abs" classes={styles.abstract}>
-        <h1 className={css(styles.header)}>Periodic Table of Polyhedra</h1>
-        <p className={css(styles.description)}>
-          This table is a categorization of the convex, regular-faced (CRF)
-          polyhedra. These include the five{' '}
-          <WikiLink href="http://en.wikipedia.org/wiki/Platonic_solid">
-            Platonic solids
-          </WikiLink>, the 13{' '}
-          <WikiLink href="http://en.wikipedia.org/wiki/Archimedean_solid">
-            Archimedean solids
-          </WikiLink>, the infinite set of{' '}
-          <WikiLink href="http://en.wikipedia.org/wiki/Prism_(geometry)">
-            prisms
-          </WikiLink>{' '}
-          and{' '}
-          <WikiLink href="http://en.wikipedia.org/wiki/Antiprism">
-            antiprisms
-          </WikiLink>, and the 92{' '}
-          <WikiLink href="http://en.wikipedia.org/wiki/Johnson_solid">
-            Johnson solids
-          </WikiLink>. When a solid is presented in a "repeated" position (e.g.
-          a Platonic solid in the prism section) it is grayed out.
-        </p>
-      </GridArea>
-      <PolyhedronTableArea area="plato" data={platonicArchimedean} />
-      <PolyhedronTableArea area="prism" data={prisms} />
-      <GridArea area="J" element="h2" classes={styles.subheader}>
-        Johnson&nbsp;Solids
-      </GridArea>
-      <PolyhedronTableArea area="pyrCup" data={pyramidsCupolae} />
-      <PolyhedronTableArea area="aug" data={augmentedSolids} />
-      <PolyhedronTableArea area="icos" data={diminishedIcosahedra} />
-      <PolyhedronTableArea area="rhombicos" data={rhombicosidodecahedra} />
-      <PolyhedronTableArea area="snub" data={snubAntiprisms} />
-      <PolyhedronTableArea area="other" data={otherJohnson} />
+    <main className={css(styles.wrapper)}>
+      <div className={css(styles.grid)}>
+        <GridArea area="abs" classes={styles.abstract}>
+          <h1 className={css(styles.header)}>Periodic Table of Polyhedra</h1>
+          <p className={css(styles.description)}>
+            This table is a categorization of the convex, regular-faced (CRF)
+            polyhedra. These include the five{' '}
+            <WikiLink href="http://en.wikipedia.org/wiki/Platonic_solid">
+              Platonic solids
+            </WikiLink>, the 13{' '}
+            <WikiLink href="http://en.wikipedia.org/wiki/Archimedean_solid">
+              Archimedean solids
+            </WikiLink>, the infinite set of{' '}
+            <WikiLink href="http://en.wikipedia.org/wiki/Prism_(geometry)">
+              prisms
+            </WikiLink>{' '}
+            and{' '}
+            <WikiLink href="http://en.wikipedia.org/wiki/Antiprism">
+              antiprisms
+            </WikiLink>, and the 92{' '}
+            <WikiLink href="http://en.wikipedia.org/wiki/Johnson_solid">
+              Johnson solids
+            </WikiLink>. When a solid is presented in a "repeated" position
+            (e.g. a Platonic solid in the prism section) it is grayed out.
+          </p>
+        </GridArea>
+        <PolyhedronTableArea area="plato" data={platonicArchimedean} />
+        <PolyhedronTableArea area="prism" data={prisms} />
+        <GridArea area="J" element="h2" classes={styles.subheader}>
+          Johnson&nbsp;Solids
+        </GridArea>
+        <PolyhedronTableArea area="pyrCup" data={pyramidsCupolae} />
+        <PolyhedronTableArea area="aug" data={augmentedSolids} />
+        <PolyhedronTableArea area="icos" data={diminishedIcosahedra} />
+        <PolyhedronTableArea area="rhombicos" data={rhombicosidodecahedra} />
+        <PolyhedronTableArea area="snub" data={snubAntiprisms} />
+        <PolyhedronTableArea area="other" data={otherJohnson} />
+      </div>
     </main>
   )
 }
