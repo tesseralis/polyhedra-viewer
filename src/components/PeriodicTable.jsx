@@ -178,8 +178,7 @@ const otherJohnson = {
 const styles = StyleSheet.create({
   wrapper: {
     position: 'absolute',
-    top: 0,
-    bottom: 0,
+    minHeight: '100%',
     display: 'flex',
     alignItems: 'center',
     padding: '0 80px',
