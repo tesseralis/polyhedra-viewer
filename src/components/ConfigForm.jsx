@@ -1,8 +1,8 @@
 import React from 'react'
 import { css, StyleSheet } from 'aphrodite/no-important'
 import _ from 'lodash'
-import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
+import { createStructuredSelector } from 'reselect'
 
 import { configInputs } from '../constants/configOptions'
 import { getConfigValues } from '../selectors'
@@ -90,7 +90,7 @@ const ResetButton = ({ reset }) => {
   )
 }
 
-const ConfigForm = ({ width, inputs, inputValues, setInputValue, reset }) => {
+const ConfigForm = ({ width, inputValues, setInputValue, reset }) => {
   const styles = StyleSheet.create({
     configMenu: {
       width,
@@ -103,7 +103,7 @@ const ConfigForm = ({ width, inputs, inputValues, setInputValue, reset }) => {
 
   return (
     <form className={css(styles.configMenu)}>
-      {inputs.map(({ key, ...input }) => (
+      {configInputs.map(({ key, ...input }) => (
         <LabelledInput
           key={key}
           input={input}
@@ -116,18 +116,13 @@ const ConfigForm = ({ width, inputs, inputValues, setInputValue, reset }) => {
   )
 }
 
-const mapStateToProps = state => ({
-  inputs: configInputs,
-  inputValues: getConfigValues(state),
+const mapStateToProps = createStructuredSelector({
+  inputValues: getConfigValues,
 })
 
-const mapDispatchToProps = dispatch =>
-  bindActionCreators(
-    {
-      setInputValue,
-      reset,
-    },
-    dispatch,
-  )
+const mapDispatchToProps = {
+  setInputValue,
+  reset,
+}
 
 export default connect(mapStateToProps, mapDispatchToProps)(ConfigForm)

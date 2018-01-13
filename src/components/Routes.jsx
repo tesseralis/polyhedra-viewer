@@ -1,9 +1,9 @@
 import React from 'react'
 import { Route, IndexRoute } from 'react-router'
 
-import PeriodicTable from './components/PeriodicTable'
-import App from './components/App'
-import Viewer from './components/Viewer'
+import PeriodicTable from './PeriodicTable'
+import App from './App'
+import Viewer from './Viewer'
 
 export default (
   <Route path="/" component={App}>

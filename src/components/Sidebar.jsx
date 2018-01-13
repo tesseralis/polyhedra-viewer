@@ -3,6 +3,7 @@ import React from 'react'
 import { Link } from 'react-router'
 import { css, StyleSheet } from 'aphrodite/no-important'
 import { connect } from 'react-redux'
+import { createStructuredSelector } from 'reselect'
 
 import SearchBar from './SearchBar'
 import { getFilteredGroups } from '../selectors'
@@ -122,9 +123,8 @@ const Sidebar = ({ groups, width }) => {
   )
 }
 
-const mapStateToProps = state => ({
-  groups: getFilteredGroups(state),
-  searchBar: SearchBar,
+const mapStateToProps = createStructuredSelector({
+  groups: getFilteredGroups,
 })
 
 export default connect(mapStateToProps)(Sidebar)

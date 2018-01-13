@@ -1,12 +1,12 @@
 import React from 'react'
 import { TransitionMotion } from 'react-motion'
 
-const ConditionTransitionMotion = ({
+export default function ConditionTransitionMotion({
   condition,
   style,
   children,
   ...props
-}) => {
+}) {
   const styles = condition ? [{ key: 'single', style }] : []
 
   return (
@@ -21,5 +21,3 @@ const ConditionTransitionMotion = ({
     </TransitionMotion>
   )
 }
-
-export default ConditionTransitionMotion

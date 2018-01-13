@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { bindActionCreators } from 'redux'
 import { css, StyleSheet } from 'aphrodite/no-important'
+import { createStructuredSelector } from 'reselect'
 
 import { andaleMono } from '../styles/fonts'
 import { transition } from '../styles/common'
@@ -81,16 +81,12 @@ export class SearchBar extends Component {
   }
 }
 
-const mapStateToProps = state => ({
-  text: getFilterText(state),
+const mapStateToProps = createStructuredSelector({
+  text: getFilterText,
 })
 
-const mapDispatchToProps = dispatch =>
-  bindActionCreators(
-    {
-      setValue: setFilterText,
-    },
-    dispatch,
-  )
+const mapDispatchToProps = {
+  setValue: setFilterText,
+}
 
 export default connect(mapStateToProps, mapDispatchToProps)(SearchBar)

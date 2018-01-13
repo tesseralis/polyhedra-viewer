@@ -3,6 +3,7 @@ import { Motion, spring, presets } from 'react-motion'
 import { rgb } from 'd3-color'
 import _ from 'lodash'
 import { connect } from 'react-redux'
+import { createStructuredSelector } from 'reselect'
 
 import { getPolyhedronConfig } from '../selectors'
 import { mapObject } from '../util'
@@ -90,8 +91,8 @@ const Polyhedron = ({ solid, config }) => {
   )
 }
 
-const mapStateToProps = state => ({
-  config: getPolyhedronConfig(state),
+const mapStateToProps = createStructuredSelector({
+  config: getPolyhedronConfig,
 })
 
 export default connect(mapStateToProps)(Polyhedron)
