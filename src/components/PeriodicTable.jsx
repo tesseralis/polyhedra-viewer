@@ -135,12 +135,17 @@ export default function PeriodicTable() {
           const area = gridAreaMapping[section.caption]
           if (section.type === 'subheader') {
             return (
-              <GridArea area={area} element="h2" classes={styles.subheader}>
+              <GridArea
+                key={area}
+                area={area}
+                element="h2"
+                classes={styles.subheader}
+              >
                 {section.caption}
               </GridArea>
             )
           }
-          return <PolyhedronTableArea area={area} data={section} />
+          return <PolyhedronTableArea key={area} area={area} data={section} />
         })}
       </div>
     </main>
