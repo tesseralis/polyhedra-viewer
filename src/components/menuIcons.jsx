@@ -9,11 +9,11 @@ const styles = StyleSheet.create({
   button: resetButton,
   link: resetLink,
   icon: {
-    ...transition('color', .25),
+    ...transition('color', 0.25),
     padding: 10,
     color: 'Gray',
     ':hover': {
-      color: 'DimGray'
+      color: 'DimGray',
     },
     ':focus': {
       outline: 'none',

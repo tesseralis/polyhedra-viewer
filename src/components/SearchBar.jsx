@@ -1,9 +1,14 @@
 import React, { Component } from 'react'
+import { connect } from 'react-redux'
+import { bindActionCreators } from 'redux'
 import { css, StyleSheet } from 'aphrodite/no-important'
 
 import { andaleMono } from '../styles/fonts'
 import { transition } from '../styles/common'
 import Icon from './Icon'
+
+import { setFilterText } from '../actions'
+import { getFilterText } from '../selectors'
 
 const styles = StyleSheet.create({
   searchBar: {
@@ -16,7 +21,7 @@ const styles = StyleSheet.create({
   },
 
   input: {
-    ...transition('border-color', .35),
+    ...transition('border-color', 0.35),
     width: '100%',
     height: 36,
     paddingLeft: 30,
@@ -30,11 +35,11 @@ const styles = StyleSheet.create({
     ':focus': {
       outline: 'none',
       borderColor: 'Gray',
-    }
+    },
   },
 
   icon: {
-    ...transition('color', .35),
+    ...transition('color', 0.35),
     position: 'absolute',
     top: 10,
     left: 10,
@@ -44,10 +49,10 @@ const styles = StyleSheet.create({
 
   iconFocus: {
     color: 'Gray',
-  }
+  },
 })
 
-export default class SearchBar extends Component {
+export class SearchBar extends Component {
   state = { isFocused: false }
 
   setFocus(value) {
@@ -76,3 +81,16 @@ export default class SearchBar extends Component {
   }
 }
 
+const mapStateToProps = state => ({
+  text: getFilterText(state),
+})
+
+const mapDispatchToProps = dispatch =>
+  bindActionCreators(
+    {
+      setValue: setFilterText,
+    },
+    dispatch,
+  )
+
+export default connect(mapStateToProps, mapDispatchToProps)(SearchBar)

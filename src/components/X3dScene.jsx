@@ -15,7 +15,7 @@ const styles = StyleSheet.create({
   x3dScene: {
     ...fullScreen,
     border: 'none',
-  }
+  },
 })
 
 export default class X3dScene extends Component {
@@ -28,8 +28,8 @@ export default class X3dScene extends Component {
     return (
       <x3d className={css(styles.x3dScene)}>
         <scene>
-          <viewpoint is position="0,0,5"></viewpoint>
-          { this.props.children }
+          <viewpoint is position="0,0,5" />
+          {this.props.children}
         </scene>
       </x3d>
     )

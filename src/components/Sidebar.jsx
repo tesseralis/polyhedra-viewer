@@ -2,6 +2,10 @@ import _ from 'lodash'
 import React from 'react'
 import { Link } from 'react-router'
 import { css, StyleSheet } from 'aphrodite/no-important'
+import { connect } from 'react-redux'
+
+import SearchBar from './SearchBar'
+import { getFilteredGroups } from '../selectors'
 
 import { escapeName } from '../constants/polyhedra'
 import GroupHeader from './GroupHeader'
@@ -35,16 +39,20 @@ const PolyhedronLink = ({ name }) => {
       to={escapeName(name)}
       className={css(styles.link)}
       activeClassName={css(styles.isActive)}
-    >{_.capitalize(name)}</Link>
+    >
+      {_.capitalize(name)}
+    </Link>
   )
 }
 
 const PolyhedronList = ({ polyhedra }) => {
   return (
     <ul>
-      { polyhedra.map(name => (
-        <li key={name}><PolyhedronLink name={name} /></li>
-      )) }
+      {polyhedra.map(name => (
+        <li key={name}>
+          <PolyhedronLink name={name} />
+        </li>
+      ))}
     </ul>
   )
 }
@@ -57,7 +65,7 @@ const Subgroup = ({ name, polyhedra }) => {
 
     header: {
       margin: '3px 12px',
-    }
+    },
   })
 
   return (
@@ -83,13 +91,17 @@ const PolyhedronGroup = ({ group }) => {
   return (
     <div className={css(styles.group)}>
       <GroupHeader text={display} styles={styles.header} />
-      { polyhedra && <PolyhedronList polyhedra={polyhedra} /> }
-      { groups && <div className={css(styles.subgroups)}>{groups.map(group => <Subgroup key={group.name} {...group} />)}</div> }
+      {polyhedra && <PolyhedronList polyhedra={polyhedra} />}
+      {groups && (
+        <div className={css(styles.subgroups)}>
+          {groups.map(group => <Subgroup key={group.name} {...group} />)}
+        </div>
+      )}
     </div>
   )
 }
 
-const Sidebar = ({ groups, width, searchBar: SearchBar }) => {
+const Sidebar = ({ groups, width }) => {
   const styles = StyleSheet.create({
     sidebar: {
       width,
@@ -103,9 +115,16 @@ const Sidebar = ({ groups, width, searchBar: SearchBar }) => {
   return (
     <section className={css(styles.sidebar)}>
       <SearchBar />
-      { groups.map(({name, ...group}) => <PolyhedronGroup key={name} group={group} /> ) }
+      {groups.map(({ name, ...group }) => (
+        <PolyhedronGroup key={name} group={group} />
+      ))}
     </section>
   )
 }
 
-export default Sidebar
+const mapStateToProps = state => ({
+  groups: getFilteredGroups(state),
+  searchBar: SearchBar,
+})
+
+export default connect(mapStateToProps)(Sidebar)

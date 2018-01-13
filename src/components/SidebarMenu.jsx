@@ -30,7 +30,9 @@ const styles = StyleSheet.create({
 export default class SidebarMenu extends Component {
   state = { show: false }
 
-  toggle() { this.setState(({ show }) => ({ show: !show })) }
+  toggle() {
+    this.setState(({ show }) => ({ show: !show }))
+  }
 
   render() {
     const Sidebar = this.props.sidebar
@@ -38,28 +40,33 @@ export default class SidebarMenu extends Component {
 
     return (
       <div className={css(styles.sidebarMenu)}>
-        <Motion style={{x: spring(this.state.show ? sidebarWidth : 0)}}>
-        { ({ x }) =>
-          <div style={{transform: `translateX(${x}px)`}} className={css(styles.menuBar)}>
-            <IconLink to="/" name="home" />
-            <IconButton onClick={() => this.toggle()} name="list" />
-          </div>
-        }
+        <Motion style={{ x: spring(this.state.show ? sidebarWidth : 0) }}>
+          {({ x }) => (
+            <div
+              style={{ transform: `translateX(${x}px)` }}
+              className={css(styles.menuBar)}
+            >
+              <IconLink to="/" name="home" />
+              <IconButton onClick={() => this.toggle()} name="list" />
+            </div>
+          )}
         </Motion>
         <ConditionTransitionMotion
           condition={this.state.show}
           willEnter={() => ({ x: -sidebarWidth })}
-          willLeave={() => ({ x: spring(-sidebarWidth)})}
-          style={{ x: spring(0)}}
+          willLeave={() => ({ x: spring(-sidebarWidth) })}
+          style={{ x: spring(0) }}
         >
-          { ({x}) => 
-            <div className={css(styles.sidebar)} style={{ transform: `translateX(${x}px)` }} >
-              <Sidebar width={sidebarWidth}/>
+          {({ x }) => (
+            <div
+              className={css(styles.sidebar)}
+              style={{ transform: `translateX(${x}px)` }}
+            >
+              <Sidebar width={sidebarWidth} />
             </div>
-          }
+          )}
         </ConditionTransitionMotion>
       </div>
     )
   }
 }
-

@@ -2,7 +2,9 @@ import React from 'react'
 import { Motion, spring, presets } from 'react-motion'
 import { rgb } from 'd3-color'
 import _ from 'lodash'
+import { connect } from 'react-redux'
 
+import { getPolyhedronConfig } from '../selectors'
 import { mapObject } from '../util'
 import polygons from '../constants/polygons'
 
@@ -17,15 +19,14 @@ const Coordinates = ({ points }) => {
   const buffer = _.times(100, _.constant([0, 0, 0]))
   const bufferedPoints = points.concat(buffer)
 
-  return (
-    <coordinate is point={joinListOfLists(bufferedPoints, ', ', ' ')}></coordinate>
-  )
+  return <coordinate is point={joinListOfLists(bufferedPoints, ', ', ' ')} />
 }
 
 /* Faces */
 
 // Convert the hex color to RGB
-const toRgb = hex => ['r', 'g', 'b'].map(_.propertyOf(rgb(hex))).map(d => d/255)
+const toRgb = hex =>
+  ['r', 'g', 'b'].map(_.propertyOf(rgb(hex))).map(d => d / 255)
 const colorIndexForFace = mapObject(polygons, _.nthArg(1))
 const getColorIndex = face => colorIndexForFace[face.length]
 const polygonColors = colors => polygons.map(n => toRgb(colors[n]))
@@ -36,20 +37,20 @@ const Faces = ({ faces, vertices, config }) => {
   return (
     <shape>
       <appearance>
-        <material is transparency={1 - opacity}></material>
+        <material is transparency={1 - opacity} />
       </appearance>
-      <indexedfaceset is
+      <indexedfaceset
+        is
         solid="false"
         colorPerVertex="false"
-        colorindex={ faces.map(getColorIndex).join(' ') }
-        coordindex={ joinListOfLists(faces, ' -1 ', ' ') }
+        colorindex={faces.map(getColorIndex).join(' ')}
+        coordindex={joinListOfLists(faces, ' -1 ', ' ')}
       >
         <Coordinates points={vertices} />
-        <color is color={getColorAttr(colors)}></color>
+        <color is color={getColorAttr(colors)} />
       </indexedfaceset>
     </shape>
   )
-  
 }
 
 /* Edges */
@@ -57,10 +58,8 @@ const Faces = ({ faces, vertices, config }) => {
 const Edges = ({ edges, vertices }) => {
   return (
     <shape>
-      <indexedlineset is
-        coordindex={ joinListOfLists(edges, ' -1 ', ' ') }
-      >
-      <Coordinates points={vertices} />
+      <indexedlineset is coordindex={joinListOfLists(edges, ' -1 ', ' ')}>
+        <Coordinates points={vertices} />
       </indexedlineset>
     </shape>
   )
@@ -75,15 +74,24 @@ const Polyhedron = ({ solid, config }) => {
   const { showEdges, showFaces } = config
 
   return (
-    <Motion defaultStyle={{ scale: 0 }} style={{ scale: spring(1, presets.gentle) }}>
-      { ({ scale }) =>
+    <Motion
+      defaultStyle={{ scale: 0 }}
+      style={{ scale: spring(1, presets.gentle) }}
+    >
+      {({ scale }) => (
         <transform is scale={getScaleAttr(scale)}>
-          { showFaces && <Faces faces={faces} vertices={vertices} config={config} /> }
-          { showEdges && <Edges edges={edges} vertices={vertices} /> }
+          {showFaces && (
+            <Faces faces={faces} vertices={vertices} config={config} />
+          )}
+          {showEdges && <Edges edges={edges} vertices={vertices} />}
         </transform>
-      }
+      )}
     </Motion>
   )
 }
 
-export default Polyhedron
+const mapStateToProps = state => ({
+  config: getPolyhedronConfig(state),
+})
+
+export default connect(mapStateToProps)(Polyhedron)

@@ -1,12 +1,18 @@
 import React from 'react'
 import { css, StyleSheet } from 'aphrodite/no-important'
 import _ from 'lodash'
+import { bindActionCreators } from 'redux'
+import { connect } from 'react-redux'
+
+import { configInputs } from '../constants/configOptions'
+import { getConfigValues } from '../selectors'
+import { reset, setInputValue } from '../actions'
 
 import { hover, transition } from '../styles/common'
 import { andaleMono } from '../styles/fonts'
 
 const getInputValue = (input, el) => {
-  switch(input.type) {
+  switch (input.type) {
     case 'checkbox':
       return el.checked
     default:
@@ -31,9 +37,7 @@ const getInputProps = (input, value) => {
 const ConfigInput = ({ input, value, setValue }) => {
   const inputProps = getInputProps(input, value)
   const onChange = evt => setValue(getInputValue(input, evt.target))
-  return (
-    <input type={input.type} onChange={onChange} {...inputProps} />
-  )
+  return <input type={input.type} onChange={onChange} {...inputProps} />
 }
 
 const LabelledInput = ({ input, value, setValue }) => {
@@ -49,7 +53,7 @@ const LabelledInput = ({ input, value, setValue }) => {
 
   return (
     <label className={css(styles.label)}>
-      { input.display }
+      {input.display}
       <ConfigInput input={input} value={value} setValue={setValue} />
     </label>
   )
@@ -59,7 +63,7 @@ const ResetButton = ({ reset }) => {
   const styles = StyleSheet.create({
     resetButton: {
       ...hover,
-      ...transition('all', .25),
+      ...transition('all', 0.25),
 
       width: 120,
       height: 30,
@@ -75,16 +79,14 @@ const ResetButton = ({ reset }) => {
       ':focus': {
         outline: 'none',
         borderColor: 'Gray',
-      }
+      },
     },
   })
 
   return (
-    <button
-      type="button"
-      onClick={reset}
-      className={css(styles.resetButton)}
-    >Reset</button>
+    <button type="button" onClick={reset} className={css(styles.resetButton)}>
+      Reset
+    </button>
   )
 }
 
@@ -101,17 +103,31 @@ const ConfigForm = ({ width, inputs, inputValues, setInputValue, reset }) => {
 
   return (
     <form className={css(styles.configMenu)}>
-      { inputs.map(({ key, ...input}) => 
+      {inputs.map(({ key, ...input }) => (
         <LabelledInput
           key={key}
           input={input}
           value={inputValues[key]}
           setValue={value => setInputValue(key, value)}
         />
-      ) }
+      ))}
       <ResetButton reset={reset} />
     </form>
   )
 }
 
-export default ConfigForm
+const mapStateToProps = state => ({
+  inputs: configInputs,
+  inputValues: getConfigValues(state),
+})
+
+const mapDispatchToProps = dispatch =>
+  bindActionCreators(
+    {
+      setInputValue,
+      reset,
+    },
+    dispatch,
+  )
+
+export default connect(mapStateToProps, mapDispatchToProps)(ConfigForm)

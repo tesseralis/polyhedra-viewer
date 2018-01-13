@@ -9,7 +9,7 @@ const styles = StyleSheet.create({
   },
 })
 
-export default function IconLink({to, ...props}) {
+export default function IconLink({ to, ...props }) {
   return (
     <a target="_blank" href={to} className={css(styles.link, props.styles)}>
       <Icon {...props} />
