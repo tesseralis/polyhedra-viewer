@@ -31,7 +31,7 @@ const styles = StyleSheet.create({
   },
 })
 
-export default function PolyhedronLink({ name, isFake }) {
+export default function PolyhedronLink({ name, isFake, subLink }) {
   const escapedName = escapeName(name)
   const img = require(`images/${escapedName}.png`)
   if (isFake) {
@@ -42,7 +42,10 @@ export default function PolyhedronLink({ name, isFake }) {
     )
   }
   return (
-    <Link to={'/' + escapedName} className={css(styles.link, styles.real)}>
+    <Link
+      to={'/' + escapedName + (subLink ? '/' + subLink : '')}
+      className={css(styles.link, styles.real)}
+    >
       <img className={css(styles.image)} src={img} alt={name} />
     </Link>
   )

@@ -6,6 +6,7 @@ import {
   toConwayNotation,
   fromConwayNotation,
 } from 'constants/polyhedra'
+import PolyhedronLink from 'components/common/PolyhedronLink'
 
 const basePolyhedraGraph = {
   T: {
@@ -41,6 +42,7 @@ const basePolyhedraGraph = {
   },
 }
 
+// Make everything an array
 function normalize(graph) {
   return _.mapValues(graph, ops => _.mapValues(ops, _.castArray))
 }
@@ -90,12 +92,12 @@ export default function RelatedPolyhedra({ match }) {
         if (!related || !related[operation]) return <div />
         return (
           <div>
+            {operations[operation]}:{' '}
             {related[operation].map(notation => {
               const name = fromConwayNotation(notation)
               return (
                 <div>
-                  {operations[operation]}:{' '}
-                  <Link to={'/' + escapeName(name) + '/related'}>{name}</Link>
+                  <PolyhedronLink name={name} subLink="related" />
                 </div>
               )
             })}
