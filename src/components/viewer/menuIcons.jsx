@@ -24,12 +24,12 @@ const styles = StyleSheet.create({
 
 export const IconButton = ({ name, onClick }) => (
   <button onClick={onClick} className={css(styles.button, styles.icon)}>
-    <Icon name={name} size={4} />
+    <Icon name={name} size={3} />
   </button>
 )
 
 export const IconLink = ({ name, to }) => (
   <Link to={to} className={css(styles.link, styles.icon)}>
-    <Icon name={name} size={4} />
+    <Icon name={name} size={3} />
   </Link>
 )

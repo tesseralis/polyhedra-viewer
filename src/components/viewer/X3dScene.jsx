@@ -13,8 +13,6 @@ x3dom.Viewarea.prototype.onDoubleClick = () => {}
 
 const styles = StyleSheet.create({
   x3dScene: {
-    width: '100%',
-    height: '100%',
     border: 'none',
   },
 })

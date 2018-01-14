@@ -10,6 +10,7 @@ import { escapeName } from 'constants/polyhedra'
 import { andaleMono } from 'styles/fonts'
 import { resetLink, hover } from 'styles/common'
 
+import { IconButton, IconLink } from './menuIcons'
 import SearchBar from './SearchBar'
 import GroupHeader from './GroupHeader'
 import SubgroupHeader from './SubgroupHeader'
@@ -104,8 +105,7 @@ const PolyhedronGroup = ({ group }) => {
 const Sidebar = ({ groups, width }) => {
   const styles = StyleSheet.create({
     sidebar: {
-      width: 400,
-      maxHeight: '100%',
+      height: '100%',
       overflowY: 'scroll',
       backgroundColor: 'WhiteSmoke',
       boxShadow: 'inset -1px -1px 4px LightGray',
@@ -114,6 +114,13 @@ const Sidebar = ({ groups, width }) => {
 
   return (
     <section className={css(styles.sidebar)}>
+      <div>
+        <IconButton name="info" />
+        <IconButton name="list" />
+        <IconButton name="link" />
+        <IconButton name="cog" />
+        <IconLink to="/" name="home" />
+      </div>
       <SearchBar />
       {groups.map(({ name, ...group }) => (
         <PolyhedronGroup key={name} group={group} />

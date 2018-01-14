@@ -38,6 +38,7 @@ const Viewer = ({ params }) => {
     isValidSolid(params.solid) ? params.solid : 'tetrahedron',
   )
 
+  // FIXME resizing (decreasing height) for the x3d scene doesn't work well
   return (
     <div className={css(styles.viewer)}>
       <X3dScene>
