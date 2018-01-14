@@ -104,8 +104,8 @@ const PolyhedronGroup = ({ group }) => {
 const Sidebar = ({ groups, width }) => {
   const styles = StyleSheet.create({
     sidebar: {
-      width,
-      height: '100%',
+      width: 400,
+      maxHeight: '100%',
       overflowY: 'scroll',
       backgroundColor: 'WhiteSmoke',
       boxShadow: 'inset -1px -1px 4px LightGray',
