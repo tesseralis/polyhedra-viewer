@@ -10,16 +10,20 @@ import PolyhedronLink from 'components/common/PolyhedronLink'
 
 const basePolyhedraGraph = {
   T: {
+    d: 'T',
     t: 'tT',
     r: 'O',
   },
   C: {
+    d: 'O',
     t: 'tC',
     r: 'aC',
+    e: 'eC',
   },
   O: {
     t: 'tO',
     r: 'aC',
+    e: 'eC',
     s: 'I',
   },
   aC: {
@@ -28,12 +32,15 @@ const basePolyhedraGraph = {
     s: 'sC',
   },
   D: {
+    d: 'D',
     t: 'tD',
     r: 'aD',
+    e: 'eD',
   },
   I: {
     t: 'tI',
     r: 'aD',
+    e: 'eD',
   },
   aD: {
     t: 'bD',
@@ -55,7 +62,7 @@ function makeBidirectional(graph) {
         if (!result[sink]) {
           result[sink] = {}
         }
-        const reverseOp = `-${operation}`
+        const reverseOp = operation === 'd' ? operation : `-${operation}`
         if (!result[sink][reverseOp]) {
           result[sink][reverseOp] = []
         }
@@ -72,15 +79,18 @@ const polyhedraGraph = makeBidirectional(normalize(basePolyhedraGraph))
 console.log(polyhedraGraph)
 
 const operations = {
-  t: 'truncate',
-  r: 'rectify',
+  d: 'dual',
+  t: 'truncation',
+  r: 'rectification',
+  e: 'cantellation',
   s: 'snub',
   '-t': 'truncation of',
   '-r': 'rectification of',
+  '-e': 'cantellation of',
   '-s': 'snub of',
 }
 
-const operationOrder = ['t', 'r', 's', '-t', '-r', '-s']
+const operationOrder = ['d', 't', 'r', 'e', 's', '-t', '-r', '-e', '-s']
 
 export default function RelatedPolyhedra({ match }) {
   const notation = toConwayNotation(match.params.solid.replace(/-/g, ' '))
