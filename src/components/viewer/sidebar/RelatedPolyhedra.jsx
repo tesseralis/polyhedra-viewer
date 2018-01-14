@@ -153,7 +153,6 @@ const basePyramidsCupolae = (() => {
   })
 
   // FIXME don't create stray nulls
-  // FIXME elongations of bipyramids
   _.forEach(pyramidsCupolae, (row, index) => {
     row = row
     graph = _.merge(graph, {
@@ -206,6 +205,7 @@ const basePyramidsCupolae = (() => {
   return graph
 })()
 
+// FIXME augmented prisms and gyrobifastigium is broken
 const baseAugmentations = (() => {
   const rowNames = periodicTable[4].rows
   let graph = {}
