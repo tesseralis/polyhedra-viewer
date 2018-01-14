@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import React from 'react'
-import { withRouter, Route, NavLink } from 'react-router-dom'
+import { NavLink } from 'react-router-dom'
 import { css, StyleSheet } from 'aphrodite/no-important'
 import { connect } from 'react-redux'
 import { createStructuredSelector } from 'reselect'
@@ -10,11 +10,9 @@ import { escapeName } from 'constants/polyhedra'
 import { andaleMono } from 'styles/fonts'
 import { resetLink, hover } from 'styles/common'
 
-import { IconButton, IconLink } from './menuIcons'
 import SearchBar from './SearchBar'
 import GroupHeader from './GroupHeader'
 import SubgroupHeader from './SubgroupHeader'
-import ConfigForm from './ConfigForm'
 
 const PolyhedronLink = ({ name }) => {
   const styles = StyleSheet.create({
@@ -47,7 +45,7 @@ const PolyhedronLink = ({ name }) => {
   )
 }
 
-const PolyhedronList = ({ polyhedra }) => {
+const SubList = ({ polyhedra }) => {
   return (
     <ul>
       {polyhedra.map(name => (
@@ -73,7 +71,7 @@ const Subgroup = ({ name, polyhedra }) => {
   return (
     <div className={css(styles.subgroup)}>
       <SubgroupHeader name={name} styles={styles.header} />
-      <PolyhedronList polyhedra={polyhedra} />
+      <SubList polyhedra={polyhedra} />
     </div>
   )
 }
@@ -93,7 +91,7 @@ const PolyhedronGroup = ({ group }) => {
   return (
     <div className={css(styles.group)}>
       <GroupHeader text={display} styles={styles.header} />
-      {polyhedra && <PolyhedronList polyhedra={polyhedra} />}
+      {polyhedra && <SubList polyhedra={polyhedra} />}
       {groups && (
         <div className={css(styles.subgroups)}>
           {groups.map(group => <Subgroup key={group.name} {...group} />)}
@@ -103,7 +101,7 @@ const PolyhedronGroup = ({ group }) => {
   )
 }
 
-const List = ({ groups }) => (
+const PolyhedronList = ({ groups }) => (
   <div>
     <SearchBar />
     {groups.map(({ name, ...group }) => (
@@ -116,38 +114,4 @@ const mapStateToProps = createStructuredSelector({
   groups: getFilteredGroups,
 })
 
-const ConnectedList = connect(mapStateToProps)(List)
-
-const ComponentInfo = ({ match }) => {
-  return <p>this is a polyhedron</p>
-}
-
-// FIXME figure out how not to have this match weaved in all the time
-const Sidebar = ({ match }) => {
-  const styles = StyleSheet.create({
-    sidebar: {
-      width: 400,
-      height: '100%',
-      overflowY: 'scroll',
-      backgroundColor: 'WhiteSmoke',
-      boxShadow: 'inset -1px -1px 4px LightGray',
-    },
-  })
-
-  return (
-    <section className={css(styles.sidebar)}>
-      <div>
-        <IconLink to={`${match.url}`} name="info" />
-        <IconLink to={`${match.url}/list`} name="list" />
-        <IconLink to={`${match.url}/related`} name="link" />
-        <IconLink to={`${match.url}/config`} name="cog" />
-        <IconLink to="/" name="home" />
-      </div>
-      <Route exact path={`${match.url}`} component={ComponentInfo} />
-      <Route path={`${match.url}/list`} component={ConnectedList} />
-      <Route path={`${match.url}/config`} component={ConfigForm} />
-    </section>
-  )
-}
-
-export default withRouter(Sidebar)
+export default connect(mapStateToProps)(PolyhedronList)

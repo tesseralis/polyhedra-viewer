@@ -1,17 +1,12 @@
 import React from 'react'
 import { css, StyleSheet } from 'aphrodite/no-important'
-import _ from 'lodash'
 
 import { getSolidData, isValidSolid } from 'constants/polyhedra'
 import { fixed, fullScreen } from 'styles/common'
 
 import X3dScene from './X3dScene'
-import SidebarMenu from './SidebarMenu'
-import ConfigMenu from './ConfigMenu'
-import Title from './Title'
 import Polyhedron from './Polyhedron'
-import Sidebar from './Sidebar'
-import ConfigForm from './ConfigForm'
+import { Sidebar } from './sidebar'
 
 const styles = StyleSheet.create({
   viewer: {
@@ -48,11 +43,6 @@ const Viewer = ({ match }) => {
       <div className={css(styles.sidebar)}>
         <Sidebar match={match} />
       </div>
-      {/* 
-      <SidebarMenu sidebar={Sidebar} />
-      <ConfigMenu configForm={ConfigForm} />
-      <Title styles={styles.title} name={_.capitalize(solid.name)} />
-    */}
     </div>
   )
 }
