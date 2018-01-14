@@ -6,6 +6,8 @@ import {
   toConwayNotation,
   fromConwayNotation,
 } from 'constants/polyhedra'
+
+import periodicTable from 'constants/periodicTable'
 import PolyhedronLink from 'components/common/PolyhedronLink'
 
 const basePolyhedraGraph = {
@@ -54,6 +56,26 @@ function normalize(graph) {
   return _.mapValues(graph, ops => _.mapValues(ops, _.castArray))
 }
 
+const getInverseOperation = operation => {
+  switch (operation) {
+    // dual
+    case 'd':
+    case 'g':
+      return operation
+    // agument / diminish
+    case '+':
+      return '-'
+    case '-':
+      return '+'
+    // gyro / elongation
+    case 'P':
+    case 'A':
+      return null
+    default:
+      return `~${operation}`
+  }
+}
+
 function makeBidirectional(graph) {
   const result = {}
   for (let [source, operations] of Object.entries(graph)) {
@@ -62,7 +84,7 @@ function makeBidirectional(graph) {
         if (!result[sink]) {
           result[sink] = {}
         }
-        const reverseOp = operation === 'd' ? operation : `-${operation}`
+        const reverseOp = getInverseOperation(operation)
         if (!result[sink][reverseOp]) {
           result[sink][reverseOp] = []
         }
@@ -73,10 +95,65 @@ function makeBidirectional(graph) {
   return _.merge(result, graph)
 }
 
-console.log(normalize(basePolyhedraGraph))
+// FIXME figure out a way to do this j
+const prisms = periodicTable[1]
+const pyramidsCupolae = periodicTable[3]
 
-const polyhedraGraph = makeBidirectional(normalize(basePolyhedraGraph))
-console.log(polyhedraGraph)
+const invalidNames = ['concave', 'coplanar']
+function convertTableNotation(notation) {
+  if (_.isArray(notation)) return notation.map(convertTableNotation)
+  if (notation[0] === '!') return notation.substring(1)
+  if (_.includes(invalidNames, notation)) return null
+  return notation
+}
+
+function createBaseJohnsonGraph() {
+  let graph = {}
+  // TODO add in prisms and antiprisms
+  for (let row of pyramidsCupolae.data) {
+    // TODO cupola-rotunda
+    row = row.map(convertTableNotation)
+    graph = {
+      ...graph,
+      [row[0]]: {
+        P: row[1],
+        A: row[2],
+        '+': row[3],
+      },
+      [row[1]]: {
+        '+': row[4],
+      },
+      [row[2]]: {
+        '+': row[5],
+      },
+    }
+
+    // gyrate relationships
+    for (let cell of row) {
+      if (_.isArray(cell)) {
+        const [c1, c2] = cell
+        graph = {
+          ...graph,
+          [c1]: {
+            ...graph[c1],
+            g: c2,
+          },
+        }
+      }
+    }
+  }
+  return graph
+}
+
+const baseJohnsonGraph = createBaseJohnsonGraph()
+
+console.log(baseJohnsonGraph)
+
+const polyhedraGraph = makeBidirectional(
+  normalize(_.merge(basePolyhedraGraph, baseJohnsonGraph)),
+)
+
+console.log('polyhedra graph', polyhedraGraph)
 
 const operations = {
   d: 'dual',
@@ -84,26 +161,56 @@ const operations = {
   r: 'rectification',
   e: 'cantellation',
   s: 'snub',
-  '-t': 'truncation of',
-  '-r': 'rectification of',
-  '-e': 'cantellation of',
-  '-s': 'snub of',
+
+  '~t': 'truncation of',
+  '~r': 'rectification of',
+  '~e': 'cantellation of',
+  '~s': 'snub of',
+
+  '+': 'augment',
+  '-': 'diminish',
+  P: 'elongate',
+  A: 'gyroelongate',
+  g: 'gyrate',
 }
 
-const operationOrder = ['d', 't', 'r', 'e', 's', '-t', '-r', '-e', '-s']
+const operationOrder = [
+  'd',
+  't',
+  'r',
+  'e',
+  's',
+
+  '~t',
+  '~r',
+  '~e',
+  '~s',
+
+  '+',
+  '-',
+  'P',
+  'A',
+  'g',
+]
 
 export default function RelatedPolyhedra({ match }) {
   const notation = toConwayNotation(match.params.solid.replace(/-/g, ' '))
+  console.log('notation', notation)
   const related = polyhedraGraph[notation]
-  console.log(related)
+  console.log('related', related)
   return (
     <div>
       {operationOrder.map(operation => {
-        if (!related || !related[operation]) return <div />
+        if (
+          !related ||
+          !related[operation] ||
+          !_.compact(related[operation]).length
+        )
+          return <div />
         return (
           <div>
             {operations[operation]}:{' '}
-            {related[operation].map(notation => {
+            {_.compact(related[operation]).map(notation => {
               const name = fromConwayNotation(notation)
               return (
                 <div>

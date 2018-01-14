@@ -52,6 +52,8 @@ const prismNames = {
   10: 'decagonal',
 }
 
+const inversePrismNames = _.invert(prismNames)
+
 const platonicMapping = {
   T: 'tetrahedron',
   C: 'cube',
@@ -107,6 +109,17 @@ export const toConwayNotation = name => {
   }
   if (inverseArchimedeanMapping[name]) {
     return inverseArchimedeanMapping[name]
+  }
+  if (name.includes('prism')) {
+    const [prefix] = name.split(' ')
+    return 'P' + inversePrismNames[prefix]
+  }
+  if (name.includes('antiprism')) {
+    const [prefix] = name.split(' ')
+    return 'A' + inversePrismNames[prefix]
+  }
+  if (_.includes(johnsonSolids, name)) {
+    return 'J' + (johnsonSolids.indexOf(name) + 1)
   }
   return null
 }
