@@ -170,6 +170,26 @@ const basePyramidsCupolae = (() => {
       },
     })
 
+    if (!_.isArray(row[3])) {
+      graph = _.merge(graph, {
+        [row[3]]: {
+          P: row[4],
+          A: row[5],
+        },
+      })
+    } else {
+      graph = _.merge(graph, {
+        [row[3][0]]: {
+          P: row[4][0],
+          A: row[5],
+        },
+        [row[3][1]]: {
+          P: row[4][1],
+          A: row[5],
+        },
+      })
+    }
+
     // gyrate relationships
     for (let cell of row) {
       if (_.isArray(cell)) {
@@ -207,17 +227,12 @@ const baseAugmentations = (() => {
 })()
 
 const diminishedIcosahedraGraph = (() => {
-  const row = diminishedIcosahedra[0]
-  // TODO might as well use Jn notation?
   return {
-    [row[0]]: {
-      '+': [row[1][1], row[3]],
+    J63: {
+      '+': ['J62', 'J64'],
     },
-    [row[1][0]]: {
-      '+': row[2],
-    },
-    [row[1][1]]: {
-      '+': row[2],
+    J62: {
+      '+': 'J11',
     },
   }
 })()
