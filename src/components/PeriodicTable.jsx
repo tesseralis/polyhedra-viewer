@@ -1,5 +1,4 @@
 import React from 'react'
-import * as _ from 'lodash'
 import { css, StyleSheet } from 'aphrodite/no-important'
 
 import PolyhedronTable from './PolyhedronTable'

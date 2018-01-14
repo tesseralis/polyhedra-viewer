@@ -6,7 +6,7 @@
     "exports-loader": "^0.6.4",
     "file-loader": "^0.10.1",
     "json-loader": "^0.5.7",
-    "react-scripts": "0.9.0"
+    "react-scripts": "^1.0.17"
   },
   "dependencies": {
     "aphrodite": "^1.2.5",
