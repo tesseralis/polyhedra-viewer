@@ -10,7 +10,8 @@ import {
 import periodicTable from 'constants/periodicTable'
 import PolyhedronLink from 'components/common/PolyhedronLink'
 
-const basePolyhedraGraph = {
+// TODO rewrite this based on the table?
+const archimedean = {
   T: {
     d: 'T',
     t: 'tT',
@@ -103,12 +104,22 @@ function convertTableNotation(notation) {
 }
 
 function convertTable(table) {
-  return table.map(row => row.map(convertTableNotation))
+  if (!table.data) return null
+  return table.data.map(row => row.map(convertTableNotation))
 }
 
 // FIXME figure out a way to do this without the table (or inverse the relationship)
-const prisms = convertTable(periodicTable[1].data)
-const pyramidsCupolae = convertTable(periodicTable[3].data)
+const [
+  ,
+  prisms,
+  ,
+  pyramidsCupolae,
+  augmentations,
+  diminishedIcosahedra,
+  rhombicosidodecahedra,
+  snubAntiprisms,
+  other,
+] = periodicTable.map(convertTable)
 
 const getPyramidRow = index => pyramidsCupolae[index > 2 ? index + 1 : index]
 
@@ -125,68 +136,163 @@ const getAugmentations = (rowIndex, colIndex) => {
     .value()
 }
 
-function createBaseJohnsonGraph() {
+const basePyramidsCupolae = (() => {
   let graph = {}
   // relation of prisms and antiprisms
   _.forEach(prisms, (row, index) => {
     const [prism, antiprism] = row
     const pyramidRow = getPyramidRow(index)
-    graph = {
-      ...graph,
+    graph = _.merge(graph, {
       [prism]: {
-        ...graph[prism],
         '+': pyramidRow[1],
       },
       [antiprism]: {
-        ...graph[antiprism],
         '+': pyramidRow[2],
       },
-    }
+    })
   })
 
+  // FIXME don't create stray nulls
+  // FIXME elongations of bipyramids
   _.forEach(pyramidsCupolae, (row, index) => {
     row = row
-    graph = {
-      ...graph,
+    graph = _.merge(graph, {
       [row[0]]: {
-        ...graph[row[0]],
         P: row[1],
         A: row[2],
         '+': getAugmentations(index, 3),
       },
       [row[1]]: {
-        ...graph[row[1]],
         '+': getAugmentations(index, 4),
       },
       [row[2]]: {
-        ...graph[row[2]],
         '+': getAugmentations(index, 5),
       },
-    }
+    })
 
     // gyrate relationships
     for (let cell of row) {
       if (_.isArray(cell)) {
         const [c1, c2] = cell
-        graph = {
-          ...graph,
+        graph = _.merge(graph, {
           [c1]: {
-            ...graph[c1],
             g: c2,
           },
-        }
+        })
       }
     }
   })
 
   return graph
-}
+})()
 
-const baseJohnsonGraph = createBaseJohnsonGraph()
+const baseAugmentations = (() => {
+  const rowNames = periodicTable[4].rows
+  let graph = {}
+  _.forEach(augmentations, (row, index) => {
+    const base = toConwayNotation(rowNames[index])
+    console.log('base', index, base)
+    graph = _.merge(graph, {
+      [base]: {
+        '+': row[0],
+      },
+      [row[0]]: {
+        '+': row[1],
+      },
+      [_.isArray(row[1]) ? row[1][1] : row[1]]: {
+        '+': row[2],
+      },
+    })
+  })
+  return graph
+})()
 
-console.log(baseJohnsonGraph)
+const diminishedIcosahedraGraph = (() => {
+  const row = diminishedIcosahedra[0]
+  // TODO might as well use Jn notation?
+  return {
+    [row[0]]: {
+      '+': [row[1][1], row[3]],
+    },
+    [row[1][0]]: {
+      '+': row[2],
+    },
+    [row[1][1]]: {
+      '+': row[2],
+    },
+  }
+})()
 
-const baseGraph = normalize(_.merge(basePolyhedraGraph, baseJohnsonGraph))
+const rhombicosidodecahedraGraph = (() => {
+  return {
+    eD: {
+      g: 'J72',
+      '-': 'J76',
+    },
+    J72: {
+      g: ['J73', 'J74'],
+      '-': ['J76', 'J77', 'J78'],
+    },
+    J73: {
+      '-': 'J77',
+    },
+    J74: {
+      g: 'J75',
+      '-': ['J78', 'J79'],
+    },
+    J75: {
+      '-': ['J79'],
+    },
+    J76: {
+      g: ['J73', 'J74'],
+      '-': ['J80', 'J81'],
+    },
+    J77: {
+      '-': 'J80',
+    },
+    J78: {
+      '-': ['J81', 'J82'],
+    },
+    J79: {
+      '-': ['J82'],
+    },
+    J81: {
+      g: 'J82',
+      '-': 'J83',
+    },
+    J82: {
+      '-': 'J83',
+    },
+  }
+})()
+
+const othersGraph = (() => {
+  return {
+    // snub antiprisms
+    T: {
+      s: 'J84',
+    },
+    A4: {
+      s: 'J85',
+    },
+
+    // "other" johnson solids
+    J86: {
+      '+': 'J87',
+    },
+  }
+})()
+
+const baseGraph = normalize(
+  _.merge(
+    archimedean,
+    basePyramidsCupolae,
+    baseAugmentations,
+    diminishedIcosahedraGraph,
+    rhombicosidodecahedraGraph,
+    othersGraph,
+  ),
+)
 console.log('baseGraph', baseGraph)
 
 const polyhedraGraph = makeBidirectional(baseGraph)
@@ -205,8 +311,8 @@ const operations = {
   '~e': 'cantellation of',
   '~s': 'snub of',
 
-  '+': 'augment',
-  '-': 'diminish',
+  '+': 'augmented',
+  '-': 'diminished',
   P: 'elongate',
   A: 'gyroelongate',
   '~P': 'elongation of',
