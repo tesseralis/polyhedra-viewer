@@ -67,10 +67,6 @@ const getInverseOperation = operation => {
       return '-'
     case '-':
       return '+'
-    // gyro / elongation
-    case 'P':
-    case 'A':
-      return null
     default:
       return `~${operation}`
   }
@@ -81,6 +77,9 @@ function makeBidirectional(graph) {
   for (let [source, operations] of Object.entries(graph)) {
     for (let [operation, sinks] of Object.entries(operations)) {
       for (let sink of sinks) {
+        if (!sink) {
+          continue
+        }
         if (!result[sink]) {
           result[sink] = {}
         }
@@ -95,10 +94,6 @@ function makeBidirectional(graph) {
   return _.merge(result, graph)
 }
 
-// FIXME figure out a way to do this j
-const prisms = periodicTable[1]
-const pyramidsCupolae = periodicTable[3]
-
 const invalidNames = ['concave', 'coplanar']
 function convertTableNotation(notation) {
   if (_.isArray(notation)) return notation.map(convertTableNotation)
@@ -107,24 +102,65 @@ function convertTableNotation(notation) {
   return notation
 }
 
+function convertTable(table) {
+  return table.map(row => row.map(convertTableNotation))
+}
+
+// FIXME figure out a way to do this without the table (or inverse the relationship)
+const prisms = convertTable(periodicTable[1].data)
+const pyramidsCupolae = convertTable(periodicTable[3].data)
+
+const getPyramidRow = index => pyramidsCupolae[index > 2 ? index + 1 : index]
+
+const hasCupolaRotunda = index => _.includes([6, 8], index)
+const cupolaRotunda = pyramidsCupolae[7]
+
+const getAugmentations = (rowIndex, colIndex) => {
+  return _([
+    pyramidsCupolae[rowIndex][colIndex],
+    hasCupolaRotunda(rowIndex) && cupolaRotunda[colIndex],
+  ])
+    .flatten()
+    .compact()
+    .value()
+}
+
 function createBaseJohnsonGraph() {
   let graph = {}
-  // TODO add in prisms and antiprisms
-  for (let row of pyramidsCupolae.data) {
-    // TODO cupola-rotunda
-    row = row.map(convertTableNotation)
+  // relation of prisms and antiprisms
+  _.forEach(prisms, (row, index) => {
+    const [prism, antiprism] = row
+    const pyramidRow = getPyramidRow(index)
+    graph = {
+      ...graph,
+      [prism]: {
+        ...graph[prism],
+        '+': pyramidRow[1],
+      },
+      [antiprism]: {
+        ...graph[antiprism],
+        '+': pyramidRow[2],
+      },
+    }
+  })
+
+  _.forEach(pyramidsCupolae, (row, index) => {
+    row = row
     graph = {
       ...graph,
       [row[0]]: {
+        ...graph[row[0]],
         P: row[1],
         A: row[2],
-        '+': row[3],
+        '+': getAugmentations(index, 3),
       },
       [row[1]]: {
-        '+': row[4],
+        ...graph[row[1]],
+        '+': getAugmentations(index, 4),
       },
       [row[2]]: {
-        '+': row[5],
+        ...graph[row[2]],
+        '+': getAugmentations(index, 5),
       },
     }
 
@@ -141,7 +177,8 @@ function createBaseJohnsonGraph() {
         }
       }
     }
-  }
+  })
+
   return graph
 }
 
@@ -149,9 +186,10 @@ const baseJohnsonGraph = createBaseJohnsonGraph()
 
 console.log(baseJohnsonGraph)
 
-const polyhedraGraph = makeBidirectional(
-  normalize(_.merge(basePolyhedraGraph, baseJohnsonGraph)),
-)
+const baseGraph = normalize(_.merge(basePolyhedraGraph, baseJohnsonGraph))
+console.log('baseGraph', baseGraph)
+
+const polyhedraGraph = makeBidirectional(baseGraph)
 
 console.log('polyhedra graph', polyhedraGraph)
 
@@ -171,6 +209,8 @@ const operations = {
   '-': 'diminish',
   P: 'elongate',
   A: 'gyroelongate',
+  '~P': 'elongation of',
+  '~A': 'gyroelongation of',
   g: 'gyrate',
 }
 
@@ -190,6 +230,8 @@ const operationOrder = [
   '-',
   'P',
   'A',
+  '~P',
+  '~A',
   'g',
 ]
 
