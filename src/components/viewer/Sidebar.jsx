@@ -5,15 +5,14 @@ import { css, StyleSheet } from 'aphrodite/no-important'
 import { connect } from 'react-redux'
 import { createStructuredSelector } from 'reselect'
 
-import SearchBar from './SearchBar'
-import { getFilteredGroups } from '../selectors'
+import { getFilteredGroups } from 'selectors'
+import { escapeName } from 'constants/polyhedra'
+import { andaleMono } from 'styles/fonts'
+import { resetLink, hover } from 'styles/common'
 
-import { escapeName } from '../constants/polyhedra'
+import SearchBar from './SearchBar'
 import GroupHeader from './GroupHeader'
 import SubgroupHeader from './SubgroupHeader'
-
-import { andaleMono } from '../styles/fonts'
-import { resetLink, hover } from '../styles/common'
 
 const PolyhedronLink = ({ name }) => {
   const styles = StyleSheet.create({

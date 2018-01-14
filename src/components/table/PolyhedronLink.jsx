@@ -2,9 +2,8 @@ import React from 'react'
 import { css, StyleSheet } from 'aphrodite/no-important'
 import { Link } from 'react-router'
 
-import { escapeName } from '../constants/polyhedra'
-
-import { hover } from '../styles/common'
+import { escapeName } from 'constants/polyhedra'
+import { hover } from 'styles/common'
 
 const thumbnailSize = 55
 
@@ -34,7 +33,7 @@ const styles = StyleSheet.create({
 
 export default function PolyhedronLink({ name, isFake }) {
   const escapedName = escapeName(name)
-  const img = require(`../images/${escapedName}.png`)
+  const img = require(`images/${escapedName}.png`)
   if (isFake) {
     return (
       <div className={css(styles.link, styles.fake)}>

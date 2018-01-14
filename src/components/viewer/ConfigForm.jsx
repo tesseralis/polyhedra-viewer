@@ -4,12 +4,11 @@ import _ from 'lodash'
 import { connect } from 'react-redux'
 import { createStructuredSelector } from 'reselect'
 
-import { configInputs } from '../constants/configOptions'
-import { getConfigValues } from '../selectors'
-import { reset, setInputValue } from '../actions'
-
-import { hover, transition } from '../styles/common'
-import { andaleMono } from '../styles/fonts'
+import { configInputs } from 'constants/configOptions'
+import { getConfigValues } from 'selectors'
+import { reset, setInputValue } from 'actions'
+import { hover, transition } from 'styles/common'
+import { andaleMono } from 'styles/fonts'
 
 const getInputValue = (input, el) => {
   switch (input.type) {

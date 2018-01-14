@@ -2,10 +2,11 @@ import React, { Component } from 'react'
 import { Motion, spring } from 'react-motion'
 import { css, StyleSheet } from 'aphrodite/no-important'
 
+import { fixed } from 'styles/common'
+
 import ConditionTransitionMotion from './ConditionTransitionMotion'
 import ConfigForm from './ConfigForm'
 import { IconButton } from './menuIcons'
-import { fixed } from '../styles/common'
 
 const styles = StyleSheet.create({
   configMenu: {

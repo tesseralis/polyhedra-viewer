@@ -5,9 +5,9 @@ import _ from 'lodash'
 import { connect } from 'react-redux'
 import { createStructuredSelector } from 'reselect'
 
-import { getPolyhedronConfig } from '../selectors'
-import { mapObject } from '../util'
-import polygons from '../constants/polygons'
+import { getPolyhedronConfig } from 'selectors'
+import { mapObject } from 'util.js'
+import polygons from 'constants/polygons'
 
 // Join a list of lists with an inner and outer separator.
 export const joinListOfLists = (list, outerSep, innerSep) => {

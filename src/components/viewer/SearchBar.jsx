@@ -3,12 +3,12 @@ import { connect } from 'react-redux'
 import { css, StyleSheet } from 'aphrodite/no-important'
 import { createStructuredSelector } from 'reselect'
 
-import { andaleMono } from '../styles/fonts'
-import { transition } from '../styles/common'
-import Icon from './Icon'
+import { andaleMono } from 'styles/fonts'
+import { transition } from 'styles/common'
+import { setFilterText } from 'actions'
+import { getFilterText } from 'selectors'
 
-import { setFilterText } from '../actions'
-import { getFilterText } from '../selectors'
+import Icon from './Icon'
 
 const styles = StyleSheet.create({
   searchBar: {

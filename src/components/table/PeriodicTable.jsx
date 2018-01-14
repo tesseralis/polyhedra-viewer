@@ -1,9 +1,10 @@
 import React from 'react'
 import { css, StyleSheet } from 'aphrodite/no-important'
 
+import { hoeflerText, andaleMono } from 'styles/fonts'
+import periodicTable from 'constants/periodicTable'
+
 import PolyhedronTable from './PolyhedronTable'
-import { hoeflerText, andaleMono } from '../styles/fonts'
-import periodicTable from '../constants/periodicTable'
 
 const gridAreaMapping = {
   'Platonic and Archimedean Solids': 'plato',

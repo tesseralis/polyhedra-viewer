@@ -2,9 +2,10 @@ import React, { Component } from 'react'
 import { Motion, spring } from 'react-motion'
 import { css, StyleSheet } from 'aphrodite/no-important'
 
+import { fixed } from 'styles/common'
+
 import ConditionTransitionMotion from './ConditionTransitionMotion'
 import { IconButton, IconLink } from './menuIcons'
-import { fixed } from '../styles/common'
 
 // Make everything fixed to the top left so that the animations work properly
 const fixTopLeft = fixed('top', 'left')

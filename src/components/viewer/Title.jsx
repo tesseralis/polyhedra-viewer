@@ -1,6 +1,7 @@
 import React from 'react'
 import { css, StyleSheet } from 'aphrodite/no-important'
-import { andaleMono } from '../styles/fonts'
+
+import { andaleMono } from 'styles/fonts'
 
 const Title = ({ name, ...props }) => {
   const styles = StyleSheet.create({
