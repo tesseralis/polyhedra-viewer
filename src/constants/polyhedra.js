@@ -60,6 +60,8 @@ const platonicMapping = {
   I: 'icosahedron',
 }
 
+const inversePlatonicMapping = _.invert(platonicMapping)
+
 const archimedeanMapping = {
   tT: 'truncated tetrahedron',
   aC: 'cuboctahedron',
@@ -75,6 +77,8 @@ const archimedeanMapping = {
   bD: 'truncated icosidodecahedron',
   sD: 'snub dodecahedron',
 }
+
+const inverseArchimedeanMapping = _.invert(archimedeanMapping)
 
 export const fromConwayNotation = notation => {
   const prefix = notation[0]
@@ -93,6 +97,16 @@ export const fromConwayNotation = notation => {
   }
   if (prefix === 'A') {
     return `${prismNames[number]} antiprism`
+  }
+  return null
+}
+
+export const toConwayNotation = name => {
+  if (inversePlatonicMapping[name]) {
+    return inversePlatonicMapping[name]
+  }
+  if (inverseArchimedeanMapping[name]) {
+    return inverseArchimedeanMapping[name]
   }
   return null
 }

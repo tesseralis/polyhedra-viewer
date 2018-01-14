@@ -4,14 +4,14 @@ import { css, StyleSheet } from 'aphrodite/no-important'
 
 import { IconLink } from './menuIcons'
 import ConfigForm from './ConfigForm'
+import RelatedPolyhedra from './RelatedPolyhedra'
 import PolyhedronList from './PolyhedronList'
 
-const ComponentInfo = () => {
-  return <div>This is a polyhedron</div>
+const ComponentInfo = ({ match }) => {
+  return <div>This is a {match.params.solid}</div>
 }
 
 // FIXME figure out how not to have this match weaved in all the time
-// FIXME factor out the components
 const Sidebar = ({ match }) => {
   const styles = StyleSheet.create({
     sidebar: {
@@ -27,14 +27,16 @@ const Sidebar = ({ match }) => {
     <section className={css(styles.sidebar)}>
       <div>
         <IconLink to={`${match.url}`} name="info" />
-        <IconLink to={`${match.url}/list`} name="list" />
         <IconLink to={`${match.url}/related`} name="link" />
         <IconLink to={`${match.url}/config`} name="cog" />
+        <IconLink to={`${match.url}/list`} name="list" />
         <IconLink to="/" name="home" />
       </div>
-      <Route exact path={`${match.url}`} component={ComponentInfo} />
-      <Route path={`${match.url}/list`} component={PolyhedronList} />
+      {/* FIXME don't hardcode the absolute path */}
+      <Route exact path={`/:solid`} component={ComponentInfo} />
+      <Route path={`/:solid/related`} component={RelatedPolyhedra} />
       <Route path={`${match.url}/config`} component={ConfigForm} />
+      <Route path={`${match.url}/list`} component={PolyhedronList} />
     </section>
   )
 }
