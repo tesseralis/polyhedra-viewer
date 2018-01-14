@@ -191,7 +191,6 @@ const baseAugmentations = (() => {
   let graph = {}
   _.forEach(augmentations, (row, index) => {
     const base = toConwayNotation(rowNames[index])
-    console.log('base', index, base)
     graph = _.merge(graph, {
       [base]: {
         '+': row[0],
@@ -293,11 +292,7 @@ const baseGraph = normalize(
     othersGraph,
   ),
 )
-console.log('baseGraph', baseGraph)
-
 const polyhedraGraph = makeBidirectional(baseGraph)
-
-console.log('polyhedra graph', polyhedraGraph)
 
 const operations = {
   d: 'dual',
@@ -343,9 +338,7 @@ const operationOrder = [
 
 export default function RelatedPolyhedra({ match }) {
   const notation = toConwayNotation(match.params.solid.replace(/-/g, ' '))
-  console.log('notation', notation)
   const related = polyhedraGraph[notation]
-  console.log('related', related)
   return (
     <div>
       {operationOrder.map(operation => {
