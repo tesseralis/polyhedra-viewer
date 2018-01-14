@@ -33,7 +33,8 @@ const styles = StyleSheet.create({
 })
 
 // FIXME separate out parameters
-const Viewer = ({ params }) => {
+const Viewer = ({ match }) => {
+  const { params } = match
   const solid = getSolidData(
     isValidSolid(params.solid) ? params.solid : 'tetrahedron',
   )
@@ -45,7 +46,7 @@ const Viewer = ({ params }) => {
         <Polyhedron solid={solid} />
       </X3dScene>
       <div className={css(styles.sidebar)}>
-        <Sidebar />
+        <Sidebar match={match} />
       </div>
       {/* 
       <SidebarMenu sidebar={Sidebar} />

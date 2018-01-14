@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import React from 'react'
-import { Link } from 'react-router'
+import { withRouter, Route, NavLink } from 'react-router-dom'
 import { css, StyleSheet } from 'aphrodite/no-important'
 import { connect } from 'react-redux'
 import { createStructuredSelector } from 'reselect'
@@ -14,6 +14,7 @@ import { IconButton, IconLink } from './menuIcons'
 import SearchBar from './SearchBar'
 import GroupHeader from './GroupHeader'
 import SubgroupHeader from './SubgroupHeader'
+import ConfigForm from './ConfigForm'
 
 const PolyhedronLink = ({ name }) => {
   const styles = StyleSheet.create({
@@ -36,13 +37,13 @@ const PolyhedronLink = ({ name }) => {
   })
 
   return (
-    <Link
-      to={escapeName(name)}
+    <NavLink
+      to={`/${escapeName(name)}/list`}
       className={css(styles.link)}
       activeClassName={css(styles.isActive)}
     >
       {_.capitalize(name)}
-    </Link>
+    </NavLink>
   )
 }
 
@@ -102,9 +103,30 @@ const PolyhedronGroup = ({ group }) => {
   )
 }
 
-const Sidebar = ({ groups, width }) => {
+const List = ({ groups }) => (
+  <div>
+    <SearchBar />
+    {groups.map(({ name, ...group }) => (
+      <PolyhedronGroup key={name} group={group} />
+    ))}
+  </div>
+)
+
+const mapStateToProps = createStructuredSelector({
+  groups: getFilteredGroups,
+})
+
+const ConnectedList = connect(mapStateToProps)(List)
+
+const ComponentInfo = ({ match }) => {
+  return <p>this is a polyhedron</p>
+}
+
+// FIXME figure out how not to have this match weaved in all the time
+const Sidebar = ({ match }) => {
   const styles = StyleSheet.create({
     sidebar: {
+      width: 400,
       height: '100%',
       overflowY: 'scroll',
       backgroundColor: 'WhiteSmoke',
@@ -115,22 +137,17 @@ const Sidebar = ({ groups, width }) => {
   return (
     <section className={css(styles.sidebar)}>
       <div>
-        <IconButton name="info" />
-        <IconButton name="list" />
-        <IconButton name="link" />
-        <IconButton name="cog" />
+        <IconLink to={`${match.url}`} name="info" />
+        <IconLink to={`${match.url}/list`} name="list" />
+        <IconLink to={`${match.url}/related`} name="link" />
+        <IconLink to={`${match.url}/config`} name="cog" />
         <IconLink to="/" name="home" />
       </div>
-      <SearchBar />
-      {groups.map(({ name, ...group }) => (
-        <PolyhedronGroup key={name} group={group} />
-      ))}
+      <Route exact path={`${match.url}`} component={ComponentInfo} />
+      <Route path={`${match.url}/list`} component={ConnectedList} />
+      <Route path={`${match.url}/config`} component={ConfigForm} />
     </section>
   )
 }
 
-const mapStateToProps = createStructuredSelector({
-  groups: getFilteredGroups,
-})
-
-export default connect(mapStateToProps)(Sidebar)
+export default withRouter(Sidebar)

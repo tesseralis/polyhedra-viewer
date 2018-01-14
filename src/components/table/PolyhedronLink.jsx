@@ -1,6 +1,6 @@
 import React from 'react'
 import { css, StyleSheet } from 'aphrodite/no-important'
-import { Link } from 'react-router'
+import { Link } from 'react-router-dom'
 
 import { escapeName } from 'constants/polyhedra'
 import { hover } from 'styles/common'
