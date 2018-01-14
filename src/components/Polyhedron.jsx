@@ -20,7 +20,7 @@ const Coordinates = ({ points }) => {
   const buffer = _.times(100, _.constant([0, 0, 0]))
   const bufferedPoints = points.concat(buffer)
 
-  return <coordinate is point={joinListOfLists(bufferedPoints, ', ', ' ')} />
+  return <coordinate point={joinListOfLists(bufferedPoints, ', ', ' ')} />
 }
 
 /* Faces */
@@ -38,17 +38,16 @@ const Faces = ({ faces, vertices, config }) => {
   return (
     <shape>
       <appearance>
-        <material is transparency={1 - opacity} />
+        <material transparency={1 - opacity} />
       </appearance>
       <indexedfaceset
-        is
         solid="false"
         colorPerVertex="false"
         colorindex={faces.map(getColorIndex).join(' ')}
         coordindex={joinListOfLists(faces, ' -1 ', ' ')}
       >
         <Coordinates points={vertices} />
-        <color is color={getColorAttr(colors)} />
+        <color color={getColorAttr(colors)} />
       </indexedfaceset>
     </shape>
   )
@@ -59,7 +58,7 @@ const Faces = ({ faces, vertices, config }) => {
 const Edges = ({ edges, vertices }) => {
   return (
     <shape>
-      <indexedlineset is coordindex={joinListOfLists(edges, ' -1 ', ' ')}>
+      <indexedlineset coordindex={joinListOfLists(edges, ' -1 ', ' ')}>
         <Coordinates points={vertices} />
       </indexedlineset>
     </shape>
@@ -80,7 +79,7 @@ const Polyhedron = ({ solid, config }) => {
       style={{ scale: spring(1, presets.gentle) }}
     >
       {({ scale }) => (
-        <transform is scale={getScaleAttr(scale)}>
+        <transform scale={getScaleAttr(scale)}>
           {showFaces && (
             <Faces faces={faces} vertices={vertices} config={config} />
           )}

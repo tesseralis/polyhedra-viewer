@@ -6,7 +6,7 @@ import { StyleSheet, css } from 'aphrodite/no-important'
 import x3dom from 'exports-loader?x3dom!x3dom'
 import 'x3dom/x3dom.css'
 
-import { fullScreen } from '../styles/common'
+import { fullScreen } from 'styles/common'
 
 // Disable double-clicking to change rotation point
 x3dom.Viewarea.prototype.onDoubleClick = () => {}
@@ -28,7 +28,7 @@ export default class X3dScene extends Component {
     return (
       <x3d className={css(styles.x3dScene)}>
         <scene>
-          <viewpoint is position="0,0,5" />
+          <viewpoint position="0,0,5" />
           {this.props.children}
         </scene>
       </x3d>

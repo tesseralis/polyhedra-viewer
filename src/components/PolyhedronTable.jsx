@@ -2,9 +2,9 @@ import React from 'react'
 import * as _ from 'lodash'
 import { css, StyleSheet } from 'aphrodite/no-important'
 
+import { hoeflerText } from 'styles/fonts'
+import { fromConwayNotation } from 'constants/polyhedra'
 import PolyhedronLink from './PolyhedronLink'
-import { hoeflerText } from '../styles/fonts'
-import { fromConwayNotation } from '../constants/polyhedra'
 
 const styles = StyleSheet.create({
   table: {
