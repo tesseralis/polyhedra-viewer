@@ -93,6 +93,7 @@ class Polyhedron extends Component {
     if (isValidSolid(solid)) {
       this.state = {
         solidData: getSolidData(solid),
+        toggle: 1,
       }
     }
   }
@@ -100,17 +101,23 @@ class Polyhedron extends Component {
   componentWillReceiveProps(nextProps) {
     if (nextProps.operation !== this.props.operation) {
       if (nextProps.operation === 't') {
-        return this.setState({ solidData: getTruncated(this.state.solidData) })
+        this.setState({
+          solidData: getTruncated(this.state.solidData, 0),
+          morphVertices: getTruncated(this.state.solidData).vertices,
+        })
+        this.setToggle()
+        return
       }
     }
 
     if (nextProps.solid !== this.props.solid) {
       this.setSolidData(nextProps.solid)
+      this.setState({ morphVertices: null })
     }
   }
 
   render() {
-    const { solidData } = this.state
+    const { solidData, toggle, morphVertices } = this.state
     const { config } = this.props
     const { faces, vertices, edges } = solidData
     // const morphVertices = getTruncated(solidData, 1).vertices
@@ -119,24 +126,35 @@ class Polyhedron extends Component {
     return (
       <Motion
         defaultStyle={{ scale: 0 }}
-        style={{ scale: spring(1, presets.gentle) }}
+        style={{ scale: spring(toggle, presets.gentle) }}
       >
-        {({ scale }) => (
-          <transform scale={getScaleAttr(1)}>
-            {showFaces && (
-              <Faces faces={faces} vertices={vertices} config={config} />
-            )}
-            {showEdges && <Edges edges={edges} vertices={vertices} />}
-          </transform>
-        )}
+        {({ scale }) => {
+          const _vertices = morphVertices
+            ? getVertices(
+                vertices,
+                morphVertices,
+                toggle === 1 ? scale : 1 - scale,
+              )
+            : vertices
+          return (
+            <transform>
+              {showFaces && (
+                <Faces faces={faces} vertices={_vertices} config={config} />
+              )}
+              {showEdges && <Edges edges={edges} vertices={_vertices} />}
+            </transform>
+          )
+        }}
       </Motion>
     )
   }
 
+  setToggle = () => {
+    this.setState(({ toggle }) => ({ toggle: 1 - toggle }))
+  }
+
   setSolidData = solid => {
-    console.log('setting solid to ', solid)
     if (isValidSolid(solid)) {
-      console.log('is valid solid')
       this.setState({ solidData: getSolidData(solid) })
     }
   }
