@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Component } from 'react'
 import { Motion, spring, presets } from 'react-motion'
 import { rgb } from 'd3-color'
 import _ from 'lodash'
@@ -82,38 +82,65 @@ function getVertices(vertices, morphVertices, scale) {
 
 const getScaleAttr = scale => `${scale} ${scale} ${scale}`
 
-const Polyhedron = ({ solid, config }) => {
-  const solidData = getSolidData(isValidSolid(solid) ? solid : 'tetrahedron')
-  const { faces, vertices, edges } = getTruncated(solidData, 0)
-  const morphVertices = getTruncated(solidData, 1).vertices
-  const { showEdges, showFaces } = config
+class Polyhedron extends Component {
+  state = {
+    solidData: getSolidData('tetrahedron'),
+  }
 
-  return (
-    <Motion
-      defaultStyle={{ scale: 0 }}
-      style={{ scale: spring(1, presets.gentle) }}
-    >
-      {({ scale }) => (
-        <transform scale={getScaleAttr(1)}>
-          {showFaces && (
-            <Faces
-              faces={faces}
-              vertices={getVertices(vertices, morphVertices, scale)}
-              config={config}
-            />
-          )}
-          {showEdges && (
-            <Edges
-              edges={edges}
-              vertices={getVertices(vertices, morphVertices, scale)}
-            />
-          )}
-        </transform>
-      )}
-    </Motion>
-  )
+  constructor(props) {
+    super(props)
+    const { solid } = props
+    if (isValidSolid(solid)) {
+      this.state = {
+        solidData: getSolidData(solid),
+      }
+    }
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.operation !== this.props.operation) {
+      if (nextProps.operation === 't') {
+        return this.setState({ solidData: getTruncated(this.state.solidData) })
+      }
+    }
+
+    if (nextProps.solid !== this.props.solid) {
+      this.setSolidData(nextProps.solid)
+    }
+  }
+
+  render() {
+    const { solidData } = this.state
+    const { config } = this.props
+    const { faces, vertices, edges } = solidData
+    // const morphVertices = getTruncated(solidData, 1).vertices
+    const { showEdges, showFaces } = config
+
+    return (
+      <Motion
+        defaultStyle={{ scale: 0 }}
+        style={{ scale: spring(1, presets.gentle) }}
+      >
+        {({ scale }) => (
+          <transform scale={getScaleAttr(1)}>
+            {showFaces && (
+              <Faces faces={faces} vertices={vertices} config={config} />
+            )}
+            {showEdges && <Edges edges={edges} vertices={vertices} />}
+          </transform>
+        )}
+      </Motion>
+    )
+  }
+
+  setSolidData = solid => {
+    console.log('setting solid to ', solid)
+    if (isValidSolid(solid)) {
+      console.log('is valid solid')
+      this.setState({ solidData: getSolidData(solid) })
+    }
+  }
 }
-
 const mapStateToProps = createStructuredSelector({
   config: getPolyhedronConfig,
 })
