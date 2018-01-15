@@ -99,7 +99,12 @@ const Polyhedron = ({ solid, config }) => {
               config={config}
             />
           )}
-          {false && showEdges && <Edges edges={edges} vertices={vertices} />}
+          {showEdges && (
+            <Edges
+              edges={edges}
+              vertices={getVertices(vertices, morphVertices, scale)}
+            />
+          )}
         </transform>
       )}
     </Motion>

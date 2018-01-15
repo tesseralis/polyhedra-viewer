@@ -95,10 +95,25 @@ function removeExtraneousVertices(polyhedron) {
   return { faces: newFaces, vertices: newVertices }
 }
 
+// get the edges associated with the given faces
+function getEdges(faces) {
+  return _.uniqWith(
+    _.flatMap(faces, face => {
+      return _.map(face, (vertex, index) => {
+        return _.sortBy([vertex, face[(index + 1) % face.length]])
+      })
+    }),
+    _.isEqual,
+  )
+}
+
 export function getTruncated(polyhedron, fraction = 1.0) {
   let newPolyhedron = polyhedron
   _.forEach(polyhedron.vertices, (vertex, index) => {
     newPolyhedron = replaceVertex(newPolyhedron, polyhedron, index, fraction)
   })
-  return removeExtraneousVertices(newPolyhedron)
+  const flatPolyhedron = removeExtraneousVertices(newPolyhedron)
+  const foo = { ...flatPolyhedron, edges: getEdges(flatPolyhedron.faces) }
+  console.log(foo)
+  return foo
 }
