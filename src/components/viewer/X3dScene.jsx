@@ -6,8 +6,6 @@ import { StyleSheet, css } from 'aphrodite/no-important'
 import x3dom from 'exports-loader?x3dom!x3dom'
 import 'x3dom/x3dom.css'
 
-import { fullScreen } from 'styles/common'
-
 // Disable double-clicking to change rotation point
 x3dom.Viewarea.prototype.onDoubleClick = () => {}
 

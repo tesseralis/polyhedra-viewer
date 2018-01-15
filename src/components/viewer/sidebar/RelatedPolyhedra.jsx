@@ -1,13 +1,8 @@
 import * as _ from 'lodash'
 import React from 'react'
-import { Link } from 'react-router-dom'
 import { css, StyleSheet } from 'aphrodite/no-important'
 
-import {
-  escapeName,
-  toConwayNotation,
-  fromConwayNotation,
-} from 'constants/polyhedra'
+import { toConwayNotation, fromConwayNotation } from 'constants/polyhedra'
 
 import periodicTable from 'constants/periodicTable'
 import PolyhedronLink from 'components/common/PolyhedronLink'
@@ -120,17 +115,9 @@ function convertTable(table) {
 }
 
 // TODO figure out a way to do this without the table (or inverse the relationship)
-const [
-  ,
-  prisms,
-  ,
-  pyramidsCupolae,
-  augmentations,
-  diminishedIcosahedra,
-  rhombicosidodecahedra,
-  snubAntiprisms,
-  other,
-] = periodicTable.map(convertTable)
+const [, prisms, , pyramidsCupolae, augmentations] = periodicTable.map(
+  convertTable,
+)
 
 const getPyramidRow = index => pyramidsCupolae[index > 2 ? index + 1 : index]
 
@@ -165,7 +152,6 @@ const basePyramidsCupolae = (() => {
 
   // TODO don't create stray nulls
   _.forEach(pyramidsCupolae, (row, index) => {
-    row = row
     graph = graphMerge(graph, {
       [row[0]]: {
         P: row[1],
