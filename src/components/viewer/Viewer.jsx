@@ -4,8 +4,9 @@ import { css, StyleSheet } from 'aphrodite/no-important'
 import { getSolidData, isValidSolid } from 'constants/polyhedra'
 import { fixed, fullScreen } from 'styles/common'
 
-import X3dScene from './X3dScene'
-import Polyhedron from './Polyhedron'
+// import X3dScene from './X3dScene'
+// import Polyhedron from './Polyhedron'
+import ThreeScene from './ThreeScene'
 import { Sidebar } from './sidebar'
 
 const styles = StyleSheet.create({
@@ -37,9 +38,10 @@ const Viewer = ({ match }) => {
   // FIXME resizing (decreasing height) for the x3d scene doesn't work well
   return (
     <div className={css(styles.viewer)}>
-      <X3dScene>
+      {/* <X3dScene>
         <Polyhedron solid={solid} />
-      </X3dScene>
+      </X3dScene> */}
+      <ThreeScene />
       <div className={css(styles.sidebar)}>
         <Sidebar match={match} />
       </div>

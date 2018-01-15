@@ -21,6 +21,7 @@
     "react-router-dom": "^4.2.2",
     "redux": "^3.7.2",
     "reselect": "^2.5.4",
+    "three": "^0.89.0",
     "x3dom": "^1.7.2"
   },
   "scripts": {
