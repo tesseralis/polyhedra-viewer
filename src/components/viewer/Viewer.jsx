@@ -29,10 +29,9 @@ const styles = StyleSheet.create({
 })
 
 // TODO separate out parameters
-const Viewer = ({ match }) => {
-  const { params } = match
+const Viewer = ({ solidName }) => {
   const solid = getSolidData(
-    isValidSolid(params.solid) ? params.solid : 'tetrahedron',
+    isValidSolid(solidName) ? solidName : 'tetrahedron',
   )
 
   // FIXME resizing (decreasing height) for the x3d scene doesn't work well
@@ -41,9 +40,8 @@ const Viewer = ({ match }) => {
       <X3dScene>
         <Polyhedron solid={solid} />
       </X3dScene>
-      {/* <ThreeScene solid={solid} /> */}
       <div className={css(styles.sidebar)}>
-        <Sidebar match={match} />
+        <Sidebar solid={solidName} />
       </div>
     </div>
   )

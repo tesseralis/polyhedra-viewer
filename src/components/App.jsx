@@ -11,7 +11,10 @@ export default () => (
   <BrowserRouter>
     <div>
       <Route exact path="/" component={PeriodicTable} />
-      <Route path="/:solid" component={Viewer} />
+      <Route
+        path="/:solid"
+        component={({ match }) => <Viewer solidName={match.params.solid} />}
+      />
     </div>
   </BrowserRouter>
 )

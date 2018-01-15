@@ -94,6 +94,9 @@ function makeBidirectional(graph) {
         if (!result[sink][reverseOp]) {
           result[sink][reverseOp] = []
         }
+        if (sink === source) {
+          continue
+        }
         result[sink][reverseOp].push(source)
       }
     }
@@ -365,8 +368,8 @@ const styles = StyleSheet.create({
   },
 })
 
-export default function RelatedPolyhedra({ match }) {
-  const notation = toConwayNotation(match.params.solid.replace(/-/g, ' '))
+export default function RelatedPolyhedra({ solid }) {
+  const notation = toConwayNotation(solid.replace(/-/g, ' '))
   const related = polyhedraGraph[notation]
 
   return (
@@ -377,14 +380,21 @@ export default function RelatedPolyhedra({ match }) {
           !related[operation] ||
           !_.compact(related[operation]).length
         )
-          return <div />
+          return null
         return (
-          <div className={css(styles.operations)}>
+          <div key={operation} className={css(styles.operations)}>
             <h2 className={css(styles.title)}>{operations[operation]}</h2>
             <div className={css(styles.options)}>
               {_.compact(related[operation]).map(notation => {
                 const name = fromConwayNotation(notation)
-                return <PolyhedronLink large name={name} subLink="related" />
+                return (
+                  <PolyhedronLink
+                    large
+                    key={name}
+                    name={name}
+                    subLink={`related?op=${operation}`}
+                  />
+                )
               })}
             </div>
           </div>

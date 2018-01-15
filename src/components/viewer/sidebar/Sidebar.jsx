@@ -7,13 +7,13 @@ import ConfigForm from './ConfigForm'
 import RelatedPolyhedra from './RelatedPolyhedra'
 import PolyhedronList from './PolyhedronList'
 
-const ComponentInfo = ({ match }) => {
-  return <div>This is a {match.params.solid}</div>
+const ComponentInfo = ({ solid }) => {
+  return <div>This is a {solid}</div>
 }
 
 // TODO figure out how not to have this match weaved in all the time
 // (In general, try to figure out a better way to do routing)
-const Sidebar = ({ match }) => {
+const Sidebar = ({ match, solid }) => {
   const styles = StyleSheet.create({
     sidebar: {
       width: 400,
@@ -38,8 +38,15 @@ const Sidebar = ({ match }) => {
         <IconLink to="/" name="home" />
       </div>
       {/* TODO don't hardcode the absolute path */}
-      <Route exact path={`/:solid`} component={ComponentInfo} />
-      <Route path={`/:solid/related`} component={RelatedPolyhedra} />
+      <Route
+        exact
+        path={match.url}
+        component={() => <ComponentInfo solid={solid} />}
+      />
+      <Route
+        path={`${match.url}/related`}
+        component={() => <RelatedPolyhedra solid={solid} />}
+      />
       <Route path={`${match.url}/config`} component={ConfigForm} />
       <Route path={`${match.url}/list`} component={PolyhedronList} />
     </section>
