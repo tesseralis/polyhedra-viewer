@@ -113,7 +113,5 @@ export function getTruncated(polyhedron, fraction = 1.0) {
     newPolyhedron = replaceVertex(newPolyhedron, polyhedron, index, fraction)
   })
   const flatPolyhedron = removeExtraneousVertices(newPolyhedron)
-  const foo = { ...flatPolyhedron, edges: getEdges(flatPolyhedron.faces) }
-  console.log(foo)
-  return foo
+  return { ...flatPolyhedron, edges: getEdges(flatPolyhedron.faces) }
 }
