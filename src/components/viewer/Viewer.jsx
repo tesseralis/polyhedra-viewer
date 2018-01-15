@@ -1,12 +1,10 @@
 import React from 'react'
 import { css, StyleSheet } from 'aphrodite/no-important'
 
-import { getSolidData, isValidSolid } from 'constants/polyhedra'
 import { fixed, fullScreen } from 'styles/common'
 
 import X3dScene from './X3dScene'
 import Polyhedron from './Polyhedron'
-// import ThreeScene from './ThreeScene'
 import { Sidebar } from './sidebar'
 
 const styles = StyleSheet.create({
@@ -29,19 +27,15 @@ const styles = StyleSheet.create({
 })
 
 // TODO separate out parameters
-const Viewer = ({ solidName }) => {
-  const solid = getSolidData(
-    isValidSolid(solidName) ? solidName : 'tetrahedron',
-  )
-
+const Viewer = ({ solid, operation }) => {
   // FIXME resizing (decreasing height) for the x3d scene doesn't work well
   return (
     <div className={css(styles.viewer)}>
       <X3dScene>
-        <Polyhedron solid={solid} />
+        <Polyhedron solid={solid} operation={operation} />
       </X3dScene>
       <div className={css(styles.sidebar)}>
-        <Sidebar solid={solidName} />
+        <Sidebar solid={solid} />
       </div>
     </div>
   )

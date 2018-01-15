@@ -4,11 +4,12 @@ import { rgb } from 'd3-color'
 import _ from 'lodash'
 import { connect } from 'react-redux'
 import { createStructuredSelector } from 'reselect'
-import { getTruncated } from 'math/operations'
 
+import { getTruncated } from 'math/operations'
+import { getSolidData, isValidSolid } from 'constants/polyhedra'
+import polygons from 'constants/polygons'
 import { getPolyhedronConfig } from 'selectors'
 import { mapObject } from 'util.js'
-import polygons from 'constants/polygons'
 import { geom } from 'toxiclibsjs'
 
 const { Vec3D } = geom
@@ -82,8 +83,9 @@ function getVertices(vertices, morphVertices, scale) {
 const getScaleAttr = scale => `${scale} ${scale} ${scale}`
 
 const Polyhedron = ({ solid, config }) => {
-  const { faces, vertices, edges } = getTruncated(solid, 0)
-  const morphVertices = getTruncated(solid, 1).vertices
+  const solidData = getSolidData(isValidSolid(solid) ? solid : 'tetrahedron')
+  const { faces, vertices, edges } = getTruncated(solidData, 0)
+  const morphVertices = getTruncated(solidData, 1).vertices
   const { showEdges, showFaces } = config
 
   return (

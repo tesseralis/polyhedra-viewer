@@ -20,6 +20,9 @@ function prevVertex(face, vertex) {
   return face[mod(face.indexOf(vertex) - 1, face.length)]
 }
 
+const getFindFn = (toAdd, vertex) => face =>
+  prevVertex(face, vertex) === nextVertex(toAdd, vertex)
+
 // Get faces that contain this vertex
 function getTouchingFaces({ faces }, vertex) {
   const touchingFaces = _.filter(faces, face => _.includes(face, vertex))
@@ -27,10 +30,7 @@ function getTouchingFaces({ faces }, vertex) {
   const ordered = []
   do {
     ordered.push(toAdd)
-    const nextFace = _.find(
-      touchingFaces,
-      face => prevVertex(face, vertex) === nextVertex(toAdd, vertex),
-    )
+    const nextFace = _.find(touchingFaces, getFindFn(toAdd, vertex))
     toAdd = nextFace
   } while (ordered.length < touchingFaces.length)
   return ordered
