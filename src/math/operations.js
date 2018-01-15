@@ -35,7 +35,7 @@ function getTouchingFaces({ faces }, vertex) {
   return ordered
 }
 
-function replaceVertex(newPolyhedron, polyhedron, vertex) {
+function replaceVertex(newPolyhedron, polyhedron, vertex, fraction) {
   const touchingFaces = getTouchingFaces(polyhedron, vertex)
   const touchingFaceIndices = touchingFaces.map(face =>
     polyhedron.faces.indexOf(face),
@@ -52,7 +52,7 @@ function replaceVertex(newPolyhedron, polyhedron, vertex) {
     const n2 = 2 * n
     const newSideLength =
       2 * Math.sin(Math.PI / n2) * apothem / Math.cos(Math.PI / n2)
-    return line.at((1 - newSideLength / sideLength) / 2).toArray()
+    return line.at(fraction * ((1 - newSideLength / sideLength) / 2)).toArray()
   })
 
   const newVertices = newPolyhedron.vertices.concat(verticesToAdd)
@@ -79,7 +79,6 @@ function removeExtraneousVertices(polyhedron) {
   let newFaces = polyhedron.faces
   _.forEach(polyhedron.vertices, (vertex, index) => {
     if (_.every(polyhedron.faces, face => !_.includes(face, index))) {
-      console.log(newFaces)
       // replace the vertex with the last vertex and update all the faces
       const toReplace = newVertices.length - 1
       newVertices = _.initial(
@@ -96,12 +95,10 @@ function removeExtraneousVertices(polyhedron) {
   return { faces: newFaces, vertices: newVertices }
 }
 
-export function getTruncated(polyhedron) {
+export function getTruncated(polyhedron, fraction = 1.0) {
   let newPolyhedron = polyhedron
   _.forEach(polyhedron.vertices, (vertex, index) => {
-    // console.log(newPolyhedron)
-    newPolyhedron = replaceVertex(newPolyhedron, polyhedron, index)
+    newPolyhedron = replaceVertex(newPolyhedron, polyhedron, index, fraction)
   })
-  // console.log(newPolyhedron)
   return removeExtraneousVertices(newPolyhedron)
 }

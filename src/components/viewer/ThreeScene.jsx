@@ -13,11 +13,28 @@ function toTriangles(polygon) {
 }
 
 function getGeometry(solid) {
-  solid = getTruncated(solid)
-  console.log(solid)
-  const vertices = _.flatten(solid.vertices)
-  const faces = _.flattenDeep(solid.faces.map(toTriangles))
-  return new THREE.PolyhedronGeometry(vertices, faces, 0, 0)
+  const truncated = getTruncated(solid, 0)
+  solid = getTruncated(solid, 1)
+  console.log(truncated, solid)
+  const geometry = new THREE.Geometry()
+  solid.vertices.forEach(vertex =>
+    geometry.vertices.push(new THREE.Vector3(...vertex)),
+  )
+  _.flatten(solid.faces.map(toTriangles)).forEach(face =>
+    geometry.faces.push(new THREE.Face3(...face)),
+  )
+  geometry.computeVertexNormals()
+  console.log('solid vertices', solid.vertices)
+  console.log('geometry vertices', geometry.vertices)
+  console.log(
+    'truncated vertices',
+    truncated.vertices.map(vertex => new THREE.Vector3(...vertex)),
+  )
+  geometry.morphTargets.push({
+    name: 'truncated',
+    vertices: truncated.vertices.map(vertex => new THREE.Vector3(...vertex)),
+  })
+  return geometry
 }
 
 // https://github.com/mrdoob/three.js/blob/master/examples/webgl_interactive_draggablecubes.html
@@ -54,7 +71,10 @@ export default class ThreeScene extends Component {
 
     const object = (this.object = new THREE.Mesh(
       getGeometry(solid),
-      new THREE.MeshLambertMaterial({ color: Math.random() * 0xffffff }),
+      new THREE.MeshLambertMaterial({
+        color: Math.random() * 0xffffff,
+        morphTargets: true,
+      }),
     ))
     scene.add(object)
 
@@ -90,6 +110,9 @@ export default class ThreeScene extends Component {
 
   doRender = () => {
     this.controls.update()
+    if (this.object.morphTargetInfluences[0] < 1.0) {
+      this.object.morphTargetInfluences[0] += 0.01
+    }
     this.renderer.render(this.scene, this.camera)
   }
 }
