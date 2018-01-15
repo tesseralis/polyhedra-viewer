@@ -1,5 +1,6 @@
 import * as _ from 'lodash'
-import { Line3, Vector3 } from 'three'
+import { geom } from 'toxiclibsjs'
+const { Vec3D } = geom
 
 function mod(a, b) {
   return a >= 0 ? a % b : a % b + b
@@ -42,17 +43,22 @@ function replaceVertex(newPolyhedron, polyhedron, vertex, fraction) {
   )
   const verticesToAdd = touchingFaces.map(face => {
     const next = nextVertex(face, vertex)
-    const p1 = new Vector3(...polyhedron.vertices[vertex])
-    const p2 = new Vector3(...polyhedron.vertices[next])
-    const line = new Line3(p1, p2)
-    const sideLength = line.distance()
+    const p1 = new Vec3D(...polyhedron.vertices[vertex])
+    const p2 = new Vec3D(...polyhedron.vertices[next])
+    const sideLength = p1.distanceTo(p2)
     const n = face.length
     const apothem =
       Math.cos(Math.PI / n) * sideLength / (2 * Math.sin(Math.PI / n))
     const n2 = 2 * n
     const newSideLength =
       2 * Math.sin(Math.PI / n2) * apothem / Math.cos(Math.PI / n2)
-    return line.at(fraction * ((1 - newSideLength / sideLength) / 2)).toArray()
+    return p1
+      .add(
+        p2
+          .sub(p1)
+          .scale((sideLength - newSideLength) / 2 / sideLength * fraction),
+      )
+      .toArray()
   })
 
   const newVertices = newPolyhedron.vertices.concat(verticesToAdd)
@@ -71,7 +77,6 @@ function replaceVertex(newPolyhedron, polyhedron, vertex, fraction) {
     })
     .concat([_.rangeRight(newPolyhedron.vertices.length, newVertices.length)])
   return { faces: newFaces, vertices: newVertices }
-  // TODO do edges if we end up caring about them
 }
 
 function removeExtraneousVertices(polyhedron) {

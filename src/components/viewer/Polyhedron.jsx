@@ -9,8 +9,9 @@ import { getTruncated } from 'math/operations'
 import { getPolyhedronConfig } from 'selectors'
 import { mapObject } from 'util.js'
 import polygons from 'constants/polygons'
-// FIXME replace this with toxi
-import { Vector3 } from 'three'
+import { geom } from 'toxiclibsjs'
+
+const { Vec3D } = geom
 
 // Join a list of lists with an inner and outer separator.
 export const joinListOfLists = (list, outerSep, innerSep) => {
@@ -70,9 +71,9 @@ const Edges = ({ edges, vertices }) => {
 
 function getVertices(vertices, morphVertices, scale) {
   return _.zip(vertices, morphVertices).map(([v1, v2]) => {
-    const _v1 = new Vector3(...v1)
-    const _v2 = new Vector3(...v2)
-    return _v1.add(_v2.sub(_v1).multiplyScalar(scale)).toArray()
+    const _v1 = new Vec3D(...v1)
+    const _v2 = new Vec3D(...v2)
+    return _v1.add(_v2.sub(_v1).scale(scale)).toArray()
   })
 }
 
