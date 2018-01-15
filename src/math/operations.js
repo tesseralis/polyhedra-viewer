@@ -36,16 +36,22 @@ function getTouchingFaces({ faces }, vertex) {
   return ordered
 }
 
-function replaceVertex(newPolyhedron, polyhedron, vertex, fraction) {
+function replaceVertex(newPolyhedron, polyhedron, vertex, { mock, rectify }) {
   const touchingFaces = getTouchingFaces(polyhedron, vertex)
   const touchingFaceIndices = touchingFaces.map(face =>
     polyhedron.faces.indexOf(face),
   )
   const verticesToAdd = touchingFaces.map(face => {
+    if (mock) {
+      return polyhedron.vertices[vertex]
+    }
     const next = nextVertex(face, vertex)
     const p1 = new Vec3D(...polyhedron.vertices[vertex])
     const p2 = new Vec3D(...polyhedron.vertices[next])
     const sideLength = p1.distanceTo(p2)
+    if (rectify) {
+      return p1.add(p2.sub(p1).scale(1 / 2)).toArray()
+    }
     const n = face.length
     const apothem =
       Math.cos(Math.PI / n) * sideLength / (2 * Math.sin(Math.PI / n))
@@ -53,11 +59,7 @@ function replaceVertex(newPolyhedron, polyhedron, vertex, fraction) {
     const newSideLength =
       2 * Math.sin(Math.PI / n2) * apothem / Math.cos(Math.PI / n2)
     return p1
-      .add(
-        p2
-          .sub(p1)
-          .scale((sideLength - newSideLength) / 2 / sideLength * fraction),
-      )
+      .add(p2.sub(p1).scale((sideLength - newSideLength) / 2 / sideLength))
       .toArray()
   })
 
@@ -100,6 +102,9 @@ function removeExtraneousVertices(polyhedron) {
   return { faces: newFaces, vertices: newVertices }
 }
 
+// Remove vertices (and faces) from the polyedron when they are all the same
+function consolidateVertices(polyhedron) {}
+
 // get the edges associated with the given faces
 function getEdges(faces) {
   return _.uniqWith(
@@ -112,10 +117,10 @@ function getEdges(faces) {
   )
 }
 
-export function getTruncated(polyhedron, fraction = 1.0) {
+export function getTruncated(polyhedron, options = {}) {
   let newPolyhedron = polyhedron
   _.forEach(polyhedron.vertices, (vertex, index) => {
-    newPolyhedron = replaceVertex(newPolyhedron, polyhedron, index, fraction)
+    newPolyhedron = replaceVertex(newPolyhedron, polyhedron, index, options)
   })
   const flatPolyhedron = removeExtraneousVertices(newPolyhedron)
   return { ...flatPolyhedron, edges: getEdges(flatPolyhedron.faces) }

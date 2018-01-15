@@ -101,9 +101,22 @@ class Polyhedron extends Component {
   componentWillReceiveProps(nextProps) {
     if (nextProps.operation !== this.props.operation) {
       if (nextProps.operation === 't') {
+        // FIXME do it so that we don't have to call this function twice each time
         this.setState({
-          solidData: getTruncated(this.state.solidData, 0),
+          solidData: getTruncated(this.state.solidData, { mock: true }),
           morphVertices: getTruncated(this.state.solidData).vertices,
+        })
+        this.setToggle()
+        return
+      }
+      if (nextProps.operation === 'r') {
+        this.setState({
+          solidData: getTruncated(this.state.solidData, {
+            mock: true,
+            rectify: true,
+          }),
+          morphVertices: getTruncated(this.state.solidData, { rectify: true })
+            .vertices,
         })
         this.setToggle()
         return
@@ -116,24 +129,24 @@ class Polyhedron extends Component {
     }
   }
 
+  // TODO color
   render() {
     const { solidData, toggle, morphVertices } = this.state
     const { config } = this.props
     const { faces, vertices, edges } = solidData
-    // const morphVertices = getTruncated(solidData, 1).vertices
     const { showEdges, showFaces } = config
 
     return (
       <Motion
         defaultStyle={{ scale: 0 }}
-        style={{ scale: spring(toggle, presets.gentle) }}
+        style={{ scale: spring(toggle, presets.noWobble) }}
       >
         {({ scale }) => {
           const _vertices = morphVertices
             ? getVertices(
                 vertices,
                 morphVertices,
-                toggle === 1 ? scale : 1 - scale,
+                toggle === 1 ? scale : 1 - scale, // TODO abstract out our trigger mechanics
               )
             : vertices
           return (
