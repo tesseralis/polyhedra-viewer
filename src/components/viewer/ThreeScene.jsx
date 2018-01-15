@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import * as THREE from 'three'
 import * as _ from 'lodash'
 import TrackballControls from './TrackballControls'
+import { getTruncated } from 'math/operations'
 
 function toTriangles(polygon) {
   const [p0, ...ps] = polygon
@@ -12,6 +13,8 @@ function toTriangles(polygon) {
 }
 
 function getGeometry(solid) {
+  solid = getTruncated(solid)
+  console.log(solid)
   const vertices = _.flatten(solid.vertices)
   const faces = _.flattenDeep(solid.faces.map(toTriangles))
   return new THREE.PolyhedronGeometry(vertices, faces, 0, 0)
