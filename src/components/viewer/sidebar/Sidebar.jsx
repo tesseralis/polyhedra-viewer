@@ -11,7 +11,8 @@ const ComponentInfo = ({ match }) => {
   return <div>This is a {match.params.solid}</div>
 }
 
-// FIXME figure out how not to have this match weaved in all the time
+// TODO figure out how not to have this match weaved in all the time
+// (In general, try to figure out a better way to do routing)
 const Sidebar = ({ match }) => {
   const styles = StyleSheet.create({
     sidebar: {
@@ -21,18 +22,22 @@ const Sidebar = ({ match }) => {
       backgroundColor: 'WhiteSmoke',
       boxShadow: 'inset -1px -1px 4px LightGray',
     },
+    menu: {
+      display: 'flex',
+      justifyContent: 'space-between',
+    },
   })
 
   return (
     <section className={css(styles.sidebar)}>
-      <div>
+      <div className={css(styles.menu)}>
         <IconLink to={`${match.url}`} name="info" />
         <IconLink to={`${match.url}/related`} name="link" />
         <IconLink to={`${match.url}/config`} name="cog" />
         <IconLink to={`${match.url}/list`} name="list" />
         <IconLink to="/" name="home" />
       </div>
-      {/* FIXME don't hardcode the absolute path */}
+      {/* TODO don't hardcode the absolute path */}
       <Route exact path={`/:solid`} component={ComponentInfo} />
       <Route path={`/:solid/related`} component={RelatedPolyhedra} />
       <Route path={`${match.url}/config`} component={ConfigForm} />

@@ -1,6 +1,8 @@
 import * as _ from 'lodash'
 import React from 'react'
 import { Link } from 'react-router-dom'
+import { css, StyleSheet } from 'aphrodite/no-important'
+
 import {
   escapeName,
   toConwayNotation,
@@ -108,7 +110,7 @@ function convertTable(table) {
   return table.data.map(row => row.map(convertTableNotation))
 }
 
-// FIXME figure out a way to do this without the table (or inverse the relationship)
+// TODO figure out a way to do this without the table (or inverse the relationship)
 const [
   ,
   prisms,
@@ -152,7 +154,7 @@ const basePyramidsCupolae = (() => {
     })
   })
 
-  // FIXME don't create stray nulls
+  // TODO don't create stray nulls
   _.forEach(pyramidsCupolae, (row, index) => {
     row = row
     graph = _.merge(graph, {
@@ -351,11 +353,29 @@ const operationOrder = [
   'g',
 ]
 
+const styles = StyleSheet.create({
+  container: {
+    padding: 20,
+  },
+
+  operations: {
+    padding: '10px 0',
+  },
+
+  title: {
+    textAlign: 'center',
+  },
+
+  options: {
+    display: 'flex',
+  },
+})
+
 export default function RelatedPolyhedra({ match }) {
   const notation = toConwayNotation(match.params.solid.replace(/-/g, ' '))
   const related = polyhedraGraph[notation]
   return (
-    <div>
+    <div className={css(styles.container)}>
       {operationOrder.map(operation => {
         if (
           !related ||
@@ -364,16 +384,14 @@ export default function RelatedPolyhedra({ match }) {
         )
           return <div />
         return (
-          <div>
-            {operations[operation]}:{' '}
-            {_.compact(related[operation]).map(notation => {
-              const name = fromConwayNotation(notation)
-              return (
-                <div>
-                  <PolyhedronLink name={name} subLink="related" />
-                </div>
-              )
-            })}
+          <div className={css(styles.operations)}>
+            <h2 className={css(styles.title)}>{operations[operation]}</h2>
+            <div className={css(styles.options)}>
+              {_.compact(related[operation]).map(notation => {
+                const name = fromConwayNotation(notation)
+                return <PolyhedronLink large name={name} subLink="related" />
+              })}
+            </div>
           </div>
         )
       })}

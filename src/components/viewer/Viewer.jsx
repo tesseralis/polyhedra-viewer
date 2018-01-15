@@ -27,7 +27,7 @@ const styles = StyleSheet.create({
   },
 })
 
-// FIXME separate out parameters
+// TODO separate out parameters
 const Viewer = ({ match }) => {
   const { params } = match
   const solid = getSolidData(
