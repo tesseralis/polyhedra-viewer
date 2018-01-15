@@ -59,6 +59,15 @@ function normalize(graph) {
   return _.mapValues(graph, ops => _.mapValues(ops, _.castArray))
 }
 
+const customizer = (objValue, srcValue) => {
+  if (_.isArray(objValue)) {
+    return objValue.concat(srcValue)
+  }
+}
+function graphMerge(object, ...other) {
+  return _.mergeWith(object, ...other, customizer)
+}
+
 const getInverseOperation = operation => {
   switch (operation) {
     // dual
@@ -94,7 +103,7 @@ function makeBidirectional(graph) {
       }
     }
   }
-  return _.merge(result, graph)
+  return graphMerge(result, graph)
 }
 
 const invalidNames = ['concave', 'coplanar']
@@ -144,7 +153,7 @@ const basePyramidsCupolae = (() => {
   _.forEach(prisms, (row, index) => {
     const [prism, antiprism] = row
     const pyramidRow = getPyramidRow(index)
-    graph = _.merge(graph, {
+    graph = graphMerge(graph, {
       [prism]: {
         '+': pyramidRow[1],
       },
@@ -157,7 +166,7 @@ const basePyramidsCupolae = (() => {
   // TODO don't create stray nulls
   _.forEach(pyramidsCupolae, (row, index) => {
     row = row
-    graph = _.merge(graph, {
+    graph = graphMerge(graph, {
       [row[0]]: {
         P: row[1],
         A: row[2],
@@ -172,14 +181,14 @@ const basePyramidsCupolae = (() => {
     })
 
     if (!_.isArray(row[3])) {
-      graph = _.merge(graph, {
+      graph = graphMerge(graph, {
         [row[3]]: {
           P: row[4],
           A: row[5],
         },
       })
     } else {
-      graph = _.merge(graph, {
+      graph = graphMerge(graph, {
         [row[3][0]]: {
           P: row[4][0],
           A: row[5],
@@ -195,7 +204,7 @@ const basePyramidsCupolae = (() => {
     for (let cell of row) {
       if (_.isArray(cell)) {
         const [c1, c2] = cell
-        graph = _.merge(graph, {
+        graph = graphMerge(graph, {
           [c1]: {
             g: c2,
           },
@@ -207,13 +216,12 @@ const basePyramidsCupolae = (() => {
   return graph
 })()
 
-// FIXME augmented prisms and gyrobifastigium is broken
 const baseAugmentations = (() => {
   const rowNames = periodicTable[4].rows
   let graph = {}
   _.forEach(augmentations, (row, index) => {
     const base = toConwayNotation(rowNames[index])
-    graph = _.merge(graph, {
+    graph = graphMerge(graph, {
       [base]: {
         '+': row[0],
       },
@@ -299,16 +307,16 @@ const othersGraph = (() => {
   }
 })()
 
-const baseGraph = normalize(
-  _.merge(
-    archimedean,
-    basePyramidsCupolae,
-    baseAugmentations,
-    diminishedIcosahedraGraph,
-    rhombicosidodecahedraGraph,
-    othersGraph,
-  ),
-)
+const normalized = [
+  archimedean,
+  basePyramidsCupolae,
+  baseAugmentations,
+  diminishedIcosahedraGraph,
+  rhombicosidodecahedraGraph,
+  othersGraph,
+].map(normalize)
+
+const baseGraph = graphMerge(...normalized)
 const polyhedraGraph = makeBidirectional(baseGraph)
 
 const operations = {
@@ -374,6 +382,7 @@ const styles = StyleSheet.create({
 export default function RelatedPolyhedra({ match }) {
   const notation = toConwayNotation(match.params.solid.replace(/-/g, ' '))
   const related = polyhedraGraph[notation]
+
   return (
     <div className={css(styles.container)}>
       {operationOrder.map(operation => {
