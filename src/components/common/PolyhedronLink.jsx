@@ -61,6 +61,7 @@ export default function PolyhedronLink({
     <Link
       to={'/' + escapedName + (subLink ? '/' + subLink : '')}
       className={css(styles.link, styles.real, large && styles.largeLink)}
+      title={name}
     >
       <img
         className={css(styles.image, large && styles.largeImage)}
