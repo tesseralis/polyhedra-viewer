@@ -44,7 +44,8 @@ export default class ThreeScene extends Component {
 
     var light = new THREE.DirectionalLight(0xffffff, 1)
     light.position.set(1, 1, 1).normalize()
-    scene.add(light)
+    camera.add(light)
+    scene.add(camera)
 
     const renderer = (this.renderer = new THREE.WebGLRenderer({
       antialias: true,
