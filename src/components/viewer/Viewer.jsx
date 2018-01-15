@@ -41,7 +41,7 @@ const Viewer = ({ match }) => {
       {/* <X3dScene>
         <Polyhedron solid={solid} />
       </X3dScene> */}
-      <ThreeScene />
+      <ThreeScene solid={solid} />
       <div className={css(styles.sidebar)}>
         <Sidebar match={match} />
       </div>

@@ -1,6 +1,21 @@
 import React, { Component } from 'react'
 import * as THREE from 'three'
+import * as _ from 'lodash'
 import TrackballControls from './TrackballControls'
+
+function toTriangles(polygon) {
+  const [p0, ...ps] = polygon
+  return _(ps)
+    .initial()
+    .map((pn, i) => [p0, pn, ps[i + 1]])
+    .value()
+}
+
+function getGeometry(solid) {
+  const vertices = _.flatten(solid.vertices)
+  const faces = _.flattenDeep(solid.faces.map(toTriangles))
+  return new THREE.PolyhedronGeometry(vertices, faces, 0, 0)
+}
 
 // https://github.com/mrdoob/three.js/blob/master/examples/webgl_interactive_draggablecubes.html
 export default class ThreeScene extends Component {
@@ -13,28 +28,35 @@ export default class ThreeScene extends Component {
     return <div ref={container => (this.container = container)} />
   }
 
+  componentWillReceiveProps(nextProps) {
+    if (this.props.solid === nextProps.solid) {
+      return
+    }
+    const { solid } = nextProps
+    this.object.geometry = getGeometry(solid)
+  }
+
   init = () => {
+    const { solid } = this.props
     const camera = (this.camera = new THREE.PerspectiveCamera(
       70,
       window.innerWidth / window.innerHeight,
       1,
-      10000,
+      1000,
     ))
-    camera.position.z = 1000
+    camera.position.z = 5
 
     const scene = (this.scene = new THREE.Scene())
     scene.background = new THREE.Color(0xf0f0f0)
 
-    // FIXME replace with the actual solid
-    const geometry = new THREE.BoxGeometry(40, 40, 40)
-    const object = new THREE.Mesh(
-      geometry,
+    const object = (this.object = new THREE.Mesh(
+      getGeometry(solid),
       new THREE.MeshLambertMaterial({ color: Math.random() * 0xffffff }),
-    )
+    ))
     scene.add(object)
 
     const controls = (this.controls = new TrackballControls(camera))
-    controls.rotateSpeed = 1.0
+    controls.rotateSpeed = 4.0
     controls.zoomSpeed = 1.2
     controls.panSpeed = 0.8
     controls.noZoom = false
