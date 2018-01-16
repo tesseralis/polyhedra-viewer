@@ -104,7 +104,7 @@ class Polyhedron extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    // TODO this will break (e.g. augment then augment)
+    // TODO going "back" will break this
     if (nextProps.operation === 't') {
       // FIXME do it so that we don't have to call this function twice each time
       this.setState({

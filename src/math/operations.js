@@ -100,14 +100,23 @@ function replaceVertex(newPolyhedron, polyhedron, vertex, { mock, rectify }) {
 
 function removeExtraneousVertices({ vertices, faces }) {
   const toRemove = _.difference(_.range(vertices.length), _.flatMap(faces))
+  console.log(toRemove)
+
+  const mapping = _(_.range(vertices.length))
+    .takeRight(toRemove.length)
+    .difference(toRemove)
+    .map((value, index) => [value, toRemove[index]])
+    .fromPairs()
+    .value()
 
   // Map the tail end of the list to the ones to be removed
-  const mapping = _.fromPairs(
-    _.zip(
-      _.rangeRight(vertices.length - toRemove.length, vertices.length),
-      toRemove,
-    ),
-  )
+  // const mapping = _.fromPairs(
+  //   _.zip(
+  //     _.rangeRight(vertices.length - toRemove.length, vertices.length),
+  //     toRemove,
+  //   ),
+  // )
+  console.log(mapping)
   const revMapping = _.invert(mapping)
   const newFaces = faces.map(face =>
     face.map(vertex => {
@@ -119,6 +128,7 @@ function removeExtraneousVertices({ vertices, faces }) {
       (vertex, index) =>
         _.has(revMapping, index) ? vertices[revMapping[index]] : vertex,
     ),
+    toRemove.length,
   )
   return { faces: newFaces, vertices: newVertices }
 }
@@ -141,6 +151,7 @@ function deduplicateVertices(polyhedron) {
       verticesByPoint[pointIndex].push(index)
     }
   })
+  console.log(verticesByPoint)
 
   // replace vertices that are the same
   let newFaces = polyhedron.faces
@@ -360,7 +371,10 @@ function augment(polyhedron, faceIndex) {
   )
 
   // remove extraneous vertices
-  return deduplicateVertices({ vertices: newVertices, faces: newFaces })
+  console.log('newVertices', newVertices, 'newFaces', newFaces)
+  const dup = deduplicateVertices({ vertices: newVertices, faces: newFaces })
+  console.log(dup)
+  return dup
 }
 
 // FIXME augmenting multiple times fails
@@ -375,7 +389,14 @@ export function getAugmented(polyhedron, name) {
   if (name.includes('truncated') || name.includes('dodecahedron')) {
     faceIndex = polyhedron.faces.indexOf(_.maxBy(polyhedron.faces, 'length'))
   } else if (name.includes('prism')) {
-    faceIndex = _.findIndex(polyhedron.faces, face => face.length === 4)
+    faceIndex = _.findIndex(polyhedron.faces, (face, i) => {
+      if (face.length !== 4) return false
+      if (name.includes('triangular')) return true
+
+      // return face that isn't close to a triangle (pyramid)
+      const neighboringFaces = graph[i].map(j => polyhedron.faces[j])
+      return _.every(neighboringFaces, nbr => nbr.length !== 3)
+    })
   }
   // (special case: triangular prism)
   // do the augmentation
