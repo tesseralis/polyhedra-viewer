@@ -368,6 +368,13 @@ const styles = StyleSheet.create({
   },
 })
 
+function getOpCode(op) {
+  if (op === '+') {
+    return 'aug'
+  }
+  return op
+}
+
 export default function RelatedPolyhedra({ solid }) {
   const notation = toConwayNotation(solid.replace(/-/g, ' '))
   const related = polyhedraGraph[notation]
@@ -392,7 +399,7 @@ export default function RelatedPolyhedra({ solid }) {
                     large
                     key={name}
                     name={name}
-                    subLink={`related?op=${operation}`}
+                    subLink={`related?op=${getOpCode(operation)}`}
                   />
                 )
               })}

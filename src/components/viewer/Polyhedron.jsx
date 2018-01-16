@@ -5,7 +5,12 @@ import _ from 'lodash'
 import { connect } from 'react-redux'
 import { createStructuredSelector } from 'reselect'
 
-import { getTruncated, getElongated, getGyroElongated } from 'math/operations'
+import {
+  getTruncated,
+  getElongated,
+  getGyroElongated,
+  getAugmented,
+} from 'math/operations'
 import { getSolidData, isValidSolid } from 'constants/polyhedra'
 import polygons from 'constants/polygons'
 import { getPolyhedronConfig } from 'selectors'
@@ -99,6 +104,7 @@ class Polyhedron extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
+    // TODO this will break (e.g. augment then augment)
     if (nextProps.operation !== this.props.operation) {
       if (nextProps.operation === 't') {
         // FIXME do it so that we don't have to call this function twice each time
@@ -132,6 +138,12 @@ class Polyhedron extends Component {
       if (nextProps.operation === 'A') {
         this.setState({
           solidData: getGyroElongated(this.state.solidData),
+        })
+        return
+      }
+      if (nextProps.operation === 'aug') {
+        this.setState({
+          solidData: getAugmented(this.state.solidData),
         })
         return
       }
