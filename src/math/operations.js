@@ -12,6 +12,10 @@ function replace(array, index, ...values) {
   return [...before, ...values, ...after]
 }
 
+function calculateCentroid(vectors) {
+  return vectors.reduce((v1, v2) => v1.add(v2)).scale(1 / vectors.length)
+}
+
 function nextVertex(face, vertex) {
   return face[(face.indexOf(vertex) + 1) % face.length]
 }
@@ -134,10 +138,18 @@ export function getTruncated(polyhedron, options = {}) {
   return { ...flatPolyhedron, edges: getEdges(flatPolyhedron.faces) }
 }
 
-export function getElongated(polyhedron) {
+export function _getElongated(
+  polyhedron,
+  {
+    normalLength = _.identity,
+    faceMap = [[0, 1, 2, 3]],
+    transform = _.identity,
+  } = {},
+) {
   const { vertices, faces } = polyhedron
   // TODO this doesn't work on bipyramids etc.
   const faceToElongate = _.maxBy(faces, 'length')
+  const n = faceToElongate.length
   const elongatedFaceIndex = faces.indexOf(faceToElongate)
   const verticesToElongate = faceToElongate.map(i => new Vec3D(...vertices[i]))
 
@@ -147,20 +159,27 @@ export function getElongated(polyhedron) {
   const normal = v0
     .sub(v1)
     .cross(v1.sub(v2))
-    .normalizeTo(sideLength)
+    .getNormalizedTo(normalLength(sideLength))
 
   // add a new vertex for each new vertex in faceToElongate
-  const verticesToAdd = _.map(verticesToElongate, v => v.add(normal).toArray())
+  const origin = calculateCentroid(verticesToElongate)
+  const theta = Math.PI / faceToElongate.length
+  const verticesToAdd = _.map(verticesToElongate, v =>
+    transform(v, { origin, normal, n })
+      .add(normal)
+      .toArray(),
+  )
   const newVertices = vertices.concat(verticesToAdd)
 
   // add a new square face for each side
-  const facesToAdd = _.map(faceToElongate, (vIndex, fIndex) => {
-    return [
+  const facesToAdd = _.flatMap(faceToElongate, (vIndex, fIndex) => {
+    const faces = [
       vIndex,
-      faceToElongate[(fIndex + 1) % faceToElongate.length],
-      vertices.length + (fIndex + 1) % faceToElongate.length,
+      faceToElongate[(fIndex + 1) % n],
+      vertices.length + (fIndex + 1) % n,
       vertices.length + fIndex,
     ]
+    return faceMap.map(face => face.map(i => faces[i]))
   })
   // make the old face point to the new one
   const newFaces = replace(
@@ -170,4 +189,20 @@ export function getElongated(polyhedron) {
   ).concat(facesToAdd)
   console.log(newFaces)
   return { vertices: newVertices, faces: newFaces, edges: getEdges(newFaces) }
+}
+
+export function getElongated(polyhedron) {
+  return _getElongated(polyhedron)
+}
+
+export function getGyroElongated(polyhedron) {
+  return _getElongated(polyhedron, {
+    normalLength: s => Math.sqrt(3) / 2 * s,
+    transform: (v, { origin, normal, n }) =>
+      v
+        .sub(origin)
+        .getRotatedAroundAxis(normal.getNormalized(), Math.PI / n)
+        .add(origin),
+    faceMap: [[0, 1, 3], [1, 2, 3]],
+  })
 }
