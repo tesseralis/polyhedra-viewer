@@ -105,48 +105,46 @@ class Polyhedron extends Component {
 
   componentWillReceiveProps(nextProps) {
     // TODO this will break (e.g. augment then augment)
-    if (nextProps.operation !== this.props.operation) {
-      if (nextProps.operation === 't') {
-        // FIXME do it so that we don't have to call this function twice each time
-        this.setState({
-          solidData: getTruncated(this.state.solidData),
-          // solidData: getTruncated(this.state.solidData, { mock: true }),
-          // morphVertices: getTruncated(this.state.solidData).vertices,
-        })
-        // this.setToggle()
-        return
-      }
-      if (nextProps.operation === 'r') {
-        this.setState({
-          solidData: getTruncated(this.state.solidData, {
-            // mock: true,
-            rectify: true,
-          }),
-          // morphVertices: getTruncated(this.state.solidData, { rectify: true })
-          //   .vertices,
-        })
-        // this.setToggle()
-        return
-      }
+    if (nextProps.operation === 't') {
+      // FIXME do it so that we don't have to call this function twice each time
+      this.setState({
+        solidData: getTruncated(this.state.solidData),
+        // solidData: getTruncated(this.state.solidData, { mock: true }),
+        // morphVertices: getTruncated(this.state.solidData).vertices,
+      })
+      // this.setToggle()
+      return
+    }
+    if (nextProps.operation === 'r') {
+      this.setState({
+        solidData: getTruncated(this.state.solidData, {
+          // mock: true,
+          rectify: true,
+        }),
+        // morphVertices: getTruncated(this.state.solidData, { rectify: true })
+        //   .vertices,
+      })
+      // this.setToggle()
+      return
+    }
 
-      if (nextProps.operation === 'P') {
-        this.setState({
-          solidData: getElongated(this.state.solidData),
-        })
-        return
-      }
-      if (nextProps.operation === 'A') {
-        this.setState({
-          solidData: getGyroElongated(this.state.solidData),
-        })
-        return
-      }
-      if (nextProps.operation === 'aug') {
-        this.setState({
-          solidData: getAugmented(this.state.solidData),
-        })
-        return
-      }
+    if (nextProps.operation === 'P') {
+      this.setState({
+        solidData: getElongated(this.state.solidData),
+      })
+      return
+    }
+    if (nextProps.operation === 'A') {
+      this.setState({
+        solidData: getGyroElongated(this.state.solidData),
+      })
+      return
+    }
+    if (nextProps.operation === 'aug') {
+      this.setState({
+        solidData: getAugmented(this.state.solidData, this.props.solid),
+      })
+      return
     }
 
     if (nextProps.solid !== this.props.solid) {

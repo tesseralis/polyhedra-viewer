@@ -248,6 +248,7 @@ function _getElongated(
   return withEdges({ vertices: newVertices, faces: newFaces })
 }
 
+// TODO replace my "elongated" function using the "augment" function
 export function getElongated(polyhedron) {
   return _getElongated(polyhedron)
 }
@@ -330,7 +331,6 @@ function augment(polyhedron, faceIndex) {
       .getRotatedAroundAxis(alignBasesNormal, alignBasesAngle - Math.PI)
   })
 
-  // FIXME still wrong...
   const translatedV0 = baseVertices[0].sub(baseCenter)
   const alignedV0 = alignedAugmenteeVertices[undersideFace[0]]
   // align the first vertex of the base face to the first vertex of the underside face
@@ -363,13 +363,20 @@ function augment(polyhedron, faceIndex) {
   return deduplicateVertices({ vertices: newVertices, faces: newFaces })
 }
 
+// FIXME augmenting multiple times fails
 export function getAugmented(polyhedron, name) {
   // only do the "main" class right now
   // Determine whether we're a (augmented) prism or an archimedean solid or dodecahedron
   // use the graph and the para/meta option to determine which face we should augment to
   // (do meta for now)
   const graph = faceGraph(polyhedron)
-  const faceIndex = 0
+  let faceIndex = 0
+  // if an archimedean solid
+  if (name.includes('truncated') || name.includes('dodecahedron')) {
+    faceIndex = polyhedron.faces.indexOf(_.maxBy(polyhedron.faces, 'length'))
+  } else if (name.includes('prism')) {
+    faceIndex = _.findIndex(polyhedron.faces, face => face.length === 4)
+  }
   // (special case: triangular prism)
   // do the augmentation
   return withEdges(augment(polyhedron, faceIndex))
