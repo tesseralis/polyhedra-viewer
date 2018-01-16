@@ -103,7 +103,14 @@ function removeExtraneousVertices(polyhedron) {
 }
 
 // Remove vertices (and faces) from the polyedron when they are all the same
-function consolidateVertices(polyhedron) {}
+// TODO implement
+function deduplicateVertices(polyhedron) {
+  // group vertex indices by same
+  // replace vertices that are the same
+  // remove duplicates in faces
+  // remove extraneous faces
+  // remove extraneous vertices
+}
 
 // get the edges associated with the given faces
 function getEdges(faces) {
@@ -123,5 +130,44 @@ export function getTruncated(polyhedron, options = {}) {
     newPolyhedron = replaceVertex(newPolyhedron, polyhedron, index, options)
   })
   const flatPolyhedron = removeExtraneousVertices(newPolyhedron)
+  // TODO deduplicate vertices when cantellating
   return { ...flatPolyhedron, edges: getEdges(flatPolyhedron.faces) }
+}
+
+export function getElongated(polyhedron) {
+  const { vertices, faces } = polyhedron
+  // TODO this doesn't work on bipyramids etc.
+  const faceToElongate = _.maxBy(faces, 'length')
+  const elongatedFaceIndex = faces.indexOf(faceToElongate)
+  const verticesToElongate = faceToElongate.map(i => new Vec3D(...vertices[i]))
+
+  // calculate the normal of the face
+  const [v0, v1, v2] = verticesToElongate
+  const sideLength = v0.distanceTo(v1)
+  const normal = v0
+    .sub(v1)
+    .cross(v1.sub(v2))
+    .normalizeTo(sideLength)
+
+  // add a new vertex for each new vertex in faceToElongate
+  const verticesToAdd = _.map(verticesToElongate, v => v.add(normal).toArray())
+  const newVertices = vertices.concat(verticesToAdd)
+
+  // add a new square face for each side
+  const facesToAdd = _.map(faceToElongate, (vIndex, fIndex) => {
+    return [
+      vIndex,
+      faceToElongate[(fIndex + 1) % faceToElongate.length],
+      vertices.length + (fIndex + 1) % faceToElongate.length,
+      vertices.length + fIndex,
+    ]
+  })
+  // make the old face point to the new one
+  const newFaces = replace(
+    faces,
+    elongatedFaceIndex,
+    _.range(vertices.length, vertices.length + faceToElongate.length),
+  ).concat(facesToAdd)
+  console.log(newFaces)
+  return { vertices: newVertices, faces: newFaces, edges: getEdges(newFaces) }
 }

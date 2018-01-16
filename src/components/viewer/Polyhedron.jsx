@@ -5,7 +5,7 @@ import _ from 'lodash'
 import { connect } from 'react-redux'
 import { createStructuredSelector } from 'reselect'
 
-import { getTruncated } from 'math/operations'
+import { getTruncated, getElongated } from 'math/operations'
 import { getSolidData, isValidSolid } from 'constants/polyhedra'
 import polygons from 'constants/polygons'
 import { getPolyhedronConfig } from 'selectors'
@@ -103,22 +103,30 @@ class Polyhedron extends Component {
       if (nextProps.operation === 't') {
         // FIXME do it so that we don't have to call this function twice each time
         this.setState({
-          solidData: getTruncated(this.state.solidData, { mock: true }),
-          morphVertices: getTruncated(this.state.solidData).vertices,
+          solidData: getTruncated(this.state.solidData),
+          // solidData: getTruncated(this.state.solidData, { mock: true }),
+          // morphVertices: getTruncated(this.state.solidData).vertices,
         })
-        this.setToggle()
+        // this.setToggle()
         return
       }
       if (nextProps.operation === 'r') {
         this.setState({
           solidData: getTruncated(this.state.solidData, {
-            mock: true,
+            // mock: true,
             rectify: true,
           }),
-          morphVertices: getTruncated(this.state.solidData, { rectify: true })
-            .vertices,
+          // morphVertices: getTruncated(this.state.solidData, { rectify: true })
+          //   .vertices,
         })
-        this.setToggle()
+        // this.setToggle()
+        return
+      }
+
+      if (nextProps.operation === 'P') {
+        this.setState({
+          solidData: getElongated(this.state.solidData),
+        })
         return
       }
     }
