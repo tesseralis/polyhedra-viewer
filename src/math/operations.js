@@ -195,76 +195,6 @@ function elongateBi(polyhedron) {
   // (can I just add a prism instead?)
 }
 
-function _getElongated(
-  polyhedron,
-  {
-    // height of the elongation as a function of side length
-    normalLength = _.identity,
-    // transformation to apply before adding the normalLength
-    transform = _.identity,
-    // mapping of faces to generate in the elongated area
-    faceMap = [[0, 1, 2, 3]],
-  } = {},
-) {
-  const { vertices, faces } = polyhedron
-  // TODO this doesn't work on bipyramids etc.
-  const faceToElongate = _.maxBy(faces, 'length')
-  const n = faceToElongate.length
-  const elongatedFaceIndex = faces.indexOf(faceToElongate)
-  const verticesToElongate = toVec3D(faceToElongate.map(i => vertices[i]))
-
-  // calculate the normal of the face
-  const [v0, v1] = verticesToElongate
-  const sideLength = v0.distanceTo(v1)
-  const normal = getNormal(verticesToElongate).getNormalizedTo(
-    normalLength(sideLength),
-  )
-
-  // add a new vertex for each new vertex in faceToElongate
-  const origin = calculateCentroid(verticesToElongate)
-  const verticesToAdd = _.map(verticesToElongate, v =>
-    transform(v, { origin, normal, n })
-      .add(normal)
-      .toArray(),
-  )
-  const newVertices = vertices.concat(verticesToAdd)
-
-  // add a new square face for each side
-  const facesToAdd = _.flatMap(faceToElongate, (vIndex, fIndex) => {
-    const faces = [
-      vIndex,
-      faceToElongate[(fIndex + 1) % n],
-      vertices.length + (fIndex + 1) % n,
-      vertices.length + fIndex,
-    ]
-    return faceMap.map(face => face.map(i => faces[i]))
-  })
-  // make the old face point to the new one
-  const newFaces = replace(
-    faces,
-    elongatedFaceIndex,
-    _.range(vertices.length, vertices.length + faceToElongate.length),
-  ).concat(facesToAdd)
-  return withEdges({ vertices: newVertices, faces: newFaces })
-}
-
-// TODO replace my "elongated" function using the "augment" function
-export function getElongated(polyhedron) {
-  return _getElongated(polyhedron)
-}
-
-export function getGyroElongated(polyhedron) {
-  return _getElongated(polyhedron, {
-    normalLength: s => Math.sqrt(3) / 2 * s,
-    transform: (v, { origin, normal, n }) =>
-      v
-        .sub(origin)
-        .getRotatedAroundAxis(normal.getNormalized(), Math.PI / n)
-        .add(origin),
-    faceMap: [[0, 1, 3], [1, 2, 3]],
-  })
-}
-
 function faceGraph(polyhedron) {
   const edgesToFaces = {}
   // build up a lookup table for every pair of edges to that face
@@ -289,18 +219,38 @@ function faceGraph(polyhedron) {
   return graph
 }
 
-const augmentees = {
-  3: 'tetrahedron',
-  4: 'square-pyramid',
-  5: 'pentagonal-pyramid',
-  6: 'triangular-cupola',
-  8: 'square-cupola',
-  10: 'pentagonal-cupola',
+const augmentTypes = {
+  pyramidsCupolae: {
+    3: 'tetrahedron',
+    4: 'square-pyramid',
+    5: 'pentagonal-pyramid',
+    6: 'triangular-cupola',
+    8: 'square-cupola',
+    10: 'pentagonal-cupola',
+  },
+
+  prisms: {
+    3: 'triangular-prism',
+    4: 'cube',
+    5: 'pentagonal-prism',
+    6: 'hexagonal-prism',
+    8: 'octagonal-prism',
+    10: 'decagonal-prism',
+  },
+
+  antiprisms: {
+    3: 'octahedron',
+    4: 'square-antiprism',
+    5: 'pentagonal-antiprism',
+    6: 'hexagonal-antiprism',
+    8: 'octagonal-antiprism',
+    10: 'decagonal-antiprism',
+  },
 }
 
 // Augment the following
 // TODO digonal cupola option and rotunda option; also reappropriate for elongation
-function augment(polyhedron, faceIndex) {
+function augment(polyhedron, faceIndex, type) {
   const base = polyhedron.faces[faceIndex]
   const n = base.length
   const baseVertices = toVec3D(base.map(index => polyhedron.vertices[index]))
@@ -308,7 +258,7 @@ function augment(polyhedron, faceIndex) {
   const sideLength = baseVertices[0].distanceTo(baseVertices[1])
   const baseNormal = getNormal(baseVertices)
 
-  const augmentee = getSolidData(augmentees[n])
+  const augmentee = getSolidData(augmentTypes[type][n])
   const augmenteeVertices = toVec3D(augmentee.vertices)
   // rotate and translate so that the face is next to our face
   const undersideIndex = _.findIndex(augmentee.faces, face => face.length === n)
@@ -375,10 +325,6 @@ function augment(polyhedron, faceIndex) {
   const dup = deduplicateVertices({ vertices: newVertices, faces: newFaces })
   console.log('deduplicated polyhedron', dup)
   return dup
-}
-
-function getNeighbors(graph, node) {
-  return graph[node].map(edge => graph[edge])
 }
 
 // find the node in the graph with n sides that is at least (or equal) to dist
@@ -451,6 +397,22 @@ function getFaceToAugment(polyhedron, name) {
   }
 }
 
+export function getElongated(polyhedron) {
+  const faceIndex = _.findIndex(
+    polyhedron.faces,
+    face => face === _.maxBy(polyhedron.faces, 'length'),
+  )
+  return withEdges(augment(polyhedron, faceIndex, 'prisms'))
+}
+
+export function getGyroElongated(polyhedron) {
+  const faceIndex = _.findIndex(
+    polyhedron.faces,
+    face => face === _.maxBy(polyhedron.faces, 'length'),
+  )
+  return withEdges(augment(polyhedron, faceIndex, 'antiprisms'))
+}
+
 export function getAugmented(polyhedron, name) {
   // only do the "main" class right now
   // Determine whether we're a (augmented) prism or an archimedean solid or dodecahedron
@@ -460,5 +422,5 @@ export function getAugmented(polyhedron, name) {
   // (special case: triangular prism)
   // do the augmentation
   console.log(faceIndex)
-  return withEdges(augment(polyhedron, faceIndex))
+  return withEdges(augment(polyhedron, faceIndex, 'pyramidsCupolae'))
 }
