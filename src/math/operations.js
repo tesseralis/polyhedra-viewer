@@ -436,9 +436,36 @@ function findPyramid(polyhedron, n) {
   })
 }
 
+// get an array mapping each vertex index to the indices of the faces it is adjacent to
+function getAdjacentFacesMapping(polyhedron) {
+  const mapping = polyhedron.vertices.map(() => [])
+  polyhedron.faces.forEach((face, fIndex) => {
+    face.forEach(vIndex => {
+      mapping[vIndex].push(fIndex)
+    })
+  })
+  return mapping
+}
+
 // Find a cupola and return the vertices of its top
-function findCupola(polyhedron, length) {
-  return []
+function findCupola(polyhedron) {
+  // find the face in the polyhedron whose vertices' adjacent faces are <face>-4-3-4
+  const adjacentFacesMapping = getAdjacentFacesMapping(polyhedron)
+  return _.find(polyhedron.faces, (face, fIndex) => {
+    const count = {
+      [face.length]: 1,
+      4: 2,
+      3: 1,
+    }
+    return _.every(face, vIndex => {
+      const foo = _(adjacentFacesMapping[vIndex])
+        .map(fIndex2 => polyhedron.faces[fIndex2].length)
+        .groupBy()
+        .mapValues('length')
+        .value()
+      return _.isEqual(foo, count)
+    })
+  })
 }
 
 function getVerticesToDiminish(polyhedron, name) {
