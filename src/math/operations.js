@@ -457,6 +457,8 @@ function findCupola(polyhedron) {
       4: 2,
       3: 1,
     }
+    // FIXME this doesn't work (e.g. pseudo-rhombicuboctahedron)
+    // Compare the square faces and make sure they're not touching
     return _.every(face, vIndex => {
       const foo = _(adjacentFacesMapping[vIndex])
         .map(fIndex2 => polyhedron.faces[fIndex2].length)
@@ -505,7 +507,7 @@ function getBoundary(faces) {
     .value()
   const first = _.values(cycle)[0]
   const result = [first]
-  for (let i = cycle[first]; i != first; i = cycle[i]) {
+  for (let i = cycle[first]; i !== first; i = cycle[i]) {
     result.push(i)
   }
   return result
