@@ -372,6 +372,9 @@ function getOpCode(op) {
   if (op === '+') {
     return 'aug'
   }
+  if (op === '-') {
+    return 'dim'
+  }
   return op
 }
 

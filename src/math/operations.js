@@ -131,6 +131,7 @@ function deduplicateVertices(polyhedron) {
   const points = []
   const verticesByPoint = {}
   _.forEach(vertices, (vertex, index) => {
+    // TODO there should be a way to do this manually so that we don't get any precision issues
     const pointIndex = _.findIndex(points, point =>
       vertex.equalsWithTolerance(point, PRECISION),
     )
@@ -167,6 +168,12 @@ function deduplicateVertices(polyhedron) {
 function _getEdges(face) {
   return _.map(face, (vertex, index) => {
     return _.sortBy([vertex, face[(index + 1) % face.length]])
+  })
+}
+
+function getEdgesOrdered(face) {
+  return _.map(face, (vertex, index) => {
+    return [vertex, face[(index + 1) % face.length]]
   })
 }
 
@@ -322,9 +329,7 @@ function augment(polyhedron, faceIndex, type) {
   _.pullAt(newFaces, [faceIndex, polyhedron.faces.length + undersideIndex])
 
   // remove extraneous vertices
-  const dup = deduplicateVertices({ vertices: newVertices, faces: newFaces })
-  console.log('deduplicated polyhedron', dup)
-  return dup
+  return deduplicateVertices({ vertices: newVertices, faces: newFaces })
 }
 
 // find the node in the graph with n sides that is at least (or equal) to dist
@@ -336,11 +341,8 @@ function findWithDistance(
   dist,
   { exact = false, avoid = [] } = {},
 ) {
-  console.log(graph)
-  console.log(n, m, dist)
   return _.findKey(graph, (face, index) => {
     if (face.length !== n) return false
-    // console.log('checking', index)
     let nbrs = [index]
     // iterate through same faced neighbors
     for (let i = 0; i < dist; i++) {
@@ -348,7 +350,6 @@ function findWithDistance(
         .flatMap(i => graph[i])
         .filter(i => !_.includes(avoid, graph[i].length))
         .value()
-      console.log(nbrs)
     }
     if (_(nbrs).some(nbr => graph[nbr].length === m)) return false
     // if exact, check that this one's neighbors *are* next to another thing
@@ -359,7 +360,6 @@ function findWithDistance(
         .value()
       return _(nbrs).some(nbr => graph[nbr].length === m)
     }
-    console.log(index, 'works')
     return true
   })
 }
@@ -402,6 +402,7 @@ export function getElongated(polyhedron) {
     polyhedron.faces,
     face => face === _.maxBy(polyhedron.faces, 'length'),
   )
+  // TODO maybe move "withEdges" to the rendering component?
   return withEdges(augment(polyhedron, faceIndex, 'prisms'))
 }
 
@@ -421,6 +422,80 @@ export function getAugmented(polyhedron, name) {
   const faceIndex = getFaceToAugment(polyhedron, name)
   // (special case: triangular prism)
   // do the augmentation
-  console.log(faceIndex)
   return withEdges(augment(polyhedron, faceIndex, 'pyramidsCupolae'))
+}
+
+// Find a pyramid and return the vertex index
+function findPyramid(polyhedron, n) {
+  return _.findIndex(polyhedron.vertices, (vertex, vIndex) => {
+    const adjacentFaces = _.filter(polyhedron.faces, face =>
+      _.includes(face, vIndex),
+    )
+    if (n >= 3 && adjacentFaces.length !== n) return false
+    return _.every(adjacentFaces, { length: 3 })
+  })
+}
+
+// Find a cupola and return the vertices of its top
+function findCupola(polyhedron, length) {
+  return []
+}
+
+function getVerticesToDiminish(polyhedron, name) {
+  if (name.includes('truncated')) {
+    return findCupola(polyhedron)
+  } else if (name.includes('sphenocorona') || name.includes('prism')) {
+    return [findPyramid(polyhedron, 4)]
+  } else {
+    return [findPyramid(polyhedron)]
+  }
+}
+
+// Get a face representing the boundary of the faces
+function getBoundary(faces) {
+  // TODO deduplicate
+  const edges = {}
+  // build up a lookup table for every pair of edges to that face
+  _.forEach(faces, (face, index) => {
+    // for the pairs of vertices, find the face that contains the corresponding pair
+    // ...this is n^2? more? ah who cares I'm too lazy
+    _.forEach(getEdgesOrdered(face), edge => {
+      const [i1, i2] = edge
+      if (_.includes(edges[i2], i1)) {
+        _.pull(edges[i2], i1)
+      } else {
+        if (!edges[i1]) {
+          edges[i1] = []
+        }
+        edges[i1].push(i2)
+      }
+    })
+  })
+
+  const cycle = _(edges)
+    .pickBy('length')
+    .mapValues(0)
+    .value()
+  const first = _.values(cycle)[0]
+  const result = [first]
+  for (let i = cycle[first]; i != first; i = cycle[i]) {
+    result.push(i)
+  }
+  return result
+}
+
+function removeVertices(polyhedron, vIndices) {
+  const [newFaces, facesToRemove] = _.partition(
+    polyhedron.faces,
+    face => _.intersection(face, vIndices).length === 0,
+  )
+  return removeExtraneousVertices({
+    ...polyhedron,
+    faces: newFaces.concat([getBoundary(facesToRemove)]),
+  })
+}
+
+export function getDiminished(polyhedron, name) {
+  const vIndices = getVerticesToDiminish(polyhedron, name)
+  return withEdges(removeVertices(polyhedron, vIndices))
 }

@@ -10,6 +10,7 @@ import {
   getElongated,
   getGyroElongated,
   getAugmented,
+  getDiminished,
 } from 'math/operations'
 import { getSolidData, isValidSolid } from 'constants/polyhedra'
 import polygons from 'constants/polygons'
@@ -143,6 +144,12 @@ class Polyhedron extends Component {
     if (nextProps.operation === 'aug') {
       this.setState({
         solidData: getAugmented(this.state.solidData, nextProps.solid),
+      })
+      return
+    }
+    if (nextProps.operation === 'dim') {
+      this.setState({
+        solidData: getDiminished(this.state.solidData, nextProps.solid),
       })
       return
     }
