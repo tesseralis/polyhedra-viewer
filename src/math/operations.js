@@ -394,7 +394,7 @@ function findWithDistance(
   console.log(n, m, dist)
   return _.findKey(graph, (face, index) => {
     if (face.length !== n) return false
-    console.log('checking', index)
+    // console.log('checking', index)
     let nbrs = [index]
     // iterate through same faced neighbors
     for (let i = 0; i < dist; i++) {
@@ -418,37 +418,27 @@ function findWithDistance(
   })
 }
 
-export function getAugmented(polyhedron, name) {
+function getFaceToAugment(polyhedron, name) {
   // only do the "main" class right now
-  // Determine whether we're a (augmented) prism or an archimedean solid or dodecahedron
-  // use the graph and the para/meta option to determine which face we should augment to
-  // (do meta for now)
   const graph = faceGraph(polyhedron)
-  let faceIndex = 0
   const maxFace = _(polyhedron.faces)
     .map('length')
     .max()
   // TODO rely on a database of metadata instead of just parsing the name
+  // Determine whether we're a (augmented) prism or an archimedean solid or dodecahedron
+  if (name.includes('sphenocorona')) {
+    return findWithDistance(graph, 4, 3, 0)
+  }
   if (name.includes('truncated')) {
-    faceIndex = findWithDistance(
-      graph,
-      maxFace,
-      4,
-      name.includes('para') ? 3 : 2,
-      {
-        exact: name.includes('meta'),
-      },
-    )
+    return findWithDistance(graph, maxFace, 4, name.includes('para') ? 3 : 2, {
+      exact: name.includes('meta'),
+    })
   } else if (name.includes('dodecahedron')) {
-    faceIndex = findWithDistance(
-      graph,
-      maxFace,
-      3,
-      name.includes('para') ? 2 : 1,
-      { exact: name.includes('meta') },
-    )
+    return findWithDistance(graph, maxFace, 3, name.includes('para') ? 2 : 1, {
+      exact: name.includes('meta'),
+    })
   } else if (name.includes('prism')) {
-    faceIndex = findWithDistance(
+    return findWithDistance(
       graph,
       4,
       3,
@@ -459,7 +449,16 @@ export function getAugmented(polyhedron, name) {
       },
     )
   }
+}
+
+export function getAugmented(polyhedron, name) {
+  // only do the "main" class right now
+  // Determine whether we're a (augmented) prism or an archimedean solid or dodecahedron
+  // use the graph and the para/meta option to determine which face we should augment to
+  // (do meta for now)
+  const faceIndex = getFaceToAugment(polyhedron, name)
   // (special case: triangular prism)
   // do the augmentation
+  console.log(faceIndex)
   return withEdges(augment(polyhedron, faceIndex))
 }
