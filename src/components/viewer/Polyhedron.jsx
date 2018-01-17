@@ -142,7 +142,7 @@ class Polyhedron extends Component {
     }
     if (nextProps.operation === 'aug') {
       this.setState({
-        solidData: getAugmented(this.state.solidData, this.props.solid),
+        solidData: getAugmented(this.state.solidData, nextProps.solid),
       })
       return
     }

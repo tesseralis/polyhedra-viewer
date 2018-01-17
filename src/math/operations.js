@@ -100,7 +100,6 @@ function replaceVertex(newPolyhedron, polyhedron, vertex, { mock, rectify }) {
 
 function removeExtraneousVertices({ vertices, faces }) {
   const toRemove = _.difference(_.range(vertices.length), _.flatMap(faces))
-  console.log(toRemove)
 
   const mapping = _(_.range(vertices.length))
     .takeRight(toRemove.length)
@@ -109,14 +108,6 @@ function removeExtraneousVertices({ vertices, faces }) {
     .fromPairs()
     .value()
 
-  // Map the tail end of the list to the ones to be removed
-  // const mapping = _.fromPairs(
-  //   _.zip(
-  //     _.rangeRight(vertices.length - toRemove.length, vertices.length),
-  //     toRemove,
-  //   ),
-  // )
-  console.log(mapping)
   const revMapping = _.invert(mapping)
   const newFaces = faces.map(face =>
     face.map(vertex => {
@@ -134,7 +125,6 @@ function removeExtraneousVertices({ vertices, faces }) {
 }
 
 // Remove vertices (and faces) from the polyhedron when they are all the same
-// TODO implement
 function deduplicateVertices(polyhedron) {
   // group vertex indices by same
   const vertices = toVec3D(polyhedron.vertices)
@@ -151,7 +141,6 @@ function deduplicateVertices(polyhedron) {
       verticesByPoint[pointIndex].push(index)
     }
   })
-  console.log(verticesByPoint)
 
   // replace vertices that are the same
   let newFaces = polyhedron.faces
@@ -343,7 +332,23 @@ function augment(polyhedron, faceIndex) {
   })
 
   const translatedV0 = baseVertices[0].sub(baseCenter)
-  const alignedV0 = alignedAugmenteeVertices[undersideFace[0]]
+  const alignIndex = (() => {
+    if (base.length <= 5) return 0
+    // If we're dealing with a cupola (that is, augmenting an archimedean solid)
+    // make sure that the triangular faces don't line up
+    const adjFace = _.find(
+      polyhedron.faces,
+      face => _.intersection([base[0], base[1]], face).length === 2,
+    )
+    const alignedFace = _.find(
+      augmentee.faces,
+      face =>
+        _.intersection([undersideFace[0], _.last(undersideFace)], face)
+          .length === 2,
+    )
+    return (adjFace.length !== 3) !== (alignedFace.length !== 3) ? 0 : 1
+  })()
+  const alignedV0 = alignedAugmenteeVertices[undersideFace[alignIndex]]
   // align the first vertex of the base face to the first vertex of the underside face
   const alignVerticesAngle = translatedV0.angleBetween(alignedV0, true)
   const transformedAugmenteeVertices = alignedAugmenteeVertices.map(v => {
@@ -359,25 +364,60 @@ function augment(polyhedron, faceIndex) {
   const newVertices = polyhedron.vertices.concat(
     transformedAugmenteeVertices.map(v => v.toArray()),
   )
-  const newFaces = _.filter(
-    polyhedron.faces.concat(
-      augmentee.faces.map(face =>
-        face.map(index => index + polyhedron.vertices.length),
-      ),
+  const newFaces = polyhedron.faces.concat(
+    augmentee.faces.map(face =>
+      face.map(index => index + polyhedron.vertices.length),
     ),
-    // remove the two glued faces
-    (face, index) =>
-      index !== faceIndex && index !== polyhedron.faces.length + undersideIndex,
   )
+  _.pullAt(newFaces, [faceIndex, polyhedron.faces.length + undersideIndex])
 
   // remove extraneous vertices
-  console.log('newVertices', newVertices, 'newFaces', newFaces)
   const dup = deduplicateVertices({ vertices: newVertices, faces: newFaces })
-  console.log(dup)
+  console.log('deduplicated polyhedron', dup)
   return dup
 }
 
-// FIXME augmenting multiple times fails
+function getNeighbors(graph, node) {
+  return graph[node].map(edge => graph[edge])
+}
+
+// find the node in the graph with n sides that is at least (or equal) to dist
+// away from a face with m sides
+function findWithDistance(
+  graph,
+  n,
+  m,
+  dist,
+  { exact = false, avoid = [] } = {},
+) {
+  console.log(graph)
+  console.log(n, m, dist)
+  return _.findKey(graph, (face, index) => {
+    if (face.length !== n) return false
+    console.log('checking', index)
+    let nbrs = [index]
+    // iterate through same faced neighbors
+    for (let i = 0; i < dist; i++) {
+      nbrs = _(nbrs)
+        .flatMap(i => graph[i])
+        .filter(i => !_.includes(avoid, graph[i].length))
+        .value()
+      console.log(nbrs)
+    }
+    if (_(nbrs).some(nbr => graph[nbr].length === m)) return false
+    // if exact, check that this one's neighbors *are* next to another thing
+    if (exact) {
+      nbrs = _(nbrs)
+        .flatMap(i => graph[i])
+        .filter(i => !_.includes(avoid, graph[i].length))
+        .value()
+      return _(nbrs).some(nbr => graph[nbr].length === m)
+    }
+    console.log(index, 'works')
+    return true
+  })
+}
+
 export function getAugmented(polyhedron, name) {
   // only do the "main" class right now
   // Determine whether we're a (augmented) prism or an archimedean solid or dodecahedron
@@ -385,18 +425,39 @@ export function getAugmented(polyhedron, name) {
   // (do meta for now)
   const graph = faceGraph(polyhedron)
   let faceIndex = 0
-  // if an archimedean solid
-  if (name.includes('truncated') || name.includes('dodecahedron')) {
-    faceIndex = polyhedron.faces.indexOf(_.maxBy(polyhedron.faces, 'length'))
+  const maxFace = _(polyhedron.faces)
+    .map('length')
+    .max()
+  // TODO rely on a database of metadata instead of just parsing the name
+  if (name.includes('truncated')) {
+    faceIndex = findWithDistance(
+      graph,
+      maxFace,
+      4,
+      name.includes('para') ? 3 : 2,
+      {
+        exact: name.includes('meta'),
+      },
+    )
+  } else if (name.includes('dodecahedron')) {
+    faceIndex = findWithDistance(
+      graph,
+      maxFace,
+      3,
+      name.includes('para') ? 2 : 1,
+      { exact: name.includes('meta') },
+    )
   } else if (name.includes('prism')) {
-    faceIndex = _.findIndex(polyhedron.faces, (face, i) => {
-      if (face.length !== 4) return false
-      if (name.includes('triangular')) return true
-
-      // return face that isn't close to a triangle (pyramid)
-      const neighboringFaces = graph[i].map(j => polyhedron.faces[j])
-      return _.every(neighboringFaces, nbr => nbr.length !== 3)
-    })
+    faceIndex = findWithDistance(
+      graph,
+      4,
+      3,
+      name.includes('triangular') ? 0 : name.includes('para') ? 2 : 1,
+      {
+        exact: name.includes('meta'),
+        avoid: [maxFace],
+      },
+    )
   }
   // (special case: triangular prism)
   // do the augmentation
