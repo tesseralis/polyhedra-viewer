@@ -12,7 +12,7 @@ import { getNextPolyhedron } from 'constants/relations'
 import { getPolyhedron, getPolyhedronConfig, getMode } from 'selectors'
 import { setPolyhedron, applyOperation } from 'actions'
 import { mapObject } from 'util.js'
-import { getCupolaTop } from 'math/operations'
+import { getEdges, getCupolaTop } from 'math/operations'
 
 // Join a list of lists with an inner and outer separator.
 export const joinListOfLists = (list, outerSep, innerSep) => {
@@ -162,6 +162,10 @@ const Edges = ({ edges, vertices }) => {
 /* Polyhedron */
 
 // const getScaleAttr = scale => `${scale} ${scale} ${scale}`
+// get the edges associated with the given faces
+function getAllEdges(faces) {
+  return _.uniqWith(_.flatMap(faces, getEdges), _.isEqual)
+}
 
 class Polyhedron extends Component {
   // TODO make sure this is stable
@@ -174,7 +178,7 @@ class Polyhedron extends Component {
   render() {
     const { solid, config, solidData } = this.props
     const { showEdges, showFaces } = config
-    const { faces, edges, vertices } = solidData
+    const { faces, vertices } = solidData
     const toggle = 1
 
     return (
@@ -193,7 +197,9 @@ class Polyhedron extends Component {
                   solid={solid}
                 />
               )}
-              {showEdges && <Edges edges={edges} vertices={vertices} />}
+              {showEdges && (
+                <Edges edges={getAllEdges(faces)} vertices={vertices} />
+              )}
             </transform>
           )
         }}

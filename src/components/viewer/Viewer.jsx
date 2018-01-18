@@ -26,7 +26,6 @@ const styles = StyleSheet.create({
   },
 })
 
-// TODO separate out parameters
 const Viewer = ({ solid, operation }) => {
   // FIXME resizing (decreasing height) for the x3d scene doesn't work well
   return (

@@ -141,7 +141,6 @@ function deduplicateVertices(polyhedron) {
   const points = []
   const verticesByPoint = {}
   _.forEach(vertices, (vertex, index) => {
-    // TODO there should be a way to do this manually so that we don't get any precision issues
     const pointIndex = _.findIndex(points, point =>
       vertex.equalsWithTolerance(point, PRECISION),
     )
@@ -175,7 +174,7 @@ function deduplicateVertices(polyhedron) {
   })
 }
 
-function _getEdges(face) {
+export function getEdges(face) {
   return _.map(face, (vertex, index) => {
     return _.sortBy([vertex, face[(index + 1) % face.length]])
   })
@@ -183,17 +182,8 @@ function _getEdges(face) {
 
 function getEdgesOrdered(face) {
   return _.map(face, (vertex, index) => {
-    return [vertex, face[(index + 1) % face.length]]
+    return [vertex, getMod(face, index + 1)]
   })
-}
-
-// get the edges associated with the given faces
-function getEdges(faces) {
-  return _.uniqWith(_.flatMap(faces, _getEdges), _.isEqual)
-}
-
-function withEdges(polyhedron) {
-  return { ...polyhedron, edges: getEdges(polyhedron.faces) }
 }
 
 export function getTruncated(polyhedron, options = {}) {
@@ -201,9 +191,8 @@ export function getTruncated(polyhedron, options = {}) {
   _.forEach(polyhedron.vertices, (vertex, index) => {
     newPolyhedron = replaceVertex(newPolyhedron, polyhedron, index, options)
   })
-  const flatPolyhedron = removeExtraneousVertices(newPolyhedron)
-  // TODO deduplicate vertices when cantellating
-  return withEdges(flatPolyhedron)
+  // TODO remove duplicate vertices when cantellating
+  return removeExtraneousVertices(newPolyhedron)
 }
 
 function faceGraph(polyhedron) {
@@ -212,7 +201,7 @@ function faceGraph(polyhedron) {
   _.forEach(polyhedron.faces, (face, index) => {
     // for the pairs of vertices, find the face that contains the corresponding pair
     // ...this is n^2? more? ah who cares I'm too lazy
-    _.forEach(_getEdges(face), edge => {
+    _.forEach(getEdges(face), edge => {
       if (!edgesToFaces[edge]) {
         edgesToFaces[edge] = []
       }
@@ -260,7 +249,7 @@ const augmentTypes = {
 }
 
 // Augment the following
-// TODO digonal cupola option and rotunda option; also reappropriate for elongation
+// TODO digonal cupola option and rotunda option
 function augment(polyhedron, faceIndex, type) {
   const base = polyhedron.faces[faceIndex]
   const n = base.length
@@ -333,6 +322,7 @@ function augment(polyhedron, faceIndex, type) {
   _.pullAt(newFaces, [faceIndex, polyhedron.faces.length + undersideIndex])
 
   // remove extraneous vertices
+  // TODO manually match up the faces instead of deduplicating (which can cause precision issues)
   return deduplicateVertices({ vertices: newVertices, faces: newFaces })
 }
 
@@ -406,8 +396,7 @@ export function getElongated(polyhedron) {
     polyhedron.faces,
     face => face === _.maxBy(polyhedron.faces, 'length'),
   )
-  // TODO maybe move "withEdges" to the rendering component?
-  return withEdges(augment(polyhedron, faceIndex, 'prisms'))
+  return augment(polyhedron, faceIndex, 'prisms')
 }
 
 export function getGyroElongated(polyhedron) {
@@ -415,7 +404,7 @@ export function getGyroElongated(polyhedron) {
     polyhedron.faces,
     face => face === _.maxBy(polyhedron.faces, 'length'),
   )
-  return withEdges(augment(polyhedron, faceIndex, 'antiprisms'))
+  return augment(polyhedron, faceIndex, 'antiprisms')
 }
 
 export function getAugmented(polyhedron, name) {
@@ -426,7 +415,7 @@ export function getAugmented(polyhedron, name) {
   const faceIndex = getFaceToAugment(polyhedron, name)
   // (special case: triangular prism)
   // do the augmentation
-  return withEdges(augment(polyhedron, faceIndex, 'pyramidsCupolae'))
+  return augment(polyhedron, faceIndex, 'pyramidsCupolae')
 }
 
 // Find a pyramid and return the vertex index
@@ -582,7 +571,7 @@ function removeVertices(polyhedron, vIndices) {
 export function getDiminished(polyhedron, name) {
   const vIndices = getVerticesToDiminish(polyhedron, name)
   console.log('diminishing', vIndices)
-  return withEdges(removeVertices(polyhedron, vIndices))
+  return removeVertices(polyhedron, vIndices)
 }
 
 // FIXME there's some distortion on the rhombicosidodecahedra
@@ -624,5 +613,5 @@ export function gyrate(polyhedron, name, fIndex) {
     })
   })
 
-  return withEdges({ faces: newFaces, vertices: newVertices })
+  return { faces: newFaces, vertices: newVertices }
 }
