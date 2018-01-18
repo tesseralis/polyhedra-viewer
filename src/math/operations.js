@@ -451,15 +451,19 @@ export function getAdjacentFacesMapping(polyhedron) {
   return mapping
 }
 
-// Find a cupola and return the vertices of its top
-export function getCupolae(polyhedron) {
+// Return the face indices of all the faces that are tops of cupolae
+export function getCupolaeIndices(polyhedron, { adjacentFacesMapping } = {}) {
+  const { faces } = polyhedron
   // find the face in the polyhedron whose vertices' adjacent faces are <face>-4-3-4
-  const adjacentFacesMapping = getAdjacentFacesMapping(polyhedron)
-  return _.filter(polyhedron.faces, (face, fIndex) => {
+  if (!adjacentFacesMapping) {
+    adjacentFacesMapping = getAdjacentFacesMapping(polyhedron)
+  }
+  return _.filter(_.range(faces.length), fIndex => {
+    const face = faces[fIndex]
     const cupolaCount = _.countBy([3, 4, 4, face.length])
     return _.every(face, vIndex => {
       const nbrFaces = adjacentFacesMapping[vIndex].map(
-        fIndex2 => polyhedron.faces[fIndex2],
+        fIndex2 => faces[fIndex2],
       )
       const count = _(nbrFaces)
         .map('length')
@@ -477,6 +481,10 @@ export function getCupolae(polyhedron) {
   })
 }
 
+export function getCupolae(polyhedron) {
+  return getCupolaeIndices(polyhedron).map(fIndex => polyhedron.faces[fIndex])
+}
+
 /**
  * Return the face index of the cupola in the polyhedron that contains the point.
  * Return -1 if the point is not part of any cupola.
@@ -490,35 +498,31 @@ export function getCupolaTop({ faces, vertices }, point) {
     const plane = getPlane(face, vertices)
     return plane.distanceTo(hitPoint)
   })
-  const cupolae = getCupolae({ faces, vertices })
-  // TODO this is called in "getCupolae", so it's a bit of a waste
   const adjacentFacesMapping = getAdjacentFacesMapping({
     faces,
     vertices,
   })
-
-  const cupolaeFaces = _.flatMapDeep(cupolae, cupola =>
-    _.map(cupola, vIndex => adjacentFacesMapping[vIndex]),
+  const cupolaeIndices = getCupolaeIndices(
+    { faces, vertices },
+    { adjacentFacesMapping },
   )
 
-  // check if we're inside a cupola
+  // check if we're inside any cupola
+  const cupolaeFaces = _.flatMapDeep(cupolaeIndices, fIndex =>
+    _.map(faces[fIndex], vIndex => adjacentFacesMapping[vIndex]),
+  )
   if (!_.includes(cupolaeFaces, hitFaceIndex)) {
-    // console.log(' we are not in a cupola so we cannot rotate')
-    // this.setState({
-    //   highlightFaceIndices: [],
-    //   applyFaceIndex: null,
-    // })
     return -1
   }
+
   // if so, determine the closest cupola point to this
   // console.log('finding nearest cupola peak...')
-  const nearestPeak = _.minBy(cupolae, face => {
-    const plane = getPlane(face, vertices)
+  const nearestPeak = _.minBy(cupolaeIndices, fIndex => {
+    const plane = getPlane(faces[fIndex], vertices)
     return plane.distanceTo(hitPoint)
   })
 
-  // TODO have the cupolae function return the face instead
-  return _.findIndex(faces, face => _.isEqual(face, nearestPeak))
+  return nearestPeak
 }
 
 function getVerticesToDiminish(polyhedron, name) {
@@ -583,7 +587,6 @@ export function getDiminished(polyhedron, name) {
 
 // FIXME there's some distortion on the rhombicosidodecahedra
 export function getGyrate(polyhedron, name, fIndex) {
-  console.log('doing the twist!')
   // get adjacent faces
   const vIndices = polyhedron.faces[fIndex]
   const facesToTurn = _.filter(
@@ -591,25 +594,22 @@ export function getGyrate(polyhedron, name, fIndex) {
     face => _.intersection(face, vIndices).length !== 0,
   )
   const boundary = getBoundary(facesToTurn)
-  console.log('boundary', boundary)
-  console.log('facesToTurn', facesToTurn)
 
   // TODO this won't work with animation, so I have to reimplement eventually
+
   // rotate the cupola top
   const normal = getNormal(
     boundary.map(vIndex => new Vec3D(...polyhedron.vertices[vIndex])),
   ).getNormalized()
   const theta = Math.PI / vIndices.length
-  console.log(theta)
   const newVertices = polyhedron.vertices.map((vertex, vIndex) => {
     if (_.includes(vIndices, vIndex)) {
       return new Vec3D(...vertex).getRotatedAroundAxis(normal, theta).toArray()
     }
     return vertex
   })
-  console.log('newVertices', newVertices)
 
-  let count = 0
+  // Rotate all the points on the boundary
   const newFaces = polyhedron.faces.map(face => {
     return face.map((vIndex, i) => {
       const j = boundary.indexOf(vIndex)
@@ -618,19 +618,11 @@ export function getGyrate(polyhedron, name, fIndex) {
         (getMod(face, i + 1) === getMod(boundary, j + 1) ||
           getMod(face, i - 1) === getMod(boundary, j - 1))
       ) {
-        count++
         return getMod(boundary, j + 1)
       }
       return vIndex
     })
   })
-  console.log(count, 'vertices twisted')
 
-  // const splitPolyhedron = splitAlongBoundary(polyhedron, boundary)
-
-  // rotate the vertices in the cupola
-
-  // reattach
-  console.log('new faces and vertices', newFaces, newVertices)
   return withEdges({ faces: newFaces, vertices: newVertices })
 }
