@@ -12,7 +12,7 @@ import { getNextPolyhedron, hasOperation } from 'constants/relations'
 import { getPolyhedron, getPolyhedronConfig, getMode } from 'selectors'
 import { setMode, setPolyhedron, applyOperation } from 'actions'
 import { mapObject } from 'util.js'
-import { getEdges, getCupolaTop } from 'math/operations'
+import { getEdges, getCupolaTop, getPyramidOrCupola } from 'math/operations'
 
 // Join a list of lists with an inner and outer separator.
 export const joinListOfLists = (list, outerSep, innerSep) => {
@@ -42,7 +42,7 @@ const getColorAttr = colors =>
 class Faces extends Component {
   state = {
     highlightFaceIndices: [],
-    applyFaceIndex: -1,
+    applyArgs: null,
   }
 
   componentDidMount() {
@@ -56,11 +56,12 @@ class Faces extends Component {
         // it's a drag, don't click
         if (this.drag) return
         const { mode, setMode, applyOperation, solid, history } = this.props
-        const { applyFaceIndex } = this.state
-        if (mode && applyFaceIndex !== -1) {
+        const { applyArgs } = this.state
+        if (mode && !_.isNil(applyArgs)) {
           const next = getNextPolyhedron(unescapeName(solid), mode)
           history.push(`/${escapeName(next)}/related`)
-          applyOperation(mode, { fIndex: applyFaceIndex, name: solid })
+          console.log(applyArgs)
+          applyOperation(mode, { ...applyArgs, name: solid })
 
           // Get out of current mode if we can't do it any more
           if (!hasOperation(next, mode)) {
@@ -76,7 +77,16 @@ class Faces extends Component {
           const { faces, vertices, mode } = this.props
           if (!mode) return
 
-          if (mode === 'g' || mode === '-') {
+          if (mode === '-') {
+            const vIndices = getPyramidOrCupola(
+              { vertices, faces },
+              event.hitPnt,
+            )
+            console.log('vIndices', vIndices)
+            this.setState({
+              applyArgs: vIndices && { vIndices },
+            })
+          } else if (mode === 'g') {
             const applyFaceIndex = getCupolaTop(
               { vertices, faces },
               event.hitPnt,
@@ -85,20 +95,21 @@ class Faces extends Component {
 
             if (applyFaceIndex === -1) {
               this.setState({
-                highlightFaceIndices: [],
-                applyFaceIndex: -1,
+                // highlightFaceIndices: [],
+                // applyFaceIndex: -1,
+                applyArgs: null,
               })
             }
 
             this.setState({
-              highlightFaceIndices: _.uniq(
-                _.flatMap(faces[applyFaceIndex], vIndex =>
-                  _.filter(_.range(faces.length), fIndex =>
-                    _.includes(faces[fIndex], vIndex),
-                  ),
-                ),
-              ),
-              applyFaceIndex,
+              // highlightFaceIndices: _.uniq(
+              //   _.flatMap(faces[applyFaceIndex], vIndex =>
+              //     _.filter(_.range(faces.length), fIndex =>
+              //       _.includes(faces[fIndex], vIndex),
+              //     ),
+              //   ),
+              // ),
+              applyArgs: { fIndex: applyFaceIndex },
             })
           }
         }, 200),

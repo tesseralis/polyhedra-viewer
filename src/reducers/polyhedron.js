@@ -36,11 +36,7 @@ export default function polyhedron(state = initialState, action) {
       return isValidSolid(action.name) ? getSolidData(action.name) : state
     case APPLY_OPERATION:
       return operations[action.operation]
-        ? operations[action.operation](
-            state,
-            action.config.name,
-            action.config.fIndex,
-          )
+        ? operations[action.operation](state, action.config)
         : state
     default:
       return state

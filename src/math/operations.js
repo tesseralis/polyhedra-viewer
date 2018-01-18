@@ -425,17 +425,6 @@ export function getAugmented(polyhedron, name) {
   return augment(polyhedron, faceIndex, 'pyramidsCupolae')
 }
 
-// Find a pyramid and return the vertex index
-function findPyramid(polyhedron, n) {
-  return _.findIndex(polyhedron.vertices, (vertex, vIndex) => {
-    const adjacentFaces = _.filter(polyhedron.faces, face =>
-      _.includes(face, vIndex),
-    )
-    if (n >= 3 && adjacentFaces.length !== n) return false
-    return _.every(adjacentFaces, { length: 3 })
-  })
-}
-
 // get an array mapping each vertex index to the indices of the faces it is adjacent to
 export function getAdjacentFacesMapping(polyhedron) {
   const mapping = polyhedron.vertices.map(() => [])
@@ -480,49 +469,130 @@ function getBoundary(faces) {
   return result
 }
 
+function isPyramid({ faces, vertices }, vIndex, { adjacentFacesMapping }) {
+  const adjacentFaces = adjacentFacesMapping[vIndex].map(
+    fIndex => faces[fIndex],
+  )
+  if (!_.every(adjacentFaces, { length: 3 })) return false
+  const boundary = getBoundary(adjacentFaces)
+  return isPlanar(boundary, vertices)
+}
+
 // Return the face indices of all the faces that are tops of cupolae
-export function getCupolaeIndices(polyhedron, { adjacentFacesMapping } = {}) {
-  const { faces, vertices } = polyhedron
+function getPyramidIndices(polyhedron, { adjacentFacesMapping } = {}) {
+  const { vertices } = polyhedron
   // find the face in the polyhedron whose vertices' adjacent faces are <face>-4-3-4
   if (!adjacentFacesMapping) {
     adjacentFacesMapping = getAdjacentFacesMapping(polyhedron)
   }
-  return _.filter(_.range(faces.length), fIndex => {
-    const face = faces[fIndex]
-    const cupolaCount = _.countBy([3, 4, 4, face.length])
-    const hasRightSides = _.every(face, vIndex => {
-      const nbrFaces = adjacentFacesMapping[vIndex].map(
-        fIndex2 => faces[fIndex2],
-      )
-      const count = _(nbrFaces)
-        .map('length')
-        .countBy()
-        .value()
+  return _.filter(_.range(vertices.length), vIndex =>
+    isPyramid(polyhedron, vIndex, { adjacentFacesMapping }),
+  )
+}
 
-      if (!_.isEqual(count, cupolaCount)) return false
-      // Make sure that the square faces aren't adjacent
-      const [sqFace1, sqFace2] = _.filter(
-        nbrFaces,
-        nbrFace => nbrFace.length === 4 && !_.isEqual(nbrFace, face),
-      )
-      return _.intersection(sqFace1, sqFace2).length === 1
-    })
+function isCupola({ faces, vertices }, fIndex, { adjacentFacesMapping }) {
+  const face = faces[fIndex]
+  const cupolaCount = _.countBy([3, 4, 4, face.length])
+  const hasRightSides = _.every(face, vIndex => {
+    const nbrFaces = adjacentFacesMapping[vIndex].map(fIndex2 => faces[fIndex2])
+    const count = _(nbrFaces)
+      .map('length')
+      .countBy()
+      .value()
 
-    if (!hasRightSides) return false
-
-    const allNeighborFaces = _.uniq(
-      _.flatMap(face, vIndex => adjacentFacesMapping[vIndex]),
-    ).map(fIndex2 => faces[fIndex2])
-
-    // return true
-    // make sure the whole thing is on a plane
-    const boundary = getBoundary(allNeighborFaces)
-    return isPlanar(boundary, vertices)
+    if (!_.isEqual(count, cupolaCount)) return false
+    // Make sure that the square faces aren't adjacent
+    const [sqFace1, sqFace2] = _.filter(
+      nbrFaces,
+      nbrFace => nbrFace.length === 4 && !_.isEqual(nbrFace, face),
+    )
+    return _.intersection(sqFace1, sqFace2).length === 1
   })
+
+  if (!hasRightSides) return false
+
+  const allNeighborFaces = _.uniq(
+    _.flatMap(face, vIndex => adjacentFacesMapping[vIndex]),
+  ).map(fIndex2 => faces[fIndex2])
+
+  // return true
+  // make sure the whole thing is on a plane
+  const boundary = getBoundary(allNeighborFaces)
+  return isPlanar(boundary, vertices)
+}
+
+// Return the face indices of all the faces that are tops of cupolae
+function getCupolaeIndices(polyhedron, { adjacentFacesMapping } = {}) {
+  const { faces } = polyhedron
+  // find the face in the polyhedron whose vertices' adjacent faces are <face>-4-3-4
+  if (!adjacentFacesMapping) {
+    adjacentFacesMapping = getAdjacentFacesMapping(polyhedron)
+  }
+  return _.filter(_.range(faces.length), fIndex =>
+    isCupola(polyhedron, fIndex, { adjacentFacesMapping }),
+  )
 }
 
 export function getCupolae(polyhedron) {
   return getCupolaeIndices(polyhedron).map(fIndex => polyhedron.faces[fIndex])
+}
+
+export function getPyramidOrCupola({ faces, vertices }, point) {
+  // TODO deduplicate
+  const hitPoint = new Vec3D(...point)
+  const hitFaceIndex = _.minBy(_.range(faces.length), fIndex => {
+    const face = faces[fIndex]
+    const plane = getPlane(face, vertices)
+    return plane.getDistanceToPoint(hitPoint)
+  })
+  const adjacentFacesMapping = getAdjacentFacesMapping({
+    faces,
+    vertices,
+  })
+  const pyramidIndices = getPyramidIndices(
+    { faces, vertices },
+    { adjacentFacesMapping },
+  )
+
+  // A solid can have only pyramids or cupolae/rotundae, so it suffices to check for one
+  if (pyramidIndices.length > 0) {
+    // check if we're inside any pyramid
+    const pyramidFaces = _.flatMap(
+      pyramidIndices,
+      vIndex => adjacentFacesMapping[vIndex],
+    )
+    if (!_.includes(pyramidFaces, hitFaceIndex)) {
+      return null
+    }
+
+    const nearestPeak = _.minBy(pyramidIndices, vIndex => {
+      const vertex = new Vec3D(...vertices[vIndex])
+      return vertex.distanceTo(hitPoint)
+    })
+    return [nearestPeak]
+  }
+
+  // Other
+  const cupolaeIndices = getCupolaeIndices(
+    { faces, vertices },
+    { adjacentFacesMapping },
+  )
+
+  // check if we're inside any cupola
+  const cupolaeFaces = _.flatMapDeep(cupolaeIndices, fIndex =>
+    _.map(faces[fIndex], vIndex => adjacentFacesMapping[vIndex]),
+  )
+  if (!_.includes(cupolaeFaces, hitFaceIndex)) {
+    return null
+  }
+
+  // if so, determine the closest cupola point to this
+  const nearestPeak = _.minBy(cupolaeIndices, fIndex => {
+    const plane = getPlane(faces[fIndex], vertices)
+    return plane.getDistanceToPoint(hitPoint)
+  })
+
+  return faces[nearestPeak]
 }
 
 /**
@@ -556,23 +626,12 @@ export function getCupolaTop({ faces, vertices }, point) {
   }
 
   // if so, determine the closest cupola point to this
-  // console.log('finding nearest cupola peak...')
   const nearestPeak = _.minBy(cupolaeIndices, fIndex => {
     const plane = getPlane(faces[fIndex], vertices)
     return plane.getDistanceToPoint(hitPoint)
   })
 
   return nearestPeak
-}
-
-function getVerticesToDiminish(polyhedron, name) {
-  if (name.includes('truncated')) {
-    return getCupolae(polyhedron)[0]
-  } else if (name.includes('sphenocorona') || name.includes('prism')) {
-    return [findPyramid(polyhedron, 4)]
-  } else {
-    return [findPyramid(polyhedron)]
-  }
 }
 
 function removeVertices(polyhedron, vIndices) {
@@ -586,15 +645,12 @@ function removeVertices(polyhedron, vIndices) {
   })
 }
 
-export function diminish(polyhedron, name, fIndex) {
-  const vIndices = !_.isNil(fIndex)
-    ? polyhedron.faces[fIndex]
-    : getVerticesToDiminish(polyhedron, name)
+export function diminish(polyhedron, { vIndices }) {
   return removeVertices(polyhedron, vIndices)
 }
 
 // TODO allow gyrating rotundae
-export function gyrate(polyhedron, name, fIndex) {
+export function gyrate(polyhedron, { fIndex }) {
   // get adjacent faces
   const vIndices = polyhedron.faces[fIndex]
   const facesToTurn = _.filter(
