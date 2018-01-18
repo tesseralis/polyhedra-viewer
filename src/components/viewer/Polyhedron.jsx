@@ -11,7 +11,7 @@ import { setPolyhedron } from 'actions'
 import { mapObject } from 'util.js'
 import { geom } from 'toxiclibsjs'
 
-const { Vec3D } = geom
+const { Vec3D, Triangle3D, Plane } = geom
 
 // Join a list of lists with an inner and outer separator.
 export const joinListOfLists = (list, outerSep, innerSep) => {
@@ -40,11 +40,24 @@ const getColorAttr = colors => joinListOfLists(polygonColors(colors), ',', ' ')
 class Faces extends Component {
   componentDidMount() {
     // TODO make sure this doesn't have a race condition
-    window.onLoad = () => {
+    document.onload = () => {
       this.shape.addEventListener(
-        'click',
+        'mousemove',
         event => {
-          console.log(event.hitPnt)
+          const { faces, vertices } = this.props
+          console.log(event.hitPnt, faces, vertices)
+          const hitPoint = new Vec3D(...event.hitPnt)
+          const hitFaceIndex = _.minBy(_.range(faces.length), fIndex => {
+            const face = faces[fIndex]
+            console.log('checking', fIndex, face)
+            const vertices = _.take(face, 3).map(
+              vIndex => new Vec3D(...vertices[vIndex]),
+            )
+            console.log('vertices', vertices)
+            const plane = new Plane(new Triangle3D(...vertices))
+            return plane.distanceTo(hitPoint)
+          })
+          console.log('touching face at index', hitFaceIndex)
         },
         false,
       )
