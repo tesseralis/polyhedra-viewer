@@ -305,6 +305,10 @@ const normalized = [
 const baseGraph = graphMerge(...normalized)
 export const polyhedraGraph = makeBidirectional(baseGraph)
 
+export function hasOperation(solid, operation) {
+  return _.has(polyhedraGraph[toConwayNotation(solid)], operation)
+}
+
 // Get the polyhedron name as a result of applying the operation to the given polyhedron
 export function getNextPolyhedron(solid, operation) {
   const next = polyhedraGraph[toConwayNotation(solid)][operation]

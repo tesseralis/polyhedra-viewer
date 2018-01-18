@@ -8,9 +8,9 @@ import { withRouter } from 'react-router-dom'
 
 import polygons from 'constants/polygons'
 import { escapeName, unescapeName } from 'constants/polyhedra'
-import { getNextPolyhedron } from 'constants/relations'
+import { getNextPolyhedron, hasOperation } from 'constants/relations'
 import { getPolyhedron, getPolyhedronConfig, getMode } from 'selectors'
-import { setPolyhedron, applyOperation } from 'actions'
+import { setMode, setPolyhedron, applyOperation } from 'actions'
 import { mapObject } from 'util.js'
 import { getEdges, getCupolaTop } from 'math/operations'
 
@@ -55,12 +55,17 @@ class Faces extends Component {
       this.shape.addEventListener('mouseup', () => {
         // it's a drag, don't click
         if (this.drag) return
-        const { mode, applyOperation, solid, history } = this.props
+        const { mode, setMode, applyOperation, solid, history } = this.props
         const { applyFaceIndex } = this.state
         if (mode && applyFaceIndex !== -1) {
-          const next = getNextPolyhedron(unescapeName(solid), 'g')
+          const next = getNextPolyhedron(unescapeName(solid), mode)
           history.push(`/${escapeName(next)}/related`)
-          applyOperation(mode, { fIndex: applyFaceIndex })
+          applyOperation(mode, { fIndex: applyFaceIndex, name: solid })
+
+          // Get out of current mode if we can't do it any more
+          if (!hasOperation(next, mode)) {
+            setMode(null)
+          }
         }
       })
 
@@ -71,13 +76,14 @@ class Faces extends Component {
           const { faces, vertices, mode } = this.props
           if (!mode) return
 
-          if (mode === 'g') {
-            const fIndexToGyrate = getCupolaTop(
+          if (mode === 'g' || mode === '-') {
+            const applyFaceIndex = getCupolaTop(
               { vertices, faces },
               event.hitPnt,
             )
+            console.log('applyFaceIndex', applyFaceIndex)
 
-            if (fIndexToGyrate === -1) {
+            if (applyFaceIndex === -1) {
               this.setState({
                 highlightFaceIndices: [],
                 applyFaceIndex: -1,
@@ -86,13 +92,13 @@ class Faces extends Component {
 
             this.setState({
               highlightFaceIndices: _.uniq(
-                _.flatMap(faces[fIndexToGyrate], vIndex =>
+                _.flatMap(faces[applyFaceIndex], vIndex =>
                   _.filter(_.range(faces.length), fIndex =>
                     _.includes(faces[fIndex], vIndex),
                   ),
                 ),
               ),
-              applyFaceIndex: fIndexToGyrate,
+              applyFaceIndex,
             })
           }
         }, 200),
@@ -136,6 +142,7 @@ class Faces extends Component {
 const ConnectedFaces = withRouter(
   connect(createStructuredSelector({ mode: getMode }), {
     applyOperation,
+    setMode,
   })(Faces),
 )
 

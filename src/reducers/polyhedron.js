@@ -3,7 +3,7 @@ import {
   getElongated,
   getGyroElongated,
   getAugmented,
-  getDiminished,
+  diminish,
   gyrate,
 } from 'math/operations'
 
@@ -24,7 +24,7 @@ const operations = {
   P: getElongated,
   A: getGyroElongated,
   '+': getAugmented,
-  '-': getDiminished,
+  '-': diminish,
   g: gyrate,
 }
 

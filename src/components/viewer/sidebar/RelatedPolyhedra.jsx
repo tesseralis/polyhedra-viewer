@@ -21,8 +21,8 @@ const operations = {
   '~e': 'cantellation of',
   '~s': 'snub of',
 
-  '+': 'augmented',
-  '-': 'diminished',
+  '+': 'augment',
+  '-': 'diminish',
   P: 'elongate',
   A: 'gyroelongate',
   '~P': 'elongation of',
@@ -88,13 +88,13 @@ function RelatedPolyhedra({ solid, applyOperation, setMode }) {
           !_.compact(related[operation]).length
         )
           return null
-        if (operation === 'g') {
+        if (_.includes(['g', '-'], operation)) {
           return (
             <button
               className={css(styles.modeButton)}
-              onClick={() => setMode('g')}
+              onClick={() => setMode(operation)}
             >
-              Gyrate
+              {operations[operation]}
             </button>
           )
         }

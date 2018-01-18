@@ -568,13 +568,15 @@ function removeVertices(polyhedron, vIndices) {
   })
 }
 
-export function getDiminished(polyhedron, name) {
-  const vIndices = getVerticesToDiminish(polyhedron, name)
+export function diminish(polyhedron, name, fIndex) {
+  const vIndices = !_.isNil(fIndex)
+    ? polyhedron.faces[fIndex]
+    : getVerticesToDiminish(polyhedron, name)
   console.log('diminishing', vIndices)
   return removeVertices(polyhedron, vIndices)
 }
 
-// FIXME there's some distortion on the rhombicosidodecahedra
+// TODO allow gyrating rotundae
 export function gyrate(polyhedron, name, fIndex) {
   // get adjacent faces
   const vIndices = polyhedron.faces[fIndex]
@@ -587,13 +589,19 @@ export function gyrate(polyhedron, name, fIndex) {
   // TODO this won't work with animation, so I have to reimplement eventually
 
   // rotate the cupola top
-  const normal = getNormal(
-    boundary.map(vIndex => new Vec3D(...polyhedron.vertices[vIndex])),
-  ).getNormalized()
+  const boundaryVertices = toVec3D(
+    boundary.map(vIndex => polyhedron.vertices[vIndex]),
+  )
+  const normal = getNormal(boundaryVertices).getNormalized()
+  const centroid = calculateCentroid(boundaryVertices)
   const theta = Math.PI / vIndices.length
   const newVertices = polyhedron.vertices.map((vertex, vIndex) => {
     if (_.includes(vIndices, vIndex)) {
-      return new Vec3D(...vertex).getRotatedAroundAxis(normal, theta).toArray()
+      return new Vec3D(...vertex)
+        .sub(centroid)
+        .getRotatedAroundAxis(normal, theta)
+        .add(centroid)
+        .toArray()
     }
     return vertex
   })
