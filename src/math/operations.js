@@ -3,7 +3,7 @@ import { geom } from 'toxiclibsjs'
 import { getSolidData } from 'constants/polyhedra'
 const PRECISION = 1e-3
 
-const { Vec3D } = geom
+const { Vec3D, Triangle3D, Plane } = geom
 
 function mod(a, b) {
   return a >= 0 ? a % b : a % b + b
@@ -32,6 +32,11 @@ function calculateCentroid(vectors) {
 function getNormal(vertices) {
   const [v0, v1, v2] = vertices
   return v0.sub(v1).cross(v1.sub(v2))
+}
+
+function getPlane(face, vertices) {
+  const triang = _.take(face, 3).map(vIndex => new Vec3D(...vertices[vIndex]))
+  return new Plane(new Triangle3D(...triang))
 }
 
 function nextVertex(face, vertex) {
@@ -472,6 +477,50 @@ export function getCupolae(polyhedron) {
   })
 }
 
+/**
+ * Return the face index of the cupola in the polyhedron that contains the point.
+ * Return -1 if the point is not part of any cupola.
+ * If the point is part of more than one cupola, this will return the one whose top
+ * the given point is closest to.
+ */
+export function getCupolaTop({ faces, vertices }, point) {
+  const hitPoint = new Vec3D(...point)
+  const hitFaceIndex = _.minBy(_.range(faces.length), fIndex => {
+    const face = faces[fIndex]
+    const plane = getPlane(face, vertices)
+    return plane.distanceTo(hitPoint)
+  })
+  const cupolae = getCupolae({ faces, vertices })
+  // TODO this is called in "getCupolae", so it's a bit of a waste
+  const adjacentFacesMapping = getAdjacentFacesMapping({
+    faces,
+    vertices,
+  })
+
+  const cupolaeFaces = _.flatMapDeep(cupolae, cupola =>
+    _.map(cupola, vIndex => adjacentFacesMapping[vIndex]),
+  )
+
+  // check if we're inside a cupola
+  if (!_.includes(cupolaeFaces, hitFaceIndex)) {
+    // console.log(' we are not in a cupola so we cannot rotate')
+    // this.setState({
+    //   highlightFaceIndices: [],
+    //   applyFaceIndex: null,
+    // })
+    return -1
+  }
+  // if so, determine the closest cupola point to this
+  // console.log('finding nearest cupola peak...')
+  const nearestPeak = _.minBy(cupolae, face => {
+    const plane = getPlane(face, vertices)
+    return plane.distanceTo(hitPoint)
+  })
+
+  // TODO have the cupolae function return the face instead
+  return _.findIndex(faces, face => _.isEqual(face, nearestPeak))
+}
+
 function getVerticesToDiminish(polyhedron, name) {
   if (name.includes('truncated')) {
     return getCupolae(polyhedron)[0]
@@ -532,6 +581,7 @@ export function getDiminished(polyhedron, name) {
   return withEdges(removeVertices(polyhedron, vIndices))
 }
 
+// FIXME there's some distortion on the rhombicosidodecahedra
 export function getGyrate(polyhedron, name, fIndex) {
   console.log('doing the twist!')
   // get adjacent faces
@@ -544,7 +594,7 @@ export function getGyrate(polyhedron, name, fIndex) {
   console.log('boundary', boundary)
   console.log('facesToTurn', facesToTurn)
 
-  // TODO this won't work with animation, so I have to reimplement
+  // TODO this won't work with animation, so I have to reimplement eventually
   // rotate the cupola top
   const normal = getNormal(
     boundary.map(vIndex => new Vec3D(...polyhedron.vertices[vIndex])),

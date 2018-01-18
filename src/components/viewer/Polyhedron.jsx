@@ -5,22 +5,14 @@ import _ from 'lodash'
 import { connect } from 'react-redux'
 import { createStructuredSelector } from 'reselect'
 import { withRouter } from 'react-router-dom'
-import { geom } from 'toxiclibsjs'
 
 import polygons from 'constants/polygons'
-import {
-  escapeName,
-  unescapeName,
-  toConwayNotation,
-  fromConwayNotation,
-} from 'constants/polyhedra'
-import { polyhedraGraph } from 'constants/relations'
+import { escapeName, unescapeName } from 'constants/polyhedra'
+import { getNextPolyhedron } from 'constants/relations'
 import { getPolyhedron, getPolyhedronConfig, getMode } from 'selectors'
 import { setPolyhedron, applyOperation } from 'actions'
 import { mapObject } from 'util.js'
-import { getAdjacentFacesMapping, getCupolae } from 'math/operations'
-
-const { Vec3D, Triangle3D, Plane } = geom
+import { getCupolaTop } from 'math/operations'
 
 // Join a list of lists with an inner and outer separator.
 export const joinListOfLists = (list, outerSep, innerSep) => {
@@ -47,15 +39,10 @@ const polygonColors = colors => polygons.map(n => toRgb(colors[n]))
 const getColorAttr = colors =>
   joinListOfLists(polygonColors(colors).concat([[0, 1, 0]]), ',', ' ')
 
-function getPlane(face, vertices) {
-  const triang = _.take(face, 3).map(vIndex => new Vec3D(...vertices[vIndex]))
-  return new Plane(new Triangle3D(...triang))
-}
-
 class Faces extends Component {
   state = {
     highlightFaceIndices: [],
-    applyFaceIndex: null,
+    applyFaceIndex: -1,
   }
 
   componentDidMount() {
@@ -70,16 +57,9 @@ class Faces extends Component {
         if (this.drag) return
         const { mode, applyOperation, solid, history } = this.props
         const { applyFaceIndex } = this.state
-        if (mode && !_.isNil(applyFaceIndex)) {
-          const next =
-            polyhedraGraph[toConwayNotation(unescapeName(solid))]['g']
-          // FIXME
-          if (next.length > 1) {
-            throw new Error(
-              'Cannot deal with more than one possibility right now',
-            )
-          }
-          history.push(`/${escapeName(fromConwayNotation(next[0]))}/related`)
+        if (mode && applyFaceIndex !== -1) {
+          const next = getNextPolyhedron(unescapeName(solid), 'g')
+          history.push(`/${escapeName(next)}/related`)
           applyOperation(mode, { fIndex: applyFaceIndex })
         }
       })
@@ -90,57 +70,30 @@ class Faces extends Component {
           this.drag = true
           const { faces, vertices, mode } = this.props
           if (!mode) return
-          const hitPoint = new Vec3D(...event.hitPnt)
-          const hitFaceIndex = _.minBy(_.range(faces.length), fIndex => {
-            const face = faces[fIndex]
-            const plane = getPlane(face, vertices)
-            return plane.distanceTo(hitPoint)
-          })
 
           if (mode === 'g') {
-            // FIXME probably can move this logic out once we know the hit index...
-            // find out if we're in a cupola
-            const cupolae = getCupolae({ faces, vertices })
-            // TODO this is called in "getCupolae", so it's a bit of a waste
-            const adjacentFacesMapping = getAdjacentFacesMapping({
-              faces,
-              vertices,
-            })
-
-            const cupolaeFaces = _.flatMapDeep(cupolae, cupola =>
-              _.map(cupola, vIndex => adjacentFacesMapping[vIndex]),
+            const fIndexToGyrate = getCupolaTop(
+              { vertices, faces },
+              event.hitPnt,
             )
 
-            // check if we're inside a cupola
-            if (!_.includes(cupolaeFaces, hitFaceIndex)) {
-              // console.log(' we are not in a cupola so we cannot rotate')
+            if (fIndexToGyrate === -1) {
               this.setState({
                 highlightFaceIndices: [],
-                applyFaceIndex: null,
+                applyFaceIndex: -1,
               })
-              return
             }
-            // if so, determine the closest cupola point to this
-            // console.log('finding nearest cupola peak...')
-            const nearestPeak = _.minBy(cupolae, face => {
-              const plane = getPlane(face, vertices)
-              return plane.distanceTo(hitPoint)
-            })
-
-            // TODO have the cupolae function return the face instead
-            const fIndexToGyrate = _.findIndex(faces, face =>
-              _.isEqual(face, nearestPeak),
-            )
 
             this.setState({
               highlightFaceIndices: _.uniq(
-                _.flatMap(nearestPeak, vIndex => adjacentFacesMapping[vIndex]),
+                _.flatMap(faces[fIndexToGyrate], vIndex =>
+                  _.filter(_.range(faces.length), fIndex =>
+                    _.includes(faces[fIndex], vIndex),
+                  ),
+                ),
               ),
               applyFaceIndex: fIndexToGyrate,
             })
-
-            // console.log('touching face at index', hitFaceIndex)
-            // console.log('touching cupola peak', fIndexToGyrate)
           }
         }, 200),
         false,

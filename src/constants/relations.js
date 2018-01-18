@@ -1,5 +1,5 @@
 import * as _ from 'lodash'
-import { toConwayNotation } from 'constants/polyhedra'
+import { fromConwayNotation, toConwayNotation } from 'constants/polyhedra'
 import periodicTable from 'constants/periodicTable'
 
 const archimedean = {
@@ -161,6 +161,9 @@ const basePyramidsCupolae = (() => {
       [row[2]]: {
         '+': getAugmentations(index, 5),
       },
+      [row[5]]: {
+        g: row[5],
+      },
     })
 
     if (!_.isArray(row[3])) {
@@ -251,7 +254,7 @@ const rhombicosidodecahedraGraph = (() => {
       '-': ['J79'],
     },
     J76: {
-      g: ['J73', 'J74'],
+      g: ['J77', 'J78'],
       '-': ['J80', 'J81'],
     },
     J77: {
@@ -301,3 +304,13 @@ const normalized = [
 
 const baseGraph = graphMerge(...normalized)
 export const polyhedraGraph = makeBidirectional(baseGraph)
+
+// Get the polyhedron name as a result of applying the operation to the given polyhedron
+export function getNextPolyhedron(solid, operation) {
+  const next = polyhedraGraph[toConwayNotation(solid)][operation]
+  // FIXME handle more than one gyration possibility
+  if (next.length > 1) {
+    throw new Error('Cannot deal with more than one possibility right now')
+  }
+  return fromConwayNotation(next[0])
+}
