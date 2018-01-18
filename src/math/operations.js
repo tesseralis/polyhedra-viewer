@@ -9,6 +9,9 @@ function mod(a, b) {
   return a >= 0 ? a % b : a % b + b
 }
 
+// convert an array of vertices into a vector
+const vec = p => new Vec3D(...p)
+
 // get the element in the array mod the array's length
 function getMod(array, index) {
   return array[mod(index, array.length)]
@@ -21,7 +24,7 @@ function replace(array, index, ...values) {
 }
 
 function toVec3D(vertices) {
-  return vertices.map(v => new Vec3D(...v))
+  return vertices.map(vec)
 }
 
 function calculateCentroid(vectors) {
@@ -35,12 +38,12 @@ function getNormal(vertices) {
 }
 
 function getPlane(face, vertices) {
-  const triang = _.take(face, 3).map(vIndex => new Vec3D(...vertices[vIndex]))
+  const triang = _.take(face, 3).map(vIndex => vec(vertices[vIndex]))
   return new Plane(new Triangle3D(...triang))
 }
 
 function isPlanar(face, vertices) {
-  const vecs = face.map(vIndex => new Vec3D(...vertices[vIndex]))
+  const vecs = face.map(vIndex => vec(vertices[vIndex]))
   const triang = _.take(vecs, 3)
   const plane = new Plane(new Triangle3D(...triang))
   return _.every(vecs, vec => plane.getDistanceToPoint(vec) < PRECISION)
@@ -80,8 +83,8 @@ function replaceVertex(newPolyhedron, polyhedron, vertex, { mock, rectify }) {
       return polyhedron.vertices[vertex]
     }
     const next = nextVertex(face, vertex)
-    const p1 = new Vec3D(...polyhedron.vertices[vertex])
-    const p2 = new Vec3D(...polyhedron.vertices[next])
+    const p1 = vec(polyhedron.vertices[vertex])
+    const p2 = vec(polyhedron.vertices[next])
     const sideLength = p1.distanceTo(p2)
     if (rectify) {
       return p1.add(p2.sub(p1).scale(1 / 2)).toArray()
@@ -144,7 +147,7 @@ function removeExtraneousVertices({ vertices, faces }) {
 // Remove vertices (and faces) from the polyhedron when they are all the same
 function deduplicateVertices(polyhedron) {
   // group vertex indices by same
-  const vertices = toVec3D(polyhedron.vertices)
+  const vertices = polyhedron.vertices.map(vec)
   const points = []
   const verticesByPoint = {}
   _.forEach(vertices, (vertex, index) => {
@@ -537,9 +540,13 @@ export function getCupolae(polyhedron) {
   return getCupolaeIndices(polyhedron).map(fIndex => polyhedron.faces[fIndex])
 }
 
-export function getPyramidOrCupola({ faces, vertices }, point) {
+export function getPyramidOrCupola(
+  { faces, vertices },
+  point,
+  { pyramids } = {},
+) {
   // TODO deduplicate
-  const hitPoint = new Vec3D(...point)
+  const hitPoint = vec(point)
   const hitFaceIndex = _.minBy(_.range(faces.length), fIndex => {
     const face = faces[fIndex]
     const plane = getPlane(face, vertices)
@@ -549,10 +556,9 @@ export function getPyramidOrCupola({ faces, vertices }, point) {
     faces,
     vertices,
   })
-  const pyramidIndices = getPyramidIndices(
-    { faces, vertices },
-    { adjacentFacesMapping },
-  )
+  const pyramidIndices = pyramids
+    ? getPyramidIndices({ faces, vertices }, { adjacentFacesMapping })
+    : []
 
   // A solid can have only pyramids or cupolae/rotundae, so it suffices to check for one
   if (pyramidIndices.length > 0) {
@@ -566,7 +572,7 @@ export function getPyramidOrCupola({ faces, vertices }, point) {
     }
 
     const nearestPeak = _.minBy(pyramidIndices, vIndex => {
-      const vertex = new Vec3D(...vertices[vIndex])
+      const vertex = vec(vertices[vIndex])
       return vertex.distanceTo(hitPoint)
     })
     return [nearestPeak]
@@ -595,45 +601,6 @@ export function getPyramidOrCupola({ faces, vertices }, point) {
   return faces[nearestPeak]
 }
 
-/**
- * Return the face index of the cupola in the polyhedron that contains the point.
- * Return -1 if the point is not part of any cupola.
- * If the point is part of more than one cupola, this will return the one whose top
- * the given point is closest to.
- */
-export function getCupolaTop({ faces, vertices }, point) {
-  const hitPoint = new Vec3D(...point)
-  const hitFaceIndex = _.minBy(_.range(faces.length), fIndex => {
-    const face = faces[fIndex]
-    const plane = getPlane(face, vertices)
-    return plane.getDistanceToPoint(hitPoint)
-  })
-  const adjacentFacesMapping = getAdjacentFacesMapping({
-    faces,
-    vertices,
-  })
-  const cupolaeIndices = getCupolaeIndices(
-    { faces, vertices },
-    { adjacentFacesMapping },
-  )
-
-  // check if we're inside any cupola
-  const cupolaeFaces = _.flatMapDeep(cupolaeIndices, fIndex =>
-    _.map(faces[fIndex], vIndex => adjacentFacesMapping[vIndex]),
-  )
-  if (!_.includes(cupolaeFaces, hitFaceIndex)) {
-    return -1
-  }
-
-  // if so, determine the closest cupola point to this
-  const nearestPeak = _.minBy(cupolaeIndices, fIndex => {
-    const plane = getPlane(faces[fIndex], vertices)
-    return plane.getDistanceToPoint(hitPoint)
-  })
-
-  return nearestPeak
-}
-
 function removeVertices(polyhedron, vIndices) {
   const [newFaces, facesToRemove] = _.partition(
     polyhedron.faces,
@@ -650,9 +617,8 @@ export function diminish(polyhedron, { vIndices }) {
 }
 
 // TODO allow gyrating rotundae
-export function gyrate(polyhedron, { fIndex }) {
+export function gyrate(polyhedron, { vIndices }) {
   // get adjacent faces
-  const vIndices = polyhedron.faces[fIndex]
   const facesToTurn = _.filter(
     polyhedron.faces,
     face => _.intersection(face, vIndices).length !== 0,
@@ -670,7 +636,7 @@ export function gyrate(polyhedron, { fIndex }) {
   const theta = Math.PI / vIndices.length
   const newVertices = polyhedron.vertices.map((vertex, vIndex) => {
     if (_.includes(vIndices, vIndex)) {
-      return new Vec3D(...vertex)
+      return vec(vertex)
         .sub(centroid)
         .getRotatedAroundAxis(normal, theta)
         .add(centroid)

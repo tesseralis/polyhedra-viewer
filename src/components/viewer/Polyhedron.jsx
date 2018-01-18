@@ -75,42 +75,21 @@ class Faces extends Component {
         _.throttle(event => {
           this.drag = true
           const { faces, vertices, mode } = this.props
-          if (!mode) return
-
-          if (mode === '-') {
-            const vIndices = getPyramidOrCupola(
-              { vertices, faces },
-              event.hitPnt,
-            )
-            console.log('vIndices', vIndices)
-            this.setState({
-              applyArgs: vIndices && { vIndices },
-            })
-          } else if (mode === 'g') {
-            const applyFaceIndex = getCupolaTop(
-              { vertices, faces },
-              event.hitPnt,
-            )
-            console.log('applyFaceIndex', applyFaceIndex)
-
-            if (applyFaceIndex === -1) {
+          switch (mode) {
+            case '-':
+            case 'g':
+              const vIndices = getPyramidOrCupola(
+                { vertices, faces },
+                event.hitPnt,
+                { pyramids: mode === '-' },
+              )
               this.setState({
-                // highlightFaceIndices: [],
-                // applyFaceIndex: -1,
-                applyArgs: null,
+                applyArgs: vIndices && { vIndices },
               })
-            }
+              return
 
-            this.setState({
-              // highlightFaceIndices: _.uniq(
-              //   _.flatMap(faces[applyFaceIndex], vIndex =>
-              //     _.filter(_.range(faces.length), fIndex =>
-              //       _.includes(faces[fIndex], vIndex),
-              //     ),
-              //   ),
-              // ),
-              applyArgs: { fIndex: applyFaceIndex },
-            })
+            default:
+              return
           }
         }, 200),
         false,
@@ -168,14 +147,6 @@ const Edges = ({ edges, vertices }) => {
     </shape>
   )
 }
-
-// function getVertices(vertices, morphVertices, scale) {
-//   return _.zip(vertices, morphVertices).map(([v1, v2]) => {
-//     const _v1 = new Vec3D(...v1)
-//     const _v2 = new Vec3D(...v2)
-//     return _v1.add(_v2.sub(_v1).scale(scale)).toArray()
-//   })
-// }
 
 /* Polyhedron */
 
