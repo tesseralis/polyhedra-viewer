@@ -586,7 +586,7 @@ export function getDiminished(polyhedron, name) {
 }
 
 // FIXME there's some distortion on the rhombicosidodecahedra
-export function getGyrate(polyhedron, name, fIndex) {
+export function gyrate(polyhedron, name, fIndex) {
   // get adjacent faces
   const vIndices = polyhedron.faces[fIndex]
   const facesToTurn = _.filter(

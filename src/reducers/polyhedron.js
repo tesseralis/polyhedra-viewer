@@ -4,7 +4,7 @@ import {
   getGyroElongated,
   getAugmented,
   getDiminished,
-  getGyrate,
+  gyrate,
 } from 'math/operations'
 
 const SET_POLYHEDRON = 'SET_POLYHEDRON'
@@ -25,7 +25,7 @@ const operations = {
   A: getGyroElongated,
   '+': getAugmented,
   '-': getDiminished,
-  g: getGyrate,
+  g: gyrate,
 }
 
 const initialState = getSolidData('tetrahedron')
