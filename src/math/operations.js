@@ -9,6 +9,11 @@ function mod(a, b) {
   return a >= 0 ? a % b : a % b + b
 }
 
+// get the element in the array mod the array's length
+function getMod(array, index) {
+  return array[mod(index, array.length)]
+}
+
 function replace(array, index, ...values) {
   const before = _.take(array, index)
   const after = _.slice(array, index + 1)
@@ -30,11 +35,11 @@ function getNormal(vertices) {
 }
 
 function nextVertex(face, vertex) {
-  return face[(face.indexOf(vertex) + 1) % face.length]
+  return getMod(face, face.indxOf(vertex) + 1)
 }
 
 function prevVertex(face, vertex) {
-  return face[mod(face.indexOf(vertex) - 1, face.length)]
+  return getMod(face, face.indexOf(vertex) - 1)
 }
 
 const getFindFn = (toAdd, vertex) => face =>
@@ -437,7 +442,7 @@ function findPyramid(polyhedron, n) {
 }
 
 // get an array mapping each vertex index to the indices of the faces it is adjacent to
-function getAdjacentFacesMapping(polyhedron) {
+export function getAdjacentFacesMapping(polyhedron) {
   const mapping = polyhedron.vertices.map(() => [])
   polyhedron.faces.forEach((face, fIndex) => {
     face.forEach(vIndex => {
@@ -448,31 +453,36 @@ function getAdjacentFacesMapping(polyhedron) {
 }
 
 // Find a cupola and return the vertices of its top
-function findCupola(polyhedron) {
+export function getCupolae(polyhedron) {
   // find the face in the polyhedron whose vertices' adjacent faces are <face>-4-3-4
   const adjacentFacesMapping = getAdjacentFacesMapping(polyhedron)
-  return _.find(polyhedron.faces, (face, fIndex) => {
-    const count = {
+  return _.filter(polyhedron.faces, (face, fIndex) => {
+    const cupolaCount = {
       [face.length]: 1,
       4: 2,
       3: 1,
     }
-    // FIXME this doesn't work (e.g. pseudo-rhombicuboctahedron)
-    // Compare the square faces and make sure they're not touching
     return _.every(face, vIndex => {
-      const foo = _(adjacentFacesMapping[vIndex])
-        .map(fIndex2 => polyhedron.faces[fIndex2].length)
+      const nbrFaces = adjacentFacesMapping[vIndex].map(
+        fIndex2 => polyhedron.faces[fIndex2],
+      )
+      const count = _(nbrFaces)
+        .map('length')
         .groupBy()
         .mapValues('length')
         .value()
-      return _.isEqual(foo, count)
+
+      if (!_.isEqual(count, cupolaCount)) return false
+      // Make sure that the square faces aren't adjacent
+      const [sqFace1, sqFace2] = _.filter(nbrFaces, { length: 4 })
+      return _.intersection(sqFace1, sqFace2).length === 1
     })
   })
 }
 
 function getVerticesToDiminish(polyhedron, name) {
   if (name.includes('truncated')) {
-    return findCupola(polyhedron)
+    return getCupolae(polyhedron)[0]
   } else if (name.includes('sphenocorona') || name.includes('prism')) {
     return [findPyramid(polyhedron, 4)]
   } else {
@@ -526,5 +536,59 @@ function removeVertices(polyhedron, vIndices) {
 
 export function getDiminished(polyhedron, name) {
   const vIndices = getVerticesToDiminish(polyhedron, name)
+  console.log('diminishing', vIndices)
   return withEdges(removeVertices(polyhedron, vIndices))
+}
+
+export function getGyrate(polyhedron, name, fIndex) {
+  console.log('doing the twist!')
+  // get adjacent faces
+  const vIndices = polyhedron.faces[fIndex]
+  const facesToTurn = _.filter(
+    polyhedron.faces,
+    face => _.intersection(face, vIndices).length !== 0,
+  )
+  const boundary = getBoundary(facesToTurn)
+  console.log('boundary', boundary)
+  console.log('facesToTurn', facesToTurn)
+
+  // TODO this won't work with animation, so I have to reimplement
+  // rotate the cupola top
+  const normal = getNormal(
+    boundary.map(vIndex => new Vec3D(...polyhedron.vertices[vIndex])),
+  ).getNormalized()
+  const theta = Math.PI / vIndices.length
+  console.log(theta)
+  const newVertices = polyhedron.vertices.map((vertex, vIndex) => {
+    if (_.includes(vIndices, vIndex)) {
+      return new Vec3D(...vertex).getRotatedAroundAxis(normal, theta).toArray()
+    }
+    return vertex
+  })
+  console.log('newVertices', newVertices)
+
+  let count = 0
+  const newFaces = polyhedron.faces.map(face => {
+    return face.map((vIndex, i) => {
+      const j = boundary.indexOf(vIndex)
+      if (
+        j !== -1 &&
+        (getMod(face, i + 1) === getMod(boundary, j + 1) ||
+          getMod(face, i - 1) === getMod(boundary, j - 1))
+      ) {
+        count++
+        return getMod(boundary, j + 1)
+      }
+      return vIndex
+    })
+  })
+  console.log(count, 'vertices twisted')
+
+  // const splitPolyhedron = splitAlongBoundary(polyhedron, boundary)
+
+  // rotate the vertices in the cupola
+
+  // reattach
+  console.log('new faces and vertices', newFaces, newVertices)
+  return withEdges({ faces: newFaces, vertices: newVertices })
 }

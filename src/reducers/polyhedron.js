@@ -4,6 +4,7 @@ import {
   getGyroElongated,
   getAugmented,
   getDiminished,
+  getGyrate,
 } from 'math/operations'
 
 const SET_POLYHEDRON = 'SET_POLYHEDRON'
@@ -24,6 +25,7 @@ const operations = {
   A: getGyroElongated,
   '+': getAugmented,
   '-': getDiminished,
+  g: getGyrate,
 }
 
 const initialState = getSolidData('tetrahedron')
@@ -34,7 +36,11 @@ export default function polyhedron(state = initialState, action) {
       return isValidSolid(action.name) ? getSolidData(action.name) : state
     case APPLY_OPERATION:
       return operations[action.operation]
-        ? operations[action.operations](state, action.config.name)
+        ? operations[action.operation](
+            state,
+            action.config.name,
+            action.config.fIndex,
+          )
         : state
     default:
       return state

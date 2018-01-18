@@ -4,12 +4,13 @@ import { rgb } from 'd3-color'
 import _ from 'lodash'
 import { connect } from 'react-redux'
 import { createStructuredSelector } from 'reselect'
+import { geom } from 'toxiclibsjs'
 
 import polygons from 'constants/polygons'
 import { getPolyhedron, getPolyhedronConfig, getMode } from 'selectors'
-import { setPolyhedron } from 'actions'
+import { setPolyhedron, applyOperation } from 'actions'
 import { mapObject } from 'util.js'
-import { geom } from 'toxiclibsjs'
+import { getAdjacentFacesMapping, getCupolae } from 'math/operations'
 
 const { Vec3D, Triangle3D, Plane } = geom
 
@@ -35,38 +36,110 @@ const toRgb = hex =>
 const colorIndexForFace = mapObject(polygons, _.nthArg(1))
 const getColorIndex = face => colorIndexForFace[face.length]
 const polygonColors = colors => polygons.map(n => toRgb(colors[n]))
-const getColorAttr = colors => joinListOfLists(polygonColors(colors), ',', ' ')
+const getColorAttr = colors =>
+  joinListOfLists(polygonColors(colors).concat([[0, 1, 0]]), ',', ' ')
+
+function getPlane(face, vertices) {
+  const triang = _.take(face, 3).map(vIndex => new Vec3D(...vertices[vIndex]))
+  return new Plane(new Triangle3D(...triang))
+}
 
 class Faces extends Component {
+  state = {
+    highlightFaceIndices: [],
+    applyFaceIndex: null,
+  }
+
   componentDidMount() {
+    this.drag = false
     // TODO make sure this doesn't have a race condition
-    document.onload = () => {
+    document.onload = _.once(() => {
+      this.shape.addEventListener('mousedown', () => {
+        this.drag = false
+      })
+      this.shape.addEventListener(
+        'mouseup',
+        _.throttle(() => {
+          // it's a drag, don't click
+          if (this.drag) return
+          const { mode, applyOperation } = this.props
+          const { applyFaceIndex } = this.state
+          if (mode && !_.isNil(applyFaceIndex)) {
+            applyOperation(mode, { fIndex: applyFaceIndex })
+          }
+        }, 200),
+      )
+
       this.shape.addEventListener(
         'mousemove',
-        event => {
-          const { faces, vertices } = this.props
-          console.log(event.hitPnt, faces, vertices)
+        _.throttle(event => {
+          this.drag = true
+          const { faces, vertices, mode } = this.props
+          if (!mode) return
           const hitPoint = new Vec3D(...event.hitPnt)
           const hitFaceIndex = _.minBy(_.range(faces.length), fIndex => {
             const face = faces[fIndex]
-            console.log('checking', fIndex, face)
-            const vertices = _.take(face, 3).map(
-              vIndex => new Vec3D(...vertices[vIndex]),
-            )
-            console.log('vertices', vertices)
-            const plane = new Plane(new Triangle3D(...vertices))
+            const plane = getPlane(face, vertices)
             return plane.distanceTo(hitPoint)
           })
-          console.log('touching face at index', hitFaceIndex)
-        },
+
+          if (mode === 'g') {
+            // FIXME probably can move this logic out once we know the hit index...
+            // find out if we're in a cupola
+            const cupolae = getCupolae({ faces, vertices })
+            // TODO this is called in "getCupolae", so it's a bit of a waste
+            const adjacentFacesMapping = getAdjacentFacesMapping({
+              faces,
+              vertices,
+            })
+
+            const cupolaeFaces = _.flatMapDeep(cupolae, cupola =>
+              _.map(cupola, vIndex => adjacentFacesMapping[vIndex]),
+            )
+
+            // check if we're inside a cupola
+            if (!_.includes(cupolaeFaces, hitFaceIndex)) {
+              // console.log(' we are not in a cupola so we cannot rotate')
+              this.setState({
+                highlightFaceIndices: [],
+                applyFaceIndex: null,
+              })
+              return
+            }
+            // if so, determine the closest cupola point to this
+            // console.log('finding nearest cupola peak...')
+            const nearestPeak = _.minBy(cupolae, face => {
+              const plane = getPlane(face, vertices)
+              return plane.distanceTo(hitPoint)
+            })
+
+            // TODO have the cupolae function return the face instead
+            const fIndexToGyrate = _.findIndex(faces, face =>
+              _.isEqual(face, nearestPeak),
+            )
+
+            this.setState({
+              highlightFaceIndices: _.uniq(
+                _.flatMap(nearestPeak, vIndex => adjacentFacesMapping[vIndex]),
+              ),
+              applyFaceIndex: fIndexToGyrate,
+            })
+
+            // console.log('touching face at index', hitFaceIndex)
+            // console.log('touching cupola peak', fIndexToGyrate)
+          }
+        }, 200),
         false,
       )
-    }
+    })
   }
 
   render() {
     const { faces, vertices, config } = this.props
+    const { highlightFaceIndices } = this.state
     const { opacity, colors } = config
+    // FIXME highlights don't work
+    // console.log('highlight faces', highlightFaceIndices)
     return (
       <shape ref={shape => (this.shape = shape)}>
         <appearance>
@@ -75,7 +148,14 @@ class Faces extends Component {
         <indexedfaceset
           solid="false"
           colorPerVertex="false"
-          colorindex={faces.map(getColorIndex).join(' ')}
+          colorindex={faces
+            .map(
+              (face, index) =>
+                false && _.includes(highlightFaceIndices, index)
+                  ? 6
+                  : getColorIndex(face),
+            )
+            .join(' ')}
           coordindex={joinListOfLists(faces, ' -1 ', ' ')}
         >
           <Coordinates points={vertices} />
@@ -85,6 +165,10 @@ class Faces extends Component {
     )
   }
 }
+
+const ConnectedFaces = connect(createStructuredSelector({ mode: getMode }), {
+  applyOperation,
+})(Faces)
 
 /* Edges */
 
@@ -133,7 +217,11 @@ class Polyhedron extends Component {
           return (
             <transform>
               {showFaces && (
-                <Faces faces={faces} vertices={vertices} config={config} />
+                <ConnectedFaces
+                  faces={faces}
+                  vertices={vertices}
+                  config={config}
+                />
               )}
               {showEdges && <Edges edges={edges} vertices={vertices} />}
             </transform>
@@ -147,7 +235,6 @@ class Polyhedron extends Component {
 const mapStateToProps = createStructuredSelector({
   config: getPolyhedronConfig,
   solidData: getPolyhedron,
-  mode: getMode,
 })
 
 const mapDispatchToProps = {
