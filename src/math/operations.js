@@ -39,6 +39,13 @@ function getPlane(face, vertices) {
   return new Plane(new Triangle3D(...triang))
 }
 
+function isPlanar(face, vertices) {
+  const vecs = face.map(vIndex => new Vec3D(...vertices[vIndex]))
+  const triang = _.take(vecs, 3)
+  const plane = new Plane(new Triangle3D(...triang))
+  return _.every(vecs, vec => plane.getDistanceToPoint(vec) < PRECISION)
+}
+
 function nextVertex(face, vertex) {
   return getMod(face, face.indxOf(vertex) + 1)
 }
@@ -440,90 +447,6 @@ export function getAdjacentFacesMapping(polyhedron) {
   return mapping
 }
 
-// Return the face indices of all the faces that are tops of cupolae
-export function getCupolaeIndices(polyhedron, { adjacentFacesMapping } = {}) {
-  const { faces } = polyhedron
-  // find the face in the polyhedron whose vertices' adjacent faces are <face>-4-3-4
-  if (!adjacentFacesMapping) {
-    adjacentFacesMapping = getAdjacentFacesMapping(polyhedron)
-  }
-  return _.filter(_.range(faces.length), fIndex => {
-    const face = faces[fIndex]
-    const cupolaCount = _.countBy([3, 4, 4, face.length])
-    return _.every(face, vIndex => {
-      const nbrFaces = adjacentFacesMapping[vIndex].map(
-        fIndex2 => faces[fIndex2],
-      )
-      const count = _(nbrFaces)
-        .map('length')
-        .countBy()
-        .value()
-
-      if (!_.isEqual(count, cupolaCount)) return false
-      // Make sure that the square faces aren't adjacent
-      const [sqFace1, sqFace2] = _.filter(
-        nbrFaces,
-        nbrFace => nbrFace.length === 4 && !_.isEqual(nbrFace, face),
-      )
-      return _.intersection(sqFace1, sqFace2).length === 1
-    })
-  })
-}
-
-export function getCupolae(polyhedron) {
-  return getCupolaeIndices(polyhedron).map(fIndex => polyhedron.faces[fIndex])
-}
-
-/**
- * Return the face index of the cupola in the polyhedron that contains the point.
- * Return -1 if the point is not part of any cupola.
- * If the point is part of more than one cupola, this will return the one whose top
- * the given point is closest to.
- */
-export function getCupolaTop({ faces, vertices }, point) {
-  const hitPoint = new Vec3D(...point)
-  const hitFaceIndex = _.minBy(_.range(faces.length), fIndex => {
-    const face = faces[fIndex]
-    const plane = getPlane(face, vertices)
-    return plane.distanceTo(hitPoint)
-  })
-  const adjacentFacesMapping = getAdjacentFacesMapping({
-    faces,
-    vertices,
-  })
-  const cupolaeIndices = getCupolaeIndices(
-    { faces, vertices },
-    { adjacentFacesMapping },
-  )
-
-  // check if we're inside any cupola
-  const cupolaeFaces = _.flatMapDeep(cupolaeIndices, fIndex =>
-    _.map(faces[fIndex], vIndex => adjacentFacesMapping[vIndex]),
-  )
-  if (!_.includes(cupolaeFaces, hitFaceIndex)) {
-    return -1
-  }
-
-  // if so, determine the closest cupola point to this
-  // console.log('finding nearest cupola peak...')
-  const nearestPeak = _.minBy(cupolaeIndices, fIndex => {
-    const plane = getPlane(faces[fIndex], vertices)
-    return plane.distanceTo(hitPoint)
-  })
-
-  return nearestPeak
-}
-
-function getVerticesToDiminish(polyhedron, name) {
-  if (name.includes('truncated')) {
-    return getCupolae(polyhedron)[0]
-  } else if (name.includes('sphenocorona') || name.includes('prism')) {
-    return [findPyramid(polyhedron, 4)]
-  } else {
-    return [findPyramid(polyhedron)]
-  }
-}
-
 // Get a face representing the boundary of the faces
 function getBoundary(faces) {
   // TODO deduplicate
@@ -557,6 +480,101 @@ function getBoundary(faces) {
   return result
 }
 
+// Return the face indices of all the faces that are tops of cupolae
+export function getCupolaeIndices(polyhedron, { adjacentFacesMapping } = {}) {
+  const { faces, vertices } = polyhedron
+  // find the face in the polyhedron whose vertices' adjacent faces are <face>-4-3-4
+  if (!adjacentFacesMapping) {
+    adjacentFacesMapping = getAdjacentFacesMapping(polyhedron)
+  }
+  return _.filter(_.range(faces.length), fIndex => {
+    const face = faces[fIndex]
+    const cupolaCount = _.countBy([3, 4, 4, face.length])
+    const hasRightSides = _.every(face, vIndex => {
+      const nbrFaces = adjacentFacesMapping[vIndex].map(
+        fIndex2 => faces[fIndex2],
+      )
+      const count = _(nbrFaces)
+        .map('length')
+        .countBy()
+        .value()
+
+      if (!_.isEqual(count, cupolaCount)) return false
+      // Make sure that the square faces aren't adjacent
+      const [sqFace1, sqFace2] = _.filter(
+        nbrFaces,
+        nbrFace => nbrFace.length === 4 && !_.isEqual(nbrFace, face),
+      )
+      return _.intersection(sqFace1, sqFace2).length === 1
+    })
+
+    if (!hasRightSides) return false
+
+    const allNeighborFaces = _.uniq(
+      _.flatMap(face, vIndex => adjacentFacesMapping[vIndex]),
+    ).map(fIndex2 => faces[fIndex2])
+
+    // return true
+    // make sure the whole thing is on a plane
+    const boundary = getBoundary(allNeighborFaces)
+    return isPlanar(boundary, vertices)
+  })
+}
+
+export function getCupolae(polyhedron) {
+  return getCupolaeIndices(polyhedron).map(fIndex => polyhedron.faces[fIndex])
+}
+
+/**
+ * Return the face index of the cupola in the polyhedron that contains the point.
+ * Return -1 if the point is not part of any cupola.
+ * If the point is part of more than one cupola, this will return the one whose top
+ * the given point is closest to.
+ */
+export function getCupolaTop({ faces, vertices }, point) {
+  const hitPoint = new Vec3D(...point)
+  const hitFaceIndex = _.minBy(_.range(faces.length), fIndex => {
+    const face = faces[fIndex]
+    const plane = getPlane(face, vertices)
+    return plane.getDistanceToPoint(hitPoint)
+  })
+  const adjacentFacesMapping = getAdjacentFacesMapping({
+    faces,
+    vertices,
+  })
+  const cupolaeIndices = getCupolaeIndices(
+    { faces, vertices },
+    { adjacentFacesMapping },
+  )
+
+  // check if we're inside any cupola
+  const cupolaeFaces = _.flatMapDeep(cupolaeIndices, fIndex =>
+    _.map(faces[fIndex], vIndex => adjacentFacesMapping[vIndex]),
+  )
+  if (!_.includes(cupolaeFaces, hitFaceIndex)) {
+    return -1
+  }
+
+  // if so, determine the closest cupola point to this
+  // console.log('finding nearest cupola peak...')
+  const nearestPeak = _.minBy(cupolaeIndices, fIndex => {
+    const plane = getPlane(faces[fIndex], vertices)
+    return plane.getDistanceToPoint(hitPoint)
+  })
+
+  return nearestPeak
+}
+
+function getVerticesToDiminish(polyhedron, name) {
+  if (name.includes('truncated')) {
+    return getCupolae(polyhedron)[0]
+  } else if (name.includes('sphenocorona') || name.includes('prism')) {
+    return [findPyramid(polyhedron, 4)]
+  } else {
+    return [findPyramid(polyhedron)]
+  }
+}
+
 function removeVertices(polyhedron, vIndices) {
   const [newFaces, facesToRemove] = _.partition(
     polyhedron.faces,
@@ -572,7 +590,6 @@ export function diminish(polyhedron, name, fIndex) {
   const vIndices = !_.isNil(fIndex)
     ? polyhedron.faces[fIndex]
     : getVerticesToDiminish(polyhedron, name)
-  console.log('diminishing', vIndices)
   return removeVertices(polyhedron, vIndices)
 }
 
