@@ -5,7 +5,7 @@ import { connect } from 'react-redux'
 import { createStructuredSelector } from 'reselect'
 
 import { configInputs } from 'constants/configOptions'
-import { getConfigValues } from 'selectors'
+import { getConfig } from 'selectors'
 import { reset, setInputValue } from 'actions'
 import { hover, transition } from 'styles/common'
 import { andaleMono } from 'styles/fonts'
@@ -116,7 +116,7 @@ const ConfigForm = ({ width, inputValues, setInputValue, reset }) => {
 }
 
 const mapStateToProps = createStructuredSelector({
-  inputValues: getConfigValues,
+  inputValues: getConfig,
 })
 
 const mapDispatchToProps = {
