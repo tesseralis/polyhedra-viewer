@@ -31,10 +31,10 @@ const Sidebar = ({ match, solid }) => {
   return (
     <section className={css(styles.sidebar)}>
       <div className={css(styles.menu)}>
-        <IconLink to={`${match.url}`} name="info" />
-        <IconLink to={`${match.url}/related`} name="link" />
-        <IconLink to={`${match.url}/config`} name="cog" />
-        <IconLink to={`${match.url}/list`} name="list" />
+        <IconLink replace to={`${match.url}`} name="info" />
+        <IconLink replace to={`${match.url}/related`} name="link" />
+        <IconLink replace to={`${match.url}/config`} name="cog" />
+        <IconLink replace to={`${match.url}/list`} name="list" />
         <IconLink to="/" name="home" />
       </div>
       {/* TODO don't hardcode the absolute path */}

@@ -5,16 +5,9 @@ import _ from 'lodash'
 import { connect } from 'react-redux'
 import { createStructuredSelector } from 'reselect'
 
-import {
-  getTruncated,
-  getElongated,
-  getGyroElongated,
-  getAugmented,
-  getDiminished,
-} from 'math/operations'
-import { getSolidData, isValidSolid } from 'constants/polyhedra'
 import polygons from 'constants/polygons'
-import { getPolyhedronConfig } from 'selectors'
+import { getPolyhedron, getPolyhedronConfig } from 'selectors'
+import { setPolyhedron } from 'actions'
 import { mapObject } from 'util.js'
 import { geom } from 'toxiclibsjs'
 
@@ -76,96 +69,87 @@ const Edges = ({ edges, vertices }) => {
   )
 }
 
-function getVertices(vertices, morphVertices, scale) {
-  return _.zip(vertices, morphVertices).map(([v1, v2]) => {
-    const _v1 = new Vec3D(...v1)
-    const _v2 = new Vec3D(...v2)
-    return _v1.add(_v2.sub(_v1).scale(scale)).toArray()
-  })
-}
+// function getVertices(vertices, morphVertices, scale) {
+//   return _.zip(vertices, morphVertices).map(([v1, v2]) => {
+//     const _v1 = new Vec3D(...v1)
+//     const _v2 = new Vec3D(...v2)
+//     return _v1.add(_v2.sub(_v1).scale(scale)).toArray()
+//   })
+// }
 
 /* Polyhedron */
 
-const getScaleAttr = scale => `${scale} ${scale} ${scale}`
+// const getScaleAttr = scale => `${scale} ${scale} ${scale}`
 
 class Polyhedron extends Component {
-  state = {
-    solidData: getSolidData('tetrahedron'),
+  // TODO make sure this is stable
+  componentDidMount() {
+    const { solid, onLoad } = this.props
+    onLoad(solid)
   }
 
-  constructor(props) {
-    super(props)
-    const { solid } = props
-    if (isValidSolid(solid)) {
-      this.state = {
-        solidData: getSolidData(solid),
-        toggle: 1,
-      }
-    }
-  }
+  // componentWillReceiveProps(nextProps) {
+  //   // TODO going "back" will break this
+  //   if (nextProps.operation === 't') {
+  //     // FIXME do it so that we don't have to call this function twice each time
+  //     this.setState({
+  //       solidData: getTruncated(this.state.solidData),
+  //       // solidData: getTruncated(this.state.solidData, { mock: true }),
+  //       // morphVertices: getTruncated(this.state.solidData).vertices,
+  //     })
+  //     // this.setToggle()
+  //     return
+  //   }
+  //   if (nextProps.operation === 'r') {
+  //     this.setState({
+  //       solidData: getTruncated(this.state.solidData, {
+  //         // mock: true,
+  //         rectify: true,
+  //       }),
+  //       // morphVertices: getTruncated(this.state.solidData, { rectify: true })
+  //       //   .vertices,
+  //     })
+  //     // this.setToggle()
+  //     return
+  //   }
 
-  componentWillReceiveProps(nextProps) {
-    // TODO going "back" will break this
-    if (nextProps.operation === 't') {
-      // FIXME do it so that we don't have to call this function twice each time
-      this.setState({
-        solidData: getTruncated(this.state.solidData),
-        // solidData: getTruncated(this.state.solidData, { mock: true }),
-        // morphVertices: getTruncated(this.state.solidData).vertices,
-      })
-      // this.setToggle()
-      return
-    }
-    if (nextProps.operation === 'r') {
-      this.setState({
-        solidData: getTruncated(this.state.solidData, {
-          // mock: true,
-          rectify: true,
-        }),
-        // morphVertices: getTruncated(this.state.solidData, { rectify: true })
-        //   .vertices,
-      })
-      // this.setToggle()
-      return
-    }
+  //   if (nextProps.operation === 'P') {
+  //     this.setState({
+  //       solidData: getElongated(this.state.solidData),
+  //     })
+  //     return
+  //   }
+  //   if (nextProps.operation === 'A') {
+  //     this.setState({
+  //       solidData: getGyroElongated(this.state.solidData),
+  //     })
+  //     return
+  //   }
+  //   if (nextProps.operation === 'aug') {
+  //     this.setState({
+  //       solidData: getAugmented(this.state.solidData, nextProps.solid),
+  //     })
+  //     return
+  //   }
+  //   if (nextProps.operation === 'dim') {
+  //     this.setState({
+  //       solidData: getDiminished(this.state.solidData, nextProps.solid),
+  //     })
+  //     return
+  //   }
 
-    if (nextProps.operation === 'P') {
-      this.setState({
-        solidData: getElongated(this.state.solidData),
-      })
-      return
-    }
-    if (nextProps.operation === 'A') {
-      this.setState({
-        solidData: getGyroElongated(this.state.solidData),
-      })
-      return
-    }
-    if (nextProps.operation === 'aug') {
-      this.setState({
-        solidData: getAugmented(this.state.solidData, nextProps.solid),
-      })
-      return
-    }
-    if (nextProps.operation === 'dim') {
-      this.setState({
-        solidData: getDiminished(this.state.solidData, nextProps.solid),
-      })
-      return
-    }
-
-    if (nextProps.solid !== this.props.solid) {
-      this.setSolidData(nextProps.solid)
-      this.setState({ morphVertices: null })
-    }
-  }
+  //   if (nextProps.solid !== this.props.solid) {
+  //     this.setSolidData(nextProps.solid)
+  //     this.setState({ morphVertices: null })
+  //   }
+  // }
 
   // TODO color
   render() {
-    const { solidData, toggle, morphVertices } = this.state
-    const { config } = this.props
-    const { faces, vertices, edges } = solidData
+    const { config, solidData } = this.props
     const { showEdges, showFaces } = config
+    const { faces, edges, vertices } = solidData
+    const toggle = 1
 
     return (
       <Motion
@@ -173,38 +157,27 @@ class Polyhedron extends Component {
         style={{ scale: spring(toggle, presets.noWobble) }}
       >
         {({ scale }) => {
-          const _vertices = morphVertices
-            ? getVertices(
-                vertices,
-                morphVertices,
-                toggle === 1 ? scale : 1 - scale, // TODO abstract out our trigger mechanics
-              )
-            : vertices
           return (
             <transform>
               {showFaces && (
-                <Faces faces={faces} vertices={_vertices} config={config} />
+                <Faces faces={faces} vertices={vertices} config={config} />
               )}
-              {showEdges && <Edges edges={edges} vertices={_vertices} />}
+              {showEdges && <Edges edges={edges} vertices={vertices} />}
             </transform>
           )
         }}
       </Motion>
     )
   }
-
-  setToggle = () => {
-    this.setState(({ toggle }) => ({ toggle: 1 - toggle }))
-  }
-
-  setSolidData = solid => {
-    if (isValidSolid(solid)) {
-      this.setState({ solidData: getSolidData(solid) })
-    }
-  }
 }
+
 const mapStateToProps = createStructuredSelector({
   config: getPolyhedronConfig,
+  solidData: getPolyhedron,
 })
 
-export default connect(mapStateToProps)(Polyhedron)
+const mapDispatchToProps = {
+  onLoad: setPolyhedron,
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Polyhedron)

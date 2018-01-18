@@ -32,7 +32,7 @@ const Viewer = ({ solid, operation }) => {
   return (
     <div className={css(styles.viewer)}>
       <X3dScene>
-        <Polyhedron solid={solid} operation={operation} />
+        <Polyhedron solid={solid} />
       </X3dScene>
       <div className={css(styles.sidebar)}>
         <Sidebar solid={solid} />

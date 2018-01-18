@@ -28,8 +28,8 @@ export const IconButton = ({ name, onClick }) => (
   </button>
 )
 
-export const IconLink = ({ name, to }) => (
-  <Link to={to} className={css(styles.link, styles.icon)}>
+export const IconLink = ({ name, to, replace }) => (
+  <Link to={to} replace={replace} className={css(styles.link, styles.icon)}>
     <Icon name={name} size={2} />
   </Link>
 )

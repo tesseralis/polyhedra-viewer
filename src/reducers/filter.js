@@ -1,11 +1,12 @@
-import { SET_FILTER_TEXT } from '../constants/ActionTypes'
+const SET_FILTER_TEXT = 'SET_FILTER_TEXT'
+export const setFilterText = value => ({ type: SET_FILTER_TEXT, value })
 
 const initialState = {
-  text: ''
+  text: '',
 }
 
 export default function filter(state = initialState, action) {
-  switch(action.type) {
+  switch (action.type) {
     case SET_FILTER_TEXT:
       return { ...state, text: action.value || '' }
     default:

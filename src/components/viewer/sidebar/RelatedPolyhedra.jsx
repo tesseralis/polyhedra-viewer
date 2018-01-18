@@ -1,8 +1,10 @@
 import * as _ from 'lodash'
 import React from 'react'
 import { css, StyleSheet } from 'aphrodite/no-important'
+import { connect } from 'react-redux'
 
 import { toConwayNotation, fromConwayNotation } from 'constants/polyhedra'
+import { applyOperation } from 'actions'
 
 import periodicTable from 'constants/periodicTable'
 import PolyhedronLink from 'components/common/PolyhedronLink'
@@ -378,7 +380,7 @@ function getOpCode(op) {
   return op
 }
 
-export default function RelatedPolyhedra({ solid }) {
+function RelatedPolyhedra({ solid, handleClick }) {
   const notation = toConwayNotation(solid.replace(/-/g, ' '))
   const related = polyhedraGraph[notation]
 
@@ -397,12 +399,14 @@ export default function RelatedPolyhedra({ solid }) {
             <div className={css(styles.options)}>
               {_.compact(related[operation]).map(notation => {
                 const name = fromConwayNotation(notation)
+                // TODO make this a button instead
                 return (
                   <PolyhedronLink
                     large
                     key={name}
                     name={name}
-                    subLink={`related?op=${getOpCode(operation)}`}
+                    onClick={() => handleClick(operation, { name })}
+                    subLink="related"
                   />
                 )
               })}
@@ -413,3 +417,5 @@ export default function RelatedPolyhedra({ solid }) {
     </div>
   )
 }
+
+export default connect(null, { handleClick: applyOperation })(RelatedPolyhedra)

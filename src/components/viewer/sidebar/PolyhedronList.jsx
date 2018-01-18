@@ -1,10 +1,11 @@
 import _ from 'lodash'
 import React from 'react'
-import { NavLink } from 'react-router-dom'
+import { NavLink, withRouter } from 'react-router-dom'
 import { css, StyleSheet } from 'aphrodite/no-important'
 import { connect } from 'react-redux'
 import { createStructuredSelector } from 'reselect'
 
+import { setPolyhedron } from 'actions'
 import { getFilteredGroups } from 'selectors'
 import { escapeName } from 'constants/polyhedra'
 import { andaleMono } from 'styles/fonts'
@@ -14,7 +15,8 @@ import SearchBar from './SearchBar'
 import GroupHeader from './GroupHeader'
 import SubgroupHeader from './SubgroupHeader'
 
-const PolyhedronLink = ({ name }) => {
+// TODO deduplicate with the other polyhedron link
+const PolyhedronLink = ({ name, handleClick }) => {
   const styles = StyleSheet.create({
     link: {
       ...resetLink,
@@ -39,18 +41,24 @@ const PolyhedronLink = ({ name }) => {
       to={`/${escapeName(name)}/list`}
       className={css(styles.link)}
       activeClassName={css(styles.isActive)}
+      onClick={() => handleClick(escapeName(name))}
+      replace
     >
       {_.capitalize(name)}
     </NavLink>
   )
 }
 
+const ConnectedPolyhedronLink = withRouter(
+  connect(null, { handleClick: setPolyhedron })(PolyhedronLink),
+)
+
 const SubList = ({ polyhedra }) => {
   return (
     <ul>
       {polyhedra.map(name => (
         <li key={name}>
-          <PolyhedronLink name={name} />
+          <ConnectedPolyhedronLink name={name} />
         </li>
       ))}
     </ul>

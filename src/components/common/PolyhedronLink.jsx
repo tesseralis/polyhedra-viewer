@@ -1,9 +1,11 @@
 import React from 'react'
 import { css, StyleSheet } from 'aphrodite/no-important'
 import { Link } from 'react-router-dom'
+import { connect } from 'react-redux'
 
 import { escapeName } from 'constants/polyhedra'
 import { hover } from 'styles/common'
+import { setPolyhedron } from 'actions'
 
 const thumbnailSize = 55
 
@@ -42,8 +44,10 @@ const styles = StyleSheet.create({
   },
 })
 
-export default function PolyhedronLink({
+function PolyhedronLink({
   name,
+  onClick,
+  handleClick,
   isFake,
   subLink,
   large = false,
@@ -61,6 +65,7 @@ export default function PolyhedronLink({
     <Link
       to={'/' + escapedName + (subLink ? '/' + subLink : '')}
       className={css(styles.link, styles.real, large && styles.largeLink)}
+      onClick={() => (onClick || handleClick)(escapedName)}
       title={name}
     >
       <img
@@ -71,3 +76,9 @@ export default function PolyhedronLink({
     </Link>
   )
 }
+
+const mapDispatchToProps = {
+  handleClick: setPolyhedron,
+}
+
+export default connect(null, mapDispatchToProps)(PolyhedronLink)
