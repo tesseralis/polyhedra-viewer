@@ -4,7 +4,7 @@ import { css, StyleSheet } from 'aphrodite/no-important'
 import { connect } from 'react-redux'
 
 import { toConwayNotation, fromConwayNotation } from 'constants/polyhedra'
-import { applyOperation } from 'actions'
+import { applyOperation, setMode } from 'actions'
 
 import periodicTable from 'constants/periodicTable'
 import PolyhedronLink from 'components/common/PolyhedronLink'
@@ -368,6 +368,12 @@ const styles = StyleSheet.create({
   options: {
     display: 'flex',
   },
+
+  modeButton: {
+    width: '100%',
+    height: 50,
+    fontSize: 20,
+  },
 })
 
 function getOpCode(op) {
@@ -380,7 +386,7 @@ function getOpCode(op) {
   return op
 }
 
-function RelatedPolyhedra({ solid, handleClick }) {
+function RelatedPolyhedra({ solid, applyOperation, setMode }) {
   const notation = toConwayNotation(solid.replace(/-/g, ' '))
   const related = polyhedraGraph[notation]
 
@@ -393,6 +399,16 @@ function RelatedPolyhedra({ solid, handleClick }) {
           !_.compact(related[operation]).length
         )
           return null
+        if (operation === 'g') {
+          return (
+            <button
+              className={css(styles.modeButton)}
+              onClick={() => setMode('g')}
+            >
+              Gyrate
+            </button>
+          )
+        }
         return (
           <div key={operation} className={css(styles.operations)}>
             <h2 className={css(styles.title)}>{operations[operation]}</h2>
@@ -405,7 +421,7 @@ function RelatedPolyhedra({ solid, handleClick }) {
                     large
                     key={name}
                     name={name}
-                    onClick={() => handleClick(operation, { name })}
+                    onClick={() => applyOperation(operation, { name })}
                     subLink="related"
                   />
                 )
@@ -418,4 +434,7 @@ function RelatedPolyhedra({ solid, handleClick }) {
   )
 }
 
-export default connect(null, { handleClick: applyOperation })(RelatedPolyhedra)
+export default connect(null, {
+  applyOperation,
+  setMode,
+})(RelatedPolyhedra)

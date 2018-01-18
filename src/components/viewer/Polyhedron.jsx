@@ -6,7 +6,7 @@ import { connect } from 'react-redux'
 import { createStructuredSelector } from 'reselect'
 
 import polygons from 'constants/polygons'
-import { getPolyhedron, getPolyhedronConfig } from 'selectors'
+import { getPolyhedron, getPolyhedronConfig, getMode } from 'selectors'
 import { setPolyhedron } from 'actions'
 import { mapObject } from 'util.js'
 import { geom } from 'toxiclibsjs'
@@ -37,24 +37,40 @@ const getColorIndex = face => colorIndexForFace[face.length]
 const polygonColors = colors => polygons.map(n => toRgb(colors[n]))
 const getColorAttr = colors => joinListOfLists(polygonColors(colors), ',', ' ')
 
-const Faces = ({ faces, vertices, config }) => {
-  const { opacity, colors } = config
-  return (
-    <shape>
-      <appearance>
-        <material transparency={1 - opacity} />
-      </appearance>
-      <indexedfaceset
-        solid="false"
-        colorPerVertex="false"
-        colorindex={faces.map(getColorIndex).join(' ')}
-        coordindex={joinListOfLists(faces, ' -1 ', ' ')}
-      >
-        <Coordinates points={vertices} />
-        <color color={getColorAttr(colors)} />
-      </indexedfaceset>
-    </shape>
-  )
+class Faces extends Component {
+  componentDidMount() {
+    // TODO make sure this doesn't have a race condition
+    window.onLoad = () => {
+      this.shape.addEventListener(
+        'click',
+        event => {
+          console.log(event.hitPnt)
+        },
+        false,
+      )
+    }
+  }
+
+  render() {
+    const { faces, vertices, config } = this.props
+    const { opacity, colors } = config
+    return (
+      <shape ref={shape => (this.shape = shape)}>
+        <appearance>
+          <material transparency={1 - opacity} />
+        </appearance>
+        <indexedfaceset
+          solid="false"
+          colorPerVertex="false"
+          colorindex={faces.map(getColorIndex).join(' ')}
+          coordindex={joinListOfLists(faces, ' -1 ', ' ')}
+        >
+          <Coordinates points={vertices} />
+          <color color={getColorAttr(colors)} />
+        </indexedfaceset>
+      </shape>
+    )
+  }
 }
 
 /* Edges */
@@ -118,6 +134,7 @@ class Polyhedron extends Component {
 const mapStateToProps = createStructuredSelector({
   config: getPolyhedronConfig,
   solidData: getPolyhedron,
+  mode: getMode,
 })
 
 const mapDispatchToProps = {
