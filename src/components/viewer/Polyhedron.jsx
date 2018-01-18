@@ -70,11 +70,10 @@ class Faces extends Component {
         if (this.drag) return
         const { mode, applyOperation, solid, history } = this.props
         const { applyFaceIndex } = this.state
-        console.log(solid)
         if (mode && !_.isNil(applyFaceIndex)) {
           const next =
             polyhedraGraph[toConwayNotation(unescapeName(solid))]['g']
-          console.log('next', next)
+          // FIXME
           if (next.length > 1) {
             throw new Error(
               'Cannot deal with more than one possibility right now',

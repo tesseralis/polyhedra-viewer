@@ -451,25 +451,22 @@ export function getCupolae(polyhedron) {
   // find the face in the polyhedron whose vertices' adjacent faces are <face>-4-3-4
   const adjacentFacesMapping = getAdjacentFacesMapping(polyhedron)
   return _.filter(polyhedron.faces, (face, fIndex) => {
-    const cupolaCount = {
-      [face.length]: 1,
-      4: 2,
-      3: 1,
-    }
+    const cupolaCount = _.countBy([3, 4, 4, face.length])
     return _.every(face, vIndex => {
       const nbrFaces = adjacentFacesMapping[vIndex].map(
         fIndex2 => polyhedron.faces[fIndex2],
       )
       const count = _(nbrFaces)
         .map('length')
-        .groupBy()
-        .mapValues('length')
+        .countBy()
         .value()
 
       if (!_.isEqual(count, cupolaCount)) return false
       // Make sure that the square faces aren't adjacent
-      // FIXME this *still* doesn't work in the case of square cupolae
-      const [sqFace1, sqFace2] = _.filter(nbrFaces, { length: 4 })
+      const [sqFace1, sqFace2] = _.filter(
+        nbrFaces,
+        nbrFace => nbrFace.length === 4 && !_.isEqual(nbrFace, face),
+      )
       return _.intersection(sqFace1, sqFace2).length === 1
     })
   })
