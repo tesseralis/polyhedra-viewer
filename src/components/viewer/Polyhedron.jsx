@@ -4,9 +4,17 @@ import { rgb } from 'd3-color'
 import _ from 'lodash'
 import { connect } from 'react-redux'
 import { createStructuredSelector } from 'reselect'
+import { withRouter } from 'react-router-dom'
 import { geom } from 'toxiclibsjs'
 
 import polygons from 'constants/polygons'
+import {
+  escapeName,
+  unescapeName,
+  toConwayNotation,
+  fromConwayNotation,
+} from 'constants/polyhedra'
+import { polyhedraGraph } from 'constants/relations'
 import { getPolyhedron, getPolyhedronConfig, getMode } from 'selectors'
 import { setPolyhedron, applyOperation } from 'actions'
 import { mapObject } from 'util.js'
@@ -57,18 +65,25 @@ class Faces extends Component {
       this.shape.addEventListener('mousedown', () => {
         this.drag = false
       })
-      this.shape.addEventListener(
-        'mouseup',
-        _.throttle(() => {
-          // it's a drag, don't click
-          if (this.drag) return
-          const { mode, applyOperation } = this.props
-          const { applyFaceIndex } = this.state
-          if (mode && !_.isNil(applyFaceIndex)) {
-            applyOperation(mode, { fIndex: applyFaceIndex })
+      this.shape.addEventListener('mouseup', () => {
+        // it's a drag, don't click
+        if (this.drag) return
+        const { mode, applyOperation, solid, history } = this.props
+        const { applyFaceIndex } = this.state
+        console.log(solid)
+        if (mode && !_.isNil(applyFaceIndex)) {
+          const next =
+            polyhedraGraph[toConwayNotation(unescapeName(solid))]['g']
+          console.log('next', next)
+          if (next.length > 1) {
+            throw new Error(
+              'Cannot deal with more than one possibility right now',
+            )
           }
-        }, 200),
-      )
+          history.push(`/${escapeName(fromConwayNotation(next[0]))}/related`)
+          applyOperation(mode, { fIndex: applyFaceIndex })
+        }
+      })
 
       this.shape.addEventListener(
         'mousemove',
@@ -166,9 +181,11 @@ class Faces extends Component {
   }
 }
 
-const ConnectedFaces = connect(createStructuredSelector({ mode: getMode }), {
-  applyOperation,
-})(Faces)
+const ConnectedFaces = withRouter(
+  connect(createStructuredSelector({ mode: getMode }), {
+    applyOperation,
+  })(Faces),
+)
 
 /* Edges */
 
@@ -203,7 +220,7 @@ class Polyhedron extends Component {
 
   // TODO color
   render() {
-    const { config, solidData } = this.props
+    const { solid, config, solidData } = this.props
     const { showEdges, showFaces } = config
     const { faces, edges, vertices } = solidData
     const toggle = 1
@@ -221,6 +238,7 @@ class Polyhedron extends Component {
                   faces={faces}
                   vertices={vertices}
                   config={config}
+                  solid={solid}
                 />
               )}
               {showEdges && <Edges edges={edges} vertices={vertices} />}

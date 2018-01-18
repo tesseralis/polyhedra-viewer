@@ -11,8 +11,6 @@ const ComponentInfo = ({ solid }) => {
   return <div>This is a {solid}</div>
 }
 
-// TODO figure out how not to have this match weaved in all the time
-// (In general, try to figure out a better way to do routing)
 const Sidebar = ({ match, solid }) => {
   const styles = StyleSheet.create({
     sidebar: {
@@ -37,7 +35,6 @@ const Sidebar = ({ match, solid }) => {
         <IconLink replace to={`${match.url}/list`} name="list" />
         <IconLink to="/" name="home" />
       </div>
-      {/* TODO don't hardcode the absolute path */}
       <Route
         exact
         path={match.url}

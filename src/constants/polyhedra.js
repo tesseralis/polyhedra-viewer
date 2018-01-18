@@ -43,6 +43,8 @@ export const getSolidData = escapedSolidName => {
 
 export const escapeName = name => name.replace(/ /g, '-')
 
+export const unescapeName = name => name.replace(/-/g, ' ')
+
 const prismNames = {
   3: 'triangular',
   4: 'square',

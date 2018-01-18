@@ -201,12 +201,6 @@ export function getTruncated(polyhedron, options = {}) {
   return withEdges(flatPolyhedron)
 }
 
-function elongateBi(polyhedron) {
-  // find the base of the pyramid, polyhedron, or rotunda
-  // push the vertices out
-  // (can I just add a prism instead?)
-}
-
 function faceGraph(polyhedron) {
   const edgesToFaces = {}
   // build up a lookup table for every pair of edges to that face
@@ -474,6 +468,7 @@ export function getCupolae(polyhedron) {
 
       if (!_.isEqual(count, cupolaCount)) return false
       // Make sure that the square faces aren't adjacent
+      // FIXME this *still* doesn't work in the case of square cupolae
       const [sqFace1, sqFace2] = _.filter(nbrFaces, { length: 4 })
       return _.intersection(sqFace1, sqFace2).length === 1
     })
