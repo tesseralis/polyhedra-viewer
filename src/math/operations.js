@@ -308,7 +308,7 @@ function doAugment(polyhedron, faceIndex, type) {
   const sideLength = baseVertices[0].distanceTo(baseVertices[1])
   const baseNormal = getNormal(baseVertices)
 
-  const augmentee = getSolidData(augmentTypes[type][n])
+  const augmentee = augmentData[type][n]
   const augmenteeVertices = augmentee.vertices.map(vec)
   // rotate and translate so that the face is next to our face
   const undersideIndex = _.findIndex(augmentee.faces, face => face.length === n)
