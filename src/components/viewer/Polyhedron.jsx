@@ -12,7 +12,7 @@ import { getNextPolyhedron, hasOperation } from 'constants/relations'
 import { getPolyhedron, getPolyhedronConfig, getMode } from 'selectors'
 import { setMode, setPolyhedron, applyOperation } from 'actions'
 import { mapObject } from 'util.js'
-import { getEdges, getCupolaTop, getPyramidOrCupola } from 'math/operations'
+import { getEdges, getAugmentFace, getPyramidOrCupola } from 'math/operations'
 
 // Join a list of lists with an inner and outer separator.
 export const joinListOfLists = (list, outerSep, innerSep) => {
@@ -76,6 +76,12 @@ class Faces extends Component {
           this.drag = true
           const { faces, vertices, mode } = this.props
           switch (mode) {
+            case '+':
+              const fIndex = getAugmentFace({ vertices, faces }, event.hitPnt)
+              this.setState({
+                applyArgs: fIndex === -1 ? null : { fIndex },
+              })
+              return
             case '-':
             case 'g':
               const vIndices = getPyramidOrCupola(

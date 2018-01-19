@@ -88,7 +88,7 @@ function RelatedPolyhedra({ solid, applyOperation, setMode }) {
           !_.compact(related[operation]).length
         )
           return null
-        if (_.includes(['g', '-'], operation)) {
+        if (_.includes(['g', '-', '+'], operation)) {
           return (
             <button
               className={css(styles.modeButton)}

@@ -23,10 +23,6 @@ function replace(array, index, ...values) {
   return [...before, ...values, ...after]
 }
 
-function toVec3D(vertices) {
-  return vertices.map(vec)
-}
-
 function calculateCentroid(vectors) {
   return vectors.reduce((v1, v2) => v1.add(v2)).scale(1 / vectors.length)
 }
@@ -50,7 +46,7 @@ function isPlanar(face, vertices) {
 }
 
 function nextVertex(face, vertex) {
-  return getMod(face, face.indxOf(vertex) + 1)
+  return getMod(face, face.indexOf(vertex) + 1)
 }
 
 function prevVertex(face, vertex) {
@@ -258,22 +254,65 @@ const augmentTypes = {
   },
 }
 
-// Augment the following
-// TODO digonal cupola option and rotunda option
-function augment(polyhedron, faceIndex, type) {
+const augmentData = _.mapValues(augmentTypes, type =>
+  _.mapValues(type, name => getSolidData(name)),
+)
+
+function getDihedralAngle({ faces, vertices }, edge) {
+  const [v1, v2] = edge.map(vIndex => vec(vertices[vIndex]))
+  const midpoint = v1.add(v2).scale(0.5)
+
+  const [c1, c2] = faces
+    .filter(face => _.intersection(face, edge).length === 2)
+    .map(face => calculateCentroid(face.map(vIndex => vec(vertices[vIndex]))))
+    .map(v => v.sub(midpoint))
+
+  return c1.angleBetween(c2, true)
+}
+
+const toDeg = theta => theta * (180 / Math.PI)
+
+// Checks to see if the polyhedron can be augmented at the base while remaining convex
+function canAugment(polyhedron, faceIndex, { offset = 0 } = {}) {
   const base = polyhedron.faces[faceIndex]
   const n = base.length
-  const baseVertices = toVec3D(base.map(index => polyhedron.vertices[index]))
+
+  const augmentee = augmentData['pyramidsCupolae'][n]
+  const augmenteeVertices = augmentee.vertices.map(vec)
+  const undersideIndex = _.findIndex(augmentee.faces, face => face.length === n)
+  const undersideFace = augmentee.faces[undersideIndex]
+
+  return _.every(base, (baseV1, i) => {
+    const baseV2 = getMod(base, i + 1)
+    const baseAngle = getDihedralAngle(polyhedron, [baseV1, baseV2])
+
+    // todo doesn't work on cupolae
+    const undersideV1 = getMod(undersideFace, i + offset)
+    const undersideV2 = getMod(undersideFace, i - 1 + offset)
+    const augmenteeAngle = getDihedralAngle(augmentee, [
+      undersideV1,
+      undersideV2,
+    ])
+
+    return baseAngle + augmenteeAngle < Math.PI - PRECISION
+  })
+}
+
+// Augment the following
+// TODO digonal cupola option and rotunda option
+function doAugment(polyhedron, faceIndex, type) {
+  const base = polyhedron.faces[faceIndex]
+  const n = base.length
+  const baseVertices = base.map(index => vec(polyhedron.vertices[index]))
   const baseCenter = calculateCentroid(baseVertices)
   const sideLength = baseVertices[0].distanceTo(baseVertices[1])
   const baseNormal = getNormal(baseVertices)
 
   const augmentee = getSolidData(augmentTypes[type][n])
-  const augmenteeVertices = toVec3D(augmentee.vertices)
+  const augmenteeVertices = augmentee.vertices.map(vec)
   // rotate and translate so that the face is next to our face
   const undersideIndex = _.findIndex(augmentee.faces, face => face.length === n)
   const undersideFace = augmentee.faces[undersideIndex]
-
   const undersideVertices = undersideFace.map(index => augmenteeVertices[index])
   const undersideNormal = getNormal(undersideVertices)
   const undersideCenter = calculateCentroid(undersideVertices)
@@ -401,12 +440,16 @@ function getFaceToAugment(polyhedron, name) {
   }
 }
 
+export function augment(polyhedron, { fIndex }) {
+  return doAugment(polyhedron, fIndex, 'pyramidsCupolae')
+}
+
 export function getElongated(polyhedron) {
   const faceIndex = _.findIndex(
     polyhedron.faces,
     face => face === _.maxBy(polyhedron.faces, 'length'),
   )
-  return augment(polyhedron, faceIndex, 'prisms')
+  return doAugment(polyhedron, faceIndex, 'prisms')
 }
 
 export function getGyroElongated(polyhedron) {
@@ -414,7 +457,7 @@ export function getGyroElongated(polyhedron) {
     polyhedron.faces,
     face => face === _.maxBy(polyhedron.faces, 'length'),
   )
-  return augment(polyhedron, faceIndex, 'antiprisms')
+  return doAugment(polyhedron, faceIndex, 'antiprisms')
 }
 
 export function getAugmented(polyhedron, name) {
@@ -425,7 +468,7 @@ export function getAugmented(polyhedron, name) {
   const faceIndex = getFaceToAugment(polyhedron, name)
   // (special case: triangular prism)
   // do the augmentation
-  return augment(polyhedron, faceIndex, 'pyramidsCupolae')
+  return doAugment(polyhedron, faceIndex, 'pyramidsCupolae')
 }
 
 // get an array mapping each vertex index to the indices of the faces it is adjacent to
@@ -446,7 +489,6 @@ function getBoundary(faces) {
   // build up a lookup table for every pair of edges to that face
   _.forEach(faces, (face, index) => {
     // for the pairs of vertices, find the face that contains the corresponding pair
-    // ...this is n^2? more? ah who cares I'm too lazy
     _.forEach(getEdgesOrdered(face), edge => {
       const [i1, i2] = edge
       if (_.includes(edges[i2], i1)) {
@@ -540,24 +582,37 @@ export function getCupolae(polyhedron) {
   return getCupolaeIndices(polyhedron).map(fIndex => polyhedron.faces[fIndex])
 }
 
-export function getPyramidOrCupola(
-  { faces, vertices },
-  point,
-  { pyramids } = {},
-) {
-  // TODO deduplicate
-  const hitPoint = vec(point)
-  const hitFaceIndex = _.minBy(_.range(faces.length), fIndex => {
+function getHitFaceIndex({ faces, vertices }, point) {
+  return _.minBy(_.range(faces.length), fIndex => {
     const face = faces[fIndex]
     const plane = getPlane(face, vertices)
-    return plane.getDistanceToPoint(hitPoint)
+    return plane.getDistanceToPoint(point)
   })
+}
+
+export function getAugmentFace(polyhedron, point) {
+  const hitPoint = vec(point)
+  const hitFaceIndex = getHitFaceIndex(polyhedron, hitPoint)
+  return canAugment(polyhedron, hitFaceIndex) ||
+    canAugment(polyhedron, hitFaceIndex, { offset: 1 })
+    ? hitFaceIndex
+    : -1
+}
+
+export function getPyramidOrCupola(
+  polyhedron,
+  point,
+  { pyramids } = {}, // whether to allow pyramids or not
+) {
+  const { faces, vertices } = polyhedron
+  const hitPoint = vec(point)
+  const hitFaceIndex = getHitFaceIndex(polyhedron, hitPoint)
   const adjacentFacesMapping = getAdjacentFacesMapping({
     faces,
     vertices,
   })
   const pyramidIndices = pyramids
-    ? getPyramidIndices({ faces, vertices }, { adjacentFacesMapping })
+    ? getPyramidIndices(polyhedron, { adjacentFacesMapping })
     : []
 
   // A solid can have only pyramids or cupolae/rotundae, so it suffices to check for one
@@ -579,10 +634,7 @@ export function getPyramidOrCupola(
   }
 
   // Other
-  const cupolaeIndices = getCupolaeIndices(
-    { faces, vertices },
-    { adjacentFacesMapping },
-  )
+  const cupolaeIndices = getCupolaeIndices(polyhedron, { adjacentFacesMapping })
 
   // check if we're inside any cupola
   const cupolaeFaces = _.flatMapDeep(cupolaeIndices, fIndex =>
@@ -628,8 +680,8 @@ export function gyrate(polyhedron, { vIndices }) {
   // TODO this won't work with animation, so I have to reimplement eventually
 
   // rotate the cupola top
-  const boundaryVertices = toVec3D(
-    boundary.map(vIndex => polyhedron.vertices[vIndex]),
+  const boundaryVertices = boundary.map(vIndex =>
+    vec(polyhedron.vertices[vIndex]),
   )
   const normal = getNormal(boundaryVertices).getNormalized()
   const centroid = calculateCentroid(boundaryVertices)

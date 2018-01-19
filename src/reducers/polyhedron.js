@@ -2,7 +2,7 @@ import { getSolidData, isValidSolid } from 'constants/polyhedra'
 import {
   getElongated,
   getGyroElongated,
-  getAugmented,
+  augment,
   diminish,
   gyrate,
 } from 'math/operations'
@@ -23,7 +23,7 @@ export const applyOperation = (operation, config) => ({
 const operations = {
   P: getElongated,
   A: getGyroElongated,
-  '+': getAugmented,
+  '+': augment,
   '-': diminish,
   g: gyrate,
 }
