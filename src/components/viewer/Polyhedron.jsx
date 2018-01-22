@@ -9,7 +9,12 @@ import { withRouter } from 'react-router-dom'
 import polygons from 'constants/polygons'
 import { escapeName, unescapeName } from 'constants/polyhedra'
 import { getNextPolyhedron, hasOperation } from 'constants/relations'
-import { getPolyhedron, getPolyhedronConfig, getMode } from 'selectors'
+import {
+  getPolyhedron,
+  getPolyhedronConfig,
+  getMode,
+  getGyrateControl,
+} from 'selectors'
 import { setMode, setPolyhedron, applyOperation } from 'actions'
 import { mapObject } from 'util.js'
 import { getEdges, getAugmentFace, getPyramidOrCupola } from 'math/operations'
@@ -55,12 +60,23 @@ class Faces extends Component {
       this.shape.addEventListener('mouseup', () => {
         // it's a drag, don't click
         if (this.drag) return
-        const { mode, setMode, applyOperation, solid, history } = this.props
+        const {
+          mode,
+          gyrate,
+          setMode,
+          applyOperation,
+          solid,
+          history,
+        } = this.props
         const { applyArgs } = this.state
         if (mode && !_.isNil(applyArgs)) {
-          const next = getNextPolyhedron(unescapeName(solid), mode)
+          const next = getNextPolyhedron(
+            unescapeName(solid),
+            mode,
+            gyrate ? { gyrate } : null,
+          )
           history.push(`/${escapeName(next)}/related`)
-          applyOperation(mode, { ...applyArgs, name: solid })
+          applyOperation(mode, { ...applyArgs, gyrate })
 
           // Get out of current mode if we can't do it any more
           if (!hasOperation(next, mode)) {
@@ -136,10 +152,13 @@ class Faces extends Component {
 }
 
 const ConnectedFaces = withRouter(
-  connect(createStructuredSelector({ mode: getMode }), {
-    applyOperation,
-    setMode,
-  })(Faces),
+  connect(
+    createStructuredSelector({ gyrate: getGyrateControl, mode: getMode }),
+    {
+      applyOperation,
+      setMode,
+    },
+  )(Faces),
 )
 
 /* Edges */

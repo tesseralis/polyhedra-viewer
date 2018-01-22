@@ -145,8 +145,8 @@ const getOrthoGyroAugment = (value, with_) => {
     return [{ with: with_, value }]
   } else {
     return [
-      { with: with_, value: value[0], gyrate: false },
-      { with: with_, value: value[1], gyrate: true },
+      { with: with_, value: value[0], gyrate: 'ortho' },
+      { with: with_, value: value[1], gyrate: 'gyro' },
     ]
   }
 }
@@ -436,8 +436,13 @@ export function hasOperation(solid, operation) {
 }
 
 // Get the polyhedron name as a result of applying the operation to the given polyhedron
-export function getNextPolyhedron(solid, operation) {
-  const next = polyhedraGraph[toConwayNotation(solid)][operation]
+export function getNextPolyhedron(solid, operation, options) {
+  console.log(options)
+  const next = _.filter(
+    polyhedraGraph[toConwayNotation(solid)][operation],
+    options || _.stubTrue,
+  )
+  console.log(next)
   // FIXME handle more than one gyration possibility
   if (next.length > 1) {
     throw new Error('Cannot deal with more than one possibility right now')
