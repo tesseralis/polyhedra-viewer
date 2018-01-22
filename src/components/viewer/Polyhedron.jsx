@@ -60,7 +60,6 @@ class Faces extends Component {
         if (mode && !_.isNil(applyArgs)) {
           const next = getNextPolyhedron(unescapeName(solid), mode)
           history.push(`/${escapeName(next)}/related`)
-          console.log(applyArgs)
           applyOperation(mode, { ...applyArgs, name: solid })
 
           // Get out of current mode if we can't do it any more

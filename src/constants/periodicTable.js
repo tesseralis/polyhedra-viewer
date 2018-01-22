@@ -62,7 +62,7 @@ export default [
       'pentagonal rotunda',
     ],
     columns: [
-      '',
+      'base',
       'elongated',
       'gyroelongated',
       { name: 'bi-', sub: ['ortho-', 'gyro-'] },

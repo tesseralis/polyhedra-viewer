@@ -102,7 +102,8 @@ function RelatedPolyhedra({ solid, applyOperation, setMode }) {
           <div key={operation} className={css(styles.operations)}>
             <h2 className={css(styles.title)}>{operations[operation]}</h2>
             <div className={css(styles.options)}>
-              {_.compact(related[operation]).map(notation => {
+              {_.compact(related[operation]).map(value => {
+                const notation = _.isObject(value) ? value.value : value
                 const name = fromConwayNotation(notation)
                 // TODO make this a button instead
                 return (

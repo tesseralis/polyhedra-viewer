@@ -270,15 +270,12 @@ function getDihedralAngle({ faces, vertices }, edge) {
   return c1.angleBetween(c2, true)
 }
 
-const toDeg = theta => theta * (180 / Math.PI)
-
 // Checks to see if the polyhedron can be augmented at the base while remaining convex
 function canAugment(polyhedron, faceIndex, { offset = 0 } = {}) {
   const base = polyhedron.faces[faceIndex]
   const n = base.length
 
   const augmentee = augmentData['pyramidsCupolae'][n]
-  const augmenteeVertices = augmentee.vertices.map(vec)
   const undersideIndex = _.findIndex(augmentee.faces, face => face.length === n)
   const undersideFace = augmentee.faces[undersideIndex]
 

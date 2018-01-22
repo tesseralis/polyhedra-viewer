@@ -77,25 +77,41 @@ function makeBidirectional(graph) {
   const result = {}
   for (let [source, operations] of Object.entries(graph)) {
     for (let [operation, sinks] of Object.entries(operations)) {
+      // FIXME handle object sinks
       for (let sink of sinks) {
-        if (!sink) {
+        const sinkValue = _.isObject(sink) ? sink.value : sink
+        if (!sinkValue) {
           continue
         }
-        if (!result[sink]) {
-          result[sink] = {}
+        if (!result[sinkValue]) {
+          result[sinkValue] = {}
         }
         const reverseOp = getInverseOperation(operation)
-        if (!result[sink][reverseOp]) {
-          result[sink][reverseOp] = []
+        if (!result[sinkValue][reverseOp]) {
+          result[sinkValue][reverseOp] = []
         }
-        if (sink === source) {
+        if (sinkValue === source) {
           continue
         }
-        result[sink][reverseOp].push(source)
+        const newValue = _.isObject(sink) ? { ...sink, value: source } : source
+        result[sinkValue][reverseOp].push(newValue)
       }
     }
   }
   return graphMerge(result, graph)
+}
+
+function getKeyedTable(table) {
+  const result = {}
+  if (!table.rows) return result
+  table.rows.forEach((row, i) => {
+    result[row] = {}
+    table.columns.forEach((column, j) => {
+      const colName = _.isObject(column) ? column.name : column
+      result[row][colName] = table.data[i][j]
+    })
+  })
+  return result
 }
 
 const invalidNames = ['concave', 'coplanar']
@@ -107,115 +123,221 @@ function convertTableNotation(notation) {
 }
 
 function convertTable(table) {
-  if (!table.data) return null
-  return table.data.map(row => row.map(convertTableNotation))
+  if (!table.data) return table
+  return {
+    ...table,
+    data: table.data.map(row => row.map(convertTableNotation)),
+  }
 }
 
 // TODO figure out a way to do this without the table (or inverse the relationship)
-const [, prisms, , pyramidsCupolae, augmentations] = periodicTable.map(
-  convertTable,
-)
+const [, prisms, , pyramidsCupolae, augmentations] = periodicTable
+  .map(convertTable)
+  .map(getKeyedTable)
 
-const getPyramidRow = index => pyramidsCupolae[index > 2 ? index + 1 : index]
+// const hasCupolaRotunda = index => _.includes([6, 8], index)
+const hasCupolaRotunda = name =>
+  name.includes('pentagonal') && !name.includes('pyramid')
+const cupolaRotunda = pyramidsCupolae['cupola-rotunda']
 
-const hasCupolaRotunda = index => _.includes([6, 8], index)
-const cupolaRotunda = pyramidsCupolae[7]
+const getOrthoGyroAugment = (value, with_) => {
+  if (!_.isArray(value)) {
+    return [{ with: with_, value }]
+  } else {
+    return [
+      { with: with_, value: value[0], gyrate: false },
+      { with: with_, value: value[1], gyrate: true },
+    ]
+  }
+}
 
-const getAugmentations = (rowIndex, colIndex) => {
+const getCupolaRotunda = (with_, colName) => {
+  const altWith = with_.includes('U') ? 'R5' : 'U5'
+  return getOrthoGyroAugment(cupolaRotunda[colName], altWith)
+}
+
+const getAugmentations = with_ => (rowName, colName) => {
   return _([
-    pyramidsCupolae[rowIndex][colIndex],
-    hasCupolaRotunda(rowIndex) && cupolaRotunda[colIndex],
+    getOrthoGyroAugment(pyramidsCupolae[rowName][colName], with_),
+    hasCupolaRotunda(rowName) && getCupolaRotunda(with_, colName),
   ])
     .flatten()
     .compact()
     .value()
 }
 
+// TODO I'm sure this is repeated
+const nameMapping = {
+  digonal: 2,
+  triangular: 3,
+  square: 4,
+  pentagonal: 5,
+  hexagonal: 6,
+  octagonal: 8,
+  decagonal: 10,
+}
+const divName = name => {
+  const m = nameMapping[name]
+  if (m <= 5) return name
+  return _.invert(nameMapping)[m / 2]
+}
+
+const getPyramidFromPrism = prismRow => {
+  const isPyramid = _.includes(['triangular', 'square', 'pentagonal'], prismRow)
+  return `${divName(prismRow)} ${isPyramid ? 'pyramid' : 'cupola'}`
+}
+
+const getPrismFromPyramid = (name, anti) => {
+  const [prefix, type] = name.split(' ')
+  console.log(name, prefix, type)
+  const isCupola = _.includes(['cupola', 'rotunda', 'cupola-rotunda'], type)
+  const index = nameMapping[prefix] * (isCupola ? 2 : 1)
+  return `${anti ? 'A' : 'P'}${index}`
+}
+
+const pyramidCupolaConway = {
+  pyramid: 'Y',
+  cupola: 'U',
+  rotunda: 'R', // not official, I don't think
+}
+
+const getPyramidCupolaConway = name => {
+  const [sides, type] = name.split(' ')
+  return `${pyramidCupolaConway[type]}${nameMapping[sides]}`
+}
+
+const getElongations = (prism, antiprism) => (pValue, aValue) => {
+  return {
+    P: { with: prism, value: pValue },
+    A: { with: antiprism, value: aValue },
+  }
+}
+
 const basePyramidsCupolae = (() => {
   let graph = {}
   // relation of prisms and antiprisms
-  _.forEach(prisms, (row, index) => {
-    const [prism, antiprism] = row
-    const pyramidRow = getPyramidRow(index)
+  _.forEach(prisms, (row, name) => {
+    const { prism, antiprism } = row
+    const pyramidRow = getPyramidFromPrism(name)
+    const { elongated, gyroelongated } = pyramidsCupolae[pyramidRow]
+    const getWith = getPyramidCupolaConway(pyramidRow)
     graph = graphMerge(graph, {
       [prism]: {
-        '+': pyramidRow[1],
+        '+': { value: elongated, with: getWith },
       },
       [antiprism]: {
-        '+': pyramidRow[2],
+        '+': {
+          value: gyroelongated,
+          with: getWith,
+        },
       },
     })
   })
 
   // TODO don't create stray nulls
-  _.forEach(pyramidsCupolae, (row, index) => {
+  _.forEach(pyramidsCupolae, (row, name) => {
+    const {
+      base,
+      elongated,
+      gyroelongated,
+      'bi-': bi,
+      'elongated bi-': elongatedBi,
+      'gyroelongated bi-': gyroelongatedBi,
+    } = row
+    const prism = getPrismFromPyramid(name)
+    const antiprism = getPrismFromPyramid(name, true)
+    const conway = getPyramidCupolaConway(name)
+    const elongations = getElongations(prism, antiprism)
+    const augmentations = getAugmentations(conway)
     graph = graphMerge(graph, {
-      [row[0]]: {
-        P: row[1],
-        A: row[2],
-        '+': getAugmentations(index, 3),
+      [base]: {
+        ...elongations(elongated, gyroelongated),
+        '+': augmentations(name, 'bi-'),
       },
-      [row[1]]: {
-        '+': getAugmentations(index, 4),
+      [elongated]: {
+        '+': augmentations(name, 'elongated bi-'),
       },
-      [row[2]]: {
-        '+': getAugmentations(index, 5),
+      [gyroelongated]: {
+        '+': augmentations(name, 'gyroelongated bi-'),
       },
-      [row[5]]: {
-        g: row[5],
+      [gyroelongatedBi]: {
+        g: { value: gyroelongatedBi },
       },
     })
 
-    if (!_.isArray(row[3])) {
+    // Populate elongations of bipyramids (which we may not even do?)
+    if (!_.isArray(bi)) {
       graph = graphMerge(graph, {
-        [row[3]]: {
-          P: row[4],
-          A: row[5],
-        },
+        [bi]: elongations(elongatedBi, gyroelongatedBi),
       })
     } else {
+      const [ortho, gyro] = bi
+      const [elongBiOrtho, elongBiGyro] = elongatedBi
       graph = graphMerge(graph, {
-        [row[3][0]]: {
-          P: row[4][0],
-          A: row[5],
-        },
-        [row[3][1]]: {
-          P: row[4][1],
-          A: row[5],
-        },
+        [ortho]: elongations(elongBiOrtho, gyroelongatedBi),
+        [gyro]: elongations(elongBiGyro, gyroelongatedBi),
       })
     }
 
     // gyrate relationships
-    for (let cell of row) {
+    _.forEach(row, cell => {
       if (_.isArray(cell)) {
-        const [c1, c2] = cell
+        const [ortho, gyro] = cell
         graph = graphMerge(graph, {
-          [c1]: {
-            g: c2,
+          [ortho]: {
+            g: gyro,
           },
         })
       }
-    }
+    })
   })
 
   return graph
 })()
+console.log('basePyramidsCupolae', basePyramidsCupolae)
+
+const getAugmentee = name => {
+  if (name.includes('prism')) return 'Y4'
+  if (name === 'dodecahedron') return 'Y5'
+  const type = name.split(' ')[1]
+  switch (type) {
+    case 'tetrahedron':
+      return 'U3'
+    case 'cube':
+      return 'U4'
+    case 'dodecahedron':
+      return 'U5'
+    default:
+      return null
+  }
+}
+
+const getBiAugmented = (biaugmented, with_) => {
+  if (!_.isArray(biaugmented)) {
+    return [{ with: with_, value: biaugmented }]
+  }
+  return [
+    { with: with_, value: biaugmented[0], align: 'para' },
+    { with: with_, value: biaugmented[1], align: 'meta' },
+  ]
+}
 
 const baseAugmentations = (() => {
-  const rowNames = periodicTable[4].rows
   let graph = {}
-  _.forEach(augmentations, (row, index) => {
-    const base = toConwayNotation(rowNames[index])
+  _.forEach(augmentations, (row, name) => {
+    const base = toConwayNotation(name)
+    const { augmented, biaugmented, triaugmented } = row
+    const augmentee = getAugmentee(name)
     graph = graphMerge(graph, {
       [base]: {
-        '+': row[0],
+        '+': { with: augmentee, value: augmented },
       },
-      [row[0]]: {
-        '+': row[1],
+      [augmented]: {
+        // TODO meta para
+        '+': getBiAugmented(biaugmented, augmentee),
       },
-      [_.isArray(row[1]) ? row[1][1] : row[1]]: {
-        '+': row[2],
+      [_.isArray(biaugmented) ? biaugmented[1] : biaugmented]: {
+        '+': { with: augmentee, value: triaugmented },
       },
     })
   })
@@ -225,14 +347,16 @@ const baseAugmentations = (() => {
 const diminishedIcosahedraGraph = (() => {
   return {
     J63: {
-      '+': ['J62', 'J64'],
+      '+': [{ align: 'para', value: 'J62' }, { align: 'meta', value: 'J64' }],
     },
     J62: {
-      '+': 'J11',
+      '+': { value: 'J11' },
     },
   }
 })()
 
+// FIXME adapt this for the new format
+// Right now, I donm't know of a good system to track diminishing *and* gyration
 const rhombicosidodecahedraGraph = (() => {
   return {
     eD: {
@@ -288,7 +412,7 @@ const othersGraph = (() => {
 
     // "other" johnson solids
     J86: {
-      '+': 'J87',
+      '+': { with: 'P4', value: 'J87' },
     },
   }
 })()
@@ -298,12 +422,14 @@ const normalized = [
   basePyramidsCupolae,
   baseAugmentations,
   diminishedIcosahedraGraph,
-  rhombicosidodecahedraGraph,
+  // rhombicosidodecahedraGraph,
   othersGraph,
 ].map(normalize)
 
 const baseGraph = graphMerge(...normalized)
 export const polyhedraGraph = makeBidirectional(baseGraph)
+
+console.log(polyhedraGraph)
 
 export function hasOperation(solid, operation) {
   return _.has(polyhedraGraph[toConwayNotation(solid)], operation)
@@ -316,5 +442,8 @@ export function getNextPolyhedron(solid, operation) {
   if (next.length > 1) {
     throw new Error('Cannot deal with more than one possibility right now')
   }
-  return fromConwayNotation(next[0])
+  const val = next[0]
+  const notation = _.isObject(val) ? val.value : val
+
+  return fromConwayNotation(notation)
 }
