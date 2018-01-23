@@ -457,17 +457,6 @@ export function getGyroElongated(polyhedron) {
   return doAugment(polyhedron, faceIndex, 'antiprisms')
 }
 
-export function getAugmented(polyhedron, name) {
-  // only do the "main" class right now
-  // Determine whether we're a (augmented) prism or an archimedean solid or dodecahedron
-  // use the graph and the para/meta option to determine which face we should augment to
-  // (do meta for now)
-  const faceIndex = getFaceToAugment(polyhedron, name)
-  // (special case: triangular prism)
-  // do the augmentation
-  return doAugment(polyhedron, faceIndex, 'pyramidsCupolae')
-}
-
 // get an array mapping each vertex index to the indices of the faces it is adjacent to
 export function getAdjacentFacesMapping(polyhedron) {
   const mapping = polyhedron.vertices.map(() => [])
