@@ -44,6 +44,16 @@ const polygonColors = colors => polygons.map(n => toRgb(colors[n]))
 const getColorAttr = colors =>
   joinListOfLists(polygonColors(colors).concat([[0, 1, 0]]), ',', ' ')
 
+const augmentees = {
+  3: 'Y3',
+  // TODO digonal cupola
+  4: 'Y4',
+  5: 'Y5',
+  6: 'U3',
+  8: 'U4',
+  10: 'U5',
+}
+
 class Faces extends Component {
   state = {
     highlightFaceIndices: [],
@@ -63,17 +73,26 @@ class Faces extends Component {
         const {
           mode,
           gyrate,
+          augmentee,
           setMode,
           applyOperation,
           solid,
+          faces,
           history,
         } = this.props
         const { applyArgs } = this.state
+        const options = {}
+        if (mode === '+') {
+          if (gyrate) {
+            options.gyrate = gyrate
+          }
+          options.with = augmentee || augmentees[faces[applyArgs.fIndex].length]
+        }
         if (mode && !_.isNil(applyArgs)) {
           const next = getNextPolyhedron(
             unescapeName(solid),
             mode,
-            gyrate ? { gyrate } : null,
+            !_.isEmpty(options) ? options : null,
           )
           history.push(`/${escapeName(next)}/related`)
           applyOperation(mode, { ...applyArgs, gyrate })
