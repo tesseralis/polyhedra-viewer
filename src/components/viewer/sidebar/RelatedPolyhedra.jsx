@@ -149,8 +149,10 @@ function RelatedPolyhedra({
             <h2 className={css(styles.title)}>{operations[operation]}</h2>
             <div className={css(styles.options)}>
               {_.compact(related[operation]).map(value => {
-                const notation = _.isObject(value) ? value.value : value
-                const name = fromConwayNotation(notation)
+                console.log('value', value)
+                const nextValue = _.isObject(value) ? value.value : value
+                if (!nextValue) return null
+                const name = fromConwayNotation(nextValue)
                 // TODO make this a button instead
                 return (
                   <PolyhedronLink

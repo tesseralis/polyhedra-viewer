@@ -1,9 +1,9 @@
 import * as _ from 'lodash'
 import { geom } from 'toxiclibsjs'
-import { getSolidData } from 'constants/polyhedra'
-const PRECISION = 1e-3
+import Polyhedron from 'math/Polyhedron'
 
 const { Vec3D, Triangle3D, Plane } = geom
+const PRECISION = 1e-3
 
 function mod(a, b) {
   return a >= 0 ? a % b : a % b + b
@@ -111,7 +111,7 @@ function replaceVertex(newPolyhedron, polyhedron, vertex, { mock, rectify }) {
       )
     })
     .concat([_.rangeRight(newPolyhedron.vertices.length, newVertices.length)])
-  return { faces: newFaces, vertices: newVertices }
+  return new Polyhedron(newVertices, newFaces)
 }
 
 function removeExtraneousVertices({ vertices, faces }) {
@@ -137,7 +137,7 @@ function removeExtraneousVertices({ vertices, faces }) {
     ),
     toRemove.length,
   )
-  return { faces: newFaces, vertices: newVertices }
+  return new Polyhedron(newVertices, newFaces)
 }
 
 // Remove vertices (and faces) from the polyhedron when they are all the same
@@ -268,7 +268,7 @@ const augmentTypes = {
 }
 
 const augmentData = _.mapValues(augmentTypes, type =>
-  _.mapValues(type, name => getSolidData(name)),
+  _.mapValues(type, Polyhedron.get),
 )
 
 function getDihedralAngle({ faces, vertices }, edge) {
@@ -764,5 +764,5 @@ export function gyrate(polyhedron, { vIndices }) {
     })
   })
 
-  return { faces: newFaces, vertices: newVertices }
+  return new Polyhedron(newVertices, newFaces)
 }

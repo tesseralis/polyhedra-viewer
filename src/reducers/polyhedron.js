@@ -1,4 +1,5 @@
-import { getSolidData, isValidSolid } from 'constants/polyhedra'
+import { isValidSolid } from 'constants/polyhedra'
+import Polyhedron from 'math/Polyhedron'
 import {
   getElongated,
   getGyroElongated,
@@ -28,12 +29,12 @@ const operations = {
   g: gyrate,
 }
 
-const initialState = getSolidData('tetrahedron')
+const initialState = Polyhedron.get('tetrahedron')
 
 export default function polyhedron(state = initialState, action) {
   switch (action.type) {
     case SET_POLYHEDRON:
-      return isValidSolid(action.name) ? getSolidData(action.name) : state
+      return isValidSolid(action.name) ? Polyhedron.get(action.name) : state
     case APPLY_OPERATION:
       return operations[action.operation]
         ? operations[action.operation](state, action.config)
