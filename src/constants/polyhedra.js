@@ -38,7 +38,7 @@ export const isValidSolid = escapedSolidName => {
 }
 
 export const getSolidData = escapedSolidName => {
-  return require(`../data/polyhedra/${escapedSolidName}.json`)
+  return require(`data/polyhedra/${escapedSolidName}.json`)
 }
 
 export const escapeName = name => name.replace(/ /g, '-')

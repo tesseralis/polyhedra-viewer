@@ -122,6 +122,7 @@ class Faces extends Component {
               const vIndices = getPyramidOrCupola(solidData, event.hitPnt, {
                 pyramids: mode === '-',
               })
+              console.log('vIndices', vIndices)
               this.setState({
                 applyArgs: vIndices && { vIndices },
               })
