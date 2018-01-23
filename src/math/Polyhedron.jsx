@@ -30,7 +30,7 @@ function getEdgesOrdered(face) {
 }
 
 // Return the number of sides of a face
-const numSides = face => face.length
+export const numSides = face => face.length
 
 // Return if the two faces share an edge
 const shareEdge = (face1, face2) => _.intersection(face1, face2).length === 2
@@ -177,9 +177,11 @@ export default class Polyhedron {
     return this.isPlanar(boundary)
   }
 
+  cupolaFaceIndices = fIndex => this.adjacentFaceIndices(...this.faces[fIndex])
+
   isCupola = fIndex => {
     const face = this.faces[fIndex]
-    const cupolaCount = _.countBy([3, 4, 4, face.length])
+    const cupolaCount = _.countBy([3, 4, 4, numSides(face)])
     // Ensure that each bounding vertex has the right faces
     const matchFaces = _.every(face, vIndex => {
       const faceCount = this.adjacentFaceCount(vIndex)
@@ -199,6 +201,11 @@ export default class Polyhedron {
     const allNeighborFaces = this.adjacentFaces(...face)
     return this.isPlanar(getBoundary(allNeighborFaces))
   }
+
+  rotundaFaceIndices = fIndex =>
+    this.adjacentFaceIndices(
+      ...this.adjacentVertexIndices(...this.faces[fIndex]),
+    )
 
   isRotunda = fIndex => {
     const face = this.faces[fIndex]
@@ -263,20 +270,21 @@ export default class Polyhedron {
       return [nearestPeak]
     }
 
-    // Other
-    const cupolaIndices = _.includes(exclude, 'U') ? [] : this.cupolaIndices()
-    const cupolaFaces = this.adjacentFaceIndices(
-      ..._.flatMap(cupolaIndices, _.propertyOf(faces)),
-    )
+    // Cupolae and rotundae
+    const cupolaIndices = _.includes(exclude, 'U')
+      ? []
+      : this.cupolaIndices().filter(fIndex =>
+          _.includes(this.cupolaFaceIndices(fIndex), hitFaceIndex),
+        )
 
-    const rotundaIndices = _.includes(exclude, 'R') ? [] : this.rotundaIndices()
-    console.log('rotundaIndices', rotundaIndices)
-    const rotundaFaces = _.flatMap(rotundaIndices, fIndex =>
-      this.adjacentFaceIndices(...this.adjacentVertexIndices(...faces[fIndex])),
-    )
+    const rotundaIndices = _.includes(exclude, 'R')
+      ? []
+      : this.rotundaIndices().filter(
+          fIndex => (_.includes(this.rotundaFaceIndices(fIndex)), hitFaceIndex),
+        )
 
     // check if we're inside any cupola or rotunda
-    if (!_.includes(cupolaFaces.concat(rotundaFaces), hitFaceIndex)) {
+    if (cupolaIndices.length + rotundaIndices.length === 0) {
       return null
     }
 
@@ -290,7 +298,6 @@ export default class Polyhedron {
     )
     console.log('nearest peak', nearestPeak)
 
-    // FIXME limit this to cupolae/rotundae we're actually part of
     return _.includes(cupolaIndices, nearestPeak)
       ? faces[nearestPeak]
       : this.adjacentVertexIndices(...faces[nearestPeak])

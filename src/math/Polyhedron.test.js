@@ -33,4 +33,11 @@ describe('Polyhedron', () => {
       expect(polyhedron.cupolaIndices()).toEqual([30, 31])
     })
   })
+
+  describe('getRotundaIndices', () => {
+    it('chooses only rotunda faces', () => {
+      const polyhedron = Polyhedron.get('pentagonal-orthobirotunda')
+      expect(polyhedron.rotundaIndices()).toEqual([20, 26])
+    })
+  })
 })

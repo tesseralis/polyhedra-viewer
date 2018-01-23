@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import Polyhedron, { getBoundary } from './Polyhedron'
+import Polyhedron, { numSides, getBoundary } from './Polyhedron'
 import { vec, getPlane, PRECISION } from './linAlg'
 
 function mod(a, b) {
@@ -280,7 +280,6 @@ const sharesVertex = (face1, face2) => {
   // Make sure they're not the same face
   return intersectionCount > 0 && intersectionCount < face1.length
 }
-const numSides = face => face.length
 
 // Computes the set equality of two arrays
 const setEquals = (array1, array2) => _.xor(array1, array2).length === 0
