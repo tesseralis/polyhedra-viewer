@@ -332,6 +332,7 @@ function getOppositePrismSide(polyhedron, base) {
 }
 
 // TODO handle rhombicosidodecahedron case (still don't know what terminology I want to use)
+// TODO for cupolaerotundae, it's *opposite* because you're matching the *faces*, not the sides
 // Get the index in the augmentee underside to align with the base's 0th vertex
 function getAlignIndex(polyhedron, base, augmentee, underside, gyrate) {
   // TODO handle gyrobifastigium
