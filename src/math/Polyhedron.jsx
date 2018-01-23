@@ -251,6 +251,7 @@ export default class Polyhedron {
     const { faces, vertices } = this
     const hitPoint = vec(point)
     const hitFaceIndex = this.hitFaceIndex(hitPoint)
+    console.log('hitFaceIndex', hitFaceIndex)
     const pyramidIndices = _.includes(exclude, 'Y') ? [] : this.pyramidIndices()
 
     // A solid can have only pyramids or cupolae/rotundae, so it suffices to check for one
@@ -279,8 +280,8 @@ export default class Polyhedron {
 
     const rotundaIndices = _.includes(exclude, 'R')
       ? []
-      : this.rotundaIndices().filter(
-          fIndex => (_.includes(this.rotundaFaceIndices(fIndex)), hitFaceIndex),
+      : this.rotundaIndices().filter(fIndex =>
+          _.includes(this.rotundaFaceIndices(fIndex), hitFaceIndex),
         )
 
     // check if we're inside any cupola or rotunda
@@ -296,7 +297,6 @@ export default class Polyhedron {
         return plane.getDistanceToPoint(hitPoint)
       },
     )
-    console.log('nearest peak', nearestPeak)
 
     return _.includes(cupolaIndices, nearestPeak)
       ? faces[nearestPeak]
