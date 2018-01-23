@@ -48,6 +48,14 @@ export default class Polyhedron {
     return _.pick('vertices', 'faces', 'edges')
   }
 
+  numVertices() {
+    return this.vertices.length
+  }
+
+  vIndices() {
+    return _.range(this.numVertices())
+  }
+
   // Return the faces adjacent to the given vertices
   adjacentFaceIndices(...vIndices) {
     return _(vIndices)
@@ -71,4 +79,9 @@ export default class Polyhedron {
     })
     return mapping
   })
+
+  // return a new polyhedron with the given faces
+  withFaces(faces) {
+    return new Polyhedron(this.vertices, faces)
+  }
 }

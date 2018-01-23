@@ -1,4 +1,4 @@
-import * as _ from 'lodash'
+import _ from 'lodash'
 import { geom } from 'toxiclibsjs'
 import Polyhedron from 'math/Polyhedron'
 
@@ -114,28 +114,28 @@ function replaceVertex(newPolyhedron, polyhedron, vertex, { mock, rectify }) {
   return new Polyhedron(newVertices, newFaces)
 }
 
-function removeExtraneousVertices({ vertices, faces }) {
-  const toRemove = _.difference(_.range(vertices.length), _.flatMap(faces))
+function removeExtraneousVertices(polyhedron) {
+  const { vertices, faces } = polyhedron
+  // Vertex indices to remove
+  const toRemove = _.difference(polyhedron.vIndices(), _.flatMap(faces))
+  const numToRemove = toRemove.length
 
-  const mapping = _(_.range(vertices.length))
-    .takeRight(toRemove.length)
+  // Map the `numToRemove` last vertices of the polyhedron (that don't overlap)
+  // to the first few removed vertices
+  const newToOld = _(polyhedron.vIndices())
+    .takeRight(numToRemove)
     .difference(toRemove)
-    .map((value, index) => [value, toRemove[index]])
+    .map((vIndex, i) => [vIndex, toRemove[i]])
     .fromPairs()
     .value()
+  const oldToNew = _.invert(newToOld)
 
-  const revMapping = _.invert(mapping)
+  const newVertices = _(vertices)
+    .map((vertex, vIndex) => vertices[_.get(oldToNew, vIndex, vIndex)])
+    .dropRight(numToRemove)
+    .value()
   const newFaces = faces.map(face =>
-    face.map(vertex => {
-      return _.has(mapping, vertex) ? mapping[vertex] : vertex
-    }),
-  )
-  const newVertices = _.dropRight(
-    vertices.map(
-      (vertex, index) =>
-        _.has(revMapping, index) ? vertices[revMapping[index]] : vertex,
-    ),
-    toRemove.length,
+    face.map(vIndex => _.get(newToOld, vIndex, vIndex)),
   )
   return new Polyhedron(newVertices, newFaces)
 }
@@ -174,10 +174,7 @@ function deduplicateVertices(polyhedron) {
   // remove extraneous faces
 
   // remove extraneous vertices
-  return removeExtraneousVertices({
-    faces: newFaces,
-    vertices: polyhedron.vertices,
-  })
+  return removeExtraneousVertices(polyhedron.withFaces(newFaces))
 }
 
 function getEdgesOrdered(face) {
@@ -463,7 +460,7 @@ function doAugment(polyhedron, faceIndex, type, gyrate) {
 
   // remove extraneous vertices
   // TODO manually match up the faces instead of deduplicating (which can cause precision issues)
-  return deduplicateVertices({ vertices: newVertices, faces: newFaces })
+  return deduplicateVertices(new Polyhedron(newVertices, newFaces))
 }
 
 // find the node in the graph with n sides that is at least (or equal) to dist
@@ -671,14 +668,12 @@ export function getPyramidOrCupola(
 }
 
 function removeVertices(polyhedron, vIndices) {
-  const [newFaces, facesToRemove] = _.partition(
+  const [facesToKeep, facesToRemove] = _.partition(
     polyhedron.faces,
     face => _.intersection(face, vIndices).length === 0,
   )
-  return removeExtraneousVertices({
-    ...polyhedron,
-    faces: newFaces.concat([getBoundary(facesToRemove)]),
-  })
+  const newFaces = facesToKeep.concat([getBoundary(facesToRemove)])
+  return removeExtraneousVertices(polyhedron.withFaces(newFaces))
 }
 
 export function diminish(polyhedron, { vIndices }) {
