@@ -17,7 +17,7 @@ import {
 } from 'selectors'
 import { setMode, setPolyhedron, applyOperation } from 'actions'
 import { mapObject } from 'util.js'
-import { getAugmentFace, getPyramidOrCupola } from 'math/operations'
+import { getAugmentFace, findPeak } from 'math/operations'
 
 // Join a list of lists with an inner and outer separator.
 export const joinListOfLists = (list, outerSep, innerSep) => {
@@ -119,8 +119,8 @@ class Faces extends Component {
               return
             case '-':
             case 'g':
-              const vIndices = getPyramidOrCupola(solidData, event.hitPnt, {
-                pyramids: mode === '-',
+              const vIndices = findPeak(solidData, event.hitPnt, {
+                exclude: [mode === '-' && 'Y'],
               })
               console.log('vIndices', vIndices)
               this.setState({
@@ -207,7 +207,7 @@ class Polyhedron extends Component {
   render() {
     const { solid, config, solidData } = this.props
     const { showEdges, showFaces } = config
-    const { faces, vertices, edges } = solidData
+    const { vertices, edges } = solidData
     const toggle = 1
 
     return (

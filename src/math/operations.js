@@ -1,9 +1,6 @@
 import _ from 'lodash'
-import { geom } from 'toxiclibsjs'
 import Polyhedron, { getBoundary } from './Polyhedron'
-import { vec, PRECISION } from './linAlg'
-
-const { Triangle3D, Plane } = geom
+import { vec, getPlane, PRECISION } from './linAlg'
 
 function mod(a, b) {
   return a >= 0 ? a % b : a % b + b
@@ -28,11 +25,6 @@ function calculateCentroid(vectors) {
 function getNormal(vertices) {
   const [v0, v1, v2] = vertices
   return v0.sub(v1).cross(v1.sub(v2))
-}
-
-function getPlane(face, vertices) {
-  const triang = _.take(face, 3).map(vIndex => vec(vertices[vIndex]))
-  return new Plane(new Triangle3D(...triang))
 }
 
 function nextVertex(face, vertex) {
@@ -499,10 +491,10 @@ export function getGyroElongated(polyhedron) {
   return doAugment(polyhedron, faceIndex, 'antiprisms')
 }
 
-function getHitFaceIndex({ faces, vertices }, point) {
-  return _.minBy(_.range(faces.length), fIndex => {
-    const face = faces[fIndex]
-    const plane = getPlane(face, vertices)
+function getHitFaceIndex(polyhedron, point) {
+  return _.minBy(polyhedron.fIndices(), fIndex => {
+    const face = polyhedron.faces[fIndex]
+    const plane = getPlane(_.at(polyhedron.vertexVectors(), face))
     return plane.getDistanceToPoint(point)
   })
 }
@@ -516,15 +508,18 @@ export function getAugmentFace(polyhedron, point) {
     : -1
 }
 
-export function getPyramidOrCupola(
-  polyhedron,
-  point,
-  { pyramids } = {}, // whether to allow pyramids or not
-) {
+/**
+ * Find the nearest pyramid, cupola, or rotunda in the solid to the provided hit point.
+ * Return the "peak" vertices, or null if the point is not part of any peak.
+ * @param exclude a list of codes for solids to exclude (Y, U, R)
+ */
+export function findPeak(polyhedron, point, exclude = {}) {
   const { faces, vertices } = polyhedron
   const hitPoint = vec(point)
   const hitFaceIndex = getHitFaceIndex(polyhedron, hitPoint)
-  const pyramidIndices = pyramids ? polyhedron.pyramidIndices() : []
+  const pyramidIndices = _.includes(exclude, 'Y')
+    ? []
+    : polyhedron.pyramidIndices()
 
   // A solid can have only pyramids or cupolae/rotundae, so it suffices to check for one
   if (pyramidIndices.length > 0) {
@@ -544,11 +539,13 @@ export function getPyramidOrCupola(
   }
 
   // Other
-  const cupolaIndices = polyhedron.cupolaIndices()
+  const cupolaIndices = _.includes(exclude, 'U')
+    ? []
+    : polyhedron.cupolaIndices()
 
   // check if we're inside any cupola
-  const cupolaFaces = _.flatMap(cupolaIndices, fIndex =>
-    polyhedron.adjacentFaceIndices(...faces[fIndex]),
+  const cupolaFaces = polyhedron.adjacentFaceIndices(
+    ..._.flatMap(cupolaIndices, _.propertyOf(faces)),
   )
   if (!_.includes(cupolaFaces, hitFaceIndex)) {
     return null
@@ -556,11 +553,10 @@ export function getPyramidOrCupola(
 
   // if so, determine the closest cupola point to this
   const nearestPeak = _.minBy(cupolaIndices, fIndex => {
-    const plane = getPlane(faces[fIndex], vertices)
+    const plane = getPlane(_.at(polyhedron.vertexVectors(), faces[fIndex]))
     return plane.getDistanceToPoint(hitPoint)
   })
 
-  console.log('peak', nearestPeak)
   return faces[nearestPeak]
 }
 
