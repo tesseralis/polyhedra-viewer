@@ -17,6 +17,7 @@ function getEdges(face) {
   })
 }
 
+// TODO optimize/clean this up
 function getAllEdges(faces) {
   return _.uniqWith(_.flatMap(faces, getEdges), _.isEqual)
 }

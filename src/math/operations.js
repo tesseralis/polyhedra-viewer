@@ -180,12 +180,6 @@ function deduplicateVertices(polyhedron) {
   })
 }
 
-export function getEdges(face) {
-  return _.map(face, (vertex, index) => {
-    return _.sortBy([vertex, face[(index + 1) % face.length]])
-  })
-}
-
 function getEdgesOrdered(face) {
   return _.map(face, (vertex, index) => {
     return [vertex, getMod(face, index + 1)]
@@ -220,7 +214,7 @@ function faceGraph(polyhedron) {
   _.forEach(polyhedron.faces, (face, index) => {
     // for the pairs of vertices, find the face that contains the corresponding pair
     // ...this is n^2? more? ah who cares I'm too lazy
-    _.forEach(getEdges(face), edge => {
+    _.forEach(polyhedron.edges, edge => {
       if (!edgesToFaces[edge]) {
         edgesToFaces[edge] = []
       }
