@@ -295,12 +295,95 @@ function canAugment(polyhedron, faceIndex, { offset = 0 } = {}) {
   })
 }
 
+const sharesVertex = (face1, face2) => {
+  const intersectionCount = _.intersection(face1, face2).length
+  // Make sure they're not the same face
+  return intersectionCount > 0 && intersectionCount < face1.length
+}
+const numSides = face => face.length
+
+// Computes the set equality of two arrays
+const setEquals = (array1, array2) => _.xor(array1, array2).length === 0
+
+// Get what kind of base we are augmenting to
+function getBaseType(faces, base) {
+  const adjacentFaceCounts = _(faces)
+    .filter(face => sharesVertex(face, base))
+    .map(numSides)
+    .uniq()
+    .value()
+  if (setEquals(adjacentFaceCounts, [3, 4])) {
+    return 'cupola'
+  } else if (setEquals(adjacentFaceCounts, [4])) {
+    return 'prism'
+  } else if (setEquals(adjacentFaceCounts, [3])) {
+    return 'antiprism'
+  } else if (setEquals(adjacentFaceCounts, [3, 5])) {
+    return 'cupola'
+  } else {
+    return 'truncated'
+  }
+}
+
+function hasDirectedEdge(face, edge) {
+  const [u1, u2] = edge
+  return _.some(face, (v1, i) => {
+    const v2 = getMod(face, i + 1)
+    return u1 === v1 && u2 === v2
+  })
+}
+
+// Get the face in the polyhedron with the given directed edge
+function getFaceWithDirectedEdge(faces, edge) {
+  return _.find(faces, face => hasDirectedEdge(face, edge))
+}
+
+// Get the index in the augmentee underside to align with the base's 0th vertex
+function getAlignIndex(polyhedron, base, augmentee, underside, gyrate) {
+  console.log('getting align index with ', gyrate)
+  const baseType = getBaseType(polyhedron.faces, base)
+  console.log('our base type is ', baseType)
+  const adjFace = getFaceWithDirectedEdge(polyhedron.faces, [base[1], base[0]])
+  console.log('adjFace', adjFace)
+  const alignedFace = getFaceWithDirectedEdge(augmentee.faces, [
+    _.last(underside),
+    underside[0],
+  ])
+  console.log('alignedFace', alignedFace)
+  switch (baseType) {
+    // No options for antiprism
+    // TODO It *does* determine chirality though... do we care?
+    case 'antiprism':
+      return 0
+    case 'cupola':
+    case 'rotunda':
+      if (_.isNil(gyrate)) {
+        throw new Error(`Must define 'gyrate' for augmenting ${baseType} `)
+      }
+      const isOrtho = (adjFace.length !== 3) === (alignedFace.length !== 3)
+      console.log('isOrtho', isOrtho)
+      return isOrtho && gyrate === 'ortho' ? 1 : 0
+    case 'prism':
+      // If it's a prism and not an elongated cupola, ortho/gyro doesn't matter
+      if (getCupolae(polyhedron).length === 0) return 0
+      if (_.isNil(gyrate)) {
+        throw new Error(`Must define 'gyrate' for augmenting ${baseType} `)
+      }
+    // If it's an augmented cupola, we need to figure align it with the stuff from across
+    case 'truncated':
+      // Make sure the triangle faces don't match up
+      return (adjFace.length !== 3) !== (alignedFace.length !== 3) ? 1 : 0
+  }
+  return 0
+}
+
 // Augment the following
 // TODO digonal cupola option and rotunda option
-function doAugment(polyhedron, faceIndex, type) {
-  const base = polyhedron.faces[faceIndex]
+function doAugment(polyhedron, faceIndex, type, gyrate) {
+  const { faces, vertices } = polyhedron
+  const base = faces[faceIndex]
   const n = base.length
-  const baseVertices = base.map(index => vec(polyhedron.vertices[index]))
+  const baseVertices = base.map(index => vec(vertices[index]))
   const baseCenter = calculateCentroid(baseVertices)
   const sideLength = baseVertices[0].distanceTo(baseVertices[1])
   const baseNormal = getNormal(baseVertices)
@@ -328,22 +411,13 @@ function doAugment(polyhedron, faceIndex, type) {
   })
 
   const translatedV0 = baseVertices[0].sub(baseCenter)
-  const alignIndex = (() => {
-    if (base.length <= 5) return 0
-    // If we're dealing with a cupola (that is, augmenting an archimedean solid)
-    // make sure that the triangular faces don't line up
-    const adjFace = _.find(
-      polyhedron.faces,
-      face => _.intersection([base[0], base[1]], face).length === 2,
-    )
-    const alignedFace = _.find(
-      augmentee.faces,
-      face =>
-        _.intersection([undersideFace[0], _.last(undersideFace)], face)
-          .length === 2,
-    )
-    return (adjFace.length !== 3) !== (alignedFace.length !== 3) ? 0 : 1
-  })()
+  const alignIndex = getAlignIndex(
+    polyhedron,
+    base,
+    augmentee,
+    undersideFace,
+    gyrate,
+  )
   const alignedV0 = alignedAugmenteeVertices[undersideFace[alignIndex]]
   // align the first vertex of the base face to the first vertex of the underside face
   const alignVerticesAngle = translatedV0.angleBetween(alignedV0, true)
@@ -437,8 +511,8 @@ function getFaceToAugment(polyhedron, name) {
   }
 }
 
-export function augment(polyhedron, { fIndex }) {
-  return doAugment(polyhedron, fIndex, 'pyramidsCupolae')
+export function augment(polyhedron, { fIndex, gyrate }) {
+  return doAugment(polyhedron, fIndex, 'pyramidsCupolae', gyrate)
 }
 
 export function getElongated(polyhedron) {
