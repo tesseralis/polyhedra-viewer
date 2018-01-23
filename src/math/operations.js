@@ -518,17 +518,6 @@ export function getGyroElongated(polyhedron) {
   return doAugment(polyhedron, faceIndex, 'antiprisms')
 }
 
-// get an array mapping each vertex index to the indices of the faces it is adjacent to
-export function getAdjacentFacesMapping(polyhedron) {
-  const mapping = polyhedron.vertices.map(() => [])
-  polyhedron.faces.forEach((face, fIndex) => {
-    face.forEach(vIndex => {
-      mapping[vIndex].push(fIndex)
-    })
-  })
-  return mapping
-}
-
 // Get a face representing the boundary of the faces
 function getBoundary(faces) {
   const edges = {}
@@ -560,32 +549,28 @@ function getBoundary(faces) {
   return result
 }
 
-function isPyramid({ faces, vertices }, vIndex, { adjacentFacesMapping }) {
-  const adjacentFaces = adjacentFacesMapping[vIndex].map(
-    fIndex => faces[fIndex],
-  )
+function isPyramid(polyhedron, vIndex) {
+  const adjacentFaces = polyhedron.adjacentFaces(vIndex)
   if (!_.every(adjacentFaces, { length: 3 })) return false
   const boundary = getBoundary(adjacentFaces)
-  return isPlanar(boundary, vertices)
+  return isPlanar(boundary, polyhedron.vertices)
 }
 
 // Return the face indices of all the faces that are tops of cupolae
-function getPyramidIndices(polyhedron, { adjacentFacesMapping } = {}) {
+function getPyramidIndices(polyhedron) {
   const { vertices } = polyhedron
   // find the face in the polyhedron whose vertices' adjacent faces are <face>-4-3-4
-  if (!adjacentFacesMapping) {
-    adjacentFacesMapping = getAdjacentFacesMapping(polyhedron)
-  }
   return _.filter(_.range(vertices.length), vIndex =>
-    isPyramid(polyhedron, vIndex, { adjacentFacesMapping }),
+    isPyramid(polyhedron, vIndex),
   )
 }
 
-function isCupola({ faces, vertices }, fIndex, { adjacentFacesMapping }) {
+function isCupola(polyhedron, fIndex) {
+  const { faces, vertices } = polyhedron
   const face = faces[fIndex]
   const cupolaCount = _.countBy([3, 4, 4, face.length])
   const hasRightSides = _.every(face, vIndex => {
-    const nbrFaces = adjacentFacesMapping[vIndex].map(fIndex2 => faces[fIndex2])
+    const nbrFaces = polyhedron.adjacentFaces(vIndex)
     const count = _(nbrFaces)
       .map('length')
       .countBy()
@@ -602,9 +587,7 @@ function isCupola({ faces, vertices }, fIndex, { adjacentFacesMapping }) {
 
   if (!hasRightSides) return false
 
-  const allNeighborFaces = _.uniq(
-    _.flatMap(face, vIndex => adjacentFacesMapping[vIndex]),
-  ).map(fIndex2 => faces[fIndex2])
+  const allNeighborFaces = polyhedron.adjacentFaces(...face)
 
   // return true
   // make sure the whole thing is on a plane
@@ -613,15 +596,10 @@ function isCupola({ faces, vertices }, fIndex, { adjacentFacesMapping }) {
 }
 
 // Return the face indices of all the faces that are tops of cupolae
-function getCupolaeIndices(polyhedron, { adjacentFacesMapping } = {}) {
+function getCupolaeIndices(polyhedron) {
   const { faces } = polyhedron
   // find the face in the polyhedron whose vertices' adjacent faces are <face>-4-3-4
-  if (!adjacentFacesMapping) {
-    adjacentFacesMapping = getAdjacentFacesMapping(polyhedron)
-  }
-  return _.filter(_.range(faces.length), fIndex =>
-    isCupola(polyhedron, fIndex, { adjacentFacesMapping }),
-  )
+  return _.filter(_.range(faces.length), fIndex => isCupola(polyhedron, fIndex))
 }
 
 export function getCupolae(polyhedron) {
@@ -653,20 +631,13 @@ export function getPyramidOrCupola(
   const { faces, vertices } = polyhedron
   const hitPoint = vec(point)
   const hitFaceIndex = getHitFaceIndex(polyhedron, hitPoint)
-  const adjacentFacesMapping = getAdjacentFacesMapping({
-    faces,
-    vertices,
-  })
-  const pyramidIndices = pyramids
-    ? getPyramidIndices(polyhedron, { adjacentFacesMapping })
-    : []
+  const pyramidIndices = pyramids ? getPyramidIndices(polyhedron) : []
 
   // A solid can have only pyramids or cupolae/rotundae, so it suffices to check for one
   if (pyramidIndices.length > 0) {
     // check if we're inside any pyramid
-    const pyramidFaces = _.flatMap(
-      pyramidIndices,
-      vIndex => adjacentFacesMapping[vIndex],
+    const pyramidFaces = _.flatMap(pyramidIndices, vIndex =>
+      polyhedron.adjacentFaceIndices(vIndex),
     )
     if (!_.includes(pyramidFaces, hitFaceIndex)) {
       return null
@@ -680,11 +651,11 @@ export function getPyramidOrCupola(
   }
 
   // Other
-  const cupolaeIndices = getCupolaeIndices(polyhedron, { adjacentFacesMapping })
+  const cupolaeIndices = getCupolaeIndices(polyhedron)
 
   // check if we're inside any cupola
-  const cupolaeFaces = _.flatMapDeep(cupolaeIndices, fIndex =>
-    _.map(faces[fIndex], vIndex => adjacentFacesMapping[vIndex]),
+  const cupolaeFaces = _.flatMap(cupolaeIndices, fIndex =>
+    polyhedron.adjacentFaceIndices(...faces[fIndex]),
   )
   if (!_.includes(cupolaeFaces, hitFaceIndex)) {
     return null

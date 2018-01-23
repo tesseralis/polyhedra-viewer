@@ -77,7 +77,7 @@ class Faces extends Component {
           setMode,
           applyOperation,
           solid,
-          faces,
+          solidData,
           history,
         } = this.props
         const { applyArgs } = this.state
@@ -86,7 +86,8 @@ class Faces extends Component {
           if (gyrate) {
             options.gyrate = gyrate
           }
-          options.with = augmentee || augmentees[faces[applyArgs.fIndex].length]
+          options.with =
+            augmentee || augmentees[solidData.faces[applyArgs.fIndex].length]
         }
         if (mode && !_.isNil(applyArgs)) {
           const next = getNextPolyhedron(
@@ -108,21 +109,19 @@ class Faces extends Component {
         'mousemove',
         _.throttle(event => {
           this.drag = true
-          const { faces, vertices, mode } = this.props
+          const { solidData, mode } = this.props
           switch (mode) {
             case '+':
-              const fIndex = getAugmentFace({ vertices, faces }, event.hitPnt)
+              const fIndex = getAugmentFace(solidData, event.hitPnt)
               this.setState({
                 applyArgs: fIndex === -1 ? null : { fIndex },
               })
               return
             case '-':
             case 'g':
-              const vIndices = getPyramidOrCupola(
-                { vertices, faces },
-                event.hitPnt,
-                { pyramids: mode === '-' },
-              )
+              const vIndices = getPyramidOrCupola(solidData, event.hitPnt, {
+                pyramids: mode === '-',
+              })
               this.setState({
                 applyArgs: vIndices && { vIndices },
               })
@@ -138,9 +137,10 @@ class Faces extends Component {
   }
 
   render() {
-    const { faces, vertices, config } = this.props
+    const { solidData, config } = this.props
     const { highlightFaceIndices } = this.state
     const { opacity, colors } = config
+    const { vertices, faces } = solidData
     // TODO implement highlighting
     // console.log('highlight faces', highlightFaceIndices)
     return (
@@ -219,8 +219,7 @@ class Polyhedron extends Component {
             <transform>
               {showFaces && (
                 <ConnectedFaces
-                  faces={faces}
-                  vertices={vertices}
+                  solidData={solidData}
                   config={config}
                   solid={solid}
                 />
