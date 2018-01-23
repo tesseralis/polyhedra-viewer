@@ -367,6 +367,8 @@ function getOppositePrismSide(polyhedron, base) {
 // TODO handle rhombicosidodecahedron case (still don't know what terminology I want to use)
 // Get the index in the augmentee underside to align with the base's 0th vertex
 function getAlignIndex(polyhedron, base, augmentee, underside, gyrate) {
+  // TODO handle gyrobifastigium
+  if (numSides(base) <= 5) return 0
   const baseType = getBaseType(polyhedron.faces, base)
   if (baseType === 'antiprism') {
     return 0
