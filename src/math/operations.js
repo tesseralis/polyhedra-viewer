@@ -535,7 +535,6 @@ export function getAdjacentFacesMapping(polyhedron) {
 
 // Get a face representing the boundary of the faces
 function getBoundary(faces) {
-  // TODO deduplicate
   const edges = {}
   // build up a lookup table for every pair of edges to that face
   _.forEach(faces, (face, index) => {

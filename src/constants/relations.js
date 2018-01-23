@@ -77,7 +77,6 @@ function makeBidirectional(graph) {
   const result = {}
   for (let [source, operations] of Object.entries(graph)) {
     for (let [operation, sinks] of Object.entries(operations)) {
-      // FIXME handle object sinks
       for (let sink of sinks) {
         const sinkValue = _.isObject(sink) ? sink.value : sink
         if (!sinkValue) {
@@ -355,7 +354,7 @@ const diminishedIcosahedraGraph = (() => {
   }
 })()
 
-// FIXME adapt this for the new format
+// TODO adapt this for the new format
 // Right now, I donm't know of a good system to track diminishing *and* gyration
 const rhombicosidodecahedraGraph = (() => {
   return {
@@ -429,21 +428,16 @@ const normalized = [
 const baseGraph = graphMerge(...normalized)
 export const polyhedraGraph = makeBidirectional(baseGraph)
 
-console.log(polyhedraGraph)
-
 export function hasOperation(solid, operation) {
   return _.has(polyhedraGraph[toConwayNotation(solid)], operation)
 }
 
 // Get the polyhedron name as a result of applying the operation to the given polyhedron
 export function getNextPolyhedron(solid, operation, options) {
-  console.log(options)
   const next = _.filter(
     polyhedraGraph[toConwayNotation(solid)][operation],
     options || _.stubTrue,
   )
-  console.log(next)
-  // FIXME handle more than one gyration possibility
   if (next.length > 1) {
     throw new Error('Cannot deal with more than one possibility right now')
   }
