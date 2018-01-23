@@ -201,6 +201,19 @@ export function getTruncated(polyhedron, options = {}) {
   return removeExtraneousVertices(newPolyhedron)
 }
 
+function vertexGraph(polyhedron) {
+  const graph = {}
+  _.forEach(polyhedron.faces, face => {
+    _.forEach(face, (vIndex, i) => {
+      if (!graph[vIndex]) {
+        graph[vIndex] = []
+      }
+      graph[vIndex].push(getMod(face, i + 1))
+    })
+  })
+  return graph
+}
+
 function faceGraph(polyhedron) {
   const edgesToFaces = {}
   // build up a lookup table for every pair of edges to that face
@@ -320,6 +333,8 @@ function getBaseType(faces, base) {
     return 'antiprism'
   } else if (setEquals(adjacentFaceCounts, [3, 5])) {
     return 'cupola'
+  } else if (setEquals(adjacentFaceCounts, [4, 5])) {
+    return 'rhombicosidodecahedron'
   } else {
     return 'truncated'
   }
@@ -338,43 +353,52 @@ function getFaceWithDirectedEdge(faces, edge) {
   return _.find(faces, face => hasDirectedEdge(face, edge))
 }
 
+// Get the opposite side of the given prism base
+// ensuring that the vertex indices match up
+function getOppositePrismSide(polyhedron, base) {
+  const graph = vertexGraph(polyhedron)
+  return _.map(base, vIndex => {
+    // Get the neighbor of each vertex that isn't also in the prism
+    const nbrs = graph[vIndex]
+    return _.find(nbrs, vIndex => _.includes(base, vIndex))
+  })
+}
+
+// TODO handle rhombicosidodecahedron case (still don't know what terminology I want to use)
 // Get the index in the augmentee underside to align with the base's 0th vertex
 function getAlignIndex(polyhedron, base, augmentee, underside, gyrate) {
-  console.log('getting align index with ', gyrate)
   const baseType = getBaseType(polyhedron.faces, base)
-  console.log('our base type is ', baseType)
-  const adjFace = getFaceWithDirectedEdge(polyhedron.faces, [base[1], base[0]])
-  console.log('adjFace', adjFace)
+  if (baseType === 'antiprism') {
+    return 0
+  }
+
+  if (baseType === 'prism' && getCupolae(polyhedron).length === 0) {
+    return 0
+  }
+
+  if (baseType !== 'truncated' && _.isNil(gyrate)) {
+    throw new Error(`Must define 'gyrate' for augmenting ${baseType} `)
+  }
+
+  const faceToCheck =
+    baseType === 'prism' ? getOppositePrismSide(polyhedron, base) : base
+
+  const adjFace = getFaceWithDirectedEdge(polyhedron.faces, [
+    faceToCheck[1],
+    faceToCheck[0],
+  ])
   const alignedFace = getFaceWithDirectedEdge(augmentee.faces, [
     _.last(underside),
     underside[0],
   ])
-  console.log('alignedFace', alignedFace)
-  switch (baseType) {
-    // No options for antiprism
-    // TODO It *does* determine chirality though... do we care?
-    case 'antiprism':
-      return 0
-    case 'cupola':
-    case 'rotunda':
-      if (_.isNil(gyrate)) {
-        throw new Error(`Must define 'gyrate' for augmenting ${baseType} `)
-      }
-      const isOrtho = (adjFace.length !== 3) === (alignedFace.length !== 3)
-      console.log('isOrtho', isOrtho)
-      return isOrtho && gyrate === 'ortho' ? 1 : 0
-    case 'prism':
-      // If it's a prism and not an elongated cupola, ortho/gyro doesn't matter
-      if (getCupolae(polyhedron).length === 0) return 0
-      if (_.isNil(gyrate)) {
-        throw new Error(`Must define 'gyrate' for augmenting ${baseType} `)
-      }
-    // If it's an augmented cupola, we need to figure align it with the stuff from across
-    case 'truncated':
-      // Make sure the triangle faces don't match up
-      return (adjFace.length !== 3) !== (alignedFace.length !== 3) ? 1 : 0
+
+  // It's orthogonal if triangle faces are aligned or non-triangle faces are aligned
+  const isOrtho = (numSides(adjFace) !== 3) === (numSides(alignedFace) !== 3)
+
+  if (baseType === 'truncated') {
+    return isOrtho ? 0 : 1
   }
-  return 0
+  return isOrtho && gyrate === 'ortho' ? 1 : 0
 }
 
 // Augment the following
@@ -476,39 +500,6 @@ function findWithDistance(
     }
     return true
   })
-}
-
-function getFaceToAugment(polyhedron, name) {
-  // only do the "main" class right now
-  const graph = faceGraph(polyhedron)
-  const maxFace = _(polyhedron.faces)
-    .map('length')
-    .max()
-  // TODO rely on a database of metadata instead of just parsing the name
-  // Determine whether we're a (augmented) prism or an archimedean solid or dodecahedron
-  if (name.includes('sphenocorona')) {
-    return findWithDistance(graph, 4, 3, 0)
-  }
-  if (name.includes('truncated')) {
-    return findWithDistance(graph, maxFace, 4, name.includes('para') ? 3 : 2, {
-      exact: name.includes('meta'),
-    })
-  } else if (name.includes('dodecahedron')) {
-    return findWithDistance(graph, maxFace, 3, name.includes('para') ? 2 : 1, {
-      exact: name.includes('meta'),
-    })
-  } else if (name.includes('prism')) {
-    return findWithDistance(
-      graph,
-      4,
-      3,
-      name.includes('triangular') ? 0 : name.includes('para') ? 2 : 1,
-      {
-        exact: name.includes('meta'),
-        avoid: [maxFace],
-      },
-    )
-  }
 }
 
 export function augment(polyhedron, { fIndex, gyrate }) {
