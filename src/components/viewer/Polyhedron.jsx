@@ -17,7 +17,7 @@ import {
 } from 'selectors'
 import { setMode, setPolyhedron, applyOperation } from 'actions'
 import { mapObject } from 'util.js'
-import { getAugmentFace, findPeak } from 'math/operations'
+import { getAugmentFace } from 'math/operations'
 
 // Join a list of lists with an inner and outer separator.
 export const joinListOfLists = (list, outerSep, innerSep) => {
@@ -119,7 +119,7 @@ class Faces extends Component {
               return
             case '-':
             case 'g':
-              const vIndices = findPeak(solidData, event.hitPnt, {
+              const vIndices = solidData.findPeak(event.hitPnt, {
                 exclude: [mode === '-' && 'Y'],
               })
               console.log('vIndices', vIndices)

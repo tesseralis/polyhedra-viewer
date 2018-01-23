@@ -491,73 +491,13 @@ export function getGyroElongated(polyhedron) {
   return doAugment(polyhedron, faceIndex, 'antiprisms')
 }
 
-function getHitFaceIndex(polyhedron, point) {
-  return _.minBy(polyhedron.fIndices(), fIndex => {
-    const face = polyhedron.faces[fIndex]
-    const plane = getPlane(_.at(polyhedron.vertexVectors(), face))
-    return plane.getDistanceToPoint(point)
-  })
-}
-
 export function getAugmentFace(polyhedron, point) {
   const hitPoint = vec(point)
-  const hitFaceIndex = getHitFaceIndex(polyhedron, hitPoint)
+  const hitFaceIndex = polyhedron.hitFaceIndex(hitPoint)
   return canAugment(polyhedron, hitFaceIndex) ||
     canAugment(polyhedron, hitFaceIndex, { offset: 1 })
     ? hitFaceIndex
     : -1
-}
-
-/**
- * Find the nearest pyramid, cupola, or rotunda in the solid to the provided hit point.
- * Return the "peak" vertices, or null if the point is not part of any peak.
- * @param exclude a list of codes for solids to exclude (Y, U, R)
- */
-export function findPeak(polyhedron, point, exclude = {}) {
-  const { faces, vertices } = polyhedron
-  const hitPoint = vec(point)
-  const hitFaceIndex = getHitFaceIndex(polyhedron, hitPoint)
-  const pyramidIndices = _.includes(exclude, 'Y')
-    ? []
-    : polyhedron.pyramidIndices()
-
-  // A solid can have only pyramids or cupolae/rotundae, so it suffices to check for one
-  if (pyramidIndices.length > 0) {
-    // check if we're inside any pyramid
-    const pyramidFaces = _.flatMap(pyramidIndices, vIndex =>
-      polyhedron.adjacentFaceIndices(vIndex),
-    )
-    if (!_.includes(pyramidFaces, hitFaceIndex)) {
-      return null
-    }
-
-    const nearestPeak = _.minBy(pyramidIndices, vIndex => {
-      const vertex = vec(vertices[vIndex])
-      return vertex.distanceTo(hitPoint)
-    })
-    return [nearestPeak]
-  }
-
-  // Other
-  const cupolaIndices = _.includes(exclude, 'U')
-    ? []
-    : polyhedron.cupolaIndices()
-
-  // check if we're inside any cupola
-  const cupolaFaces = polyhedron.adjacentFaceIndices(
-    ..._.flatMap(cupolaIndices, _.propertyOf(faces)),
-  )
-  if (!_.includes(cupolaFaces, hitFaceIndex)) {
-    return null
-  }
-
-  // if so, determine the closest cupola point to this
-  const nearestPeak = _.minBy(cupolaIndices, fIndex => {
-    const plane = getPlane(_.at(polyhedron.vertexVectors(), faces[fIndex]))
-    return plane.getDistanceToPoint(hitPoint)
-  })
-
-  return faces[nearestPeak]
 }
 
 function removeVertices(polyhedron, vIndices) {
@@ -573,24 +513,21 @@ export function diminish(polyhedron, { vIndices }) {
   return removeVertices(polyhedron, vIndices)
 }
 
-// TODO allow gyrating rotundae
 export function gyrate(polyhedron, { vIndices }) {
   // get adjacent faces
-  const facesToTurn = _.filter(
-    polyhedron.faces,
-    face => _.intersection(face, vIndices).length !== 0,
-  )
+  const facesToTurn = polyhedron.adjacentFaces(...vIndices)
   const boundary = getBoundary(facesToTurn)
 
   // TODO this won't work with animation, so I have to reimplement eventually
 
   // rotate the cupola top
-  const boundaryVertices = boundary.map(vIndex =>
-    vec(polyhedron.vertices[vIndex]),
+  const boundaryVertices = boundary.map(
+    vIndex => polyhedron.vertexVectors()[vIndex],
   )
   const normal = getNormal(boundaryVertices).getNormalized()
   const centroid = calculateCentroid(boundaryVertices)
-  const theta = Math.PI / vIndices.length
+  // const theta = 2 * Math.PI / boundary.length
+  const theta = 2 * Math.PI / numSides(boundary)
   const newVertices = polyhedron.vertices.map((vertex, vIndex) => {
     if (_.includes(vIndices, vIndex)) {
       return vec(vertex)
