@@ -2,6 +2,8 @@ import _ from 'lodash'
 import Polyhedron, { numSides, getBoundary } from './Polyhedron'
 import { vec, getPlane, PRECISION } from './linAlg'
 
+const TAU = 2 * Math.PI
+
 function mod(a, b) {
   return a >= 0 ? a % b : a % b + b
 }
@@ -38,21 +40,8 @@ function prevVertex(face, vertex) {
 const getFindFn = (toAdd, vertex) => face =>
   prevVertex(face, vertex) === nextVertex(toAdd, vertex)
 
-// Get faces that contain this vertex
-function getTouchingFaces({ faces }, vertex) {
-  const touchingFaces = _.filter(faces, face => _.includes(face, vertex))
-  let toAdd = touchingFaces[0]
-  const ordered = []
-  do {
-    ordered.push(toAdd)
-    const nextFace = _.find(touchingFaces, getFindFn(toAdd, vertex))
-    toAdd = nextFace
-  } while (ordered.length < touchingFaces.length)
-  return ordered
-}
-
 function replaceVertex(newPolyhedron, polyhedron, vertex, { mock, rectify }) {
-  const touchingFaces = getTouchingFaces(polyhedron, vertex)
+  const touchingFaces = polyhedron.adjacentFaces(vertex)
   const touchingFaceIndices = touchingFaces.map(face =>
     polyhedron.faces.indexOf(face),
   )
@@ -322,21 +311,22 @@ function getFaceWithDirectedEdge(faces, edge) {
 // Get the opposite side of the given prism base
 // ensuring that the vertex indices match up
 function getOppositePrismSide(polyhedron, base) {
-  const graph = vertexGraph(polyhedron)
   return _.map(base, vIndex => {
     // Get the neighbor of each vertex that isn't also in the prism
-    const nbrs = graph[vIndex]
-    return _.find(nbrs, vIndex => _.includes(base, vIndex))
+    const nbrs = polyhedron.adjacentVertexIndices(vIndex)
+    return _.find(nbrs, vIndex2 => !_.includes(base, vIndex2))
   })
 }
 
 // TODO handle rhombicosidodecahedron case (still don't know what terminology I want to use)
 // TODO for cupolaerotundae, it's *opposite* because you're matching the *faces*, not the sides
+// FIXME this broke
 // Get the index in the augmentee underside to align with the base's 0th vertex
 function getAlignIndex(polyhedron, base, augmentee, underside, gyrate) {
   // TODO handle gyrobifastigium
   if (numSides(base) <= 5) return 0
   const baseType = getBaseType(polyhedron.faces, base)
+  console.log('baseType', baseType)
   if (baseType === 'antiprism') {
     return 0
   }
@@ -367,6 +357,7 @@ function getAlignIndex(polyhedron, base, augmentee, underside, gyrate) {
   if (baseType === 'truncated') {
     return isOrtho ? 0 : 1
   }
+  console.log('gyrate', gyrate)
   return isOrtho && gyrate === 'ortho' ? 1 : 0
 }
 
@@ -526,8 +517,7 @@ export function gyrate(polyhedron, { vIndices }) {
   )
   const normal = getNormal(boundaryVertices).getNormalized()
   const centroid = calculateCentroid(boundaryVertices)
-  // const theta = 2 * Math.PI / boundary.length
-  const theta = 2 * Math.PI / numSides(boundary)
+  const theta = TAU / numSides(boundary)
   const newVertices = polyhedron.vertices.map((vertex, vIndex) => {
     if (_.includes(vIndices, vIndex)) {
       return vec(vertex)
