@@ -174,6 +174,11 @@ export default class Polyhedron {
     return isPlanar(_.at(this.vertexVectors(), vIndices))
   }
 
+  /*
+   * Methodes relating to pyramids, cupolae, and rotundae
+   */
+
+  // TODO move all these "peak" functions to a different file
   // Returns whether the given polyhedron at vIndex is a pyramid
   isPyramid = vIndex => {
     const adjacentFaces = this.adjacentFaces(vIndex)

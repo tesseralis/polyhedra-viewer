@@ -55,79 +55,9 @@ class Faces extends Component {
     this.drag = false
     // TODO make sure this doesn't have a race condition
     document.onload = _.once(() => {
-      this.shape.addEventListener('mousedown', () => {
-        this.drag = false
-      })
-      this.shape.addEventListener('mouseup', () => {
-        // it's a drag, don't click
-        if (this.drag) return
-        const {
-          mode,
-          gyrate,
-          using,
-          setMode,
-          applyOperation,
-          solid,
-          solidData,
-          history,
-        } = this.props
-
-        const { applyArgs } = this.state
-        const options = {}
-        if (mode === '+') {
-          if (gyrate) {
-            options.gyrate = gyrate
-          }
-          if (using) {
-            options.using = using
-          }
-        }
-        if (mode && !_.isNil(applyArgs)) {
-          const next = getNextPolyhedron(
-            unescapeName(solid),
-            mode,
-            !_.isEmpty(options) ? options : null,
-          )
-          history.push(`/${escapeName(next)}/related`)
-          applyOperation(mode, { ...applyArgs, gyrate, using })
-
-          // Get out of current mode if we can't do it any more
-          if (!hasOperation(next, mode)) {
-            setMode(null)
-          }
-        }
-      })
-
-      this.shape.addEventListener(
-        'mousemove',
-        _.throttle(event => {
-          this.drag = true
-          const { solidData, mode } = this.props
-          switch (mode) {
-            case '+':
-              const fIndex = getAugmentFace(solidData, event.hitPnt)
-              console.log(fIndex)
-              this.setState({
-                applyArgs: fIndex === -1 ? null : { fIndex },
-              })
-              return
-            case '-':
-            case 'g':
-              const vIndices = solidData.findPeak(event.hitPnt, {
-                exclude: [mode === '-' && 'Y'],
-              })
-              console.log('vIndices', vIndices)
-              this.setState({
-                applyArgs: vIndices && { vIndices },
-              })
-              return
-
-            default:
-              return
-          }
-        }, 200),
-        false,
-      )
+      this.shape.addEventListener('mousedown', this.handleMouseDown)
+      this.shape.addEventListener('mouseup', this.handleMouseUp)
+      this.shape.addEventListener('mousemove', _.throttle(this.handleMove, 200))
     })
   }
 
@@ -146,14 +76,7 @@ class Faces extends Component {
         <indexedfaceset
           solid="false"
           colorPerVertex="false"
-          colorindex={faces
-            .map(
-              (face, index) =>
-                false && _.includes(highlightFaceIndices, index)
-                  ? 6
-                  : getColorIndex(face),
-            )
-            .join(' ')}
+          colorindex={faces.map((face, index) => getColorIndex(face)).join(' ')}
           coordindex={joinListOfLists(faces, ' -1 ', ' ')}
         >
           <Coordinates points={vertices} />
@@ -161,6 +84,77 @@ class Faces extends Component {
         </indexedfaceset>
       </shape>
     )
+  }
+
+  handleMouseDown = () => {
+    // logic to ensure drags aren't registered as clicks
+    this.drag = false
+  }
+
+  handleMouseUp = () => {
+    if (this.drag) return
+
+    const {
+      mode,
+      gyrate,
+      using,
+      setMode,
+      applyOperation,
+      solid,
+      solidData,
+      history,
+    } = this.props
+
+    const { applyArgs } = this.state
+    const options = {}
+    if (mode === '+') {
+      if (gyrate) {
+        options.gyrate = gyrate
+      }
+      if (using) {
+        options.using = using
+      }
+    }
+    if (mode && !_.isNil(applyArgs)) {
+      const next = getNextPolyhedron(
+        unescapeName(solid),
+        mode,
+        !_.isEmpty(options) ? options : null,
+      )
+      history.push(`/${escapeName(next)}/related`)
+      applyOperation(mode, { ...applyArgs, gyrate, using })
+
+      // Get out of current mode if we can't do it any more
+      if (!hasOperation(next, mode)) {
+        setMode(null)
+      }
+    }
+  }
+
+  handleMove = event => {
+    this.drag = true
+    const { solidData, mode } = this.props
+    switch (mode) {
+      case '+':
+        const fIndex = getAugmentFace(solidData, event.hitPnt)
+        console.log(fIndex)
+        this.setState({
+          applyArgs: fIndex === -1 ? null : { fIndex },
+        })
+        return
+      case '-':
+      case 'g':
+        const vIndices = solidData.findPeak(event.hitPnt, {
+          exclude: [mode === '-' && 'Y'],
+        })
+        console.log('vIndices', vIndices)
+        this.setState({
+          applyArgs: vIndices && { vIndices },
+        })
+        return
+      default:
+        return
+    }
   }
 }
 
