@@ -16,7 +16,7 @@ import {
   getGyrateControl,
   getAugmentee,
 } from 'selectors'
-import { setMode, setPolyhedron, applyOperation } from 'actions'
+import { setMode, applyOperation } from 'actions'
 import { mapObject } from 'util.js'
 import { getAugmentFace } from 'math/operations'
 
@@ -94,16 +94,7 @@ class Faces extends Component {
   handleMouseUp = () => {
     if (this.drag) return
 
-    const {
-      mode,
-      gyrate,
-      using,
-      setMode,
-      applyOperation,
-      solid,
-      solidData,
-      history,
-    } = this.props
+    const { mode, gyrate, using, setMode, applyOperation, solid } = this.props
 
     const { applyArgs } = this.state
     const options = {}
@@ -121,8 +112,7 @@ class Faces extends Component {
         mode,
         !_.isEmpty(options) ? options : null,
       )
-      history.push(`/${escapeName(next)}/related`)
-      applyOperation(mode, { ...applyArgs, gyrate, using })
+      applyOperation(mode, escapeName(next), { ...applyArgs, gyrate, using })
 
       // Get out of current mode if we can't do it any more
       if (!hasOperation(next, mode)) {
@@ -189,12 +179,6 @@ const Edges = ({ edges, vertices }) => {
 // const getScaleAttr = scale => `${scale} ${scale} ${scale}`
 
 class Polyhedron extends Component {
-  // TODO make sure this is stable
-  componentDidMount() {
-    const { solid, onLoad } = this.props
-    onLoad(solid)
-  }
-
   // TODO color
   render() {
     const { solid, config, solidData } = this.props
@@ -231,8 +215,4 @@ const mapStateToProps = createStructuredSelector({
   solidData: getPolyhedron,
 })
 
-const mapDispatchToProps = {
-  onLoad: setPolyhedron,
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(Polyhedron)
+export default withRouter(connect(mapStateToProps)(Polyhedron))

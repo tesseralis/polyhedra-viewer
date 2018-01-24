@@ -15,9 +15,10 @@ export const setPolyhedron = name => ({
 })
 
 const APPLY_OPERATION = 'APPLY_OPERATION'
-export const applyOperation = (operation, config) => ({
+export const applyOperation = (operation, name, config) => ({
   type: APPLY_OPERATION,
   operation,
+  name,
   config,
 })
 
@@ -30,6 +31,7 @@ const operations = {
 }
 
 const initialState = {
+  name: 'tetrahedron',
   data: Polyhedron.get('tetrahedron'),
 }
 
@@ -39,7 +41,7 @@ export default function polyhedron(state = initialState, action) {
       if (!isValidSolid(action.name)) {
         return state
       }
-      return { ...state, data: Polyhedron.get(action.name) }
+      return { ...state, data: Polyhedron.get(action.name), name: action.name }
     case APPLY_OPERATION:
       if (!operations[action.operation]) {
         return state
@@ -47,6 +49,7 @@ export default function polyhedron(state = initialState, action) {
       return {
         ...state,
         data: operations[action.operation](state.data, action.config),
+        name: action.name,
       }
     default:
       return state
