@@ -340,7 +340,7 @@ function getAlignIndex(polyhedron, base, augmentee, underside, gyrate) {
 
 // Augment the following
 // TODO digonal cupola option and rotunda option
-function doAugment(polyhedron, faceIndex, type, gyrate) {
+function doAugment(polyhedron, faceIndex, type, gyrate, augmentWith) {
   const { faces, vertices } = polyhedron
   const base = faces[faceIndex]
   const n = base.length
@@ -349,7 +349,13 @@ function doAugment(polyhedron, faceIndex, type, gyrate) {
   const sideLength = baseVertices[0].distanceTo(baseVertices[1])
   const baseNormal = getNormal(baseVertices)
 
-  const augmentee = augmentData[type][n]
+  // FIXME genericize this
+  const augmentee =
+    augmentWith === 'R5'
+      ? Polyhedron.get('pentagonal-rotunda')
+      : augmentWith === 'U2'
+        ? Polyhedron.get('triangular-prism')
+        : augmentData[type][n]
   const augmenteeVertices = augmentee.vertices.map(vec)
   // rotate and translate so that the face is next to our face
   const undersideIndex = _.findIndex(augmentee.faces, face => face.length === n)
@@ -447,8 +453,9 @@ function findWithDistance(
   })
 }
 
-export function augment(polyhedron, { fIndex, gyrate }) {
-  return doAugment(polyhedron, fIndex, 'pyramidsCupolae', gyrate)
+export function augment(polyhedron, { fIndex, gyrate, augmentee }) {
+  console.log('augmentee', augmentee)
+  return doAugment(polyhedron, fIndex, 'pyramidsCupolae', gyrate, augmentee)
 }
 
 export function getElongated(polyhedron) {

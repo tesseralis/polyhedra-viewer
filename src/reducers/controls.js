@@ -13,9 +13,16 @@ export const setGyrate = gyrate => ({
   gyrate,
 })
 
+const SET_AUGMENTEE = 'SET_AUGMENTEE'
+export const setAugmentee = augmentee => ({
+  type: SET_AUGMENTEE,
+  augmentee,
+})
+
 const initialState = {
   mode: null,
   gyrate: null,
+  augmentee: null,
 }
 
 export default function controls(state = initialState, action) {
@@ -23,13 +30,19 @@ export default function controls(state = initialState, action) {
     case SET_MODE:
       const newState = { mode: action.mode, gyrate: null }
       if (action.mode === '+') {
+        // FIXME I don't like this, not one bit!
         if (_.filter(action.relations, 'gyrate').length > 1) {
           newState.gyrate = 'ortho'
+        }
+        if (_.filter(action.relations, 'with').length > 1) {
+          newState.augmentee = action.relations[0].with
         }
       }
       return { ...state, ...newState }
     case SET_GYRATE:
       return { ...state, gyrate: action.gyrate }
+    case SET_AUGMENTEE:
+      return { ...state, augmentee: action.augmentee }
     default:
       return state
   }

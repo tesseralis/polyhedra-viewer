@@ -5,8 +5,8 @@ import { connect } from 'react-redux'
 import { createStructuredSelector } from 'reselect'
 
 import { toConwayNotation, fromConwayNotation } from 'constants/polyhedra'
-import { applyOperation, setMode, setGyrate } from 'actions'
-import { getMode, getGyrateControl } from 'selectors'
+import { applyOperation, setMode, setGyrate, setAugmentee } from 'actions'
+import { getMode, getGyrateControl, getAugmentee } from 'selectors'
 
 import { polyhedraGraph } from 'constants/relations'
 import PolyhedronLink from 'components/common/PolyhedronLink'
@@ -90,9 +90,11 @@ function RelatedPolyhedra({
   solid,
   mode,
   gyrateControl,
+  augmentee,
   applyOperation,
   setMode,
   setGyrate,
+  setAugmentee,
 }) {
   const notation = toConwayNotation(solid.replace(/-/g, ' '))
   const related = polyhedraGraph[notation]
@@ -141,6 +143,26 @@ function RelatedPolyhedra({
                     </button>
                   </div>
                 )}
+              {operation === '+' &&
+                !!augmentee && (
+                  <div>
+                    {_(related[operation])
+                      .map('with')
+                      .uniq()
+                      .map(with_ => (
+                        <button
+                          className={css(
+                            styles.optionButton,
+                            augmentee === with_ && styles.isHighlighted,
+                          )}
+                          onClick={() => setAugmentee(with_)}
+                        >
+                          {with_}
+                        </button>
+                      ))
+                      .value()}
+                  </div>
+                )}
             </div>
           )
         }
@@ -173,10 +195,15 @@ function RelatedPolyhedra({
 }
 
 export default connect(
-  createStructuredSelector({ mode: getMode, gyrateControl: getGyrateControl }),
+  createStructuredSelector({
+    mode: getMode,
+    gyrateControl: getGyrateControl,
+    augmentee: getAugmentee,
+  }),
   {
     applyOperation,
     setMode,
     setGyrate,
+    setAugmentee,
   },
 )(RelatedPolyhedra)

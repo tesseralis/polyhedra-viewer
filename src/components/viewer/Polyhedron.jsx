@@ -14,6 +14,7 @@ import {
   getPolyhedronConfig,
   getMode,
   getGyrateControl,
+  getAugmentee,
 } from 'selectors'
 import { setMode, setPolyhedron, applyOperation } from 'actions'
 import { mapObject } from 'util.js'
@@ -96,7 +97,7 @@ class Faces extends Component {
             !_.isEmpty(options) ? options : null,
           )
           history.push(`/${escapeName(next)}/related`)
-          applyOperation(mode, { ...applyArgs, gyrate })
+          applyOperation(mode, { ...applyArgs, gyrate, augmentee })
 
           // Get out of current mode if we can't do it any more
           if (!hasOperation(next, mode)) {
@@ -173,7 +174,11 @@ class Faces extends Component {
 
 const ConnectedFaces = withRouter(
   connect(
-    createStructuredSelector({ gyrate: getGyrateControl, mode: getMode }),
+    createStructuredSelector({
+      gyrate: getGyrateControl,
+      augmentee: getAugmentee,
+      mode: getMode,
+    }),
     {
       applyOperation,
       setMode,
