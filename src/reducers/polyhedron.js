@@ -29,16 +29,25 @@ const operations = {
   g: gyrate,
 }
 
-const initialState = Polyhedron.get('tetrahedron')
+const initialState = {
+  data: Polyhedron.get('tetrahedron'),
+}
 
 export default function polyhedron(state = initialState, action) {
   switch (action.type) {
     case SET_POLYHEDRON:
-      return isValidSolid(action.name) ? Polyhedron.get(action.name) : state
+      if (!isValidSolid(action.name)) {
+        return state
+      }
+      return { ...state, data: Polyhedron.get(action.name) }
     case APPLY_OPERATION:
-      return operations[action.operation]
-        ? operations[action.operation](state, action.config)
-        : state
+      if (!operations[action.operation]) {
+        return state
+      }
+      return {
+        ...state,
+        data: operations[action.operation](state.data, action.config),
+      }
     default:
       return state
   }
