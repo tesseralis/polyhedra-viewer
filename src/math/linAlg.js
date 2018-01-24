@@ -22,3 +22,6 @@ export function isPlanar(points) {
   return _.every(points, vec => plane.getDistanceToPoint(vec) < PRECISION)
 }
 
+export function getCentroid(vectors) {
+  return vectors.reduce((v1, v2) => v1.add(v2)).scale(1 / vectors.length)
+}

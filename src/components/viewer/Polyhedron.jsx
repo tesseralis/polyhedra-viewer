@@ -113,6 +113,7 @@ class Faces extends Component {
           switch (mode) {
             case '+':
               const fIndex = getAugmentFace(solidData, event.hitPnt)
+              console.log(fIndex)
               this.setState({
                 applyArgs: fIndex === -1 ? null : { fIndex },
               })

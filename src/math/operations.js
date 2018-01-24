@@ -1,6 +1,7 @@
 import _ from 'lodash'
 import Polyhedron, { numSides, getBoundary } from './Polyhedron'
-import { vec, getPlane, PRECISION } from './linAlg'
+import { vec, getPlane, getCentroid, PRECISION } from './linAlg'
+import { replace } from 'util.js'
 
 const TAU = 2 * Math.PI
 
@@ -8,19 +9,10 @@ function mod(a, b) {
   return a >= 0 ? a % b : a % b + b
 }
 
+// TODO deduplicate with getCyclic
 // get the element in the array mod the array's length
 function getMod(array, index) {
   return array[mod(index, array.length)]
-}
-
-function replace(array, index, ...values) {
-  const before = _.take(array, index)
-  const after = _.slice(array, index + 1)
-  return [...before, ...values, ...after]
-}
-
-function calculateCentroid(vectors) {
-  return vectors.reduce((v1, v2) => v1.add(v2)).scale(1 / vectors.length)
 }
 
 // Get the normal of a polygon given its ordered vertices
@@ -157,19 +149,6 @@ export function getTruncated(polyhedron, options = {}) {
   return removeExtraneousVertices(newPolyhedron)
 }
 
-function vertexGraph(polyhedron) {
-  const graph = {}
-  _.forEach(polyhedron.faces, face => {
-    _.forEach(face, (vIndex, i) => {
-      if (!graph[vIndex]) {
-        graph[vIndex] = []
-      }
-      graph[vIndex].push(getMod(face, i + 1))
-    })
-  })
-  return graph
-}
-
 function faceGraph(polyhedron) {
   const edgesToFaces = {}
   // build up a lookup table for every pair of edges to that face
@@ -233,13 +212,14 @@ function getDihedralAngle({ faces, vertices }, edge) {
 
   const [c1, c2] = faces
     .filter(face => _.intersection(face, edge).length === 2)
-    .map(face => calculateCentroid(face.map(vIndex => vec(vertices[vIndex]))))
+    .map(face => getCentroid(face.map(vIndex => vec(vertices[vIndex]))))
     .map(v => v.sub(midpoint))
 
   return c1.angleBetween(c2, true)
 }
 
 // Checks to see if the polyhedron can be augmented at the base while remaining convex
+// TODO add ortho/gyro to the "canAugment" argument
 function canAugment(polyhedron, faceIndex, { offset = 0 } = {}) {
   const base = polyhedron.faces[faceIndex]
   const n = base.length
@@ -250,6 +230,7 @@ function canAugment(polyhedron, faceIndex, { offset = 0 } = {}) {
 
   return _.every(base, (baseV1, i) => {
     const baseV2 = getMod(base, i + 1)
+    console.log(polyhedron, base, baseV1, baseV2)
     const baseAngle = getDihedralAngle(polyhedron, [baseV1, baseV2])
 
     // todo doesn't work on cupolae
@@ -319,7 +300,7 @@ function getOppositePrismSide(polyhedron, base) {
 }
 
 // TODO handle rhombicosidodecahedron case (still don't know what terminology I want to use)
-// TODO for cupolaerotundae, it's *opposite* because you're matching the *faces*, not the sides
+// TODO for cupolarotunda, it's *opposite* because you're matching the *faces*, not the sides
 // FIXME this broke
 // Get the index in the augmentee underside to align with the base's 0th vertex
 function getAlignIndex(polyhedron, base, augmentee, underside, gyrate) {
@@ -368,7 +349,7 @@ function doAugment(polyhedron, faceIndex, type, gyrate) {
   const base = faces[faceIndex]
   const n = base.length
   const baseVertices = base.map(index => vec(vertices[index]))
-  const baseCenter = calculateCentroid(baseVertices)
+  const baseCenter = getCentroid(baseVertices)
   const sideLength = baseVertices[0].distanceTo(baseVertices[1])
   const baseNormal = getNormal(baseVertices)
 
@@ -379,12 +360,20 @@ function doAugment(polyhedron, faceIndex, type, gyrate) {
   const undersideFace = augmentee.faces[undersideIndex]
   const undersideVertices = undersideFace.map(index => augmenteeVertices[index])
   const undersideNormal = getNormal(undersideVertices)
-  const undersideCenter = calculateCentroid(undersideVertices)
+  const undersideCenter = getCentroid(undersideVertices)
   const augmenteeSideLength = undersideVertices[0].distanceTo(
     undersideVertices[1],
   )
 
-  const alignBasesNormal = undersideNormal.cross(baseNormal).getNormalized()
+  // TODO what if they're perpendicular?
+  const alignBasesNormal = (() => {
+    const cross = undersideNormal.cross(baseNormal).getNormalized()
+    // If they're the same (e.g. augmenting something with itself), use a random vertex on the base
+    if (cross.magnitude() < PRECISION) {
+      return baseVertices[0].sub(baseCenter).getNormalized()
+    }
+    return cross
+  })()
   const alignBasesAngle = baseNormal.angleBetween(undersideNormal, true)
 
   const alignedAugmenteeVertices = augmenteeVertices.map(v => {
@@ -516,7 +505,7 @@ export function gyrate(polyhedron, { vIndices }) {
     vIndex => polyhedron.vertexVectors()[vIndex],
   )
   const normal = getNormal(boundaryVertices).getNormalized()
-  const centroid = calculateCentroid(boundaryVertices)
+  const centroid = getCentroid(boundaryVertices)
   const theta = TAU / numSides(boundary)
   const newVertices = polyhedron.vertices.map((vertex, vIndex) => {
     if (_.includes(vIndices, vIndex)) {
