@@ -23,7 +23,7 @@ function getAllEdges(faces) {
   return _.uniqWith(_.flatMap(faces, getEdges), _.isEqual)
 }
 
-function getEdgesOrdered(face) {
+export function getDirectedEdges(face) {
   return _.map(face, (vertex, index) => {
     return [vertex, getCyclic(face, index + 1)]
   })
@@ -41,7 +41,7 @@ export function getBoundary(faces) {
   // build up a lookup table for every pair of edges to that face
   _.forEach(faces, (face, index) => {
     // for the pairs of vertices, find the face that contains the corresponding pair
-    _.forEach(getEdgesOrdered(face), edge => {
+    _.forEach(getDirectedEdges(face), edge => {
       const [i1, i2] = edge
       if (_.includes(edges[i2], i1)) {
         _.pull(edges[i2], i1)

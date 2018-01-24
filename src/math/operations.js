@@ -230,7 +230,6 @@ function canAugment(polyhedron, faceIndex, { offset = 0 } = {}) {
 
   return _.every(base, (baseV1, i) => {
     const baseV2 = getMod(base, i + 1)
-    console.log(polyhedron, base, baseV1, baseV2)
     const baseAngle = getDihedralAngle(polyhedron, [baseV1, baseV2])
 
     // todo doesn't work on cupolae
@@ -301,13 +300,11 @@ function getOppositePrismSide(polyhedron, base) {
 
 // TODO handle rhombicosidodecahedron case (still don't know what terminology I want to use)
 // TODO for cupolarotunda, it's *opposite* because you're matching the *faces*, not the sides
-// FIXME this broke
 // Get the index in the augmentee underside to align with the base's 0th vertex
 function getAlignIndex(polyhedron, base, augmentee, underside, gyrate) {
   // TODO handle gyrobifastigium
   if (numSides(base) <= 5) return 0
   const baseType = getBaseType(polyhedron.faces, base)
-  console.log('baseType', baseType)
   if (baseType === 'antiprism') {
     return 0
   }
@@ -328,18 +325,17 @@ function getAlignIndex(polyhedron, base, augmentee, underside, gyrate) {
     faceToCheck[0],
   ])
   const alignedFace = getFaceWithDirectedEdge(augmentee.faces, [
-    _.last(underside),
     underside[0],
+    _.last(underside),
   ])
 
   // It's orthogonal if triangle faces are aligned or non-triangle faces are aligned
   const isOrtho = (numSides(adjFace) !== 3) === (numSides(alignedFace) !== 3)
 
   if (baseType === 'truncated') {
-    return isOrtho ? 0 : 1
+    return isOrtho ? 1 : 0
   }
-  console.log('gyrate', gyrate)
-  return isOrtho && gyrate === 'ortho' ? 1 : 0
+  return isOrtho === (gyrate === 'ortho') ? 0 : 1
 }
 
 // Augment the following
