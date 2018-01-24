@@ -145,7 +145,7 @@ class Faces extends Component {
       case '-':
       case 'g':
         const vIndices = solidData.findPeak(event.hitPnt, {
-          exclude: [mode === '-' && 'Y'],
+          exclude: [mode === 'g' && 'Y'],
         })
         console.log('vIndices', vIndices)
         this.setState({
