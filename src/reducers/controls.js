@@ -28,14 +28,15 @@ const initialState = {
 export default function controls(state = initialState, action) {
   switch (action.type) {
     case SET_MODE:
-      const newState = { mode: action.mode, gyrate: null }
+      const newState = { mode: action.mode, gyrate: null, augmentee: null }
+      // FIXME we need to redo this when moving to a different polyhedron
       if (action.mode === '+') {
         // FIXME I don't like this, not one bit!
         if (_.filter(action.relations, 'gyrate').length > 1) {
           newState.gyrate = 'ortho'
         }
-        if (_.filter(action.relations, 'with').length > 1) {
-          newState.augmentee = action.relations[0].with
+        if (_.filter(action.relations, 'using').length > 1) {
+          newState.augmentee = action.relations[0].using
         }
       }
       return { ...state, ...newState }

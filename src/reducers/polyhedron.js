@@ -1,8 +1,8 @@
 import { isValidSolid } from 'constants/polyhedra'
 import Polyhedron from 'math/Polyhedron'
 import {
-  getElongated,
-  getGyroElongated,
+  // getElongated,
+  // getGyroElongated,
   augment,
   diminish,
   gyrate,
@@ -22,8 +22,8 @@ export const applyOperation = (operation, config) => ({
 })
 
 const operations = {
-  P: getElongated,
-  A: getGyroElongated,
+  // P: getElongated,
+  // A: getGyroElongated,
   '+': augment,
   '-': diminish,
   g: gyrate,

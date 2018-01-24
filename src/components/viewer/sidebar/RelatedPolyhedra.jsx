@@ -147,17 +147,17 @@ function RelatedPolyhedra({
                 !!augmentee && (
                   <div>
                     {_(related[operation])
-                      .map('with')
+                      .map('using')
                       .uniq()
-                      .map(with_ => (
+                      .map(using => (
                         <button
                           className={css(
                             styles.optionButton,
-                            augmentee === with_ && styles.isHighlighted,
+                            augmentee === using && styles.isHighlighted,
                           )}
-                          onClick={() => setAugmentee(with_)}
+                          onClick={() => setAugmentee(using)}
                         >
-                          {with_}
+                          {using}
                         </button>
                       ))
                       .value()}

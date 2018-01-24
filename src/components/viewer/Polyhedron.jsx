@@ -45,16 +45,6 @@ const polygonColors = colors => polygons.map(n => toRgb(colors[n]))
 const getColorAttr = colors =>
   joinListOfLists(polygonColors(colors).concat([[0, 1, 0]]), ',', ' ')
 
-const augmentees = {
-  3: 'Y3',
-  // TODO digonal cupola
-  4: 'Y4',
-  5: 'Y5',
-  6: 'U3',
-  8: 'U4',
-  10: 'U5',
-}
-
 class Faces extends Component {
   state = {
     highlightFaceIndices: [],
@@ -74,21 +64,23 @@ class Faces extends Component {
         const {
           mode,
           gyrate,
-          augmentee,
+          using,
           setMode,
           applyOperation,
           solid,
           solidData,
           history,
         } = this.props
+
         const { applyArgs } = this.state
         const options = {}
         if (mode === '+') {
           if (gyrate) {
             options.gyrate = gyrate
           }
-          options.with =
-            augmentee || augmentees[solidData.faces[applyArgs.fIndex].length]
+          if (using) {
+            options.using = using
+          }
         }
         if (mode && !_.isNil(applyArgs)) {
           const next = getNextPolyhedron(
@@ -97,7 +89,7 @@ class Faces extends Component {
             !_.isEmpty(options) ? options : null,
           )
           history.push(`/${escapeName(next)}/related`)
-          applyOperation(mode, { ...applyArgs, gyrate, augmentee })
+          applyOperation(mode, { ...applyArgs, gyrate, using })
 
           // Get out of current mode if we can't do it any more
           if (!hasOperation(next, mode)) {
@@ -176,7 +168,7 @@ const ConnectedFaces = withRouter(
   connect(
     createStructuredSelector({
       gyrate: getGyrateControl,
-      augmentee: getAugmentee,
+      using: getAugmentee,
       mode: getMode,
     }),
     {

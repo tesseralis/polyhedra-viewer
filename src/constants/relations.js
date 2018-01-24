@@ -139,26 +139,26 @@ const hasCupolaRotunda = name =>
   name.includes('pentagonal') && !name.includes('pyramid')
 const cupolaRotunda = pyramidsCupolae['cupola-rotunda']
 
-const getOrthoGyroAugment = (value, with_) => {
+const getOrthoGyroAugment = (value, using) => {
   if (!_.isArray(value)) {
-    return [{ with: with_, value }]
+    return [{ using, value }]
   } else {
     return [
-      { with: with_, value: value[0], gyrate: 'ortho' },
-      { with: with_, value: value[1], gyrate: 'gyro' },
+      { using, value: value[0], gyrate: 'ortho' },
+      { using, value: value[1], gyrate: 'gyro' },
     ]
   }
 }
 
-const getCupolaRotunda = (with_, colName) => {
-  const altWith = with_.includes('U') ? 'R5' : 'U5'
-  return getOrthoGyroAugment(cupolaRotunda[colName], altWith)
+const getCupolaRotunda = (using, colName) => {
+  const altUsing = using.includes('U') ? 'R5' : 'U5'
+  return getOrthoGyroAugment(cupolaRotunda[colName], altUsing)
 }
 
-const getAugmentations = with_ => (rowName, colName) => {
+const getAugmentations = using => (rowName, colName) => {
   return _([
-    getOrthoGyroAugment(pyramidsCupolae[rowName][colName], with_),
-    hasCupolaRotunda(rowName) && getCupolaRotunda(with_, colName),
+    getOrthoGyroAugment(pyramidsCupolae[rowName][colName], using),
+    hasCupolaRotunda(rowName) && getCupolaRotunda(using, colName),
   ])
     .flatten()
     .compact()
@@ -207,8 +207,8 @@ const getPyramidCupolaConway = name => {
 
 const getElongations = (prism, antiprism) => (pValue, aValue) => {
   return {
-    P: { with: prism, value: pValue },
-    A: { with: antiprism, value: aValue },
+    P: { using: prism, value: pValue },
+    A: { using: antiprism, value: aValue },
   }
 }
 
@@ -219,15 +219,15 @@ const basePyramidsCupolae = (() => {
     const { prism, antiprism } = row
     const pyramidRow = getPyramidFromPrism(name)
     const { elongated, gyroelongated } = pyramidsCupolae[pyramidRow]
-    const getWith = getPyramidCupolaConway(pyramidRow)
+    const using = getPyramidCupolaConway(pyramidRow)
     graph = graphMerge(graph, {
       [prism]: {
-        '+': { value: elongated, with: getWith },
+        '+': { value: elongated, using },
       },
       [antiprism]: {
         '+': {
           value: gyroelongated,
-          with: getWith,
+          using,
         },
       },
     })
@@ -311,13 +311,13 @@ const getAugmentee = name => {
   }
 }
 
-const getBiAugmented = (biaugmented, with_) => {
+const getBiAugmented = (biaugmented, using) => {
   if (!_.isArray(biaugmented)) {
-    return [{ with: with_, value: biaugmented }]
+    return [{ using, value: biaugmented }]
   }
   return [
-    { with: with_, value: biaugmented[0], align: 'para' },
-    { with: with_, value: biaugmented[1], align: 'meta' },
+    { using, value: biaugmented[0], align: 'para' },
+    { using, value: biaugmented[1], align: 'meta' },
   ]
 }
 
@@ -329,14 +329,14 @@ const baseAugmentations = (() => {
     const augmentee = getAugmentee(name)
     graph = graphMerge(graph, {
       [base]: {
-        '+': { with: augmentee, value: augmented },
+        '+': { using: augmentee, value: augmented },
       },
       [augmented]: {
         // TODO meta para
         '+': getBiAugmented(biaugmented, augmentee),
       },
       [_.isArray(biaugmented) ? biaugmented[1] : biaugmented]: {
-        '+': { with: augmentee, value: triaugmented },
+        '+': { using: augmentee, value: triaugmented },
       },
     })
   })
@@ -412,7 +412,7 @@ const othersGraph = (() => {
 
     // "other" johnson solids
     J86: {
-      '+': { with: 'Y4', value: 'J87' },
+      '+': { using: 'Y4', value: 'J87' },
     },
   }
 })()

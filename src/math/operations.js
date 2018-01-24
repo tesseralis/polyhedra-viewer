@@ -174,13 +174,21 @@ function faceGraph(polyhedron) {
 }
 
 const augmentTypes = {
-  pyramidsCupolae: {
+  pyramids: {
     3: 'tetrahedron',
     4: 'square-pyramid',
     5: 'pentagonal-pyramid',
-    6: 'triangular-cupola',
-    8: 'square-cupola',
-    10: 'pentagonal-cupola',
+  },
+
+  cupolae: {
+    2: 'triangular-prism',
+    3: 'triangular-cupola',
+    4: 'square-cupola',
+    5: 'pentagonal-cupola',
+  },
+
+  rotundae: {
+    5: 'pentagonal-rotunda',
   },
 
   prisms: {
@@ -202,9 +210,42 @@ const augmentTypes = {
   },
 }
 
+// Default augmentee for each numFaces
+const defaultAugmentees = {
+  3: 'Y3',
+  // TODO digonal cupola
+  4: 'Y4',
+  5: 'Y5',
+  6: 'U3',
+  8: 'U4',
+  10: 'U5',
+}
+
 const augmentData = _.mapValues(augmentTypes, type =>
   _.mapValues(type, Polyhedron.get),
 )
+
+// TODO move this to a polyhedron method
+function getAugmentee(notation) {
+  const [prefix, index] = notation
+  const type = (() => {
+    switch (prefix) {
+      case 'Y':
+        return 'pyramids'
+      case 'U':
+        return 'cupolae'
+      case 'R':
+        return 'rotundae'
+      case 'P':
+        return 'prisms'
+      case 'A':
+        return 'antiprisms'
+      default:
+        throw new Error(`Unknown prefix ${prefix}`)
+    }
+  })()
+  return augmentData[type][index]
+}
 
 function getDihedralAngle({ faces, vertices }, edge) {
   const [v1, v2] = edge.map(vIndex => vec(vertices[vIndex]))
@@ -224,7 +265,8 @@ function canAugment(polyhedron, faceIndex, { offset = 0 } = {}) {
   const base = polyhedron.faces[faceIndex]
   const n = base.length
 
-  const augmentee = augmentData['pyramidsCupolae'][n]
+  // This *should* work on everything except gyrobifastigium
+  const augmentee = getAugmentee(defaultAugmentees[n])
   const undersideIndex = _.findIndex(augmentee.faces, face => face.length === n)
   const undersideFace = augmentee.faces[undersideIndex]
 
@@ -340,7 +382,8 @@ function getAlignIndex(polyhedron, base, augmentee, underside, gyrate) {
 
 // Augment the following
 // TODO digonal cupola option and rotunda option
-function doAugment(polyhedron, faceIndex, type, gyrate, augmentWith) {
+function doAugment(polyhedron, faceIndex, gyrate, using) {
+  console.log(gyrate, using)
   const { faces, vertices } = polyhedron
   const base = faces[faceIndex]
   const n = base.length
@@ -349,13 +392,7 @@ function doAugment(polyhedron, faceIndex, type, gyrate, augmentWith) {
   const sideLength = baseVertices[0].distanceTo(baseVertices[1])
   const baseNormal = getNormal(baseVertices)
 
-  // FIXME genericize this
-  const augmentee =
-    augmentWith === 'R5'
-      ? Polyhedron.get('pentagonal-rotunda')
-      : augmentWith === 'U2'
-        ? Polyhedron.get('triangular-prism')
-        : augmentData[type][n]
+  const augmentee = getAugmentee(using || defaultAugmentees[n])
   const augmenteeVertices = augmentee.vertices.map(vec)
   // rotate and translate so that the face is next to our face
   const undersideIndex = _.findIndex(augmentee.faces, face => face.length === n)
@@ -453,17 +490,13 @@ function findWithDistance(
   })
 }
 
-export function augment(polyhedron, { fIndex, gyrate, augmentee }) {
-  console.log('augmentee', augmentee)
-  return doAugment(polyhedron, fIndex, 'pyramidsCupolae', gyrate, augmentee)
-}
-
 export function getElongated(polyhedron) {
   const faceIndex = _.findIndex(
     polyhedron.faces,
-    face => face === _.maxBy(polyhedron.faces, 'length'),
+    face => face === _.maxBy(polyhedron.faces, numSides),
   )
-  return doAugment(polyhedron, faceIndex, 'prisms')
+  const using = `P${numSides(polyhedron.faces[faceIndex])}`
+  return doAugment(polyhedron, faceIndex, null, using)
 }
 
 export function getGyroElongated(polyhedron) {
@@ -471,7 +504,8 @@ export function getGyroElongated(polyhedron) {
     polyhedron.faces,
     face => face === _.maxBy(polyhedron.faces, 'length'),
   )
-  return doAugment(polyhedron, faceIndex, 'antiprisms')
+  const using = `A${numSides(polyhedron.faces[faceIndex])}`
+  return doAugment(polyhedron, faceIndex, null, using)
 }
 
 export function getAugmentFace(polyhedron, point) {
@@ -490,6 +524,10 @@ function removeVertices(polyhedron, vIndices) {
   )
   const newFaces = facesToKeep.concat([getBoundary(facesToRemove)])
   return removeExtraneousVertices(polyhedron.withFaces(newFaces))
+}
+
+export function augment(polyhedron, { fIndex, gyrate, using }) {
+  return doAugment(polyhedron, fIndex, gyrate, using)
 }
 
 export function diminish(polyhedron, { vIndices }) {

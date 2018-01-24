@@ -81,4 +81,40 @@ describe('operations', () => {
 
     xit('properly aligns cupola-rotunda', () => {})
   })
+
+  describe('multiple options', () => {
+    describe('cupola-rotunda', () => {
+      const polyhedron = Polyhedron.get('pentagonal-cupola')
+      const usingOpts = ['U5', 'R5']
+      const expectedName = [
+        'pentagonal-orthobicupola',
+        'pentagonal-orthocupolarotunda',
+      ]
+      usingOpts.forEach((using, i) => {
+        it(`can augment with ${using}`, () => {
+          const augmented = operations.augment(polyhedron, {
+            fIndex: 11,
+            gyrate: 'ortho',
+            using,
+          })
+          checkProperPolyhedron(augmented)
+          const expected = Polyhedron.get(expectedName[i])
+          expect(augmented.faceCount()).toEqual(expected.faceCount())
+        })
+      })
+    })
+
+    it('properly augments gyrobifastigium', () => {
+      const polyhedron = Polyhedron.get('triangular-prism')
+      // FIXME this doesn't work on fIndex = 2
+      const augmented = operations.augment(polyhedron, {
+        fIndex: 4,
+        gyrate: 'gyro',
+        using: 'U2',
+      })
+      checkProperPolyhedron(augmented)
+      const expected = Polyhedron.get('gyrobifastigium')
+      expect(augmented.faceCount()).toEqual(expected.faceCount())
+    })
+  })
 })

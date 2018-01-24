@@ -108,6 +108,11 @@ export default class Polyhedron {
     return _.range(this.numFaces())
   }
 
+  // Return the number of each type of faces of each face
+  faceCount() {
+    return _.countBy(this.faces, numSides)
+  }
+
   // Return the vectors of this polyhedron as vectors
   vertexVectors = _.memoize(() => this.vertices.map(vec))
 
