@@ -38,11 +38,15 @@ class Viewer extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    const { history, solid, polyhedronName } = nextProps
+    const { history, solid, polyhedronName, onLoad } = nextProps
     // If the name in the URL and the current name don't match up, push a new state
     if (solid !== polyhedronName) {
       // FIXME don't hardcode this?
-      history.push(`/${polyhedronName}/related`)
+      if (history.action === 'POP') {
+        onLoad(solid)
+      } else {
+        history.push(`/${polyhedronName}/related`)
+      }
     }
   }
 
