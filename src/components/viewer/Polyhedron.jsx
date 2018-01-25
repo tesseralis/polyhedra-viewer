@@ -98,13 +98,12 @@ class Faces extends Component {
       using,
       setMode,
       applyOperation,
-      solid,
       solidData,
     } = this.props
 
     const { applyArgs } = this.state
     if (mode && !_.isNil(applyArgs)) {
-      applyOperation(mode, solid, solidData, {
+      applyOperation(mode, solidData, {
         ...applyArgs,
         gyrate,
         using,
@@ -172,7 +171,7 @@ const Edges = ({ edges, vertices }) => {
 class Polyhedron extends Component {
   // TODO color
   render() {
-    const { solid, config, solidData } = this.props
+    const { config, solidData } = this.props
     const { showEdges, showFaces } = config
     const { vertices, edges } = solidData
     const toggle = 1
@@ -186,11 +185,7 @@ class Polyhedron extends Component {
           return (
             <transform>
               {showFaces && (
-                <ConnectedFaces
-                  solidData={solidData}
-                  config={config}
-                  solid={solid}
-                />
+                <ConnectedFaces solidData={solidData} config={config} />
               )}
               {showEdges && <Edges edges={edges} vertices={vertices} />}
             </transform>

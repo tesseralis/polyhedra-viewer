@@ -17,7 +17,7 @@ export const setPolyhedron = name => dispatch => {
   if (!isValidSolid(name)) {
     throw new Error(`Got a solid with an invalid name: ${name}`)
   }
-  dispatch(setPolyhedronRaw(name, Polyhedron.get(name)))
+  dispatch(setPolyhedronRaw(Polyhedron.get(name)))
 }
 
 const operations = {
@@ -29,12 +29,7 @@ const operations = {
 }
 // Apply the given operation to the given polyhedron
 // TODO won't need the "name" parameter in the new one
-export const applyOperation = (
-  operation,
-  name,
-  polyhedron,
-  config,
-) => dispatch => {
+export const applyOperation = (operation, polyhedron, config) => dispatch => {
   console.log('calling', operation, 'on', polyhedron)
   const options = {}
   const { gyrate, using } = config
@@ -49,16 +44,15 @@ export const applyOperation = (
   // if (mode && !_.isNil(applyArgs)) {
   const next = escapeName(
     getNextPolyhedron(
-      unescapeName(name),
+      unescapeName(polyhedron.name),
       operation,
       !_.isEmpty(options) ? options : null,
     ),
   )
-  console.log('operating on', polyhedron)
 
-  dispatch(setPolyhedronRaw(next, operations[operation](polyhedron, config)))
-
-  console.log('we did it!')
+  dispatch(
+    setPolyhedronRaw(operations[operation](polyhedron, config).withName(next)),
+  )
   // FIXME move this here
   // // Get out of current mode if we can't do it any more
   // if (!hasOperation(next, mode)) {

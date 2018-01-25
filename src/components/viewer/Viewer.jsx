@@ -46,7 +46,6 @@ class Viewer extends Component {
       if (history.action === 'POP') {
         onLoad(solid)
       } else {
-        // FIXME don't hardcode this?
         history.push(`/${polyhedronName}/related`)
       }
     }
@@ -58,7 +57,7 @@ class Viewer extends Component {
     return (
       <div className={css(styles.viewer)}>
         <X3dScene>
-          <Polyhedron solid={solid} />
+          <Polyhedron />
         </X3dScene>
         <div className={css(styles.sidebar)}>
           <Sidebar solid={solid} />

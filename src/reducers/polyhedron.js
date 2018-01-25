@@ -1,21 +1,17 @@
 import Polyhedron from 'math/Polyhedron'
 
 const SET_POLYHEDRON = 'SET_POLYHEDRON'
-export const setPolyhedron = (name, data) => ({
+export const setPolyhedron = polyhedron => ({
   type: SET_POLYHEDRON,
-  name,
-  data,
+  polyhedron,
 })
 
-const initialState = {
-  name: 'tetrahedron',
-  data: Polyhedron.get('tetrahedron'),
-}
+const initialState = Polyhedron.get('tetrahedron')
 
 export default function polyhedron(state = initialState, action) {
   switch (action.type) {
     case SET_POLYHEDRON:
-      return { ...state, data: action.data, name: action.name }
+      return action.polyhedron
     default:
       return state
   }
