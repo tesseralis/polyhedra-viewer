@@ -7,8 +7,6 @@ import { createStructuredSelector } from 'reselect'
 import { withRouter } from 'react-router-dom'
 
 import polygons from 'constants/polygons'
-import { escapeName, unescapeName } from 'constants/polyhedra'
-import { getNextPolyhedron, hasOperation } from 'constants/relations'
 import {
   getPolyhedron,
   getPolyhedronConfig,
@@ -94,30 +92,23 @@ class Faces extends Component {
   handleMouseUp = () => {
     if (this.drag) return
 
-    const { mode, gyrate, using, setMode, applyOperation, solid } = this.props
+    const {
+      mode,
+      gyrate,
+      using,
+      setMode,
+      applyOperation,
+      solid,
+      solidData,
+    } = this.props
 
     const { applyArgs } = this.state
-    const options = {}
-    if (mode === '+') {
-      if (gyrate) {
-        options.gyrate = gyrate
-      }
-      if (using) {
-        options.using = using
-      }
-    }
     if (mode && !_.isNil(applyArgs)) {
-      const next = getNextPolyhedron(
-        unescapeName(solid),
-        mode,
-        !_.isEmpty(options) ? options : null,
-      )
-      applyOperation(mode, escapeName(next), { ...applyArgs, gyrate, using })
-
-      // Get out of current mode if we can't do it any more
-      if (!hasOperation(next, mode)) {
-        setMode(null)
-      }
+      applyOperation(mode, solidData, solid, {
+        ...applyArgs,
+        gyrate,
+        using,
+      })
     }
   }
 

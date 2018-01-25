@@ -32,19 +32,21 @@ const styles = StyleSheet.create({
 })
 
 class Viewer extends Component {
-  componentDidMount() {
-    const { solid, onLoad } = this.props
+  componentWillMount() {
+    const { solid, onLoad, history } = this.props
     onLoad(solid)
+    // Add a mock action to the history so that we don't "pop" whenever we change the solid
+    history.replace(history.location.pathname)
   }
 
   componentWillReceiveProps(nextProps) {
     const { history, solid, polyhedronName, onLoad } = nextProps
     // If the name in the URL and the current name don't match up, push a new state
     if (solid !== polyhedronName) {
-      // FIXME don't hardcode this?
       if (history.action === 'POP') {
         onLoad(solid)
       } else {
+        // FIXME don't hardcode this?
         history.push(`/${polyhedronName}/related`)
       }
     }

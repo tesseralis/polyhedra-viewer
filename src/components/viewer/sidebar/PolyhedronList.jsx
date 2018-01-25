@@ -42,7 +42,6 @@ const PolyhedronLink = ({ name, handleClick }) => {
       className={css(styles.link)}
       activeClassName={css(styles.isActive)}
       onClick={() => handleClick(escapeName(name))}
-      replace
     >
       {_.capitalize(name)}
     </NavLink>
