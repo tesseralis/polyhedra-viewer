@@ -74,7 +74,7 @@ function replaceVertex(newPolyhedron, polyhedron, vertex, { mock, rectify }) {
       )
     })
     .concat([_.rangeRight(newPolyhedron.vertices.length, newVertices.length)])
-  return new Polyhedron(newVertices, newFaces)
+  return Polyhedron.of(newVertices, newFaces)
 }
 
 function removeExtraneousVertices(polyhedron) {
@@ -100,7 +100,7 @@ function removeExtraneousVertices(polyhedron) {
   const newFaces = faces.map(face =>
     face.map(vIndex => _.get(newToOld, vIndex, vIndex)),
   )
-  return new Polyhedron(newVertices, newFaces)
+  return Polyhedron.of(newVertices, newFaces)
 }
 
 // Remove vertices (and faces) from the polyhedron when they are all the same
@@ -455,7 +455,7 @@ function doAugment(polyhedron, faceIndex, gyrate, using) {
 
   // remove extraneous vertices
   // TODO manually match up the faces instead of deduplicating (which can cause precision issues)
-  return deduplicateVertices(new Polyhedron(newVertices, newFaces))
+  return deduplicateVertices(Polyhedron.of(newVertices, newFaces))
 }
 
 // find the node in the graph with n sides that is at least (or equal) to dist
@@ -574,5 +574,5 @@ export function gyrate(polyhedron, { vIndices }) {
     })
   })
 
-  return new Polyhedron(newVertices, newFaces)
+  return Polyhedron.of(newVertices, newFaces)
 }

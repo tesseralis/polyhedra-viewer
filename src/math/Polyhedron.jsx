@@ -69,15 +69,21 @@ export function getBoundary(faces) {
 // TODO: this is a JSX class because otherwise class properties won't be highlighted in sublime
 export default class Polyhedron {
   static get(name) {
-    const { vertices, faces } = getSolidData(name)
-    return new Polyhedron(vertices, faces)
+    return new Polyhedron({ ...getSolidData(name), name })
   }
 
-  constructor(vertices, faces, edges) {
+  static of(vertices, faces) {
+    return new Polyhedron({ vertices, faces })
+  }
+
+  constructor({ vertices, faces, edges, name }) {
     this.vertices = vertices
     this.faces = faces
     if (edges) {
       this._edges = edges
+    }
+    if (name) {
+      this.name = name
     }
   }
 
@@ -89,7 +95,7 @@ export default class Polyhedron {
   }
 
   toJSON() {
-    return _.pick('vertices', 'faces', 'edges')
+    return _.pick(this, ['vertices', 'faces', 'edges', 'name'])
   }
 
   numVertices() {
@@ -166,7 +172,11 @@ export default class Polyhedron {
 
   // return a new polyhedron with the given faces
   withFaces(faces) {
-    return new Polyhedron(this.vertices, faces)
+    return new Polyhedron({ ...this.toJSON(), faces })
+  }
+
+  withName(name) {
+    return new Polyhedron({ ...this.toJSON(), name })
   }
 
   // Returns whether the set of vertices in this polyhedron are planar
@@ -261,7 +271,6 @@ export default class Polyhedron {
     const { faces, vertices } = this
     const hitPoint = vec(point)
     const hitFaceIndex = this.hitFaceIndex(hitPoint)
-    console.log('hitFaceIndex', hitFaceIndex)
     const pyramidIndices = _.includes(exclude, 'Y') ? [] : this.pyramidIndices()
 
     // A solid can have only pyramids or cupolae/rotundae, so it suffices to check for one

@@ -104,7 +104,7 @@ class Faces extends Component {
 
     const { applyArgs } = this.state
     if (mode && !_.isNil(applyArgs)) {
-      applyOperation(mode, solidData, solid, {
+      applyOperation(mode, solid, solidData, {
         ...applyArgs,
         gyrate,
         using,

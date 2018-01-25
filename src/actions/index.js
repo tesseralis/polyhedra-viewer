@@ -54,8 +54,11 @@ export const applyOperation = (
       !_.isEmpty(options) ? options : null,
     ),
   )
+  console.log('operating on', polyhedron)
 
   dispatch(setPolyhedronRaw(next, operations[operation](polyhedron, config)))
+
+  console.log('we did it!')
   // FIXME move this here
   // // Get out of current mode if we can't do it any more
   // if (!hasOperation(next, mode)) {
