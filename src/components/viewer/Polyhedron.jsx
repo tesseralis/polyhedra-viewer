@@ -46,23 +46,43 @@ class Faces extends Component {
   state = {
     highlightFaceIndices: [],
     applyArgs: null,
+    error: null,
   }
 
   componentDidMount() {
     this.drag = false
     // TODO make sure this doesn't have a race condition
     document.onload = _.once(() => {
-      this.shape.addEventListener('mousedown', this.handleMouseDown)
-      this.shape.addEventListener('mouseup', this.handleMouseUp)
-      this.shape.addEventListener('mousemove', _.throttle(this.handleMove, 200))
+      this.shape.addEventListener(
+        'mousedown',
+        this.wrapError(this.handleMouseDown),
+      )
+      this.shape.addEventListener('mouseup', this.wrapError(this.handleMouseUp))
+      this.shape.addEventListener(
+        'mousemove',
+        this.wrapError(_.throttle(this.handleMove, 200)),
+      )
     })
+  }
+
+  // FIXME find a better way to do this?
+  wrapError = fn => event => {
+    try {
+      fn(event)
+    } catch (error) {
+      this.setState({ error })
+    }
   }
 
   render() {
     const { solidData, config } = this.props
-    const { highlightFaceIndices } = this.state
+    const { highlightFaceIndices, error } = this.state
     const { opacity, colors } = config
     const { vertices, faces } = solidData
+
+    if (error) {
+      throw error
+    }
     // TODO implement highlighting
     // console.log('highlight faces', highlightFaceIndices)
     return (
@@ -92,6 +112,7 @@ class Faces extends Component {
     if (this.drag) return
 
     const { operation, options, solidData, applyOperation } = this.props
+    console.log(applyArgs, operation)
 
     const { applyArgs } = this.state
     if (operation && !_.isNil(applyArgs)) {
@@ -103,6 +124,7 @@ class Faces extends Component {
   handleMove = event => {
     this.drag = true
     const { solidData, operation } = this.props
+    console.log('operation', operation)
     switch (operation) {
       case '+':
         console.log('doing an augment')
