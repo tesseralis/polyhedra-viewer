@@ -48,6 +48,17 @@ function normalize(graph) {
   return _.mapValues(graph, ops => _.mapValues(ops, _.castArray))
 }
 
+function compact(graph) {
+  return _.mapValues(graph, ops =>
+    _.mapValues(ops, options => {
+      return _.filter(options, option => {
+        const val = _.isObject(option) ? option.value : option
+        return !_.isNil(val)
+      })
+    }),
+  )
+}
+
 const customizer = (objValue, srcValue) => {
   if (_.isArray(objValue)) {
     return objValue.concat(srcValue)
@@ -424,7 +435,9 @@ const normalized = [
   diminishedIcosahedraGraph,
   // rhombicosidodecahedraGraph,
   othersGraph,
-].map(normalize)
+]
+  .map(normalize)
+  .map(compact)
 
 const baseGraph = graphMerge(...normalized)
 export const polyhedraGraph = makeBidirectional(baseGraph)
