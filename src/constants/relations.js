@@ -455,7 +455,9 @@ export function getNextPolyhedron(solid, operation, options) {
     .value()
   console.log(next)
   if (next.length > 1) {
-    throw new Error('Cannot deal with more than one possibility right now')
+    throw new Error(
+      `Multiple possibilities found for operation ${operation} on ${solid} with options: ${options}`,
+    )
   }
   const val = next[0]
   const notation = _.isObject(val) ? val.value : val

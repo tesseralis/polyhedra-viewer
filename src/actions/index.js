@@ -61,6 +61,14 @@ export const applyOperation = (operation, polyhedron, config) => dispatch => {
   // TODO otherwise reset the apply opts for the new polyhedron
 }
 
+function hasMultipleOptionsForFace(relations) {
+  return _.some(
+    relations,
+    relation =>
+      _.isObject(relation) && _.includes(['U2', 'U5', 'R5'], relation.using),
+  )
+}
+
 // FIXME still broken
 export const setMode = (operation, relations) => dispatch => {
   const newOpts = {}
@@ -69,7 +77,7 @@ export const setMode = (operation, relations) => dispatch => {
     if (_.filter(relations, 'gyrate').length > 1) {
       newOpts.gyrate = 'ortho'
     }
-    if (_.filter(relations, 'using').length > 1) {
+    if (hasMultipleOptionsForFace(relations)) {
       newOpts.using = relations[0].using
     }
   }
