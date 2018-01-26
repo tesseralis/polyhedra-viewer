@@ -5,8 +5,6 @@ export const getPolyhedron = state => state.polyhedron
 
 export const getPolyhedronName = state => state.polyhedron.name
 
-export const getMode = state => state.controls.mode
+export const getOperation = state => state.controls.operation
 
-export const getGyrateControl = state => state.controls.gyrate
-
-export const getAugmentee = state => state.controls.augmentee
+export const getApplyOpts = state => state.controls.options

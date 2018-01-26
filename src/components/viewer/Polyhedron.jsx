@@ -10,11 +10,10 @@ import polygons from 'constants/polygons'
 import {
   getPolyhedron,
   getPolyhedronConfig,
-  getMode,
-  getGyrateControl,
-  getAugmentee,
+  getOperation,
+  getApplyOpts,
 } from 'selectors'
-import { setMode, applyOperation } from 'actions'
+import { applyOperation } from 'actions'
 import { mapObject } from 'util.js'
 import { getAugmentFace } from 'math/operations'
 
@@ -92,30 +91,21 @@ class Faces extends Component {
   handleMouseUp = () => {
     if (this.drag) return
 
-    const {
-      mode,
-      gyrate,
-      using,
-      setMode,
-      applyOperation,
-      solidData,
-    } = this.props
+    const { operation, options, solidData, applyOperation } = this.props
 
     const { applyArgs } = this.state
-    if (mode && !_.isNil(applyArgs)) {
-      applyOperation(mode, solidData, {
-        ...applyArgs,
-        gyrate,
-        using,
-      })
+    if (operation && !_.isNil(applyArgs)) {
+      console.log('applying operation')
+      applyOperation(operation, solidData, { ...applyArgs, ...options })
     }
   }
 
   handleMove = event => {
     this.drag = true
-    const { solidData, mode } = this.props
-    switch (mode) {
+    const { solidData, operation } = this.props
+    switch (operation) {
       case '+':
+        console.log('doing an augment')
         const fIndex = getAugmentFace(solidData, event.hitPnt)
         console.log(fIndex)
         this.setState({
@@ -125,7 +115,7 @@ class Faces extends Component {
       case '-':
       case 'g':
         const vIndices = solidData.findPeak(event.hitPnt, {
-          exclude: [mode === 'g' && 'Y'],
+          exclude: [operation === 'g' && 'Y'],
         })
         console.log('vIndices', vIndices)
         this.setState({
@@ -141,14 +131,10 @@ class Faces extends Component {
 const ConnectedFaces = withRouter(
   connect(
     createStructuredSelector({
-      gyrate: getGyrateControl,
-      using: getAugmentee,
-      mode: getMode,
+      operation: getOperation,
+      options: getApplyOpts,
     }),
-    {
-      applyOperation,
-      setMode,
-    },
+    { applyOperation },
   )(Faces),
 )
 

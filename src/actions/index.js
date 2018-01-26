@@ -1,6 +1,7 @@
 import _ from 'lodash'
 import { getNextPolyhedron, hasOperation } from 'constants/relations'
 import { setPolyhedron as setPolyhedronRaw } from 'reducers/polyhedron'
+import { setOperation, setApplyOpts } from 'reducers/controls'
 import { isValidSolid, escapeName, unescapeName } from 'constants/polyhedra'
 import Polyhedron from 'math/Polyhedron'
 
@@ -53,13 +54,34 @@ export const applyOperation = (operation, polyhedron, config) => dispatch => {
   dispatch(
     setPolyhedronRaw(operations[operation](polyhedron, config).withName(next)),
   )
-  // FIXME move this here
   // // Get out of current mode if we can't do it any more
-  // if (!hasOperation(next, mode)) {
-  //   setMode(null)
-  // }
+  if (!hasOperation(next, operation)) {
+    dispatch(setMode(null))
+  }
+  // TODO otherwise reset the apply opts for the new polyhedron
+}
+
+// FIXME still broken
+export const setMode = (operation, relations) => dispatch => {
+  const newOpts = {}
+  if (operation === '+') {
+    // FIXME I don't like this, not one bit!
+    if (_.filter(relations, 'gyrate').length > 1) {
+      newOpts.gyrate = 'ortho'
+    }
+    if (_.filter(relations, 'using').length > 1) {
+      newOpts.using = relations[0].using
+    }
+  }
+  dispatch(setOperation(operation))
+  dispatch(setApplyOpts(newOpts))
+}
+
+export const setApplyOpt = (name, value) => dispatch => {
+  dispatch(setApplyOpts({ [name]: value }))
 }
 
 export * from 'reducers/config'
+
 export * from 'reducers/filter'
-export * from 'reducers/controls'
+// export * from 'reducers/controls'

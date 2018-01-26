@@ -5,8 +5,8 @@ import { connect } from 'react-redux'
 import { createStructuredSelector } from 'reselect'
 
 import { toConwayNotation, fromConwayNotation } from 'constants/polyhedra'
-import { applyOperation, setMode, setGyrate, setAugmentee } from 'actions'
-import { getMode, getGyrateControl, getAugmentee } from 'selectors'
+import { applyOperation, setMode, setApplyOpt } from 'actions'
+import { getOperation, getApplyOpts } from 'selectors'
 
 import { polyhedraGraph } from 'constants/relations'
 import PolyhedronLink from 'components/common/PolyhedronLink'
@@ -89,12 +89,10 @@ const styles = StyleSheet.create({
 function RelatedPolyhedra({
   solid,
   mode,
-  gyrateControl,
-  augmentee,
+  options: { gyrate, using },
   applyOperation,
   setMode,
-  setGyrate,
-  setAugmentee,
+  setApplyOpt,
 }) {
   const notation = toConwayNotation(solid.replace(/-/g, ' '))
   const related = polyhedraGraph[notation]
@@ -121,43 +119,43 @@ function RelatedPolyhedra({
                 {operations[operation]}
               </button>
               {operation === '+' &&
-                !!gyrateControl && (
+                !!gyrate && (
                   <div>
                     <button
                       className={css(
                         styles.optionButton,
-                        gyrateControl === 'ortho' && styles.isHighlighted,
+                        gyrate === 'ortho' && styles.isHighlighted,
                       )}
-                      onClick={() => setGyrate('ortho')}
+                      onClick={() => setApplyOpt('gyrate', 'ortho')}
                     >
                       Ortho
                     </button>
                     <button
                       className={css(
                         styles.optionButton,
-                        gyrateControl === 'gyro' && styles.isHighlighted,
+                        gyrate === 'gyro' && styles.isHighlighted,
                       )}
-                      onClick={() => setGyrate('gyro')}
+                      onClick={() => setApplyOpt('gyrate', 'gyro')}
                     >
                       Gyro
                     </button>
                   </div>
                 )}
               {operation === '+' &&
-                !!augmentee && (
+                !!using && (
                   <div>
                     {_(related[operation])
                       .map('using')
                       .uniq()
-                      .map(using => (
+                      .map(usingOpt => (
                         <button
                           className={css(
                             styles.optionButton,
-                            augmentee === using && styles.isHighlighted,
+                            using === usingOpt && styles.isHighlighted,
                           )}
-                          onClick={() => setAugmentee(using)}
+                          onClick={() => setApplyOpt('using', usingOpt)}
                         >
-                          {using}
+                          {usingOpt}
                         </button>
                       ))
                       .value()}
@@ -196,14 +194,12 @@ function RelatedPolyhedra({
 
 export default connect(
   createStructuredSelector({
-    mode: getMode,
-    gyrateControl: getGyrateControl,
-    augmentee: getAugmentee,
+    mode: getOperation,
+    options: getApplyOpts,
   }),
   {
     applyOperation,
     setMode,
-    setGyrate,
-    setAugmentee,
+    setApplyOpt,
   },
 )(RelatedPolyhedra)
