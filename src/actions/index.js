@@ -29,9 +29,9 @@ const operations = {
   g: gyrate,
 }
 
+// TODO deduplicate with the other thing
 const defaultAugmentees = {
   3: 'Y3',
-  // TODO digonal cupola
   4: 'Y4',
   5: 'Y5',
   6: 'U3',
@@ -51,6 +51,13 @@ export const applyOperation = (operation, polyhedron, config) => dispatch => {
     }
     options.using =
       using || defaultAugmentees[polyhedron.faces[config.fIndex].length]
+  } else if (operation === '-') {
+    // If diminishing a pentagonal cupola/rotunda, check which one it is
+    if (config.vIndices.length === 5) {
+      options.using = 'U5'
+    } else if (config.vIndices.length === 10) {
+      options.using = 'R5'
+    }
   }
   const next = escapeName(
     getNextPolyhedron(
