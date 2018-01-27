@@ -367,7 +367,9 @@ function doAugment(polyhedron, faceIndex, gyrate, using) {
   const { faces, vertices } = polyhedron
   const base = faces[faceIndex]
   const n = base.length
-  const [prefix, index] = using || defaultAugmentees[n]
+  const augmenteeCode = using || defaultAugmentees[n]
+  const prefix = augmenteeCode[0]
+  const index = augmenteeCode.substring(1)
   const baseVertices = base.map(index => vec(vertices[index]))
   const baseCenter = getCentroid(baseVertices)
   const sideLength = baseVertices[0].distanceTo(baseVertices[1])
@@ -512,7 +514,15 @@ export function gyroelongate(polyhedron) {
 }
 
 export function shorten(polyhedron) {
-  const face = _.maxBy(polyhedron.faces, numSides)
+  // Find a prism or antiprism face
+  const face = _(polyhedron.faces)
+    .filter((face, fIndex) => {
+      const adjacent = polyhedron
+        .faceGraph()
+        [fIndex].map(fIndex2 => polyhedron.faces[fIndex2])
+      return _.keys(_.countBy(adjacent, numSides)).length === 1
+    })
+    .maxBy(numSides)
   return removeVertices(polyhedron, face)
 }
 

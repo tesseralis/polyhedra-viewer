@@ -46,6 +46,40 @@ function checkGyrate(polyhedron, gyrate) {
 }
 
 describe('operations', () => {
+  const elongTypes = ['elongate', 'gyroelongate']
+
+  elongTypes.forEach(elongType => {
+    describe(elongType, () => {
+      const tests = [
+        'triangular-pyramid',
+        'square-pyramid',
+        'pentagonal-pyramid',
+        'triangular-cupola',
+        'square-cupola',
+        'pentagonal-cupola',
+        'pentagonal-rotunda',
+      ]
+
+      tests.forEach(test => {
+        // this is planar; skip it
+        if (test === 'triangular-pyramid' && elongType === 'gyroelongate')
+          return
+        const shortened = Polyhedron.get(
+          test === 'triangular-pyramid' ? 'tetrahedron' : test,
+        )
+        const elongated = Polyhedron.get(`${elongType}d-${test}`)
+        it(`can elongate ${test}`, () => {
+          const actual = operations[elongType](shortened)
+          expect(actual.isIsomorphicTo(elongated)).toBe(true)
+        })
+
+        it(`can shorten ${elongType}d ${test}`, () => {
+          const actual = operations.shorten(elongated)
+          expect(actual.isIsomorphicTo(shortened)).toBe(true)
+        })
+      })
+    })
+  })
   describe('augment', () => {
     it('can augment prisms', () => {
       const testPolyhedra = [
@@ -148,6 +182,7 @@ describe('operations', () => {
       })
     })
   })
+
   describe('diminish', () => {
     it('properly diminishes gyrobifastigium', () => {
       const polyhedron = Polyhedron.get('gyrobifastigium')
