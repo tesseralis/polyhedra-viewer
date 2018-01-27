@@ -319,7 +319,7 @@ function isAligned(
   gyrate,
   augmentType,
 ) {
-  if (augmentType === 'pyramid') return true
+  if (_.includes(['pyramid', 'prism', 'antiprism'], augmentType)) return true
   const baseType = getBaseType(polyhedron.faces, base)
   if (baseType === 'pyramid' || baseType === 'antiprism') {
     return true
@@ -475,24 +475,6 @@ function findWithDistance(
   })
 }
 
-export function elongate(polyhedron) {
-  const faceIndex = _.findIndex(
-    polyhedron.faces,
-    face => face === _.maxBy(polyhedron.faces, numSides),
-  )
-  const using = `P${numSides(polyhedron.faces[faceIndex])}`
-  return doAugment(polyhedron, faceIndex, null, using)
-}
-
-export function gyroelongate(polyhedron) {
-  const faceIndex = _.findIndex(
-    polyhedron.faces,
-    face => face === _.maxBy(polyhedron.faces, 'length'),
-  )
-  const using = `A${numSides(polyhedron.faces[faceIndex])}`
-  return doAugment(polyhedron, faceIndex, null, using)
-}
-
 export function getAugmentFace(polyhedron, point) {
   const hitPoint = vec(point)
   const hitFaceIndex = polyhedron.hitFaceIndex(hitPoint)
@@ -509,6 +491,29 @@ function removeVertices(polyhedron, vIndices) {
   )
   const newFaces = facesToKeep.concat([getBoundary(facesToRemove)])
   return removeExtraneousVertices(polyhedron.withFaces(newFaces))
+}
+
+export function elongate(polyhedron) {
+  const faceIndex = _.findIndex(
+    polyhedron.faces,
+    face => face === _.maxBy(polyhedron.faces, 'length'),
+  )
+  const using = `P${numSides(polyhedron.faces[faceIndex])}`
+  return doAugment(polyhedron, faceIndex, null, using)
+}
+
+export function gyroelongate(polyhedron) {
+  const faceIndex = _.findIndex(
+    polyhedron.faces,
+    face => face === _.maxBy(polyhedron.faces, 'length'),
+  )
+  const using = `A${numSides(polyhedron.faces[faceIndex])}`
+  return doAugment(polyhedron, faceIndex, null, using)
+}
+
+export function shorten(polyhedron) {
+  const face = _.maxBy(polyhedron.faces, numSides)
+  return removeVertices(polyhedron, face)
 }
 
 export function augment(polyhedron, { fIndex, gyrate, using }) {

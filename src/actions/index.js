@@ -14,6 +14,7 @@ import { polyhedraGraph } from 'constants/relations'
 import {
   elongate,
   gyroelongate,
+  shorten,
   augment,
   diminish,
   gyrate,
@@ -31,6 +32,8 @@ export const setPolyhedron = name => dispatch => {
 const operations = {
   P: elongate,
   A: gyroelongate,
+  '~P': shorten,
+  '~A': shorten,
   '+': augment,
   '-': diminish,
   g: gyrate,
