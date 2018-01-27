@@ -73,9 +73,9 @@ export const applyOperation = (operation, polyhedron, config) => dispatch => {
   const { gyrate, using } = config
   if (operation === '+') {
     if (using === 'U2') {
+      console.log('setting gyrate for fastigium')
       options.gyrate = 'gyro'
-    }
-    if (gyrate) {
+    } else if (gyrate) {
       options.gyrate = gyrate
     }
     options.using =
@@ -95,12 +95,16 @@ export const applyOperation = (operation, polyhedron, config) => dispatch => {
       !_.isEmpty(options) ? options : null,
     ),
   )
+  // // Get out of current mode if we can't do it any more
+  console.log(next, operation, options)
 
   dispatch(
-    setPolyhedronRaw(operations[operation](polyhedron, config).withName(next)),
+    setPolyhedronRaw(
+      operations[operation](polyhedron, { ...config, ...options }).withName(
+        next,
+      ),
+    ),
   )
-  // // Get out of current mode if we can't do it any more
-  console.log(next, operation)
   if (!hasOperation(unescapeName(next), operation)) {
     dispatch(setMode(null))
   } else {

@@ -47,61 +47,70 @@ function checkGyrate(polyhedron, gyrate) {
 
 describe('operations', () => {
   describe('augment', () => {
-    it('properly augments a cupola with itself', () => {
-      const polyhedron = Polyhedron.get('triangular-cupola')
-      const augmented = operations.augment(polyhedron, {
-        fIndex: 7,
-        gyrate: 'ortho',
-      })
-      checkProperPolyhedron(augmented)
-    })
-  })
-
-  describe('ortho/gyro', () => {
-    it('properly aligns truncated solids', () => {
-      const polyhedron = Polyhedron.get('truncated-cube')
-      const augmented = operations.augment(polyhedron, {
-        fIndex: 8,
-      })
-      checkGyrate(augmented, 'gyro')
-    })
-
-    it('properly aligns cupolae', () => {
-      const polyhedron = Polyhedron.get('triangular-cupola')
-
-      const options = ['ortho', 'gyro']
-      options.forEach(gyrate => {
-        const augmented = operations.augment(polyhedron, {
-          fIndex: 7,
-          gyrate,
-        })
-        checkGyrate(augmented, gyrate)
-      })
-    })
-
-    xit('properly aligns elongated cupolae', () => {})
-
-    xit('properly aligns cupola-rotunda', () => {})
-  })
-
-  describe('multiple options', () => {
-    describe('cupola-rotunda', () => {
-      const polyhedron = Polyhedron.get('pentagonal-cupola')
-      const usingOpts = ['U5', 'R5']
-      const expectedName = [
-        'pentagonal-orthobicupola',
-        'pentagonal-orthocupolarotunda',
+    it('can augment prisms', () => {
+      const testPolyhedra = [
+        'triangular-prism',
+        'pentagonal-prism',
+        'hexagonal-prism',
       ]
-      usingOpts.forEach((using, i) => {
-        it(`can augment with ${using}`, () => {
+      testPolyhedra.forEach(test => {
+        const polyhedron = Polyhedron.get(test)
+        const augmented = operations.augment(polyhedron, {
+          fIndex: _.findIndex(polyhedron.faces, face => numSides(face) === 4),
+          with: 'Y4',
+        })
+        checkProperPolyhedron(augmented)
+        const expected = Polyhedron.get(`augmented-${test}`)
+        expect(augmented.faceCount()).toEqual(expected.faceCount())
+      })
+    })
+
+    describe('ortho/gyro', () => {
+      it('properly aligns truncated solids', () => {
+        const polyhedron = Polyhedron.get('truncated-cube')
+        const augmented = operations.augment(polyhedron, {
+          fIndex: 8,
+        })
+        checkGyrate(augmented, 'gyro')
+      })
+
+      it('properly aligns cupolae', () => {
+        const polyhedron = Polyhedron.get('triangular-cupola')
+
+        const options = ['ortho', 'gyro']
+        options.forEach(gyrate => {
           const augmented = operations.augment(polyhedron, {
-            fIndex: 11,
-            gyrate: 'ortho',
-            using,
+            fIndex: 7,
+            gyrate,
           })
-          checkProperPolyhedron(augmented)
-          const expected = Polyhedron.get(expectedName[i])
-          expect(augmented.faceCount()).toEqual(expected.faceCount())
+          checkGyrate(augmented, gyrate)
+        })
+      })
+
+      xit('properly aligns elongated cupolae', () => {})
+
+      xit('properly aligns cupola-rotunda', () => {})
+    })
+
+    describe('multiple options', () => {
+      describe('cupola-rotunda', () => {
+        const polyhedron = Polyhedron.get('pentagonal-cupola')
+        const usingOpts = ['U5', 'R5']
+        const expectedName = [
+          'pentagonal-orthobicupola',
+          'pentagonal-orthocupolarotunda',
+        ]
+        usingOpts.forEach((using, i) => {
+          it(`can augment with ${using}`, () => {
+            const augmented = operations.augment(polyhedron, {
+              fIndex: 11,
+              gyrate: 'ortho',
+              using,
+            })
+            checkProperPolyhedron(augmented)
+            const expected = Polyhedron.get(expectedName[i])
+            expect(augmented.faceCount()).toEqual(expected.faceCount())
+          })
         })
       })
     })
@@ -118,6 +127,19 @@ describe('operations', () => {
         checkProperPolyhedron(augmented)
         const expected = Polyhedron.get('gyrobifastigium')
         expect(augmented.faceCount()).toEqual(expected.faceCount())
+      })
+    })
+  })
+  describe('diminish', () => {
+    it('properly diminishes gyrobifastigium', () => {
+      const polyhedron = Polyhedron.get('gyrobifastigium')
+      polyhedron.fIndices().forEach(fIndex => {
+        const diminished = operations.diminish(polyhedron, {
+          vIndices: polyhedron.findPeak(polyhedron.faceCentroid(fIndex)),
+        })
+        checkProperPolyhedron(diminished)
+        const expected = Polyhedron.get('triangular-prism')
+        expect(diminished.faceCount()).toEqual(expected.faceCount())
       })
     })
   })

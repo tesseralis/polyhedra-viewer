@@ -183,6 +183,14 @@ export default class Polyhedron {
   isPlanar(vIndices) {
     return isPlanar(_.at(this.vertexVectors(), vIndices))
   }
+
+  /** Return the centroid of the face given by the face index */
+  faceCentroid(fIndex) {
+    return getCentroid(
+      this.faces[fIndex].map(vIndex => this.vertexVectors()[vIndex]),
+    ).toArray()
+  }
+
   getDihedralAngle(edge) {
     const { vertices, faces } = this
     const [v1, v2] = edge.map(vIndex => this.vertexVectors()[vIndex])
@@ -236,6 +244,19 @@ export default class Polyhedron {
     return this.isPlanar(getBoundary(allNeighborFaces))
   }
 
+  isFastigium = edge => {
+    const fastigiumCount = { 3: 1, 4: 2 }
+    const matchFaces = _.every(edge, vIndex => {
+      const faceCount = this.adjacentFaceCount(vIndex)
+      if (!_.isEqual(faceCount, fastigiumCount)) return false
+    })
+    // make sure the whole thing is on a plane
+    const allNeighborFaces = this.adjacentFaces(...edge)
+    return this.isPlanar(getBoundary(allNeighborFaces))
+  }
+
+  fastigiumFaceIndices = vIndices => this.adjacentFaceIndices(...vIndices)
+
   rotundaFaceIndices = fIndex =>
     this.adjacentFaceIndices(
       ...this.adjacentVertexIndices(...this.faces[fIndex]),
@@ -257,6 +278,10 @@ export default class Polyhedron {
   // Get the vertex indices of the polyhedron that represent the tops of pyramids
   pyramidIndices() {
     return this.vIndices().filter(this.isPyramid)
+  }
+
+  fastigiumIndices() {
+    return this.edges.filter(this.isFastigium)
   }
 
   cupolaIndices() {
@@ -305,6 +330,16 @@ export default class Polyhedron {
     }
 
     // Cupolae and rotundae
+    const fastigiumIndices = _.includes(exclude, 'U2')
+      ? []
+      : this.fastigiumIndices().filter(vIndices =>
+          _.includes(this.fastigiumFaceIndices(vIndices), hitFaceIndex),
+        )
+
+    if (fastigiumIndices.length > 0) {
+      return fastigiumIndices[0]
+    }
+
     const cupolaIndices = _.includes(exclude, 'U')
       ? []
       : this.cupolaIndices().filter(fIndex =>
