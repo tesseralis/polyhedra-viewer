@@ -475,7 +475,7 @@ function findWithDistance(
   })
 }
 
-export function getElongated(polyhedron) {
+export function elongate(polyhedron) {
   const faceIndex = _.findIndex(
     polyhedron.faces,
     face => face === _.maxBy(polyhedron.faces, numSides),
@@ -484,7 +484,7 @@ export function getElongated(polyhedron) {
   return doAugment(polyhedron, faceIndex, null, using)
 }
 
-export function getGyroElongated(polyhedron) {
+export function gyroelongate(polyhedron) {
   const faceIndex = _.findIndex(
     polyhedron.faces,
     face => face === _.maxBy(polyhedron.faces, 'length'),

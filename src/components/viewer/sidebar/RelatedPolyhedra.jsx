@@ -6,7 +6,7 @@ import { createStructuredSelector } from 'reselect'
 
 import { toConwayNotation, fromConwayNotation } from 'constants/polyhedra'
 import { applyOperation, setMode, setApplyOpt } from 'actions'
-import { getOperation, getApplyOpts } from 'selectors'
+import { getPolyhedron, getOperation, getApplyOpts } from 'selectors'
 
 import { polyhedraGraph } from 'constants/relations'
 import PolyhedronLink from 'components/common/PolyhedronLink'
@@ -88,6 +88,7 @@ const styles = StyleSheet.create({
 
 function RelatedPolyhedra({
   solid,
+  polyhedron,
   mode,
   options: { gyrate, using },
   applyOperation,
@@ -178,7 +179,7 @@ function RelatedPolyhedra({
                     large
                     key={name}
                     name={name}
-                    onClick={() => applyOperation(operation, { name })}
+                    onClick={() => applyOperation(operation, polyhedron)}
                     subLink="related"
                   />
                 )
@@ -194,6 +195,7 @@ function RelatedPolyhedra({
 export default connect(
   createStructuredSelector({
     mode: getOperation,
+    polyhedron: getPolyhedron,
     options: getApplyOpts,
   }),
   {

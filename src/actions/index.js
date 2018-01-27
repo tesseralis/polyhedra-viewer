@@ -12,8 +12,8 @@ import Polyhedron from 'math/Polyhedron'
 import { polyhedraGraph } from 'constants/relations'
 
 import {
-  // getElongated,
-  // getGyroElongated,
+  elongate,
+  gyroelongate,
   augment,
   diminish,
   gyrate,
@@ -29,8 +29,8 @@ export const setPolyhedron = name => dispatch => {
 }
 
 const operations = {
-  // P: getElongated,
-  // A: getGyroElongated,
+  P: elongate,
+  A: gyroelongate,
   '+': augment,
   '-': diminish,
   g: gyrate,
@@ -64,7 +64,11 @@ const setApplyOptsFor = (solid, operation) => dispatch => {
 
 // Apply the given operation to the given polyhedron
 // TODO won't need the "name" parameter in the new one
-export const applyOperation = (operation, polyhedron, config) => dispatch => {
+export const applyOperation = (
+  operation,
+  polyhedron,
+  config = {},
+) => dispatch => {
   // TODO is it a good idea to keep the defaulting logic here?
   // It makes it harder to unit test
   const options = {}
