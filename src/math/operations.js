@@ -149,30 +149,6 @@ export function getTruncated(polyhedron, options = {}) {
   return removeExtraneousVertices(newPolyhedron)
 }
 
-function faceGraph(polyhedron) {
-  const edgesToFaces = {}
-  // build up a lookup table for every pair of edges to that face
-  _.forEach(polyhedron.faces, (face, index) => {
-    // for the pairs of vertices, find the face that contains the corresponding pair
-    // ...this is n^2? more? ah who cares I'm too lazy
-    _.forEach(polyhedron.edges, edge => {
-      if (!edgesToFaces[edge]) {
-        edgesToFaces[edge] = []
-      }
-      // NOTE: this indexes the edge as a string (e.g. "1,2")
-      edgesToFaces[edge].push(index)
-    })
-  })
-  const graph = {}
-  _.forEach(edgesToFaces, ([f1, f2]) => {
-    if (!graph[f1]) graph[f1] = []
-    if (!graph[f2]) graph[f2] = []
-    graph[f1].push(f2)
-    graph[f2].push(f1)
-  })
-  return graph
-}
-
 const augmentTypes = {
   pyramid: {
     3: 'tetrahedron',

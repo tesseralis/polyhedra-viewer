@@ -20,6 +20,25 @@ describe('Polyhedron', () => {
     })
   })
 
+  describe('isIsomorphicTo', () => {
+    const testCases = [
+      ['rhombicuboctahedron', 'elongated-square-gyrobicupola'],
+      ['metabiaugmented-hexagonal-prism', 'parabiaugmented-hexagonal-prism'],
+      [
+        'parabigyrate-rhombicosidodecahedron',
+        'metabigyrate-rhombicosidodecahedron',
+      ],
+    ]
+
+    testCases.forEach(([p1, p2]) => {
+      it(`differentiates between ${p1} and ${p2}`, () => {
+        expect(Polyhedron.get(p1).isIsomorphicTo(Polyhedron.get(p2))).toBe(
+          false,
+        )
+      })
+    })
+  })
+
   describe('getPyramidIndices', () => {
     it('chooses only triangular faces that have a planar base', () => {
       const polyhedron = Polyhedron.get('triaugmented-triangular-prism')

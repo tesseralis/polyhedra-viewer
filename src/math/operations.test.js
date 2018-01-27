@@ -71,19 +71,21 @@ describe('operations', () => {
         const augmented = operations.augment(polyhedron, {
           fIndex: 8,
         })
-        checkGyrate(augmented, 'gyro')
+        const expected = Polyhedron.get('augmented-truncated-cube')
+        expect(augmented.isIsomorphicTo(expected)).toBe(true)
       })
 
       it('properly aligns cupolae', () => {
-        const polyhedron = Polyhedron.get('triangular-cupola')
+        const polyhedron = Polyhedron.get('square-cupola')
 
         const options = ['ortho', 'gyro']
         options.forEach(gyrate => {
           const augmented = operations.augment(polyhedron, {
-            fIndex: 7,
+            fIndex: _.findIndex(polyhedron.faces, face => numSides(face) === 8),
             gyrate,
           })
-          checkGyrate(augmented, gyrate)
+          const expected = Polyhedron.get(`square-${gyrate}bicupola`)
+          expect(augmented.isIsomorphicTo(expected)).toBe(true)
         })
       })
 
@@ -109,6 +111,8 @@ describe('operations', () => {
             })
             checkProperPolyhedron(augmented)
             const expected = Polyhedron.get(expectedName[i])
+            // FIXME this actually isn't correct
+            // expect(augmented.isIsomorphicTo(expected)).toBe(true)
             expect(augmented.faceCount()).toEqual(expected.faceCount())
           })
         })
@@ -126,7 +130,7 @@ describe('operations', () => {
         })
         checkProperPolyhedron(augmented)
         const expected = Polyhedron.get('gyrobifastigium')
-        expect(augmented.faceCount()).toEqual(expected.faceCount())
+        expect(augmented.isIsomorphicTo(expected)).toBe(true)
       })
     })
   })
@@ -139,7 +143,7 @@ describe('operations', () => {
         })
         checkProperPolyhedron(diminished)
         const expected = Polyhedron.get('triangular-prism')
-        expect(diminished.faceCount()).toEqual(expected.faceCount())
+        expect(diminished.isIsomorphicTo(expected)).toBe(true)
       })
     })
   })

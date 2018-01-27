@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { getSolidData } from 'constants/polyhedra'
+import { isValidSolid, getSolidData } from 'constants/polyhedra'
 import { vec, isPlanar, getPlane, getCentroid } from './linAlg'
 
 function mod(a, b) {
@@ -69,6 +69,9 @@ export function getBoundary(faces) {
 // TODO: this is a JSX class because otherwise class properties won't be highlighted in sublime
 export default class Polyhedron {
   static get(name) {
+    if (!isValidSolid(name)) {
+      throw new Error(`Invalid solid name: ${name}`)
+    }
     return new Polyhedron({ ...getSolidData(name), name })
   }
 
@@ -203,6 +206,52 @@ export default class Polyhedron {
       .map(v => v.sub(midpoint))
 
     return c1.angleBetween(c2, true)
+  }
+
+  faceGraph = _.memoize(() => {
+    const edgesToFaces = {}
+    // build up a lookup table for every pair of edges to that face
+    _.forEach(this.faces, (face, index) => {
+      // for the pairs of vertices, find the face that contains the corresponding pair
+      // ...this is n^2? more? ah who cares I'm too lazy
+      _.forEach(getEdges(face), edge => {
+        if (!edgesToFaces[edge]) {
+          edgesToFaces[edge] = []
+        }
+        // NOTE: this indexes the edge as a string (e.g. "1,2")
+        edgesToFaces[edge].push(index)
+      })
+    })
+    const graph = {}
+    _.forEach(edgesToFaces, ([f1, f2]) => {
+      if (!graph[f1]) graph[f1] = []
+      if (!graph[f2]) graph[f2] = []
+      graph[f1].push(f2)
+      graph[f2].push(f1)
+    })
+    return graph
+  })
+
+  faceAdjacencyList() {
+    const faceAdjacencyCounts = _.map(this.faceGraph(), (adjFaces, fIndex) => ({
+      n: numSides(this.faces[fIndex]),
+      adj: _.countBy(adjFaces, fIndex2 => numSides(this.faces[fIndex2])),
+    }))
+    return _.sortBy(faceAdjacencyCounts, [
+      'n',
+      'adj.length',
+      'adj[3]',
+      'adj[4]',
+      'adj[5]',
+      'adj[6]',
+      'adj[8]',
+      'adj[10]',
+    ])
+  }
+
+  isIsomorphicTo(other) {
+    if (!_.isEqual(this.faceCount(), other.faceCount())) return false
+    return _.isEqual(this.faceAdjacencyList(), other.faceAdjacencyList())
   }
 
   /*

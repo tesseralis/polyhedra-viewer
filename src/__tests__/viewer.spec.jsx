@@ -48,8 +48,8 @@ describe('viewer', () => {
       app
         .find('Faces')
         .prop('solidData')
-        .faceCount(),
-    ).toEqual(Polyhedron.get(expected).faceCount())
+        .isIsomorphicTo(Polyhedron.get(expected)),
+    ).toBe(true)
 
     // verify that the solid being rendered is indeed a triangular bipyramid
   })
