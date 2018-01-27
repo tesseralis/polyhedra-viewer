@@ -274,19 +274,19 @@ const basePyramidsCupolae = (() => {
       },
     })
 
-    // Populate elongations of bipyramids (which we may not even do?)
-    if (!_.isArray(bi)) {
-      graph = graphMerge(graph, {
-        [bi]: elongations(elongatedBi, gyroelongatedBi),
-      })
-    } else {
-      const [ortho, gyro] = bi
-      const [elongBiOrtho, elongBiGyro] = elongatedBi
-      graph = graphMerge(graph, {
-        [ortho]: elongations(elongBiOrtho, gyroelongatedBi),
-        [gyro]: elongations(elongBiGyro, gyroelongatedBi),
-      })
-    }
+    // TODO Populate elongations of bipyramids (which we may not even do?)
+    // if (!_.isArray(bi)) {
+    //   graph = graphMerge(graph, {
+    //     [bi]: elongations(elongatedBi, gyroelongatedBi),
+    //   })
+    // } else {
+    //   const [ortho, gyro] = bi
+    //   const [elongBiOrtho, elongBiGyro] = elongatedBi
+    //   graph = graphMerge(graph, {
+    //     [ortho]: elongations(elongBiOrtho, gyroelongatedBi),
+    //     [gyro]: elongations(elongBiGyro, gyroelongatedBi),
+    //   })
+    // }
 
     // gyrate relationships
     _.forEach(row, cell => {

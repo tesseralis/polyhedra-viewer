@@ -102,7 +102,7 @@ const fromConwayNotationUnescaped = notation => {
   if (prefix === 'A') {
     return `${prismNames[number]} antiprism`
   }
-  return null
+  return ''
 }
 
 export const fromConwayNotation = notation =>
