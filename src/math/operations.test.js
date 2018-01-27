@@ -196,4 +196,22 @@ describe('operations', () => {
       })
     })
   })
+
+  describe('getAugmentAlignment', () => {
+    const tests = ['hexagonal-prism', 'dodecahedron', 'truncated-dodecahedron']
+    const allAlignIndices = [[8, 7], [10, 11], [35, 34]]
+    tests.forEach((name, i) => {
+      const polyhedron = Polyhedron.get(`augmented-${name}`)
+      const alignIndices = allAlignIndices[i]
+      const alignTypes = ['para', 'meta']
+      alignTypes.forEach((align, j) => {
+        const fIndex = alignIndices[j]
+        it(`can ${align}augment augmented-${name}`, () => {
+          expect(operations.getAugmentAlignment(polyhedron, fIndex)).toEqual(
+            align,
+          )
+        })
+      })
+    })
+  })
 })

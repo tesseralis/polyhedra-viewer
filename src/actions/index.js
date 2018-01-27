@@ -4,7 +4,7 @@ import { setPolyhedron as setPolyhedronRaw } from 'reducers/polyhedron'
 import { setOperation, setApplyOpts } from 'reducers/controls'
 import { isValidSolid } from 'constants/polyhedra'
 import Polyhedron from 'math/Polyhedron'
-import { getOperations } from 'constants/relations'
+import { hasAlignment, getOperations } from 'constants/relations'
 
 import {
   elongate,
@@ -13,6 +13,7 @@ import {
   augment,
   diminish,
   gyrate,
+  getAugmentAlignment,
 } from 'math/operations'
 
 // Set the polyhedron
@@ -78,6 +79,10 @@ export const applyOperation = (
     }
     options.using =
       using || defaultAugmentees[polyhedron.faces[config.fIndex].length]
+
+    if (hasAlignment(polyhedron.name, operation)) {
+      options.align = getAugmentAlignment(polyhedron, config.fIndex)
+    }
   } else if (operation === '-') {
     // If diminishing a pentagonal cupola/rotunda, check which one it is
     if (config.vIndices.length === 5) {
@@ -86,6 +91,7 @@ export const applyOperation = (
       options.using = 'R5'
     }
   }
+  // TODO should I move this logic to the actual operation?
   const next = getNextPolyhedron(
     polyhedron.name,
     operation,
@@ -111,7 +117,7 @@ function hasMultipleOptionsForFace(relations) {
   return _.some(
     relations,
     relation =>
-      _.isObject(relation) && _.includes(['U2', 'U5', 'R5'], relation.using),
+      _.isObject(relation) && _.includes(['U2', 'R5'], relation.using),
   )
 }
 

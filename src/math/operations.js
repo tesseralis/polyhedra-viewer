@@ -309,6 +309,41 @@ function isCupolaRotunda(baseType, augmentType) {
   return _.xor(['cupola', 'rotunda'], [baseType, augmentType]).length === 0
 }
 
+function faceGraphDistance(polyhedron, fIndex, peakBoundary, exclude = []) {
+  const faceGraph = polyhedron.faceGraph()
+  const excludeFn = fIndex =>
+    !_.includes(exclude, numSides(polyhedron.faces[fIndex]))
+  let foundFaceIndices = _.flatMap(peakBoundary, vIndex =>
+    polyhedron.adjacentFaceIndices(vIndex),
+  ).filter(excludeFn)
+  let distance = 0
+  while (!_.includes(foundFaceIndices, fIndex)) {
+    foundFaceIndices = _.flatMap(
+      foundFaceIndices,
+      fIndex => faceGraph[fIndex],
+    ).filter(excludeFn)
+    distance++
+  }
+  return distance
+}
+
+// Return "meta" or "para", or null
+export function getAugmentAlignment(polyhedron, fIndex) {
+  // get the existing peak boundary
+  const peakBoundary = polyhedron.getPeakBoundary()
+  const isHexagonalPrism = _.some(
+    polyhedron.faces,
+    face => numSides(face) === 6,
+  )
+
+  // calculate the face distance to the peak's boundary
+  return faceGraphDistance(polyhedron, fIndex, peakBoundary, [
+    isHexagonalPrism && 6,
+  ]) > 1
+    ? 'para'
+    : 'meta'
+}
+
 // TODO handle rhombicosidodecahedron case (still don't know what terminology I want to use)
 // Return true if the base and augmentee are aligned
 function isAligned(

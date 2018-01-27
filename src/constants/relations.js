@@ -448,6 +448,9 @@ export function getOperations(solid, operation) {
   return polyhedraGraph[toConwayNotation(solid)][operation]
 }
 
+export function hasAlignment(solid, operation) {
+  return _.some(getOperations(solid, operation), 'align')
+}
 // Get the polyhedron name as a result of applying the operation to the given polyhedron
 export function getNextPolyhedron(solid, operation, options) {
   const next = _(polyhedraGraph[toConwayNotation(solid)][operation])
@@ -455,7 +458,9 @@ export function getNextPolyhedron(solid, operation, options) {
     .value()
   if (next.length > 1) {
     throw new Error(
-      `Multiple possibilities found for operation ${operation} on ${solid} with options: ${options}`,
+      `Multiple possibilities found for operation ${operation} on ${solid}: ${JSON.stringify(
+        next,
+      )}`,
     )
   }
   const val = next[0]

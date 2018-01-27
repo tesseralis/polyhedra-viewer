@@ -344,11 +344,35 @@ export default class Polyhedron {
       return plane.getDistanceToPoint(point)
     })
   }
+
+  getPeakBoundary() {
+    const pyramidIndices = this.pyramidIndices()
+    if (pyramidIndices.length > 0) {
+      if (pyramidIndices.length > 1) {
+        throw new Error('More than one pyramid found on polyhedron')
+      }
+      return this.adjacentVertexIndices(pyramidIndices[0])
+    }
+
+    const cupolaIndices = this.cupolaIndices()
+    if (cupolaIndices.length > 0) {
+      if (cupolaIndices.length > 1) {
+        throw new Error('More than one cupola found on polyhedron')
+      }
+      return getBoundary(
+        this.cupolaFaceIndices(cupolaIndices[0]).map(
+          fIndex => this.faces[fIndex],
+        ),
+      )
+    }
+    throw new Error('No peaks found on polyhedron')
+  }
+
   /**
- * Find the nearest pyramid, cupola, or rotunda in the solid to the provided hit point.
- * Return the "peak" vertices, or null if the point is not part of any peak.
- * @param exclude a list of codes for solids to exclude (Y, U, R)
- */
+   * Find the nearest pyramid, cupola, or rotunda in the solid to the provided hit point.
+   * Return the "peak" vertices, or null if the point is not part of any peak.
+   * @param exclude a list of codes for solids to exclude (Y, U, R)
+   */
   findPeak(point, exclude = {}) {
     const { faces, vertices } = this
     const hitPoint = vec(point)
