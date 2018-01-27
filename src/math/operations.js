@@ -334,7 +334,6 @@ function getOppositePrismSide(polyhedron, base) {
 // Get the index in the augmentee underside to align with the base's 0th vertex
 function getAlignIndex(polyhedron, base, augmentee, underside, gyrate) {
   const baseType = getBaseType(polyhedron.faces, base)
-  console.log('baseType: ', baseType)
   if (baseType === 'pyramid' || baseType === 'antiprism') {
     return 0
   }
@@ -372,7 +371,6 @@ function getAlignIndex(polyhedron, base, augmentee, underside, gyrate) {
 // TODO digonal cupola option and rotunda option
 function doAugment(polyhedron, faceIndex, gyrate, using) {
   const { faces, vertices } = polyhedron
-  console.log('gyrate: ', gyrate)
   const base = faces[faceIndex]
   const n = base.length
   const [prefix, index] = using || defaultAugmentees[n]

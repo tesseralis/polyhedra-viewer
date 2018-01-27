@@ -199,7 +199,6 @@ const getPyramidFromPrism = prismRow => {
 
 const getPrismFromPyramid = (name, anti) => {
   const [prefix, type] = name.split(' ')
-  console.log(name, prefix, type)
   const isCupola = _.includes(['cupola', 'rotunda', 'cupola-rotunda'], type)
   const index = nameMapping[prefix] * (isCupola ? 2 : 1)
   return `${anti ? 'A' : 'P'}${index}`
@@ -304,7 +303,6 @@ const basePyramidsCupolae = (() => {
 
   return graph
 })()
-console.log('basePyramidsCupolae', basePyramidsCupolae)
 
 const getAugmentee = name => {
   if (name.includes('prism')) return 'Y4'
@@ -448,12 +446,9 @@ export function hasOperation(solid, operation) {
 
 // Get the polyhedron name as a result of applying the operation to the given polyhedron
 export function getNextPolyhedron(solid, operation, options) {
-  console.log(operation, options)
-  console.log(polyhedraGraph[toConwayNotation(solid)][operation])
   const next = _(polyhedraGraph[toConwayNotation(solid)][operation])
     .filter(options || _.stubTrue)
     .value()
-  console.log(next)
   if (next.length > 1) {
     throw new Error(
       `Multiple possibilities found for operation ${operation} on ${solid} with options: ${options}`,
