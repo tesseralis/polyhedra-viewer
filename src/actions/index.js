@@ -15,6 +15,7 @@ import {
   gyrate,
   getAugmentAlignment,
   getDiminishAlignment,
+  getDiminishGyrate,
   getGyrateDirection,
   getGyrateAlignment,
 } from 'math/operations'
@@ -95,7 +96,18 @@ export const applyOperation = (
       options.using = 'R5'
     }
 
-    if (_.some(relations, 'align')) {
+    if (_.filter(relations, 'gyrate').length > 1) {
+      options.gyrate = getDiminishGyrate(polyhedron, config.vIndices)
+    }
+
+    if (
+      _.filter(
+        relations,
+        relation =>
+          (!!relation.gyrate ? relation.gyrate === options.gyrate : true) &&
+          !!relation.align,
+      ).length > 1
+    ) {
       options.align = getDiminishAlignment(polyhedron, config.vIndices)
     }
   } else if (operation === 'g') {

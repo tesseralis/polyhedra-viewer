@@ -366,7 +366,7 @@ export function getAugmentAlignment(polyhedron, fIndex) {
     : 'meta'
 }
 
-// TODO diminished rhombicosidodecahedra
+// FIXME diminished rhombicosidodecahedra
 export function getDiminishAlignment(polyhedron, vIndices) {
   const { faces } = polyhedron
   const peakBoundary = getBoundary(polyhedron.adjacentFaces(...vIndices))
@@ -390,6 +390,11 @@ export function getGyrateDirection(polyhedron, vIndices) {
     return (n1 === 4) === (n2 === 4)
   })
   return isOrtho ? 'back' : 'forward'
+}
+
+export function getDiminishGyrate(polyhedron, vIndices) {
+  // FIXME these dependencies should be reversed
+  return getGyrateDirection(polyhedron, vIndices) === 'back' ? 'ortho' : 'gyro'
 }
 
 export function getGyrateAlignment(polyhedron, vIndices) {
