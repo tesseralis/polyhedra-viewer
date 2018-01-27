@@ -69,7 +69,7 @@ class Faces extends Component {
         onMouseMove={this.handleMouseMove}
         onMouseUp={this.handleMouseUp}
       >
-        <EventListener target="window" onLoad={this.handleLoad} />
+        <EventListener target="document" onLoad={this.handleLoad} />
         <appearance>
           <material transparency={1 - opacity} />
         </appearance>
@@ -96,6 +96,7 @@ class Faces extends Component {
   }
 
   handleLoad = () => {
+    console.log('handling load')
     this.shape.addEventListener(
       'mousedown',
       this.wrapError(this.handleMouseDown),
