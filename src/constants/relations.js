@@ -104,6 +104,9 @@ function makeBidirectional(graph) {
           continue
         }
         const newValue = _.isObject(sink) ? { ...sink, value: source } : source
+        if (operation === 'g' && _.isObject(newValue) && sink.direction) {
+          newValue.direction = 'back'
+        }
         result[sinkValue][reverseOp].push(newValue)
       }
     }
@@ -368,7 +371,7 @@ const diminishedIcosahedraGraph = (() => {
 
 // TODO adapt this for the new format
 // Right now, I donm't know of a good system to track diminishing *and* gyration
-const rhombicosidodecahedraGraph = (() => {
+const oldRhombicosidodecahedraGraph = (() => {
   return {
     eD: {
       g: 'J72',
@@ -411,6 +414,86 @@ const rhombicosidodecahedraGraph = (() => {
   }
 })()
 
+const rhombicosidodecahedraGraph = (() => {
+  const getAugment = relations =>
+    relations.map(relation => ({ ...relation, using: 'U5' }))
+  const getGyrate = relations =>
+    relations.map(relation => ({ ...relation, direction: 'forward' }))
+  return {
+    // tridiminished
+    J83: {
+      '+': getAugment([
+        { value: 'J81', gyrate: 'ortho' },
+        { value: 'J82', gyrate: 'gyro' },
+      ]),
+    },
+    // bidiminished
+    J81: {
+      '+': getAugment([
+        { value: 'J76', gyrate: 'ortho', align: 'meta' },
+        { value: 'J78', gyrate: 'gyro' },
+      ]),
+      g: getGyrate([{ value: 'J82' }]),
+    },
+    J82: {
+      '+': getAugment([
+        { value: 'J78', gyrate: 'ortho' },
+        { value: 'J79', gyrate: 'gyro' },
+      ]),
+    },
+    J80: {
+      '+': getAugment([
+        { value: 'J76', gyrate: 'ortho', align: 'para' },
+        { value: 'J77', gyrate: 'gyro' },
+      ]),
+    },
+    // diminished
+    J76: {
+      '+': getAugment([
+        { value: 'eD', gyrate: 'ortho' },
+        { value: 'J72', gyrate: 'gyro' },
+      ]),
+      g: getGyrate([
+        { value: 'J77', align: 'para' },
+        { value: 'J78', align: 'meta' },
+      ]),
+    },
+    J77: {
+      '+': getAugment([
+        { value: 'J72', gyrate: 'ortho', align: 'para' },
+        { value: 'J73', gyrate: 'gyro' },
+      ]),
+    },
+    J78: {
+      '+': getAugment([
+        { value: 'J72', gyrate: 'ortho', align: 'meta' },
+        { value: 'J74', gyrate: 'gyro' },
+      ]),
+      g: getGyrate([{ value: 'J79' }]),
+    },
+    J79: {
+      '+': getAugment([
+        { value: 'J74', gyrate: 'ortho' },
+        { value: 'J75', gyrate: 'gyro' },
+      ]),
+    },
+
+    // gyrate
+    eD: {
+      g: getGyrate([{ value: 'J72' }]),
+    },
+    J72: {
+      g: getGyrate([
+        { value: 'J73', align: 'para' },
+        { value: 'J74', align: 'meta' },
+      ]),
+    },
+    J74: {
+      g: getGyrate([{ value: 'J75' }]),
+    },
+  }
+})()
+
 const othersGraph = (() => {
   return {
     // snub antiprisms
@@ -433,7 +516,7 @@ const normalized = [
   basePyramidsCupolae,
   baseAugmentations,
   diminishedIcosahedraGraph,
-  // rhombicosidodecahedraGraph,
+  rhombicosidodecahedraGraph,
   othersGraph,
 ]
   .map(normalize)
