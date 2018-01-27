@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import Polyhedron, { numSides, getBoundary } from './Polyhedron'
-import { vec, getPlane, getCentroid, PRECISION } from './linAlg'
+import { vec, getCentroid, PRECISION } from './linAlg'
 import { replace } from 'util.js'
 
 const TAU = 2 * Math.PI
@@ -24,13 +24,6 @@ function getNormal(vertices) {
 function nextVertex(face, vertex) {
   return getMod(face, face.indexOf(vertex) + 1)
 }
-
-function prevVertex(face, vertex) {
-  return getMod(face, face.indexOf(vertex) - 1)
-}
-
-const getFindFn = (toAdd, vertex) => face =>
-  prevVertex(face, vertex) === nextVertex(toAdd, vertex)
 
 function replaceVertex(newPolyhedron, polyhedron, vertex, { mock, rectify }) {
   const touchingFaces = polyhedron.adjacentFaces(vertex)
@@ -480,38 +473,6 @@ function doAugment(polyhedron, faceIndex, gyrate, using) {
   return deduplicateVertices(Polyhedron.of(newVertices, newFaces))
 }
 
-// find the node in the graph with n sides that is at least (or equal) to dist
-// away from a face with m sides
-function findWithDistance(
-  graph,
-  n,
-  m,
-  dist,
-  { exact = false, avoid = [] } = {},
-) {
-  return _.findKey(graph, (face, index) => {
-    if (face.length !== n) return false
-    let nbrs = [index]
-    // iterate through same faced neighbors
-    for (let i = 0; i < dist; i++) {
-      nbrs = _(nbrs)
-        .flatMap(i => graph[i])
-        .filter(i => !_.includes(avoid, graph[i].length))
-        .value()
-    }
-    if (_(nbrs).some(nbr => graph[nbr].length === m)) return false
-    // if exact, check that this one's neighbors *are* next to another thing
-    if (exact) {
-      nbrs = _(nbrs)
-        .flatMap(i => graph[i])
-        .filter(i => !_.includes(avoid, graph[i].length))
-        .value()
-      return _(nbrs).some(nbr => graph[nbr].length === m)
-    }
-    return true
-  })
-}
-
 export function getAugmentFace(polyhedron, point) {
   const hitPoint = vec(point)
   const hitFaceIndex = polyhedron.hitFaceIndex(hitPoint)
@@ -552,9 +513,8 @@ export function shorten(polyhedron) {
   // Find a prism or antiprism face
   const face = _(polyhedron.faces)
     .filter((face, fIndex) => {
-      const adjacent = polyhedron
-        .faceGraph()
-        [fIndex].map(fIndex2 => polyhedron.faces[fIndex2])
+      const adjacentFace = polyhedron.faceGraph()[fIndex]
+      const adjacent = adjacentFace.map(fIndex2 => polyhedron.faces[fIndex2])
       return _.keys(_.countBy(adjacent, numSides)).length === 1
     })
     .maxBy(numSides)
