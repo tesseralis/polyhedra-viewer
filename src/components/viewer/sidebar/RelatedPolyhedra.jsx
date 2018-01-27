@@ -108,7 +108,7 @@ function RelatedPolyhedra({
           return null
         if (_.includes(['g', '-', '+'], operation)) {
           return (
-            <div>
+            <div key={operation}>
               <button
                 className={css(
                   styles.modeButton,
@@ -169,7 +169,6 @@ function RelatedPolyhedra({
             <h2 className={css(styles.title)}>{operations[operation]}</h2>
             <div className={css(styles.options)}>
               {_.compact(related[operation]).map(value => {
-                console.log('value', value)
                 const nextValue = _.isObject(value) ? value.value : value
                 if (!nextValue) return null
                 const name = fromConwayNotation(nextValue)

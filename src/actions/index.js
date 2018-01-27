@@ -48,7 +48,6 @@ const defaultAugmentees = {
 
 const setApplyOptsFor = (solid, operation) => dispatch => {
   if (!solid) return
-  console.log('solid', solid)
   const relations =
     polyhedraGraph[toConwayNotation(unescapeName(solid))][operation]
   const newOpts = { gyrate: null, using: null }
@@ -68,12 +67,10 @@ const setApplyOptsFor = (solid, operation) => dispatch => {
 export const applyOperation = (operation, polyhedron, config) => dispatch => {
   // TODO is it a good idea to keep the defaulting logic here?
   // It makes it harder to unit test
-  console.log('calling', operation, 'on', polyhedron)
   const options = {}
   const { gyrate, using } = config
   if (operation === '+') {
     if (using === 'U2') {
-      console.log('setting gyrate for fastigium')
       options.gyrate = 'gyro'
     } else if (gyrate) {
       options.gyrate = gyrate
@@ -95,8 +92,6 @@ export const applyOperation = (operation, polyhedron, config) => dispatch => {
       !_.isEmpty(options) ? options : null,
     ),
   )
-  // // Get out of current mode if we can't do it any more
-  console.log(next, operation, options)
 
   dispatch(
     setPolyhedronRaw(

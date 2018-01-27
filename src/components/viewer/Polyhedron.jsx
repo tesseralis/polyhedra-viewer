@@ -5,6 +5,7 @@ import _ from 'lodash'
 import { connect } from 'react-redux'
 import { createStructuredSelector } from 'reselect'
 import { withRouter } from 'react-router-dom'
+import EventListener from 'react-event-listener'
 
 import polygons from 'constants/polygons'
 import {
@@ -49,31 +50,6 @@ class Faces extends Component {
     error: null,
   }
 
-  componentDidMount() {
-    this.drag = false
-    // TODO make sure this doesn't have a race condition
-    document.onload = _.once(() => {
-      this.shape.addEventListener(
-        'mousedown',
-        this.wrapError(this.handleMouseDown),
-      )
-      this.shape.addEventListener('mouseup', this.wrapError(this.handleMouseUp))
-      this.shape.addEventListener(
-        'mousemove',
-        this.wrapError(_.throttle(this.handleMove, 200)),
-      )
-    })
-  }
-
-  // FIXME find a better way to do this?
-  wrapError = fn => event => {
-    try {
-      fn(event)
-    } catch (error) {
-      this.setState({ error })
-    }
-  }
-
   render() {
     const { solidData, config } = this.props
     const { highlightFaceIndices, error } = this.state
@@ -85,8 +61,15 @@ class Faces extends Component {
     }
     // TODO implement highlighting
     // console.log('highlight faces', highlightFaceIndices)
+    // FIXME we're duplicating these so they'll work in enzyme; they don't do anything in the actual app
     return (
-      <shape ref={shape => (this.shape = shape)}>
+      <shape
+        ref={shape => (this.shape = shape)}
+        onMouseDown={this.handleMouseDown}
+        onMouseMove={this.handleMouseMove}
+        onMouseUp={this.handleMouseUp}
+      >
+        <EventListener target="window" onLoad={this.handleLoad} />
         <appearance>
           <material transparency={1 - opacity} />
         </appearance>
@@ -100,6 +83,27 @@ class Faces extends Component {
           <color color={getColorAttr(colors)} />
         </indexedfaceset>
       </shape>
+    )
+  }
+
+  // FIXME find a better way to do this?
+  wrapError = fn => event => {
+    try {
+      fn(event)
+    } catch (error) {
+      this.setState({ error })
+    }
+  }
+
+  handleLoad = () => {
+    this.shape.addEventListener(
+      'mousedown',
+      this.wrapError(this.handleMouseDown),
+    )
+    this.shape.addEventListener('mouseup', this.wrapError(this.handleMouseUp))
+    this.shape.addEventListener(
+      'mousemove',
+      this.wrapError(_.throttle(this.handleMouseMove, 200)),
     )
   }
 
@@ -118,7 +122,7 @@ class Faces extends Component {
     }
   }
 
-  handleMove = event => {
+  handleMouseMove = event => {
     this.drag = true
     const { solidData, operation } = this.props
     console.log('operation', operation)
