@@ -296,6 +296,7 @@ const sharesVertex = (face1, face2) => {
 const setEquals = (array1, array2) => _.xor(array1, array2).length === 0
 
 // Get what kind of base we are augmenting to
+// TODO should I just use the "using" property to figure this out?
 function getBaseType(faces, base) {
   const adjacentFaceCounts = _(faces)
     .filter(face => sharesVertex(face, base))
@@ -343,9 +344,9 @@ function getOppositePrismSide(polyhedron, base) {
 // TODO handle rhombicosidodecahedron case (still don't know what terminology I want to use)
 // TODO for cupolarotunda, it's *opposite* because you're matching the *faces*, not the sides
 // Get the index in the augmentee underside to align with the base's 0th vertex
-function getAlignIndex(polyhedron, base, augmentee, underside, gyrate) {
-  // TODO handle gyrobifastigium
-  if (numSides(base) <= 5) return 0
+function getAlignIndex(polyhedron, base, augmentee, underside, gyrate, using) {
+  // FIXME don't hardcode this (or consistently hardcode everything)
+  if (numSides(base) <= 5 && using !== 'U2') return 0
   const baseType = getBaseType(polyhedron.faces, base)
   if (baseType === 'antiprism') {
     return 0
@@ -383,7 +384,6 @@ function getAlignIndex(polyhedron, base, augmentee, underside, gyrate) {
 // Augment the following
 // TODO digonal cupola option and rotunda option
 function doAugment(polyhedron, faceIndex, gyrate, using) {
-  console.log(gyrate, using)
   const { faces, vertices } = polyhedron
   const base = faces[faceIndex]
   const n = base.length
@@ -413,7 +413,8 @@ function doAugment(polyhedron, faceIndex, gyrate, using) {
     }
     return cross
   })()
-  const alignBasesAngle = baseNormal.angleBetween(undersideNormal, true)
+  // The `|| 0` is because this sometimes returns NaN if the angle is 0
+  const alignBasesAngle = baseNormal.angleBetween(undersideNormal, true) || 0
 
   const alignedAugmenteeVertices = augmenteeVertices.map(v => {
     return v
@@ -429,6 +430,7 @@ function doAugment(polyhedron, faceIndex, gyrate, using) {
     augmentee,
     undersideFace,
     gyrate,
+    using,
   )
   const alignedV0 = alignedAugmenteeVertices[undersideFace[alignIndex]]
   // align the first vertex of the base face to the first vertex of the underside face

@@ -2,7 +2,8 @@ import _ from 'lodash'
 import { geom } from 'toxiclibsjs'
 const { Vec3D, Triangle3D, Plane } = geom
 
-export const PRECISION = 1e-3
+export const PRECISION_DIGITS = 3
+export const PRECISION = Math.pow(10, -PRECISION_DIGITS)
 
 // convert an array of vertices into a vector
 export const vec = p => new Vec3D(...p)

@@ -67,10 +67,15 @@ const setApplyOptsFor = (solid, operation) => dispatch => {
 // Apply the given operation to the given polyhedron
 // TODO won't need the "name" parameter in the new one
 export const applyOperation = (operation, polyhedron, config) => dispatch => {
+  // TODO is it a good idea to keep the defaulting logic here?
+  // It makes it harder to unit test
   console.log('calling', operation, 'on', polyhedron)
   const options = {}
   const { gyrate, using } = config
   if (operation === '+') {
+    if (using === 'U2') {
+      options.gyrate = 'gyro'
+    }
     if (gyrate) {
       options.gyrate = gyrate
     }

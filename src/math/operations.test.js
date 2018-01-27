@@ -1,11 +1,27 @@
 import _ from 'lodash'
-import { precision } from './linAlg'
+import { getCentroid, PRECISION, PRECISION_DIGITS } from './linAlg'
 import * as operations from './operations'
 import Polyhedron, {
   numSides,
   getDirectedEdges,
   getBoundary,
 } from './Polyhedron'
+
+// FIXME deduplicate with the other one in operations.js
+function getDihedralAngle(polyhedron, edge) {
+  const { vertices, faces } = polyhedron
+  const [v1, v2] = edge.map(vIndex => polyhedron.vertexVectors()[vIndex])
+  const midpoint = v1.add(v2).scale(0.5)
+
+  const [c1, c2] = faces
+    .filter(face => _.intersection(face, edge).length === 2)
+    .map(face =>
+      getCentroid(face.map(vIndex => polyhedron.vertexVectors()[vIndex])),
+    )
+    .map(v => v.sub(midpoint))
+
+  return c1.angleBetween(c2, true)
+}
 
 // Assert that the solid is likely a proper convex regular faced polyhedron.
 // Add assertions to this to
@@ -16,9 +32,10 @@ function checkProperPolyhedron(polyhedron) {
     const [v1, v2] = edge.map(vIndex => polyhedron.vertexVectors()[vIndex])
     const sideLength = v1.distanceTo(v2)
     if (!_.isNil(prevSideLength)) {
-      expect(sideLength).toBeCloseTo(prevSideLength, 3)
+      expect(sideLength).toBeCloseTo(prevSideLength, PRECISION_DIGITS)
     }
     prevSideLength = sideLength
+    expect(getDihedralAngle(polyhedron, edge)).toBeLessThan(Math.PI - PRECISION)
   })
 }
 
@@ -107,14 +124,17 @@ describe('operations', () => {
     it('properly augments gyrobifastigium', () => {
       const polyhedron = Polyhedron.get('triangular-prism')
       // FIXME this doesn't work on fIndex = 2
-      const augmented = operations.augment(polyhedron, {
-        fIndex: 4,
-        gyrate: 'gyro',
-        using: 'U2',
+      const fIndices = [2, 3, 4]
+      fIndices.forEach(fIndex => {
+        const augmented = operations.augment(polyhedron, {
+          fIndex,
+          gyrate: 'gyro',
+          using: 'U2',
+        })
+        checkProperPolyhedron(augmented)
+        const expected = Polyhedron.get('gyrobifastigium')
+        expect(augmented.faceCount()).toEqual(expected.faceCount())
       })
-      checkProperPolyhedron(augmented)
-      const expected = Polyhedron.get('gyrobifastigium')
-      expect(augmented.faceCount()).toEqual(expected.faceCount())
     })
   })
 })
