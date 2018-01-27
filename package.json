@@ -3,6 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "devDependencies": {
+    "enzyme": "^3.3.0",
+    "enzyme-adapter-react-16": "^1.1.1",
     "exports-loader": "^0.6.4",
     "file-loader": "^0.10.1",
     "json-loader": "^0.5.7",
