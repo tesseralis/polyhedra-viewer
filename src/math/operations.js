@@ -305,10 +305,22 @@ function getOppositePrismSide(polyhedron, base) {
   })
 }
 
+function isCupolaRotunda(baseType, augmentType) {
+  return _.xor(['cupola', 'rotunda'], [baseType, augmentType]).length === 0
+}
+
 // TODO handle rhombicosidodecahedron case (still don't know what terminology I want to use)
 // TODO for cupolarotunda, it's *opposite* because you're matching the *faces*, not the sides
 // Get the index in the augmentee underside to align with the base's 0th vertex
-function getAlignIndex(polyhedron, base, augmentee, underside, gyrate) {
+function getAlignIndex(
+  polyhedron,
+  base,
+  augmentee,
+  underside,
+  gyrate,
+  augmentType,
+) {
+  if (augmentType === 'pyramid') return 0
   const baseType = getBaseType(polyhedron.faces, base)
   if (baseType === 'pyramid' || baseType === 'antiprism') {
     return 0
@@ -340,6 +352,13 @@ function getAlignIndex(polyhedron, base, augmentee, underside, gyrate) {
   if (baseType === 'truncated') {
     return isOrtho ? 1 : 0
   }
+
+  // "ortho" or "gyro" is actually determined by whether the *tops* are aligned, not the bottoms
+  // So for a cupola-rotunda, it's actually the opposite of everything else
+  if (isCupolaRotunda(baseType, augmentType)) {
+    return isOrtho === (gyrate === 'ortho') ? 1 : 0
+  }
+
   return isOrtho === (gyrate === 'ortho') ? 0 : 1
 }
 
@@ -388,10 +407,14 @@ function doAugment(polyhedron, faceIndex, gyrate, using) {
   })
 
   const translatedV0 = baseVertices[0].sub(baseCenter)
-  const alignIndex =
-    augmentType === 'pyramid'
-      ? 0
-      : getAlignIndex(polyhedron, base, augmentee, undersideFace, gyrate)
+  const alignIndex = getAlignIndex(
+    polyhedron,
+    base,
+    augmentee,
+    undersideFace,
+    gyrate,
+    augmentType,
+  )
   const alignedV0 = alignedAugmenteeVertices[undersideFace[alignIndex]]
   // align the first vertex of the base face to the first vertex of the underside face
   const alignVerticesAngle = translatedV0.angleBetween(alignedV0, true)

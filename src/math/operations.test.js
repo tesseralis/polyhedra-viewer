@@ -89,31 +89,45 @@ describe('operations', () => {
         })
       })
 
-      xit('properly aligns elongated cupolae', () => {})
+      it('properly aligns elongated cupolae', () => {
+        const polyhedron = Polyhedron.get('elongated-triangular-cupola')
 
-      xit('properly aligns cupola-rotunda', () => {})
+        const options = ['ortho', 'gyro']
+        options.forEach(gyrate => {
+          const augmented = operations.augment(polyhedron, {
+            fIndex: _.findIndex(polyhedron.faces, face => numSides(face) === 6),
+            gyrate,
+          })
+          const expected = Polyhedron.get(
+            `elongated-triangular-${gyrate}bicupola`,
+          )
+          expect(augmented.isIsomorphicTo(expected)).toBe(true)
+        })
+      })
     })
 
     describe('multiple options', () => {
       describe('cupola-rotunda', () => {
         const polyhedron = Polyhedron.get('pentagonal-cupola')
         const usingOpts = ['U5', 'R5']
-        const expectedName = [
-          'pentagonal-orthobicupola',
-          'pentagonal-orthocupolarotunda',
-        ]
-        usingOpts.forEach((using, i) => {
-          it(`can augment with ${using}`, () => {
-            const augmented = operations.augment(polyhedron, {
-              fIndex: 11,
-              gyrate: 'ortho',
-              using,
+        const gyrateOpts = ['ortho', 'gyro']
+
+        gyrateOpts.forEach(gyrate => {
+          const expectedName = [
+            `pentagonal-${gyrate}bicupola`,
+            `pentagonal-${gyrate}cupolarotunda`,
+          ]
+          usingOpts.forEach((using, i) => {
+            it(`can augment with ${using}`, () => {
+              const augmented = operations.augment(polyhedron, {
+                fIndex: 11,
+                gyrate,
+                using,
+              })
+              checkProperPolyhedron(augmented)
+              const expected = Polyhedron.get(expectedName[i])
+              expect(augmented.isIsomorphicTo(expected)).toBe(true)
             })
-            checkProperPolyhedron(augmented)
-            const expected = Polyhedron.get(expectedName[i])
-            // FIXME this actually isn't correct
-            // expect(augmented.isIsomorphicTo(expected)).toBe(true)
-            expect(augmented.faceCount()).toEqual(expected.faceCount())
           })
         })
       })

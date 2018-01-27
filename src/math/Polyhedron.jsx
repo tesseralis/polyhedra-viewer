@@ -237,16 +237,10 @@ export default class Polyhedron {
       n: numSides(this.faces[fIndex]),
       adj: _.countBy(adjFaces, fIndex2 => numSides(this.faces[fIndex2])),
     }))
-    return _.sortBy(faceAdjacencyCounts, [
-      'n',
-      'adj.length',
-      'adj[3]',
-      'adj[4]',
-      'adj[5]',
-      'adj[6]',
-      'adj[8]',
-      'adj[10]',
-    ])
+    return _.sortBy(
+      faceAdjacencyCounts,
+      ['n', 'adj.length'].concat([3, 4, 5, 6, 8, 10].map(n => `adj[${n}]`)),
+    )
   }
 
   isIsomorphicTo(other) {
