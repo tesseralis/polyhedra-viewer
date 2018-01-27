@@ -53,7 +53,6 @@ const setApplyOptsFor = (solid, operation) => dispatch => {
     polyhedraGraph[toConwayNotation(unescapeName(solid))][operation]
   const newOpts = { gyrate: null, using: null }
   if (operation === '+') {
-    // FIXME I don't like this, not one bit!
     if (_.filter(relations, 'gyrate').length > 1) {
       newOpts.gyrate = 'ortho'
     }
@@ -118,7 +117,6 @@ function hasMultipleOptionsForFace(relations) {
   )
 }
 
-// FIXME still broken
 export const setMode = (solid, operation) => dispatch => {
   dispatch(setOperation(operation))
   dispatch(setApplyOptsFor(solid, operation))

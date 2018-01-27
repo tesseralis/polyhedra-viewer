@@ -174,24 +174,24 @@ function faceGraph(polyhedron) {
 }
 
 const augmentTypes = {
-  pyramids: {
+  pyramid: {
     3: 'tetrahedron',
     4: 'square-pyramid',
     5: 'pentagonal-pyramid',
   },
 
-  cupolae: {
+  cupola: {
     2: 'triangular-prism',
     3: 'triangular-cupola',
     4: 'square-cupola',
     5: 'pentagonal-cupola',
   },
 
-  rotundae: {
+  rotunda: {
     5: 'pentagonal-rotunda',
   },
 
-  prisms: {
+  prism: {
     3: 'triangular-prism',
     4: 'cube',
     5: 'pentagonal-prism',
@@ -200,7 +200,7 @@ const augmentTypes = {
     10: 'decagonal-prism',
   },
 
-  antiprisms: {
+  antiprism: {
     3: 'octahedron',
     4: 'square-antiprism',
     5: 'pentagonal-antiprism',
@@ -225,26 +225,26 @@ const augmentData = _.mapValues(augmentTypes, type =>
   _.mapValues(type, Polyhedron.get),
 )
 
-// TODO move this to a polyhedron method
-function getAugmentee(notation) {
-  const [prefix, index] = notation
-  const type = (() => {
-    switch (prefix) {
-      case 'Y':
-        return 'pyramids'
-      case 'U':
-        return 'cupolae'
-      case 'R':
-        return 'rotundae'
-      case 'P':
-        return 'prisms'
-      case 'A':
-        return 'antiprisms'
-      default:
-        throw new Error(`Unknown prefix ${prefix}`)
-    }
-  })()
-  return augmentData[type][index]
+function getAugmentType(prefix) {
+  switch (prefix) {
+    case 'Y':
+      return 'pyramid'
+    case 'U':
+      return 'cupola'
+    case 'R':
+      return 'rotunda'
+    case 'P':
+      return 'prism'
+    case 'A':
+      return 'antiprism'
+    default:
+      throw new Error(`Unknown prefix ${prefix}`)
+  }
+}
+
+function getDefaultAugmentee(n) {
+  const [prefix, index] = defaultAugmentees[n]
+  return augmentData[getAugmentType(prefix)][index]
 }
 
 // Checks to see if the polyhedron can be augmented at the base while remaining convex
@@ -254,7 +254,7 @@ function canAugment(polyhedron, faceIndex, { offset = 0 } = {}) {
   const n = base.length
 
   // This *should* work on everything except gyrobifastigium
-  const augmentee = getAugmentee(defaultAugmentees[n])
+  const augmentee = getDefaultAugmentee(n)
   const undersideIndex = _.findIndex(augmentee.faces, face => face.length === n)
   const undersideFace = augmentee.faces[undersideIndex]
 
@@ -332,11 +332,15 @@ function getOppositePrismSide(polyhedron, base) {
 // TODO handle rhombicosidodecahedron case (still don't know what terminology I want to use)
 // TODO for cupolarotunda, it's *opposite* because you're matching the *faces*, not the sides
 // Get the index in the augmentee underside to align with the base's 0th vertex
-function getAlignIndex(polyhedron, base, augmentee, underside, gyrate, using) {
-  // FIXME don't hardcode this (or consistently hardcode everything)
-  if (numSides(base) <= 5 && using !== 'U2') return 0
-  const baseType = getBaseType(polyhedron.faces, base)
-  if (baseType === 'antiprism') {
+function getAlignIndex(
+  polyhedron,
+  base,
+  augmentee,
+  underside,
+  gyrate,
+  baseType,
+) {
+  if (baseType === 'pyramid' || baseType === 'antiprism') {
     return 0
   }
 
@@ -373,14 +377,17 @@ function getAlignIndex(polyhedron, base, augmentee, underside, gyrate, using) {
 // TODO digonal cupola option and rotunda option
 function doAugment(polyhedron, faceIndex, gyrate, using) {
   const { faces, vertices } = polyhedron
+  console.log('using: ', using)
   const base = faces[faceIndex]
   const n = base.length
+  const [prefix, index] = using || defaultAugmentees[n]
   const baseVertices = base.map(index => vec(vertices[index]))
   const baseCenter = getCentroid(baseVertices)
   const sideLength = baseVertices[0].distanceTo(baseVertices[1])
   const baseNormal = getNormal(baseVertices)
 
-  const augmentee = getAugmentee(using || defaultAugmentees[n])
+  const augmentType = getAugmentType(prefix)
+  const augmentee = augmentData[augmentType][index]
   const augmenteeVertices = augmentee.vertices.map(vec)
   // rotate and translate so that the face is next to our face
   const undersideIndex = _.findIndex(augmentee.faces, face => face.length === n)
@@ -418,7 +425,7 @@ function doAugment(polyhedron, faceIndex, gyrate, using) {
     augmentee,
     undersideFace,
     gyrate,
-    using,
+    augmentType,
   )
   const alignedV0 = alignedAugmenteeVertices[undersideFace[alignIndex]]
   // align the first vertex of the base face to the first vertex of the underside face

@@ -19,6 +19,7 @@ function checkProperPolyhedron(polyhedron) {
       expect(sideLength).toBeCloseTo(prevSideLength, PRECISION_DIGITS)
     }
     prevSideLength = sideLength
+    // Make sure the whole thing is convex
     expect(polyhedron.getDihedralAngle(edge)).toBeLessThan(Math.PI - PRECISION)
   })
 }
@@ -107,7 +108,6 @@ describe('operations', () => {
 
     it('properly augments gyrobifastigium', () => {
       const polyhedron = Polyhedron.get('triangular-prism')
-      // FIXME this doesn't work on fIndex = 2
       const fIndices = [2, 3, 4]
       fIndices.forEach(fIndex => {
         const augmented = operations.augment(polyhedron, {
