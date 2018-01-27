@@ -247,18 +247,6 @@ function getAugmentee(notation) {
   return augmentData[type][index]
 }
 
-function getDihedralAngle({ faces, vertices }, edge) {
-  const [v1, v2] = edge.map(vIndex => vec(vertices[vIndex]))
-  const midpoint = v1.add(v2).scale(0.5)
-
-  const [c1, c2] = faces
-    .filter(face => _.intersection(face, edge).length === 2)
-    .map(face => getCentroid(face.map(vIndex => vec(vertices[vIndex]))))
-    .map(v => v.sub(midpoint))
-
-  return c1.angleBetween(c2, true)
-}
-
 // Checks to see if the polyhedron can be augmented at the base while remaining convex
 // TODO add ortho/gyro to the "canAugment" argument
 function canAugment(polyhedron, faceIndex, { offset = 0 } = {}) {
@@ -272,12 +260,12 @@ function canAugment(polyhedron, faceIndex, { offset = 0 } = {}) {
 
   return _.every(base, (baseV1, i) => {
     const baseV2 = getMod(base, i + 1)
-    const baseAngle = getDihedralAngle(polyhedron, [baseV1, baseV2])
+    const baseAngle = polyhedron.getDihedralAngle([baseV1, baseV2])
 
     // todo doesn't work on cupolae
     const undersideV1 = getMod(undersideFace, i + offset)
     const undersideV2 = getMod(undersideFace, i - 1 + offset)
-    const augmenteeAngle = getDihedralAngle(augmentee, [
+    const augmenteeAngle = augmentee.getDihedralAngle([
       undersideV1,
       undersideV2,
     ])

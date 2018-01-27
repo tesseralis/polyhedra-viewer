@@ -7,22 +7,6 @@ import Polyhedron, {
   getBoundary,
 } from './Polyhedron'
 
-// FIXME deduplicate with the other one in operations.js
-function getDihedralAngle(polyhedron, edge) {
-  const { vertices, faces } = polyhedron
-  const [v1, v2] = edge.map(vIndex => polyhedron.vertexVectors()[vIndex])
-  const midpoint = v1.add(v2).scale(0.5)
-
-  const [c1, c2] = faces
-    .filter(face => _.intersection(face, edge).length === 2)
-    .map(face =>
-      getCentroid(face.map(vIndex => polyhedron.vertexVectors()[vIndex])),
-    )
-    .map(v => v.sub(midpoint))
-
-  return c1.angleBetween(c2, true)
-}
-
 // Assert that the solid is likely a proper convex regular faced polyhedron.
 // Add assertions to this to
 function checkProperPolyhedron(polyhedron) {
@@ -35,7 +19,7 @@ function checkProperPolyhedron(polyhedron) {
       expect(sideLength).toBeCloseTo(prevSideLength, PRECISION_DIGITS)
     }
     prevSideLength = sideLength
-    expect(getDihedralAngle(polyhedron, edge)).toBeLessThan(Math.PI - PRECISION)
+    expect(polyhedron.getDihedralAngle(edge)).toBeLessThan(Math.PI - PRECISION)
   })
 }
 

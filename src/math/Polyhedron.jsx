@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import { getSolidData } from 'constants/polyhedra'
-import { vec, isPlanar, getPlane } from './linAlg'
+import { vec, isPlanar, getPlane, getCentroid } from './linAlg'
 
 function mod(a, b) {
   return a >= 0 ? a % b : a % b + b
@@ -182,6 +182,20 @@ export default class Polyhedron {
   // Returns whether the set of vertices in this polyhedron are planar
   isPlanar(vIndices) {
     return isPlanar(_.at(this.vertexVectors(), vIndices))
+  }
+  getDihedralAngle(edge) {
+    const { vertices, faces } = this
+    const [v1, v2] = edge.map(vIndex => this.vertexVectors()[vIndex])
+    const midpoint = v1.add(v2).scale(0.5)
+
+    const [c1, c2] = faces
+      .filter(face => _.intersection(face, edge).length === 2)
+      .map(face =>
+        getCentroid(face.map(vIndex => this.vertexVectors()[vIndex])),
+      )
+      .map(v => v.sub(midpoint))
+
+    return c1.angleBetween(c2, true)
   }
 
   /*
