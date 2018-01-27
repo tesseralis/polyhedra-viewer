@@ -1,5 +1,3 @@
-import * as _ from 'lodash'
-
 const SET_OPERATION = 'SET_OPERATION'
 export const setOperation = (operation, relations) => ({
   type: SET_OPERATION,

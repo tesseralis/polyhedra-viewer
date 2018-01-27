@@ -192,11 +192,10 @@ export default class Polyhedron {
   }
 
   getDihedralAngle(edge) {
-    const { vertices, faces } = this
     const [v1, v2] = edge.map(vIndex => this.vertexVectors()[vIndex])
     const midpoint = v1.add(v2).scale(0.5)
 
-    const [c1, c2] = faces
+    const [c1, c2] = this.faces
       .filter(face => _.intersection(face, edge).length === 2)
       .map(face =>
         getCentroid(face.map(vIndex => this.vertexVectors()[vIndex])),
@@ -248,8 +247,9 @@ export default class Polyhedron {
     const fastigiumCount = { 3: 1, 4: 2 }
     const matchFaces = _.every(edge, vIndex => {
       const faceCount = this.adjacentFaceCount(vIndex)
-      if (!_.isEqual(faceCount, fastigiumCount)) return false
+      return _.isEqual(faceCount, fastigiumCount)
     })
+    if (!matchFaces) return false
     // make sure the whole thing is on a plane
     const allNeighborFaces = this.adjacentFaces(...edge)
     return this.isPlanar(getBoundary(allNeighborFaces))
