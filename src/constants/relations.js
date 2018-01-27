@@ -1,4 +1,4 @@
-import * as _ from 'lodash'
+import _ from 'lodash'
 import { fromConwayNotation, toConwayNotation } from 'constants/polyhedra'
 import periodicTable from 'constants/periodicTable'
 
