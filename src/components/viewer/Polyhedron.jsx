@@ -92,7 +92,7 @@ class Faces extends Component {
         </appearance>
         <indexedfaceset
           solid="false"
-          colorPerVertex="false"
+          colorpervertex="false"
           colorindex={faces.map((face, index) => getColorIndex(face)).join(' ')}
           coordindex={joinListOfLists(faces, ' -1 ', ' ')}
         >
