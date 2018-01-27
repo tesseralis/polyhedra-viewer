@@ -2,14 +2,9 @@ import _ from 'lodash'
 import { getNextPolyhedron, hasOperation } from 'constants/relations'
 import { setPolyhedron as setPolyhedronRaw } from 'reducers/polyhedron'
 import { setOperation, setApplyOpts } from 'reducers/controls'
-import {
-  isValidSolid,
-  escapeName,
-  unescapeName,
-  toConwayNotation,
-} from 'constants/polyhedra'
+import { isValidSolid } from 'constants/polyhedra'
 import Polyhedron from 'math/Polyhedron'
-import { polyhedraGraph } from 'constants/relations'
+import { getOperations } from 'constants/relations'
 
 import {
   elongate,
@@ -51,8 +46,7 @@ const defaultAugmentees = {
 
 const setApplyOptsFor = (solid, operation) => dispatch => {
   if (!solid) return
-  const relations =
-    polyhedraGraph[toConwayNotation(unescapeName(solid))][operation]
+  const relations = getOperations(solid, operation)
   const newOpts = { gyrate: null, using: null }
   if (operation === '+') {
     if (_.filter(relations, 'gyrate').length > 1) {
@@ -92,12 +86,10 @@ export const applyOperation = (
       options.using = 'R5'
     }
   }
-  const next = escapeName(
-    getNextPolyhedron(
-      unescapeName(polyhedron.name),
-      operation,
-      !_.isEmpty(options) ? options : null,
-    ),
+  const next = getNextPolyhedron(
+    polyhedron.name,
+    operation,
+    !_.isEmpty(options) ? options : null,
   )
 
   dispatch(
@@ -107,7 +99,7 @@ export const applyOperation = (
       ),
     ),
   )
-  if (!hasOperation(unescapeName(next), operation)) {
+  if (!hasOperation(next, operation)) {
     dispatch(setMode(null))
   } else {
     dispatch(setApplyOptsFor(next, operation))

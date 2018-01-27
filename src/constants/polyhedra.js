@@ -84,7 +84,7 @@ const archimedeanMapping = {
 
 const inverseArchimedeanMapping = _.invert(archimedeanMapping)
 
-export const fromConwayNotation = notation => {
+const fromConwayNotationUnescaped = notation => {
   const prefix = notation[0]
   const number = notation.substring(1)
   if (platonicMapping[notation]) {
@@ -105,7 +105,11 @@ export const fromConwayNotation = notation => {
   return null
 }
 
-export const toConwayNotation = name => {
+export const fromConwayNotation = notation =>
+  escapeName(fromConwayNotationUnescaped(notation))
+
+export const toConwayNotation = solid => {
+  const name = unescapeName(solid)
   if (inversePlatonicMapping[name]) {
     return inversePlatonicMapping[name]
   }

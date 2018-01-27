@@ -444,6 +444,10 @@ export function hasOperation(solid, operation) {
   return _.has(polyhedraGraph[toConwayNotation(solid)], operation)
 }
 
+export function getOperations(solid, operation) {
+  return polyhedraGraph[toConwayNotation(solid)][operation]
+}
+
 // Get the polyhedron name as a result of applying the operation to the given polyhedron
 export function getNextPolyhedron(solid, operation, options) {
   const next = _(polyhedraGraph[toConwayNotation(solid)][operation])
