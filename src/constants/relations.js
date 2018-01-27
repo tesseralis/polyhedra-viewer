@@ -242,6 +242,8 @@ const basePyramidsCupolae = (() => {
       },
     })
   })
+  // for diminished icosahedra
+  graph['A5']['+'].align = 'para'
 
   // TODO don't create stray nulls
   _.forEach(pyramidsCupolae, (row, name) => {
@@ -356,10 +358,10 @@ const baseAugmentations = (() => {
 const diminishedIcosahedraGraph = (() => {
   return {
     J63: {
-      '+': [{ align: 'para', value: 'J62' }, { align: 'meta', value: 'J64' }],
+      '+': [{ using: 'Y3', value: 'J64' }, { using: 'Y5', value: 'J62' }],
     },
     J62: {
-      '+': { value: 'J11' },
+      '+': { using: 'Y5', align: 'meta', value: 'J11' },
     },
   }
 })()
@@ -448,9 +450,6 @@ export function getOperations(solid, operation) {
   return polyhedraGraph[toConwayNotation(solid)][operation]
 }
 
-export function hasAlignment(solid, operation) {
-  return _.some(getOperations(solid, operation), 'align')
-}
 // Get the polyhedron name as a result of applying the operation to the given polyhedron
 export function getNextPolyhedron(solid, operation, options) {
   const next = _(polyhedraGraph[toConwayNotation(solid)][operation])

@@ -14,6 +14,7 @@ import {
   diminish,
   gyrate,
   getAugmentAlignment,
+  getDiminishAlignment,
 } from 'math/operations'
 
 // Set the polyhedron
@@ -71,6 +72,7 @@ export const applyOperation = (
   // It makes it harder to unit test
   const options = {}
   const { gyrate, using } = config
+  const relations = getOperations(polyhedron.name, operation)
   if (operation === '+') {
     if (using === 'U2') {
       options.gyrate = 'gyro'
@@ -80,7 +82,7 @@ export const applyOperation = (
     options.using =
       using || defaultAugmentees[polyhedron.faces[config.fIndex].length]
 
-    if (hasAlignment(polyhedron.name, operation)) {
+    if (_.countBy(relations, 'align') > 1) {
       options.align = getAugmentAlignment(polyhedron, config.fIndex)
     }
   } else if (operation === '-') {
@@ -89,6 +91,10 @@ export const applyOperation = (
       options.using = 'U5'
     } else if (config.vIndices.length === 10) {
       options.using = 'R5'
+    }
+
+    if (_.some(relations, 'align')) {
+      options.align = getDiminishAlignment(polyhedron, config.vIndices)
     }
   }
   // TODO should I move this logic to the actual operation?

@@ -197,6 +197,7 @@ describe('operations', () => {
     })
   })
 
+  // TODO make sure this errors when invalid
   describe('getAugmentAlignment', () => {
     const tests = ['hexagonal-prism', 'dodecahedron', 'truncated-dodecahedron']
     const allAlignIndices = [[8, 7], [10, 11], [35, 34]]
@@ -214,4 +215,20 @@ describe('operations', () => {
       })
     })
   })
+
+  describe('getDiminishAlignment', () => {
+    // it('works on diminished icosahedron', () => {
+    const polyhedron = Polyhedron.get('gyroelongated-pentagonal-pyramid')
+    const alignIndices = [10, 7]
+    const alignTypes = ['para', 'meta']
+    alignTypes.forEach((align, j) => {
+      const vIndex = alignIndices[j]
+      it(`can ${align}-diminish a diminished icosahedron`, () => {
+        expect(operations.getDiminishAlignment(polyhedron, [vIndex])).toEqual(
+          align,
+        )
+      })
+    })
+  })
+  // })
 })

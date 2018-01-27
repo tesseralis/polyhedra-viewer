@@ -302,7 +302,7 @@ function isCupolaRotunda(baseType, augmentType) {
   return _.xor(['cupola', 'rotunda'], [baseType, augmentType]).length === 0
 }
 
-function faceGraphDistance(polyhedron, fIndex, peakBoundary, exclude = []) {
+function faceGraphDistance(polyhedron, fIndices, peakBoundary, exclude = []) {
   const faceGraph = polyhedron.faceGraph()
   const excludeFn = fIndex =>
     !_.includes(exclude, numSides(polyhedron.faces[fIndex]))
@@ -310,11 +310,15 @@ function faceGraphDistance(polyhedron, fIndex, peakBoundary, exclude = []) {
     polyhedron.adjacentFaceIndices(vIndex),
   ).filter(excludeFn)
   let distance = 0
-  while (!_.includes(foundFaceIndices, fIndex)) {
-    foundFaceIndices = _.flatMap(
-      foundFaceIndices,
-      fIndex => faceGraph[fIndex],
-    ).filter(excludeFn)
+  while (
+    _.intersection(foundFaceIndices, fIndices).length === 0 &&
+    distance < 5
+  ) {
+    foundFaceIndices = _.uniq(
+      _.flatMap(foundFaceIndices, fIndex => faceGraph[fIndex]).filter(
+        excludeFn,
+      ),
+    )
     distance++
   }
   return distance
@@ -330,9 +334,24 @@ export function getAugmentAlignment(polyhedron, fIndex) {
   )
 
   // calculate the face distance to the peak's boundary
-  return faceGraphDistance(polyhedron, fIndex, peakBoundary, [
+  return faceGraphDistance(polyhedron, [fIndex], peakBoundary, [
     isHexagonalPrism && 6,
   ]) > 1
+    ? 'para'
+    : 'meta'
+}
+
+// TODO diminished rhombicosidodecahedra
+export function getDiminishAlignment(polyhedron, vIndices) {
+  const { faces } = polyhedron
+  const peakBoundary = getBoundary(polyhedron.adjacentFaces(...vIndices))
+
+  const maxNumSides = _.max(faces.map(numSides))
+  const diminishedIndices = polyhedron
+    .fIndices()
+    .filter(fIndex => numSides(faces[fIndex]) === maxNumSides)
+
+  return faceGraphDistance(polyhedron, diminishedIndices, peakBoundary) >= 1
     ? 'para'
     : 'meta'
 }
