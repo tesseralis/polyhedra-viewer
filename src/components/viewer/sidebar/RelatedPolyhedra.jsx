@@ -114,7 +114,7 @@ function RelatedPolyhedra({
                   styles.modeButton,
                   mode === operation && styles.isHighlighted,
                 )}
-                onClick={() => setMode(operation, related[operation])}
+                onClick={() => setMode(solid, operation)}
               >
                 {operations[operation]}
               </button>

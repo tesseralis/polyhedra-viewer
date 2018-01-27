@@ -2,8 +2,14 @@ import _ from 'lodash'
 import { getNextPolyhedron, hasOperation } from 'constants/relations'
 import { setPolyhedron as setPolyhedronRaw } from 'reducers/polyhedron'
 import { setOperation, setApplyOpts } from 'reducers/controls'
-import { isValidSolid, escapeName, unescapeName } from 'constants/polyhedra'
+import {
+  isValidSolid,
+  escapeName,
+  unescapeName,
+  toConwayNotation,
+} from 'constants/polyhedra'
 import Polyhedron from 'math/Polyhedron'
+import { polyhedraGraph } from 'constants/relations'
 
 import {
   // getElongated,
@@ -19,6 +25,7 @@ export const setPolyhedron = name => dispatch => {
     throw new Error(`Got a solid with an invalid name: ${name}`)
   }
   dispatch(setPolyhedronRaw(Polyhedron.get(name)))
+  dispatch(setMode(null))
 }
 
 const operations = {
@@ -37,6 +44,24 @@ const defaultAugmentees = {
   6: 'U3',
   8: 'U4',
   10: 'U5',
+}
+
+const setApplyOptsFor = (solid, operation) => dispatch => {
+  if (!solid) return
+  console.log('solid', solid)
+  const relations =
+    polyhedraGraph[toConwayNotation(unescapeName(solid))][operation]
+  const newOpts = { gyrate: null, using: null }
+  if (operation === '+') {
+    // FIXME I don't like this, not one bit!
+    if (_.filter(relations, 'gyrate').length > 1) {
+      newOpts.gyrate = 'ortho'
+    }
+    if (hasMultipleOptionsForFace(relations)) {
+      newOpts.using = relations[0].using
+    }
+  }
+  dispatch(setApplyOpts(newOpts))
 }
 
 // Apply the given operation to the given polyhedron
@@ -71,8 +96,11 @@ export const applyOperation = (operation, polyhedron, config) => dispatch => {
     setPolyhedronRaw(operations[operation](polyhedron, config).withName(next)),
   )
   // // Get out of current mode if we can't do it any more
-  if (!hasOperation(next, operation)) {
+  console.log(next, operation)
+  if (!hasOperation(unescapeName(next), operation)) {
     dispatch(setMode(null))
+  } else {
+    dispatch(setApplyOptsFor(next, operation))
   }
   // TODO otherwise reset the apply opts for the new polyhedron
 }
@@ -86,19 +114,9 @@ function hasMultipleOptionsForFace(relations) {
 }
 
 // FIXME still broken
-export const setMode = (operation, relations) => dispatch => {
-  const newOpts = {}
-  if (operation === '+') {
-    // FIXME I don't like this, not one bit!
-    if (_.filter(relations, 'gyrate').length > 1) {
-      newOpts.gyrate = 'ortho'
-    }
-    if (hasMultipleOptionsForFace(relations)) {
-      newOpts.using = relations[0].using
-    }
-  }
+export const setMode = (solid, operation) => dispatch => {
   dispatch(setOperation(operation))
-  dispatch(setApplyOpts(newOpts))
+  dispatch(setApplyOptsFor(solid, operation))
 }
 
 export const setApplyOpt = (name, value) => dispatch => {
