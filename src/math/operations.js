@@ -286,8 +286,8 @@ const setEquals = (array1, array2) => _.xor(array1, array2).length === 0
 // Get what kind of base we are augmenting to
 // TODO should I just use the "using" property to figure this out?
 function getBaseType(faces, base) {
-  const adjacentFaceCounts = _(faces)
-    .filter(face => sharesVertex(face, base))
+  const adjacentFaces = faces.filter(face => sharesVertex(face, base))
+  const adjacentFaceCounts = _(adjacentFaces)
     .map(numSides)
     .uniq()
     .value()
@@ -296,9 +296,9 @@ function getBaseType(faces, base) {
   } else if (setEquals(adjacentFaceCounts, [4])) {
     return 'prism'
   } else if (setEquals(adjacentFaceCounts, [3])) {
-    return 'antiprism'
+    return _.intersection(adjacentFaces).length > 0 ? 'pyramid' : 'antiprism'
   } else if (setEquals(adjacentFaceCounts, [3, 5])) {
-    return 'cupola'
+    return 'rotunda'
   } else if (setEquals(adjacentFaceCounts, [4, 5])) {
     return 'rhombicosidodecahedron'
   } else {
@@ -332,14 +332,8 @@ function getOppositePrismSide(polyhedron, base) {
 // TODO handle rhombicosidodecahedron case (still don't know what terminology I want to use)
 // TODO for cupolarotunda, it's *opposite* because you're matching the *faces*, not the sides
 // Get the index in the augmentee underside to align with the base's 0th vertex
-function getAlignIndex(
-  polyhedron,
-  base,
-  augmentee,
-  underside,
-  gyrate,
-  baseType,
-) {
+function getAlignIndex(polyhedron, base, augmentee, underside, gyrate) {
+  const baseType = getBaseType(polyhedron.faces, base)
   if (baseType === 'pyramid' || baseType === 'antiprism') {
     return 0
   }
@@ -425,7 +419,6 @@ function doAugment(polyhedron, faceIndex, gyrate, using) {
     augmentee,
     undersideFace,
     gyrate,
-    augmentType,
   )
   const alignedV0 = alignedAugmenteeVertices[undersideFace[alignIndex]]
   // align the first vertex of the base face to the first vertex of the underside face
