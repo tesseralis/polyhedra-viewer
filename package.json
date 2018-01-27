@@ -16,7 +16,6 @@
     "d3-scale-chromatic": "^1.1.1",
     "font-awesome": "^4.7.0",
     "lodash": "^4.17.4",
-    "query-string": "^5.0.1",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
     "react-motion": "^0.4.8",
