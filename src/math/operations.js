@@ -1,5 +1,9 @@
 import _ from 'lodash'
-import Polyhedron, { numSides, getBoundary } from './Polyhedron'
+import Polyhedron, {
+  numSides,
+  getBoundary,
+  getDirectedEdges,
+} from './Polyhedron'
 import { vec, getCentroid, PRECISION } from './linAlg'
 import { replace } from 'util.js'
 
@@ -324,6 +328,27 @@ function faceGraphDistance(polyhedron, fIndices, peakBoundary, exclude = []) {
   return distance
 }
 
+function faceDistanceBetweenVertices(polyhedron, vIndices1, vIndices2) {
+  const faceGraph = polyhedron.faceGraph()
+  let foundFaceIndices = _.flatMap(vIndices1, vIndex =>
+    polyhedron.adjacentFaceIndices(vIndex),
+  )
+  let distance = 0
+  while (
+    _.intersection(
+      _.flatMap(foundFaceIndices, fIndex => polyhedron.faces[fIndex]),
+      vIndices2,
+    ).length === 0 &&
+    distance < 5
+  ) {
+    foundFaceIndices = _.uniq(
+      _.flatMap(foundFaceIndices, fIndex => faceGraph[fIndex]),
+    )
+    distance++
+  }
+  return distance
+}
+
 // Return "meta" or "para", or null
 export function getAugmentAlignment(polyhedron, fIndex) {
   // get the existing peak boundary
@@ -352,6 +377,50 @@ export function getDiminishAlignment(polyhedron, vIndices) {
     .filter(fIndex => numSides(faces[fIndex]) === maxNumSides)
 
   return faceGraphDistance(polyhedron, diminishedIndices, peakBoundary) >= 1
+    ? 'para'
+    : 'meta'
+}
+
+export function getGyrateDirection(polyhedron, vIndices) {
+  const boundary = getBoundary(polyhedron.adjacentFaces(...vIndices))
+  const isOrtho = _.every(getDirectedEdges(boundary), edge => {
+    const [n1, n2] = polyhedron.faces
+      .filter(face => _.intersection(face, edge).length === 2)
+      .map(numSides)
+    return (n1 === 4) === (n2 === 4)
+  })
+  return isOrtho ? 'back' : 'forward'
+}
+
+export function getGyrateAlignment(polyhedron, vIndices) {
+  const { faces } = polyhedron
+  const peakBoundary = getBoundary(polyhedron.adjacentFaces(...vIndices))
+  const boundary = getBoundary(polyhedron.adjacentFaces(...vIndices))
+  const vIndicesToCheck = (() => {
+    const cupolaBoundaries = polyhedron
+      .cupolaIndices()
+      .map(fIndex => faces[fIndex])
+      .filter(vIndices => getGyrateDirection(polyhedron, vIndices) === 'back')
+      .map(vIndices => getBoundary(polyhedron.adjacentFaces(...vIndices)))
+
+    if (cupolaBoundaries.length > 0) {
+      if (cupolaBoundaries.length !== 1) {
+        throw new Error('we done goofed too')
+      }
+      return cupolaBoundaries[0]
+    }
+
+    const maxNumSides = _.max(faces.map(numSides))
+    const diminishedIndices = polyhedron
+      .fIndices()
+      .filter(fIndex => numSides(faces[fIndex]) === maxNumSides)
+
+    if (diminishedIndices.length !== 1) {
+      throw new Error('we done did something wrong')
+    }
+    return faces[diminishedIndices[0]]
+  })()
+  return faceDistanceBetweenVertices(polyhedron, boundary, vIndicesToCheck) > 1
     ? 'para'
     : 'meta'
 }

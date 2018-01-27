@@ -15,6 +15,8 @@ import {
   gyrate,
   getAugmentAlignment,
   getDiminishAlignment,
+  getGyrateDirection,
+  getGyrateAlignment,
 } from 'math/operations'
 
 // Set the polyhedron
@@ -82,7 +84,7 @@ export const applyOperation = (
     options.using =
       using || defaultAugmentees[polyhedron.faces[config.fIndex].length]
 
-    if (_.countBy(relations, 'align') > 1) {
+    if (_.filter(relations, 'align').length > 1) {
       options.align = getAugmentAlignment(polyhedron, config.fIndex)
     }
   } else if (operation === '-') {
@@ -96,6 +98,21 @@ export const applyOperation = (
     if (_.some(relations, 'align')) {
       options.align = getDiminishAlignment(polyhedron, config.vIndices)
     }
+  } else if (operation === 'g') {
+    if (_.some(relations, 'direction')) {
+      options.direction = getGyrateDirection(polyhedron, config.vIndices)
+      if (
+        _.filter(
+          relations,
+          relation =>
+            relation.direction === options.direction && !!relation.align,
+        ).length > 1
+      ) {
+        options.align = getGyrateAlignment(polyhedron, config.vIndices)
+        console.log('options.align: ', options.align)
+      }
+    }
+    console.log(relations)
   }
   // TODO should I move this logic to the actual operation?
   const next = getNextPolyhedron(

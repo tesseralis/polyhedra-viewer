@@ -69,7 +69,7 @@ class Faces extends Component {
         onMouseMove={this.handleMouseMove}
         onMouseUp={this.handleMouseUp}
       >
-        <EventListener target="document" onLoad={this.handleLoad} />
+        <EventListener target="document" onLoad={_.once(this.handleLoad)} />
         <appearance>
           <material transparency={1 - opacity} />
         </appearance>

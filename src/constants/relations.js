@@ -423,35 +423,35 @@ const rhombicosidodecahedraGraph = (() => {
     // tridiminished
     J83: {
       '+': getAugment([
-        { value: 'J81', gyrate: 'ortho' },
-        { value: 'J82', gyrate: 'gyro' },
+        { value: 'J81', gyrate: 'gyro' },
+        { value: 'J82', gyrate: 'ortho' },
       ]),
     },
     // bidiminished
     J81: {
       '+': getAugment([
-        { value: 'J76', gyrate: 'ortho', align: 'meta' },
-        { value: 'J78', gyrate: 'gyro' },
+        { value: 'J76', gyrate: 'gyro', align: 'meta' },
+        { value: 'J78', gyrate: 'ortho' },
       ]),
       g: getGyrate([{ value: 'J82' }]),
     },
     J82: {
       '+': getAugment([
-        { value: 'J78', gyrate: 'ortho' },
-        { value: 'J79', gyrate: 'gyro' },
+        { value: 'J78', gyrate: 'gyro' },
+        { value: 'J79', gyrate: 'ortho' },
       ]),
     },
     J80: {
       '+': getAugment([
-        { value: 'J76', gyrate: 'ortho', align: 'para' },
-        { value: 'J77', gyrate: 'gyro' },
+        { value: 'J76', gyrate: 'gyro', align: 'para' },
+        { value: 'J77', gyrate: 'ortho' },
       ]),
     },
     // diminished
     J76: {
       '+': getAugment([
-        { value: 'eD', gyrate: 'ortho' },
-        { value: 'J72', gyrate: 'gyro' },
+        { value: 'eD', gyrate: 'gyro' },
+        { value: 'J72', gyrate: 'ortho' },
       ]),
       g: getGyrate([
         { value: 'J77', align: 'para' },
@@ -460,21 +460,21 @@ const rhombicosidodecahedraGraph = (() => {
     },
     J77: {
       '+': getAugment([
-        { value: 'J72', gyrate: 'ortho', align: 'para' },
-        { value: 'J73', gyrate: 'gyro' },
+        { value: 'J72', gyrate: 'gyro', align: 'para' },
+        { value: 'J73', gyrate: 'ortho' },
       ]),
     },
     J78: {
       '+': getAugment([
-        { value: 'J72', gyrate: 'ortho', align: 'meta' },
-        { value: 'J74', gyrate: 'gyro' },
+        { value: 'J72', gyrate: 'gyro', align: 'meta' },
+        { value: 'J74', gyrate: 'ortho' },
       ]),
       g: getGyrate([{ value: 'J79' }]),
     },
     J79: {
       '+': getAugment([
-        { value: 'J74', gyrate: 'ortho' },
-        { value: 'J75', gyrate: 'gyro' },
+        { value: 'J74', gyrate: 'gyro' },
+        { value: 'J75', gyrate: 'ortho' },
       ]),
     },
 
