@@ -110,13 +110,10 @@ class Faces extends Component {
 
   handleMouseUp = () => {
     if (this.drag) return
-
     const { operation, options, solidData, applyOperation } = this.props
-    console.log(applyArgs, operation)
-
     const { applyArgs } = this.state
+
     if (operation && !_.isNil(applyArgs)) {
-      console.log('applying operation')
       applyOperation(operation, solidData, { ...applyArgs, ...options })
     }
   }

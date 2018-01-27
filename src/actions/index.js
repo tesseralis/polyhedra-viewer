@@ -28,6 +28,17 @@ const operations = {
   '-': diminish,
   g: gyrate,
 }
+
+const defaultAugmentees = {
+  3: 'Y3',
+  // TODO digonal cupola
+  4: 'Y4',
+  5: 'Y5',
+  6: 'U3',
+  8: 'U4',
+  10: 'U5',
+}
+
 // Apply the given operation to the given polyhedron
 // TODO won't need the "name" parameter in the new one
 export const applyOperation = (operation, polyhedron, config) => dispatch => {
@@ -38,11 +49,9 @@ export const applyOperation = (operation, polyhedron, config) => dispatch => {
     if (gyrate) {
       options.gyrate = gyrate
     }
-    if (using) {
-      options.using = using
-    }
+    options.using =
+      using || defaultAugmentees[polyhedron.faces[config.fIndex].length]
   }
-  // if (mode && !_.isNil(applyArgs)) {
   const next = escapeName(
     getNextPolyhedron(
       unescapeName(polyhedron.name),
