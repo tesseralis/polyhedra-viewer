@@ -26,31 +26,22 @@ const operations = {
   g: gyrate,
 }
 
-// TODO deduplicate with the other thing
-const defaultAugmentees = {
-  3: 'Y3',
-  4: 'Y4',
-  5: 'Y5',
-  6: 'U3',
-  8: 'U4',
-  10: 'U5',
-}
+const hasMultiple = (relations, property) =>
+  _.filter(relations, property).length > 1
 
 export function applyOperation(operation, polyhedron, args, config = {}) {
   // TODO is it a good idea to keep the defaulting logic here?
   // It makes it harder to unit test
-  const options = {}
+  let options = {}
   const { gyrate, using } = config
   const relations = getOperations(polyhedron.name, operation)
   if (operation === '+') {
     const fIndex = args
-    if (gyrate) {
-      options.gyrate = gyrate
-    }
-    options.using = using || defaultAugmentees[polyhedron.faces[fIndex].length]
-
-    if (_.filter(relations, 'align').length > 1) {
-      options.align = getAugmentAlignment(polyhedron, fIndex)
+    options = {
+      ...config,
+      align:
+        hasMultiple(relations, 'align') &&
+        getAugmentAlignment(polyhedron, fIndex),
     }
   } else if (operation === '-') {
     const vIndices = args
@@ -92,11 +83,6 @@ export function applyOperation(operation, polyhedron, args, config = {}) {
     }
     console.log(relations)
   }
-  const next = getNextPolyhedron(
-    polyhedron.name,
-    operation,
-    !_.isEmpty(options) ? options : null,
-  )
-
+  const next = getNextPolyhedron(polyhedron.name, operation, _.pickBy(options))
   return operations[operation](polyhedron, args, config).withName(next)
 }

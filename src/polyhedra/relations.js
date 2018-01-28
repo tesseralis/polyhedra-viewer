@@ -489,15 +489,21 @@ export function getOperations(solid, operation) {
 }
 
 // Get the polyhedron name as a result of applying the operation to the given polyhedron
-export function getNextPolyhedron(solid, operation, options) {
+export function getNextPolyhedron(solid, operation, filterOpts) {
   const next = _(polyhedraGraph[toConwayNotation(solid)][operation])
-    .filter(options || _.stubTrue)
+    .filter(!_.isEmpty(filterOpts) ? filterOpts : _.stubTrue)
     .value()
   if (next.length > 1) {
     throw new Error(
       `Multiple possibilities found for operation ${operation} on ${solid}: ${JSON.stringify(
         next,
       )}`,
+    )
+  } else if (next.length === 0) {
+    throw new Error(
+      `No possibilities found for operation ${operation} on ${solid} with options ${JSON.stringify(
+        filterOpts,
+      )}. Are you sure you didn't put in too many?`,
     )
   }
   const val = next[0]
