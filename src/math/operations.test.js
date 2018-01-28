@@ -24,28 +24,18 @@ function checkProperPolyhedron(polyhedron) {
   })
 }
 
-function checkGyrate(polyhedron, gyrate) {
-  const cupolaIndex = polyhedron.cupolaIndices()[0]
-  // TODO okay, I keep repeating this...
-  const boundary = getBoundary(
-    polyhedron
-      .cupolaFaceIndices(cupolaIndex)
-      .map(fIndex => polyhedron.faces[fIndex]),
-  )
-  getDirectedEdges(boundary).forEach(edge => {
-    // TODO move this to a function
-    const [n1, n2] = polyhedron.faces
-      .filter(face => _.difference(edge, face).length === 0)
-      .map(numSides)
-    if (gyrate === 'ortho') {
-      expect(n1 === 3).toBe(n2 === 3)
-    } else {
-      expect(n1 === 3).not.toBe(n2 === 3)
-    }
-  })
-}
-
 describe('operations', () => {
+  xdescribe('truncate', () => {
+    it('can truncate a tetrahedron', () => {
+      const polyhedron = Polyhedron.get('tetrahedron')
+      const truncated = operations.truncate(polyhedron)
+      const expected = Polyhedron.get('truncated-tetrahedron')
+
+      checkProperPolyhedron(truncated)
+      expect(truncated.isIsomorphicTo(expected)).toBe(true)
+    })
+  })
+
   const elongTypes = ['elongate', 'gyroelongate']
 
   elongTypes.forEach(elongType => {

@@ -4,7 +4,7 @@ import Polyhedron, {
   getBoundary,
   getDirectedEdges,
 } from './Polyhedron'
-import { vec, getCentroid, PRECISION } from './linAlg'
+import { vec, getCentroid, getNormal, PRECISION } from './linAlg'
 import { replace } from 'util.js'
 
 const TAU = 2 * Math.PI
@@ -19,17 +19,11 @@ function getMod(array, index) {
   return array[mod(index, array.length)]
 }
 
-// Get the normal of a polygon given its ordered vertices
-function getNormal(vertices) {
-  const [v0, v1, v2] = vertices
-  return v0.sub(v1).cross(v1.sub(v2))
-}
-
 function nextVertex(face, vertex) {
   return getMod(face, face.indexOf(vertex) + 1)
 }
 
-function replaceVertex(newPolyhedron, polyhedron, vertex, { mock, rectify }) {
+function truncateVertex(newPolyhedron, polyhedron, vertex, { mock, rectify }) {
   const touchingFaces = polyhedron.adjacentFaces(vertex)
   const touchingFaceIndices = touchingFaces.map(face =>
     polyhedron.faces.indexOf(face),
@@ -74,6 +68,10 @@ function replaceVertex(newPolyhedron, polyhedron, vertex, { mock, rectify }) {
   return Polyhedron.of(newVertices, newFaces)
 }
 
+/**
+ * Remove vertices in the polyhedron that aren't connected to any faces,
+ * and remap the faces to the smaller indices
+ */
 function removeExtraneousVertices(polyhedron) {
   const { vertices, faces } = polyhedron
   // Vertex indices to remove
@@ -137,16 +135,16 @@ function deduplicateVertices(polyhedron) {
   return removeExtraneousVertices(polyhedron.withFaces(newFaces))
 }
 
-export function getTruncated(polyhedron, options = {}) {
+export function truncate(polyhedron, options = {}) {
   let newPolyhedron = polyhedron
   _.forEach(polyhedron.vertices, (vertex, index) => {
-    newPolyhedron = replaceVertex(newPolyhedron, polyhedron, index, options)
+    newPolyhedron = truncateVertex(newPolyhedron, polyhedron, index, options)
   })
   // TODO remove duplicate vertices when cantellating
   return removeExtraneousVertices(newPolyhedron)
 }
 
-const augmentTypes = {
+const augmentees = {
   pyramid: {
     3: 'tetrahedron',
     4: 'square-pyramid',
@@ -186,7 +184,6 @@ const augmentTypes = {
 // Default augmentee for each numFaces
 const defaultAugmentees = {
   3: 'Y3',
-  // TODO digonal cupola
   4: 'Y4',
   5: 'Y5',
   6: 'U3',
@@ -194,30 +191,21 @@ const defaultAugmentees = {
   10: 'U5',
 }
 
-const augmentData = _.mapValues(augmentTypes, type =>
+const augmentData = _.mapValues(augmentees, type =>
   _.mapValues(type, Polyhedron.get),
 )
 
-function getAugmentType(prefix) {
-  switch (prefix) {
-    case 'Y':
-      return 'pyramid'
-    case 'U':
-      return 'cupola'
-    case 'R':
-      return 'rotunda'
-    case 'P':
-      return 'prism'
-    case 'A':
-      return 'antiprism'
-    default:
-      throw new Error(`Unknown prefix ${prefix}`)
-  }
+const augmentTypes = {
+  Y: 'pyramid',
+  U: 'cupola',
+  R: 'rotunda',
+  P: 'prism',
+  A: 'antiprism',
 }
 
 function getDefaultAugmentee(n) {
   const [prefix, index] = defaultAugmentees[n]
-  return augmentData[getAugmentType(prefix)][index]
+  return augmentData[augmentTypes[prefix]][index]
 }
 
 // Checks to see if the polyhedron can be augmented at the base while remaining convex
@@ -495,7 +483,7 @@ function doAugment(polyhedron, faceIndex, gyrate, using) {
   const sideLength = baseVertices[0].distanceTo(baseVertices[1])
   const baseNormal = getNormal(baseVertices)
 
-  const augmentType = getAugmentType(prefix)
+  const augmentType = augmentTypes[prefix]
   const augmentee = augmentData[augmentType][index]
   const augmenteeVertices = augmentee.vertices.map(vec)
   // rotate and translate so that the face is next to our face
@@ -626,9 +614,7 @@ export function gyrate(polyhedron, { vIndices }) {
   const facesToTurn = polyhedron.adjacentFaces(...vIndices)
   const boundary = getBoundary(facesToTurn)
 
-  // TODO this won't work with animation, so I have to reimplement eventually
-
-  // rotate the cupola top
+  // rotate the cupola/rotunda top
   const boundaryVertices = boundary.map(
     vIndex => polyhedron.vertexVectors()[vIndex],
   )
@@ -647,6 +633,7 @@ export function gyrate(polyhedron, { vIndices }) {
   })
 
   // Rotate all the points on the boundary
+  // TODO this won't work with animation, so I have to reimplement eventually
   const newFaces = polyhedron.faces.map(face => {
     return face.map((vIndex, i) => {
       const j = boundary.indexOf(vIndex)

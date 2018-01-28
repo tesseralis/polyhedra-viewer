@@ -26,3 +26,9 @@ export function isPlanar(points) {
 export function getCentroid(vectors) {
   return vectors.reduce((v1, v2) => v1.add(v2)).scale(1 / vectors.length)
 }
+
+// Get the normal of a polygon given its ordered vertices
+export function getNormal(vertices) {
+  const [v0, v1, v2] = vertices
+  return v0.sub(v1).cross(v1.sub(v2))
+}

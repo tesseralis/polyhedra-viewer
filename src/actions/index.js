@@ -7,6 +7,7 @@ import Polyhedron from 'math/Polyhedron'
 import { getOperations } from 'constants/relations'
 
 import {
+  truncate,
   elongate,
   gyroelongate,
   shorten,
@@ -30,6 +31,7 @@ export const setPolyhedron = name => dispatch => {
 }
 
 const operations = {
+  t: truncate,
   P: elongate,
   A: gyroelongate,
   '~P': shorten,
