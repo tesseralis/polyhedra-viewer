@@ -67,6 +67,15 @@ describe('viewer', () => {
     // TODO do the diminishing?
     appPage
       .simulateLoad()
+      // test gyrobifastigium
+      .clickButtonWithText('augment')
+      .clickButtonWithText('U2')
+      .clickFaceWithNumSides(4)
+      .expectTransitionTo('gyrobifastigium')
+      .clickButtonWithText('diminish')
+      .clickFaceWithNumSides(4)
+      .expectTransitionTo('triangular-prism')
+      // augmented with pyramids
       .clickButtonWithText('augment')
       .clickButtonWithText('Y4')
       .clickFaceWithNumSides(4)

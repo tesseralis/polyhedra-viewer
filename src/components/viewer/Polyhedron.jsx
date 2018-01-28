@@ -95,7 +95,6 @@ class Faces extends Component {
   }
 
   handleLoad = () => {
-    console.log('handling load')
     this.shape.addEventListener(
       'mousedown',
       this.wrapError(this.handleMouseDown),
@@ -123,14 +122,14 @@ class Faces extends Component {
   }
 
   handleMouseMove = event => {
+    // TODO replace this with logs
     this.drag = true
     const { solidData, operation } = this.props
     console.log('operation', operation)
     switch (operation) {
       case '+':
-        console.log('doing an augment')
         const fIndex = getAugmentFace(solidData, event.hitPnt)
-        console.log(fIndex)
+        console.log('fIndex', fIndex)
         this.setState({
           applyArgs: fIndex === -1 ? null : { fIndex },
         })
