@@ -1,4 +1,4 @@
-import * as _ from 'lodash'
+import _ from 'lodash'
 import React from 'react'
 import { css, StyleSheet } from 'aphrodite/no-important'
 import { connect } from 'react-redux'
@@ -27,8 +27,8 @@ const operations = {
   '-': 'diminish',
   P: 'elongate',
   A: 'gyroelongate',
-  '~P': 'elongation of',
-  '~A': 'gyroelongation of',
+  '~P': 'shorten',
+  '~A': 'shorten',
   g: 'gyrate',
 }
 
@@ -150,6 +150,7 @@ function RelatedPolyhedra({
                       .uniq()
                       .map(usingOpt => (
                         <button
+                          key={usingOpt}
                           className={css(
                             styles.optionButton,
                             using === usingOpt && styles.isHighlighted,
@@ -167,24 +168,30 @@ function RelatedPolyhedra({
         }
         return (
           <div key={operation} className={css(styles.operations)}>
-            <h2 className={css(styles.title)}>{operations[operation]}</h2>
-            <div className={css(styles.options)}>
-              {_.compact(related[operation]).map(value => {
-                const nextValue = _.isObject(value) ? value.value : value
-                if (!nextValue) return null
-                const name = fromConwayNotation(nextValue)
-                // TODO make this a button instead
-                return (
-                  <PolyhedronLink
-                    large
-                    key={name}
-                    name={name}
-                    onClick={() => applyOperation(operation, polyhedron)}
-                    subLink="related"
-                  />
-                )
-              })}
-            </div>
+            {_.compact(related[operation]).map(value => {
+              const nextValue = _.isObject(value) ? value.value : value
+              if (!nextValue) return null
+              const name = fromConwayNotation(nextValue)
+              return (
+                <button
+                  key={name}
+                  className={css(styles.modeButton)}
+                  onClick={() => applyOperation(operation, polyhedron)}
+                >
+                  {operations[operation]}
+                </button>
+              )
+              // // TODO make this a button instead
+              // return (
+              //   <PolyhedronLink
+              //     large
+              //     key={name}
+              //     name={name}
+              //     onClick={() => applyOperation(operation, polyhedron)}
+              //     subLink="related"
+              //   />
+              // )
+            })}
           </div>
         )
       })}

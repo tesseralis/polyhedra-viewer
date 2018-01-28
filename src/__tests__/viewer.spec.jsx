@@ -3,54 +3,81 @@ import { MemoryRouter } from 'react-router-dom'
 import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
 
-import App from 'components/App'
-import configureStore from 'store/configureStore'
 import Polyhedron from 'math/Polyhedron'
-
-function mountViewer(path = '/tetrahedron') {
-  return mount(
-    <Provider store={configureStore()}>
-      <MemoryRouter initialEntries={[path]}>
-        <App />
-      </MemoryRouter>
-    </Provider>,
-  )
-}
+import AppPage from 'pages/AppPage'
 
 describe('viewer', () => {
-  it('works', () => {
-    mountViewer()
+  let appPage
+
+  function setup(path = '/tetrahedron') {
+    appPage = new AppPage(path)
+  }
+
+  beforeEach(() => {
+    setup('/tetrahedron')
   })
 
-  it('can augment a tetrahedron', () => {
-    const app = mountViewer('/tetrahedron/related')
+  it('works', () => {
+    setup()
+  })
 
-    // click on the "augment" button
-    const augmentButton = app.findWhere(
-      n => n.type() === 'button' && n.text() === 'augment',
-    )
-    augmentButton.simulate('click')
+  it('can augment and diminish a tetrahedron', () => {
+    setup('/tetrahedron/related')
 
-    // simulate a click on any of the faces
-    const shape = app.find('Faces').find('shape')
-    shape.find('EventListener').prop('onLoad')()
-    shape.simulate('mousemove', { hitPnt: [0, 0, 0] })
-    shape.simulate('mousedown')
-    shape.simulate('mouseup')
+    appPage
+      .simulateLoad()
+      .clickButtonWithText('augment')
+      .clickFaceIndex(0)
+      .expectTransitionTo('triangular-bipyramid')
+      .clickButtonWithText('diminish')
+      .clickFaceIndex(0)
+      .expectTransitionTo('tetrahedron')
+  })
 
-    // ensure that the url is now 'triangular-bipyramid/related'
-    const expected = 'triangular-bipyramid'
-    app.update()
-    const viewer = app.find('Viewer')
-    const history = viewer.prop('history')
-    expect(history.location.pathname).toEqual(`/${expected}/related`)
-    expect(
-      app
-        .find('Faces')
-        .prop('solidData')
-        .isIsomorphicTo(Polyhedron.get(expected)),
-    ).toBe(true)
+  it('can transition through a pyramid series', () => {
+    setup('/square-pyramid/related')
 
-    // verify that the solid being rendered is indeed a triangular bipyramid
+    appPage
+      .simulateLoad()
+      .clickButtonWithText('augment')
+      .clickFaceWithNumSides(4)
+      .expectTransitionTo('octahedron')
+      .clickButtonWithText('diminish')
+      .clickFaceWithNumSides(3)
+      .expectTransitionTo('square-pyramid')
+      .clickButtonWithText('elongate')
+      .expectTransitionTo('elongated-square-pyramid')
+      .clickButtonWithText('augment')
+    // .clickFaceWithNumSides(3)
+    // .expectTransitionTo('elongated-square-bipyramid')
+    // square pyramid?
+  })
+
+  xit('can transition through a cupola series', () => {
+    // triangular cupola?
+  })
+
+  xit('can transition through cupola-rotunda', () => {
+    //
+  })
+
+  it('can triaugment a trinagular prism', () => {
+    setup('/triangular-prism/related')
+    // TODO do the diminishing?
+    appPage
+      .simulateLoad()
+      .clickButtonWithText('augment')
+      .clickButtonWithText('Y4')
+      .clickFaceWithNumSides(4)
+      .expectTransitionTo('augmented-triangular-prism')
+      .clickFaceWithNumSides(4)
+      .expectTransitionTo('biaugmented-triangular-prism')
+      .clickFaceWithNumSides(4)
+      .expectTransitionTo('triaugmented-triangular-prism')
+    // TODO check the mode has been unset?
+  })
+
+  xit('can augment a set of meta/para polyhedra', () => {
+    //
   })
 })
