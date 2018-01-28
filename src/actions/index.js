@@ -35,9 +35,10 @@ const setApplyOptsFor = (solid, operation) => dispatch => {
 export const applyOperation = (
   operation,
   polyhedron,
-  config = {},
+  args,
+  options,
 ) => dispatch => {
-  const result = doApplyOperation(operation, polyhedron, config)
+  const result = doApplyOperation(operation, polyhedron, args, options)
 
   dispatch(setPolyhedronRaw(result))
   if (!hasOperation(result.name, operation)) {

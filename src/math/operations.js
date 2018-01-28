@@ -417,6 +417,10 @@ export function getGyrateAlignment(polyhedron, vIndices) {
     : 'meta'
 }
 
+function isFastigium(augmentType, underside) {
+  return augmentType === 'cupola' && numSides(underside) === 4
+}
+
 // TODO handle rhombicosidodecahedron case (still don't know what terminology I want to use)
 // Return true if the base and augmentee are aligned
 function isAligned(
@@ -429,6 +433,7 @@ function isAligned(
 ) {
   if (_.includes(['pyramid', 'prism', 'antiprism'], augmentType)) return true
   const baseType = getBaseType(polyhedron.faces, base)
+  const fastigium = isFastigium(augmentType, underside)
   if (baseType === 'pyramid' || baseType === 'antiprism') {
     return true
   }
@@ -437,7 +442,7 @@ function isAligned(
     return true
   }
 
-  if (baseType !== 'truncated' && _.isNil(gyrate)) {
+  if (baseType !== 'truncated' && !fastigium && _.isNil(gyrate)) {
     throw new Error(`Must define 'gyrate' for augmenting ${baseType} `)
   }
 
@@ -457,6 +462,10 @@ function isAligned(
   const isOrtho = (numSides(adjFace) !== 3) === (numSides(alignedFace) !== 3)
 
   if (baseType === 'truncated') {
+    return !isOrtho
+  }
+
+  if (fastigium) {
     return !isOrtho
   }
 
@@ -601,15 +610,15 @@ export function shorten(polyhedron) {
   return removeVertices(polyhedron, face)
 }
 
-export function augment(polyhedron, { fIndex, gyrate, using }) {
+export function augment(polyhedron, fIndex, { gyrate, using } = {}) {
   return doAugment(polyhedron, fIndex, gyrate, using)
 }
 
-export function diminish(polyhedron, { vIndices }) {
+export function diminish(polyhedron, vIndices) {
   return removeVertices(polyhedron, vIndices)
 }
 
-export function gyrate(polyhedron, { vIndices }) {
+export function gyrate(polyhedron, vIndices) {
   // get adjacent faces
   const facesToTurn = polyhedron.adjacentFaces(...vIndices)
   const boundary = getBoundary(facesToTurn)

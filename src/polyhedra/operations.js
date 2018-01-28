@@ -36,34 +36,33 @@ const defaultAugmentees = {
   10: 'U5',
 }
 
-export function applyOperation(operation, polyhedron, config = {}) {
+export function applyOperation(operation, polyhedron, args, config = {}) {
   // TODO is it a good idea to keep the defaulting logic here?
   // It makes it harder to unit test
   const options = {}
   const { gyrate, using } = config
   const relations = getOperations(polyhedron.name, operation)
   if (operation === '+') {
-    if (using === 'U2') {
-      options.gyrate = 'gyro'
-    } else if (gyrate) {
+    const fIndex = args
+    if (gyrate) {
       options.gyrate = gyrate
     }
-    options.using =
-      using || defaultAugmentees[polyhedron.faces[config.fIndex].length]
+    options.using = using || defaultAugmentees[polyhedron.faces[fIndex].length]
 
     if (_.filter(relations, 'align').length > 1) {
-      options.align = getAugmentAlignment(polyhedron, config.fIndex)
+      options.align = getAugmentAlignment(polyhedron, fIndex)
     }
   } else if (operation === '-') {
+    const vIndices = args
     // If diminishing a pentagonal cupola/rotunda, check which one it is
-    if (config.vIndices.length === 5) {
+    if (vIndices.length === 5) {
       options.using = 'U5'
-    } else if (config.vIndices.length === 10) {
+    } else if (vIndices.length === 10) {
       options.using = 'R5'
     }
 
     if (_.filter(relations, 'gyrate').length > 1) {
-      options.gyrate = getDiminishGyrate(polyhedron, config.vIndices)
+      options.gyrate = getDiminishGyrate(polyhedron, vIndices)
     }
 
     if (
@@ -74,11 +73,12 @@ export function applyOperation(operation, polyhedron, config = {}) {
           !!relation.align,
       ).length > 1
     ) {
-      options.align = getDiminishAlignment(polyhedron, config.vIndices)
+      options.align = getDiminishAlignment(polyhedron, vIndices)
     }
   } else if (operation === 'g') {
+    const vIndices = args
     if (_.some(relations, 'direction')) {
-      options.direction = getGyrateDirection(polyhedron, config.vIndices)
+      options.direction = getGyrateDirection(polyhedron, vIndices)
       if (
         _.filter(
           relations,
@@ -86,20 +86,17 @@ export function applyOperation(operation, polyhedron, config = {}) {
             relation.direction === options.direction && !!relation.align,
         ).length > 1
       ) {
-        options.align = getGyrateAlignment(polyhedron, config.vIndices)
+        options.align = getGyrateAlignment(polyhedron, vIndices)
         console.log('options.align: ', options.align)
       }
     }
     console.log(relations)
   }
-  // TODO should I move this logic to the actual operation?
   const next = getNextPolyhedron(
     polyhedron.name,
     operation,
     !_.isEmpty(options) ? options : null,
   )
 
-  return operations[operation](polyhedron, { ...config, ...options }).withName(
-    next,
-  )
+  return operations[operation](polyhedron, args, config).withName(next)
 }

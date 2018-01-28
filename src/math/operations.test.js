@@ -79,10 +79,11 @@ describe('operations', () => {
       ]
       testPolyhedra.forEach(test => {
         const polyhedron = Polyhedron.get(test)
-        const augmented = operations.augment(polyhedron, {
-          fIndex: _.findIndex(polyhedron.faces, face => numSides(face) === 4),
-          with: 'Y4',
-        })
+        const fIndex = _.findIndex(
+          polyhedron.faces,
+          face => numSides(face) === 4,
+        )
+        const augmented = operations.augment(polyhedron, fIndex, { with: 'Y4' })
         checkProperPolyhedron(augmented)
         const expected = Polyhedron.get(`augmented-${test}`)
         expect(augmented.faceCount()).toEqual(expected.faceCount())
@@ -92,9 +93,11 @@ describe('operations', () => {
     describe('ortho/gyro', () => {
       it('properly aligns truncated solids', () => {
         const polyhedron = Polyhedron.get('truncated-cube')
-        const augmented = operations.augment(polyhedron, {
-          fIndex: 8,
-        })
+        const fIndex = _.findIndex(
+          polyhedron.faces,
+          face => numSides(face) === 8,
+        )
+        const augmented = operations.augment(polyhedron, fIndex)
         const expected = Polyhedron.get('augmented-truncated-cube')
         expect(augmented.isSame(expected)).toBe(true)
       })
@@ -104,8 +107,11 @@ describe('operations', () => {
 
         const options = ['ortho', 'gyro']
         options.forEach(gyrate => {
-          const augmented = operations.augment(polyhedron, {
-            fIndex: _.findIndex(polyhedron.faces, face => numSides(face) === 8),
+          const fIndex = _.findIndex(
+            polyhedron.faces,
+            face => numSides(face) === 8,
+          )
+          const augmented = operations.augment(polyhedron, fIndex, {
             gyrate,
           })
           const expected = Polyhedron.get(`square-${gyrate}bicupola`)
@@ -117,9 +123,12 @@ describe('operations', () => {
         const polyhedron = Polyhedron.get('elongated-triangular-cupola')
 
         const options = ['ortho', 'gyro']
+        const fIndex = _.findIndex(
+          polyhedron.faces,
+          face => numSides(face) === 6,
+        )
         options.forEach(gyrate => {
-          const augmented = operations.augment(polyhedron, {
-            fIndex: _.findIndex(polyhedron.faces, face => numSides(face) === 6),
+          const augmented = operations.augment(polyhedron, fIndex, {
             gyrate,
           })
           const expected = Polyhedron.get(
@@ -143,8 +152,11 @@ describe('operations', () => {
           ]
           usingOpts.forEach((using, i) => {
             it(`can augment with ${using}`, () => {
-              const augmented = operations.augment(polyhedron, {
-                fIndex: 11,
+              const fIndex = _.findIndex(
+                polyhedron.faces,
+                face => numSides(face) === 10,
+              )
+              const augmented = operations.augment(polyhedron, fIndex, {
                 gyrate,
                 using,
               })
@@ -161,8 +173,7 @@ describe('operations', () => {
       const polyhedron = Polyhedron.get('triangular-prism')
       const fIndices = [2, 3, 4]
       fIndices.forEach(fIndex => {
-        const augmented = operations.augment(polyhedron, {
-          fIndex,
+        const augmented = operations.augment(polyhedron, fIndex, {
           gyrate: 'gyro',
           using: 'U2',
         })
@@ -177,9 +188,10 @@ describe('operations', () => {
     it('properly diminishes gyrobifastigium', () => {
       const polyhedron = Polyhedron.get('gyrobifastigium')
       polyhedron.fIndices().forEach(fIndex => {
-        const diminished = operations.diminish(polyhedron, {
-          vIndices: polyhedron.findPeak(polyhedron.faceCentroid(fIndex)),
-        })
+        const diminished = operations.diminish(
+          polyhedron,
+          polyhedron.findPeak(polyhedron.faceCentroid(fIndex)),
+        )
         checkProperPolyhedron(diminished)
         const expected = Polyhedron.get('triangular-prism')
         expect(diminished.isSame(expected)).toBe(true)

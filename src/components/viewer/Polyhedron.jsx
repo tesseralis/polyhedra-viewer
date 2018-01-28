@@ -117,7 +117,7 @@ class Faces extends Component {
     const { applyArgs } = this.state
 
     if (operation && !_.isNil(applyArgs)) {
-      applyOperation(operation, solidData, { ...applyArgs, ...options })
+      applyOperation(operation, solidData, applyArgs, options)
     }
   }
 
@@ -131,7 +131,7 @@ class Faces extends Component {
         const fIndex = getAugmentFace(solidData, event.hitPnt)
         console.log('fIndex', fIndex)
         this.setState({
-          applyArgs: fIndex === -1 ? null : { fIndex },
+          applyArgs: fIndex === -1 ? null : fIndex,
         })
         return
       case '-':
@@ -141,7 +141,7 @@ class Faces extends Component {
         })
         console.log('vIndices', vIndices)
         this.setState({
-          applyArgs: vIndices && { vIndices },
+          applyArgs: vIndices,
         })
         return
       default:
