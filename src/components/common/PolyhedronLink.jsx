@@ -3,7 +3,7 @@ import { css, StyleSheet } from 'aphrodite/no-important'
 import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
 
-import { escapeName } from 'constants/polyhedra'
+import { escapeName } from 'polyhedra/names'
 import { hover } from 'styles/common'
 import { setPolyhedron } from 'actions'
 

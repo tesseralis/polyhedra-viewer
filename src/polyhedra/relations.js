@@ -1,6 +1,6 @@
 import _ from 'lodash'
-import { fromConwayNotation, toConwayNotation } from 'constants/polyhedra'
 import periodicTable from 'constants/periodicTable'
+import { fromConwayNotation, toConwayNotation } from './names'
 
 const archimedean = {
   T: {
@@ -365,51 +365,6 @@ const diminishedIcosahedraGraph = (() => {
     },
     J62: {
       '+': { using: 'Y5', align: 'meta', value: 'J11' },
-    },
-  }
-})()
-
-// TODO adapt this for the new format
-// Right now, I donm't know of a good system to track diminishing *and* gyration
-const oldRhombicosidodecahedraGraph = (() => {
-  return {
-    eD: {
-      g: 'J72',
-      '-': 'J76',
-    },
-    J72: {
-      g: ['J73', 'J74'],
-      '-': ['J76', 'J77', 'J78'],
-    },
-    J73: {
-      '-': 'J77',
-    },
-    J74: {
-      g: 'J75',
-      '-': ['J78', 'J79'],
-    },
-    J75: {
-      '-': ['J79'],
-    },
-    J76: {
-      g: ['J77', 'J78'],
-      '-': ['J80', 'J81'],
-    },
-    J77: {
-      '-': 'J80',
-    },
-    J78: {
-      '-': ['J81', 'J82'],
-    },
-    J79: {
-      '-': ['J82'],
-    },
-    J81: {
-      g: 'J82',
-      '-': 'J83',
-    },
-    J82: {
-      '-': 'J83',
     },
   }
 })()

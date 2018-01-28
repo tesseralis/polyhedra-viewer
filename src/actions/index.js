@@ -1,10 +1,13 @@
 import _ from 'lodash'
-import { getNextPolyhedron, hasOperation } from 'constants/relations'
+import {
+  getNextPolyhedron,
+  hasOperation,
+  getOperations,
+} from 'polyhedra/relations'
+import { isValidSolid } from 'data'
 import { setPolyhedron as setPolyhedronRaw } from 'reducers/polyhedron'
 import { setOperation, setApplyOpts } from 'reducers/controls'
-import { isValidSolid } from 'constants/polyhedra'
 import Polyhedron from 'math/Polyhedron'
-import { getOperations } from 'constants/relations'
 
 import {
   truncate,

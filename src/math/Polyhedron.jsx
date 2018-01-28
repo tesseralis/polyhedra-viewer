@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { isValidSolid, getSolidData } from 'constants/polyhedra'
+import { isValidSolid, getSolidData } from 'data'
 import { vec, isPlanar, getPlane, getCentroid } from './linAlg'
 
 function mod(a, b) {

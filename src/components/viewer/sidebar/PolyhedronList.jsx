@@ -7,7 +7,7 @@ import { createStructuredSelector } from 'reselect'
 
 import { setPolyhedron } from 'actions'
 import { getFilteredGroups } from 'selectors'
-import { escapeName } from 'constants/polyhedra'
+import { escapeName } from 'polyhedra/names'
 import { andaleMono } from 'styles/fonts'
 import { resetLink, hover } from 'styles/common'
 

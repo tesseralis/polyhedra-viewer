@@ -4,11 +4,11 @@ import { css, StyleSheet } from 'aphrodite/no-important'
 import { connect } from 'react-redux'
 import { createStructuredSelector } from 'reselect'
 
-import { toConwayNotation, fromConwayNotation } from 'constants/polyhedra'
+import { toConwayNotation, fromConwayNotation } from 'polyhedra/names'
 import { applyOperation, setMode, setApplyOpt } from 'actions'
 import { getPolyhedron, getOperation, getApplyOpts } from 'selectors'
 
-import { polyhedraGraph } from 'constants/relations'
+import { polyhedraGraph } from 'polyhedra/relations'
 import PolyhedronLink from 'components/common/PolyhedronLink'
 
 const operations = {

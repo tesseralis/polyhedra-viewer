@@ -1,5 +1,5 @@
 import { createSelector } from 'reselect'
-import { groups } from '../constants/polyhedra'
+import { groups } from 'data'
 
 const getFilteredPolyhedra = (polyhedra, filter) =>
   polyhedra.filter(solid => solid.includes(filter.toLowerCase()))
