@@ -62,7 +62,7 @@ export default class AppPage {
       this.wrapper
         .find('Faces')
         .prop('solidData')
-        .isIsomorphicTo(Polyhedron.get(expected)),
+        .isSame(Polyhedron.get(expected)),
     ).toBe(true)
     return this
   }

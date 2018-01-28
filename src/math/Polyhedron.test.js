@@ -20,7 +20,7 @@ describe('Polyhedron', () => {
     })
   })
 
-  describe('isIsomorphicTo', () => {
+  describe('isSame', () => {
     const testCases = [
       ['rhombicuboctahedron', 'elongated-square-gyrobicupola'],
       ['metabiaugmented-hexagonal-prism', 'parabiaugmented-hexagonal-prism'],
@@ -32,9 +32,7 @@ describe('Polyhedron', () => {
 
     testCases.forEach(([p1, p2]) => {
       it(`differentiates between ${p1} and ${p2}`, () => {
-        expect(Polyhedron.get(p1).isIsomorphicTo(Polyhedron.get(p2))).toBe(
-          false,
-        )
+        expect(Polyhedron.get(p1).isSame(Polyhedron.get(p2))).toBe(false)
       })
     })
   })

@@ -243,7 +243,7 @@ export default class Polyhedron {
     )
   }
 
-  isIsomorphicTo(other) {
+  isSame(other) {
     if (!_.isEqual(this.faceCount(), other.faceCount())) return false
     return _.isEqual(this.faceAdjacencyList(), other.faceAdjacencyList())
   }

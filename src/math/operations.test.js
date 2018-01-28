@@ -32,7 +32,7 @@ describe('operations', () => {
       const expected = Polyhedron.get('truncated-tetrahedron')
 
       checkProperPolyhedron(truncated)
-      expect(truncated.isIsomorphicTo(expected)).toBe(true)
+      expect(truncated.isSame(expected)).toBe(true)
     })
   })
 
@@ -60,12 +60,12 @@ describe('operations', () => {
         const elongated = Polyhedron.get(`${elongType}d-${test}`)
         it(`can elongate ${test}`, () => {
           const actual = operations[elongType](shortened)
-          expect(actual.isIsomorphicTo(elongated)).toBe(true)
+          expect(actual.isSame(elongated)).toBe(true)
         })
 
         it(`can shorten ${elongType}d ${test}`, () => {
           const actual = operations.shorten(elongated)
-          expect(actual.isIsomorphicTo(shortened)).toBe(true)
+          expect(actual.isSame(shortened)).toBe(true)
         })
       })
     })
@@ -96,7 +96,7 @@ describe('operations', () => {
           fIndex: 8,
         })
         const expected = Polyhedron.get('augmented-truncated-cube')
-        expect(augmented.isIsomorphicTo(expected)).toBe(true)
+        expect(augmented.isSame(expected)).toBe(true)
       })
 
       it('properly aligns cupolae', () => {
@@ -109,7 +109,7 @@ describe('operations', () => {
             gyrate,
           })
           const expected = Polyhedron.get(`square-${gyrate}bicupola`)
-          expect(augmented.isIsomorphicTo(expected)).toBe(true)
+          expect(augmented.isSame(expected)).toBe(true)
         })
       })
 
@@ -125,7 +125,7 @@ describe('operations', () => {
           const expected = Polyhedron.get(
             `elongated-triangular-${gyrate}bicupola`,
           )
-          expect(augmented.isIsomorphicTo(expected)).toBe(true)
+          expect(augmented.isSame(expected)).toBe(true)
         })
       })
     })
@@ -150,7 +150,7 @@ describe('operations', () => {
               })
               checkProperPolyhedron(augmented)
               const expected = Polyhedron.get(expectedName[i])
-              expect(augmented.isIsomorphicTo(expected)).toBe(true)
+              expect(augmented.isSame(expected)).toBe(true)
             })
           })
         })
@@ -168,7 +168,7 @@ describe('operations', () => {
         })
         checkProperPolyhedron(augmented)
         const expected = Polyhedron.get('gyrobifastigium')
-        expect(augmented.isIsomorphicTo(expected)).toBe(true)
+        expect(augmented.isSame(expected)).toBe(true)
       })
     })
   })
@@ -182,7 +182,7 @@ describe('operations', () => {
         })
         checkProperPolyhedron(diminished)
         const expected = Polyhedron.get('triangular-prism')
-        expect(diminished.isIsomorphicTo(expected)).toBe(true)
+        expect(diminished.isSame(expected)).toBe(true)
       })
     })
   })
