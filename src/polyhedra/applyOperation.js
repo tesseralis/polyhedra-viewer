@@ -29,11 +29,15 @@ const operations = {
 const hasMultiple = (relations, property) =>
   _.filter(relations, property).length > 1
 
-export function applyOperation(operation, polyhedron, args, config = {}) {
+export default function applyOperation(
+  operation,
+  polyhedron,
+  args,
+  config = {},
+) {
   // TODO is it a good idea to keep the defaulting logic here?
   // It makes it harder to unit test
   let options = {}
-  const { gyrate, using } = config
   const relations = getOperations(polyhedron.name, operation)
   if (operation === '+') {
     const fIndex = args

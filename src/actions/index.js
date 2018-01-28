@@ -4,7 +4,7 @@ import { isValidSolid } from 'data'
 import { setPolyhedron as setPolyhedronRaw } from 'reducers/polyhedron'
 import { setOperation, setApplyOpts } from 'reducers/controls'
 import Polyhedron from 'math/Polyhedron'
-import { applyOperation as doApplyOperation } from 'polyhedra/operations'
+import doApplyOperation from 'polyhedra/applyOperation'
 
 // Set the polyhedron
 export const setPolyhedron = name => dispatch => {
@@ -68,4 +68,3 @@ export const setApplyOpt = (name, value) => dispatch => {
 export * from 'reducers/config'
 
 export * from 'reducers/filter'
-// export * from 'reducers/controls'

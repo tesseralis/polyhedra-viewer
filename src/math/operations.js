@@ -480,7 +480,7 @@ function isAligned(
 
 // Augment the following
 // TODO digonal cupola option and rotunda option
-function doAugment(polyhedron, faceIndex, gyrate, using) {
+function doAugment(polyhedron, faceIndex, using, gyrate) {
   const { faces, vertices } = polyhedron
   const base = faces[faceIndex]
   const n = base.length
@@ -586,7 +586,7 @@ export function elongate(polyhedron) {
     face => face === _.maxBy(polyhedron.faces, 'length'),
   )
   const using = `P${numSides(polyhedron.faces[faceIndex])}`
-  return doAugment(polyhedron, faceIndex, null, using)
+  return doAugment(polyhedron, faceIndex, using)
 }
 
 export function gyroelongate(polyhedron) {
@@ -595,7 +595,7 @@ export function gyroelongate(polyhedron) {
     face => face === _.maxBy(polyhedron.faces, 'length'),
   )
   const using = `A${numSides(polyhedron.faces[faceIndex])}`
-  return doAugment(polyhedron, faceIndex, null, using)
+  return doAugment(polyhedron, faceIndex, using)
 }
 
 export function shorten(polyhedron) {
@@ -611,7 +611,7 @@ export function shorten(polyhedron) {
 }
 
 export function augment(polyhedron, fIndex, { gyrate, using } = {}) {
-  return doAugment(polyhedron, fIndex, gyrate, using)
+  return doAugment(polyhedron, fIndex, using, gyrate)
 }
 
 export function diminish(polyhedron, vIndices) {
