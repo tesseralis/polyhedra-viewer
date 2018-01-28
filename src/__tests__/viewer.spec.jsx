@@ -48,6 +48,7 @@ describe('viewer', () => {
       .clickButtonWithText('elongate')
       .expectTransitionTo('elongated-square-pyramid')
       .clickButtonWithText('augment')
+    // .triggerOperation()
     // .clickFaceWithNumSides(3)
     // .expectTransitionTo('elongated-square-bipyramid')
     // square pyramid?
@@ -79,5 +80,18 @@ describe('viewer', () => {
 
   xit('can augment a set of meta/para polyhedra', () => {
     //
+  })
+
+  it('can go through a simple rhombicosadodecahedron workflow', () => {
+    setup('/tridiminished-rhombicosidodecahedron/related')
+    appPage
+      .simulateLoad()
+      .clickButtonWithText('augment')
+      .clickFaceWithNumSides(10)
+      .expectTransitionTo('gyrate-bidiminished-rhombicosidodecahedron')
+      .clickFaceWithNumSides(10)
+      .expectTransitionTo('bigyrate-diminished-rhombicosidodecahedron')
+      .clickFaceWithNumSides(10)
+      .expectTransitionTo('trigyrate-rhombicosidodecahedron')
   })
 })

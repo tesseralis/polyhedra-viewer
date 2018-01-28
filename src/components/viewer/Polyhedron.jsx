@@ -4,7 +4,6 @@ import { rgb } from 'd3-color'
 import _ from 'lodash'
 import { connect } from 'react-redux'
 import { createStructuredSelector } from 'reselect'
-import { withRouter } from 'react-router-dom'
 import EventListener from 'react-event-listener'
 
 import polygons from 'constants/polygons'
@@ -152,15 +151,13 @@ class Faces extends Component {
   }
 }
 
-const ConnectedFaces = withRouter(
-  connect(
-    createStructuredSelector({
-      operation: getOperation,
-      options: getApplyOpts,
-    }),
-    { applyOperation },
-  )(Faces),
-)
+const ConnectedFaces = connect(
+  createStructuredSelector({
+    operation: getOperation,
+    options: getApplyOpts,
+  }),
+  { applyOperation },
+)(Faces)
 
 /* Edges */
 
@@ -211,4 +208,4 @@ const mapStateToProps = createStructuredSelector({
   solidData: getPolyhedron,
 })
 
-export default withRouter(connect(mapStateToProps)(Polyhedron))
+export default connect(mapStateToProps)(Polyhedron)

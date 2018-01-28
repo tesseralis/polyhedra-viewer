@@ -399,7 +399,6 @@ export function getDiminishGyrate(polyhedron, vIndices) {
 
 export function getGyrateAlignment(polyhedron, vIndices) {
   const { faces } = polyhedron
-  const peakBoundary = getBoundary(polyhedron.adjacentFaces(...vIndices))
   const boundary = getBoundary(polyhedron.adjacentFaces(...vIndices))
   const vIndicesToCheck = (() => {
     const cupolaBoundaries = polyhedron

@@ -4,7 +4,7 @@ import { setPolyhedron as setPolyhedronRaw } from 'reducers/polyhedron'
 import { setOperation, setApplyOpts } from 'reducers/controls'
 import { isValidSolid } from 'constants/polyhedra'
 import Polyhedron from 'math/Polyhedron'
-import { hasAlignment, getOperations } from 'constants/relations'
+import { getOperations } from 'constants/relations'
 
 import {
   elongate,
