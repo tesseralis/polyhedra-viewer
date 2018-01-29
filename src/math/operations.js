@@ -281,11 +281,17 @@ function faceGraphDistance(polyhedron, fIndices, peakBoundary, exclude = []) {
   )
 }
 
+function getSingle(array) {
+  if (array.length !== 1) {
+    throw new Error(`Expected array to have one element: ${array}`)
+  }
+  return array[0]
+}
+
 // Return "meta" or "para", or null
 export function getAugmentAlignment(polyhedron, fIndex) {
   // get the existing peak boundary
-  // FIXME verify there's only one
-  const peakBoundary = polyhedron.peaks()[0].boundary()
+  const peakBoundary = getSingle(polyhedron.peaks()).boundary()
   const isHexagonalPrism = _.some(
     polyhedron.faces,
     face => numSides(face) === 6,
@@ -313,7 +319,7 @@ export function getDiminishAlignment(polyhedron, peak) {
     : []
   const diminishedIndices =
     orthoIndices.length > 0
-      ? orthoIndices[0].boundary()
+      ? getSingle(orthoIndices).boundary()
       : _.maxBy(polyhedron.faces, numSides)
 
   return faceDistanceBetweenVertices(
@@ -350,10 +356,7 @@ export function getGyrateAlignment(polyhedron, peak) {
       .map(peak => peak.boundary())
 
     if (cupolaBoundaries.length > 0) {
-      if (cupolaBoundaries.length !== 1) {
-        throw new Error('we done goofed too')
-      }
-      return cupolaBoundaries[0]
+      return getSingle(cupolaBoundaries)
     }
 
     const maxNumSides = _.max(faces.map(numSides))
@@ -361,10 +364,7 @@ export function getGyrateAlignment(polyhedron, peak) {
       .fIndices()
       .filter(fIndex => numSides(faces[fIndex]) === maxNumSides)
 
-    if (diminishedIndices.length !== 1) {
-      throw new Error('we done did something wrong')
-    }
-    return faces[diminishedIndices[0]]
+    return faces[getSingle(diminishedIndices)]
   })()
   return faceDistanceBetweenVertices(polyhedron, boundary, vIndicesToCheck) > 1
     ? 'para'
@@ -556,7 +556,6 @@ export function gyroelongate(polyhedron) {
   return doAugment(polyhedron, faceIndex, using)
 }
 
-// FIXME this is broken now
 export function shorten(polyhedron) {
   // Find a prism or antiprism face
   const face = _(polyhedron.faces)
