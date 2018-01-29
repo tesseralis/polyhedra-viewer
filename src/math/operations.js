@@ -88,43 +88,6 @@ function removeExtraneousVertices(polyhedron) {
   return Polyhedron.of(newVertices, newFaces)
 }
 
-// Remove vertices (and faces) from the polyhedron when they are all the same
-function deduplicateVertices(polyhedron) {
-  // group vertex indices by same
-  const vertices = polyhedron.vertices.map(vec)
-  const points = []
-  const verticesByPoint = {}
-  _.forEach(vertices, (vertex, index) => {
-    const pointIndex = _.findIndex(points, point =>
-      vertex.equalsWithTolerance(point, PRECISION),
-    )
-    if (pointIndex === -1) {
-      points.push(vertex)
-      verticesByPoint[points.length - 1] = [index]
-    } else {
-      verticesByPoint[pointIndex].push(index)
-    }
-  })
-
-  // replace vertices that are the same
-  let newFaces = polyhedron.faces
-  _.forEach(verticesByPoint, groupedVertices => {
-    if (groupedVertices.length <= 1) return
-    newFaces = newFaces.map(face =>
-      face.map(
-        vertex =>
-          _.includes(groupedVertices, vertex) ? groupedVertices[0] : vertex,
-      ),
-    )
-  })
-  // TODO do this for animation
-  // remove duplicates in faces
-  // remove extraneous faces
-
-  // remove extraneous vertices
-  return removeExtraneousVertices(polyhedron.withFaces(newFaces))
-}
-
 export function truncate(polyhedron, options = {}) {
   let newPolyhedron = polyhedron
   _.forEach(polyhedron.vertices, (vertex, index) => {
@@ -282,47 +245,39 @@ function isCupolaRotunda(baseType, augmentType) {
   return _.xor(['cupola', 'rotunda'], [baseType, augmentType]).length === 0
 }
 
-function faceGraphDistance(polyhedron, fIndices, peakBoundary, exclude = []) {
+function faceDistanceBetweenVertices(
+  polyhedron,
+  vIndices1,
+  vIndices2,
+  exclude = [],
+) {
   const faceGraph = polyhedron.faceGraph()
-  const excludeFn = fIndex =>
-    !_.includes(exclude, numSides(polyhedron.faces[fIndex]))
-  let foundFaceIndices = _.flatMap(peakBoundary, vIndex =>
-    polyhedron.adjacentFaceIndices(vIndex),
-  ).filter(excludeFn)
+  const v2fGraph = polyhedron.vertexToFaceGraph()
+  let foundVertexIndices = vIndices1
   let distance = 0
   while (
-    _.intersection(foundFaceIndices, fIndices).length === 0 &&
+    _.intersection(foundVertexIndices, vIndices2).length === 0 &&
     distance < 5
   ) {
-    foundFaceIndices = _.uniq(
-      _.flatMap(foundFaceIndices, fIndex => faceGraph[fIndex]).filter(
-        excludeFn,
-      ),
-    )
+    foundVertexIndices = _(foundVertexIndices)
+      .flatMap(vIndex => v2fGraph[vIndex])
+      .map(fIndex => polyhedron.faces[fIndex])
+      .filter(face => !_.includes(exclude, numSides(face)))
+      .flatten()
+      .value()
     distance++
   }
   return distance
 }
 
-function faceDistanceBetweenVertices(polyhedron, vIndices1, vIndices2) {
-  const faceGraph = polyhedron.faceGraph()
-  let foundFaceIndices = _.flatMap(vIndices1, vIndex =>
-    polyhedron.adjacentFaceIndices(vIndex),
+function faceGraphDistance(polyhedron, fIndices, peakBoundary, exclude = []) {
+  const vIndices = _.flatMap(fIndices, fIndex => polyhedron.faces[fIndex])
+  return faceDistanceBetweenVertices(
+    polyhedron,
+    vIndices,
+    peakBoundary,
+    exclude,
   )
-  let distance = 0
-  while (
-    _.intersection(
-      _.flatMap(foundFaceIndices, fIndex => polyhedron.faces[fIndex]),
-      vIndices2,
-    ).length === 0 &&
-    distance < 5
-  ) {
-    foundFaceIndices = _.uniq(
-      _.flatMap(foundFaceIndices, fIndex => faceGraph[fIndex]),
-    )
-    distance++
-  }
-  return distance
 }
 
 // Return "meta" or "para", or null

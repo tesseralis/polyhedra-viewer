@@ -82,7 +82,7 @@ export default class Polyhedron {
   }
 
   adjacentFaces(...vIndices) {
-    return this.adjacentFaceIndices(...vIndices).map(_.propertyOf(this.faces))
+    return _.at(this.faces, this.adjacentFaceIndices(...vIndices))
   }
 
   // Return the number of faces by side for the given vertex
