@@ -7,12 +7,18 @@ import Polyhedron from 'math/Polyhedron'
 import doApplyOperation from 'polyhedra/applyOperation'
 
 // Set the polyhedron
+
+const unsetMode = () => dispatch => {
+  dispatch(setMode(null))
+  dispatch(setApplyOpts({ gyrate: null, using: null }))
+}
+
 export const setPolyhedron = name => dispatch => {
   if (!isValidSolid(name)) {
     throw new Error(`Got a solid with an invalid name: ${name}`)
   }
   dispatch(setPolyhedronRaw(Polyhedron.get(name)))
-  dispatch(setMode(null))
+  dispatch(unsetMode())
 }
 
 function hasMultipleOptionsForFace(relations) {
@@ -35,7 +41,6 @@ const setApplyOptsFor = (solid, operation) => dispatch => {
 }
 
 // Apply the given operation to the given polyhedron
-// TODO won't need the "name" parameter in the new one
 export const applyOperation = (
   operation,
   polyhedron,
@@ -46,7 +51,7 @@ export const applyOperation = (
 
   dispatch(setPolyhedronRaw(result))
   if (_.isEmpty(getRelations(result.name, operation))) {
-    dispatch(setMode(null))
+    dispatch(unsetMode())
   } else {
     dispatch(setApplyOptsFor(result.name, operation))
   }

@@ -8,7 +8,7 @@ function mod(a, b) {
 
 // Get the element of the array at the given index,
 // modulo its length
-function getCyclic(array, index) {
+export function getCyclic(array, index) {
   return array[mod(index, array.length)]
 }
 
@@ -18,7 +18,6 @@ function getEdges(face) {
   })
 }
 
-// TODO optimize/clean this up
 function getAllEdges(faces) {
   return _.uniqWith(_.flatMap(faces, getEdges), _.isEqual)
 }
@@ -66,7 +65,7 @@ export function getBoundary(faces) {
   return result
 }
 
-// TODO: this is a JSX class because otherwise class properties won't be highlighted in sublime
+// NOTE: this file is .jsx because otherwise class properties won't be highlighted in sublime
 export default class Polyhedron {
   static get(name) {
     if (!isValidSolid(name)) {
@@ -252,7 +251,7 @@ export default class Polyhedron {
    * Methodes relating to pyramids, cupolae, and rotundae
    */
 
-  // TODO move all these "peak" functions to a different file
+  // FIXME move all these "peak" functions to a different file
   // Returns whether the given polyhedron at vIndex is a pyramid
   isPyramid = vIndex => {
     const adjacentFaces = this.adjacentFaces(vIndex)

@@ -6,7 +6,7 @@ import { getColorInputKey } from 'constants/configOptions'
 export const getConfig = state => state.config
 
 const getColors = createSelector(getConfig, config =>
-  mapObject(polygons, n => config[getColorInputKey(n)]),
+  mapObject(polygons, n => [n, config[getColorInputKey(n)]]),
 )
 
 export const getPolyhedronConfig = createSelector(

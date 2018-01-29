@@ -149,12 +149,10 @@ function convertTable(table) {
   }
 }
 
-// TODO figure out a way to do this without the table (or inverse the relationship)
 const [, prisms, , pyramidsCupolae, augmentations] = periodicTable
   .map(convertTable)
   .map(getKeyedTable)
 
-// const hasCupolaRotunda = index => _.includes([6, 8], index)
 const hasCupolaRotunda = name =>
   name.includes('pentagonal') && !name.includes('pyramid')
 const cupolaRotunda = pyramidsCupolae['cupola-rotunda']
@@ -185,7 +183,6 @@ const getAugmentations = using => (rowName, colName) => {
     .value()
 }
 
-// TODO I'm sure this is repeated
 const nameMapping = {
   digonal: 2,
   triangular: 3,
@@ -256,7 +253,6 @@ const basePyramidsCupolae = (() => {
   // for diminished icosahedra
   graph['A5']['+'][0].align = 'para'
 
-  // TODO don't create stray nulls
   _.forEach(pyramidsCupolae, (row, name) => {
     const {
       base,
@@ -354,7 +350,6 @@ const baseAugmentations = (() => {
         '+': { using: augmentee, value: augmented },
       },
       [augmented]: {
-        // TODO meta para
         '+': getBiAugmented(biaugmented, augmentee),
       },
       [_.isArray(biaugmented) ? biaugmented[1] : biaugmented]: {
@@ -365,7 +360,6 @@ const baseAugmentations = (() => {
   return graph
 })()
 
-// TODO this is broken too
 const diminishedIcosahedraGraph = (() => {
   return {
     J63: {
@@ -497,7 +491,6 @@ export function getRelations(solid, operation) {
   return polyhedraGraph[toConwayNotation(solid)][operation]
 }
 
-// FIXME dedupe
 const defaultAugmentees = {
   3: 'Y3',
   4: 'Y4',

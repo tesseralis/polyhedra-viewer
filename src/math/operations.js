@@ -3,21 +3,12 @@ import Polyhedron, {
   numSides,
   getBoundary,
   getDirectedEdges,
+  getCyclic as getMod,
 } from './Polyhedron'
 import { vec, getCentroid, getNormal, PRECISION } from './linAlg'
-import { replace } from 'util.js'
+import { mapObject, replace } from 'util.js'
 
 const TAU = 2 * Math.PI
-
-function mod(a, b) {
-  return a >= 0 ? a % b : a % b + b
-}
-
-// TODO deduplicate with getCyclic
-// get the element in the array mod the array's length
-function getMod(array, index) {
-  return array[mod(index, array.length)]
-}
 
 function nextVertex(face, vertex) {
   return getMod(face, face.indexOf(vertex) + 1)
@@ -51,6 +42,8 @@ function truncateVertex(newPolyhedron, polyhedron, vertex, { mock, rectify }) {
   })
 
   const newVertices = newPolyhedron.vertices.concat(verticesToAdd)
+
+  const mod = (a, b) => (a >= 0 ? a % b : a % b + b)
 
   const newFaces = newPolyhedron.faces
     .map((face, faceIndex) => {
@@ -244,7 +237,6 @@ const sharesVertex = (face1, face2) => {
 const setEquals = (array1, array2) => _.xor(array1, array2).length === 0
 
 // Get what kind of base we are augmenting to
-// TODO should I just use the "using" property to figure this out?
 function getBaseType(faces, base) {
   const adjacentFaces = faces.filter(face => sharesVertex(face, base))
   const adjacentFaceCounts = _(adjacentFaces)
@@ -427,7 +419,6 @@ function isFastigium(augmentType, underside) {
   return augmentType === 'cupola' && numSides(underside) === 4
 }
 
-// TODO handle rhombicosidodecahedron case (still don't know what terminology I want to use)
 // Return true if the base and augmentee are aligned
 function isAligned(
   polyhedron,
@@ -493,7 +484,6 @@ function isAligned(
 }
 
 // Augment the following
-// TODO digonal cupola option and rotunda option
 function doAugment(polyhedron, faceIndex, using, gyrate) {
   const { faces, vertices } = polyhedron
   const base = faces[faceIndex]
@@ -518,7 +508,6 @@ function doAugment(polyhedron, faceIndex, using, gyrate) {
     undersideVertices[1],
   )
 
-  // TODO what if they're perpendicular?
   const alignBasesNormal = (() => {
     const cross = undersideNormal.cross(baseNormal).getNormalized()
     // If they're the same (e.g. augmenting something with itself), use a random vertex on the base
@@ -546,8 +535,8 @@ function doAugment(polyhedron, faceIndex, using, gyrate) {
     gyrate,
     augmentType,
   )
-  const alignedV0 =
-    alignedAugmenteeVertices[undersideFace[baseIsAligned ? 0 : 1]]
+  const offset = baseIsAligned ? 0 : 1
+  const alignedV0 = alignedAugmenteeVertices[undersideFace[offset]]
   // align the first vertex of the base face to the first vertex of the underside face
   const alignVerticesAngle = translatedV0.angleBetween(alignedV0, true)
   const transformedAugmenteeVertices = alignedAugmenteeVertices.map(v => {
@@ -563,16 +552,25 @@ function doAugment(polyhedron, faceIndex, using, gyrate) {
   const newVertices = polyhedron.vertices.concat(
     transformedAugmenteeVertices.map(v => v.toArray()),
   )
+
+  // Map the underside vertices to the base's
+  const undersideMapping = mapObject(base, (vIndex, i) => {
+    const correspondingIndex = getMod(undersideFace, offset - i)
+    return [correspondingIndex, vIndex]
+  })
+
   const newFaces = polyhedron.faces.concat(
     augmentee.faces.map(face =>
-      face.map(index => index + polyhedron.vertices.length),
+      face.map(vIndex =>
+        _.get(undersideMapping, vIndex, vIndex + polyhedron.numVertices()),
+      ),
     ),
   )
-  _.pullAt(newFaces, [faceIndex, polyhedron.faces.length + undersideIndex])
+  // Remove the original base and underside
+  _.pullAt(newFaces, [faceIndex, polyhedron.numFaces() + undersideIndex])
 
   // remove extraneous vertices
-  // TODO manually match up the faces instead of deduplicating (which can cause precision issues)
-  return deduplicateVertices(Polyhedron.of(newVertices, newFaces))
+  return removeExtraneousVertices(Polyhedron.of(newVertices, newFaces))
 }
 
 export function getAugmentFace(polyhedron, point) {

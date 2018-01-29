@@ -36,7 +36,7 @@ const Coordinates = ({ points }) => {
 // Convert the hex color to RGB
 const toRgb = hex =>
   ['r', 'g', 'b'].map(_.propertyOf(rgb(hex))).map(d => d / 255)
-const colorIndexForFace = mapObject(polygons, _.nthArg(1))
+const colorIndexForFace = mapObject(polygons, (n, i) => [n, i])
 const getColorIndex = face => colorIndexForFace[face.length]
 const polygonColors = colors => polygons.map(n => toRgb(colors[n]))
 const getColorAttr = colors =>

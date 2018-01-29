@@ -48,10 +48,22 @@ export default class AppPage {
     return this.clickFaceIndex(fIndex)
   }
 
-  expectTransitionTo(expected) {
+  expectNoButtonWithText(text) {
+    expect(
+      this.wrapper.findWhere(n => n.type() === 'button' && n.text() === text),
+    ).toHaveLength(0)
+    return this
+  }
+
+  expectPath(path) {
     const viewer = this.wrapper.find('Viewer')
     const history = viewer.prop('history')
-    expect(history.location.pathname).toEqual(`/${expected}/related`)
+    expect(history.location.pathname).toEqual(path)
+    return this
+  }
+
+  expectTransitionTo(expected) {
+    this.expectPath(`/${expected}/related`)
     expect(
       this.wrapper
         .find('Faces')

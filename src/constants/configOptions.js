@@ -41,4 +41,7 @@ export const configInputs = [
   display: input.display || _.startCase(input.key),
 }))
 
-export const configOptions = mapObject(configInputs, _.identity, 'key')
+export const configOptions = mapObject(configInputs, value => [
+  value.key,
+  value,
+])

@@ -39,8 +39,6 @@ export default function applyOperation(
   args,
   config = {},
 ) {
-  // TODO is it a good idea to keep the defaulting logic here?
-  // It makes it harder to unit test
   let options = {}
   let applyConfig = {}
   const relations = getRelations(polyhedron.name, operation)

@@ -1,17 +1,11 @@
 import _ from 'lodash'
 
 /**
- * Create an object from the array given the value and key iteratees.
+ * Create an object from the array using the iteratee
  */
-export const mapObject = (
-  arr,
-  valueIter = _.identity,
-  keyIter = _.identity,
-) => {
-  keyIter = _.iteratee(keyIter)
-  valueIter = _.iteratee(valueIter)
+export const mapObject = (arr, iteratee) => {
   return _(arr)
-    .map((item, i) => [keyIter(item, i), valueIter(item, i)])
+    .map(iteratee)
     .fromPairs()
     .value()
 }

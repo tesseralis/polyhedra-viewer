@@ -46,23 +46,10 @@ describe('viewer', () => {
       .clickButtonWithText('elongate')
       .expectTransitionTo('elongated-square-pyramid')
       .clickButtonWithText('augment')
-    // .triggerOperation()
-    // .clickFaceWithNumSides(3)
-    // .expectTransitionTo('elongated-square-bipyramid')
-    // square pyramid?
-  })
-
-  xit('can transition through a cupola series', () => {
-    // triangular cupola?
-  })
-
-  xit('can transition through cupola-rotunda', () => {
-    //
   })
 
   it('can triaugment a trinagular prism', () => {
     setup('/triangular-prism/related')
-    // TODO do the diminishing?
     appPage
       // test gyrobifastigium
       .clickButtonWithText('augment')
@@ -81,11 +68,6 @@ describe('viewer', () => {
       .expectTransitionTo('biaugmented-triangular-prism')
       .clickFaceWithNumSides(4)
       .expectTransitionTo('triaugmented-triangular-prism')
-    // TODO check the mode has been unset?
-  })
-
-  xit('can augment a set of meta/para polyhedra', () => {
-    //
   })
 
   it('can go through a simple rhombicosadodecahedron workflow', () => {
@@ -98,5 +80,13 @@ describe('viewer', () => {
       .expectTransitionTo('bigyrate-diminished-rhombicosidodecahedron')
       .clickFaceWithNumSides(10)
       .expectTransitionTo('trigyrate-rhombicosidodecahedron')
+  })
+
+  it('unsets the mode and apply args when going to a different polyhedron', () => {
+    setup('/triangular-cupola/related')
+    appPage
+      .clickButtonWithText('augment')
+      .clickButtonWithText('elongate')
+      .expectNoButtonWithText('ortho')
   })
 })
