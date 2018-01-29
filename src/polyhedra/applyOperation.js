@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { getNextPolyhedron, getRelations } from './relations'
+import { getNextPolyhedron, getRelations, getUsingOpt } from './relations'
 import {
   truncate,
   elongate,
@@ -26,22 +26,6 @@ const operations = {
   g: gyrate,
 }
 
-// Default augmentee for each numFaces
-const defaultAugmentees = {
-  3: 'Y3',
-  4: 'Y4',
-  5: 'Y5',
-  6: 'U3',
-  8: 'U4',
-  10: 'U5',
-}
-
-const augmenteeSides = {
-  ..._.invert(defaultAugmentees),
-  U2: 4,
-  R5: 10,
-}
-
 const hasMultiple = (relations, property) =>
   _(relations)
     .map(property)
@@ -63,14 +47,10 @@ export default function applyOperation(
   if (operation === '+') {
     const fIndex = args
     const n = polyhedron.faces[fIndex].length
-    const using =
-      config.using && augmenteeSides[config.using] === n
-        ? config.using
-        : defaultAugmentees[n]
 
     applyConfig = {
       ...config,
-      using,
+      using: getUsingOpt(config.using, n),
     }
     options = {
       ...applyConfig,

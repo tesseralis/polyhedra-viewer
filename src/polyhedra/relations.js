@@ -520,6 +520,12 @@ export function getUsingOpts(solid) {
   return _.find(grouped, group => group.length > 1) || []
 }
 
+export function getUsingOpt(using, numSides) {
+  return using && augmenteeSides[using] === numSides
+    ? using
+    : defaultAugmentees[numSides]
+}
+
 // Get the polyhedron name as a result of applying the operation to the given polyhedron
 export function getNextPolyhedron(solid, operation, filterOpts) {
   const next = _(polyhedraGraph[toConwayNotation(solid)][operation])
