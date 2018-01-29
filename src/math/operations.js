@@ -181,16 +181,6 @@ const augmentees = {
   },
 }
 
-// Default augmentee for each numFaces
-const defaultAugmentees = {
-  3: 'Y3',
-  4: 'Y4',
-  5: 'Y5',
-  6: 'U3',
-  8: 'U4',
-  10: 'U5',
-}
-
 const augmentData = _.mapValues(augmentees, type =>
   _.mapValues(type, Polyhedron.get),
 )
@@ -203,19 +193,15 @@ const augmentTypes = {
   A: 'antiprism',
 }
 
-function getDefaultAugmentee(n) {
-  const [prefix, index] = defaultAugmentees[n]
-  return augmentData[augmentTypes[prefix]][index]
+function getPossibleAugmentees(n) {
+  const { pyramid, cupola, rotunda } = augmentData
+  return _.compact([pyramid[n], cupola[n / 2], rotunda[n / 2]])
 }
 
 // Checks to see if the polyhedron can be augmented at the base while remaining convex
-// TODO add ortho/gyro to the "canAugment" argument
-export function canAugment(polyhedron, faceIndex, { offset = 0 } = {}) {
+function canAugmentWith(polyhedron, faceIndex, augmentee, offset) {
   const base = polyhedron.faces[faceIndex]
   const n = base.length
-
-  // This *should* work on everything except gyrobifastigium
-  const augmentee = getDefaultAugmentee(n)
   const undersideIndex = _.findIndex(augmentee.faces, face => face.length === n)
   const undersideFace = augmentee.faces[undersideIndex]
 
@@ -223,7 +209,6 @@ export function canAugment(polyhedron, faceIndex, { offset = 0 } = {}) {
     const baseV2 = getMod(base, i + 1)
     const baseAngle = polyhedron.getDihedralAngle([baseV1, baseV2])
 
-    // todo doesn't work on cupolae
     const undersideV1 = getMod(undersideFace, i + offset)
     const undersideV2 = getMod(undersideFace, i - 1 + offset)
     const augmenteeAngle = augmentee.getDihedralAngle([
@@ -233,6 +218,20 @@ export function canAugment(polyhedron, faceIndex, { offset = 0 } = {}) {
 
     return baseAngle + augmenteeAngle < Math.PI - PRECISION
   })
+}
+
+export function canAugment(polyhedron, faceIndex) {
+  const base = polyhedron.faces[faceIndex]
+  const n = base.length
+  const augmentees = getPossibleAugmentees(n)
+  for (let augmentee of augmentees) {
+    for (let offset of [0, 1]) {
+      if (canAugmentWith(polyhedron, faceIndex, augmentee, offset)) {
+        return true
+      }
+    }
+  }
+  return false
 }
 
 const sharesVertex = (face1, face2) => {
@@ -355,31 +354,29 @@ export function getAugmentAlignment(polyhedron, fIndex) {
     : 'meta'
 }
 
-// FIXME diminished rhombicosidodecahedra
 export function getDiminishAlignment(polyhedron, vIndices) {
   const { faces } = polyhedron
   const peakBoundary = getBoundary(polyhedron.adjacentFaces(...vIndices))
 
   const maxNumSides = _.max(faces.map(numSides))
-  const rhombicos = vIndices.length > 1
+  const isRhombicosidodecahedron = vIndices.length > 1
   const diminishedIndices = polyhedron
     .fIndices()
     .filter(
       fIndex =>
         numSides(faces[fIndex]) === maxNumSides &&
-        (rhombicos && polyhedron.isCupola(fIndex)
-          ? getDiminishGyrate(polyhedron, faces[fIndex]) === 'ortho'
+        (isRhombicosidodecahedron && polyhedron.isCupola(fIndex)
+          ? (polyhedron, faces[fIndex]) === 'ortho'
           : true),
     )
 
-  // FIXME make this more stable
   return faceGraphDistance(polyhedron, diminishedIndices, peakBoundary) >=
-    (rhombicos ? 2 : 1)
+    (isRhombicosidodecahedron ? 2 : 1)
     ? 'para'
     : 'meta'
 }
 
-export function getGyrateDirection(polyhedron, vIndices) {
+export function getCupolaGyrate(polyhedron, vIndices) {
   const boundary = getBoundary(polyhedron.adjacentFaces(...vIndices))
   const isOrtho = _.every(getDirectedEdges(boundary), edge => {
     const [n1, n2] = polyhedron.faces
@@ -387,12 +384,11 @@ export function getGyrateDirection(polyhedron, vIndices) {
       .map(numSides)
     return (n1 === 4) === (n2 === 4)
   })
-  return isOrtho ? 'back' : 'forward'
+  return isOrtho ? 'ortho' : 'gyro'
 }
 
-export function getDiminishGyrate(polyhedron, vIndices) {
-  // FIXME these dependencies should be reversed
-  return getGyrateDirection(polyhedron, vIndices) === 'back' ? 'ortho' : 'gyro'
+export function getGyrateDirection(polyhedron, vIndices) {
+  return getCupolaGyrate(polyhedron, vIndices) === 'ortho' ? 'back' : 'forward'
 }
 
 export function getGyrateAlignment(polyhedron, vIndices) {
@@ -402,7 +398,7 @@ export function getGyrateAlignment(polyhedron, vIndices) {
     const cupolaBoundaries = polyhedron
       .cupolaIndices()
       .map(fIndex => faces[fIndex])
-      .filter(vIndices => getGyrateDirection(polyhedron, vIndices) === 'back')
+      .filter(vIndices => getCupolaGyrate(polyhedron, vIndices) === 'ortho')
       .map(vIndices => getBoundary(polyhedron.adjacentFaces(...vIndices)))
 
     if (cupolaBoundaries.length > 0) {
@@ -502,9 +498,8 @@ function doAugment(polyhedron, faceIndex, using, gyrate) {
   const { faces, vertices } = polyhedron
   const base = faces[faceIndex]
   const n = base.length
-  const augmenteeCode = using || defaultAugmentees[n]
-  const prefix = augmenteeCode[0]
-  const index = augmenteeCode.substring(1)
+  const prefix = using[0]
+  const index = using.substring(1)
   const baseVertices = base.map(index => vec(vertices[index]))
   const baseCenter = getCentroid(baseVertices)
   const sideLength = baseVertices[0].distanceTo(baseVertices[1])
@@ -583,10 +578,7 @@ function doAugment(polyhedron, faceIndex, using, gyrate) {
 export function getAugmentFace(polyhedron, point) {
   const hitPoint = vec(point)
   const hitFaceIndex = polyhedron.hitFaceIndex(hitPoint)
-  return canAugment(polyhedron, hitFaceIndex) ||
-    canAugment(polyhedron, hitFaceIndex, { offset: 1 })
-    ? hitFaceIndex
-    : -1
+  return canAugment(polyhedron, hitFaceIndex) ? hitFaceIndex : -1
 }
 
 function removeVertices(polyhedron, vIndices) {

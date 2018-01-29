@@ -25,7 +25,6 @@ describe('viewer', () => {
     setup('/tetrahedron/related')
 
     appPage
-      .simulateLoad()
       .clickButtonWithText('augment')
       .clickFaceIndex(0)
       .expectTransitionTo('triangular-bipyramid')
@@ -38,7 +37,6 @@ describe('viewer', () => {
     setup('/square-pyramid/related')
 
     appPage
-      .simulateLoad()
       .clickButtonWithText('augment')
       .clickFaceWithNumSides(4)
       .expectTransitionTo('octahedron')
@@ -66,7 +64,6 @@ describe('viewer', () => {
     setup('/triangular-prism/related')
     // TODO do the diminishing?
     appPage
-      .simulateLoad()
       // test gyrobifastigium
       .clickButtonWithText('augment')
       .clickButtonWithText('U2')
@@ -94,7 +91,6 @@ describe('viewer', () => {
   it('can go through a simple rhombicosadodecahedron workflow', () => {
     setup('/tridiminished-rhombicosidodecahedron/related')
     appPage
-      .simulateLoad()
       .clickButtonWithText('augment')
       .clickFaceWithNumSides(10)
       .expectTransitionTo('gyrate-bidiminished-rhombicosidodecahedron')

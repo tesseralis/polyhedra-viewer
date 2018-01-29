@@ -8,7 +8,6 @@ import applyOperation from './applyOperation'
 
 const opsToTest = ['+', '-', 'g', 'P', 'A']
 
-// FIXME deduplicate
 function isProperPolyhedron(polyhedron) {
   // Make sure edges all have the same length
   let prevSideLength
@@ -16,7 +15,6 @@ function isProperPolyhedron(polyhedron) {
     const [v1, v2] = edge.map(vIndex => polyhedron.vertexVectors()[vIndex])
     const sideLength = v1.distanceTo(v2)
     if (!_.isNil(prevSideLength)) {
-      // expect(sideLength).toBeCloseTo(prevSideLength, PRECISION_DIGITS)
       if (Math.abs(sideLength, prevSideLength) > PRECISION) {
         return false
       }
@@ -34,7 +32,6 @@ expect.extend({
   toBeValidPolyhedron(received) {
     const isProper = isProperPolyhedron(received)
     const matchesName = received.isSame(Polyhedron.get(received.name))
-    // TODO check the polyhedron is valid
     return {
       message: () => {
         if (!isProper)
@@ -81,7 +78,6 @@ describe('applyOperation', () => {
               }
             })
           })
-          console.log(optionsToTest)
 
           argsToTest.forEach(args => {
             optionsToTest.forEach(options => {
@@ -95,9 +91,6 @@ describe('applyOperation', () => {
             })
           })
         }
-        // for each user defined option and for each applicable face or vertex,
-        // do the operation
-        // check that the new name matches the new solid
       })
     })
   })

@@ -59,8 +59,8 @@ class Faces extends Component {
       throw error
     }
     // TODO implement highlighting
-    // console.log('highlight faces', highlightFaceIndices)
-    // FIXME we're duplicating these so they'll work in enzyme; they don't do anything in the actual app
+    // NOTE: The mouse handlers are duplicated to make it easy to test on enzyme.
+    // They don't actually do anything in production
     return (
       <shape
         ref={shape => (this.shape = shape)}
@@ -85,7 +85,7 @@ class Faces extends Component {
     )
   }
 
-  // FIXME find a better way to do this?
+  // Manually adding event listeners swallows errors, so we have to store it in the component itself
   wrapError = fn => event => {
     try {
       fn(event)
@@ -94,16 +94,14 @@ class Faces extends Component {
     }
   }
 
+  addEventListener(type, fn) {
+    this.shape.addEventListener(type, this.wrapError(fn))
+  }
+
   handleLoad = () => {
-    this.shape.addEventListener(
-      'mousedown',
-      this.wrapError(this.handleMouseDown),
-    )
-    this.shape.addEventListener('mouseup', this.wrapError(this.handleMouseUp))
-    this.shape.addEventListener(
-      'mousemove',
-      this.wrapError(_.throttle(this.handleMouseMove, 200)),
-    )
+    this.addEventListener('mousedown', this.handleMouseDown)
+    this.addEventListener('mouseup', this.handleMouseUp)
+    this.addEventListener('mousemove', _.throttle(this.handleMouseMove, 200))
   }
 
   handleMouseDown = () => {

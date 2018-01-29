@@ -10,7 +10,7 @@ import {
   gyrate,
   getAugmentAlignment,
   getDiminishAlignment,
-  getDiminishGyrate,
+  getCupolaGyrate,
   getGyrateDirection,
   getGyrateAlignment,
 } from 'math/operations'
@@ -58,8 +58,8 @@ export default function applyOperation(
   // TODO is it a good idea to keep the defaulting logic here?
   // It makes it harder to unit test
   let options = {}
+  let applyConfig = {}
   const relations = getRelations(polyhedron.name, operation)
-  console.log(relations)
   if (operation === '+') {
     const fIndex = args
     const n = polyhedron.faces[fIndex].length
@@ -68,12 +68,12 @@ export default function applyOperation(
         ? config.using
         : defaultAugmentees[n]
 
-    // FIXME this is inelegant
-    config.using = using
-    console.log('config', config)
-    options = {
+    applyConfig = {
       ...config,
       using,
+    }
+    options = {
+      ...applyConfig,
       align:
         hasMultiple(relations, 'align') &&
         getAugmentAlignment(polyhedron, fIndex),
@@ -88,7 +88,7 @@ export default function applyOperation(
     }
 
     if (hasMultiple(relations, 'gyrate')) {
-      options.gyrate = getDiminishGyrate(polyhedron, vIndices)
+      options.gyrate = getCupolaGyrate(polyhedron, vIndices)
     }
 
     if (options.gyrate !== 'ortho' && hasMultiple(relations, 'align')) {
@@ -113,5 +113,5 @@ export default function applyOperation(
   if (!_.isFunction(operations[operation])) {
     throw new Error(`Function not found for ${operation}`)
   }
-  return operations[operation](polyhedron, args, config).withName(next)
+  return operations[operation](polyhedron, args, applyConfig).withName(next)
 }

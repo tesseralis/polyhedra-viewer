@@ -28,12 +28,6 @@ export default class AppPage {
     return this
   }
 
-  simulateLoad() {
-    const shape = this.wrapper.find('Faces').find('shape')
-    shape.find('EventListener').prop('onLoad')()
-    return this
-  }
-
   getPolyhedron() {
     return this.wrapper.find('Faces').prop('solidData')
   }
