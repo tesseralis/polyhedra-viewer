@@ -448,7 +448,10 @@ function isAligned(
     return true
   }
 
-  if (baseType === 'prism' && polyhedron.cupolaIndices().length === 0) {
+  if (
+    baseType === 'prism' &&
+    polyhedron.cupolaIndices().length + polyhedron.rotundaIndices().length === 0
+  ) {
     return true
   }
 
