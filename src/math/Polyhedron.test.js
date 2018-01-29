@@ -36,25 +36,4 @@ describe('Polyhedron', () => {
       })
     })
   })
-
-  describe('getPyramidIndices', () => {
-    it('chooses only triangular faces that have a planar base', () => {
-      const polyhedron = Polyhedron.get('triaugmented-triangular-prism')
-      expect(polyhedron.pyramidIndices()).toEqual([1, 4, 7])
-    })
-  })
-
-  describe('getCupolaIndices', () => {
-    it('chooses only cupola faces that have a planar base', () => {
-      const polyhedron = Polyhedron.get('elongated-pentagonal-orthobicupola')
-      expect(polyhedron.cupolaIndices()).toEqual([30, 31])
-    })
-  })
-
-  describe('getRotundaIndices', () => {
-    it('chooses only rotunda faces', () => {
-      const polyhedron = Polyhedron.get('pentagonal-orthobirotunda')
-      expect(polyhedron.rotundaIndices()).toEqual([20, 26])
-    })
-  })
 })

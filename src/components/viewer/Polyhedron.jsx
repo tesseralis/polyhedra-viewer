@@ -109,6 +109,8 @@ class Faces extends Component {
     this.drag = false
   }
 
+  // FIXME if you double click you can create weird augment states
+  // (and throttling causes it to create valid states?)
   handleMouseUp = () => {
     if (this.drag) return
     const { operation, options, solidData, applyOperation } = this.props

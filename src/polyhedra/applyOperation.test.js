@@ -57,7 +57,7 @@ describe('applyOperation', () => {
           const result = applyOperation(operation, polyhedron)
           expect(result).toBeValidPolyhedron()
         } else if (_.includes(['-', 'g'], operation)) {
-          const argsToTest = polyhedron.getPeaks()
+          const argsToTest = polyhedron.peakInnerVertexIndices()
           argsToTest.forEach(args => {
             const result = applyOperation(operation, polyhedron, args)
             expect(result).toBeValidPolyhedron()

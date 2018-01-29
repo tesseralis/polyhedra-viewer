@@ -1,12 +1,13 @@
 import _ from 'lodash'
 import Polyhedron, {
   numSides,
-  getBoundary,
   getDirectedEdges,
   getCyclic as getMod,
 } from './Polyhedron'
 import { vec, getCentroid, getNormal, PRECISION } from './linAlg'
 import { mapObject, replace } from 'util.js'
+// FIXME make it so we don't need to use this
+import { getBoundary, Cupola } from './peaks'
 
 const TAU = 2 * Math.PI
 
@@ -281,8 +282,7 @@ function getOppositePrismSide(polyhedron, base) {
   })
 }
 
-function isCupolaRotunda(polyhedron, augmentType) {
-  const baseType = polyhedron.cupolaIndices().length > 0 ? 'cupola' : 'rotunda'
+function isCupolaRotunda(baseType, augmentType) {
   return _.xor(['cupola', 'rotunda'], [baseType, augmentType]).length === 0
 }
 
@@ -332,7 +332,8 @@ function faceDistanceBetweenVertices(polyhedron, vIndices1, vIndices2) {
 // Return "meta" or "para", or null
 export function getAugmentAlignment(polyhedron, fIndex) {
   // get the existing peak boundary
-  const peakBoundary = polyhedron.getPeakBoundary()
+  // FIXME verify there's only one
+  const peakBoundary = polyhedron.peaks()[0].boundary()
   const isHexagonalPrism = _.some(
     polyhedron.faces,
     face => numSides(face) === 6,
@@ -357,7 +358,7 @@ export function getDiminishAlignment(polyhedron, vIndices) {
     .filter(
       fIndex =>
         numSides(faces[fIndex]) === maxNumSides &&
-        (isRhombicosidodecahedron && polyhedron.isCupola(fIndex)
+        (isRhombicosidodecahedron && new Cupola(polyhedron, fIndex).isValid()
           ? (polyhedron, faces[fIndex]) === 'ortho'
           : true),
     )
@@ -388,8 +389,7 @@ export function getGyrateAlignment(polyhedron, vIndices) {
   const boundary = getBoundary(polyhedron.adjacentFaces(...vIndices))
   const vIndicesToCheck = (() => {
     const cupolaBoundaries = polyhedron
-      .cupolaIndices()
-      .map(fIndex => faces[fIndex])
+      .peakInnerVertexIndices()
       .filter(vIndices => getCupolaGyrate(polyhedron, vIndices) === 'ortho')
       .map(vIndices => getBoundary(polyhedron.adjacentFaces(...vIndices)))
 
@@ -435,10 +435,7 @@ function isAligned(
     return true
   }
 
-  if (
-    baseType === 'prism' &&
-    polyhedron.cupolaIndices().length + polyhedron.rotundaIndices().length === 0
-  ) {
+  if (baseType === 'prism' && polyhedron.peaks().length === 0) {
     return true
   }
 
@@ -476,7 +473,7 @@ function isAligned(
 
   // "ortho" or "gyro" is actually determined by whether the *tops* are aligned, not the bottoms
   // So for a cupola-rotunda, it's actually the opposite of everything else
-  if (isCupolaRotunda(polyhedron, augmentType)) {
+  if (isCupolaRotunda(polyhedron.peaks()[0].type, augmentType)) {
     return isOrtho !== (gyrate === 'ortho')
   }
 

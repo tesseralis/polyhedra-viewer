@@ -1,6 +1,7 @@
 import _ from 'lodash'
 import { isValidSolid, getSolidData } from 'data'
 import { vec, isPlanar, getPlane, getCentroid } from './linAlg'
+import { Peak } from './peaks'
 
 function mod(a, b) {
   return a >= 0 ? a % b : a % b + b
@@ -33,37 +34,6 @@ export const numSides = face => face.length
 
 // Return if the two faces share an edge
 const shareEdge = (face1, face2) => _.intersection(face1, face2).length === 2
-
-// Get a face representing the boundary of the faces
-export function getBoundary(faces) {
-  const edges = {}
-  // build up a lookup table for every pair of edges to that face
-  _.forEach(faces, (face, index) => {
-    // for the pairs of vertices, find the face that contains the corresponding pair
-    _.forEach(getDirectedEdges(face), edge => {
-      const [i1, i2] = edge
-      if (_.includes(edges[i2], i1)) {
-        _.pull(edges[i2], i1)
-      } else {
-        if (!edges[i1]) {
-          edges[i1] = []
-        }
-        edges[i1].push(i2)
-      }
-    })
-  })
-
-  const cycle = _(edges)
-    .pickBy('length')
-    .mapValues(0)
-    .value()
-  const first = _.values(cycle)[0]
-  const result = [first]
-  for (let i = cycle[first]; i !== first; i = cycle[i]) {
-    result.push(i)
-  }
-  return result
-}
 
 // NOTE: this file is .jsx because otherwise class properties won't be highlighted in sublime
 export default class Polyhedron {
@@ -247,95 +217,6 @@ export default class Polyhedron {
     return _.isEqual(this.faceAdjacencyList(), other.faceAdjacencyList())
   }
 
-  /*
-   * Methodes relating to pyramids, cupolae, and rotundae
-   */
-
-  // FIXME move all these "peak" functions to a different file
-  // Returns whether the given polyhedron at vIndex is a pyramid
-  isPyramid = vIndex => {
-    const adjacentFaces = this.adjacentFaces(vIndex)
-    if (!_.every(adjacentFaces, { length: 3 })) return false
-    const boundary = getBoundary(adjacentFaces)
-    return this.isPlanar(boundary)
-  }
-
-  cupolaFaceIndices = fIndex => this.adjacentFaceIndices(...this.faces[fIndex])
-
-  isCupola = fIndex => {
-    const face = this.faces[fIndex]
-    const cupolaCount = _.countBy([3, 4, 4, numSides(face)])
-    // Ensure that each bounding vertex has the right faces
-    const matchFaces = _.every(face, vIndex => {
-      const faceCount = this.adjacentFaceCount(vIndex)
-      if (!_.isEqual(faceCount, cupolaCount)) return false
-
-      // Make sure that the square faces aren't adjacent
-      const [sqFace1, sqFace2] = _.filter(
-        this.adjacentFaces(vIndex),
-        nbrFace => numSides(nbrFace) === 4 && !_.isEqual(nbrFace, face),
-      )
-      return !shareEdge(sqFace1, sqFace2)
-    })
-
-    if (!matchFaces) return false
-
-    // make sure the whole thing is on a plane
-    const allNeighborFaces = this.adjacentFaces(...face)
-    return this.isPlanar(getBoundary(allNeighborFaces))
-  }
-
-  isFastigium = edge => {
-    const fastigiumCount = { 3: 1, 4: 2 }
-    const matchFaces = _.every(edge, vIndex => {
-      const faceCount = this.adjacentFaceCount(vIndex)
-      return _.isEqual(faceCount, fastigiumCount)
-    })
-    if (!matchFaces) return false
-    // make sure the whole thing is on a plane
-    const allNeighborFaces = this.adjacentFaces(...edge)
-    return this.isPlanar(getBoundary(allNeighborFaces))
-  }
-
-  fastigiumFaceIndices = vIndices => this.adjacentFaceIndices(...vIndices)
-
-  rotundaFaceIndices = fIndex =>
-    this.adjacentFaceIndices(
-      ...this.adjacentVertexIndices(...this.faces[fIndex]),
-    )
-
-  isRotunda = fIndex => {
-    const face = this.faces[fIndex]
-    const nbrIndices = this.adjacentVertexIndices(...face)
-    const rotundaCount = { 5: 2, 3: 2 }
-    const matchFaces = _.every(nbrIndices, vIndex => {
-      const faceCount = this.adjacentFaceCount(vIndex)
-      return _.isEqual(faceCount, rotundaCount)
-    })
-    if (!matchFaces) return false
-    const nbrFaces = this.adjacentFaces(...nbrIndices)
-    return this.isPlanar(getBoundary(nbrFaces))
-  }
-
-  // Get the vertex indices of the polyhedron that represent the tops of pyramids
-  pyramidIndices = _.memoize(() => {
-    return this.vIndices().filter(this.isPyramid)
-  })
-
-  fastigiumIndices = _.memoize(() => {
-    return this.edges.filter(this.isFastigium)
-  })
-
-  cupolaIndices = _.memoize(() => {
-    // Return the face indices of all the faces that are tops of cupolae
-    // find the face in the polyhedron whose vertices' adjacent faces are <face>-4-3-4
-    return this.fIndices().filter(this.isCupola)
-  })
-
-  rotundaIndices = _.memoize(() => {
-    return this.fIndices().filter(this.isRotunda)
-  })
-
   hitFaceIndex(point) {
     return _.minBy(this.fIndices(), fIndex => {
       const face = this.faces[fIndex]
@@ -344,111 +225,28 @@ export default class Polyhedron {
     })
   }
 
-  getPeakBoundary() {
-    const pyramidIndices = this.pyramidIndices()
-    if (pyramidIndices.length > 0) {
-      if (pyramidIndices.length > 1) {
-        throw new Error('More than one pyramid found on polyhedron')
-      }
-      return this.adjacentVertexIndices(pyramidIndices[0])
-    }
-
-    const cupolaIndices = this.cupolaIndices()
-    if (cupolaIndices.length > 0) {
-      if (cupolaIndices.length > 1) {
-        throw new Error('More than one cupola found on polyhedron')
-      }
-      return getBoundary(
-        this.cupolaFaceIndices(cupolaIndices[0]).map(
-          fIndex => this.faces[fIndex],
-        ),
-      )
-    }
-    throw new Error('No peaks found on polyhedron')
+  peaks() {
+    return Peak.getAll(this)
   }
 
-  getPeaks() {
-    if (this.pyramidIndices().length > 0)
-      return this.pyramidIndices().map(_.castArray)
-    if (this.fastigiumIndices().length > 0) return this.fastigiumIndices()
-    if (this.cupolaIndices().length + this.rotundaIndices().length > 0) {
-      return this.cupolaIndices()
-        .map(fIndex => this.faces[fIndex])
-        .concat(
-          this.rotundaIndices().map(fIndex =>
-            this.adjacentVertexIndices(...this.faces[fIndex]),
-          ),
-        )
-    }
+  peakInnerVertexIndices() {
+    return this.peaks().map(peak => peak.innerVertexIndices())
   }
 
-  /**
-   * Find the nearest pyramid, cupola, or rotunda in the solid to the provided hit point.
-   * Return the "peak" vertices, or null if the point is not part of any peak.
-   * @param exclude a list of codes for solids to exclude (Y, U, R)
-   */
-  findPeak(point, exclude = {}) {
-    const { faces, vertices } = this
+  findPeak(point) {
     const hitPoint = vec(point)
     const hitFaceIndex = this.hitFaceIndex(hitPoint)
-    const pyramidIndices = _.includes(exclude, 'Y') ? [] : this.pyramidIndices()
-
-    // A solid can have only pyramids or cupolae/rotundae, so it suffices to check for one
-    if (pyramidIndices.length > 0) {
-      // check if we're inside any pyramid
-      const pyramidFaces = _.flatMap(pyramidIndices, vIndex =>
-        this.adjacentFaceIndices(vIndex),
-      )
-      if (!_.includes(pyramidFaces, hitFaceIndex)) {
-        return null
-      }
-
-      const nearestPeak = _.minBy(pyramidIndices, vIndex => {
-        const vertex = vec(vertices[vIndex])
-        return vertex.distanceTo(hitPoint)
-      })
-      return [nearestPeak]
-    }
-
-    // Cupolae and rotundae
-    const fastigiumIndices = _.includes(exclude, 'U2')
-      ? []
-      : this.fastigiumIndices().filter(vIndices =>
-          _.includes(this.fastigiumFaceIndices(vIndices), hitFaceIndex),
-        )
-
-    if (fastigiumIndices.length > 0) {
-      return fastigiumIndices[0]
-    }
-
-    const cupolaIndices = _.includes(exclude, 'U')
-      ? []
-      : this.cupolaIndices().filter(fIndex =>
-          _.includes(this.cupolaFaceIndices(fIndex), hitFaceIndex),
-        )
-
-    const rotundaIndices = _.includes(exclude, 'R')
-      ? []
-      : this.rotundaIndices().filter(fIndex =>
-          _.includes(this.rotundaFaceIndices(fIndex), hitFaceIndex),
-        )
-
-    // check if we're inside any cupola or rotunda
-    if (cupolaIndices.length + rotundaIndices.length === 0) {
+    const peaks = this.peaks().filter(peak =>
+      _.includes(peak.faceIndices(), hitFaceIndex),
+    )
+    console.log(peaks)
+    if (peaks.length === 0) {
       return null
     }
-
-    // if so, determine the closest cupola point to this
-    const nearestPeak = _.minBy(
-      cupolaIndices.concat(rotundaIndices),
-      fIndex => {
-        const plane = getPlane(_.at(this.vertexVectors(), faces[fIndex]))
-        return plane.getDistanceToPoint(hitPoint)
-      },
+    const nearestPeak = _.minBy(peaks, peak =>
+      vec(peak.topPoint()).distanceTo(hitPoint),
     )
 
-    return _.includes(cupolaIndices, nearestPeak)
-      ? faces[nearestPeak]
-      : this.adjacentVertexIndices(...faces[nearestPeak])
+    return nearestPeak.innerVertexIndices()
   }
 }
