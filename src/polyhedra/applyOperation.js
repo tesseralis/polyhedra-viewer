@@ -68,9 +68,9 @@ export default function applyOperation(
         ? config.using
         : defaultAugmentees[n]
 
-    console.log(n, config.using, using)
     // FIXME this is inelegant
     config.using = using
+    console.log('config', config)
     options = {
       ...config,
       using,

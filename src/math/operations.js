@@ -471,6 +471,11 @@ function isAligned(
     _.last(underside),
   ])
 
+  if (baseType === 'rhombicosidodecahedron') {
+    const isOrtho = (numSides(adjFace) !== 4) === (numSides(alignedFace) !== 4)
+    return isOrtho === (gyrate === 'ortho')
+  }
+
   // It's orthogonal if triangle faces are aligned or non-triangle faces are aligned
   const isOrtho = (numSides(adjFace) !== 3) === (numSides(alignedFace) !== 3)
 
