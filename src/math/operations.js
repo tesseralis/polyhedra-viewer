@@ -3,7 +3,6 @@ import Polyhedron from './Polyhedron'
 import { vec, getCentroid, getNormal, PRECISION } from './linAlg'
 import { mapObject, replace } from 'util.js'
 // FIXME make it so we don't need to use this
-import { Cupola } from './peaks'
 import {
   getDirectedEdges,
   getBoundary,
@@ -353,17 +352,30 @@ export function getDiminishAlignment(polyhedron, vIndices) {
   const { faces } = polyhedron
   const peakBoundary = getBoundary(polyhedron.adjacentFaces(...vIndices))
 
-  const maxNumSides = _.max(faces.map(numSides))
   const isRhombicosidodecahedron = vIndices.length > 1
-  const diminishedIndices = polyhedron
-    .fIndices()
+  console.log(isRhombicosidodecahedron)
+  const orthoIndices = polyhedron
+    .peaks()
     .filter(
-      fIndex =>
-        numSides(faces[fIndex]) === maxNumSides &&
-        (isRhombicosidodecahedron && new Cupola(polyhedron, fIndex).isValid()
-          ? (polyhedron, faces[fIndex]) === 'ortho'
-          : true),
+      peak =>
+        peak.type === 'cupola' &&
+        getCupolaGyrate(polyhedron, peak.innerVertexIndices()) === 'ortho',
     )
+    .map(peak => peak.fIndex)
+  console.log('orthoIndices', orthoIndices)
+  const maxNumSides = _.max(faces.map(numSides))
+  const diminishedIndices =
+    orthoIndices.length > 0
+      ? orthoIndices
+      : polyhedron
+          .fIndices()
+          .filter(fIndex => numSides(faces[fIndex]) === maxNumSides)
+  console.log('diminishedIndices', diminishedIndices)
+  console.log('peakBoundary: ', peakBoundary)
+  console.log(
+    'fgd',
+    faceGraphDistance(polyhedron, diminishedIndices, peakBoundary),
+  )
 
   return faceGraphDistance(polyhedron, diminishedIndices, peakBoundary) >=
     (isRhombicosidodecahedron ? 2 : 1)

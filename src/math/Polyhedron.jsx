@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import { isValidSolid, getSolidData } from 'data'
 import { vec, isPlanar, getPlane, getCentroid } from './linAlg'
-import { Peak } from './peaks'
+import Peak from './Peak'
 import { numSides, getCyclic, getDirectedEdges } from './solidUtils'
 
 function getEdges(face) {
