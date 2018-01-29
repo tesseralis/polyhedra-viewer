@@ -1,13 +1,15 @@
 import _ from 'lodash'
-import Polyhedron, {
-  numSides,
-  getDirectedEdges,
-  getCyclic as getMod,
-} from './Polyhedron'
+import Polyhedron from './Polyhedron'
 import { vec, getCentroid, getNormal, PRECISION } from './linAlg'
 import { mapObject, replace } from 'util.js'
 // FIXME make it so we don't need to use this
-import { getBoundary, Cupola } from './peaks'
+import { Cupola } from './peaks'
+import {
+  getDirectedEdges,
+  getBoundary,
+  numSides,
+  getCyclic as getMod,
+} from './solidUtils'
 
 const TAU = 2 * Math.PI
 

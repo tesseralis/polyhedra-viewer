@@ -1,49 +1,5 @@
 import _ from 'lodash'
-// FIXME dedupe
-// Get the element of the array at the given index,
-// modulo its length
-function mod(a, b) {
-  return a >= 0 ? a % b : a % b + b
-}
-export function getCyclic(array, index) {
-  return array[mod(index, array.length)]
-}
-export function getDirectedEdges(face) {
-  return _.map(face, (vertex, index) => {
-    return [vertex, getCyclic(face, index + 1)]
-  })
-}
-
-// Get a face representing the boundary of the faces
-export function getBoundary(faces) {
-  const edges = {}
-  // build up a lookup table for every pair of edges to that face
-  _.forEach(faces, (face, index) => {
-    // for the pairs of vertices, find the face that contains the corresponding pair
-    _.forEach(getDirectedEdges(face), edge => {
-      const [i1, i2] = edge
-      if (_.includes(edges[i2], i1)) {
-        _.pull(edges[i2], i1)
-      } else {
-        if (!edges[i1]) {
-          edges[i1] = []
-        }
-        edges[i1].push(i2)
-      }
-    })
-  })
-
-  const cycle = _(edges)
-    .pickBy('length')
-    .mapValues(0)
-    .value()
-  const first = _.values(cycle)[0]
-  const result = [first]
-  for (let i = cycle[first]; i !== first; i = cycle[i]) {
-    result.push(i)
-  }
-  return result
-}
+import { getBoundary } from './solidUtils'
 
 export class Peak {
   static getAll(polyhedron) {
@@ -67,9 +23,9 @@ export class Peak {
 
   innerVertexIndices() {}
 
-  _isValid() {}
-
   topPoint() {}
+
+  faceConfiguration() {}
 
   faceIndices = _.memoize(() => {
     return this.polyhedron.adjacentFaceIndices(...this.innerVertexIndices())
@@ -84,7 +40,11 @@ export class Peak {
   })
 
   isValid() {
-    return this._isValid() && this.polyhedron.isPlanar(this.boundary())
+    const matchFaces = _.every(this.innerVertexIndices(), vIndex => {
+      const faceCount = this.polyhedron.adjacentFaceCount(vIndex)
+      return _.isEqual(faceCount, this.faceConfiguration())
+    })
+    return matchFaces && this.polyhedron.isPlanar(this.boundary())
   }
 }
 export class Pyramid extends Peak {
@@ -104,9 +64,7 @@ export class Pyramid extends Peak {
     return [this.vIndex]
   }
 
-  _isValid() {
-    return _.every(this.faces(), { length: 3 })
-  }
+  faceConfiguration = () => ({ 3: this.faces().length })
 
   topPoint() {
     return this.polyhedron.vertices[this.vIndex]
@@ -129,13 +87,7 @@ export class Fastigium extends Peak {
     return this.edge
   }
 
-  _isValid() {
-    const fastigiumCount = { 3: 1, 4: 2 }
-    return _.every(this.edge, vIndex => {
-      const faceCount = this.polyhedron.adjacentFaceCount(vIndex)
-      return _.isEqual(faceCount, fastigiumCount)
-    })
-  }
+  faceConfiguration = () => ({ 3: 1, 4: 2 })
 
   topPoint() {
     const [v1, v2] = this.edge.map(v => this.polyhedron.vertexVectors()[v])
@@ -143,8 +95,6 @@ export class Fastigium extends Peak {
     return midpoint.toArray()
   }
 }
-
-// const shareEdge = (face1, face2) => _.intersection(face1, face2).length === 2
 
 export class Cupola extends Peak {
   static getAll(polyhedron) {
@@ -163,15 +113,8 @@ export class Cupola extends Peak {
     return this.polyhedron.faces[this.fIndex]
   })
 
-  _isValid() {
-    const face = this.innerVertexIndices()
-    const cupolaCount = _.countBy([3, 4, 4, face.length])
-    // Ensure that each bounding vertex has the right faces
-    return _.every(face, vIndex => {
-      const faceCount = this.polyhedron.adjacentFaceCount(vIndex)
-      return _.isEqual(faceCount, cupolaCount)
-    })
-  }
+  faceConfiguration = () =>
+    _.countBy([3, 4, 4, this.innerVertexIndices().length])
 
   topPoint() {
     return this.polyhedron.faceCentroid(this.fIndex)
@@ -197,14 +140,7 @@ export class Rotunda extends Peak {
     )
   })
 
-  _isValid() {
-    const nbrIndices = this.innerVertexIndices()
-    const rotundaCount = { 5: 2, 3: 2 }
-    return _.every(nbrIndices, vIndex => {
-      const faceCount = this.polyhedron.adjacentFaceCount(vIndex)
-      return _.isEqual(faceCount, rotundaCount)
-    })
-  }
+  faceConfiguration = () => ({ 5: 2, 3: 2 })
 
   topPoint() {
     return this.polyhedron.faceCentroid(this.fIndex)

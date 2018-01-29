@@ -2,16 +2,7 @@ import _ from 'lodash'
 import { isValidSolid, getSolidData } from 'data'
 import { vec, isPlanar, getPlane, getCentroid } from './linAlg'
 import { Peak } from './peaks'
-
-function mod(a, b) {
-  return a >= 0 ? a % b : a % b + b
-}
-
-// Get the element of the array at the given index,
-// modulo its length
-export function getCyclic(array, index) {
-  return array[mod(index, array.length)]
-}
+import { numSides, getCyclic, getDirectedEdges } from './solidUtils'
 
 function getEdges(face) {
   return _.map(face, (vertex, index) => {
@@ -22,18 +13,6 @@ function getEdges(face) {
 function getAllEdges(faces) {
   return _.uniqWith(_.flatMap(faces, getEdges), _.isEqual)
 }
-
-export function getDirectedEdges(face) {
-  return _.map(face, (vertex, index) => {
-    return [vertex, getCyclic(face, index + 1)]
-  })
-}
-
-// Return the number of sides of a face
-export const numSides = face => face.length
-
-// Return if the two faces share an edge
-const shareEdge = (face1, face2) => _.intersection(face1, face2).length === 2
 
 // NOTE: this file is .jsx because otherwise class properties won't be highlighted in sublime
 export default class Polyhedron {
@@ -225,7 +204,7 @@ export default class Polyhedron {
     })
   }
 
-  peaks() {
+  peaks = () => {
     return Peak.getAll(this)
   }
 
@@ -239,7 +218,6 @@ export default class Polyhedron {
     const peaks = this.peaks().filter(peak =>
       _.includes(peak.faceIndices(), hitFaceIndex),
     )
-    console.log(peaks)
     if (peaks.length === 0) {
       return null
     }
