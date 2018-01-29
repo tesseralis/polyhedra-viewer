@@ -81,6 +81,43 @@ function truncateVertex(
   return Polyhedron.of(newVertices, newFaces)
 }
 
+// Remove vertices (and faces) from the polyhedron when they are all the same
+function deduplicateVertices(polyhedron) {
+  // group vertex indices by same
+  const vertices = polyhedron.vertices.map(vec)
+  const points = []
+  const verticesByPoint = {}
+  _.forEach(vertices, (vertex, index) => {
+    const pointIndex = _.findIndex(points, point =>
+      vertex.equalsWithTolerance(point, PRECISION),
+    )
+    if (pointIndex === -1) {
+      points.push(vertex)
+      verticesByPoint[points.length - 1] = [index]
+    } else {
+      verticesByPoint[pointIndex].push(index)
+    }
+  })
+  console.log('verticesByPoint: ', verticesByPoint)
+
+  // replace vertices that are the same
+  let newFaces = polyhedron.faces
+  _.forEach(verticesByPoint, groupedVertices => {
+    if (groupedVertices.length <= 1) return
+    newFaces = newFaces.map(face =>
+      face.map(
+        vertex =>
+          _.includes(groupedVertices, vertex) ? groupedVertices[0] : vertex,
+      ),
+    )
+  })
+  // remove vertices in faces and extraneous faces
+  newFaces = newFaces.map(_.uniq).filter(face => numSides(face) >= 3)
+
+  // remove extraneous vertices
+  return removeExtraneousVertices(polyhedron.withFaces(newFaces))
+}
+
 /**
  * Remove vertices in the polyhedron that aren't connected to any faces,
  * and remap the faces to the smaller indices
@@ -116,8 +153,7 @@ export function truncate(polyhedron, options) {
   _.forEach(polyhedron.vertices, (vertex, index) => {
     newPolyhedron = truncateVertex(newPolyhedron, polyhedron, index, options)
   })
-  // TODO remove duplicate vertices when cantellating
-  return removeExtraneousVertices(newPolyhedron)
+  return deduplicateVertices(newPolyhedron)
 }
 
 export function rectify(polyhedron) {
