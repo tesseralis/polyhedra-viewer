@@ -368,6 +368,21 @@ export default class Polyhedron {
     throw new Error('No peaks found on polyhedron')
   }
 
+  getPeaks() {
+    if (this.pyramidIndices().length > 0)
+      return this.pyramidIndices().map(_.castArray)
+    if (this.fastigiumIndices().length > 0) return this.fastigiumIndices()
+    if (this.cupolaIndices().length + this.rotundaIndices().length > 0) {
+      return this.cupolaIndices()
+        .map(fIndex => this.faces[fIndex])
+        .concat(
+          this.rotundaIndices().map(fIndex =>
+            this.adjacentVertexIndices(...this.faces[fIndex]),
+          ),
+        )
+    }
+  }
+
   /**
    * Find the nearest pyramid, cupola, or rotunda in the solid to the provided hit point.
    * Return the "peak" vertices, or null if the point is not part of any peak.

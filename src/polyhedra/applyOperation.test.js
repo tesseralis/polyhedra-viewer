@@ -59,13 +59,7 @@ describe('applyOperation', () => {
           const result = applyOperation(operation, polyhedron)
           expect(result).toBeValidPolyhedron()
         } else if (_.includes(['-', 'g'], operation)) {
-          const argsToTest = polyhedron
-            .fIndices()
-            .map(fIndex => {
-              const point = polyhedron.faceCentroid(fIndex)
-              return polyhedron.findPeak(point)
-            })
-            .filter(_.identity)
+          const argsToTest = polyhedron.getPeaks()
           argsToTest.forEach(args => {
             const result = applyOperation(operation, polyhedron, args)
             expect(result).toBeValidPolyhedron()
