@@ -30,6 +30,14 @@ const operations = {
   g: gyrate,
 }
 
+const platonicMap = {
+  T: 3,
+  C: 3,
+  O: 4,
+  D: 3,
+  I: 5,
+}
+
 const hasMultiple = (relations, property) =>
   _(relations)
     .map(property)
@@ -93,7 +101,11 @@ export default function applyOperation(
         options.align = getPeakAlignment(polyhedron, peak)
       }
     }
+  } else if (operation === '~r') {
+    applyConfig = { faceType: platonicMap[config.value] }
+    options = config
   }
+
   const next = getNextPolyhedron(polyhedron.name, operation, _.pickBy(options))
   if (!_.isFunction(operations[operation])) {
     throw new Error(`Function not found for ${operation}`)

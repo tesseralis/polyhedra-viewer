@@ -1,14 +1,7 @@
 import _ from 'lodash'
 import { geom } from 'toxiclibsjs'
 import Polyhedron from './Polyhedron'
-import {
-  vec,
-  getMidpoint,
-  getPlane,
-  getCentroid,
-  getNormal,
-  PRECISION,
-} from './linAlg'
+import { vec, getMidpoint, getCentroid, getNormal, PRECISION } from './linAlg'
 import { mapObject, replace } from 'util.js'
 import { getDirectedEdges, numSides, getCyclic as getMod } from './solidUtils'
 import Peak from './Peak'
@@ -35,12 +28,11 @@ function directedAdjacentFaceIndices(polyhedron, vIndex) {
   const touchingFaceIndices = _.clone(polyhedron.adjacentFaceIndices(vIndex))
   const result = []
   let next = touchingFaceIndices[0]
+  const checkVertex = f =>
+    prevVertex(faces[next], vIndex) === nextVertex(faces[f], vIndex)
   do {
     result.push(next)
-    next = _.find(
-      touchingFaceIndices,
-      f => prevVertex(faces[next], vIndex) === nextVertex(faces[f], vIndex),
-    )
+    next = _.find(touchingFaceIndices, checkVertex)
   } while (result.length < touchingFaceIndices.length)
   return result
 }
@@ -175,7 +167,7 @@ export function rectify(polyhedron) {
   return truncate(polyhedron, { rectify: true })
 }
 
-export function antitruncate(polyhedron, { faceType } = {}) {
+export function antitruncate(polyhedron, args, { faceType } = {}) {
   const { vertices, faces } = polyhedron
   const n = faceType || _.min(faces.map(numSides))
   const fIndices = polyhedron

@@ -164,15 +164,16 @@ function RelatedPolyhedra({
         }
         return (
           <div key={operation} className={css(styles.operations)}>
-            {_.compact(related[operation]).map(value => {
-              const nextValue = _.isObject(value) ? value.value : value
+            {_.compact(related[operation]).map(relation => {
+              const nextValue = relation.value
               if (!nextValue) return null
               const name = fromConwayNotation(nextValue)
               return (
                 <button
                   key={name}
                   className={css(styles.modeButton)}
-                  onClick={() => applyOperation(operation, polyhedron)}
+                  onClick={() =>
+                    applyOperation(operation, polyhedron, null, relation)}
                 >
                   {operations[operation]}
                 </button>

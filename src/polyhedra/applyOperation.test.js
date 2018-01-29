@@ -6,7 +6,9 @@ import Polyhedron from 'math/polyhedron'
 import { canAugment } from 'math/operations'
 import applyOperation from './applyOperation'
 
-const opsToTest = ['t', 'r', '~t', '~r', '+', '-', 'g', 'P', 'A', '~P', '~A']
+const archimedeanOpts = ['t', 'r', '~t', '~r']
+const johnsonOpts = ['+', '-', 'g', 'P', 'A', '~P', '~A']
+const opsToTest = johnsonOpts
 
 function isProperPolyhedron(polyhedron) {
   // Make sure edges all have the same length
