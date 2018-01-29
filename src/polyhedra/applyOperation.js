@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { getNextPolyhedron, getOperations } from './relations'
+import { getNextPolyhedron, getRelations } from './relations'
 import {
   truncate,
   elongate,
@@ -38,7 +38,7 @@ export default function applyOperation(
   // TODO is it a good idea to keep the defaulting logic here?
   // It makes it harder to unit test
   let options = {}
-  const relations = getOperations(polyhedron.name, operation)
+  const relations = getRelations(polyhedron.name, operation)
   if (operation === '+') {
     const fIndex = args
     options = {
@@ -88,5 +88,8 @@ export default function applyOperation(
     console.log(relations)
   }
   const next = getNextPolyhedron(polyhedron.name, operation, _.pickBy(options))
+  if (!_.isFunction(operations[operation])) {
+    throw new Error(`Function not found for ${operation}`)
+  }
   return operations[operation](polyhedron, args, config).withName(next)
 }

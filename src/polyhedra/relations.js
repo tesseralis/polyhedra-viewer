@@ -45,17 +45,23 @@ const archimedean = {
 
 // Make everything an array
 function normalize(graph) {
-  return _.mapValues(graph, ops => _.mapValues(ops, _.castArray))
+  return _.mapValues(graph, ops =>
+    _.mapValues(ops, relations => {
+      return _.castArray(relations).map(
+        relation => (_.isObject(relation) ? relation : { value: relation }),
+      )
+    }),
+  )
 }
 
 function compact(graph) {
   return _.mapValues(graph, ops =>
-    _.mapValues(ops, options => {
-      return _.filter(options, option => {
-        const val = _.isObject(option) ? option.value : option
-        return !_.isNil(val)
+    _(ops)
+      .mapValues(options => {
+        return _.filter(options, option => !_.isNil(option.value))
       })
-    }),
+      .pickBy('length')
+      .value(),
   )
 }
 
@@ -89,7 +95,7 @@ function makeBidirectional(graph) {
   for (let [source, operations] of Object.entries(graph)) {
     for (let [operation, sinks] of Object.entries(operations)) {
       for (let sink of sinks) {
-        const sinkValue = _.isObject(sink) ? sink.value : sink
+        const sinkValue = sink.value
         if (!sinkValue) {
           continue
         }
@@ -103,8 +109,8 @@ function makeBidirectional(graph) {
         if (sinkValue === source) {
           continue
         }
-        const newValue = _.isObject(sink) ? { ...sink, value: source } : source
-        if (operation === 'g' && _.isObject(newValue) && sink.direction) {
+        const newValue = { ...sink, value: source }
+        if (operation === 'g' && sink.direction) {
           newValue.direction = 'back'
         }
         result[sinkValue][reverseOp].push(newValue)
@@ -480,11 +486,12 @@ const normalized = [
 const baseGraph = graphMerge(...normalized)
 export const polyhedraGraph = makeBidirectional(baseGraph)
 
-export function hasOperation(solid, operation) {
-  return _.has(polyhedraGraph[toConwayNotation(solid)], operation)
+// Get the operations that can be applied to the given solid
+export function getOperations(solid) {
+  return _.keys(polyhedraGraph[toConwayNotation(solid)])
 }
 
-export function getOperations(solid, operation) {
+export function getRelations(solid, operation) {
   return polyhedraGraph[toConwayNotation(solid)][operation]
 }
 
@@ -506,8 +513,6 @@ export function getNextPolyhedron(solid, operation, filterOpts) {
       )}. Are you sure you didn't put in too many?`,
     )
   }
-  const val = next[0]
-  const notation = _.isObject(val) ? val.value : val
 
-  return fromConwayNotation(notation)
+  return fromConwayNotation(next[0].value)
 }

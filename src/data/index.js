@@ -31,12 +31,13 @@ export const groups = groupData.map(group => ({
   ...getNestedPolyhedra(group.name),
 }))
 
-const allSolidNames = _.flatMap(flatGroups, 'polyhedra')
+export const allSolidNames = _.flatMap(flatGroups, 'polyhedra')
 
 export const isValidSolid = escapedSolidName => {
   return allSolidNames.includes(escapedSolidName.replace(/-/g, ' '))
 }
 
-export const getSolidData = escapedSolidName => {
-  return require(`data/polyhedra/${escapedSolidName}.json`)
+// TODO make name escaping consistent *again*
+export const getSolidData = solidName => {
+  return require(`data/polyhedra/${solidName.replace(/ /g, '-')}.json`)
 }

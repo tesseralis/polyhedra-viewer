@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { hasOperation, getOperations } from 'polyhedra/relations'
+import { getRelations } from 'polyhedra/relations'
 import { isValidSolid } from 'data'
 import { setPolyhedron as setPolyhedronRaw } from 'reducers/polyhedron'
 import { setOperation, setApplyOpts } from 'reducers/controls'
@@ -17,7 +17,7 @@ export const setPolyhedron = name => dispatch => {
 
 const setApplyOptsFor = (solid, operation) => dispatch => {
   if (!solid) return
-  const relations = getOperations(solid, operation)
+  const relations = getRelations(solid, operation)
   const newOpts = { gyrate: null, using: null }
   if (operation === '+') {
     if (_.filter(relations, 'gyrate').length > 1) {
@@ -41,7 +41,7 @@ export const applyOperation = (
   const result = doApplyOperation(operation, polyhedron, args, options)
 
   dispatch(setPolyhedronRaw(result))
-  if (!hasOperation(result.name, operation)) {
+  if (_.isEmpty(getRelations(result.name, operation))) {
     dispatch(setMode(null))
   } else {
     dispatch(setApplyOptsFor(result.name, operation))
