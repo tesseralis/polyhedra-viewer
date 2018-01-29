@@ -43,7 +43,11 @@ const augmenteeSides = {
 }
 
 const hasMultiple = (relations, property) =>
-  _.uniqBy(relations, property).length > 1
+  _(relations)
+    .map(property)
+    .uniq()
+    .compact()
+    .value().length > 1
 
 export default function applyOperation(
   operation,
