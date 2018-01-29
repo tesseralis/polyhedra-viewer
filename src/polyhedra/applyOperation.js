@@ -45,9 +45,11 @@ export default function applyOperation(
     const fIndex = args
     const n = polyhedron.faces[fIndex].length
 
+    const using = getUsingOpt(config.using, n)
+
     applyConfig = {
-      ...config,
-      using: getUsingOpt(config.using, n),
+      using,
+      gyrate: using === 'U2' ? 'gyro' : config.gyrate,
     }
     options = {
       ...applyConfig,

@@ -6,16 +6,17 @@ import Polyhedron from 'math/polyhedron'
 import { canAugment } from 'math/operations'
 import applyOperation from './applyOperation'
 
-const opsToTest = ['+', '-', 'g', 'P', 'A', '~P', '~A']
+const opsToTest = ['t', '+', '-', 'g', 'P', 'A', '~P', '~A']
 
 function isProperPolyhedron(polyhedron) {
   // Make sure edges all have the same length
   let prevSideLength
-  polyhedron.edges.forEach(edge => {
+  // polyhedron.edges.forEach(edge => {
+  for (let edge of polyhedron.edges) {
     const [v1, v2] = edge.map(vIndex => polyhedron.vertexVectors()[vIndex])
     const sideLength = v1.distanceTo(v2)
     if (!_.isNil(prevSideLength)) {
-      if (Math.abs(sideLength, prevSideLength) > PRECISION) {
+      if (Math.abs(sideLength - prevSideLength) > PRECISION) {
         return false
       }
     }
@@ -24,7 +25,7 @@ function isProperPolyhedron(polyhedron) {
     if (polyhedron.getDihedralAngle(edge) > Math.PI - PRECISION) {
       return false
     }
-  })
+  }
   return true
 }
 
@@ -57,7 +58,7 @@ function getArgsToTest(operation, polyhedron) {
         .fIndices()
         .filter(fIndex => canAugment(polyhedron, fIndex))
     default:
-      return [null]
+      return [undefined]
   }
 }
 
@@ -76,7 +77,7 @@ function getOptsToTest(operation, polyhedron) {
         })
       })
     default:
-      return [null]
+      return [undefined]
   }
 }
 
@@ -92,6 +93,15 @@ describe('applyOperation', () => {
         argsToTest.forEach(args => {
           optsToTest.forEach(options => {
             const result = applyOperation(operation, polyhedron, args, options)
+
+            // console.log(
+            //   result.edges.map(edge => {
+            //     const [v1, v2] = edge.map(
+            //       vIndex => polyhedron.vertexVectors()[vIndex],
+            //     )
+            //     return v1.distanceTo(v2)
+            //   }),
+            // )
             expect(result).toBeValidPolyhedron()
           })
         })

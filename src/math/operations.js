@@ -7,21 +7,44 @@ import Peak from './Peak'
 
 const TAU = 2 * Math.PI
 
-function nextVertex(face, vertex) {
-  return getMod(face, face.indexOf(vertex) + 1)
+function nextVertex(face, vIndex) {
+  return getMod(face, face.indexOf(vIndex) + 1)
+}
+function prevVertex(face, vIndex) {
+  return getMod(face, face.indexOf(vIndex) - 1)
 }
 
-function truncateVertex(newPolyhedron, polyhedron, vertex, { mock, rectify }) {
-  const touchingFaces = polyhedron.adjacentFaces(vertex)
-  const touchingFaceIndices = touchingFaces.map(face =>
-    polyhedron.faces.indexOf(face),
-  )
-  const verticesToAdd = touchingFaces.map(face => {
+function directedAdjacentFaceIndices(polyhedron, vIndex) {
+  const { faces } = polyhedron
+  const touchingFaceIndices = _.clone(polyhedron.adjacentFaceIndices(vIndex))
+  const result = []
+  let next = touchingFaceIndices[0]
+  do {
+    result.push(next)
+    next = _.find(
+      touchingFaceIndices,
+      f => prevVertex(faces[next], vIndex) === nextVertex(faces[f], vIndex),
+    )
+  } while (result.length < touchingFaceIndices.length)
+  return result
+}
+
+function truncateVertex(
+  newPolyhedron,
+  polyhedron,
+  vIndex,
+  { mock, rectify } = {},
+) {
+  // const touchingFaces = polyhedron.adjacentFaces(vIndex)
+  const touchingFaceIndices = directedAdjacentFaceIndices(polyhedron, vIndex)
+  const touchingFaces = _.at(polyhedron.faces, touchingFaceIndices)
+  // const touchingFaceIndices = polyhedron.adjacentFaceIndices(vIndex)
+  let verticesToAdd = touchingFaces.map(face => {
     if (mock) {
-      return polyhedron.vertices[vertex]
+      return polyhedron.vertices[vIndex]
     }
-    const next = nextVertex(face, vertex)
-    const p1 = vec(polyhedron.vertices[vertex])
+    const next = nextVertex(face, vIndex)
+    const p1 = vec(polyhedron.vertices[vIndex])
     const p2 = vec(polyhedron.vertices[next])
     const sideLength = p1.distanceTo(p2)
     if (rectify) {
@@ -48,13 +71,13 @@ function truncateVertex(newPolyhedron, polyhedron, vertex, { mock, rectify }) {
       const touchingFaceIndex = touchingFaceIndices.indexOf(faceIndex)
       return replace(
         face,
-        face.indexOf(vertex),
+        face.indexOf(vIndex),
         newPolyhedron.vertices.length +
-          mod(touchingFaceIndex - 1, touchingFaces.length),
+          mod(touchingFaceIndex + 1, touchingFaces.length),
         newPolyhedron.vertices.length + touchingFaceIndex,
       )
     })
-    .concat([_.rangeRight(newPolyhedron.vertices.length, newVertices.length)])
+    .concat([_.range(newPolyhedron.vertices.length, newVertices.length)])
   return Polyhedron.of(newVertices, newFaces)
 }
 
@@ -88,10 +111,10 @@ function removeExtraneousVertices(polyhedron) {
   return Polyhedron.of(newVertices, newFaces)
 }
 
-export function truncate(polyhedron, options = {}) {
+export function truncate(polyhedron) {
   let newPolyhedron = polyhedron
   _.forEach(polyhedron.vertices, (vertex, index) => {
-    newPolyhedron = truncateVertex(newPolyhedron, polyhedron, index, options)
+    newPolyhedron = truncateVertex(newPolyhedron, polyhedron, index)
   })
   // TODO remove duplicate vertices when cantellating
   return removeExtraneousVertices(newPolyhedron)
@@ -338,10 +361,6 @@ export function getGyrateDirection(polyhedron, peak) {
   return getCupolaGyrate(polyhedron, peak) === 'ortho' ? 'back' : 'forward'
 }
 
-function isFastigium(augmentType, underside) {
-  return augmentType === 'cupola' && numSides(underside) === 4
-}
-
 // Return true if the base and augmentee are aligned
 function isAligned(
   polyhedron,
@@ -353,7 +372,6 @@ function isAligned(
 ) {
   if (_.includes(['pyramid', 'prism', 'antiprism'], augmentType)) return true
   const baseType = getBaseType(polyhedron.faces, base)
-  const fastigium = isFastigium(augmentType, underside)
   if (baseType === 'pyramid' || baseType === 'antiprism') {
     return true
   }
@@ -362,7 +380,7 @@ function isAligned(
     return true
   }
 
-  if (baseType !== 'truncated' && !fastigium && _.isNil(gyrate)) {
+  if (baseType !== 'truncated' && _.isNil(gyrate)) {
     throw new Error(`Must define 'gyrate' for augmenting ${baseType} `)
   }
 
@@ -387,10 +405,6 @@ function isAligned(
   const isOrtho = (numSides(adjFace) !== 3) === (numSides(alignedFace) !== 3)
 
   if (baseType === 'truncated') {
-    return !isOrtho
-  }
-
-  if (fastigium) {
     return !isOrtho
   }
 
@@ -567,17 +581,14 @@ export function gyrate(polyhedron, peak) {
 
   // Rotate all the points on the boundary
   // TODO this won't work with animation, so I have to reimplement eventually
-  const newFaces = polyhedron.faces.map(face => {
+  const newFaces = polyhedron.faces.map((face, fIndex) => {
+    if (!_.includes(peak.faceIndices(), fIndex)) {
+      return face
+    }
     return face.map((vIndex, i) => {
-      const j = boundary.indexOf(vIndex)
-      if (
-        j !== -1 &&
-        (getMod(face, i + 1) === getMod(boundary, j + 1) ||
-          getMod(face, i - 1) === getMod(boundary, j - 1))
-      ) {
-        return getMod(boundary, j + 1)
-      }
-      return vIndex
+      return _.includes(boundary, vIndex)
+        ? nextVertex(boundary, vIndex)
+        : vIndex
     })
   })
 
