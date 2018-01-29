@@ -6,7 +6,7 @@ import Polyhedron from 'math/polyhedron'
 import { canAugment } from 'math/operations'
 import applyOperation from './applyOperation'
 
-const opsToTest = ['t', '+', '-', 'g', 'P', 'A', '~P', '~A']
+const opsToTest = ['t', 'r', '+', '-', 'g', 'P', 'A', '~P', '~A']
 
 function isProperPolyhedron(polyhedron) {
   // Make sure edges all have the same length
@@ -93,15 +93,6 @@ describe('applyOperation', () => {
         argsToTest.forEach(args => {
           optsToTest.forEach(options => {
             const result = applyOperation(operation, polyhedron, args, options)
-
-            // console.log(
-            //   result.edges.map(edge => {
-            //     const [v1, v2] = edge.map(
-            //       vIndex => polyhedron.vertexVectors()[vIndex],
-            //     )
-            //     return v1.distanceTo(v2)
-            //   }),
-            // )
             expect(result).toBeValidPolyhedron()
           })
         })

@@ -111,13 +111,17 @@ function removeExtraneousVertices(polyhedron) {
   return Polyhedron.of(newVertices, newFaces)
 }
 
-export function truncate(polyhedron) {
+export function truncate(polyhedron, options) {
   let newPolyhedron = polyhedron
   _.forEach(polyhedron.vertices, (vertex, index) => {
-    newPolyhedron = truncateVertex(newPolyhedron, polyhedron, index)
+    newPolyhedron = truncateVertex(newPolyhedron, polyhedron, index, options)
   })
   // TODO remove duplicate vertices when cantellating
   return removeExtraneousVertices(newPolyhedron)
+}
+
+export function rectify(polyhedron) {
+  return truncate(polyhedron, { rectify: true })
 }
 
 const augmentees = {

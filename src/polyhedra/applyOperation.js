@@ -2,6 +2,7 @@ import _ from 'lodash'
 import { getNextPolyhedron, getRelations, getUsingOpt } from './relations'
 import {
   truncate,
+  rectify,
   elongate,
   gyroelongate,
   shorten,
@@ -16,6 +17,7 @@ import {
 
 const operations = {
   t: truncate,
+  r: rectify,
   P: elongate,
   A: gyroelongate,
   '~P': shorten,
