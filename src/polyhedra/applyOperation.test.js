@@ -47,50 +47,54 @@ expect.extend({
   },
 })
 
+function getArgsToTest(operation, polyhedron) {
+  switch (operation) {
+    case '-':
+    case 'g':
+      return polyhedron.peaks()
+    case '+':
+      return polyhedron
+        .fIndices()
+        .filter(fIndex => canAugment(polyhedron, fIndex))
+    default:
+      return [null]
+  }
+}
+
+function getOptsToTest(operation, polyhedron) {
+  switch (operation) {
+    case '+':
+      const relations = getRelations(polyhedron.name, operation)
+      const gyrateOpts = _.uniq(_.map(relations, 'gyrate'))
+      const usingOpts = _.uniq(_.map(relations, 'using'))
+      return _.flatMapDeep(gyrateOpts, gyrate => {
+        return usingOpts.map(using => {
+          return {
+            gyrate: _.uniq(_.compact(gyrateOpts)).length > 1 && gyrate,
+            using: _.uniq(_.compact(usingOpts)).length > 1 && using,
+          }
+        })
+      })
+    default:
+      return [null]
+  }
+}
+
 describe('applyOperation', () => {
   allSolidNames.forEach(solidName => {
     it(`correctly applies all possible operations on ${solidName}`, () => {
       const operations = _.intersection(getOperations(solidName), opsToTest)
       operations.forEach(operation => {
         const polyhedron = Polyhedron.get(solidName)
-        if (!_.includes(['+', '-', 'g'], operation)) {
-          const result = applyOperation(operation, polyhedron)
-          expect(result).toBeValidPolyhedron()
-        } else if (_.includes(['-', 'g'], operation)) {
-          const argsToTest = polyhedron.peaks()
-          argsToTest.forEach(args => {
-            const result = applyOperation(operation, polyhedron, args)
+        const argsToTest = getArgsToTest(operation, polyhedron)
+        const optsToTest = getOptsToTest(operation, polyhedron)
+
+        argsToTest.forEach(args => {
+          optsToTest.forEach(options => {
+            const result = applyOperation(operation, polyhedron, args, options)
             expect(result).toBeValidPolyhedron()
           })
-        } else if (operation === '+') {
-          const argsToTest = polyhedron
-            .fIndices()
-            .filter(fIndex => canAugment(polyhedron, fIndex))
-          const relations = getRelations(solidName, operation)
-          const gyrateOpts = _.uniq(_.map(relations, 'gyrate'))
-          const usingOpts = _.uniq(_.map(relations, 'using'))
-
-          const optionsToTest = _.flatMapDeep(gyrateOpts, gyrate => {
-            return usingOpts.map(using => {
-              return {
-                gyrate: _.uniq(_.compact(gyrateOpts)).length > 1 && gyrate,
-                using: _.uniq(_.compact(usingOpts)).length > 1 && using,
-              }
-            })
-          })
-
-          argsToTest.forEach(args => {
-            optionsToTest.forEach(options => {
-              const result = applyOperation(
-                operation,
-                polyhedron,
-                args,
-                options,
-              )
-              expect(result).toBeValidPolyhedron()
-            })
-          })
-        }
+        })
       })
     })
   })
