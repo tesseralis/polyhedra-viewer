@@ -210,7 +210,7 @@ function getDefaultAugmentee(n) {
 
 // Checks to see if the polyhedron can be augmented at the base while remaining convex
 // TODO add ortho/gyro to the "canAugment" argument
-function canAugment(polyhedron, faceIndex, { offset = 0 } = {}) {
+export function canAugment(polyhedron, faceIndex, { offset = 0 } = {}) {
   const base = polyhedron.faces[faceIndex]
   const n = base.length
 
@@ -290,7 +290,8 @@ function getOppositePrismSide(polyhedron, base) {
   })
 }
 
-function isCupolaRotunda(baseType, augmentType) {
+function isCupolaRotunda(polyhedron, augmentType) {
+  const baseType = polyhedron.cupolaIndices().length > 0 ? 'cupola' : 'rotunda'
   return _.xor(['cupola', 'rotunda'], [baseType, augmentType]).length === 0
 }
 
@@ -480,7 +481,7 @@ function isAligned(
 
   // "ortho" or "gyro" is actually determined by whether the *tops* are aligned, not the bottoms
   // So for a cupola-rotunda, it's actually the opposite of everything else
-  if (isCupolaRotunda(baseType, augmentType)) {
+  if (isCupolaRotunda(polyhedron, augmentType)) {
     return isOrtho !== (gyrate === 'ortho')
   }
 

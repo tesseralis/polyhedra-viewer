@@ -26,6 +26,22 @@ const operations = {
   g: gyrate,
 }
 
+// Default augmentee for each numFaces
+const defaultAugmentees = {
+  3: 'Y3',
+  4: 'Y4',
+  5: 'Y5',
+  6: 'U3',
+  8: 'U4',
+  10: 'U5',
+}
+
+const augmenteeSides = {
+  ..._.invert(defaultAugmentees),
+  U2: 4,
+  R5: 10,
+}
+
 const hasMultiple = (relations, property) =>
   _.uniqBy(relations, property).length > 1
 
@@ -39,10 +55,21 @@ export default function applyOperation(
   // It makes it harder to unit test
   let options = {}
   const relations = getRelations(polyhedron.name, operation)
+  console.log(relations)
   if (operation === '+') {
     const fIndex = args
+    const n = polyhedron.faces[fIndex].length
+    const using =
+      config.using && augmenteeSides[config.using] === n
+        ? config.using
+        : defaultAugmentees[n]
+
+    console.log(n, config.using, using)
+    // FIXME this is inelegant
+    config.using = using
     options = {
       ...config,
+      using,
       align:
         hasMultiple(relations, 'align') &&
         getAugmentAlignment(polyhedron, fIndex),

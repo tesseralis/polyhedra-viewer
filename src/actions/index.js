@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { getRelations } from 'polyhedra/relations'
+import { getRelations, getUsingOpts } from 'polyhedra/relations'
 import { isValidSolid } from 'data'
 import { setPolyhedron as setPolyhedronRaw } from 'reducers/polyhedron'
 import { setOperation, setApplyOpts } from 'reducers/controls'
@@ -15,6 +15,10 @@ export const setPolyhedron = name => dispatch => {
   dispatch(setMode(null))
 }
 
+function hasMultipleOptionsForFace(relations) {
+  return _.some(relations, relation => _.includes(['U2', 'R5'], relation.using))
+}
+
 const setApplyOptsFor = (solid, operation) => dispatch => {
   if (!solid) return
   const relations = getRelations(solid, operation)
@@ -24,7 +28,7 @@ const setApplyOptsFor = (solid, operation) => dispatch => {
       newOpts.gyrate = 'ortho'
     }
     if (hasMultipleOptionsForFace(relations)) {
-      newOpts.using = relations[0].using
+      newOpts.using = getUsingOpts(solid)[0]
     }
   }
   dispatch(setApplyOpts(newOpts))
@@ -46,14 +50,6 @@ export const applyOperation = (
   } else {
     dispatch(setApplyOptsFor(result.name, operation))
   }
-}
-
-function hasMultipleOptionsForFace(relations) {
-  return _.some(
-    relations,
-    relation =>
-      _.isObject(relation) && _.includes(['U2', 'R5'], relation.using),
-  )
 }
 
 export const setMode = (solid, operation) => dispatch => {

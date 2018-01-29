@@ -8,7 +8,7 @@ import { toConwayNotation, fromConwayNotation } from 'polyhedra/names'
 import { applyOperation, setMode, setApplyOpt } from 'actions'
 import { getPolyhedron, getOperation, getApplyOpts } from 'selectors'
 
-import { polyhedraGraph } from 'polyhedra/relations'
+import { polyhedraGraph, getUsingOpts } from 'polyhedra/relations'
 import PolyhedronLink from 'components/common/PolyhedronLink'
 
 const operations = {
@@ -145,22 +145,18 @@ function RelatedPolyhedra({
               {operation === '+' &&
                 !!using && (
                   <div>
-                    {_(related[operation])
-                      .map('using')
-                      .uniq()
-                      .map(usingOpt => (
-                        <button
-                          key={usingOpt}
-                          className={css(
-                            styles.optionButton,
-                            using === usingOpt && styles.isHighlighted,
-                          )}
-                          onClick={() => setApplyOpt('using', usingOpt)}
-                        >
-                          {usingOpt}
-                        </button>
-                      ))
-                      .value()}
+                    {getUsingOpts(solid).map(usingOpt => (
+                      <button
+                        key={usingOpt}
+                        className={css(
+                          styles.optionButton,
+                          using === usingOpt && styles.isHighlighted,
+                        )}
+                        onClick={() => setApplyOpt('using', usingOpt)}
+                      >
+                        {usingOpt}
+                      </button>
+                    ))}
                   </div>
                 )}
             </div>

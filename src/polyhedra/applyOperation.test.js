@@ -1,8 +1,9 @@
 import _ from 'lodash'
 import { allSolidNames } from 'data'
 import { PRECISION } from 'math/linAlg'
-import { getOperations } from 'polyhedra/relations'
+import { getOperations, getRelations } from 'polyhedra/relations'
 import Polyhedron from 'math/polyhedron'
+import { canAugment } from 'math/operations'
 import applyOperation from './applyOperation'
 
 const opsToTest = ['+', '-', 'g', 'P', 'A']
@@ -63,6 +64,35 @@ describe('applyOperation', () => {
           argsToTest.forEach(args => {
             const result = applyOperation(operation, polyhedron, args)
             expect(result).toBeValidPolyhedron()
+          })
+        } else if (operation === '+') {
+          const argsToTest = polyhedron
+            .fIndices()
+            .filter(fIndex => canAugment(polyhedron, fIndex))
+          const relations = getRelations(solidName, operation)
+          const gyrateOpts = _.uniq(_.map(relations, 'gyrate'))
+          const usingOpts = _.uniq(_.map(relations, 'using'))
+
+          const optionsToTest = _.flatMapDeep(gyrateOpts, gyrate => {
+            return usingOpts.map(using => {
+              return {
+                gyrate: _.uniq(_.compact(gyrateOpts)).length > 1 && gyrate,
+                using: _.uniq(_.compact(usingOpts)).length > 1 && using,
+              }
+            })
+          })
+          console.log(optionsToTest)
+
+          argsToTest.forEach(args => {
+            optionsToTest.forEach(options => {
+              const result = applyOperation(
+                operation,
+                polyhedron,
+                args,
+                options,
+              )
+              expect(result).toBeValidPolyhedron()
+            })
           })
         }
         // for each user defined option and for each applicable face or vertex,

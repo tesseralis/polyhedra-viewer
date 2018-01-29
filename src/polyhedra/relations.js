@@ -241,18 +241,20 @@ const basePyramidsCupolae = (() => {
     const using = getPyramidCupolaConway(pyramidRow)
     graph = graphMerge(graph, {
       [prism]: {
-        '+': { value: elongated, using },
+        '+': [{ value: elongated, using }],
       },
       [antiprism]: {
-        '+': {
-          value: gyroelongated,
-          using,
-        },
+        '+': [
+          {
+            value: gyroelongated,
+            using,
+          },
+        ],
       },
     })
   })
   // for diminished icosahedra
-  graph['A5']['+'].align = 'para'
+  graph['A5']['+'][0].align = 'para'
 
   // TODO don't create stray nulls
   _.forEach(pyramidsCupolae, (row, name) => {
@@ -493,6 +495,29 @@ export function getOperations(solid) {
 
 export function getRelations(solid, operation) {
   return polyhedraGraph[toConwayNotation(solid)][operation]
+}
+
+// FIXME dedupe
+const defaultAugmentees = {
+  3: 'Y3',
+  4: 'Y4',
+  5: 'Y5',
+  6: 'U3',
+  8: 'U4',
+  10: 'U5',
+}
+
+const augmenteeSides = {
+  ..._.invert(defaultAugmentees),
+  U2: 4,
+  R5: 10,
+}
+
+export function getUsingOpts(solid) {
+  const augments = getRelations(solid, '+')
+  const using = _.uniq(_.map(augments, 'using'))
+  const grouped = _.groupBy(using, option => augmenteeSides[option])
+  return _.find(grouped, group => group.length > 1) || []
 }
 
 // Get the polyhedron name as a result of applying the operation to the given polyhedron
