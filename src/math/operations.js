@@ -251,21 +251,22 @@ function faceDistanceBetweenVertices(
   vIndices2,
   exclude = [],
 ) {
-  const faceGraph = polyhedron.faceGraph()
   const v2fGraph = polyhedron.vertexToFaceGraph()
   let foundVertexIndices = vIndices1
   let distance = 0
-  while (
-    _.intersection(foundVertexIndices, vIndices2).length === 0 &&
-    distance < 5
-  ) {
+  while (_.intersection(foundVertexIndices, vIndices2).length === 0) {
     foundVertexIndices = _(foundVertexIndices)
       .flatMap(vIndex => v2fGraph[vIndex])
       .map(fIndex => polyhedron.faces[fIndex])
       .filter(face => !_.includes(exclude, numSides(face)))
       .flatten()
+      .uniq()
       .value()
     distance++
+
+    if (distance > 10) {
+      throw new Error('Reached some unreachable state')
+    }
   }
   return distance
 }
@@ -303,30 +304,23 @@ export function getDiminishAlignment(polyhedron, peak) {
   const peakBoundary = peak.boundary()
 
   const isRhombicosidodecahedron = peak.type === 'cupola'
-  const orthoIndices = polyhedron
-    .peaks()
-    .filter(
-      peak =>
-        peak.type === 'cupola' && getCupolaGyrate(polyhedron, peak) === 'ortho',
-    )
-    .map(peak => peak.fIndex)
-  console.log('orthoIndices', orthoIndices)
-  const maxNumSides = _.max(faces.map(numSides))
+
+  const orthoIndices = isRhombicosidodecahedron
+    ? _.filter(
+        polyhedron.peaks(),
+        peak => getCupolaGyrate(polyhedron, peak) === 'ortho',
+      )
+    : []
   const diminishedIndices =
     orthoIndices.length > 0
-      ? orthoIndices
-      : polyhedron
-          .fIndices()
-          .filter(fIndex => numSides(faces[fIndex]) === maxNumSides)
-  console.log('diminishedIndices', diminishedIndices)
-  console.log('peakBoundary: ', peakBoundary)
-  console.log(
-    'fgd',
-    faceGraphDistance(polyhedron, diminishedIndices, peakBoundary),
-  )
+      ? orthoIndices[0].boundary()
+      : _.maxBy(polyhedron.faces, numSides)
 
-  return faceGraphDistance(polyhedron, diminishedIndices, peakBoundary) >=
-    (isRhombicosidodecahedron ? 2 : 1)
+  return faceDistanceBetweenVertices(
+    polyhedron,
+    diminishedIndices,
+    peakBoundary,
+  ) >= (isRhombicosidodecahedron ? 2 : 1)
     ? 'para'
     : 'meta'
 }
