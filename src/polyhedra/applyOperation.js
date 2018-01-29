@@ -3,6 +3,7 @@ import { getNextPolyhedron, getRelations, getUsingOpt } from './relations'
 import {
   truncate,
   rectify,
+  antitruncate,
   elongate,
   gyroelongate,
   shorten,
@@ -18,6 +19,8 @@ import {
 const operations = {
   t: truncate,
   r: rectify,
+  '~t': antitruncate,
+  '~r': antitruncate,
   P: elongate,
   A: gyroelongate,
   '~P': shorten,

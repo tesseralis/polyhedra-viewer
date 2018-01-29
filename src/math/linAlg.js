@@ -8,6 +8,7 @@ export const PRECISION = Math.pow(10, -PRECISION_DIGITS)
 // convert an array of vertices into a vector
 export const vec = p => new Vec3D(...p)
 
+export const getMidpoint = (v1, v2) => v1.add(v2).scale(0.5)
 // Get the plane containing the given points
 export function getPlane(points) {
   if (points.length < 3) {

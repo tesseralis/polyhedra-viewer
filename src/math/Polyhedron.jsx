@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import { isValidSolid, getSolidData } from 'data'
-import { vec, isPlanar, getPlane, getCentroid } from './linAlg'
+import { vec, getMidpoint, isPlanar, getPlane, getCentroid } from './linAlg'
 import Peak from './Peak'
 import { numSides, getCyclic } from './solidUtils'
 
@@ -144,8 +144,7 @@ export default class Polyhedron {
 
   getDihedralAngle(edge) {
     const [v1, v2] = edge.map(vIndex => this.vertexVectors()[vIndex])
-    const midpoint = v1.add(v2).scale(0.5)
-
+    const midpoint = getMidpoint(v1, v2)
     const [c1, c2] = this.faces
       .filter(face => _.intersection(face, edge).length === 2)
       .map(face =>

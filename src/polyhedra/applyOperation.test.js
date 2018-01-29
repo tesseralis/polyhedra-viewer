@@ -6,12 +6,11 @@ import Polyhedron from 'math/polyhedron'
 import { canAugment } from 'math/operations'
 import applyOperation from './applyOperation'
 
-const opsToTest = ['t', 'r', '+', '-', 'g', 'P', 'A', '~P', '~A']
+const opsToTest = ['t', 'r', '~t', '~r', '+', '-', 'g', 'P', 'A', '~P', '~A']
 
 function isProperPolyhedron(polyhedron) {
   // Make sure edges all have the same length
   let prevSideLength
-  // polyhedron.edges.forEach(edge => {
   for (let edge of polyhedron.edges) {
     const [v1, v2] = edge.map(vIndex => polyhedron.vertexVectors()[vIndex])
     const sideLength = v1.distanceTo(v2)

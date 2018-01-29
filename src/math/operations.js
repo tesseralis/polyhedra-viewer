@@ -1,11 +1,27 @@
 import _ from 'lodash'
+import { geom } from 'toxiclibsjs'
 import Polyhedron from './Polyhedron'
-import { vec, getCentroid, getNormal, PRECISION } from './linAlg'
+import {
+  vec,
+  getMidpoint,
+  getPlane,
+  getCentroid,
+  getNormal,
+  PRECISION,
+} from './linAlg'
 import { mapObject, replace } from 'util.js'
 import { getDirectedEdges, numSides, getCyclic as getMod } from './solidUtils'
 import Peak from './Peak'
+const { Line3D } = geom
 
 const TAU = 2 * Math.PI
+
+function getSingle(array) {
+  if (array.length !== 1) {
+    throw new Error(`Expected array to have one element: ${array}`)
+  }
+  return array[0]
+}
 
 function nextVertex(face, vIndex) {
   return getMod(face, face.indexOf(vIndex) + 1)
@@ -98,7 +114,6 @@ function deduplicateVertices(polyhedron) {
       verticesByPoint[pointIndex].push(index)
     }
   })
-  console.log('verticesByPoint: ', verticesByPoint)
 
   // replace vertices that are the same
   let newFaces = polyhedron.faces
@@ -158,6 +173,48 @@ export function truncate(polyhedron, options) {
 
 export function rectify(polyhedron) {
   return truncate(polyhedron, { rectify: true })
+}
+
+export function antitruncate(polyhedron, { faceType } = {}) {
+  const { vertices, faces } = polyhedron
+  const n = faceType || _.min(faces.map(numSides))
+  const fIndices = polyhedron
+    .fIndices()
+    .filter(fIndex => numSides(faces[fIndex]) === n)
+  const verticesToAdd = fIndices.map(fIndex => {
+    const face = faces[fIndex]
+    const sources = face.map(vIndex =>
+      getSingle(_.difference(polyhedron.adjacentVertexIndices(vIndex), face)),
+    )
+    // FIXME this doesn't work for octahedron. Use faces instead
+    const [v1, v2] = _.at(polyhedron.vertexVectors(), face)
+    const [u1, u2] = _.at(polyhedron.vertexVectors(), sources)
+    const l1 = new Line3D(v1, u1)
+    const l2 = new Line3D(v2, u2)
+    const intersection = l1.closestLineTo(l2).getLine()
+    const newVertex = getMidpoint(intersection.a, intersection.b)
+    return newVertex.toArray()
+  })
+
+  const oldToNew = {}
+  fIndices.forEach((fIndex, i) => {
+    faces[fIndex].forEach(vIndex => {
+      oldToNew[vIndex] = i
+    })
+  })
+
+  const newVertices = vertices.concat(verticesToAdd)
+
+  const newFaces = faces.map(face => {
+    return _.uniq(
+      face.map(vIndex => {
+        if (!_.has(oldToNew, vIndex)) return vIndex
+        return oldToNew[vIndex] + polyhedron.numVertices()
+      }),
+    )
+  })
+
+  return deduplicateVertices(Polyhedron.of(newVertices, newFaces))
 }
 
 const augmentees = {
@@ -332,13 +389,6 @@ function faceDistanceBetweenVertices(
     }
   }
   return distance
-}
-
-function getSingle(array) {
-  if (array.length !== 1) {
-    throw new Error(`Expected array to have one element: ${array}`)
-  }
-  return array[0]
 }
 
 // Return "meta" or "para", or null
