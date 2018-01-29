@@ -2,7 +2,7 @@ import _ from 'lodash'
 import { isValidSolid, getSolidData } from 'data'
 import { vec, isPlanar, getPlane, getCentroid } from './linAlg'
 import Peak from './Peak'
-import { numSides, getCyclic, getDirectedEdges } from './solidUtils'
+import { numSides, getCyclic } from './solidUtils'
 
 function getEdges(face) {
   return _.map(face, (vertex, index) => {

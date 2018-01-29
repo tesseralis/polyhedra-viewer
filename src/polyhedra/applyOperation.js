@@ -9,10 +9,9 @@ import {
   diminish,
   gyrate,
   getAugmentAlignment,
-  getDiminishAlignment,
+  getPeakAlignment,
   getCupolaGyrate,
   getGyrateDirection,
-  getGyrateAlignment,
 } from 'math/operations'
 
 const operations = {
@@ -71,7 +70,7 @@ export default function applyOperation(
     }
 
     if (options.gyrate !== 'ortho' && hasMultiple(relations, 'align')) {
-      options.align = getDiminishAlignment(polyhedron, peak)
+      options.align = getPeakAlignment(polyhedron, peak)
     }
   } else if (operation === 'g') {
     const peak = args
@@ -84,7 +83,7 @@ export default function applyOperation(
             relation.direction === options.direction && !!relation.align,
         ).length > 1
       ) {
-        options.align = getGyrateAlignment(polyhedron, peak)
+        options.align = getPeakAlignment(polyhedron, peak)
       }
     }
   }

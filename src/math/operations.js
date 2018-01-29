@@ -271,16 +271,6 @@ function faceDistanceBetweenVertices(
   return distance
 }
 
-function faceGraphDistance(polyhedron, fIndices, peakBoundary, exclude = []) {
-  const vIndices = _.flatMap(fIndices, fIndex => polyhedron.faces[fIndex])
-  return faceDistanceBetweenVertices(
-    polyhedron,
-    vIndices,
-    peakBoundary,
-    exclude,
-  )
-}
-
 function getSingle(array) {
   if (array.length !== 1) {
     throw new Error(`Expected array to have one element: ${array}`)
@@ -298,15 +288,17 @@ export function getAugmentAlignment(polyhedron, fIndex) {
   )
 
   // calculate the face distance to the peak's boundary
-  return faceGraphDistance(polyhedron, [fIndex], peakBoundary, [
-    isHexagonalPrism && 6,
-  ]) > 1
+  return faceDistanceBetweenVertices(
+    polyhedron,
+    polyhedron.faces[fIndex],
+    peakBoundary,
+    [isHexagonalPrism && 6],
+  ) > 1
     ? 'para'
     : 'meta'
 }
 
-export function getDiminishAlignment(polyhedron, peak) {
-  const { faces } = polyhedron
+export function getPeakAlignment(polyhedron, peak) {
   const peakBoundary = peak.boundary()
 
   const isRhombicosidodecahedron = peak.type === 'cupola'
@@ -344,31 +336,6 @@ export function getCupolaGyrate(polyhedron, peak) {
 
 export function getGyrateDirection(polyhedron, peak) {
   return getCupolaGyrate(polyhedron, peak) === 'ortho' ? 'back' : 'forward'
-}
-
-export function getGyrateAlignment(polyhedron, peak) {
-  const { faces } = polyhedron
-  const boundary = peak.boundary()
-  const vIndicesToCheck = (() => {
-    const cupolaBoundaries = polyhedron
-      .peaks()
-      .filter(peak => getCupolaGyrate(polyhedron, peak) === 'ortho')
-      .map(peak => peak.boundary())
-
-    if (cupolaBoundaries.length > 0) {
-      return getSingle(cupolaBoundaries)
-    }
-
-    const maxNumSides = _.max(faces.map(numSides))
-    const diminishedIndices = polyhedron
-      .fIndices()
-      .filter(fIndex => numSides(faces[fIndex]) === maxNumSides)
-
-    return faces[getSingle(diminishedIndices)]
-  })()
-  return faceDistanceBetweenVertices(polyhedron, boundary, vIndicesToCheck) > 1
-    ? 'para'
-    : 'meta'
 }
 
 function isFastigium(augmentType, underside) {
