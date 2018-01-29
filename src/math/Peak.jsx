@@ -28,12 +28,15 @@ export default class Peak {
     return []
   }
 
-  constructor(polyhedron, type) {
+  constructor(polyhedron, vIndices, type) {
     this.polyhedron = polyhedron
+    this.vIndices = vIndices
     this.type = type
   }
 
-  innerVertexIndices() {}
+  innerVertexIndices() {
+    return this.vIndices
+  }
 
   topPoint() {}
 
@@ -62,12 +65,8 @@ export default class Peak {
 const Pyramid = withMapper('vIndices')(
   class extends Peak {
     constructor(polyhedron, vIndex) {
-      super(polyhedron, 'pyramid')
+      super(polyhedron, [vIndex], 'pyramid')
       this.vIndex = vIndex
-    }
-
-    innerVertexIndices() {
-      return [this.vIndex]
     }
 
     faceConfiguration = () => ({ 3: this.faces().length })
@@ -81,12 +80,8 @@ const Pyramid = withMapper('vIndices')(
 const Fastigium = withMapper('edges')(
   class extends Peak {
     constructor(polyhedron, edge) {
-      super(polyhedron, 'fastigium')
+      super(polyhedron, edge, 'fastigium')
       this.edge = edge
-    }
-
-    innerVertexIndices() {
-      return this.edge
     }
 
     faceConfiguration = () => ({ 3: 1, 4: 2 })
@@ -102,13 +97,9 @@ const Fastigium = withMapper('edges')(
 const Cupola = withMapper('fIndices')(
   class extends Peak {
     constructor(polyhedron, fIndex) {
-      super(polyhedron, 'cupola')
+      super(polyhedron, polyhedron.faces[fIndex], 'cupola')
       this.fIndex = fIndex
     }
-
-    innerVertexIndices = _.memoize(() => {
-      return this.polyhedron.faces[this.fIndex]
-    })
 
     faceConfiguration = () =>
       _.countBy([3, 4, 4, this.innerVertexIndices().length])
@@ -122,15 +113,13 @@ const Cupola = withMapper('fIndices')(
 const Rotunda = withMapper('fIndices')(
   class extends Peak {
     constructor(polyhedron, fIndex) {
-      super(polyhedron, 'rotunda')
+      super(
+        polyhedron,
+        polyhedron.adjacentVertexIndices(...polyhedron.faces[fIndex]),
+        'rotunda',
+      )
       this.fIndex = fIndex
     }
-
-    innerVertexIndices = _.memoize(() => {
-      return this.polyhedron.adjacentVertexIndices(
-        ...this.polyhedron.faces[this.fIndex],
-      )
-    })
 
     faceConfiguration = () => ({ 5: 2, 3: 2 })
 

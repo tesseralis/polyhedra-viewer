@@ -6,7 +6,7 @@ import Polyhedron from 'math/polyhedron'
 import { canAugment } from 'math/operations'
 import applyOperation from './applyOperation'
 
-const opsToTest = ['+', '-', 'g', 'P', 'A']
+const opsToTest = ['+', '-', 'g', 'P', 'A', '~P', '~A']
 
 function isProperPolyhedron(polyhedron) {
   // Make sure edges all have the same length
@@ -57,7 +57,7 @@ describe('applyOperation', () => {
           const result = applyOperation(operation, polyhedron)
           expect(result).toBeValidPolyhedron()
         } else if (_.includes(['-', 'g'], operation)) {
-          const argsToTest = polyhedron.peakInnerVertexIndices()
+          const argsToTest = polyhedron.peaks()
           argsToTest.forEach(args => {
             const result = applyOperation(operation, polyhedron, args)
             expect(result).toBeValidPolyhedron()

@@ -57,7 +57,8 @@ export default function applyOperation(
         getAugmentAlignment(polyhedron, fIndex),
     }
   } else if (operation === '-') {
-    const vIndices = args
+    const peak = args
+    const vIndices = peak.innerVertexIndices()
     // If diminishing a pentagonal cupola/rotunda, check which one it is
     if (vIndices.length === 5) {
       options.using = 'U5'
@@ -66,16 +67,16 @@ export default function applyOperation(
     }
 
     if (hasMultiple(relations, 'gyrate')) {
-      options.gyrate = getCupolaGyrate(polyhedron, vIndices)
+      options.gyrate = getCupolaGyrate(polyhedron, peak)
     }
 
     if (options.gyrate !== 'ortho' && hasMultiple(relations, 'align')) {
-      options.align = getDiminishAlignment(polyhedron, vIndices)
+      options.align = getDiminishAlignment(polyhedron, peak)
     }
   } else if (operation === 'g') {
-    const vIndices = args
+    const peak = args
     if (_.some(relations, 'direction')) {
-      options.direction = getGyrateDirection(polyhedron, vIndices)
+      options.direction = getGyrateDirection(polyhedron, peak)
       if (
         _.filter(
           relations,
@@ -83,7 +84,7 @@ export default function applyOperation(
             relation.direction === options.direction && !!relation.align,
         ).length > 1
       ) {
-        options.align = getGyrateAlignment(polyhedron, vIndices)
+        options.align = getGyrateAlignment(polyhedron, peak)
       }
     }
   }

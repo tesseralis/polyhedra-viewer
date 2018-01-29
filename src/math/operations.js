@@ -2,13 +2,8 @@ import _ from 'lodash'
 import Polyhedron from './Polyhedron'
 import { vec, getCentroid, getNormal, PRECISION } from './linAlg'
 import { mapObject, replace } from 'util.js'
-// FIXME make it so we don't need to use this
-import {
-  getDirectedEdges,
-  getBoundary,
-  numSides,
-  getCyclic as getMod,
-} from './solidUtils'
+import { getDirectedEdges, numSides, getCyclic as getMod } from './solidUtils'
+import Peak from './Peak'
 
 const TAU = 2 * Math.PI
 
@@ -348,18 +343,16 @@ export function getAugmentAlignment(polyhedron, fIndex) {
     : 'meta'
 }
 
-export function getDiminishAlignment(polyhedron, vIndices) {
+export function getDiminishAlignment(polyhedron, peak) {
   const { faces } = polyhedron
-  const peakBoundary = getBoundary(polyhedron.adjacentFaces(...vIndices))
+  const peakBoundary = peak.boundary()
 
-  const isRhombicosidodecahedron = vIndices.length > 1
-  console.log(isRhombicosidodecahedron)
+  const isRhombicosidodecahedron = peak.type === 'cupola'
   const orthoIndices = polyhedron
     .peaks()
     .filter(
       peak =>
-        peak.type === 'cupola' &&
-        getCupolaGyrate(polyhedron, peak.innerVertexIndices()) === 'ortho',
+        peak.type === 'cupola' && getCupolaGyrate(polyhedron, peak) === 'ortho',
     )
     .map(peak => peak.fIndex)
   console.log('orthoIndices', orthoIndices)
@@ -383,8 +376,8 @@ export function getDiminishAlignment(polyhedron, vIndices) {
     : 'meta'
 }
 
-export function getCupolaGyrate(polyhedron, vIndices) {
-  const boundary = getBoundary(polyhedron.adjacentFaces(...vIndices))
+export function getCupolaGyrate(polyhedron, peak) {
+  const boundary = peak.boundary()
   const isOrtho = _.every(getDirectedEdges(boundary), edge => {
     const [n1, n2] = polyhedron.faces
       .filter(face => _.intersection(face, edge).length === 2)
@@ -394,18 +387,18 @@ export function getCupolaGyrate(polyhedron, vIndices) {
   return isOrtho ? 'ortho' : 'gyro'
 }
 
-export function getGyrateDirection(polyhedron, vIndices) {
-  return getCupolaGyrate(polyhedron, vIndices) === 'ortho' ? 'back' : 'forward'
+export function getGyrateDirection(polyhedron, peak) {
+  return getCupolaGyrate(polyhedron, peak) === 'ortho' ? 'back' : 'forward'
 }
 
-export function getGyrateAlignment(polyhedron, vIndices) {
+export function getGyrateAlignment(polyhedron, peak) {
   const { faces } = polyhedron
-  const boundary = getBoundary(polyhedron.adjacentFaces(...vIndices))
+  const boundary = peak.boundary()
   const vIndicesToCheck = (() => {
     const cupolaBoundaries = polyhedron
-      .peakInnerVertexIndices()
-      .filter(vIndices => getCupolaGyrate(polyhedron, vIndices) === 'ortho')
-      .map(vIndices => getBoundary(polyhedron.adjacentFaces(...vIndices)))
+      .peaks()
+      .filter(peak => getCupolaGyrate(polyhedron, peak) === 'ortho')
+      .map(peak => peak.boundary())
 
     if (cupolaBoundaries.length > 0) {
       if (cupolaBoundaries.length !== 1) {
@@ -590,12 +583,9 @@ export function getAugmentFace(polyhedron, point) {
   return canAugment(polyhedron, hitFaceIndex) ? hitFaceIndex : -1
 }
 
-function removeVertices(polyhedron, vIndices) {
-  const [facesToKeep, facesToRemove] = _.partition(
-    polyhedron.faces,
-    face => _.intersection(face, vIndices).length === 0,
-  )
-  const newFaces = facesToKeep.concat([getBoundary(facesToRemove)])
+function removeVertices(polyhedron, peak) {
+  const newFaces = polyhedron.faces.concat([peak.boundary()])
+  _.pullAt(newFaces, peak.faceIndices())
   return removeExtraneousVertices(polyhedron.withFaces(newFaces))
 }
 
@@ -617,6 +607,7 @@ export function gyroelongate(polyhedron) {
   return doAugment(polyhedron, faceIndex, using)
 }
 
+// FIXME this is broken now
 export function shorten(polyhedron) {
   // Find a prism or antiprism face
   const face = _(polyhedron.faces)
@@ -626,21 +617,20 @@ export function shorten(polyhedron) {
       return _.keys(_.countBy(adjacent, numSides)).length === 1
     })
     .maxBy(numSides)
-  return removeVertices(polyhedron, face)
+  return removeVertices(polyhedron, new Peak(polyhedron, face))
 }
 
 export function augment(polyhedron, fIndex, { gyrate, using } = {}) {
   return doAugment(polyhedron, fIndex, using, gyrate)
 }
 
-export function diminish(polyhedron, vIndices) {
-  return removeVertices(polyhedron, vIndices)
+export function diminish(polyhedron, peak) {
+  return removeVertices(polyhedron, peak)
 }
 
-export function gyrate(polyhedron, vIndices) {
+export function gyrate(polyhedron, peak) {
   // get adjacent faces
-  const facesToTurn = polyhedron.adjacentFaces(...vIndices)
-  const boundary = getBoundary(facesToTurn)
+  const boundary = peak.boundary()
 
   // rotate the cupola/rotunda top
   const boundaryVertices = boundary.map(
@@ -650,7 +640,7 @@ export function gyrate(polyhedron, vIndices) {
   const centroid = getCentroid(boundaryVertices)
   const theta = TAU / numSides(boundary)
   const newVertices = polyhedron.vertices.map((vertex, vIndex) => {
-    if (_.includes(vIndices, vIndex)) {
+    if (_.includes(peak.innerVertexIndices(), vIndex)) {
       return vec(vertex)
         .sub(centroid)
         .getRotatedAroundAxis(normal, theta)

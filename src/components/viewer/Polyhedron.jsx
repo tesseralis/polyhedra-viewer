@@ -136,12 +136,10 @@ class Faces extends Component {
         return
       case '-':
       case 'g':
-        const vIndices = solidData.findPeak(event.hitPnt, {
-          exclude: [operation === 'g' && 'Y'],
-        })
-        console.log('vIndices', vIndices)
+        const peak = solidData.findPeak(event.hitPnt)
+        console.log('peak', peak && peak.innerVertexIndices())
         this.setState({
-          applyArgs: vIndices,
+          applyArgs: peak,
         })
         return
       default:

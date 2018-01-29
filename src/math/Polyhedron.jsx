@@ -208,10 +208,6 @@ export default class Polyhedron {
     return Peak.getAll(this)
   }
 
-  peakInnerVertexIndices() {
-    return this.peaks().map(peak => peak.innerVertexIndices())
-  }
-
   findPeak(point) {
     const hitPoint = vec(point)
     const hitFaceIndex = this.hitFaceIndex(hitPoint)
@@ -221,10 +217,8 @@ export default class Polyhedron {
     if (peaks.length === 0) {
       return null
     }
-    const nearestPeak = _.minBy(peaks, peak =>
-      vec(peak.topPoint()).distanceTo(hitPoint),
-    )
+    return _.minBy(peaks, peak => vec(peak.topPoint()).distanceTo(hitPoint))
 
-    return nearestPeak.innerVertexIndices()
+    // return nearestPeak.innerVertexIndices()
   }
 }
