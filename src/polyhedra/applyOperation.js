@@ -27,7 +27,7 @@ const operations = {
 }
 
 const hasMultiple = (relations, property) =>
-  _.filter(relations, property).length > 1
+  _.uniqBy(relations, property).length > 1
 
 export default function applyOperation(
   operation,
@@ -56,18 +56,11 @@ export default function applyOperation(
       options.using = 'R5'
     }
 
-    if (_.filter(relations, 'gyrate').length > 1) {
+    if (hasMultiple(relations, 'gyrate')) {
       options.gyrate = getDiminishGyrate(polyhedron, vIndices)
     }
 
-    if (
-      _.filter(
-        relations,
-        relation =>
-          (!!relation.gyrate ? relation.gyrate === options.gyrate : true) &&
-          !!relation.align,
-      ).length > 1
-    ) {
+    if (options.gyrate !== 'ortho' && hasMultiple(relations, 'align')) {
       options.align = getDiminishAlignment(polyhedron, vIndices)
     }
   } else if (operation === 'g') {
@@ -82,10 +75,8 @@ export default function applyOperation(
         ).length > 1
       ) {
         options.align = getGyrateAlignment(polyhedron, vIndices)
-        console.log('options.align: ', options.align)
       }
     }
-    console.log(relations)
   }
   const next = getNextPolyhedron(polyhedron.name, operation, _.pickBy(options))
   if (!_.isFunction(operations[operation])) {

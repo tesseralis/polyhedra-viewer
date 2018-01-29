@@ -24,7 +24,7 @@ function checkProperPolyhedron(polyhedron) {
   })
 }
 
-describe('operations', () => {
+xdescribe('operations', () => {
   xdescribe('truncate', () => {
     it('can truncate a tetrahedron', () => {
       const polyhedron = Polyhedron.get('tetrahedron')

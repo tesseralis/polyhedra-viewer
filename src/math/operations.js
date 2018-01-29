@@ -360,11 +360,20 @@ export function getDiminishAlignment(polyhedron, vIndices) {
   const peakBoundary = getBoundary(polyhedron.adjacentFaces(...vIndices))
 
   const maxNumSides = _.max(faces.map(numSides))
+  const rhombicos = vIndices.length > 1
   const diminishedIndices = polyhedron
     .fIndices()
-    .filter(fIndex => numSides(faces[fIndex]) === maxNumSides)
+    .filter(
+      fIndex =>
+        numSides(faces[fIndex]) === maxNumSides &&
+        (rhombicos && polyhedron.isCupola(fIndex)
+          ? getDiminishGyrate(polyhedron, faces[fIndex]) === 'ortho'
+          : true),
+    )
 
-  return faceGraphDistance(polyhedron, diminishedIndices, peakBoundary) >= 1
+  // FIXME make this more stable
+  return faceGraphDistance(polyhedron, diminishedIndices, peakBoundary) >=
+    (rhombicos ? 2 : 1)
     ? 'para'
     : 'meta'
 }

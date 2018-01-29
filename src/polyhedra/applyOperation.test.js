@@ -31,22 +31,20 @@ function isProperPolyhedron(polyhedron) {
 
 expect.extend({
   toBeValidPolyhedron(received) {
-    const pass =
-      received.isSame(Polyhedron.get(received.name)) &&
-      isProperPolyhedron(received)
+    const isProper = isProperPolyhedron(received)
+    const matchesName = received.isSame(Polyhedron.get(received.name))
     // TODO check the polyhedron is valid
-    if (pass) {
-      return {
-        message: () =>
-          `expected ${JSON.stringify(received)} not to be a valid polyhedron`,
-        pass: true,
-      }
-    } else {
-      return {
-        message: () =>
-          `expected ${JSON.stringify(received)} to be valid a valid polyhedron`,
-        pass: false,
-      }
+    return {
+      message: () => {
+        if (!isProper)
+          return `expected ${this.isNot
+            ? 'an improper'
+            : 'a proper'} CRF polyhedron`
+        return `expected polyhedron to ${this.isNot
+          ? 'not be'
+          : 'be'} a ${received.name}`
+      },
+      pass: isProper && matchesName,
     }
   },
 })

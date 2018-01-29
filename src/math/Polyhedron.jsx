@@ -319,23 +319,23 @@ export default class Polyhedron {
   }
 
   // Get the vertex indices of the polyhedron that represent the tops of pyramids
-  pyramidIndices() {
+  pyramidIndices = _.memoize(() => {
     return this.vIndices().filter(this.isPyramid)
-  }
+  })
 
-  fastigiumIndices() {
+  fastigiumIndices = _.memoize(() => {
     return this.edges.filter(this.isFastigium)
-  }
+  })
 
-  cupolaIndices() {
+  cupolaIndices = _.memoize(() => {
     // Return the face indices of all the faces that are tops of cupolae
     // find the face in the polyhedron whose vertices' adjacent faces are <face>-4-3-4
     return this.fIndices().filter(this.isCupola)
-  }
+  })
 
-  rotundaIndices() {
+  rotundaIndices = _.memoize(() => {
     return this.fIndices().filter(this.isRotunda)
-  }
+  })
 
   hitFaceIndex(point) {
     return _.minBy(this.fIndices(), fIndex => {

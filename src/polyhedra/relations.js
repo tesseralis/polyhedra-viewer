@@ -502,9 +502,9 @@ export function getNextPolyhedron(solid, operation, filterOpts) {
     .value()
   if (next.length > 1) {
     throw new Error(
-      `Multiple possibilities found for operation ${operation} on ${solid}: ${JSON.stringify(
-        next,
-      )}`,
+      `Multiple possibilities found for operation ${operation} on ${solid} with options ${JSON.stringify(
+        filterOpts,
+      )}: ${JSON.stringify(next)}`,
     )
   } else if (next.length === 0) {
     throw new Error(
