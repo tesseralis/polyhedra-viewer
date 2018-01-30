@@ -155,7 +155,7 @@ function removeExtraneousVertices(polyhedron) {
   return Polyhedron.of(newVertices, newFaces)
 }
 
-export function truncate(polyhedron, options) {
+function doTruncate(polyhedron, options = {}) {
   let newPolyhedron = polyhedron
   _.forEach(polyhedron.vertices, (vertex, index) => {
     newPolyhedron = truncateVertex(newPolyhedron, polyhedron, index, options)
@@ -163,8 +163,12 @@ export function truncate(polyhedron, options) {
   return deduplicateVertices(newPolyhedron)
 }
 
+export function truncate(polyhedron) {
+  return doTruncate(polyhedron)
+}
+
 export function rectify(polyhedron) {
-  return truncate(polyhedron, { rectify: true })
+  return doTruncate(polyhedron, { rectify: true })
 }
 
 export function antitruncate(polyhedron, args, { faceType } = {}) {
