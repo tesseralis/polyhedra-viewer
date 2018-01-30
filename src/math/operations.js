@@ -299,6 +299,10 @@ export function canAugment(polyhedron, faceIndex) {
   return false
 }
 
+export function getAugmentGraph(polyhedron) {
+  return polyhedron.fIndices().map(fIndex => canAugment(polyhedron, fIndex))
+}
+
 const sharesVertex = (face1, face2) => {
   const intersectionCount = _.intersection(face1, face2).length
   // Make sure they're not the same face
@@ -589,10 +593,11 @@ function doAugment(polyhedron, faceIndex, using, gyrate) {
   return removeExtraneousVertices(Polyhedron.of(newVertices, newFaces))
 }
 
-export function getAugmentFace(polyhedron, point) {
+export function getAugmentFace(polyhedron, point, graph) {
   const hitPoint = vec(point)
   const hitFaceIndex = polyhedron.hitFaceIndex(hitPoint)
-  return canAugment(polyhedron, hitFaceIndex) ? hitFaceIndex : -1
+  return graph[hitFaceIndex] ? hitFaceIndex : -1
+  // return canAugment(polyhedron, hitFaceIndex) ? hitFaceIndex : -1
 }
 
 function removeVertices(polyhedron, peak) {
