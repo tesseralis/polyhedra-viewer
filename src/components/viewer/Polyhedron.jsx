@@ -64,6 +64,7 @@ class Faces extends Component {
         onMouseDown={this.handleMouseDown}
         onMouseMove={this.handleMouseMove}
         onMouseUp={this.handleMouseUp}
+        onMouseOut={this.handleMouseOut}
       >
         <EventListener target="document" onLoad={_.once(this.handleLoad)} />
         <appearance>
@@ -118,6 +119,7 @@ class Faces extends Component {
     this.addEventListener('mousedown', this.handleMouseDown)
     this.addEventListener('mouseup', this.handleMouseUp)
     this.addEventListener('mousemove', this.handleMouseMove)
+    this.addEventListener('mouseout', this.handleMouseOut)
   }
 
   handleMouseDown = () => {
@@ -164,6 +166,10 @@ class Faces extends Component {
       default:
         return
     }
+  }
+
+  handleMouseOut = () => {
+    this.setState({ applyArgs: null })
   }
 }
 
