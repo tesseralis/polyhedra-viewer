@@ -1,5 +1,6 @@
 import _ from 'lodash'
 import { getNextPolyhedron, getRelations, getUsingOpt } from './relations'
+import Polyhedron from 'math/Polyhedron'
 import {
   truncate,
   rectify,
@@ -108,7 +109,8 @@ export default function applyOperation(
 
   const next = getNextPolyhedron(polyhedron.name, operation, _.pickBy(options))
   if (!_.isFunction(operations[operation])) {
-    throw new Error(`Function not found for ${operation}`)
+    // throw new Error(`Function not found for ${operation}`)
+    return Polyhedron.get(next)
   }
   return operations[operation](polyhedron, args, applyConfig).withName(next)
 }

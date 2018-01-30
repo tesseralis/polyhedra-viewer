@@ -48,8 +48,8 @@ export const applyOperation = (
   options,
 ) => dispatch => {
   const result = doApplyOperation(operation, polyhedron, args, options)
-
   dispatch(setPolyhedronRaw(result))
+
   if (_.isEmpty(getRelations(result.name, operation))) {
     dispatch(unsetMode())
   } else {
