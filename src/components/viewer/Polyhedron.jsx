@@ -40,12 +40,6 @@ const toRgb = hex =>
 const colorIndexForFace = mapObject(polygons, (n, i) => [n, i])
 const getColorIndex = face => colorIndexForFace[face.length]
 const polygonColors = colors => polygons.map(n => toRgb(colors[n]))
-const getColorAttr = colors =>
-  joinListOfLists(
-    _.flatMap(_.range(100), () => polygonColors(colors)).concat([[0, 1, 0]]),
-    ',',
-    ' ',
-  )
 
 class Faces extends Component {
   state = {
@@ -53,48 +47,17 @@ class Faces extends Component {
     error: null,
   }
 
-  getColors = () => {
-    // const buffer = _.times(100, _.constant([0, 0, 0]))
-    const { solidData: { faces }, config: { colors } } = this.props
-    const { applyArgs } = this.state
-    const defaultColors = polygonColors(colors)
-    const buffer = _.times(100, _.constant([0, 0, 0]))
-    const foo = joinListOfLists(
-      faces
-        .map((face, fIndex) => {
-          if (_.isNumber(applyArgs) && fIndex === applyArgs) {
-            return [0, 1, 0]
-          }
-          if (
-            _.isObject(applyArgs) &&
-            _.includes(applyArgs.faceIndices(), fIndex)
-          ) {
-            return [1, 1, 0]
-          }
-          return defaultColors[getColorIndex(face)]
-        })
-        .concat(buffer),
-      ',',
-      ' ',
-    )
-    console.log(foo)
-    return foo
-  }
-
   render() {
     const { solidData, config } = this.props
-    const { applyArgs, error } = this.state
-    const { opacity, colors } = config
+    const { error } = this.state
+    const { opacity } = config
     const { vertices, faces } = solidData
-    // this.getColors()
 
     if (error) {
       throw error
     }
-    // TODO implement highlighting
     // NOTE: The mouse handlers are duplicated to make it easy to test on enzyme.
     // They don't actually do anything in production
-    // colorindex={faces.map(this.getColors).join(' ')}
     return (
       <shape
         ref={shape => (this.shape = shape)}
@@ -116,6 +79,26 @@ class Faces extends Component {
         </indexedfaceset>
       </shape>
     )
+  }
+
+  getColorForFace = (face, fIndex) => {
+    const { applyArgs } = this.state
+    const { config: { colors } } = this.props
+    const defaultColors = polygonColors(colors)
+
+    // TODO pick better colors / have better effects
+    if (_.isNumber(applyArgs) && fIndex === applyArgs) {
+      return [0, 1, 0]
+    }
+    if (_.isObject(applyArgs) && _.includes(applyArgs.faceIndices(), fIndex)) {
+      return [1, 1, 0]
+    }
+    return defaultColors[getColorIndex(face)]
+  }
+
+  getColors = () => {
+    const { solidData: { faces } } = this.props
+    return joinListOfLists(faces.map(this.getColorForFace), ',', ' ')
   }
 
   // Manually adding event listeners swallows errors, so we have to store it in the component itself
@@ -149,18 +132,21 @@ class Faces extends Component {
 
     if (operation && !_.isNil(applyArgs)) {
       applyOperation(operation, solidData, applyArgs, options)
-      this.setState({ applyArgs: null })
+      // prevent the operation from doing something else
+      if (operation !== 'g') {
+        this.setState({ applyArgs: null })
+      }
     }
   }
 
   handleMouseMove = event => {
     // TODO replace this with logs
     this.drag = true
-    const { solidData, operation, augments } = this.props
+    const { solidData, operation, augmentInfo } = this.props
     console.log('operation', operation)
     switch (operation) {
       case '+':
-        const fIndex = getAugmentFace(solidData, event.hitPnt, augments)
+        const fIndex = getAugmentFace(solidData, augmentInfo, event.hitPnt)
         console.log('fIndex', fIndex)
         this.setState({
           applyArgs: fIndex === -1 ? null : fIndex,
@@ -185,7 +171,7 @@ const ConnectedFaces = connect(
   createStructuredSelector({
     operation: getOperation,
     options: getApplyOpts,
-    augments: getAugments,
+    augmentInfo: getAugments,
   }),
   { applyOperation },
 )(Faces)

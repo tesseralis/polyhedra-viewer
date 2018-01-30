@@ -593,11 +593,10 @@ function doAugment(polyhedron, faceIndex, using, gyrate) {
   return removeExtraneousVertices(Polyhedron.of(newVertices, newFaces))
 }
 
-export function getAugmentFace(polyhedron, point, graph) {
+export function getAugmentFace(polyhedron, graph, point) {
   const hitPoint = vec(point)
   const hitFaceIndex = polyhedron.hitFaceIndex(hitPoint)
   return graph[hitFaceIndex] ? hitFaceIndex : -1
-  // return canAugment(polyhedron, hitFaceIndex) ? hitFaceIndex : -1
 }
 
 function removeVertices(polyhedron, peak) {
