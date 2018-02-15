@@ -26,6 +26,7 @@ const archimedean = {
   aC: {
     // TODO (possibly) coxeter snub and rectify relations
     t: 'bC',
+    p: 'I',
   },
   eC: {
     p: 'sC',
@@ -38,7 +39,7 @@ const archimedean = {
     s: 'sD',
   },
   I: {
-    a: 'tI',
+    t: 'tI',
     a: 'aD',
     e: 'eD',
     s: 'sD',

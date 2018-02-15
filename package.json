@@ -16,6 +16,7 @@
     "d3-scale-chromatic": "^1.1.1",
     "lodash": "^4.17.4",
     "mdi": "^2.1.19",
+    "rc-tooltip": "^3.7.0",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
     "react-event-listener": "^0.5.3",

@@ -48,12 +48,12 @@ describe('viewer', () => {
       .clickButtonWithText('augment')
   })
 
-  it('can triaugment a trinagular prism', () => {
+  it('can triaugment a triangular prism', () => {
     setup('/triangular-prism/related')
     appPage
       // test gyrobifastigium
       .clickButtonWithText('augment')
-      .clickButtonWithText('U2')
+      .clickButtonWithText('fastigium')
       .clickFaceWithNumSides(4)
       .expectTransitionTo('gyrobifastigium')
       .clickButtonWithText('diminish')
@@ -61,7 +61,7 @@ describe('viewer', () => {
       .expectTransitionTo('triangular-prism')
       // augmented with pyramids
       .clickButtonWithText('augment')
-      .clickButtonWithText('Y4')
+      .clickButtonWithText('pyramid')
       .clickFaceWithNumSides(4)
       .expectTransitionTo('augmented-triangular-prism')
       .clickFaceWithNumSides(4)

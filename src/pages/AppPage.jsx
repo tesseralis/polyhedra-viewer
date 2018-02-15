@@ -28,6 +28,7 @@ export default class AppPage {
   }
 
   clickButtonWithText(text) {
+    console.log('click button with text', text)
     this.findButtonWithText(text).simulate('click')
     return this
   }
