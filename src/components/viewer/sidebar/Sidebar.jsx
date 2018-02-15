@@ -29,10 +29,14 @@ const Sidebar = ({ match, solid }) => {
   return (
     <section className={css(styles.sidebar)}>
       <div className={css(styles.menu)}>
-        <IconLink replace to={`${match.url}`} name="info" />
-        <IconLink replace to={`${match.url}/related`} name="link" />
-        <IconLink replace to={`${match.url}/config`} name="cog" />
-        <IconLink replace to={`${match.url}/list`} name="list" />
+        <IconLink replace to={`${match.url}`} name="information-variant" />
+        <IconLink replace to={`${match.url}/related`} name="math-compass" />
+        <IconLink replace to={`${match.url}/config`} name="settings" />
+        <IconLink
+          replace
+          to={`${match.url}/list`}
+          name="format-list-bulleted"
+        />
         <IconLink to="/" name="home" />
       </div>
       <Route
