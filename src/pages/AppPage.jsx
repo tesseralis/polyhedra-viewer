@@ -20,11 +20,15 @@ export default class AppPage {
     )
   }
 
+  // Find a (not disabled) button with the given text
+  findButtonWithText(text) {
+    return this.wrapper
+      .find('button')
+      .filterWhere(n => n.text() === text && !n.prop('disabled'))
+  }
+
   clickButtonWithText(text) {
-    // click on the "augment" button
-    this.wrapper
-      .findWhere(n => n.type() === 'button' && n.text() === text)
-      .simulate('click')
+    this.findButtonWithText(text).simulate('click')
     return this
   }
 
@@ -49,9 +53,7 @@ export default class AppPage {
   }
 
   expectNoButtonWithText(text) {
-    expect(
-      this.wrapper.findWhere(n => n.type() === 'button' && n.text() === text),
-    ).toHaveLength(0)
+    expect(this.findButtonWithText(text)).toHaveLength(0)
     return this
   }
 
