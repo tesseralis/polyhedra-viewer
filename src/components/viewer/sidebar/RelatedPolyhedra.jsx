@@ -3,14 +3,15 @@ import React from 'react'
 import { css, StyleSheet } from 'aphrodite/no-important'
 import { connect } from 'react-redux'
 import { createStructuredSelector } from 'reselect'
-import Tooltip from 'rc-tooltip'
-import 'rc-tooltip/assets/bootstrap.css'
+// import Tooltip from 'rc-tooltip'
+// import 'rc-tooltip/assets/bootstrap.css'
 
 import { toConwayNotation } from 'polyhedra/names'
 import { applyOperation, setMode, setApplyOpt } from 'actions'
 import { getPolyhedron, getOperation, getApplyOpts } from 'selectors'
 
 import { polyhedraGraph, getUsingOpts } from 'polyhedra/relations'
+import Tooltip from './Tooltip'
 
 const styles = StyleSheet.create({
   opGrid: {
@@ -194,8 +195,7 @@ function RelatedPolyhedra({
               {buttons.map(relation => (
                 <Tooltip
                   key={relation.value}
-                  placement="bottom"
-                  overlay={<div>{description}</div>}
+                  content={description}
                   trigger={!!relations ? ['hover'] : []}
                 >
                   <button
@@ -223,10 +223,7 @@ function RelatedPolyhedra({
                 {optionArgs.map(
                   ({ name, values, value, description: optDesc }) => (
                     <div key={name} className={css(styles.options)}>
-                      <Tooltip
-                        placement="bottom"
-                        overlay={<div>{optDesc}</div>}
-                      >
+                      <Tooltip content={optDesc}>
                         <span>{name}: </span>
                       </Tooltip>
                       {values.map(optValue => (
