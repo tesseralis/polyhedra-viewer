@@ -2,11 +2,86 @@ import _ from 'lodash'
 import periodicTable from 'constants/periodicTable'
 import { fromConwayNotation, toConwayNotation } from './names'
 
+export const operations = [
+  {
+    name: 'truncate',
+    symbol: 't',
+    description: 'Cut and create a new face at each vertex.',
+  },
+  {
+    name: 'rectify',
+    symbol: 'a',
+    description: 'Cut (truncate) each vertex at the midpoint of each edge.',
+  },
+  {
+    name: 'cumulate',
+    symbol: 'k',
+    description: 'Opposite of truncation. Append a pyramid at certain faces.',
+  },
+  {
+    name: 'dual',
+    symbol: 'd',
+    description: 'Replace each face with a vertex.',
+  },
+  {
+    name: 'expand',
+    symbol: 'e',
+    description: 'Pull out faces, creating new square faces.',
+  },
+  {
+    name: 'snub',
+    symbol: 's',
+    description: 'Pull out and twist faces, creating new triangular faces.',
+  },
+  {
+    name: 'contract',
+    symbol: 'c',
+    description: 'Opposite of expand/snub. Shrink faces in, removing faces.',
+  },
+  {
+    name: 'elongate',
+    symbol: 'P',
+    description: 'Extend with a prism.',
+  },
+  {
+    name: 'gyroelongate',
+    symbol: 'A',
+    description: 'Extend with an antiprism.',
+  },
+  {
+    name: 'shorten',
+    symbol: 'h',
+    description: 'Remove a prism or antiprism',
+  },
+  {
+    name: 'twist',
+    symbol: 'p',
+    description:
+      'Replace each square face with two triangular faces, or vice versa.',
+  },
+  {
+    name: 'augment',
+    symbol: '+',
+    description: 'Append a pyramid, cupola, or rotunda.',
+  },
+  {
+    name: 'diminish',
+    symbol: '-',
+    description: 'Remove a pyramid, cupola, or rotunda.',
+  },
+  {
+    name: 'gyrate',
+    symbol: 'g',
+    description: 'Rotate a cupola or rotunda.',
+  },
+]
+
+// TODO: adapt this from the table to we don't miss anything
 const archimedean = {
   T: {
     d: 'T',
     t: 'tT',
-    r: 'O',
+    a: 'O',
     e: 'aC',
     s: 'I',
   },

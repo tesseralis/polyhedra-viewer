@@ -3,14 +3,11 @@ import React from 'react'
 import { css, StyleSheet } from 'aphrodite/no-important'
 import { connect } from 'react-redux'
 import { createStructuredSelector } from 'reselect'
-// import Tooltip from 'rc-tooltip'
-// import 'rc-tooltip/assets/bootstrap.css'
 
-import { toConwayNotation } from 'polyhedra/names'
 import { applyOperation, setMode, setApplyOpt } from 'actions'
 import { getPolyhedron, getOperation, getApplyOpts } from 'selectors'
 
-import { polyhedraGraph, getUsingOpts } from 'polyhedra/relations'
+import { operations, getRelations, getUsingOpts } from 'polyhedra/relations'
 import Tooltip from './Tooltip'
 
 const styles = StyleSheet.create({
@@ -60,80 +57,6 @@ const styles = StyleSheet.create({
   },
 })
 
-const operations = [
-  {
-    name: 'truncate',
-    symbol: 't',
-    description: 'Cut and create a new face at each vertex.',
-  },
-  {
-    name: 'rectify',
-    symbol: 'a',
-    description: 'Cut (truncate) each vertex at the midpoint of each edge.',
-  },
-  {
-    name: 'cumulate',
-    symbol: 'k',
-    description: 'Opposite of truncation. Append a pyramid at certain faces.',
-  },
-  {
-    name: 'dual',
-    symbol: 'd',
-    description: 'Replace each face with a vertex.',
-  },
-  {
-    name: 'expand',
-    symbol: 'e',
-    description: 'Pull out faces, creating new square faces.',
-  },
-  {
-    name: 'snub',
-    symbol: 's',
-    description: 'Pull out and twist faces, creating new triangular faces.',
-  },
-  {
-    name: 'contract',
-    symbol: 'c',
-    description: 'Opposite of expand/snub. Shrink faces in, removing faces.',
-  },
-  {
-    name: 'elongate',
-    symbol: 'P',
-    description: 'Extend with a prism.',
-  },
-  {
-    name: 'gyroelongate',
-    symbol: 'A',
-    description: 'Extend with an antiprism.',
-  },
-  {
-    name: 'shorten',
-    symbol: 'h',
-    description: 'Remove a prism or antiprism',
-  },
-  {
-    name: 'twist',
-    symbol: 'p',
-    description:
-      'Replace each square face with two triangular faces, or vice versa.',
-  },
-  {
-    name: 'augment',
-    symbol: '+',
-    description: 'Append a pyramid, cupola, or rotunda.',
-  },
-  {
-    name: 'diminish',
-    symbol: '-',
-    description: 'Remove a pyramid, cupola, or rotunda.',
-  },
-  {
-    name: 'gyrate',
-    symbol: 'g',
-    description: 'Rotate a cupola or rotunda.',
-  },
-]
-
 const hasMode = ['+', '-', 'g']
 
 const getOptionName = optValue => {
@@ -151,17 +74,7 @@ const getOptionName = optValue => {
   }
 }
 
-function RelatedPolyhedra({
-  solid,
-  polyhedron,
-  mode,
-  options,
-  applyOperation,
-  setMode,
-  setApplyOpt,
-}) {
-  const notation = toConwayNotation(solid)
-  const related = polyhedraGraph[notation]
+function AugmentOptions({ options, solid, onClickOption }) {
   const { gyrate, using } = options
 
   const optionArgs = [
@@ -181,9 +94,44 @@ function RelatedPolyhedra({
   ]
 
   return (
+    <div>
+      {optionArgs.map(({ name, values, value, description }) => (
+        <div key={name} className={css(styles.options)}>
+          <Tooltip content={description}>
+            <span>{name}: </span>
+          </Tooltip>
+          {values.map(optValue => (
+            <button
+              key={optValue}
+              onClick={() => onClickOption(name, optValue)}
+              disabled={!value}
+              className={css(
+                styles.optionButton,
+                optValue === value && styles.isHighlighted,
+              )}
+            >
+              {getOptionName(optValue)}
+            </button>
+          ))}
+        </div>
+      ))}
+    </div>
+  )
+}
+
+function RelatedPolyhedra({
+  solid,
+  polyhedron,
+  mode,
+  options,
+  applyOperation,
+  setMode,
+  setApplyOpt,
+}) {
+  return (
     <div className={css(styles.opGrid)}>
       {operations.map(({ name, symbol: operation, description }) => {
-        const relations = related[operation]
+        const relations = getRelations(solid, operation)
         const buttons =
           !relations || _.includes(hasMode, operation)
             ? [{ value: '' }]
@@ -219,30 +167,11 @@ function RelatedPolyhedra({
               ))}
             </div>
             {operation === '+' && (
-              <div>
-                {optionArgs.map(
-                  ({ name, values, value, description: optDesc }) => (
-                    <div key={name} className={css(styles.options)}>
-                      <Tooltip content={optDesc}>
-                        <span>{name}: </span>
-                      </Tooltip>
-                      {values.map(optValue => (
-                        <button
-                          key={optValue}
-                          onClick={() => setApplyOpt(name, optValue)}
-                          disabled={!value}
-                          className={css(
-                            styles.optionButton,
-                            optValue === value && styles.isHighlighted,
-                          )}
-                        >
-                          {getOptionName(optValue)}
-                        </button>
-                      ))}
-                    </div>
-                  ),
-                )}
-              </div>
+              <AugmentOptions
+                solid={solid}
+                options={options}
+                onClickOption={setApplyOpt}
+              />
             )}
           </div>
         )

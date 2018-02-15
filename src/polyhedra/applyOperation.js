@@ -1,6 +1,7 @@
 import _ from 'lodash'
 import { getNextPolyhedron, getRelations, getUsingOpt } from './relations'
 import Polyhedron from 'math/Polyhedron'
+// TODO move the op functions to an object so we can reference them?
 import {
   truncate,
   rectify,
