@@ -4,54 +4,11 @@ import { css, StyleSheet } from 'aphrodite/no-important'
 import { connect } from 'react-redux'
 import { createStructuredSelector } from 'reselect'
 
-import { toConwayNotation, fromConwayNotation } from 'polyhedra/names'
+import { toConwayNotation } from 'polyhedra/names'
 import { applyOperation, setMode, setApplyOpt } from 'actions'
 import { getPolyhedron, getOperation, getApplyOpts } from 'selectors'
 
 import { polyhedraGraph, getUsingOpts } from 'polyhedra/relations'
-import PolyhedronLink from 'components/common/PolyhedronLink'
-
-const operations = {
-  d: 'dual',
-  t: 'truncation',
-  r: 'rectification',
-  e: 'cantellation',
-  s: 'snub',
-
-  '~t': 'truncation of',
-  '~r': 'rectification of',
-  '~e': 'cantellation of',
-  '~s': 'snub of',
-
-  '+': 'augment',
-  '-': 'diminish',
-  P: 'elongate',
-  A: 'gyroelongate',
-  '~P': 'shorten',
-  '~A': 'shorten',
-  g: 'gyrate',
-}
-
-const operationOrder = [
-  'd',
-  't',
-  'r',
-  'e',
-  's',
-
-  '~t',
-  '~r',
-  '~e',
-  '~s',
-
-  '+',
-  '-',
-  'P',
-  'A',
-  '~P',
-  '~A',
-  'g',
-]
 
 const styles = StyleSheet.create({
   opGrid: {
