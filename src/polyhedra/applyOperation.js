@@ -19,7 +19,7 @@ import {
 
 const operations = {
   t: truncate,
-  r: rectify,
+  a: rectify,
   k: cumulate,
   P: elongate,
   A: gyroelongate,

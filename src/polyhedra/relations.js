@@ -7,19 +7,19 @@ const archimedean = {
     d: 'T',
     t: 'tT',
     r: 'O',
-    e: 'rC',
+    e: 'aC',
     s: 'I',
   },
   C: {
     d: 'O',
-    t: 'tC',
+    a: 'tC',
     r: 'aC',
     e: 'eC',
     s: 'sC',
   },
   O: {
     t: 'tO',
-    r: 'aC',
+    a: 'aC',
     e: 'eC',
     s: 'sC',
   },
@@ -33,18 +33,18 @@ const archimedean = {
   D: {
     d: 'D',
     t: 'tD',
-    r: 'aD',
+    a: 'aD',
     e: 'eD',
     s: 'sD',
   },
   I: {
-    t: 'tI',
-    r: 'aD',
+    a: 'tI',
+    a: 'aD',
     e: 'eD',
     s: 'sD',
   },
   aD: {
-    t: 'bD',
+    a: 'bD',
   },
   eD: {
     p: 'sD',
@@ -95,7 +95,7 @@ const getInverseOperation = operation => {
     case '-':
       return '+'
     case 't':
-    case 'r':
+    case 'a':
       return 'k'
     case 'e':
     case 's':

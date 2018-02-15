@@ -78,7 +78,7 @@ const hasMode = ['+', '-', 'g']
 
 const opSymbols = {
   truncate: 't',
-  rectify: 'r',
+  rectify: 'a',
   cumulate: 'k', // for 'kis'
   dual: 'd',
   expand: 'e',
