@@ -8,13 +8,13 @@
     "exports-loader": "^0.6.4",
     "file-loader": "^0.10.1",
     "json-loader": "^0.5.7",
-    "react-scripts": "^1.0.17"
+    "react-scripts": "^1.1.1"
   },
   "dependencies": {
     "aphrodite": "^1.2.5",
     "d3-color": "^1.0.3",
-    "d3-scale-chromatic": "^1.1.1",
-    "lodash": "^4.17.4",
+    "d3-scale-chromatic": "^1.2.0",
+    "lodash": "^4.17.5",
     "mdi": "^2.1.19",
     "rc-tooltip": "^3.7.0",
     "react": "^16.2.0",
