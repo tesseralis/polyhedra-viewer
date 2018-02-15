@@ -54,31 +54,45 @@ const operationOrder = [
 ]
 
 const styles = StyleSheet.create({
-  container: {
-    padding: 20,
+  opGrid: {
+    padding: '0 10px',
+    display: 'grid',
+    gridGap: 10,
+    gridTemplateAreas: `
+      "truncate rectify      dual"
+      "cumulate cumulate     dual"
+      "expand   snub         twist"
+      "contract contract     twist"
+      "elongate gyroelongate twist"
+      "shorten  shorten      twist"
+      "augment  augment      gyrate"
+      "diminish diminish     gyrate"
+    `,
   },
 
   operations: {
     padding: '10px 0',
   },
 
-  title: {
-    textAlign: 'center',
-  },
-
   options: {
     display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    height: '100%',
+    minHeight: 40,
   },
 
   modeButton: {
+    fontSize: 14,
     width: '100%',
-    height: 50,
-    fontSize: 20,
+    height: '100%',
+    minHeight: 40,
+    padding: '10px 0',
   },
 
   optionButton: {
-    width: '50%',
     height: 30,
+    width: '100%',
   },
 
   isHighlighted: {
@@ -86,109 +100,131 @@ const styles = StyleSheet.create({
   },
 })
 
+const ops = [
+  'truncate',
+  'rectify',
+  'cumulate',
+  'dual',
+  'expand',
+  'snub',
+  'contract',
+  'elongate',
+  'gyroelongate',
+  'shorten',
+  'twist',
+  'augment',
+  'diminish',
+  'gyrate',
+]
+
+const hasMode = ['+', '-', 'g']
+
+const opSymbols = {
+  truncate: 't',
+  rectify: 'r',
+  cumulate: 'k', // for 'kis'
+  dual: 'd',
+  expand: 'e',
+  snub: 's',
+  contract: 'c', // not an official symbol
+  twist: 'p', // for "propeller". I *think* this is what this is
+  augment: '+',
+  diminish: '-',
+  elongate: 'P',
+  gyroelongate: 'A',
+  shorten: 'h', // not an official symbol
+  gyrate: 'g',
+}
+
 function RelatedPolyhedra({
   solid,
   polyhedron,
   mode,
-  options: { gyrate, using },
+  options,
   applyOperation,
   setMode,
   setApplyOpt,
 }) {
-  const notation = toConwayNotation(solid.replace(/-/g, ' '))
+  const notation = toConwayNotation(solid)
   const related = polyhedraGraph[notation]
+  const { gyrate, using } = options
 
   return (
-    <div className={css(styles.container)}>
-      {operationOrder.map(operation => {
-        if (
-          !related ||
-          !related[operation] ||
-          !_.compact(related[operation]).length
-        )
-          return null
-        if (_.includes(['g', '-', '+'], operation)) {
-          return (
-            <div key={operation}>
-              <button
-                className={css(
-                  styles.modeButton,
-                  mode === operation && styles.isHighlighted,
-                )}
-                onClick={() => setMode(solid, operation)}
-              >
-                {operations[operation]}
-              </button>
-              {operation === '+' &&
-                !!gyrate && (
-                  <div>
-                    <button
-                      className={css(
-                        styles.optionButton,
-                        gyrate === 'ortho' && styles.isHighlighted,
-                      )}
-                      onClick={() => setApplyOpt('gyrate', 'ortho')}
-                    >
-                      Ortho
-                    </button>
-                    <button
-                      className={css(
-                        styles.optionButton,
-                        gyrate === 'gyro' && styles.isHighlighted,
-                      )}
-                      onClick={() => setApplyOpt('gyrate', 'gyro')}
-                    >
-                      Gyro
-                    </button>
-                  </div>
-                )}
-              {operation === '+' &&
-                !!using && (
-                  <div>
-                    {getUsingOpts(solid).map(usingOpt => (
+    <div className={css(styles.opGrid)}>
+      {ops.map(op => {
+        const operation = opSymbols[op]
+        const relations = related[operation]
+        const buttons =
+          !relations || _.includes(hasMode, operation)
+            ? [{ value: '' }]
+            : relations
+        const showResult = buttons.length > 1
+        return (
+          <div key={op} style={{ gridArea: op }}>
+            <div className={css(styles.options)}>
+              {buttons.map(relation => {
+                return (
+                  <button
+                    key={relation.value}
+                    className={css(
+                      styles.modeButton,
+                      mode === operation && styles.isHighlighted,
+                    )}
+                    disabled={!relations}
+                    onClick={() => {
+                      if (_.includes(hasMode, operation)) {
+                        setMode(solid, operation)
+                      } else {
+                        applyOperation(operation, polyhedron, null, relation)
+                      }
+                    }}
+                  >
+                    {op}
+                    {showResult ? `: ${relation.value}` : ''}
+                  </button>
+                )
+              })}
+            </div>
+            {operation === '+' && (
+              <div>
+                <div className={css(styles.options)}>
+                  gyrate:{' '}
+                  {['ortho', 'gyro'].map(gyrateOpt => {
+                    return (
                       <button
-                        key={usingOpt}
+                        key={gyrateOpt}
+                        onClick={() => setApplyOpt('gyrate', gyrateOpt)}
+                        disabled={!gyrate}
                         className={css(
                           styles.optionButton,
-                          using === usingOpt && styles.isHighlighted,
+                          gyrateOpt === gyrate && styles.isHighlighted,
                         )}
+                      >
+                        {gyrateOpt}
+                      </button>
+                    )
+                  })}
+                </div>
+                <div className={css(styles.options)}>
+                  using:{' '}
+                  {getUsingOpts(solid).map(usingOpt => {
+                    return (
+                      <button
+                        key={usingOpt}
                         onClick={() => setApplyOpt('using', usingOpt)}
+                        disabled={!using}
+                        className={css(
+                          styles.optionButton,
+                          usingOpt === using && styles.isHighlighted,
+                        )}
                       >
                         {usingOpt}
                       </button>
-                    ))}
-                  </div>
-                )}
-            </div>
-          )
-        }
-        return (
-          <div key={operation} className={css(styles.operations)}>
-            {_.compact(related[operation]).map(relation => {
-              const nextValue = relation.value
-              if (!nextValue) return null
-              const name = fromConwayNotation(nextValue)
-              return (
-                <button
-                  key={name}
-                  className={css(styles.modeButton)}
-                  onClick={() =>
-                    applyOperation(operation, polyhedron, null, relation)}
-                >
-                  {operations[operation]}
-                </button>
-              )
-              // // TODO make this a button instead
-              // return (
-              //   <PolyhedronLink
-              //     large
-              //     key={name}
-              //     name={name}
-              //     onClick={() => applyOperation(operation, polyhedron)}
-              //     subLink="related"
-              //   />
-              // )
-            })}
+                    )
+                  })}
+                </div>
+              </div>
+            )}
           </div>
         )
       })}

@@ -171,7 +171,7 @@ export function rectify(polyhedron) {
   return doTruncate(polyhedron, { rectify: true })
 }
 
-export function antitruncate(polyhedron, args, { faceType } = {}) {
+export function cumulate(polyhedron, args, { faceType } = {}) {
   const { vertices, faces } = polyhedron
   const n = faceType || _.min(faces.map(numSides))
   const fIndices = polyhedron

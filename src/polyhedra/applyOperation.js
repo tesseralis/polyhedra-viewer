@@ -4,7 +4,7 @@ import Polyhedron from 'math/Polyhedron'
 import {
   truncate,
   rectify,
-  antitruncate,
+  cumulate,
   elongate,
   gyroelongate,
   shorten,
@@ -20,12 +20,10 @@ import {
 const operations = {
   t: truncate,
   r: rectify,
-  '~t': antitruncate,
-  '~r': antitruncate,
+  k: cumulate,
   P: elongate,
   A: gyroelongate,
-  '~P': shorten,
-  '~A': shorten,
+  h: shorten,
   '+': augment,
   '-': diminish,
   g: gyrate,
@@ -52,7 +50,7 @@ export default function applyOperation(
   args,
   config = {},
 ) {
-  let options = {}
+  let options = config
   let applyConfig = {}
   const relations = getRelations(polyhedron.name, operation)
   if (operation === '+') {
@@ -102,7 +100,7 @@ export default function applyOperation(
         options.align = getPeakAlignment(polyhedron, peak)
       }
     }
-  } else if (operation === '~r') {
+  } else if (_.includes(['k', 'c'], operation)) {
     applyConfig = { faceType: platonicMap[config.value] }
     options = config
   }

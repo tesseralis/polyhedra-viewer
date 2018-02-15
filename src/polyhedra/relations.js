@@ -7,39 +7,47 @@ const archimedean = {
     d: 'T',
     t: 'tT',
     r: 'O',
+    e: 'rC',
+    s: 'I',
   },
   C: {
     d: 'O',
     t: 'tC',
     r: 'aC',
     e: 'eC',
+    s: 'sC',
   },
   O: {
     t: 'tO',
     r: 'aC',
     e: 'eC',
-    s: 'I',
+    s: 'sC',
   },
   aC: {
+    // TODO (possibly) coxeter snub and rectify relations
     t: 'bC',
-    r: 'eC',
-    s: 'sC',
+  },
+  eC: {
+    p: 'sC',
   },
   D: {
     d: 'D',
     t: 'tD',
     r: 'aD',
     e: 'eD',
+    s: 'sD',
   },
   I: {
     t: 'tI',
     r: 'aD',
     e: 'eD',
+    s: 'sD',
   },
   aD: {
     t: 'bD',
-    r: 'eD',
-    s: 'sD',
+  },
+  eD: {
+    p: 'sD',
   },
 }
 
@@ -79,12 +87,22 @@ const getInverseOperation = operation => {
     // dual
     case 'd':
     case 'g':
+    case 'p':
       return operation
     // agument / diminish
     case '+':
       return '-'
     case '-':
       return '+'
+    case 't':
+    case 'r':
+      return 'k'
+    case 'e':
+    case 's':
+      return 'c'
+    case 'P':
+    case 'A':
+      return 'h'
     default:
       return `~${operation}`
   }
@@ -279,7 +297,7 @@ const basePyramidsCupolae = (() => {
         '+': augmentations(name, 'gyroelongated bi-'),
       },
       [gyroelongatedBi]: {
-        g: { value: gyroelongatedBi },
+        g: _.isArray(bi) ? { value: gyroelongatedBi } : null,
       },
     })
 
