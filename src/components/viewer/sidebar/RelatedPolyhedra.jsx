@@ -119,6 +119,7 @@ function AugmentOptions({ options, solid, onClickOption }) {
   )
 }
 
+// TODO this could probably use a test to make sure all the buttons are in the right places
 function RelatedPolyhedra({
   solid,
   polyhedron,

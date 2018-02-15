@@ -327,19 +327,23 @@ const basePyramidsCupolae = (() => {
   // relation of prisms and antiprisms
   _.forEach(prisms, (row, name) => {
     const { prism, antiprism } = row
+    const hasRotunda = name.startsWith('decagonal')
     const pyramidRow = getPyramidFromPrism(name)
     const { elongated, gyroelongated } = pyramidsCupolae[pyramidRow]
+    const rotundaRow = pyramidsCupolae['pentagonal rotunda']
     const using = getPyramidCupolaConway(pyramidRow)
+    const augmentations = getAugmentations(using)
     graph = graphMerge(graph, {
       [prism]: {
-        '+': [{ value: elongated, using }],
+        '+': [
+          { value: elongated, using },
+          hasRotunda && { value: rotundaRow.elongated, using: 'R5' },
+        ],
       },
       [antiprism]: {
         '+': [
-          {
-            value: gyroelongated,
-            using,
-          },
+          { value: gyroelongated, using },
+          hasRotunda && { value: rotundaRow.gyroelongated, using: 'R5' },
         ],
       },
     })
