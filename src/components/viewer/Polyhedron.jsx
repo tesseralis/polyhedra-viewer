@@ -37,7 +37,7 @@ const polygonColors = colors => polygons.map(n => toRgb(colors[n]))
 
 class Faces extends Component {
   state = {
-    applyArgs: null,
+    applyArgs: {},
     error: null,
   }
 
@@ -82,10 +82,18 @@ class Faces extends Component {
     const defaultColors = polygonColors(colors)
 
     // TODO pick better colors / have better effects
-    if (_.isNumber(applyArgs) && fIndex === applyArgs) {
+    if (
+      applyArgs &&
+      _.isNumber(applyArgs.fIndex) &&
+      fIndex === applyArgs.fIndex
+    ) {
       return [0, 1, 0]
     }
-    if (_.isObject(applyArgs) && _.includes(applyArgs.faceIndices(), fIndex)) {
+    if (
+      applyArgs &&
+      _.isObject(applyArgs.peak) &&
+      _.includes(applyArgs.peak.faceIndices(), fIndex)
+    ) {
       return [1, 1, 0]
     }
     return defaultColors[getColorIndex(face)]
@@ -123,18 +131,19 @@ class Faces extends Component {
 
   handleMouseUp = () => {
     if (this.drag) return
-    const { operation, options, applyOperation } = this.props
+    const { operation, applyOperation } = this.props
     const { applyArgs } = this.state
 
     if (operation && !_.isNil(applyArgs)) {
-      applyOperation(operation, applyArgs, options)
+      applyOperation(operation, applyArgs)
       // prevent the operation from doing something else
       if (operation !== 'g') {
-        this.setState({ applyArgs: null })
+        this.setState({ applyArgs: {} })
       }
     }
   }
 
+  // FIXME double click error is back
   handleMouseMove = event => {
     // TODO replace this with logs
     this.drag = true
@@ -145,8 +154,9 @@ class Faces extends Component {
         const fIndex = getAugmentFace(solidData, augmentInfo, event.hitPnt)
         console.log('fIndex', fIndex)
         this.setState({
-          applyArgs: fIndex === -1 ? null : fIndex,
+          applyArgs: fIndex === -1 ? {} : { fIndex },
         })
+        // TODO what is this for?
         this.forceUpdate()
         return
       case '-':
@@ -154,7 +164,7 @@ class Faces extends Component {
         const peak = solidData.findPeak(event.hitPnt)
         console.log('peak', peak && peak.innerVertexIndices())
         this.setState({
-          applyArgs: peak,
+          applyArgs: { peak },
         })
         return
       default:
@@ -163,7 +173,7 @@ class Faces extends Component {
   }
 
   handleMouseOut = () => {
-    this.setState({ applyArgs: null })
+    this.setState({ applyArgs: {} })
   }
 }
 

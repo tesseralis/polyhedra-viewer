@@ -18,3 +18,9 @@ export function replace(array, index, ...values) {
   const after = _.slice(array, index + 1)
   return [...before, ...values, ...after]
 }
+
+const f = (a, b) => [].concat(...a.map(d => b.map(e => [].concat(d, e))))
+/**
+ * Calculate the cartesian product of the given arrays.
+ */
+export const cartesian = (a, b, ...c) => (b ? cartesian(f(a, b), ...c) : a)

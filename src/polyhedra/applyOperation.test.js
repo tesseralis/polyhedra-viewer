@@ -1,4 +1,5 @@
 import _ from 'lodash'
+import { cartesian } from 'util.js'
 import { allSolidNames } from 'data'
 import { PRECISION } from 'math/linAlg'
 import { getOperations, getRelations } from 'polyhedra/relations'
@@ -49,34 +50,27 @@ expect.extend({
   },
 })
 
-function getArgsToTest(operation, polyhedron) {
-  switch (operation) {
-    case '-':
-    case 'g':
-      return polyhedron.peaks()
-    case '+':
-      return polyhedron
-        .fIndices()
-        .filter(fIndex => canAugment(polyhedron, fIndex))
-    default:
-      return [undefined]
-  }
-}
-
 function getOptsToTest(operation, polyhedron) {
   switch (operation) {
     case '+':
       const relations = getRelations(polyhedron.name, operation)
-      const gyrateOpts = _.uniq(_.map(relations, 'gyrate'))
-      const usingOpts = _.uniq(_.map(relations, 'using'))
-      return _.flatMapDeep(gyrateOpts, gyrate => {
-        return usingOpts.map(using => {
-          return {
-            gyrate: _.uniq(_.compact(gyrateOpts)).length > 1 && gyrate,
-            using: _.uniq(_.compact(usingOpts)).length > 1 && using,
-          }
-        })
-      })
+      const rawGyrateOpts = _.compact(_.uniq(_.map(relations, 'gyrate')))
+      const gyrateOpts =
+        rawGyrateOpts.length === 2 ? rawGyrateOpts : [undefined]
+      const usingOpts = _.compact(_.uniq(_.map(relations, 'using')))
+      const fIndexOpts = polyhedron
+        .fIndices()
+        .filter(fIndex => canAugment(polyhedron, fIndex))
+
+      // FIXME this leads to invalid combinations
+      return cartesian(
+        gyrateOpts,
+        usingOpts,
+        fIndexOpts,
+      ).map(([gyrate, using, fIndex]) => ({ gyrate, using, fIndex }))
+    case '-':
+    case 'g':
+      return polyhedron.peaks().map(peak => ({ peak }))
     default:
       return [undefined]
   }
@@ -88,14 +82,11 @@ describe('applyOperation', () => {
       const operations = _.intersection(getOperations(solidName), opsToTest)
       operations.forEach(operation => {
         const polyhedron = Polyhedron.get(solidName)
-        const argsToTest = getArgsToTest(operation, polyhedron)
         const optsToTest = getOptsToTest(operation, polyhedron)
 
-        argsToTest.forEach(args => {
-          optsToTest.forEach(options => {
-            const result = applyOperation(operation, polyhedron, args, options)
-            expect(result).toBeValidPolyhedron()
-          })
+        optsToTest.forEach(options => {
+          const result = applyOperation(operation, polyhedron, options)
+          expect(result).toBeValidPolyhedron()
         })
       })
     })

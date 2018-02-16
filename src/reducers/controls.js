@@ -21,7 +21,7 @@ export default function controls(state = initialState, action) {
     case SET_OPERATION:
       return { ...state, operation: action.operation }
     case SET_APPLY_OPTS:
-      return { ...state, options: { ...state.options, ...action.options } }
+      return { ...state, options: action.options }
     default:
       return state
   }

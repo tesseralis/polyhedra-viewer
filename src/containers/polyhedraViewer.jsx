@@ -14,10 +14,9 @@ import * as actions from 'actions'
 
 const mapStateToProps = createStructuredSelector({
   polyhedron: getPolyhedron,
-
-  // FIXME we don't actually need this for most things
   operation: getOperation,
   options: getApplyOpts,
+  // TODO move this out
   augmentInfo: getAugments,
 })
 
@@ -26,7 +25,7 @@ function hasMultipleOptionsForFace(relations) {
 }
 
 const mergeProps = (stateProps, dispatchProps, ownProps) => {
-  const { polyhedron } = stateProps
+  const { polyhedron, options } = stateProps
   const {
     setApplyOpts,
     setOperation,
@@ -36,7 +35,7 @@ const mergeProps = (stateProps, dispatchProps, ownProps) => {
   const setApplyOptsFor = (solid, operation) => {
     if (!solid) return
     const relations = getRelations(solid, operation)
-    const newOpts = { gyrate: null, using: null }
+    const newOpts = {}
     if (operation === '+') {
       if (_.filter(relations, 'gyrate').length > 1) {
         newOpts.gyrate = 'ortho'
@@ -64,8 +63,11 @@ const mergeProps = (stateProps, dispatchProps, ownProps) => {
     setMode,
 
     // Apply the given operation to the given polyhedron
-    applyOperation(operation, args, options) {
-      const result = doApplyOperation(operation, polyhedron, args, options)
+    applyOperation(operation, args) {
+      const result = doApplyOperation(operation, polyhedron, {
+        ...args,
+        ...options,
+      })
       setPolyhedronRaw(result)
 
       if (_.isEmpty(getRelations(result.name, operation))) {
@@ -76,7 +78,7 @@ const mergeProps = (stateProps, dispatchProps, ownProps) => {
     },
 
     setApplyOpt(name, value) {
-      setApplyOpts({ [name]: value })
+      setApplyOpts({ ...options, [name]: value })
     },
   }
 }

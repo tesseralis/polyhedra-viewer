@@ -18,9 +18,8 @@ export default connect(
           throw new Error(`Got a solid with an invalid name: ${name}`)
         }
         setPolyhedronRaw(Polyhedron.get(name))
-        // FIXME rename
         setOperation(null)
-        setApplyOpts({ gyrate: null, using: null })
+        setApplyOpts({})
       },
     }
   },

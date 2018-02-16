@@ -17,7 +17,7 @@ import GroupHeader from './GroupHeader'
 import SubgroupHeader from './SubgroupHeader'
 
 // TODO deduplicate with the other polyhedron link
-const PolyhedronLink = ({ name, handleClick }) => {
+const PolyhedronLink = ({ name, setPolyhedron }) => {
   const styles = StyleSheet.create({
     link: {
       ...resetLink,
@@ -44,7 +44,7 @@ const PolyhedronLink = ({ name, handleClick }) => {
       activeClassName={css(styles.isActive)}
       onClick={() => {
         console.log('clicking link')
-        handleClick(escapeName(name))
+        setPolyhedron(escapeName(name))
       }}
     >
       {_.capitalize(name)}
@@ -52,7 +52,7 @@ const PolyhedronLink = ({ name, handleClick }) => {
   )
 }
 
-const ConnectedPolyhedronLink = compose(withSetPolyhedron, withRouter)(
+const ConnectedPolyhedronLink = compose(withRouter, withSetPolyhedron)(
   PolyhedronLink,
 )
 

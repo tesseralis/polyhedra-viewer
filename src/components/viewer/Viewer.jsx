@@ -70,7 +70,7 @@ class Viewer extends Component {
 
 // FIXME doesn't work after going back
 export default compose(
-  connect(createStructuredSelector({ polyhedron: getPolyhedron })),
-  withSetPolyhedron,
   withRouter,
+  withSetPolyhedron,
+  connect(createStructuredSelector({ polyhedron: getPolyhedron })),
 )(Viewer)
