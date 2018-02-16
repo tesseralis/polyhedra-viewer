@@ -1,13 +1,9 @@
 import _ from 'lodash'
 import React from 'react'
 import { css, StyleSheet } from 'aphrodite/no-important'
-import { connect } from 'react-redux'
-import { createStructuredSelector } from 'reselect'
-
-import { applyOperation, setMode, setApplyOpt } from 'actions'
-import { getPolyhedron, getOperation, getApplyOpts } from 'selectors'
 
 import { operations, getRelations, getUsingOpts } from 'polyhedra/relations'
+import polyhedraViewer from 'containers/polyhedraViewer'
 import Tooltip from './Tooltip'
 
 const styles = StyleSheet.create({
@@ -122,8 +118,7 @@ function AugmentOptions({ options, solid, onClickOption }) {
 // TODO this could probably use a test to make sure all the buttons are in the right places
 function RelatedPolyhedra({
   solid,
-  polyhedron,
-  mode,
+  operation,
   options,
   applyOperation,
   setMode,
@@ -131,10 +126,10 @@ function RelatedPolyhedra({
 }) {
   return (
     <div className={css(styles.opGrid)}>
-      {operations.map(({ name, symbol: operation, description }) => {
-        const relations = getRelations(solid, operation)
+      {operations.map(({ name, symbol, description }) => {
+        const relations = getRelations(solid, symbol)
         const buttons =
-          !relations || _.includes(hasMode, operation)
+          !relations || _.includes(hasMode, symbol)
             ? [{ value: '' }]
             : relations
         const showResult = buttons.length > 1
@@ -150,14 +145,14 @@ function RelatedPolyhedra({
                   <button
                     className={css(
                       styles.modeButton,
-                      mode === operation && styles.isHighlighted,
+                      operation === symbol && styles.isHighlighted,
                     )}
                     disabled={!relations}
                     onClick={() => {
-                      if (_.includes(hasMode, operation)) {
-                        setMode(solid, operation)
+                      if (_.includes(hasMode, symbol)) {
+                        setMode(symbol)
                       } else {
-                        applyOperation(operation, polyhedron, null, relation)
+                        applyOperation(symbol, relation)
                       }
                     }}
                   >
@@ -167,7 +162,7 @@ function RelatedPolyhedra({
                 </Tooltip>
               ))}
             </div>
-            {operation === '+' && (
+            {symbol === '+' && (
               <AugmentOptions
                 solid={solid}
                 options={options}
@@ -181,15 +176,4 @@ function RelatedPolyhedra({
   )
 }
 
-export default connect(
-  createStructuredSelector({
-    mode: getOperation,
-    polyhedron: getPolyhedron,
-    options: getApplyOpts,
-  }),
-  {
-    applyOperation,
-    setMode,
-    setApplyOpt,
-  },
-)(RelatedPolyhedra)
+export default polyhedraViewer(RelatedPolyhedra)

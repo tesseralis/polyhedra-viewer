@@ -171,7 +171,7 @@ export function rectify(polyhedron) {
   return doTruncate(polyhedron, { rectify: true })
 }
 
-export function cumulate(polyhedron, args, { faceType } = {}) {
+export function cumulate(polyhedron, { faceType } = {}) {
   const { vertices, faces } = polyhedron
   const n = faceType || _.min(faces.map(numSides))
   const fIndices = polyhedron
@@ -639,15 +639,15 @@ export function shorten(polyhedron) {
   return removeVertices(polyhedron, new Peak(polyhedron, face))
 }
 
-export function augment(polyhedron, fIndex, { gyrate, using } = {}) {
+export function augment(polyhedron, { fIndex, gyrate, using } = {}) {
   return doAugment(polyhedron, fIndex, using, gyrate)
 }
 
-export function diminish(polyhedron, peak) {
+export function diminish(polyhedron, { peak }) {
   return removeVertices(polyhedron, peak)
 }
 
-export function gyrate(polyhedron, peak) {
+export function gyrate(polyhedron, { peak }) {
   // get adjacent faces
   const boundary = peak.boundary()
 
@@ -683,4 +683,16 @@ export function gyrate(polyhedron, peak) {
   })
 
   return Polyhedron.of(newVertices, newFaces)
+}
+
+export const operationFunctions = {
+  truncate,
+  rectify,
+  cumulate,
+  elongate,
+  gyroelongate,
+  shorten,
+  augment,
+  diminish,
+  gyrate,
 }

@@ -1,12 +1,13 @@
 import React, { Component } from 'react'
+import { compose } from 'redux'
+import { connect } from 'react-redux'
+import { createStructuredSelector } from 'reselect'
 import { css, StyleSheet } from 'aphrodite/no-important'
 import { withRouter } from 'react-router-dom'
-import { createStructuredSelector } from 'reselect'
-import { connect } from 'react-redux'
 
-import { getPolyhedronName } from 'selectors'
-import { setPolyhedron } from 'actions'
+import { getPolyhedron } from 'selectors'
 import { fixed, fullScreen } from 'styles/common'
+import { withSetPolyhedron } from 'containers'
 
 import X3dScene from './X3dScene'
 import Polyhedron from './Polyhedron'
@@ -33,20 +34,20 @@ const styles = StyleSheet.create({
 
 class Viewer extends Component {
   componentWillMount() {
-    const { solid, onLoad, history } = this.props
-    onLoad(solid)
+    const { solid, setPolyhedron, history } = this.props
+    setPolyhedron(solid)
     // Add a mock action to the history so that we don't "pop" whenever we change the solid
     history.replace(history.location.pathname)
   }
 
   componentWillReceiveProps(nextProps) {
-    const { history, solid, polyhedronName, onLoad } = nextProps
+    const { history, solid, polyhedron, setPolyhedron } = nextProps
     // If the name in the URL and the current name don't match up, push a new state
-    if (solid !== polyhedronName) {
+    if (solid !== polyhedron.name) {
       if (history.action === 'POP') {
-        onLoad(solid)
+        setPolyhedron(solid)
       } else {
-        history.push(`/${polyhedronName}/related`)
+        history.push(`/${polyhedron.name}/related`)
       }
     }
   }
@@ -67,8 +68,9 @@ class Viewer extends Component {
   }
 }
 
-export default withRouter(
-  connect(createStructuredSelector({ polyhedronName: getPolyhedronName }), {
-    onLoad: setPolyhedron,
-  })(Viewer),
-)
+// FIXME doesn't work after going back
+export default compose(
+  withRouter,
+  withSetPolyhedron,
+  connect(createStructuredSelector({ polyhedron: getPolyhedron })),
+)(Viewer)
