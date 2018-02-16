@@ -82,15 +82,10 @@ class Faces extends Component {
     const defaultColors = polygonColors(colors)
 
     // TODO pick better colors / have better effects
-    if (
-      applyArgs &&
-      _.isNumber(applyArgs.fIndex) &&
-      fIndex === applyArgs.fIndex
-    ) {
+    if (_.isNumber(applyArgs.fIndex) && fIndex === applyArgs.fIndex) {
       return [0, 1, 0]
     }
     if (
-      applyArgs &&
       _.isObject(applyArgs.peak) &&
       _.includes(applyArgs.peak.faceIndices(), fIndex)
     ) {
@@ -134,7 +129,7 @@ class Faces extends Component {
     const { operation, applyOperation } = this.props
     const { applyArgs } = this.state
 
-    if (operation && !_.isNil(applyArgs)) {
+    if (operation && !_.isEmpty(applyArgs)) {
       applyOperation(operation, applyArgs)
       // prevent the operation from doing something else
       if (operation !== 'g') {
@@ -143,7 +138,6 @@ class Faces extends Component {
     }
   }
 
-  // FIXME double click error is back
   handleMouseMove = event => {
     // TODO replace this with logs
     this.drag = true
