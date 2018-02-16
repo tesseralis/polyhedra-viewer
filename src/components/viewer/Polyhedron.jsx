@@ -7,16 +7,10 @@ import { createStructuredSelector } from 'reselect'
 import EventListener from 'react-event-listener'
 
 import polygons from 'constants/polygons'
-import {
-  getPolyhedron,
-  getPolyhedronConfig,
-  getOperation,
-  getApplyOpts,
-  getAugments,
-} from 'selectors'
-import { applyOperation } from 'actions'
+import { getPolyhedron, getPolyhedronConfig } from 'selectors'
 import { mapObject } from 'util.js'
 import { getAugmentFace } from 'math/operations'
+import polyhedraViewer from 'containers/polyhedraViewer'
 
 // Join a list of lists with an inner and outer separator.
 export const joinListOfLists = (list, outerSep, innerSep) => {
@@ -129,11 +123,11 @@ class Faces extends Component {
 
   handleMouseUp = () => {
     if (this.drag) return
-    const { operation, options, solidData, applyOperation } = this.props
+    const { operation, options, applyOperation } = this.props
     const { applyArgs } = this.state
 
     if (operation && !_.isNil(applyArgs)) {
-      applyOperation(operation, solidData, applyArgs, options)
+      applyOperation(operation, applyArgs, options)
       // prevent the operation from doing something else
       if (operation !== 'g') {
         this.setState({ applyArgs: null })
@@ -173,14 +167,7 @@ class Faces extends Component {
   }
 }
 
-const ConnectedFaces = connect(
-  createStructuredSelector({
-    operation: getOperation,
-    options: getApplyOpts,
-    augmentInfo: getAugments,
-  }),
-  { applyOperation },
-)(Faces)
+const ConnectedFaces = polyhedraViewer(Faces)
 
 /* Edges */
 

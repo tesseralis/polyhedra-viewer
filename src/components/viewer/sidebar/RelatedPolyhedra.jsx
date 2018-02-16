@@ -1,13 +1,9 @@
 import _ from 'lodash'
 import React from 'react'
 import { css, StyleSheet } from 'aphrodite/no-important'
-import { connect } from 'react-redux'
-import { createStructuredSelector } from 'reselect'
-
-import { applyOperation, setMode, setApplyOpt } from 'actions'
-import { getPolyhedron, getOperation, getApplyOpts } from 'selectors'
 
 import { operations, getRelations, getUsingOpts } from 'polyhedra/relations'
+import polyhedraViewer from 'containers/polyhedraViewer'
 import Tooltip from './Tooltip'
 
 const styles = StyleSheet.create({
@@ -122,8 +118,7 @@ function AugmentOptions({ options, solid, onClickOption }) {
 // TODO this could probably use a test to make sure all the buttons are in the right places
 function RelatedPolyhedra({
   solid,
-  polyhedron,
-  mode,
+  operation: mode,
   options,
   applyOperation,
   setMode,
@@ -155,9 +150,9 @@ function RelatedPolyhedra({
                     disabled={!relations}
                     onClick={() => {
                       if (_.includes(hasMode, operation)) {
-                        setMode(solid, operation)
+                        setMode(operation)
                       } else {
-                        applyOperation(operation, polyhedron, null, relation)
+                        applyOperation(operation, null, relation)
                       }
                     }}
                   >
@@ -181,15 +176,4 @@ function RelatedPolyhedra({
   )
 }
 
-export default connect(
-  createStructuredSelector({
-    mode: getOperation,
-    polyhedron: getPolyhedron,
-    options: getApplyOpts,
-  }),
-  {
-    applyOperation,
-    setMode,
-    setApplyOpt,
-  },
-)(RelatedPolyhedra)
+export default polyhedraViewer(RelatedPolyhedra)
