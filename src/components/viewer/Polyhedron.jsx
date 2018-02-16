@@ -158,7 +158,7 @@ class Faces extends Component {
         const peak = solidData.findPeak(event.hitPnt)
         console.log('peak', peak && peak.innerVertexIndices())
         this.setState({
-          applyArgs: { peak },
+          applyArgs: peak ? { peak } : {},
         })
         return
       default:
