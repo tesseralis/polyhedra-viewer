@@ -70,6 +70,7 @@ const mergeProps = (stateProps, dispatchProps, ownProps) => {
       })
       setPolyhedronRaw(result)
 
+      // FIXME gyrate -> twist needs to be unset
       if (_.isEmpty(getRelations(result.name, operation))) {
         unsetMode()
       } else {
