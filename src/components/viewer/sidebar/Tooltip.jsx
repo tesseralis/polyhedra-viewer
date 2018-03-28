@@ -5,11 +5,7 @@ import 'rc-tooltip/assets/bootstrap.css'
 // Wrapper/Adapter around React Components Tooltip
 export default function({ trigger = ['hover'], children, content }) {
   return (
-    <Tooltip
-      placement="bottom"
-      overlay={<div>{content}</div>}
-      trigger={trigger}
-    >
+    <Tooltip placement="left" overlay={<div>{content}</div>} trigger={trigger}>
       {children}
     </Tooltip>
   )
