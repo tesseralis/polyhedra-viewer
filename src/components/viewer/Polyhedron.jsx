@@ -190,30 +190,91 @@ const Edges = ({ edges, vertices }) => {
 // const getScaleAttr = scale => `${scale} ${scale} ${scale}`
 
 class Polyhedron extends Component {
-  // TODO color
+  constructor(props) {
+    super(props)
+    this.state = {
+      solidData: props.solidData,
+      animate: false,
+    }
+  }
+
   render() {
-    const { config, solidData } = this.props
+    const { config } = this.props
+    const { solidData, animate } = this.state
     const { showEdges, showFaces } = config
     const { vertices, edges } = solidData
 
-    return (
-      <Transition
-        defaultStyle={{ scale: 0 }}
-        style={{ scale: 1 }}
-        duration={1500}
-      >
-        {({ scale }) => {
-          return (
-            <transform scale={`${scale},${scale},${scale}`}>
-              {showFaces && (
-                <ConnectedFaces solidData={solidData} config={config} />
-              )}
-              {showEdges && <Edges edges={edges} vertices={vertices} />}
-            </transform>
-          )
-        }}
-      </Transition>
-    )
+    // FIXME After the transition is finished, the new polyhedron can't receive events
+    // because of an unmounting issue
+
+    // TODO different eases for different animations?
+    if (animate) {
+      return (
+        <Transition
+          defaultStyle={{ vertices: solidData.vertices }}
+          style={{ vertices: this.props.solidData.vertices }}
+          duration={350}
+          ease="easePolyOut"
+          onFinish={() =>
+            this.setState({ animation: false, solidData: this.props.solidData })
+          }
+        >
+          {({ vertices }) => {
+            return (
+              <transform>
+                {showFaces && (
+                  <ConnectedFaces
+                    solidData={solidData.withVertices(vertices)}
+                    config={config}
+                  />
+                )}
+                {showEdges && <Edges edges={edges} vertices={vertices} />}
+              </transform>
+            )
+          }}
+        </Transition>
+      )
+    } else {
+      return (
+        <transform>
+          {showFaces && (
+            <ConnectedFaces solidData={solidData} config={config} />
+          )}
+          {showEdges && <Edges edges={edges} vertices={vertices} />}
+        </transform>
+      )
+    }
+
+    // return (
+    //   <Transition
+    //     defaultStyle={{ scale: 0 }}
+    //     style={{ scale: 1 }}
+    //     duration={1500}
+    //   >
+    //     {({ scale }) => {
+    //       return (
+    //         <transform scale={`${scale},${scale},${scale}`}>
+    //           {showFaces && (
+    //             <ConnectedFaces solidData={solidData} config={config} />
+    //           )}
+    //           {showEdges && <Edges edges={edges} vertices={vertices} />}
+    //         </transform>
+    //       )
+    //     }}
+    //   </Transition>
+    // )
+  }
+
+  componentWillReceiveProps(nextProps) {
+    // FIXME handle the case where vertices are removed after animation
+    if (nextProps.solidData !== this.props.solidData) {
+      const { solidData } = nextProps
+      if (solidData.mock) {
+        this.setState({ solidData: solidData.mock, animate: true })
+      } else {
+        this.setState({ solidData, animate: false })
+      }
+    }
   }
 }
 

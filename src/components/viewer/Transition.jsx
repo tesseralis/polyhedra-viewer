@@ -25,6 +25,7 @@ export default class Transition extends Component {
       duration = 1000,
       defaultStyle,
       style,
+      onFinish = _.noop,
       // d3-ease function
       ease = 'easePolyInOut',
     } = this.props
@@ -34,6 +35,8 @@ export default class Transition extends Component {
     this.setState({ currentStyle })
     if (progress < duration) {
       requestAnimationFrame(this.step)
+    } else {
+      onFinish()
     }
   }
 }
