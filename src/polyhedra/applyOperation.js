@@ -96,16 +96,11 @@ export default function applyOperation(operation, polyhedron, config = {}) {
     // throw new Error(`Function not found for ${operation}`)
     return Polyhedron.get(next)
   }
-  // return opFunction(polyhedron, applyConfig).withName(next)
-  const final = opFunction(polyhedron, applyConfig).withName(next)
-  const mock = opFunction(polyhedron, applyConfig, true)
+  return opFunction(polyhedron, applyConfig).withName(next)
+  // const final = opFunction(polyhedron, applyConfig).withName(next)
+  // const mock = opFunction(polyhedron, applyConfig, true)
   // for now I'm just gonna do this so I don't have to remake the state again
   // FIXME BAD DON'T DO THIS
-  final.mock = mock
-  return final
-
-  // return {
-  //   final,
-  //   animInitial: mock,
-  // }
+  // final.mock = mock
+  // return final
 }
