@@ -9,6 +9,7 @@ import Polyhedron from 'math/Polyhedron'
 // TODO move the op functions to an object so we can reference them?
 import {
   operationFunctions,
+  // applyOperationWithAnimation,
   getAugmentAlignment,
   getPeakAlignment,
   getCupolaGyrate,
@@ -96,4 +97,10 @@ export default function applyOperation(operation, polyhedron, config = {}) {
     return Polyhedron.get(next)
   }
   return opFunction(polyhedron, applyConfig).withName(next)
+  // const final = opFunction(polyhedron, config).withName(next)
+  // const mock = opFunction(polyhedron, config, true)
+  // return {
+  //   final,
+  //   animInitial: mock,
+  // }
 }

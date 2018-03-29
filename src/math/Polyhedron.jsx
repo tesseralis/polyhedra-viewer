@@ -121,6 +121,11 @@ export default class Polyhedron {
     return mapping
   })
 
+  // return a new polyhedron with the given vertices
+  withVertices(vertices) {
+    return new Polyhedron({ ...this.toJSON(), vertices })
+  }
+
   // return a new polyhedron with the given faces
   withFaces(faces) {
     return new Polyhedron({ ...this.toJSON(), faces })

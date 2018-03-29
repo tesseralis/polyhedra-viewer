@@ -1,7 +1,14 @@
 import _ from 'lodash'
 import { geom } from 'toxiclibsjs'
 import Polyhedron from './Polyhedron'
-import { vec, getMidpoint, getCentroid, getNormal, PRECISION } from './linAlg'
+import {
+  vec,
+  getPlane,
+  getMidpoint,
+  getCentroid,
+  getNormal,
+  PRECISION,
+} from './linAlg'
 import { mapObject, replace } from 'util.js'
 import { getDirectedEdges, numSides, getCyclic as getMod } from './solidUtils'
 import Peak from './Peak'
@@ -507,8 +514,19 @@ function isAligned(
   return isOrtho === (gyrate === 'ortho')
 }
 
+// Flatten a polyhedron to the face given at fIndex
+function flatten(polyhedron, fIndex) {
+  const vertexVectors = polyhedron.vertexVectors()
+  const faceVectors = _.at(vertexVectors, polyhedron.faces[fIndex])
+  const plane = getPlane(faceVectors)
+  const newVertices = vertexVectors.map(v =>
+    plane.getProjectedPoint(v).toArray(),
+  )
+  return polyhedron.withVertices(newVertices)
+}
+
 // Augment the following
-function doAugment(polyhedron, faceIndex, using, gyrate) {
+function doAugment(polyhedron, faceIndex, using, gyrate, mock = false) {
   const { faces, vertices } = polyhedron
   const base = faces[faceIndex]
   const n = base.length
@@ -520,10 +538,17 @@ function doAugment(polyhedron, faceIndex, using, gyrate) {
   const baseNormal = getNormal(baseVertices)
 
   const augmentType = augmentTypes[prefix]
-  const augmentee = augmentData[augmentType][index]
-  const augmenteeVertices = augmentee.vertices.map(vec)
+  // FIXME rename
+  const _augmentee = augmentData[augmentType][index]
+  const undersideIndex = _.findIndex(
+    _augmentee.faces,
+    face => face.length === n,
+  )
+  const augmentee = mock ? flatten(_augmentee, undersideIndex) : _augmentee
+
   // rotate and translate so that the face is next to our face
-  const undersideIndex = _.findIndex(augmentee.faces, face => face.length === n)
+  const augmenteeVertices = augmentee.vertices.map(vec)
+
   const undersideFace = augmentee.faces[undersideIndex]
   const undersideVertices = undersideFace.map(index => augmenteeVertices[index])
   const undersideNormal = getNormal(undersideVertices)
@@ -639,8 +664,8 @@ export function shorten(polyhedron) {
   return removeVertices(polyhedron, new Peak(polyhedron, face))
 }
 
-export function augment(polyhedron, { fIndex, gyrate, using } = {}) {
-  return doAugment(polyhedron, fIndex, using, gyrate)
+export function augment(polyhedron, { fIndex, gyrate, using } = {}, mock) {
+  return doAugment(polyhedron, fIndex, using, gyrate, mock)
 }
 
 export function diminish(polyhedron, { peak }) {
@@ -695,4 +720,13 @@ export const operationFunctions = {
   augment,
   diminish,
   gyrate,
+}
+
+export function applyOperationWithAnimation(polyhedron, config, name, op) {
+  const final = operationFunctions[op](polyhedron, config).withName(name)
+  const mock = operationFunctions[op](polyhedron, config, true)
+  return {
+    final,
+    animInitial: mock,
+  }
 }

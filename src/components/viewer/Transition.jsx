@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import _ from 'lodash'
 import * as d3 from 'd3-ease'
+import { interpolate } from 'd3-interpolate'
 
 export default class Transition extends Component {
   state = { currentStyle: {} }
@@ -24,17 +25,13 @@ export default class Transition extends Component {
       duration = 1000,
       defaultStyle,
       style,
+      // d3-ease function
       ease = 'easePolyInOut',
     } = this.props
     if (!this.start) this.start = timestamp
-    var progress = Math.min((timestamp - this.start) / duration, 1)
-    const currentStyle = _.mapValues(defaultStyle, (initialValue, key) => {
-      const finalValue = style[key]
-      return initialValue + (finalValue - initialValue) * d3[ease](progress)
-    })
-    console.log('setting style to', currentStyle)
+    const progress = Math.min((timestamp - this.start) / duration, 1)
+    const currentStyle = interpolate(defaultStyle, style)(d3[ease](progress))
     this.setState({ currentStyle })
-    // element.style.left = Math.min(progress / 10, 200) + 'px'
     if (progress < duration) {
       requestAnimationFrame(this.step)
     }

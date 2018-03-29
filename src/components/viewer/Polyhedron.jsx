@@ -197,7 +197,11 @@ class Polyhedron extends Component {
     const { vertices, edges } = solidData
 
     return (
-      <Transition defaultStyle={{ scale: 0 }} style={{ scale: 1 }}>
+      <Transition
+        defaultStyle={{ scale: 0 }}
+        style={{ scale: 1 }}
+        duration={1500}
+      >
         {({ scale }) => {
           return (
             <transform scale={`${scale},${scale},${scale}`}>
