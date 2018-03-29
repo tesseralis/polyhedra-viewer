@@ -213,7 +213,7 @@ class Polyhedron extends Component {
         <Transition
           defaultStyle={{ vertices: solidData.vertices }}
           style={{ vertices: this.props.solidData.vertices }}
-          duration={350}
+          duration={750}
           ease="easePolyOut"
           onFinish={() =>
             this.setState({ animation: false, solidData: this.props.solidData })

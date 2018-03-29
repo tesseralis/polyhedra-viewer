@@ -167,11 +167,14 @@ function doTruncate(polyhedron, options = {}) {
   _.forEach(polyhedron.vertices, (vertex, index) => {
     newPolyhedron = truncateVertex(newPolyhedron, polyhedron, index, options)
   })
-  return deduplicateVertices(newPolyhedron)
+  // FIXME deduplicating fails
+  return options.mock
+    ? removeExtraneousVertices(newPolyhedron)
+    : deduplicateVertices(newPolyhedron)
 }
 
-export function truncate(polyhedron) {
-  return doTruncate(polyhedron)
+export function truncate(polyhedron, options, mock) {
+  return doTruncate(polyhedron, { mock })
 }
 
 export function rectify(polyhedron) {
