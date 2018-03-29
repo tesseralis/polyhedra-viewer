@@ -634,22 +634,23 @@ function removeVertices(polyhedron, peak) {
   return removeExtraneousVertices(polyhedron.withFaces(newFaces))
 }
 
-export function elongate(polyhedron) {
+export function elongate(polyhedron, options, mock) {
   const faceIndex = _.findIndex(
     polyhedron.faces,
     face => face === _.maxBy(polyhedron.faces, 'length'),
   )
   const using = `P${numSides(polyhedron.faces[faceIndex])}`
-  return doAugment(polyhedron, faceIndex, using)
+  return doAugment(polyhedron, faceIndex, using, null, mock)
 }
 
-export function gyroelongate(polyhedron) {
+// FIXME this needs rotation
+export function gyroelongate(polyhedron, options, mock) {
   const faceIndex = _.findIndex(
     polyhedron.faces,
     face => face === _.maxBy(polyhedron.faces, 'length'),
   )
   const using = `A${numSides(polyhedron.faces[faceIndex])}`
-  return doAugment(polyhedron, faceIndex, using)
+  return doAugment(polyhedron, faceIndex, using, null, mock)
 }
 
 export function shorten(polyhedron) {
@@ -720,13 +721,4 @@ export const operationFunctions = {
   augment,
   diminish,
   gyrate,
-}
-
-export function applyOperationWithAnimation(polyhedron, config, name, op) {
-  const final = operationFunctions[op](polyhedron, config).withName(name)
-  const mock = operationFunctions[op](polyhedron, config, true)
-  return {
-    final,
-    animInitial: mock,
-  }
 }

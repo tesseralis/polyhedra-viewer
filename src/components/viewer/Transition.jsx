@@ -22,7 +22,7 @@ export default class Transition extends Component {
   // https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame
   step = timestamp => {
     const {
-      duration = 1000,
+      duration = 1500,
       defaultStyle,
       style,
       onFinish = _.noop,
