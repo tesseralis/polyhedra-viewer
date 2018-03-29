@@ -1,5 +1,4 @@
 import React, { Component } from 'react'
-import { Motion, spring, presets } from 'react-motion'
 import { rgb } from 'd3-color'
 import _ from 'lodash'
 import { connect } from 'react-redux'
@@ -11,6 +10,7 @@ import { getPolyhedron, getPolyhedronConfig } from 'selectors'
 import { mapObject } from 'util.js'
 import { getAugmentFace } from 'math/operations'
 import polyhedraViewer from 'containers/polyhedraViewer'
+import Transition from './Transition'
 
 // Join a list of lists with an inner and outer separator.
 export const joinListOfLists = (list, outerSep, innerSep) => {
@@ -195,16 +195,12 @@ class Polyhedron extends Component {
     const { config, solidData } = this.props
     const { showEdges, showFaces } = config
     const { vertices, edges } = solidData
-    const toggle = 1
 
     return (
-      <Motion
-        defaultStyle={{ scale: 0 }}
-        style={{ scale: spring(toggle, presets.noWobble) }}
-      >
+      <Transition defaultStyle={{ scale: 0 }} style={{ scale: 1 }}>
         {({ scale }) => {
           return (
-            <transform>
+            <transform scale={`${scale},${scale},${scale}`}>
               {showFaces && (
                 <ConnectedFaces solidData={solidData} config={config} />
               )}
@@ -212,7 +208,7 @@ class Polyhedron extends Component {
             </transform>
           )
         }}
-      </Motion>
+      </Transition>
     )
   }
 }
