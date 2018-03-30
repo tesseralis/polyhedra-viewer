@@ -1,14 +1,60 @@
-import React from 'react'
+import React, { Component } from 'react'
 import { css, StyleSheet } from 'aphrodite/no-important'
 import _ from 'lodash'
-import { connect } from 'react-redux'
-import { createStructuredSelector } from 'reselect'
 
-import { configInputs } from 'constants/configOptions'
-import { getConfig } from 'selectors'
-import { reset, setInputValue } from 'actions'
+import { mapObject } from 'util.js'
+import polygons from 'constants/polygons'
+import {
+  configOptions,
+  configInputs,
+  getColorInputKey,
+} from 'constants/configOptions'
 import { hover, transition } from 'styles/common'
 import { andaleMono } from 'styles/fonts'
+
+const ConfigContext = React.createContext({
+  inputValues: null,
+  setInputValue: _.noop,
+  reset: _.noop,
+})
+
+const initialState = _.mapValues(configOptions, 'default')
+const getColors = config =>
+  mapObject(polygons, n => [n, config[getColorInputKey(n)]])
+
+const getPolyhedronConfig = config => ({ ...config, colors: getColors(config) })
+
+// FIXME color changing is a little slow
+export class WithConfig extends Component {
+  constructor(props) {
+    super(props)
+    this.state = initialState
+  }
+
+  render() {
+    const { children } = this.props
+    const inputValues = getPolyhedronConfig(this.state)
+    const configValue = {
+      inputValues,
+      setInputValue: this.setInputValue,
+      reset: this.reset,
+    }
+    return (
+      <ConfigContext.Provider value={configValue}>
+        {children(inputValues)}
+      </ConfigContext.Provider>
+    )
+  }
+
+  setInputValue = (key, value) => {
+    console.log('setting input value')
+    this.setState({ [key]: value })
+  }
+
+  reset = () => {
+    this.setState(initialState)
+  }
+}
 
 const getInputValue = (input, el) => {
   switch (input.type) {
@@ -89,7 +135,7 @@ const ResetButton = ({ reset }) => {
   )
 }
 
-const ConfigForm = ({ width, inputValues, setInputValue, reset }) => {
+export default ({ width, inputValues, setInputValue, reset }) => {
   const styles = StyleSheet.create({
     configMenu: {
       width,
@@ -101,27 +147,20 @@ const ConfigForm = ({ width, inputValues, setInputValue, reset }) => {
   })
 
   return (
-    <form className={css(styles.configMenu)}>
-      {configInputs.map(({ key, ...input }) => (
-        <LabelledInput
-          key={key}
-          input={input}
-          value={inputValues[key]}
-          setValue={value => setInputValue(key, value)}
-        />
-      ))}
-      <ResetButton reset={reset} />
-    </form>
+    <ConfigContext.Consumer>
+      {({ inputValues, setInputValue, reset }) => (
+        <form className={css(styles.configMenu)}>
+          {configInputs.map(({ key, ...input }) => (
+            <LabelledInput
+              key={key}
+              input={input}
+              value={inputValues[key]}
+              setValue={value => setInputValue(key, value)}
+            />
+          ))}
+          <ResetButton reset={reset} />
+        </form>
+      )}
+    </ConfigContext.Consumer>
   )
 }
-
-const mapStateToProps = createStructuredSelector({
-  inputValues: getConfig,
-})
-
-const mapDispatchToProps = {
-  setInputValue,
-  reset,
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(ConfigForm)

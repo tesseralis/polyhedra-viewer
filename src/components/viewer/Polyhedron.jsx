@@ -6,7 +6,7 @@ import { createStructuredSelector } from 'reselect'
 import EventListener from 'react-event-listener'
 
 import polygons from 'constants/polygons'
-import { getPolyhedron, getPolyhedronConfig } from 'selectors'
+import { getPolyhedron } from 'selectors'
 import { mapObject } from 'util.js'
 import { getAugmentFace } from 'math/operations'
 import polyhedraViewer from 'containers/polyhedraViewer'
@@ -279,7 +279,6 @@ class Polyhedron extends Component {
 }
 
 const mapStateToProps = createStructuredSelector({
-  config: getPolyhedronConfig,
   solidData: getPolyhedron,
 })
 

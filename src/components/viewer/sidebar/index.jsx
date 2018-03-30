@@ -1,2 +1,3 @@
 import Sidebar from './Sidebar'
-export { Sidebar }
+import { WithConfig } from './ConfigForm'
+export { WithConfig, Sidebar }
