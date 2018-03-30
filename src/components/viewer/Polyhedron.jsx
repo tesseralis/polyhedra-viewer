@@ -258,17 +258,17 @@ class Polyhedron extends Component {
     // }
   }
 
-  // componentWillReceiveProps(nextProps) {
-  //   // FIXME handle the case where vertices are removed after animation
-  //   if (nextProps.solidData !== this.props.solidData) {
-  //     const { solidData } = nextProps
-  //     if (solidData.mock) {
-  //       this.setState({ solidData: solidData.mock, animate: true })
-  //     } else {
-  //       this.setState({ solidData, animate: false })
-  //     }
-  //   }
-  // }
+  componentWillReceiveProps(nextProps) {
+    // FIXME handle the case where vertices are removed after animation
+    if (nextProps.solidData !== this.props.solidData) {
+      const { solidData } = nextProps
+      if (solidData.mock) {
+        this.setState({ solidData: solidData.mock, animate: true })
+      } else {
+        this.setState({ solidData, animate: false })
+      }
+    }
+  }
 }
 
 const mapStateToProps = createStructuredSelector({
