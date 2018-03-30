@@ -37,9 +37,13 @@ const getColorIndex = face => colorIndexForFace[face.length]
 const polygonColors = colors => polygons.map(n => toRgb(colors[n]))
 
 class Faces extends Component {
-  state = {
-    applyArgs: {},
-    error: null,
+  constructor(props) {
+    super(props)
+    this.state = {
+      applyArgs: {},
+      error: null,
+    }
+    this.shape = React.createRef()
   }
 
   render() {
@@ -55,7 +59,7 @@ class Faces extends Component {
     // They don't actually do anything in production
     return (
       <shape
-        ref={shape => (this.shape = shape)}
+        ref={this.shape}
         onMouseDown={this.handleMouseDown}
         onMouseMove={this.handleMouseMove}
         onMouseUp={this.handleMouseUp}
@@ -110,7 +114,7 @@ class Faces extends Component {
   }
 
   addEventListener(type, fn) {
-    this.shape.addEventListener(type, this.wrapError(fn))
+    this.shape.current.addEventListener(type, this.wrapError(fn))
   }
 
   handleLoad = () => {
