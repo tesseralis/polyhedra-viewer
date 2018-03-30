@@ -1,12 +1,8 @@
 import React, { Component } from 'react'
-import { connect } from 'react-redux'
 import { css, StyleSheet } from 'aphrodite/no-important'
-import { createStructuredSelector } from 'reselect'
 
 import { andaleMono } from 'styles/fonts'
 import { transition } from 'styles/common'
-import { setFilterText } from 'actions'
-import { getFilterText } from 'selectors'
 
 import Icon from './Icon'
 
@@ -52,7 +48,7 @@ const styles = StyleSheet.create({
   },
 })
 
-export class SearchBar extends Component {
+export default class SearchBar extends Component {
   state = { isFocused: false }
 
   setFocus(value) {
@@ -60,15 +56,15 @@ export class SearchBar extends Component {
   }
 
   render() {
-    const { text, setValue } = this.props
+    const { value, onChange } = this.props
     const { isFocused } = this.state
     return (
       <label className={css(styles.searchBar)}>
         <input
           type="text"
           placeholder="Search..."
-          value={text}
-          onChange={e => setValue(e.target.value)}
+          value={value}
+          onChange={e => onChange(e.target.value)}
           onFocus={() => this.setFocus(true)}
           onBlur={() => this.setFocus(false)}
           className={css(styles.input)}
@@ -80,13 +76,3 @@ export class SearchBar extends Component {
     )
   }
 }
-
-const mapStateToProps = createStructuredSelector({
-  text: getFilterText,
-})
-
-const mapDispatchToProps = {
-  setValue: setFilterText,
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(SearchBar)

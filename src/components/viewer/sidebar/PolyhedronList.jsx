@@ -1,13 +1,11 @@
 import _ from 'lodash'
-import React from 'react'
+import React, { Component } from 'react'
 import { compose } from 'redux'
 import { NavLink, withRouter } from 'react-router-dom'
 import { css, StyleSheet } from 'aphrodite/no-important'
-import { connect } from 'react-redux'
-import { createStructuredSelector } from 'reselect'
 
+import { groups } from 'data'
 import { withSetPolyhedron } from 'containers'
-import { getFilteredGroups } from 'selectors'
 import { escapeName } from 'polyhedra/names'
 import { andaleMono } from 'styles/fonts'
 import { resetLink, hover } from 'styles/common'
@@ -15,6 +13,28 @@ import { resetLink, hover } from 'styles/common'
 import SearchBar from './SearchBar'
 import GroupHeader from './GroupHeader'
 import SubgroupHeader from './SubgroupHeader'
+
+const getFilteredPolyhedra = (polyhedra, filter) =>
+  polyhedra.filter(solid => solid.includes(filter.toLowerCase()))
+
+const filterGroups = (groups, filterText) =>
+  groups
+    .map(group => {
+      if (group.groups) {
+        return {
+          ...group,
+          groups: filterGroups(group.groups, filterText),
+        }
+      }
+      return {
+        ...group,
+        polyhedra: getFilteredPolyhedra(group.polyhedra, filterText),
+      }
+    })
+    .filter(
+      ({ groups, polyhedra }) =>
+        (groups && groups.length > 0) || (polyhedra && polyhedra.length > 0),
+    )
 
 // TODO deduplicate with the other polyhedron link
 const PolyhedronLink = ({ name, setPolyhedron }) => {
@@ -55,7 +75,6 @@ const PolyhedronLink = ({ name, setPolyhedron }) => {
 const ConnectedPolyhedronLink = compose(withRouter, withSetPolyhedron)(
   PolyhedronLink,
 )
-
 const SubList = ({ polyhedra }) => {
   return (
     <ul>
@@ -112,17 +131,27 @@ const PolyhedronGroup = ({ group }) => {
   )
 }
 
-const PolyhedronList = ({ groups }) => (
-  <div>
-    <SearchBar />
-    {groups.map(({ name, ...group }) => (
-      <PolyhedronGroup key={name} group={group} />
-    ))}
-  </div>
-)
+export default class PolyhedronList extends Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      filterText: '',
+    }
+  }
 
-export default connect(
-  createStructuredSelector({
-    groups: getFilteredGroups,
-  }),
-)(PolyhedronList)
+  render() {
+    const { filterText } = this.state
+    return (
+      <div>
+        <SearchBar text={filterText} onChange={this.handleFilterChange} />
+        {filterGroups(groups, filterText).map(({ name, ...group }) => (
+          <PolyhedronGroup key={name} group={group} />
+        ))}
+      </div>
+    )
+  }
+
+  handleFilterChange = value => {
+    this.setState({ filterText: value })
+  }
+}

@@ -1,7 +1,6 @@
 import { getAugmentGraph } from 'math/operations'
 import { createSelector } from 'reselect'
 export * from './config'
-export * from './filter'
 
 export const getPolyhedron = state => state.polyhedron
 
