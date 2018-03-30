@@ -1,3 +1,3 @@
 import Sidebar from './Sidebar'
-import { WithConfig } from './ConfigForm'
-export { WithConfig, Sidebar }
+import { ConfigProvider, WithConfig } from './ConfigForm'
+export { ConfigProvider, WithConfig, Sidebar }

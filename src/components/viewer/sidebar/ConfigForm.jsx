@@ -24,8 +24,7 @@ const getColors = config =>
 
 const getPolyhedronConfig = config => ({ ...config, colors: getColors(config) })
 
-// FIXME color changing is a little slow
-export class WithConfig extends Component {
+export class ConfigProvider extends Component {
   constructor(props) {
     super(props)
     this.state = initialState
@@ -33,15 +32,14 @@ export class WithConfig extends Component {
 
   render() {
     const { children } = this.props
-    const inputValues = getPolyhedronConfig(this.state)
     const configValue = {
-      inputValues,
+      inputValues: getPolyhedronConfig(this.state),
       setInputValue: this.setInputValue,
       reset: this.reset,
     }
     return (
       <ConfigContext.Provider value={configValue}>
-        {children(inputValues)}
+        {children}
       </ConfigContext.Provider>
     )
   }
@@ -54,6 +52,14 @@ export class WithConfig extends Component {
   reset = () => {
     this.setState(initialState)
   }
+}
+
+export function WithConfig({ children }) {
+  return (
+    <ConfigContext.Consumer>
+      {({ inputValues }) => children(inputValues)}
+    </ConfigContext.Consumer>
+  )
 }
 
 const getInputValue = (input, el) => {

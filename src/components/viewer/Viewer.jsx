@@ -11,7 +11,7 @@ import { withSetPolyhedron } from 'containers'
 
 import X3dScene from './X3dScene'
 import Polyhedron from './Polyhedron'
-import { Sidebar, WithConfig } from './sidebar'
+import { Sidebar, ConfigProvider } from './sidebar'
 
 const styles = StyleSheet.create({
   viewer: {
@@ -56,18 +56,16 @@ class Viewer extends Component {
     const { solid } = this.props
     // FIXME resizing (decreasing height) for the x3d scene doesn't work well
     return (
-      <WithConfig>
-        {config => (
-          <div className={css(styles.viewer)}>
-            <X3dScene>
-              <Polyhedron config={config} />
-            </X3dScene>
-            <div className={css(styles.sidebar)}>
-              <Sidebar solid={solid} />
-            </div>
+      <ConfigProvider>
+        <div className={css(styles.viewer)}>
+          <X3dScene>
+            <Polyhedron />
+          </X3dScene>
+          <div className={css(styles.sidebar)}>
+            <Sidebar solid={solid} />
           </div>
-        )}
-      </WithConfig>
+        </div>
+      </ConfigProvider>
     )
   }
 }
