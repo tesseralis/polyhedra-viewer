@@ -69,7 +69,6 @@ export default class Viewer extends Component {
     }
   }
 
-  // FIXME do "pop" again; update from history
   static getDerivedStateFromProps(nextProps, prevState) {
     const { polyhedron } = prevState
     const { solid } = nextProps
