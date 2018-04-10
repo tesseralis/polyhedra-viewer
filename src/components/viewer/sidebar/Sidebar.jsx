@@ -7,26 +7,22 @@ import ConfigForm from './ConfigForm'
 import RelatedPolyhedra from './RelatedPolyhedra'
 import PolyhedronList from './PolyhedronList'
 
-const ComponentInfo = ({ solid }) => {
-  return <div>This is a {solid}</div>
-}
+const styles = StyleSheet.create({
+  sidebar: {
+    width: 400,
+    height: '100%',
+    overflowY: 'scroll',
+    backgroundColor: 'WhiteSmoke',
+    boxShadow: 'inset -1px -1px 4px LightGray',
+  },
+  menu: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    padding: '0 10px',
+  },
+})
 
-const Sidebar = ({ match, solid }) => {
-  const styles = StyleSheet.create({
-    sidebar: {
-      width: 400,
-      height: '100%',
-      overflowY: 'scroll',
-      backgroundColor: 'WhiteSmoke',
-      boxShadow: 'inset -1px -1px 4px LightGray',
-    },
-    menu: {
-      display: 'flex',
-      justifyContent: 'space-between',
-      padding: '0 10px',
-    },
-  })
-
+const Sidebar = ({ match, solid, config, setConfigValue }) => {
   return (
     <section className={css(styles.sidebar)}>
       <div className={css(styles.menu)}>
@@ -57,9 +53,14 @@ const Sidebar = ({ match, solid }) => {
       />
       <Route
         path={`${match.url}/related`}
-        component={() => <RelatedPolyhedra solid={solid} />}
+        render={() => <RelatedPolyhedra solid={solid} />}
       />
-      <Route path={`${match.url}/config`} component={ConfigForm} />
+      <Route
+        path={`${match.url}/config`}
+        render={() => (
+          <ConfigForm inputValues={config} setInputValue={setConfigValue} />
+        )}
+      />
       <Route path={`${match.url}/list`} component={PolyhedronList} />
     </section>
   )

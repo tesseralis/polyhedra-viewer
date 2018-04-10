@@ -1,54 +1,10 @@
-import React, { Component } from 'react'
+import React from 'react'
 import { css, StyleSheet } from 'aphrodite/no-important'
 import _ from 'lodash'
 
-import { mapObject } from 'util.js'
-import polygons from 'constants/polygons'
-import {
-  configOptions,
-  configInputs,
-  getColorInputKey,
-} from 'constants/configOptions'
+import { configInputs } from 'constants/configOptions'
 import { hover, transition } from 'styles/common'
 import { andaleMono } from 'styles/fonts'
-
-const ConfigContext = React.createContext(null)
-
-const ConfigSetter = React.createContext(_.noop)
-
-const initialState = _.mapValues(configOptions, 'default')
-const getColors = config =>
-  mapObject(polygons, n => [n, config[getColorInputKey(n)]])
-
-const getPolyhedronConfig = config => ({ ...config, colors: getColors(config) })
-
-export class ConfigProvider extends Component {
-  constructor(props) {
-    super(props)
-    this.state = initialState
-  }
-
-  render() {
-    const { children } = this.props
-    // FIXME don't call this function every time
-    return (
-      <ConfigContext.Provider value={getPolyhedronConfig(this.state)}>
-        <ConfigSetter.Provider value={this.setInputValue}>
-          {children}
-        </ConfigSetter.Provider>
-      </ConfigContext.Provider>
-    )
-  }
-
-  setInputValue = (key, value) => {
-    if (key === null) {
-      this.setState(initialState)
-    }
-    this.setState({ [key]: value })
-  }
-}
-
-export const WithConfig = ConfigContext.Consumer
 
 const getInputValue = (input, el) => {
   switch (input.type) {
@@ -141,24 +97,16 @@ export default ({ width, inputValues, setInputValue, reset }) => {
   })
 
   return (
-    <ConfigContext.Consumer>
-      {inputValues => (
-        <ConfigSetter.Consumer>
-          {setInputValue => (
-            <form className={css(styles.configMenu)}>
-              {configInputs.map(({ key, ...input }) => (
-                <LabelledInput
-                  key={key}
-                  input={input}
-                  value={inputValues[key]}
-                  setValue={value => setInputValue(key, value)}
-                />
-              ))}
-              <ResetButton reset={() => setInputValue(null)} />
-            </form>
-          )}
-        </ConfigSetter.Consumer>
-      )}
-    </ConfigContext.Consumer>
+    <form className={css(styles.configMenu)}>
+      {configInputs.map(({ key, ...input }) => (
+        <LabelledInput
+          key={key}
+          input={input}
+          value={inputValues[key]}
+          setValue={value => setInputValue(key, value)}
+        />
+      ))}
+      <ResetButton reset={() => setInputValue(null)} />
+    </form>
   )
 }
