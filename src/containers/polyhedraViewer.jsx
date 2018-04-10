@@ -61,6 +61,7 @@ const mergeProps = (stateProps, dispatchProps, ownProps) => {
     ...stateProps,
 
     setMode,
+    unsetMode,
 
     // Apply the given operation to the given polyhedron
     applyOperation(operation, args) {

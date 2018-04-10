@@ -130,6 +130,7 @@ function RelatedPolyhedra({
   applyOperation,
   recenter,
   setMode,
+  unsetMode,
   setApplyOpt,
 }) {
   return (
@@ -158,7 +159,8 @@ function RelatedPolyhedra({
                     disabled={!relations}
                     onClick={() => {
                       if (_.includes(hasMode, symbol)) {
-                        setMode(symbol)
+                        if (symbol !== operation) setMode(symbol)
+                        else unsetMode()
                       } else {
                         applyOperation(symbol, relation)
                       }
