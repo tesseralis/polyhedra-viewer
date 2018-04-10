@@ -2,7 +2,7 @@ import React from 'react'
 import { withRouter, Route, Redirect } from 'react-router-dom'
 import { css, StyleSheet } from 'aphrodite/no-important'
 
-import { IconLink } from './menuIcons'
+import IconLink from './IconLink'
 import ConfigForm from './ConfigForm'
 import RelatedPolyhedra from './RelatedPolyhedra'
 import PolyhedronList from './PolyhedronList'
@@ -23,19 +23,31 @@ const Sidebar = ({ match, solid }) => {
     menu: {
       display: 'flex',
       justifyContent: 'space-between',
+      padding: '0 10px',
     },
   })
 
   return (
     <section className={css(styles.sidebar)}>
       <div className={css(styles.menu)}>
-        <IconLink to="/" name="home" />
-        <IconLink replace to={`${match.url}/related`} name="math-compass" />
-        <IconLink replace to={`${match.url}/config`} name="settings" />
+        <IconLink to="/" title="Home" iconName="home" exact />
+        <IconLink
+          replace
+          to={`${match.url}/related`}
+          title="Related"
+          iconName="math-compass"
+        />
+        <IconLink
+          replace
+          to={`${match.url}/config`}
+          title="Options"
+          iconName="settings"
+        />
         <IconLink
           replace
           to={`${match.url}/list`}
-          name="format-list-bulleted"
+          title="List"
+          iconName="format-list-bulleted"
         />
       </div>
       <Route
