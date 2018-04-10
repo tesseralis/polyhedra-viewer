@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import React, { Component } from 'react'
-import { NavLink, withRouter } from 'react-router-dom'
+import { NavLink, Route } from 'react-router-dom'
 import { css, StyleSheet } from 'aphrodite/no-important'
 
 import { groups } from 'data'
@@ -56,23 +56,26 @@ const PolyhedronLink = ({ name }) => {
   })
 
   return (
-    <NavLink
-      to={`/${escapeName(name)}/list`}
-      className={css(styles.link)}
-      activeClassName={css(styles.isActive)}
-    >
-      {_.capitalize(name)}
-    </NavLink>
+    <Route
+      render={({ match }) => (
+        <NavLink
+          to={`/${escapeName(name)}/list`}
+          className={css(styles.link)}
+          activeClassName={css(styles.isActive)}
+        >
+          {_.capitalize(name)}
+        </NavLink>
+      )}
+    />
   )
 }
 
-const ConnectedPolyhedronLink = withRouter(PolyhedronLink)
 const SubList = ({ polyhedra }) => {
   return (
     <ul>
       {polyhedra.map(name => (
         <li key={name}>
-          <ConnectedPolyhedronLink name={name} />
+          <PolyhedronLink name={name} />
         </li>
       ))}
     </ul>

@@ -1,5 +1,5 @@
 import React from 'react'
-import { withRouter, Route, Redirect } from 'react-router-dom'
+import { Route, Redirect } from 'react-router-dom'
 import { css, StyleSheet } from 'aphrodite/no-important'
 
 import IconLink from './IconLink'
@@ -23,46 +23,48 @@ const styles = StyleSheet.create({
 })
 
 // TODO figure out how to separate out the state of different tabs
-const Sidebar = ({ match, configProps, relatedPolyhedraProps }) => {
+export default function Sidebar({ match, configProps, relatedPolyhedraProps }) {
   return (
-    <section className={css(styles.sidebar)}>
-      <div className={css(styles.menu)}>
-        <IconLink to="/" title="Home" iconName="home" exact />
-        <IconLink
-          replace
-          to={`${match.url}/list`}
-          title="List"
-          iconName="format-list-bulleted"
-        />
-        <IconLink
-          replace
-          to={`${match.url}/config`}
-          title="Options"
-          iconName="settings"
-        />
-        <IconLink
-          replace
-          to={`${match.url}/related`}
-          title="Operations"
-          iconName="math-compass"
-        />
-      </div>
-      <Route
-        exact
-        path={match.url}
-        render={() => <Redirect to={`${match.url}/related`} />}
-      />
-      <Route
-        path={`${match.url}/related`}
-        render={() => <RelatedPolyhedra {...relatedPolyhedraProps} />}
-      />
-      <Route
-        path={`${match.url}/config`}
-        render={() => <ConfigForm {...configProps} />}
-      />
-      <Route path={`${match.url}/list`} component={PolyhedronList} />
-    </section>
+    <Route
+      render={({ match }) => (
+        <section className={css(styles.sidebar)}>
+          <div className={css(styles.menu)}>
+            <IconLink to="/" title="Home" iconName="home" exact />
+            <IconLink
+              replace
+              to={`${match.url}/list`}
+              title="List"
+              iconName="format-list-bulleted"
+            />
+            <IconLink
+              replace
+              to={`${match.url}/config`}
+              title="Options"
+              iconName="settings"
+            />
+            <IconLink
+              replace
+              to={`${match.url}/related`}
+              title="Operations"
+              iconName="math-compass"
+            />
+          </div>
+          <Route
+            exact
+            path={match.url}
+            render={() => <Redirect to={`${match.url}/related`} />}
+          />
+          <Route
+            path={`${match.url}/related`}
+            render={() => <RelatedPolyhedra {...relatedPolyhedraProps} />}
+          />
+          <Route
+            path={`${match.url}/config`}
+            render={() => <ConfigForm {...configProps} />}
+          />
+          <Route path={`${match.url}/list`} component={PolyhedronList} />
+        </section>
+      )}
+    />
   )
 }
-
-export default withRouter(Sidebar)

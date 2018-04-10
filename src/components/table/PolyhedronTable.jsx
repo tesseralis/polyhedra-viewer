@@ -4,7 +4,7 @@ import { css, StyleSheet } from 'aphrodite/no-important'
 
 import { hoeflerText } from 'styles/fonts'
 import { fromConwayNotation } from 'polyhedra/names'
-import PolyhedronLink from 'components/common/PolyhedronLink'
+import PolyhedronLink from './PolyhedronLink'
 
 const styles = StyleSheet.create({
   table: {

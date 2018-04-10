@@ -1,7 +1,6 @@
 import _ from 'lodash'
 import React, { Component } from 'react'
 import { css, StyleSheet } from 'aphrodite/no-important'
-import { withRouter } from 'react-router-dom'
 
 import { isValidSolid } from 'data'
 import Polyhedron from 'math/Polyhedron'
