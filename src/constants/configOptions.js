@@ -4,7 +4,7 @@ import { schemeSet1 } from 'd3-scale-chromatic'
 import polygons, { polygonNames } from './polygons'
 import { mapObject } from '../util'
 
-const polygonSchemeIdx = { 3: 4, 4: 0, 5: 1, 6: 2, 8: 3, 10: 6 }
+const polygonSchemeIdx = { 3: 4, 4: 0, 5: 1, 6: 2, 8: 6, 10: 3 }
 
 export const getColorInputKey = n => `${polygonNames[n]}Color`
 
