@@ -41,11 +41,11 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     minHeight: 40,
+    maxHeight: 80,
     padding: '10px 0',
     border: '1px gray solid',
 
     ':disabled': {
-      // border: 'none',
       borderColor: 'LightGray',
       backgroundColor: 'WhiteSmoke',
     },
