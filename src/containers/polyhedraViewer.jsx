@@ -78,6 +78,10 @@ const mergeProps = (stateProps, dispatchProps, ownProps) => {
       }
     },
 
+    recenter() {
+      setPolyhedronRaw(polyhedron.center())
+    },
+
     setApplyOpt(name, value) {
       setApplyOpts({ ...options, [name]: value })
     },

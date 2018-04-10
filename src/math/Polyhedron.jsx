@@ -200,6 +200,16 @@ export default class Polyhedron {
     return _.isEqual(this.faceAdjacencyList(), other.faceAdjacencyList())
   }
 
+  /**
+   * Center the polyhedron on its centroid.
+   */
+  center() {
+    const centroid = getCentroid(this.vertexVectors())
+    return this.withVertices(
+      this.vertexVectors().map(v => v.sub(centroid).toArray()),
+    )
+  }
+
   hitFaceIndex(point) {
     return _.minBy(this.fIndices(), fIndex => {
       const face = this.faces[fIndex]

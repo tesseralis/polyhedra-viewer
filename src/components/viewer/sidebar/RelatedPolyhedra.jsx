@@ -20,6 +20,7 @@ const styles = StyleSheet.create({
       "shorten  shorten      twist"
       "augment  augment      gyrate"
       "diminish diminish     gyrate"
+      "recenter recenter     recenter"
     `,
   },
 
@@ -50,6 +51,12 @@ const styles = StyleSheet.create({
 
   isHighlighted: {
     border: '2px red solid',
+  },
+
+  recenterButton: {
+    marginTop: 10,
+    gridArea: 'recenter',
+    padding: 10,
   },
 })
 
@@ -121,6 +128,7 @@ function RelatedPolyhedra({
   operation,
   options,
   applyOperation,
+  recenter,
   setMode,
   setApplyOpt,
 }) {
@@ -172,6 +180,9 @@ function RelatedPolyhedra({
           </div>
         )
       })}
+      <button onClick={() => recenter()} className={css(styles.recenterButton)}>
+        Recenter
+      </button>
     </div>
   )
 }

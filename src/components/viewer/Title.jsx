@@ -8,7 +8,7 @@ const Title = ({ name, ...props }) => {
   const styles = StyleSheet.create({
     title: {
       fontFamily: andaleMono,
-      fontSize: 36,
+      fontSize: 32,
       fontWeight: 'bold',
     },
   })
