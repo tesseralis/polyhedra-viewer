@@ -1,6 +1,7 @@
 import _ from 'lodash'
 import periodicTable from 'constants/periodicTable'
 import { toConwayNotation } from './names'
+import { mapObject } from 'util.js'
 // TODO: adapt this from the table to we don't miss anything
 const archimedean = {
   T: {
@@ -458,7 +459,9 @@ const rhombicosidodecahedraGraph = (() => {
 })()
 
 const othersGraph = (() => {
+  const empty = mapObject(_.range(87, 93), j => [`J${j}`, {}])
   return {
+    ...empty,
     // snub antiprisms
     T: {
       s: 'J84',
