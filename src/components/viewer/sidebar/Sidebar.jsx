@@ -22,7 +22,6 @@ const styles = StyleSheet.create({
   },
 })
 
-// TODO figure out how to separate out the state of different tabs
 const Sidebar = ({ match, solid, config, setConfigValue }) => {
   return (
     <section className={css(styles.sidebar)}>
