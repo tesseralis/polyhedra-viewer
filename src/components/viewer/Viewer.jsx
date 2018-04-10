@@ -8,10 +8,12 @@ import { withRouter } from 'react-router-dom'
 import { getPolyhedron } from 'selectors'
 import { fixed, fullScreen } from 'styles/common'
 import { withSetPolyhedron } from 'containers'
+import { unescapeName } from 'polyhedra/names'
 
 import X3dScene from './X3dScene'
 import Polyhedron from './Polyhedron'
 import { Sidebar, ConfigProvider } from './sidebar'
+import Title from './Title'
 
 const styles = StyleSheet.create({
   viewer: {
@@ -74,6 +76,9 @@ class Viewer extends Component {
             <X3dScene>
               <Polyhedron />
             </X3dScene>
+            <div className={css(styles.title)}>
+              <Title name={unescapeName(solid)} />
+            </div>
           </div>
         </div>
       </ConfigProvider>
