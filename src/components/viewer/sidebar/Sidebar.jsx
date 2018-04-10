@@ -1,5 +1,5 @@
 import React from 'react'
-import { withRouter, Route } from 'react-router-dom'
+import { withRouter, Route, Redirect } from 'react-router-dom'
 import { css, StyleSheet } from 'aphrodite/no-important'
 
 import { IconLink } from './menuIcons'
@@ -29,7 +29,7 @@ const Sidebar = ({ match, solid }) => {
   return (
     <section className={css(styles.sidebar)}>
       <div className={css(styles.menu)}>
-        <IconLink replace to={`${match.url}`} name="information-variant" />
+        <IconLink to="/" name="home" />
         <IconLink replace to={`${match.url}/related`} name="math-compass" />
         <IconLink replace to={`${match.url}/config`} name="settings" />
         <IconLink
@@ -37,12 +37,11 @@ const Sidebar = ({ match, solid }) => {
           to={`${match.url}/list`}
           name="format-list-bulleted"
         />
-        <IconLink to="/" name="home" />
       </div>
       <Route
         exact
         path={match.url}
-        component={() => <ComponentInfo solid={solid} />}
+        render={() => <Redirect to={`${match.url}/related`} />}
       />
       <Route
         path={`${match.url}/related`}
