@@ -41,7 +41,7 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     minHeight: 40,
-    maxHeight: 80,
+    maxHeight: 60,
     padding: '10px 0',
     border: '1px gray solid',
 

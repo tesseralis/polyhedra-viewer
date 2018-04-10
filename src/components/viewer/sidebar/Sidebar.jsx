@@ -46,7 +46,7 @@ const Sidebar = ({ match, solid }) => {
         <IconLink
           replace
           to={`${match.url}/related`}
-          title="Related"
+          title="Operations"
           iconName="math-compass"
         />
       </div>
