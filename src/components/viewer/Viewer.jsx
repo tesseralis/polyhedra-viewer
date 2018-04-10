@@ -3,6 +3,7 @@ import React, { Component } from 'react'
 import { css, StyleSheet } from 'aphrodite/no-important'
 
 import { isValidSolid } from 'data'
+import { andaleMono } from 'styles/fonts'
 import Polyhedron from 'math/Polyhedron'
 import { fixed, fullScreen } from 'styles/common'
 import { unescapeName } from 'polyhedra/names'
@@ -36,12 +37,25 @@ const styles = StyleSheet.create({
     minHeight: '100%',
   },
   title: {
-    padding: 36,
     ...fixed('bottom', 'right'),
+    padding: 36,
     maxWidth: '50%',
     textAlign: 'right',
   },
+  description: {
+    ...fixed('top', 'right'),
+    padding: 36,
+    fontSize: 24,
+    fontFamily: andaleMono,
+    textAlign: 'right',
+  },
 })
+
+const operationDescriptions = {
+  '+': 'Click on a face to add a pyramid or cupola.',
+  '-': 'Click on a set of faces to remove them.',
+  g: 'Click on a set of faces to gyrate them.',
+}
 
 function hasMultipleOptionsForFace(relations) {
   return _.some(relations, relation => _.includes(['U2', 'R5'], relation.using))
@@ -125,6 +139,11 @@ export default class Viewer extends Component {
           <div className={css(styles.title)}>
             <Title name={unescapeName(solid)} />
           </div>
+          {_.has(operationDescriptions, operation) && (
+            <div className={css(styles.description)}>
+              {operationDescriptions[operation]}
+            </div>
+          )}
         </div>
       </div>
     )
