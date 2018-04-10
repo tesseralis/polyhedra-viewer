@@ -1,15 +1,11 @@
 import React, { Component } from 'react'
 import { rgb } from 'd3-color'
 import _ from 'lodash'
-import { connect } from 'react-redux'
-import { createStructuredSelector } from 'reselect'
 import EventListener from 'react-event-listener'
 
 import polygons from 'constants/polygons'
-import { getPolyhedron } from 'selectors'
 import { mapObject } from 'util.js'
-import { getAugmentFace } from 'math/operations'
-import polyhedraViewer from 'containers/polyhedraViewer'
+import { getAugmentFace, getAugmentGraph } from 'math/operations'
 import Transition from './Transition'
 
 // Join a list of lists with an inner and outer separator.
@@ -80,6 +76,12 @@ class Faces extends Component {
     )
   }
 
+  static getDerivedStateFromProps(props) {
+    return {
+      augmentInfo: getAugmentGraph(props.solidData),
+    }
+  }
+
   getColorForFace = (face, fIndex) => {
     const { applyArgs } = this.state
     const { config: { colors } } = this.props
@@ -145,7 +147,8 @@ class Faces extends Component {
   handleMouseMove = event => {
     // TODO replace this with logs
     this.drag = true
-    const { solidData, operation, augmentInfo } = this.props
+    const { solidData, operation } = this.props
+    const { augmentInfo } = this.state
     console.log('operation', operation)
     switch (operation) {
       case '+':
@@ -175,7 +178,7 @@ class Faces extends Component {
   }
 }
 
-const ConnectedFaces = polyhedraViewer(Faces)
+// const ConnectedFaces = polyhedraViewer(Faces)
 
 /* Edges */
 
@@ -193,7 +196,7 @@ const Edges = ({ edges, vertices }) => {
 
 // const getScaleAttr = scale => `${scale} ${scale} ${scale}`
 
-class Polyhedron extends Component {
+export default class Polyhedron extends Component {
   constructor(props) {
     super(props)
     this.state = {
@@ -203,7 +206,7 @@ class Polyhedron extends Component {
   }
 
   render() {
-    const { config } = this.props
+    const { config, operation, applyOperation } = this.props
     const { solidData, animate } = this.state
     const { vertices, edges } = solidData
 
@@ -214,7 +217,12 @@ class Polyhedron extends Component {
     return (
       <transform>
         {config.showFaces && (
-          <ConnectedFaces solidData={solidData} config={config} />
+          <Faces
+            solidData={solidData}
+            config={config}
+            operation={operation}
+            applyOperation={applyOperation}
+          />
         )}
         {config.showEdges && <Edges edges={edges} vertices={vertices} />}
       </transform>
@@ -269,9 +277,3 @@ class Polyhedron extends Component {
     }
   }
 }
-
-const mapStateToProps = createStructuredSelector({
-  solidData: getPolyhedron,
-})
-
-export default connect(mapStateToProps)(Polyhedron)

@@ -23,7 +23,7 @@ const styles = StyleSheet.create({
 })
 
 // TODO figure out how to separate out the state of different tabs
-const Sidebar = ({ match, solid, config, setConfigValue }) => {
+const Sidebar = ({ match, configProps, relatedPolyhedraProps }) => {
   return (
     <section className={css(styles.sidebar)}>
       <div className={css(styles.menu)}>
@@ -54,13 +54,11 @@ const Sidebar = ({ match, solid, config, setConfigValue }) => {
       />
       <Route
         path={`${match.url}/related`}
-        render={() => <RelatedPolyhedra solid={solid} />}
+        render={() => <RelatedPolyhedra {...relatedPolyhedraProps} />}
       />
       <Route
         path={`${match.url}/config`}
-        render={() => (
-          <ConfigForm inputValues={config} setInputValue={setConfigValue} />
-        )}
+        render={() => <ConfigForm {...configProps} />}
       />
       <Route path={`${match.url}/list`} component={PolyhedronList} />
     </section>

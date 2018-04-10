@@ -3,7 +3,6 @@ import React from 'react'
 import { css, StyleSheet } from 'aphrodite/no-important'
 
 import { operations, getRelations, getUsingOpts } from 'polyhedra/relations'
-import polyhedraViewer from 'containers/polyhedraViewer'
 import Tooltip from './Tooltip'
 
 const styles = StyleSheet.create({
@@ -131,14 +130,13 @@ function AugmentOptions({ options, solid, onClickOption }) {
 }
 
 // TODO this could probably use a test to make sure all the buttons are in the right places
-function RelatedPolyhedra({
+export default function RelatedPolyhedra({
   solid,
   operation,
-  options,
+  applyOptions,
   applyOperation,
   recenter,
-  setMode,
-  unsetMode,
+  setOperation,
   setApplyOpt,
 }) {
   return (
@@ -167,8 +165,7 @@ function RelatedPolyhedra({
                     disabled={!relations}
                     onClick={() => {
                       if (_.includes(hasMode, symbol)) {
-                        if (symbol !== operation) setMode(symbol)
-                        else unsetMode()
+                        setOperation(symbol !== operation ? symbol : null)
                       } else {
                         applyOperation(symbol, relation)
                       }
@@ -183,7 +180,7 @@ function RelatedPolyhedra({
             {symbol === '+' && (
               <AugmentOptions
                 solid={solid}
-                options={options}
+                options={applyOptions}
                 onClickOption={setApplyOpt}
               />
             )}
@@ -196,5 +193,3 @@ function RelatedPolyhedra({
     </div>
   )
 }
-
-export default polyhedraViewer(RelatedPolyhedra)
