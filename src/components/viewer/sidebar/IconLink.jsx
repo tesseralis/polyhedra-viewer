@@ -3,7 +3,7 @@ import { Route, NavLink } from 'react-router-dom'
 import { css, StyleSheet } from 'aphrodite/no-important'
 
 import Icon from './Icon'
-import { transition, resetButton, resetLink } from 'styles/common'
+import { resetButton, resetLink } from 'styles/common'
 
 const styles = StyleSheet.create({
   button: resetButton,

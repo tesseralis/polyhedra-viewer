@@ -1,22 +1,18 @@
 import _ from 'lodash'
 import React from 'react'
 import { MemoryRouter } from 'react-router-dom'
-import { Provider } from 'react-redux'
 
 import { mount } from 'enzyme'
 
 import App from 'components/App'
-import configureStore from 'store/configureStore'
 import Polyhedron from 'math/Polyhedron'
 
 export default class AppPage {
   constructor(path = '/') {
     this.wrapper = mount(
-      <Provider store={configureStore()}>
-        <MemoryRouter initialEntries={[path]}>
-          <App />
-        </MemoryRouter>
-      </Provider>,
+      <MemoryRouter initialEntries={[path]}>
+        <App />
+      </MemoryRouter>,
     )
   }
 

@@ -4,7 +4,6 @@ import { Link } from 'react-router-dom'
 
 import { escapeName } from 'polyhedra/names'
 import { hover } from 'styles/common'
-import { withSetPolyhedron } from 'containers'
 
 const thumbnailSize = 55
 
@@ -43,10 +42,8 @@ const styles = StyleSheet.create({
   },
 })
 
-function PolyhedronLink({
-  setPolyhedron,
+export default function PolyhedronLink({
   name,
-  onClick,
   isFake,
   subLink,
   large = false,
@@ -64,7 +61,6 @@ function PolyhedronLink({
     <Link
       to={'/' + escapedName + (subLink ? '/' + subLink : '')}
       className={css(styles.link, styles.real, large && styles.largeLink)}
-      onClick={() => (onClick || setPolyhedron)(escapedName)}
       title={name}
     >
       <img
@@ -75,5 +71,3 @@ function PolyhedronLink({
     </Link>
   )
 }
-
-export default withSetPolyhedron(PolyhedronLink)

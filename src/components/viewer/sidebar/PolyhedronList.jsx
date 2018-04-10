@@ -1,11 +1,9 @@
 import _ from 'lodash'
 import React, { Component } from 'react'
-import { compose } from 'redux'
 import { NavLink, withRouter } from 'react-router-dom'
 import { css, StyleSheet } from 'aphrodite/no-important'
 
 import { groups } from 'data'
-import { withSetPolyhedron } from 'containers'
 import { escapeName } from 'polyhedra/names'
 import { andaleMono } from 'styles/fonts'
 import { resetLink, hover } from 'styles/common'
@@ -37,7 +35,7 @@ const filterGroups = (groups, filterText) =>
     )
 
 // TODO deduplicate with the other polyhedron link
-const PolyhedronLink = ({ name, setPolyhedron }) => {
+const PolyhedronLink = ({ name }) => {
   const styles = StyleSheet.create({
     link: {
       ...resetLink,
@@ -62,19 +60,13 @@ const PolyhedronLink = ({ name, setPolyhedron }) => {
       to={`/${escapeName(name)}/list`}
       className={css(styles.link)}
       activeClassName={css(styles.isActive)}
-      onClick={() => {
-        console.log('clicking link')
-        setPolyhedron(escapeName(name))
-      }}
     >
       {_.capitalize(name)}
     </NavLink>
   )
 }
 
-const ConnectedPolyhedronLink = compose(withRouter, withSetPolyhedron)(
-  PolyhedronLink,
-)
+const ConnectedPolyhedronLink = withRouter(PolyhedronLink)
 const SubList = ({ polyhedra }) => {
   return (
     <ul>

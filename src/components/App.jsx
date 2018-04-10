@@ -7,13 +7,14 @@ import 'styles/box-sizing.css'
 import { PeriodicTable } from './table'
 import { Viewer } from './viewer'
 
-const ViewerComponent = ({ match }) => {
-  return <Viewer solid={match.params.solid} />
-}
-
 export default () => (
   <div>
     <Route exact path="/" component={PeriodicTable} />
-    <Route path="/:solid" component={ViewerComponent} />
+    <Route
+      path="/:solid"
+      render={({ match, history }) => (
+        <Viewer solid={match.params.solid} history={history} />
+      )}
+    />
   </div>
 )
