@@ -10,7 +10,6 @@ import { getPolyhedron } from 'selectors'
 import { mapObject } from 'util.js'
 import { getAugmentFace } from 'math/operations'
 import polyhedraViewer from 'containers/polyhedraViewer'
-import { WithConfig } from './sidebar'
 import Transition from './Transition'
 
 // Join a list of lists with an inner and outer separator.
@@ -213,16 +212,12 @@ class Polyhedron extends Component {
 
     // TODO different eases for different animations?
     return (
-      <WithConfig>
-        {config => (
-          <transform>
-            {config.showFaces && (
-              <ConnectedFaces solidData={solidData} config={config} />
-            )}
-            {config.showEdges && <Edges edges={edges} vertices={vertices} />}
-          </transform>
+      <transform>
+        {config.showFaces && (
+          <ConnectedFaces solidData={solidData} config={config} />
         )}
-      </WithConfig>
+        {config.showEdges && <Edges edges={edges} vertices={vertices} />}
+      </transform>
     )
     // if (animate) {
     //   return (

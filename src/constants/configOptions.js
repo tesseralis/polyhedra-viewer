@@ -41,7 +41,14 @@ export const configInputs = [
   display: input.display || _.startCase(input.key),
 }))
 
-export const configOptions = mapObject(configInputs, value => [
-  value.key,
-  value,
-])
+const configOptions = mapObject(configInputs, value => [value.key, value])
+
+export const defaultConfig = _.mapValues(configOptions, 'default')
+
+const getColors = config =>
+  mapObject(polygons, n => [n, config[getColorInputKey(n)]])
+
+export const getPolyhedronConfig = config => ({
+  ...config,
+  colors: getColors(config),
+})

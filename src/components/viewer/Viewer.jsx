@@ -9,10 +9,11 @@ import { getPolyhedron } from 'selectors'
 import { fixed, fullScreen } from 'styles/common'
 import { withSetPolyhedron } from 'containers'
 import { unescapeName } from 'polyhedra/names'
+import { defaultConfig, getPolyhedronConfig } from 'constants/configOptions'
 
 import X3dScene from './X3dScene'
 import Polyhedron from './Polyhedron'
-import { Sidebar, ConfigProvider } from './sidebar'
+import { Sidebar } from './sidebar'
 import Title from './Title'
 
 const styles = StyleSheet.create({
@@ -44,6 +45,13 @@ const styles = StyleSheet.create({
 })
 
 class Viewer extends Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      config: defaultConfig,
+    }
+  }
+
   componentWillMount() {
     const { solid, setPolyhedron, history } = this.props
     setPolyhedron(solid)
@@ -65,24 +73,34 @@ class Viewer extends Component {
 
   render() {
     const { solid } = this.props
+    const { config } = this.state
     // FIXME resizing (decreasing height) for the x3d scene doesn't work well
     return (
-      <ConfigProvider>
-        <div className={css(styles.viewer)}>
-          <div className={css(styles.sidebar)}>
-            <Sidebar solid={solid} />
-          </div>
-          <div className={css(styles.scene)}>
-            <X3dScene>
-              <Polyhedron />
-            </X3dScene>
-            <div className={css(styles.title)}>
-              <Title name={unescapeName(solid)} />
-            </div>
+      <div className={css(styles.viewer)}>
+        <div className={css(styles.sidebar)}>
+          <Sidebar
+            solid={solid}
+            config={config}
+            setConfigValue={this.setConfigValue}
+          />
+        </div>
+        <div className={css(styles.scene)}>
+          <X3dScene>
+            <Polyhedron config={getPolyhedronConfig(config)} />
+          </X3dScene>
+          <div className={css(styles.title)}>
+            <Title name={unescapeName(solid)} />
           </div>
         </div>
-      </ConfigProvider>
+      </div>
     )
+  }
+
+  setConfigValue = (key, value) => {
+    if (key === null) {
+      this.setState({ config: defaultConfig })
+    }
+    this.setState(({ config }) => ({ config: { ...config, [key]: value } }))
   }
 }
 
