@@ -33,9 +33,9 @@ const Sidebar = ({ match, solid }) => {
         <IconLink to="/" title="Home" iconName="home" exact />
         <IconLink
           replace
-          to={`${match.url}/related`}
-          title="Related"
-          iconName="math-compass"
+          to={`${match.url}/list`}
+          title="List"
+          iconName="format-list-bulleted"
         />
         <IconLink
           replace
@@ -45,9 +45,9 @@ const Sidebar = ({ match, solid }) => {
         />
         <IconLink
           replace
-          to={`${match.url}/list`}
-          title="List"
-          iconName="format-list-bulleted"
+          to={`${match.url}/related`}
+          title="Related"
+          iconName="math-compass"
         />
       </div>
       <Route
