@@ -19,6 +19,8 @@ if (x3dom.Viewarea) {
 const styles = StyleSheet.create({
   x3dScene: {
     border: 'none',
+    height: '100%',
+    width: '100%',
   },
 })
 

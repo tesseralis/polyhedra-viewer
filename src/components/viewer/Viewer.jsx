@@ -17,12 +17,21 @@ const styles = StyleSheet.create({
   viewer: {
     ...fullScreen,
     display: 'grid',
-    gridTemplateColumns: '1fr 400px',
+    gridTemplateColumns: '400px 1fr',
+    gridTemplateAreas: '"sidebar scene"',
   },
   sidebar: {
     height: '100%',
+    // FIXME this is really janky and messes with the grid template
     position: 'fixed',
-    right: 0,
+    left: 0,
+    gridArea: 'sidebar',
+  },
+  scene: {
+    gridArea: 'scene',
+    width: '100%',
+    height: '100%',
+    minHeight: '100%',
   },
   title: {
     padding: 36,
@@ -58,11 +67,13 @@ class Viewer extends Component {
     return (
       <ConfigProvider>
         <div className={css(styles.viewer)}>
-          <X3dScene>
-            <Polyhedron />
-          </X3dScene>
           <div className={css(styles.sidebar)}>
             <Sidebar solid={solid} />
+          </div>
+          <div className={css(styles.scene)}>
+            <X3dScene>
+              <Polyhedron />
+            </X3dScene>
           </div>
         </div>
       </ConfigProvider>
