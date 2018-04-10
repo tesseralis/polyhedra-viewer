@@ -42,6 +42,13 @@ const styles = StyleSheet.create({
     height: '100%',
     minHeight: 40,
     padding: '10px 0',
+    border: '1px gray solid',
+
+    ':disabled': {
+      // border: 'none',
+      borderColor: 'LightGray',
+      backgroundColor: 'WhiteSmoke',
+    },
   },
 
   optionButton: {
@@ -54,6 +61,7 @@ const styles = StyleSheet.create({
   },
 
   recenterButton: {
+    borderColor: 'Gray',
     marginTop: 10,
     gridArea: 'recenter',
     padding: 10,
@@ -182,7 +190,7 @@ function RelatedPolyhedra({
           </div>
         )
       })}
-      <button onClick={() => recenter()} className={css(styles.recenterButton)}>
+      <button onClick={recenter} className={css(styles.recenterButton)}>
         Recenter
       </button>
     </div>
