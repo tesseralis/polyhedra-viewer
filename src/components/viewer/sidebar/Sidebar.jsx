@@ -22,7 +22,6 @@ const styles = StyleSheet.create({
   },
 })
 
-// TODO figure out how to separate out the state of different tabs
 export default function Sidebar({ match, configProps, relatedPolyhedraProps }) {
   return (
     <Route

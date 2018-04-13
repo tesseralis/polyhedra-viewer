@@ -95,6 +95,7 @@ class Faces extends Component {
       _.isObject(applyArgs.peak) &&
       _.includes(applyArgs.peak.faceIndices(), fIndex)
     ) {
+      // return polygonColors(diminishColors)[getColorIndex(face)]
       return [1, 1, 0]
     }
     return defaultColors[getColorIndex(face)]

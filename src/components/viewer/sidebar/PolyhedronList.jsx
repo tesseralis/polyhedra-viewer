@@ -34,7 +34,6 @@ const filterGroups = (groups, filterText) =>
         (groups && groups.length > 0) || (polyhedra && polyhedra.length > 0),
     )
 
-// TODO deduplicate with the other polyhedron link
 const PolyhedronLink = ({ name }) => {
   const styles = StyleSheet.create({
     link: {

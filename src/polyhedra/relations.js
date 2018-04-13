@@ -134,3 +134,22 @@ export function getNextPolyhedron(solid, operation, filterOpts) {
 
   return fromConwayNotation(next[0].value)
 }
+
+function hasMultipleOptionsForFace(relations) {
+  return _.some(relations, relation => _.includes(['U2', 'R5'], relation.using))
+}
+
+export function applyOptionsFor(solid, operation) {
+  if (!solid) return
+  const relations = getRelations(solid, operation)
+  const newOpts = {}
+  if (operation === '+') {
+    if (_.filter(relations, 'gyrate').length > 1) {
+      newOpts.gyrate = 'ortho'
+    }
+    if (hasMultipleOptionsForFace(relations)) {
+      newOpts.using = getUsingOpts(solid)[0]
+    }
+  }
+  return newOpts
+}

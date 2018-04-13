@@ -8,7 +8,7 @@ import Polyhedron from 'math/Polyhedron'
 import { fixed, fullScreen } from 'styles/common'
 import { unescapeName } from 'polyhedra/names'
 import doApplyOperation from 'polyhedra/applyOperation'
-import { getRelations, getUsingOpts } from 'polyhedra/relations'
+import { getRelations, applyOptionsFor } from 'polyhedra/relations'
 import { defaultConfig, getPolyhedronConfig } from 'constants/configOptions'
 
 import X3dScene from './X3dScene'
@@ -55,10 +55,6 @@ const operationDescriptions = {
   '+': 'Click on a face to add a pyramid or cupola.',
   '-': 'Click on a set of faces to remove them.',
   g: 'Click on a set of faces to gyrate them.',
-}
-
-function hasMultipleOptionsForFace(relations) {
-  return _.some(relations, relation => _.includes(['U2', 'R5'], relation.using))
 }
 
 function viewerStateFromSolidName(name) {
@@ -156,25 +152,10 @@ export default class Viewer extends Component {
     this.setState(({ config }) => ({ config: { ...config, [key]: value } }))
   }
 
-  applyOptionsFor = (solid, operation) => {
-    if (!solid) return
-    const relations = getRelations(solid, operation)
-    const newOpts = {}
-    if (operation === '+') {
-      if (_.filter(relations, 'gyrate').length > 1) {
-        newOpts.gyrate = 'ortho'
-      }
-      if (hasMultipleOptionsForFace(relations)) {
-        newOpts.using = getUsingOpts(solid)[0]
-      }
-    }
-    return newOpts
-  }
-
   setOperation = operation => {
     this.setState(({ polyhedron }) => ({
       operation,
-      applyOptions: this.applyOptionsFor(polyhedron.name, operation),
+      applyOptions: applyOptionsFor(polyhedron.name, operation),
     }))
   }
 
@@ -189,7 +170,7 @@ export default class Viewer extends Component {
         if (_.isEmpty(getRelations(result.name, operation))) {
           return { operation: null, applyOptions: {} }
         } else {
-          return { applyOptions: this.applyOptionsFor(result.name, operation) }
+          return { applyOptions: applyOptionsFor(result.name, operation) }
         }
       })()
       return {
