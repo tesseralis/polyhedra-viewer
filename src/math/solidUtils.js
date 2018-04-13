@@ -47,3 +47,12 @@ export function getBoundary(faces) {
   }
   return result
 }
+
+export function nextVertex(face, vIndex) {
+  return getCyclic(face, face.indexOf(vIndex) + 1)
+}
+
+export function prevVertex(face, vIndex) {
+  return getCyclic(face, face.indexOf(vIndex) - 1)
+}
+

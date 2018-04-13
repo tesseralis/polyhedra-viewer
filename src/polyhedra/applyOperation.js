@@ -10,11 +10,14 @@ import Polyhedron from 'math/Polyhedron'
 import {
   operationFunctions,
   // applyOperationWithAnimation,
+} from 'math/operations'
+
+import {
   getAugmentAlignment,
   getPeakAlignment,
   getCupolaGyrate,
   getGyrateDirection,
-} from 'math/operations'
+} from 'math/applyOptionUtils'
 
 const platonicMap = {
   T: 3,

@@ -11,6 +11,16 @@ export const mapObject = (arr, iteratee) => {
 }
 
 /**
+ * Get the single element from the given array.
+ */
+export function getSingle(array) {
+  if (array.length !== 1) {
+    throw new Error(`Expected array to have one element: ${array}`)
+  }
+  return array[0]
+}
+
+/**
  * Replace the given index in the array with the given values. Alternative to "splice".
  */
 export function replace(array, index, ...values) {
