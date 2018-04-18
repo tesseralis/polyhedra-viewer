@@ -34,7 +34,13 @@ const hasMultiple = (relations, property) =>
     .value().length > 1
 
 // FIXME (animation) this is inelegant
-const updateName = ({ result, animationData: { start, end } }, name) => {
+const updateName = (opResult, name) => {
+  if (!opResult.animationData) {
+    return {
+      result: opResult.withName(name),
+    }
+  }
+  const { result, animationData: { start, end } } = opResult
   return {
     result: result.withName(name),
     animationData: {

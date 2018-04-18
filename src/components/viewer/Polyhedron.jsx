@@ -242,6 +242,7 @@ export default class Polyhedron extends Component {
 
     // TODO different eases for different animations?
     // FIXME animation replays whenever we switch tabs
+    // FIXME the current transition API is overly complicated and not at all clear
     return (
       <Transition
         defaultStyle={{
@@ -264,6 +265,7 @@ export default class Polyhedron extends Component {
                   solidData={solidData.withVertices(vertices)}
                   animate={animate}
                   operation={operation}
+                  applyOperation={applyOperation}
                   opacity={opacity}
                   colors={colors}
                   colorMap={faceColors}
