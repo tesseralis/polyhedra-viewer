@@ -38,12 +38,12 @@ expect.extend({
     return {
       message: () => {
         if (!isProper)
-          return `expected ${this.isNot
-            ? 'an improper'
-            : 'a proper'} CRF polyhedron`
-        return `expected polyhedron to ${this.isNot
-          ? 'not be'
-          : 'be'} a ${received.name}`
+          return `expected ${
+            this.isNot ? 'an improper' : 'a proper'
+          } CRF polyhedron`
+        return `expected polyhedron to ${this.isNot ? 'not be' : 'be'} a ${
+          received.name
+        }`
       },
       pass: isProper && matchesName,
     }
@@ -63,11 +63,9 @@ function getOptsToTest(operation, polyhedron) {
         .filter(fIndex => canAugment(polyhedron, fIndex))
 
       // FIXME this leads to invalid combinations
-      return cartesian(
-        gyrateOpts,
-        usingOpts,
-        fIndexOpts,
-      ).map(([gyrate, using, fIndex]) => ({ gyrate, using, fIndex }))
+      return cartesian(gyrateOpts, usingOpts, fIndexOpts).map(
+        ([gyrate, using, fIndex]) => ({ gyrate, using, fIndex }),
+      )
     case '-':
     case 'g':
       return polyhedron.peaks().map(peak => ({ peak }))
@@ -85,7 +83,7 @@ describe('applyOperation', () => {
         const optsToTest = getOptsToTest(operation, polyhedron)
 
         optsToTest.forEach(options => {
-          const result = applyOperation(operation, polyhedron, options)
+          const { result } = applyOperation(operation, polyhedron, options)
           expect(result).toBeValidPolyhedron()
         })
       })

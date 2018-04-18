@@ -80,6 +80,7 @@ class Faces extends Component {
     if (props.animate) {
       return null
     }
+    console.log('solidData', props.solidData)
 
     return {
       augmentInfo: getAugmentGraph(props.solidData),
@@ -284,7 +285,6 @@ export default class Polyhedron extends Component {
     if (solidData === prevState.solidData) {
       return null
     }
-    console.log('updating with ', solidData, animationData)
     if (animationData) {
       return { solidData: animationData.start, animate: true }
     } else {
