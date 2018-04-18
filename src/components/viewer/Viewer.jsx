@@ -174,6 +174,7 @@ export default class Viewer extends Component {
         ...args,
         ...applyOptions,
       })
+      console.log('result', result)
       // FIXME gyrate -> twist needs to be unset
       const postOpState = (() => {
         if (_.isEmpty(getRelations(result.name, operation))) {
@@ -190,6 +191,7 @@ export default class Viewer extends Component {
     })
   }
 
+  // TODO animation recenter
   recenter = () => {
     this.setState(({ polyhedron }) => ({
       polyhedron: polyhedron.center(),

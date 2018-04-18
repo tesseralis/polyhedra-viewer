@@ -80,7 +80,6 @@ class Faces extends Component {
     if (props.animate) {
       return null
     }
-    console.log('solidData', props.solidData)
 
     return {
       augmentInfo: getAugmentGraph(props.solidData),
@@ -232,7 +231,8 @@ export default class Polyhedron extends Component {
 
   render() {
     const { config, operation, applyOperation, animationData } = this.props
-    const { solidData, animate } = this.state
+    const { animate, solidData } = this.state
+    // const solidData = animate ? this.state.solidData : this.props.solidData
     const { edges } = solidData
     const { showFaces, showEdges, transitionDuration, colors, opacity } = config
 
@@ -263,7 +263,11 @@ export default class Polyhedron extends Component {
             <transform>
               {showFaces && (
                 <Faces
-                  solidData={solidData.withVertices(vertices)}
+                  solidData={
+                    // FIXME We have an update race condition where this child updates before the Transition component
+                    // maybe don't use "componentDidUpdate?"
+                    animate ? solidData.withVertices(vertices) : solidData
+                  }
                   animate={animate}
                   operation={operation}
                   applyOperation={applyOperation}

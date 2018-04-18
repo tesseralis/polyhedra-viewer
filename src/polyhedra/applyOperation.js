@@ -115,5 +115,6 @@ export default function applyOperation(operation, polyhedron, config = {}) {
     // throw new Error(`Function not found for ${operation}`)
     return Polyhedron.get(next)
   }
+  console.log('applyConfig', applyConfig)
   return updateName(opFunction(polyhedron, applyConfig), next)
 }
