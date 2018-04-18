@@ -74,17 +74,26 @@ function truncateVertex(
 
 function doTruncate(polyhedron, options = {}) {
   let newPolyhedron = polyhedron
+  let mockPolyhedron = polyhedron
+  // FIXME (animation) make this more concise
   _.forEach(polyhedron.vertices, (vertex, index) => {
     newPolyhedron = truncateVertex(newPolyhedron, polyhedron, index, options)
+    mockPolyhedron = truncateVertex(mockPolyhedron, polyhedron, index, {
+      ...options,
+      mock: true,
+    })
   })
-  // FIXME deduplicating fails
-  return options.mock
-    ? removeExtraneousVertices(newPolyhedron)
-    : deduplicateVertices(newPolyhedron)
+  return {
+    animationData: {
+      start: removeExtraneousVertices(mockPolyhedron),
+      end: removeExtraneousVertices(newPolyhedron).vertices,
+    },
+    result: deduplicateVertices(newPolyhedron),
+  }
 }
 
-export function truncate(polyhedron, options, mock) {
-  return doTruncate(polyhedron, { mock })
+export function truncate(polyhedron, options) {
+  return doTruncate(polyhedron)
 }
 
 export function rectify(polyhedron) {

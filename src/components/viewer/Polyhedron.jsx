@@ -41,6 +41,14 @@ class Faces extends Component {
     this.shape = React.createRef()
   }
 
+  componentWillUnmount() {
+    console.log('Faces unmounting')
+  }
+
+  componentDidMount() {
+    console.log('Faces mounted')
+  }
+
   render() {
     const { solidData, config } = this.props
     const { error } = this.state
@@ -77,6 +85,10 @@ class Faces extends Component {
   }
 
   static getDerivedStateFromProps(props) {
+    if (props.animate) {
+      return null
+    }
+
     return {
       augmentInfo: getAugmentGraph(props.solidData),
     }
@@ -120,6 +132,7 @@ class Faces extends Component {
   }
 
   handleLoad = () => {
+    console.log('handleLoad')
     this.addEventListener('mousedown', this.handleMouseDown)
     this.addEventListener('mouseup', this.handleMouseUp)
     this.addEventListener('mousemove', this.handleMouseMove)
@@ -179,8 +192,6 @@ class Faces extends Component {
   }
 }
 
-// const ConnectedFaces = polyhedraViewer(Faces)
-
 /* Edges */
 
 const Edges = ({ edges, vertices }) => {
@@ -195,8 +206,6 @@ const Edges = ({ edges, vertices }) => {
 
 /* Polyhedron */
 
-// const getScaleAttr = scale => `${scale} ${scale} ${scale}`
-
 export default class Polyhedron extends Component {
   constructor(props) {
     super(props)
@@ -209,72 +218,61 @@ export default class Polyhedron extends Component {
   render() {
     const { config, operation, applyOperation } = this.props
     const { solidData, animate } = this.state
-    const { vertices, edges } = solidData
+    const { edges } = solidData
 
-    // FIXME After the transition is finished, the new polyhedron can't receive events
-    // because of an unmounting issue
+    // FIXME (animation) After the transition is finished, the new polyhedron can't receive events
+    // because of an unmounting issue. Transition needs to handle disabling
 
     // TODO different eases for different animations?
     return (
-      <transform>
-        {config.showFaces && (
-          <Faces
-            solidData={solidData}
-            config={config}
-            operation={operation}
-            applyOperation={applyOperation}
-          />
-        )}
-        {config.showEdges && <Edges edges={edges} vertices={vertices} />}
-      </transform>
+      <Transition
+        defaultStyle={{ vertices: solidData.vertices }}
+        style={{
+          vertices: animate ? this.props.animationData.end : solidData.vertices,
+        }}
+        duration={animate ? 750 : 0}
+        ease="easePolyOut"
+        onFinish={this.finishAnimation}
+      >
+        {({ vertices }) => {
+          return (
+            <transform>
+              {config.showFaces && (
+                <Faces
+                  solidData={solidData.withVertices(vertices)}
+                  config={config}
+                  animate={animate}
+                  operation={operation}
+                />
+              )}
+              {config.showEdges && <Edges edges={edges} vertices={vertices} />}
+            </transform>
+          )
+        }}
+      </Transition>
     )
-    // if (animate) {
-    //   return (
-    //     <Transition
-    //       defaultStyle={{ vertices: solidData.vertices }}
-    //       style={{ vertices: this.props.solidData.vertices }}
-    //       duration={750}
-    //       ease="easePolyOut"
-    //       onFinish={() =>
-    //         this.setState({ animation: false, solidData: this.props.solidData })
-    //       }
-    //     >
-    //       {({ vertices }) => {
-    //         return (
-    //           <transform>
-    //             {showFaces && (
-    //               <ConnectedFaces
-    //                 solidData={solidData.withVertices(vertices)}
-    //                 config={config}
-    //               />
-    //             )}
-    //             {showEdges && <Edges edges={edges} vertices={vertices} />}
-    //           </transform>
-    //         )
-    //       }}
-    //     </Transition>
-    //   )
-    // } else {
-    //   return (
-    //     <transform>
-    //       {showFaces && (
-    //         <ConnectedFaces solidData={solidData} config={config} />
-    //       )}
-    //       {showEdges && <Edges edges={edges} vertices={vertices} />}
-    //     </transform>
-    //   )
-    // }
   }
 
-  componentWillReceiveProps(nextProps) {
-    // FIXME handle the case where vertices are removed after animation
-    if (nextProps.solidData !== this.props.solidData) {
-      const { solidData } = nextProps
-      if (solidData.mock) {
-        this.setState({ solidData: solidData.mock, animate: true })
-      } else {
-        this.setState({ solidData, animate: false })
-      }
+  renderTransition = children => {}
+
+  renderSolid = (solidData, config) => {}
+
+  static getDerivedStateFromProps(nextProps, prevState) {
+    const { solidData, animationData } = nextProps
+    if (solidData === prevState.solidData) {
+      return null
     }
+    console.log('updating with ', solidData, animationData)
+    if (animationData) {
+      return { solidData: animationData.start, animate: true }
+    } else {
+      return { solidData, animate: false }
+    }
+  }
+
+  finishAnimation = () => {
+    console.log('onfinish called')
+    const { solidData } = this.props
+    this.setState({ solidData, animate: false })
   }
 }

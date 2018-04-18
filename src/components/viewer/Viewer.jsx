@@ -7,7 +7,7 @@ import { andaleMono } from 'styles/fonts'
 import Polyhedron from 'math/Polyhedron'
 import { fixed, fullScreen } from 'styles/common'
 import { unescapeName } from 'polyhedra/names'
-import doApplyOperation from 'polyhedra/applyOperation'
+import applyOperation from 'polyhedra/applyOperation'
 import { getRelations, applyOptionsFor } from 'polyhedra/relations'
 import { defaultConfig, getPolyhedronConfig } from 'constants/configOptions'
 
@@ -63,6 +63,7 @@ function viewerStateFromSolidName(name) {
   }
   return {
     polyhedron: Polyhedron.get(name),
+    animationData: null,
     operation: null,
     applyOptions: {},
   }
@@ -73,6 +74,7 @@ export default class Viewer extends Component {
     super(props)
     this.state = {
       polyhedron: Polyhedron.get(props.solid),
+      animationData: null,
       config: defaultConfig,
       operation: null,
       applyOptions: {},
@@ -100,7 +102,13 @@ export default class Viewer extends Component {
 
   render() {
     const { solid } = this.props
-    const { polyhedron, operation, config, applyOptions } = this.state
+    const {
+      polyhedron,
+      animationData,
+      operation,
+      config,
+      applyOptions,
+    } = this.state
     // FIXME resizing (decreasing height) for the x3d scene doesn't work well
     return (
       <div className={css(styles.viewer)}>
@@ -127,6 +135,7 @@ export default class Viewer extends Component {
           <X3dScene>
             <X3dPolyhedron
               solidData={polyhedron}
+              animationData={animationData}
               config={getPolyhedronConfig(config)}
               operation={operation}
               applyOperation={this.applyOperation}
@@ -161,7 +170,7 @@ export default class Viewer extends Component {
 
   applyOperation = (operation, args) => {
     this.setState(({ polyhedron, applyOptions }) => {
-      const result = doApplyOperation(operation, polyhedron, {
+      const { result, animationData } = applyOperation(operation, polyhedron, {
         ...args,
         ...applyOptions,
       })
@@ -175,13 +184,17 @@ export default class Viewer extends Component {
       })()
       return {
         polyhedron: result,
+        animationData,
         ...postOpState,
       }
     })
   }
 
   recenter = () => {
-    this.setState(({ polyhedron }) => ({ polyhedron: polyhedron.center() }))
+    this.setState(({ polyhedron }) => ({
+      polyhedron: polyhedron.center(),
+      animationData: null,
+    }))
   }
 
   setApplyOpt = (name, value) => {

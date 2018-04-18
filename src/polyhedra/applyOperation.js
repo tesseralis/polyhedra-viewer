@@ -33,6 +33,17 @@ const hasMultiple = (relations, property) =>
     .compact()
     .value().length > 1
 
+// FIXME (animation) this is inelegant
+const updateName = ({ result, animationData: { start, end } }, name) => {
+  return {
+    result: result.withName(name),
+    animationData: {
+      start: start.withName(name),
+      end,
+    },
+  }
+}
+
 export default function applyOperation(operation, polyhedron, config = {}) {
   let options = {}
   let applyConfig = config
@@ -98,11 +109,5 @@ export default function applyOperation(operation, polyhedron, config = {}) {
     // throw new Error(`Function not found for ${operation}`)
     return Polyhedron.get(next)
   }
-  return opFunction(polyhedron, applyConfig).withName(next)
-  // const final = opFunction(polyhedron, applyConfig).withName(next)
-  // const mock = opFunction(polyhedron, applyConfig, true)
-  // for now I'm just gonna do this so I don't have to remake the state again
-  // FIXME BAD DON'T DO THIS
-  // final.mock = mock
-  // return final
+  return updateName(opFunction(polyhedron, applyConfig), next)
 }
