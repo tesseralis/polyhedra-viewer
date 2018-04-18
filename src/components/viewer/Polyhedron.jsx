@@ -167,8 +167,6 @@ class Faces extends Component {
         this.setState({
           applyArgs: fIndex === -1 ? {} : { fIndex },
         })
-        // TODO what is this for?
-        this.forceUpdate()
         return
       case '-':
       case 'g':
