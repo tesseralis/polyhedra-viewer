@@ -35,6 +35,12 @@ export const configInputs = [
     max: 1,
     step: 0.01,
   },
+  {
+    // FIXME help this make more sense
+    key: 'transitionDuration',
+    type: 'number',
+    default: 750,
+  },
   ...colorOptionsList,
 ].map(input => ({
   ...input,

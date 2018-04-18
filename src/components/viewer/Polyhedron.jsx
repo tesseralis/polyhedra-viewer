@@ -233,7 +233,7 @@ export default class Polyhedron extends Component {
     const { config, operation, applyOperation, animationData } = this.props
     const { solidData, animate } = this.state
     const { edges } = solidData
-    const { showFaces, showEdges, colors, opacity } = config
+    const { showFaces, showEdges, transitionDuration, colors, opacity } = config
 
     const colorStart = animationData ? getFaceColors(solidData, colors) : {}
     const colorEnd = animationData
@@ -241,6 +241,7 @@ export default class Polyhedron extends Component {
       : {}
 
     // TODO different eases for different animations?
+    // FIXME animation replays whenever we switch tabs
     return (
       <Transition
         defaultStyle={{
@@ -251,7 +252,7 @@ export default class Polyhedron extends Component {
           vertices: animate ? animationData.end : solidData.vertices,
           faceColors: { ...colorStart, ...colorEnd },
         }}
-        duration={animate ? 750 : 0}
+        duration={animate ? transitionDuration : 0}
         ease="easePolyOut"
         onFinish={this.finishAnimation}
       >
