@@ -29,13 +29,11 @@ export default class Transition extends Component {
     }
 
     if (defaultStyle !== prevProps.defaultStyle || style !== prevProps.style) {
+      // FIXME test the possibilities of this
+      this.setState({ currentStyle: defaultStyle })
       if (duration > 0) {
-        console.log('updating with animation')
         this.start = null
         requestAnimationFrame(this.step)
-      } else {
-        console.log('updating without animating')
-        this.setState({ currentStyle: defaultStyle })
       }
     }
   }

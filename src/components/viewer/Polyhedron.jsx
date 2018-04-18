@@ -3,6 +3,7 @@ import { rgb } from 'd3-color'
 import _ from 'lodash'
 import EventListener from 'react-event-listener'
 
+import { PRECISION } from 'math/linAlg'
 import polygons from 'constants/polygons'
 import { mapObject } from 'util.js'
 import { getAugmentFace, getAugmentGraph } from 'math/operations'
@@ -41,18 +42,9 @@ class Faces extends Component {
     this.shape = React.createRef()
   }
 
-  componentWillUnmount() {
-    console.log('Faces unmounting')
-  }
-
-  componentDidMount() {
-    console.log('Faces mounted')
-  }
-
   render() {
-    const { solidData, config } = this.props
+    const { solidData, opacity } = this.props
     const { error } = this.state
-    const { opacity } = config
     const { vertices, faces } = solidData
 
     if (error) {
@@ -96,7 +88,7 @@ class Faces extends Component {
 
   getColorForFace = (face, fIndex) => {
     const { applyArgs } = this.state
-    const { config: { colors } } = this.props
+    const { colors, colorMap } = this.props
     const defaultColors = polygonColors(colors)
 
     // TODO pick better colors / have better effects
@@ -109,6 +101,11 @@ class Faces extends Component {
     ) {
       // return polygonColors(diminishColors)[getColorIndex(face)]
       return [1, 1, 0]
+    }
+
+    // If we specify that this face has a color, use it
+    if (_.has(colorMap, fIndex)) {
+      return toRgb(colorMap[fIndex])
     }
     return defaultColors[getColorIndex(face)]
   }
@@ -132,7 +129,6 @@ class Faces extends Component {
   }
 
   handleLoad = () => {
-    console.log('handleLoad')
     this.addEventListener('mousedown', this.handleMouseDown)
     this.addEventListener('mouseup', this.handleMouseUp)
     this.addEventListener('mousemove', this.handleMouseMove)
@@ -204,6 +200,24 @@ const Edges = ({ edges, vertices }) => {
   )
 }
 
+// FIXME prob need to move this
+function getTrueNumSides(polyhedron, face) {
+  const faceVertices = _.at(polyhedron.vertexVectors(), face)
+  const uniqueVertices = _.filter(faceVertices, (vertex, i) => {
+    return !vertex.equalsWithTolerance(
+      faceVertices[(i + 1) % faceVertices.length],
+      PRECISION,
+    )
+  })
+  return uniqueVertices.length
+}
+
+function getFaceColors(polyhedron, colors) {
+  return _.pickBy(
+    polyhedron.faces.map(face => colors[getTrueNumSides(polyhedron, face)]),
+  )
+}
+
 /* Polyhedron */
 
 export default class Polyhedron extends Component {
@@ -216,46 +230,51 @@ export default class Polyhedron extends Component {
   }
 
   render() {
-    const { config, operation, applyOperation } = this.props
+    const { config, operation, applyOperation, animationData } = this.props
     const { solidData, animate } = this.state
     const { edges } = solidData
+    const { showFaces, showEdges, colors, opacity } = config
 
-    // FIXME (animation) After the transition is finished, the new polyhedron can't receive events
-    // because of an unmounting issue. Transition needs to handle disabling
+    const colorStart = animationData ? getFaceColors(solidData, colors) : {}
+    const colorEnd = animationData
+      ? getFaceColors(solidData.withVertices(animationData.end), colors)
+      : {}
 
     // TODO different eases for different animations?
     return (
       <Transition
-        defaultStyle={{ vertices: solidData.vertices }}
+        defaultStyle={{
+          vertices: solidData.vertices,
+          faceColors: { ...colorEnd, ...colorStart },
+        }}
         style={{
-          vertices: animate ? this.props.animationData.end : solidData.vertices,
+          vertices: animate ? animationData.end : solidData.vertices,
+          faceColors: { ...colorStart, ...colorEnd },
         }}
         duration={animate ? 750 : 0}
         ease="easePolyOut"
         onFinish={this.finishAnimation}
       >
-        {({ vertices }) => {
+        {({ vertices, faceColors }) => {
           return (
             <transform>
-              {config.showFaces && (
+              {showFaces && (
                 <Faces
                   solidData={solidData.withVertices(vertices)}
-                  config={config}
                   animate={animate}
                   operation={operation}
+                  opacity={opacity}
+                  colors={colors}
+                  colorMap={faceColors}
                 />
               )}
-              {config.showEdges && <Edges edges={edges} vertices={vertices} />}
+              {showEdges && <Edges edges={edges} vertices={vertices} />}
             </transform>
           )
         }}
       </Transition>
     )
   }
-
-  renderTransition = children => {}
-
-  renderSolid = (solidData, config) => {}
 
   static getDerivedStateFromProps(nextProps, prevState) {
     const { solidData, animationData } = nextProps
@@ -271,7 +290,6 @@ export default class Polyhedron extends Component {
   }
 
   finishAnimation = () => {
-    console.log('onfinish called')
     const { solidData } = this.props
     this.setState({ solidData, animate: false })
   }
