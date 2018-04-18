@@ -5,11 +5,14 @@ import { css, StyleSheet } from 'aphrodite/no-important'
 import { isValidSolid } from 'data'
 import { andaleMono } from 'styles/fonts'
 import Polyhedron from 'math/Polyhedron'
+import { PRECISION } from 'math/linAlg'
+import polygons from 'constants/polygons'
 import { fixed, fullScreen } from 'styles/common'
 import { unescapeName } from 'polyhedra/names'
 import applyOperation from 'polyhedra/applyOperation'
 import { getRelations, applyOptionsFor } from 'polyhedra/relations'
 import { defaultConfig, getPolyhedronConfig } from 'constants/configOptions'
+import transition from 'transition.js'
 
 import X3dScene from './X3dScene'
 import X3dPolyhedron from './Polyhedron'
@@ -63,10 +66,29 @@ function viewerStateFromSolidName(name) {
   }
   return {
     polyhedron: Polyhedron.get(name),
-    animationData: null,
+    // animationData: null,
+    // animating: false,
     operation: null,
     applyOptions: {},
   }
+}
+
+// FIXME prob need to move this
+function getTrueNumSides(polyhedron, face) {
+  const faceVertices = _.at(polyhedron.vertexVectors(), face)
+  const uniqueVertices = _.filter(faceVertices, (vertex, i) => {
+    return !vertex.equalsWithTolerance(
+      faceVertices[(i + 1) % faceVertices.length],
+      PRECISION,
+    )
+  })
+  return uniqueVertices.length
+}
+
+function getFaceColors(polyhedron, colors) {
+  return _.pickBy(
+    polyhedron.faces.map(face => colors[getTrueNumSides(polyhedron, face)]),
+  )
 }
 
 export default class Viewer extends Component {
@@ -74,7 +96,8 @@ export default class Viewer extends Component {
     super(props)
     this.state = {
       polyhedron: Polyhedron.get(props.solid),
-      animationData: null,
+      // animationData: null,
+      // animating: false,
       config: defaultConfig,
       operation: null,
       applyOptions: {},
@@ -104,7 +127,8 @@ export default class Viewer extends Component {
     const { solid } = this.props
     const {
       polyhedron,
-      animationData,
+      interpolated,
+      faceColors,
       operation,
       config,
       applyOptions,
@@ -134,8 +158,8 @@ export default class Viewer extends Component {
         <div className={css(styles.scene)}>
           <X3dScene>
             <X3dPolyhedron
-              solidData={polyhedron}
-              animationData={animationData}
+              solidData={interpolated || polyhedron}
+              faceColors={faceColors}
               config={getPolyhedronConfig(config)}
               operation={operation}
               applyOperation={this.applyOperation}
@@ -169,33 +193,86 @@ export default class Viewer extends Component {
   }
 
   applyOperation = (operation, args) => {
-    this.setState(({ polyhedron, applyOptions }) => {
-      const { result, animationData } = applyOperation(operation, polyhedron, {
-        ...args,
-        ...applyOptions,
-      })
-      console.log('result', result)
-      // FIXME gyrate -> twist needs to be unset
-      const postOpState = (() => {
-        if (_.isEmpty(getRelations(result.name, operation))) {
-          return { operation: null, applyOptions: {} }
-        } else {
-          return { applyOptions: applyOptionsFor(result.name, operation) }
+    this.setState(
+      ({ polyhedron, applyOptions, config }) => {
+        const { result, animationData } = applyOperation(
+          operation,
+          polyhedron,
+          {
+            ...args,
+            ...applyOptions,
+          },
+        )
+        // FIXME gyrate -> twist needs to be unset
+        const postOpState = (() => {
+          if (_.isEmpty(getRelations(result.name, operation))) {
+            return { operation: null, applyOptions: {} }
+          } else {
+            return { applyOptions: applyOptionsFor(result.name, operation) }
+          }
+        })()
+        // FIXME figure out how to deduplicate all this logic
+        const { colors, transitionDuration } = getPolyhedronConfig(config)
+        const colorStart =
+          animationData && getFaceColors(animationData.start, colors)
+        return {
+          polyhedron: result,
+          animationData,
+          faceColors: colorStart,
+          interpolated: animationData && animationData.start,
+          ...postOpState,
         }
-      })()
-      return {
-        polyhedron: result,
-        animationData,
-        ...postOpState,
-      }
-    })
+      },
+      () => {
+        // start the animation
+        const { animationData, interpolated, config } = this.state
+        if (!animationData) return
+        console.log('starting transition')
+
+        const { colors, transitionDuration } = getPolyhedronConfig(config)
+        const colorStart = getFaceColors(interpolated, colors)
+        const colorEnd = getFaceColors(
+          interpolated.withVertices(animationData.end),
+          colors,
+        )
+        this.transitionId = transition(
+          {
+            duration: transitionDuration,
+            ease: 'easePolyOut',
+            startStyle: {
+              vertices: interpolated.vertices,
+              faceColors: { ...colorEnd, ...colorStart },
+            },
+            endStyle: {
+              vertices: animationData.end,
+              faceColors: { ...colorStart, ...colorEnd },
+            },
+            onFinish: () => {
+              console.log('finish animation')
+              this.setState({
+                animationData: null,
+                interpolated: null,
+                faceColors: null,
+              })
+            },
+          },
+          ({ vertices, faceColors }) => {
+            console.log('set interp state')
+            this.setState(({ interpolated }) => ({
+              interpolated: interpolated.withVertices(vertices),
+              faceColors,
+            }))
+          },
+        )
+      },
+    )
   }
 
   // TODO animation recenter
   recenter = () => {
     this.setState(({ polyhedron }) => ({
       polyhedron: polyhedron.center(),
-      animationData: null,
+      // animationData: null,
     }))
   }
 
@@ -203,5 +280,11 @@ export default class Viewer extends Component {
     this.setState(({ applyOptions }) => ({
       applyOptions: { ...applyOptions, [name]: value },
     }))
+  }
+
+  componentWillUnmount() {
+    if (this.transitionId) {
+      cancelAnimationFrame(this.transitionId.current)
+    }
   }
 }

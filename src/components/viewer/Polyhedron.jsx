@@ -77,10 +77,6 @@ class Faces extends Component {
   }
 
   static getDerivedStateFromProps(props) {
-    if (props.animate) {
-      return null
-    }
-
     return {
       augmentInfo: getAugmentGraph(props.solidData),
     }
@@ -198,104 +194,35 @@ const Edges = ({ edges, vertices }) => {
   )
 }
 
-// FIXME prob need to move this
-function getTrueNumSides(polyhedron, face) {
-  const faceVertices = _.at(polyhedron.vertexVectors(), face)
-  const uniqueVertices = _.filter(faceVertices, (vertex, i) => {
-    return !vertex.equalsWithTolerance(
-      faceVertices[(i + 1) % faceVertices.length],
-      PRECISION,
-    )
-  })
-  return uniqueVertices.length
-}
-
-function getFaceColors(polyhedron, colors) {
-  return _.pickBy(
-    polyhedron.faces.map(face => colors[getTrueNumSides(polyhedron, face)]),
-  )
-}
-
 /* Polyhedron */
 
 export default class Polyhedron extends Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      solidData: props.solidData,
-      animate: false,
-    }
-  }
-
   render() {
-    const { config, operation, applyOperation, animationData } = this.props
-    const { animate, solidData } = this.state
-    // const solidData = animate ? this.state.solidData : this.props.solidData
-    const { edges } = solidData
-    const { showFaces, showEdges, transitionDuration, colors, opacity } = config
+    const {
+      solidData,
+      config,
+      operation,
+      applyOperation,
+      faceColors,
+    } = this.props
 
-    const colorStart = animationData ? getFaceColors(solidData, colors) : {}
-    const colorEnd = animationData
-      ? getFaceColors(solidData.withVertices(animationData.end), colors)
-      : {}
+    const { edges, vertices } = solidData
+    const { showFaces, showEdges, colors, opacity } = config
 
-    // TODO different eases for different animations?
-    // FIXME animation replays whenever we switch tabs
-    // FIXME the current transition API is overly complicated and not at all clear
     return (
-      <Transition
-        defaultStyle={{
-          vertices: solidData.vertices,
-          faceColors: { ...colorEnd, ...colorStart },
-        }}
-        style={{
-          vertices: animate ? animationData.end : solidData.vertices,
-          faceColors: { ...colorStart, ...colorEnd },
-        }}
-        duration={animate ? transitionDuration : 0}
-        ease="easePolyOut"
-        onFinish={this.finishAnimation}
-      >
-        {({ vertices, faceColors }) => {
-          return (
-            <transform>
-              {showFaces && (
-                <Faces
-                  solidData={
-                    // FIXME We have an update race condition where this child updates before the Transition component
-                    // maybe don't use "componentDidUpdate?"
-                    animate ? solidData.withVertices(vertices) : solidData
-                  }
-                  animate={animate}
-                  operation={operation}
-                  applyOperation={applyOperation}
-                  opacity={opacity}
-                  colors={colors}
-                  colorMap={faceColors}
-                />
-              )}
-              {showEdges && <Edges edges={edges} vertices={vertices} />}
-            </transform>
-          )
-        }}
-      </Transition>
+      <transform>
+        {showFaces && (
+          <Faces
+            solidData={solidData}
+            operation={operation}
+            applyOperation={applyOperation}
+            opacity={opacity}
+            colors={colors}
+            colorMap={faceColors}
+          />
+        )}
+        {showEdges && <Edges edges={edges} vertices={vertices} />}
+      </transform>
     )
-  }
-
-  static getDerivedStateFromProps(nextProps, prevState) {
-    const { solidData, animationData } = nextProps
-    if (solidData === prevState.solidData) {
-      return null
-    }
-    if (animationData) {
-      return { solidData: animationData.start, animate: true }
-    } else {
-      return { solidData, animate: false }
-    }
-  }
-
-  finishAnimation = () => {
-    const { solidData } = this.props
-    this.setState({ solidData, animate: false })
   }
 }
