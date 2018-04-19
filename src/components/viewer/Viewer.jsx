@@ -5,7 +5,6 @@ import { css, StyleSheet } from 'aphrodite/no-important'
 import { isValidSolid } from 'data'
 import { andaleMono } from 'styles/fonts'
 import Polyhedron from 'math/Polyhedron'
-import { PRECISION } from 'math/linAlg'
 import { fixed, fullScreen } from 'styles/common'
 import { unescapeName } from 'polyhedra/names'
 import applyOperation from 'polyhedra/applyOperation'
@@ -65,28 +64,16 @@ function viewerStateFromSolidName(name) {
   }
   return {
     polyhedron: Polyhedron.get(name),
-    // animationData: null,
-    // animating: false,
     operation: null,
     applyOptions: {},
   }
 }
 
-// FIXME prob need to move this
-function getTrueNumSides(polyhedron, face) {
-  const faceVertices = _.at(polyhedron.vertexVectors(), face)
-  const uniqueVertices = _.filter(faceVertices, (vertex, i) => {
-    return !vertex.equalsWithTolerance(
-      faceVertices[(i + 1) % faceVertices.length],
-      PRECISION,
-    )
-  })
-  return uniqueVertices.length
-}
-
 function getFaceColors(polyhedron, colors) {
   return _.pickBy(
-    polyhedron.faces.map(face => colors[getTrueNumSides(polyhedron, face)]),
+    polyhedron.faces.map(
+      (face, fIndex) => colors[polyhedron.numUniqueSides(fIndex)],
+    ),
   )
 }
 
@@ -95,8 +82,6 @@ export default class Viewer extends Component {
     super(props)
     this.state = {
       polyhedron: Polyhedron.get(props.solid),
-      // animationData: null,
-      // animating: false,
       config: defaultConfig,
       operation: null,
       applyOptions: {},
@@ -192,70 +177,65 @@ export default class Viewer extends Component {
   }
 
   applyOperation = (operation, args) => {
-    this.setState(
-      ({ polyhedron, applyOptions, config }) => {
-        const { result, animationData } = applyOperation(
-          operation,
-          polyhedron,
-          {
-            ...args,
-            ...applyOptions,
-          },
-        )
-        // FIXME gyrate -> twist needs to be unset
-        const postOpState = (() => {
-          if (_.isEmpty(getRelations(result.name, operation))) {
-            return { operation: null, applyOptions: {} }
-          } else {
-            return { applyOptions: applyOptionsFor(result.name, operation) }
-          }
-        })()
-        // FIXME figure out how to deduplicate all this logic
-        const { colors, transitionDuration } = getPolyhedronConfig(config)
-        const colorStart =
-          animationData && getFaceColors(animationData.start, colors)
-        return {
-          polyhedron: result,
-          animationData,
-          faceColors: colorStart,
-          interpolated: animationData && animationData.start,
-          ...postOpState,
+    this.setState(({ polyhedron, applyOptions, config }) => {
+      const { result, animationData } = applyOperation(operation, polyhedron, {
+        ...args,
+        ...applyOptions,
+      })
+      // FIXME gyrate -> twist needs to be unset
+      const postOpState = (() => {
+        if (_.isEmpty(getRelations(result.name, operation))) {
+          return { operation: null, applyOptions: {} }
+        } else {
+          return { applyOptions: applyOptionsFor(result.name, operation) }
         }
-      },
-      () => {
-        // start the animation
-        const { animationData, interpolated, config } = this.state
-        if (!animationData) return
-        console.log('starting transition')
+      })()
+      // FIXME figure out how to deduplicate all this logic
+      const { colors } = getPolyhedronConfig(config)
+      const colorStart =
+        animationData && getFaceColors(animationData.start, colors)
+      return {
+        polyhedron: result,
+        animationData,
+        faceColors: colorStart,
+        interpolated: animationData && animationData.start,
+        ...postOpState,
+      }
+    }, this.startAnimation)
+  }
 
-        const { colors, transitionDuration } = getPolyhedronConfig(config)
-        const colorStart = getFaceColors(interpolated, colors)
-        const colorEnd = getFaceColors(
-          interpolated.withVertices(animationData.end),
-          colors,
-        )
-        this.transitionId = transition(
-          {
-            duration: transitionDuration,
-            ease: 'easePolyOut',
-            startValue: {
-              vertices: interpolated.vertices,
-              faceColors: { ...colorEnd, ...colorStart },
-            },
-            endValue: {
-              vertices: animationData.end,
-              faceColors: { ...colorStart, ...colorEnd },
-            },
-            onFinish: this.finishAnimation,
-          },
-          ({ vertices, faceColors }) => {
-            console.log('set interp state')
-            this.setState(({ interpolated }) => ({
-              interpolated: interpolated.withVertices(vertices),
-              faceColors,
-            }))
-          },
-        )
+  startAnimation = () => {
+    // start the animation
+    const { animationData, interpolated, config } = this.state
+    if (!animationData) return
+    console.log('starting transition')
+
+    const { colors, transitionDuration } = getPolyhedronConfig(config)
+    const colorStart = getFaceColors(interpolated, colors)
+    const colorEnd = getFaceColors(
+      interpolated.withVertices(animationData.endVertices),
+      colors,
+    )
+    this.transitionId = transition(
+      {
+        duration: transitionDuration,
+        ease: 'easePolyOut',
+        startValue: {
+          vertices: interpolated.vertices,
+          faceColors: { ...colorEnd, ...colorStart },
+        },
+        endValue: {
+          vertices: animationData.endVertices,
+          faceColors: { ...colorStart, ...colorEnd },
+        },
+        onFinish: this.finishAnimation,
+      },
+      ({ vertices, faceColors }) => {
+        console.log('set interp state')
+        this.setState(({ interpolated }) => ({
+          interpolated: interpolated.withVertices(vertices),
+          faceColors,
+        }))
       },
     )
   }

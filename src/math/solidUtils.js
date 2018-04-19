@@ -1,4 +1,5 @@
 import _ from 'lodash'
+
 // Get the element of the array at the given index,
 // modulo its length
 function mod(a, b) {

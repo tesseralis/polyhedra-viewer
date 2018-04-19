@@ -40,12 +40,12 @@ const updateName = (opResult, name) => {
       result: opResult.withName(name),
     }
   }
-  const { result, animationData: { start, end } } = opResult
+  const { result, animationData: { start, endVertices } } = opResult
   return {
     result: result.withName(name),
     animationData: {
       start: start.withName(name),
-      end,
+      endVertices,
     },
   }
 }

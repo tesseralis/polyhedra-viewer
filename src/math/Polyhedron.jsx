@@ -1,6 +1,13 @@
 import _ from 'lodash'
 import { isValidSolid, getSolidData } from 'data'
-import { vec, getMidpoint, isPlanar, getPlane, getCentroid } from './linAlg'
+import {
+  vec,
+  getMidpoint,
+  isPlanar,
+  getPlane,
+  getCentroid,
+  PRECISION,
+} from './linAlg'
 import Peak from './Peak'
 import { numSides, getCyclic } from './solidUtils'
 
@@ -55,6 +62,18 @@ export default class Polyhedron {
 
   numFaces() {
     return this.faces.length
+  }
+
+  numUniqueSides(fIndex) {
+    const face = this.faces[fIndex]
+    const faceVertices = _.at(this.vertexVectors(), face)
+    const uniqueVertices = _.filter(faceVertices, (vertex, i) => {
+      return !vertex.equalsWithTolerance(
+        faceVertices[(i + 1) % faceVertices.length],
+        PRECISION,
+      )
+    })
+    return uniqueVertices.length
   }
 
   vIndices() {
