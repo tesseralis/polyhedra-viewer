@@ -63,6 +63,10 @@ export default class AppPage {
 
   expectTransitionTo(expected) {
     this.expectPath(`/${expected}/related`)
+    const viewer = this.wrapper.find('Viewer')
+    // TODO do a more robust animation test
+    viewer.instance().finishAnimation()
+    this.wrapper.update()
     expect(
       this.wrapper
         .find('Faces')

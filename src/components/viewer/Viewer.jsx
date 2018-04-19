@@ -6,7 +6,6 @@ import { isValidSolid } from 'data'
 import { andaleMono } from 'styles/fonts'
 import Polyhedron from 'math/Polyhedron'
 import { PRECISION } from 'math/linAlg'
-import polygons from 'constants/polygons'
 import { fixed, fullScreen } from 'styles/common'
 import { unescapeName } from 'polyhedra/names'
 import applyOperation from 'polyhedra/applyOperation'
@@ -239,22 +238,15 @@ export default class Viewer extends Component {
           {
             duration: transitionDuration,
             ease: 'easePolyOut',
-            startStyle: {
+            startValue: {
               vertices: interpolated.vertices,
               faceColors: { ...colorEnd, ...colorStart },
             },
-            endStyle: {
+            endValue: {
               vertices: animationData.end,
               faceColors: { ...colorStart, ...colorEnd },
             },
-            onFinish: () => {
-              console.log('finish animation')
-              this.setState({
-                animationData: null,
-                interpolated: null,
-                faceColors: null,
-              })
-            },
+            onFinish: this.finishAnimation,
           },
           ({ vertices, faceColors }) => {
             console.log('set interp state')
@@ -268,11 +260,19 @@ export default class Viewer extends Component {
     )
   }
 
+  finishAnimation = () => {
+    console.log('finish animation')
+    this.setState({
+      animationData: null,
+      interpolated: null,
+      faceColors: null,
+    })
+  }
+
   // TODO animation recenter
   recenter = () => {
     this.setState(({ polyhedron }) => ({
       polyhedron: polyhedron.center(),
-      // animationData: null,
     }))
   }
 

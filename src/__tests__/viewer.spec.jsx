@@ -88,4 +88,13 @@ describe('viewer', () => {
       .clickButtonWithText('elongate')
       .expectNoButtonWithText('ortho')
   })
+
+  it('can go through a truncation and rectification workflow', () => {
+    setup('/tetrahedron/related')
+    appPage
+      .clickButtonWithText('rectify')
+      .expectTransitionTo('octahedron')
+      .clickButtonWithText('truncate')
+      .expectTransitionTo('truncated-octahedron')
+  })
 })

@@ -3,11 +3,9 @@ import { rgb } from 'd3-color'
 import _ from 'lodash'
 import EventListener from 'react-event-listener'
 
-import { PRECISION } from 'math/linAlg'
 import polygons from 'constants/polygons'
 import { mapObject } from 'util.js'
 import { getAugmentFace, getAugmentGraph } from 'math/operations'
-import Transition from './Transition'
 
 // Join a list of lists with an inner and outer separator.
 export const joinListOfLists = (list, outerSep, innerSep) => {
