@@ -6,10 +6,7 @@ import {
   getUsingOpt,
 } from './relations'
 import Polyhedron from 'math/Polyhedron'
-import {
-  operationFunctions,
-  // applyOperationWithAnimation,
-} from 'math/operations'
+import { operationFunctions } from 'math/operations'
 
 import {
   getAugmentAlignment,
@@ -17,14 +14,6 @@ import {
   getCupolaGyrate,
   getGyrateDirection,
 } from 'math/applyOptionUtils'
-
-const platonicMap = {
-  T: 3,
-  C: 3,
-  O: 4,
-  D: 3,
-  I: 5,
-}
 
 const hasMultiple = (relations, property) =>
   _(relations)
@@ -104,8 +93,6 @@ export default function applyOperation(operation, polyhedron, config = {}) {
     }
   } else if (_.includes(['k', 'c'], operation)) {
     options = config
-    // FIXME reimplement this
-    // applyConfig = { faceType: platonicMap[config.value] }
   }
 
   const next = getNextPolyhedron(polyhedron.name, operation, _.pickBy(options))
