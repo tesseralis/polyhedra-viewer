@@ -36,6 +36,11 @@ export function cumulate(polyhedron, { faceType } = {}) {
     })
   })
 
+  const mockVertices = vertices.map(
+    (vertex, vIndex) =>
+      _.has(oldToNew, vIndex) ? verticesToAdd[oldToNew[vIndex]] : vertex,
+  )
+
   const newVertices = vertices.concat(verticesToAdd)
 
   const newFaces = faces.map(face => {
@@ -47,5 +52,11 @@ export function cumulate(polyhedron, { faceType } = {}) {
     )
   })
 
-  return deduplicateVertices(Polyhedron.of(newVertices, newFaces))
+  return {
+    animationData: {
+      start: polyhedron,
+      endVertices: mockVertices,
+    },
+    result: deduplicateVertices(Polyhedron.of(newVertices, newFaces)),
+  }
 }
