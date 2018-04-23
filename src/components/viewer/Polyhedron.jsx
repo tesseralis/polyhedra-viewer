@@ -63,7 +63,7 @@ class Faces extends Component {
           <material transparency={1 - opacity} />
         </appearance>
         <indexedfaceset
-          solid="true"
+          solid="false"
           colorpervertex="false"
           coordindex={joinListOfLists(faces, ' -1 ', ' ')}
         >
