@@ -84,7 +84,7 @@ const getOptionName = optValue => {
   }
 }
 
-function AugmentOptions({ options, solid, onClickOption }) {
+function AugmentOptions({ options, solid, onClickOption, disabled }) {
   const { gyrate, using } = options
 
   const optionArgs = [
@@ -114,7 +114,7 @@ function AugmentOptions({ options, solid, onClickOption }) {
             <button
               key={optValue}
               onClick={() => onClickOption(name, optValue)}
-              disabled={!value}
+              disabled={!value || disabled}
               className={css(
                 styles.optionButton,
                 optValue === value && styles.isHighlighted,
@@ -131,6 +131,7 @@ function AugmentOptions({ options, solid, onClickOption }) {
 
 // TODO this could probably use a test to make sure all the buttons are in the right places
 export default function RelatedPolyhedra({
+  disabled,
   solid,
   operation,
   applyOptions,
@@ -162,7 +163,7 @@ export default function RelatedPolyhedra({
                       styles.modeButton,
                       operation === symbol && styles.isHighlighted,
                     )}
-                    disabled={!relations}
+                    disabled={!relations || disabled}
                     onClick={() => {
                       if (_.includes(hasMode, symbol)) {
                         setOperation(symbol !== operation ? symbol : null)
@@ -182,12 +183,17 @@ export default function RelatedPolyhedra({
                 solid={solid}
                 options={applyOptions}
                 onClickOption={setApplyOpt}
+                disabled={disabled}
               />
             )}
           </div>
         )
       })}
-      <button onClick={recenter} className={css(styles.recenterButton)}>
+      <button
+        disabled={disabled}
+        onClick={recenter}
+        className={css(styles.recenterButton)}
+      >
         Recenter
       </button>
     </div>

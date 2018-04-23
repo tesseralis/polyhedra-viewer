@@ -130,6 +130,7 @@ export default class Viewer extends Component {
               solid,
               operation,
               applyOptions,
+              disabled: !!interpolated,
               ..._.pick(this, [
                 'applyOperation',
                 'recenter',
