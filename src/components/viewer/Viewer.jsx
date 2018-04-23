@@ -251,6 +251,7 @@ export default class Viewer extends Component {
   }
 
   // TODO animation recenter
+  // (I feel like doing this will reveal a lot of ways to clean up the animation code)
   recenter = () => {
     this.setState(({ polyhedron }) => ({
       polyhedron: polyhedron.center(),

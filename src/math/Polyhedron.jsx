@@ -176,6 +176,11 @@ export default class Polyhedron {
       )
       .map(v => v.sub(midpoint))
 
+    if (!c1 || !c2) {
+      // throw new Error(`The edge ${edge} is not connected to two faces.`)
+      return 2 * Math.PI
+    }
+
     return c1.angleBetween(c2, true)
   }
 

@@ -18,7 +18,7 @@ export function getDirectedEdges(face) {
   })
 }
 
-// Get a face representing the boundary of the faces
+// Get a "face" (list of vertices) representing the boundary of the given faces
 export function getBoundary(faces) {
   const edges = {}
   // build up a lookup table for every pair of edges to that face
