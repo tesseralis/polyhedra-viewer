@@ -5,6 +5,7 @@ import {
   getMidpoint,
   isPlanar,
   getPlane,
+  getNormal,
   getCentroid,
   PRECISION,
 } from './linAlg'
@@ -64,6 +65,10 @@ export default class Polyhedron {
     return this.faces.length
   }
 
+  numSides(fIndex) {
+    return numSides(this.faces[fIndex])
+  }
+
   numUniqueSides(fIndex) {
     const face = this.faces[fIndex]
     const faceVertices = _.at(this.vertexVectors(), face)
@@ -91,6 +96,16 @@ export default class Polyhedron {
 
   // Return the vectors of this polyhedron as vectors
   vertexVectors = _.memoize(() => this.vertices.map(vec))
+
+  edgeLength() {
+    const [v0, v1] = _.at(this.vertexVectors(), this.faces[0])
+    return v0.distanceTo(v1)
+  }
+
+  // get the apothem of the given face
+  apothem(fIndex) {
+    return this.edgeLength() / (2 * Math.tan(Math.PI / this.numSides(fIndex)))
+  }
 
   // Return the faces adjacent to the given vertices
   adjacentFaceIndices(...vIndices) {
@@ -164,6 +179,13 @@ export default class Polyhedron {
     return getCentroid(
       this.faces[fIndex].map(vIndex => this.vertexVectors()[vIndex]),
     ).toArray()
+  }
+
+  /** Return the normal of the face given by the face index */
+  faceNormal(fIndex) {
+    return getNormal(
+      _.at(this.vertexVectors(), this.faces[fIndex]),
+    ).getNormalized()
   }
 
   getDihedralAngle(edge) {

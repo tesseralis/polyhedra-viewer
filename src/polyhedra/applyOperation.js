@@ -47,9 +47,9 @@ export default function applyOperation(operation, polyhedron, config = {}) {
     // since there's so few options, let's just hardcode
     const { polygon } = config
     if (polyhedron.name === 'cuboctahedron') {
-      options = { value: polygon === 3 ? 'O' : 'C' }
+      options = { value: polygon === 3 ? 'C' : 'O' }
     } else if (polyhedron.name === 'icosidodecahedron') {
-      options = { value: polygon === 3 ? 'I' : 'D' }
+      options = { value: polygon === 3 ? 'D' : 'I' }
     }
     applyConfig = { ...applyConfig, faceType: polygon }
   } else if (operation === '+') {

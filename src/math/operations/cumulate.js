@@ -19,22 +19,21 @@ export function getCumulatePolygon(polyhedron, point) {
 export function cumulate(polyhedron, { faceType } = {}) {
   const { vertices, faces } = polyhedron
   const n = faceType || _.min(faces.map(numSides))
+
+  // face indices with the right number of sides
   const fIndices = polyhedron
     .fIndices()
     .filter(fIndex => numSides(faces[fIndex]) === n)
+
   const verticesToAdd = fIndices.map(fIndex => {
-    const face = faces[fIndex]
-    const sources = face.map(vIndex =>
-      getSingle(_.difference(polyhedron.adjacentVertexIndices(vIndex), face)),
-    )
-    // FIXME this doesn't work for octahedron. Use faces instead
-    const [v1, v2] = _.at(polyhedron.vertexVectors(), face)
-    const [u1, u2] = _.at(polyhedron.vertexVectors(), sources)
-    const l1 = new Line3D(v1, u1)
-    const l2 = new Line3D(v2, u2)
-    const intersection = l1.closestLineTo(l2).getLine()
-    const newVertex = getMidpoint(intersection.a, intersection.b)
-    return newVertex.toArray()
+    const s = polyhedron.edgeLength()
+    const apothem = polyhedron.apothem(fIndex)
+    const normal = polyhedron.faceNormal(fIndex)
+    const centroid = vec(polyhedron.faceCentroid(fIndex))
+    const theta =
+      Math.PI - polyhedron.getDihedralAngle(_.take(polyhedron.faces[fIndex], 2))
+    const scale = apothem * Math.tan(theta)
+    return centroid.add(normal.scale(scale)).toArray()
   })
 
   const oldToNew = {}
@@ -49,22 +48,11 @@ export function cumulate(polyhedron, { faceType } = {}) {
       _.has(oldToNew, vIndex) ? verticesToAdd[oldToNew[vIndex]] : vertex,
   )
 
-  const newVertices = vertices.concat(verticesToAdd)
-
-  const newFaces = faces.map(face => {
-    return _.uniq(
-      face.map(vIndex => {
-        if (!_.has(oldToNew, vIndex)) return vIndex
-        return oldToNew[vIndex] + polyhedron.numVertices()
-      }),
-    )
-  })
-
   return {
     animationData: {
       start: polyhedron,
       endVertices: mockVertices,
     },
-    result: deduplicateVertices(Polyhedron.of(newVertices, newFaces)),
+    result: deduplicateVertices(polyhedron.withVertices(mockVertices)),
   }
 }
