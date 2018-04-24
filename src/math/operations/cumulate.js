@@ -3,10 +3,18 @@ import { geom } from 'toxiclibsjs'
 
 import { getSingle } from 'util.js'
 import Polyhedron from 'math/Polyhedron'
-import { getMidpoint } from 'math/linAlg'
+import { vec, getMidpoint } from 'math/linAlg'
 import { numSides } from 'math/solidUtils'
 import { deduplicateVertices } from './operationUtils'
 const { Line3D } = geom
+
+export function getCumulatePolygon(polyhedron, point) {
+  const hitPoint = vec(point)
+  const hitFaceIndex = polyhedron.hitFaceIndex(hitPoint)
+  // TODO handle octahedron case
+  const n = numSides(polyhedron.faces[hitFaceIndex])
+  return n <= 5 ? n : -1
+}
 
 export function cumulate(polyhedron, { faceType } = {}) {
   const { vertices, faces } = polyhedron

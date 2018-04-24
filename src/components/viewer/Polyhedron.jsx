@@ -5,7 +5,11 @@ import EventListener from 'react-event-listener'
 
 import polygons from 'constants/polygons'
 import { mapObject } from 'util.js'
-import { getAugmentFace, getAugmentGraph } from 'math/operations'
+import {
+  getCumulatePolygon,
+  getAugmentFace,
+  getAugmentGraph,
+} from 'math/operations'
 
 // Join a list of lists with an inner and outer separator.
 export const joinListOfLists = (list, outerSep, innerSep) => {
@@ -96,6 +100,9 @@ class Faces extends Component {
       // return polygonColors(diminishColors)[getColorIndex(face)]
       return [1, 1, 0]
     }
+    if (_.isNumber(applyArgs.polygon) && face.length === applyArgs.polygon) {
+      return [1, 1, 0]
+    }
 
     // If we specify that this face has a color, use it
     if (_.has(colorMap, fIndex)) {
@@ -168,6 +175,12 @@ class Faces extends Component {
         console.log('peak', peak && peak.innerVertexIndices())
         this.setState({
           applyArgs: peak ? { peak } : {},
+        })
+        return
+      case 'k':
+        const polygon = getCumulatePolygon(solidData, event.hitPnt)
+        this.setState({
+          applyArgs: polygon === -1 ? {} : { polygon },
         })
         return
       default:

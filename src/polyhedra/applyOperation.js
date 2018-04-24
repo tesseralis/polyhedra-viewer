@@ -43,7 +43,16 @@ export default function applyOperation(operation, polyhedron, config = {}) {
   let options = {}
   let applyConfig = config
   const relations = getRelations(polyhedron.name, operation)
-  if (operation === '+') {
+  if (operation === 'k') {
+    // since there's so few options, let's just hardcode
+    const { polygon } = config
+    if (polyhedron.name === 'cuboctahedron') {
+      options = { value: polygon === 3 ? 'O' : 'C' }
+    } else if (polyhedron.name === 'icosidodecahedron') {
+      options = { value: polygon === 3 ? 'I' : 'D' }
+    }
+    applyConfig = { ...applyConfig, faceType: polygon }
+  } else if (operation === '+') {
     const { fIndex } = config
     const n = polyhedron.faces[fIndex].length
 

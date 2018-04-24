@@ -5,6 +5,7 @@ import { diminish, shorten } from './diminish'
 import { gyrate } from './gyrate'
 
 export { canAugment, getAugmentFace, getAugmentGraph } from './augment'
+export { getCumulatePolygon } from './cumulate'
 export const operationFunctions = {
   truncate,
   cumulate,

@@ -67,7 +67,7 @@ const styles = StyleSheet.create({
   },
 })
 
-const hasMode = ['+', '-', 'g']
+const hasMode = ['k', '+', '-', 'g']
 
 const getOptionName = optValue => {
   switch (optValue) {
