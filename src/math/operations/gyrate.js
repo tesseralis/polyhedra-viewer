@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import { vec, getCentroid, getNormal } from 'math/linAlg'
 import Polyhedron from 'math/Polyhedron'
-import { numSides, nextVertex } from 'math/solidUtils'
+import { numSides } from 'math/solidUtils'
 import { deduplicateVertices } from './operationUtils'
 import { mapObject } from 'util.js'
 

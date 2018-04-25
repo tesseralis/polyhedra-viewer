@@ -97,14 +97,16 @@ export default class Polyhedron {
   // Return the vectors of this polyhedron as vectors
   vertexVectors = _.memoize(() => this.vertices.map(vec))
 
-  edgeLength() {
-    const [v0, v1] = _.at(this.vertexVectors(), this.faces[0])
+  edgeLength(fIndex = 0) {
+    const [v0, v1] = _.at(this.vertexVectors(), this.faces[fIndex])
     return v0.distanceTo(v1)
   }
 
   // get the apothem of the given face
   apothem(fIndex) {
-    return this.edgeLength() / (2 * Math.tan(Math.PI / this.numSides(fIndex)))
+    return (
+      this.edgeLength(fIndex) / (2 * Math.tan(Math.PI / this.numSides(fIndex)))
+    )
   }
 
   // Return the faces adjacent to the given vertices
@@ -167,6 +169,22 @@ export default class Polyhedron {
 
   withName(name) {
     return new Polyhedron({ ...this.toJSON(), name })
+  }
+
+  addVertices(vertices) {
+    return this.withVertices(this.vertices.concat(vertices))
+  }
+
+  addFaces(faces) {
+    return this.withFaces(this.faces.concat(faces))
+  }
+
+  mapVertices(iteratee) {
+    return this.withVertices(this.vertices.map(iteratee))
+  }
+
+  mapFaces(iteratee) {
+    return this.withFaces(this.faces.map(iteratee))
   }
 
   // Returns whether the set of vertices in this polyhedron are planar
