@@ -2,11 +2,20 @@
 import _ from 'lodash';
 import React, { Component } from 'react';
 import { css, StyleSheet } from 'aphrodite/no-important';
+import { rgb } from 'd3-color';
 
 import { isValidSolid } from 'data';
 import { andaleMono } from 'styles/fonts';
 import Polyhedron from 'math/Polyhedron';
-import type { Vertex } from 'math/solidTypes';
+import type { Vertex, Face, FIndex } from 'math/solidTypes';
+import type { Vector } from 'math/linAlg';
+import {
+  getCumulatePolygon,
+  getAugmentFace,
+  getAugmentGraph,
+} from 'math/operations';
+import polygons from 'constants/polygons';
+import { mapObject } from 'util.js';
 import { fixed, fullScreen } from 'styles/common';
 import { unescapeName } from 'polyhedra/names';
 import doApplyOperation from 'polyhedra/applyOperation';
@@ -72,11 +81,21 @@ function viewerStateFromSolidName(name) {
   };
 }
 
-function getFaceColors(polyhedron, colors) {
+type Color = [number, number, number];
+function toRgb(hex: string): Color {
+  const col = rgb(hex);
+  return [col.r / 255, col.g / 255, col.b / 255];
+}
+const colorIndexForFace = mapObject(polygons, (n, i) => [n, i]);
+const getColorIndex = face => colorIndexForFace[face.length];
+const polygonColors = colors => polygons.map(n => toRgb(colors[n]));
+
+function getFaceColors(polyhedron: Polyhedron, colors: any) {
   return _.pickBy(
-    polyhedron.faces.map(
-      (face, fIndex) => colors[polyhedron.numUniqueSides(fIndex)],
-    ),
+    mapObject(polyhedron.faces, (face, fIndex) => [
+      fIndex,
+      colors[polyhedron.numUniqueSides(fIndex)],
+    ]),
   );
 }
 
@@ -88,7 +107,10 @@ interface ViewerProps {
 interface ViewerState {
   polyhedron: Polyhedron;
   operation: ?Operation;
+  // TODO consolidate applyArgs (which are determined by the polyhedron)
+  // and applyOptions (which are determined by the the panel)
   applyOptions: any;
+  applyArgs: any;
   interpolated?: Polyhedron;
   faceColors?: any;
   config: any;
@@ -108,7 +130,9 @@ export default class Viewer extends Component<ViewerProps, ViewerState> {
     this.state = {
       polyhedron: Polyhedron.get(props.solid),
       config: defaultConfig,
+      operation: undefined,
       applyOptions: {},
+      applyArgs: {},
     };
   }
 
@@ -139,7 +163,6 @@ export default class Viewer extends Component<ViewerProps, ViewerState> {
     const {
       polyhedron,
       interpolated,
-      faceColors,
       operation,
       config,
       applyOptions,
@@ -171,10 +194,10 @@ export default class Viewer extends Component<ViewerProps, ViewerState> {
           <X3dScene>
             <X3dPolyhedron
               solidData={interpolated || polyhedron}
-              faceColors={faceColors}
-              config={getPolyhedronConfig(config)}
-              operation={operation}
-              applyOperation={this.applyOperation}
+              faceColors={this.getColors()}
+              config={config}
+              setApplyArgs={this.setApplyArgs}
+              applyOperation={this.applyCurrentOperation}
             />
           </X3dScene>
           <div className={css(styles.title)}>
@@ -190,6 +213,38 @@ export default class Viewer extends Component<ViewerProps, ViewerState> {
     );
   }
 
+  getColors = () => {
+    const { interpolated, polyhedron } = this.state;
+    return (interpolated || polyhedron).faces.map(this.getColorForFace);
+  };
+
+  getColorForFace = (face: Face, fIndex: FIndex) => {
+    const { applyArgs, config, faceColors } = this.state;
+    const { colors } = getPolyhedronConfig(config);
+    const defaultColors = polygonColors(colors);
+
+    // TODO pick better colors / have better effects
+    if (_.isNumber(applyArgs.fIndex) && fIndex === applyArgs.fIndex) {
+      return [0, 1, 0];
+    }
+    if (
+      _.isObject(applyArgs.peak) &&
+      _.includes(applyArgs.peak.faceIndices(), fIndex)
+    ) {
+      // return polygonColors(diminishColors)[getColorIndex(face)]
+      return [1, 1, 0];
+    }
+    if (_.isNumber(applyArgs.polygon) && face.length === applyArgs.polygon) {
+      return [1, 1, 0];
+    }
+
+    // If we specify that this face has a color, use it
+    if (!!faceColors && _.has(faceColors, fIndex.toString())) {
+      return toRgb(faceColors[fIndex]);
+    }
+    return defaultColors[getColorIndex(face)];
+  };
+
   setConfigValue = (key: string, value: any) => {
     if (key === null) {
       this.setState({ config: defaultConfig });
@@ -204,13 +259,19 @@ export default class Viewer extends Component<ViewerProps, ViewerState> {
     }));
   };
 
-  applyOperation = (operation: Operation, args: any) => {
-    this.setState(({ polyhedron, applyOptions, config }) => {
+  applyCurrentOperation = () => {
+    if (this.state.operation) {
+      this.applyOperation(this.state.operation);
+    }
+  };
+
+  applyOperation = (operation: Operation) => {
+    this.setState(({ polyhedron, applyOptions, applyArgs, config }) => {
       const { result, animationData } = doApplyOperation(
         operation,
         polyhedron,
         {
-          ...args,
+          ...applyArgs,
           ...applyOptions,
         },
       );
@@ -231,6 +292,7 @@ export default class Viewer extends Component<ViewerProps, ViewerState> {
         animationData,
         faceColors: colorStart,
         interpolated: animationData && animationData.start,
+        applyArgs: {},
         ...postOpState,
       };
     }, this.startAnimation);
@@ -292,6 +354,38 @@ export default class Viewer extends Component<ViewerProps, ViewerState> {
     this.setState(({ applyOptions }) => ({
       applyOptions: { ...applyOptions, [name]: value },
     }));
+  };
+
+  setApplyArgs = (hitPnt?: Vector) => {
+    this.setState(({ polyhedron, operation }) => {
+      if (!hitPnt) {
+        return {};
+      }
+      switch (operation) {
+        case '+':
+          // FIXME move to state
+          const augmentInfo = getAugmentGraph(polyhedron);
+          const fIndex = getAugmentFace(polyhedron, augmentInfo, hitPnt);
+          console.log('fIndex', fIndex);
+          return {
+            applyArgs: fIndex === -1 ? {} : { fIndex },
+          };
+        case '-':
+        case 'g':
+          const peak = polyhedron.findPeak(hitPnt);
+          console.log('peak', peak && peak.innerVertexIndices());
+          return {
+            applyArgs: peak ? { peak } : {},
+          };
+        case 'k':
+          const polygon = getCumulatePolygon(polyhedron, hitPnt);
+          return {
+            applyArgs: polygon === -1 ? {} : { polygon },
+          };
+        default:
+          return;
+      }
+    });
   };
 
   componentWillUnmount() {

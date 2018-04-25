@@ -117,7 +117,7 @@ function AugmentOptions({ options, solid, onClickOption, disabled }) {
               disabled={!value || disabled}
               className={css(
                 styles.optionButton,
-                optValue === value && styles.isHighlighted
+                optValue === value && styles.isHighlighted,
               )}
             >
               {getOptionName(optValue)}
@@ -173,14 +173,14 @@ export default function RelatedPolyhedra({
                   <button
                     className={css(
                       styles.modeButton,
-                      operation === symbol && styles.isHighlighted
+                      operation === symbol && styles.isHighlighted,
                     )}
                     disabled={!relations || disabled}
                     onClick={() => {
                       if (hasOptions(symbol, relations)) {
                         setOperation(symbol !== operation ? symbol : null);
                       } else {
-                        applyOperation(symbol, relation);
+                        applyOperation(symbol);
                       }
                     }}
                   >

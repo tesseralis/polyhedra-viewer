@@ -12,7 +12,7 @@ export default class AppPage {
     this.wrapper = mount(
       <MemoryRouter initialEntries={[path]}>
         <App />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
   }
 
@@ -30,13 +30,15 @@ export default class AppPage {
   }
 
   getPolyhedron() {
-    return this.wrapper.find('Faces').prop('solidData');
+    return this.wrapper.find('Polyhedron').prop('solidData');
   }
 
   clickFaceIndex(faceIndex) {
     const polyhedron = this.getPolyhedron();
     const hitPnt = polyhedron.faceCentroid(faceIndex);
-    const shape = this.wrapper.find('Faces').find('shape');
+    const shape = this.wrapper
+      .find('shape')
+      .filterWhere(n => !!n.prop('onMouseMove'));
     shape.simulate('mousemove', { hitPnt });
     shape.simulate('mousedown');
     shape.simulate('mouseup');
@@ -69,9 +71,9 @@ export default class AppPage {
     this.wrapper.update();
     expect(
       this.wrapper
-        .find('Faces')
+        .find('Polyhedron')
         .prop('solidData')
-        .isSame(Polyhedron.get(expected))
+        .isSame(Polyhedron.get(expected)),
     ).toBe(true);
     return this;
   }
