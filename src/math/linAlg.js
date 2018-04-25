@@ -3,7 +3,7 @@ import _ from 'lodash';
 import { geom } from 'toxiclibsjs';
 const { Vec3D, Triangle3D, Plane } = geom;
 
-export type Vector = number[];
+export type Vector = [number, number, number];
 
 export const PRECISION_DIGITS = 3;
 export const PRECISION = Math.pow(10, -PRECISION_DIGITS);

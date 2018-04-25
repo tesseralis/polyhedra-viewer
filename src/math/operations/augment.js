@@ -45,7 +45,7 @@ const augmentees = {
 };
 
 const augmentData = _.mapValues(augmentees, type =>
-  _.mapValues(type, Polyhedron.get)
+  _.mapValues(type, Polyhedron.get),
 );
 
 const augmentTypes = {
@@ -67,7 +67,7 @@ function canAugmentWith(polyhedron, faceIndex, augmentee, offset) {
   const n = base.length;
   const undersideIndex = _.findIndex(
     augmentee.faces,
-    face => face.length === n
+    face => face.length === n,
   );
   const undersideFace = augmentee.faces[undersideIndex];
 
@@ -174,7 +174,7 @@ function isAligned(
   augmentee,
   underside,
   gyrate,
-  augmentType
+  augmentType,
 ) {
   if (_.includes(['pyramid', 'prism', 'antiprism'], augmentType)) return true;
   const baseType = getBaseType(polyhedron.faces, base);
@@ -229,7 +229,7 @@ function flatten(polyhedron, fIndex) {
   const faceVectors = _.at(vertexVectors, polyhedron.faces[fIndex]);
   const plane = getPlane(faceVectors);
   const newVertices = vertexVectors.map(v =>
-    plane.getProjectedPoint(v).toArray()
+    plane.getProjectedPoint(v).toArray(),
   );
   return polyhedron.withVertices(newVertices);
 }
@@ -251,7 +251,7 @@ function doAugment(polyhedron, faceIndex, using, gyrate, mock = false) {
   const _augmentee = augmentData[augmentType][index];
   const undersideIndex = _.findIndex(
     _augmentee.faces,
-    face => face.length === n
+    face => face.length === n,
   );
   const augmentee = mock ? flatten(_augmentee, undersideIndex) : _augmentee;
 
@@ -260,12 +260,12 @@ function doAugment(polyhedron, faceIndex, using, gyrate, mock = false) {
 
   const undersideFace = augmentee.faces[undersideIndex];
   const undersideVertices = undersideFace.map(
-    index => augmenteeVertices[index]
+    index => augmenteeVertices[index],
   );
   const undersideNormal = getNormal(undersideVertices);
   const undersideCenter = getCentroid(undersideVertices);
   const augmenteeSideLength = undersideVertices[0].distanceTo(
-    undersideVertices[1]
+    undersideVertices[1],
   );
 
   const alignBasesNormal = (() => {
@@ -293,7 +293,7 @@ function doAugment(polyhedron, faceIndex, using, gyrate, mock = false) {
     augmentee,
     undersideFace,
     gyrate,
-    augmentType
+    augmentType,
   );
   const offset = baseIsAligned ? 0 : 1;
   const alignedV0 = alignedAugmenteeVertices[undersideFace[offset]];
@@ -303,14 +303,14 @@ function doAugment(polyhedron, faceIndex, using, gyrate, mock = false) {
     return v
       .getRotatedAroundAxis(
         alignedV0.cross(translatedV0).getNormalized(),
-        alignVerticesAngle
+        alignVerticesAngle,
       )
       .add(baseCenter);
   });
 
   // append the faces and vertices
   const newVertices = polyhedron.vertices.concat(
-    transformedAugmenteeVertices.map(v => v.toArray())
+    transformedAugmenteeVertices.map(v => v.toArray()),
   );
 
   // Map the underside vertices to the base's
@@ -322,9 +322,9 @@ function doAugment(polyhedron, faceIndex, using, gyrate, mock = false) {
   const newFaces = polyhedron.faces.concat(
     augmentee.faces.map(face =>
       face.map(vIndex =>
-        _.get(undersideMapping, vIndex, vIndex + polyhedron.numVertices())
-      )
-    )
+        _.get(undersideMapping, vIndex, vIndex + polyhedron.numVertices()),
+      ),
+    ),
   );
   // Remove the original base and underside
   _.pullAt(newFaces, [faceIndex, polyhedron.numFaces() + undersideIndex]);
@@ -336,7 +336,7 @@ function doAugment(polyhedron, faceIndex, using, gyrate, mock = false) {
 export function elongate(polyhedron, options, mock) {
   const faceIndex = _.findIndex(
     polyhedron.faces,
-    face => face === _.maxBy(polyhedron.faces, 'length')
+    face => face === _.maxBy(polyhedron.faces, 'length'),
   );
   const using = `P${numSides(polyhedron.faces[faceIndex])}`;
   return doAugment(polyhedron, faceIndex, using, null, mock);
@@ -346,7 +346,7 @@ export function elongate(polyhedron, options, mock) {
 export function gyroelongate(polyhedron, options, mock) {
   const faceIndex = _.findIndex(
     polyhedron.faces,
-    face => face === _.maxBy(polyhedron.faces, 'length')
+    face => face === _.maxBy(polyhedron.faces, 'length'),
   );
   const using = `A${numSides(polyhedron.faces[faceIndex])}`;
   return doAugment(polyhedron, faceIndex, using, null, mock);

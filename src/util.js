@@ -14,7 +14,7 @@ export function mapObject<T, U>(arr: T[], iteratee: T => [T, U]): { T: U } {
 /**
  * Get the single element from the given array.
  */
-export function getSingle<T>(array: T[]) {
+export function getSingle<T>(array: T[]): T {
   if (array.length !== 1) {
     throw new Error(`Expected array to have one element: ${array.toString()}`);
   }

@@ -1,13 +1,17 @@
+// @flow
 import _ from 'lodash';
 import { getSingle } from 'util.js';
 import { getDirectedEdges, numSides } from 'math/solidUtils';
+import type { FIndex } from 'math/solidUtils';
+import Peak from 'math/Peak';
+import Polyhedron from 'math/Polyhedron';
 
 // Get what kind of base we are augmenting to
 function faceDistanceBetweenVertices(
   polyhedron,
   vIndices1,
   vIndices2,
-  exclude = []
+  exclude = [],
 ) {
   const v2fGraph = polyhedron.vertexToFaceGraph();
   let foundVertexIndices = vIndices1;
@@ -30,12 +34,12 @@ function faceDistanceBetweenVertices(
 }
 
 // Return "meta" or "para", or null
-export function getAugmentAlignment(polyhedron, fIndex) {
+export function getAugmentAlignment(polyhedron: Polyhedron, fIndex: FIndex) {
   // get the existing peak boundary
   const peakBoundary = getSingle(polyhedron.peaks()).boundary();
   const isHexagonalPrism = _.some(
     polyhedron.faces,
-    face => numSides(face) === 6
+    face => numSides(face) === 6,
   );
 
   // calculate the face distance to the peak's boundary
@@ -43,21 +47,21 @@ export function getAugmentAlignment(polyhedron, fIndex) {
     polyhedron,
     polyhedron.faces[fIndex],
     peakBoundary,
-    [isHexagonalPrism && 6]
+    [isHexagonalPrism && 6],
   ) > 1
     ? 'para'
     : 'meta';
 }
 
-export function getPeakAlignment(polyhedron, peak) {
+export function getPeakAlignment(polyhedron: Polyhedron, peak: Peak) {
   const peakBoundary = peak.boundary();
 
   const isRhombicosidodecahedron = peak.type === 'cupola';
 
   const orthoIndices = isRhombicosidodecahedron
     ? _.filter(
-        polyhedron.peaks(),
-        peak => getCupolaGyrate(polyhedron, peak) === 'ortho'
+        Peak.getAll(polyhedron),
+        peak => getCupolaGyrate(polyhedron, peak) === 'ortho',
       )
     : [];
   const diminishedIndices =
@@ -68,13 +72,13 @@ export function getPeakAlignment(polyhedron, peak) {
   return faceDistanceBetweenVertices(
     polyhedron,
     diminishedIndices,
-    peakBoundary
+    peakBoundary,
   ) >= (isRhombicosidodecahedron ? 2 : 1)
     ? 'para'
     : 'meta';
 }
 
-export function getCupolaGyrate(polyhedron, peak) {
+export function getCupolaGyrate(polyhedron: Polyhedron, peak: Peak) {
   const boundary = peak.boundary();
   const isOrtho = _.every(getDirectedEdges(boundary), edge => {
     const [n1, n2] = polyhedron.faces
@@ -85,6 +89,6 @@ export function getCupolaGyrate(polyhedron, peak) {
   return isOrtho ? 'ortho' : 'gyro';
 }
 
-export function getGyrateDirection(polyhedron, peak) {
+export function getGyrateDirection(polyhedron: Polyhedron, peak: Peak) {
   return getCupolaGyrate(polyhedron, peak) === 'ortho' ? 'back' : 'forward';
 }

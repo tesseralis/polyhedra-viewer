@@ -3,18 +3,21 @@
 import _ from 'lodash';
 import type { Vector } from './linAlg';
 
-export type Vertex = [Vector, Vector, Vector];
-export type VertexIndex = number;
+// TODO move this to a solidtypes file or something
+export type Vertex = Vector;
+export type VIndex = number;
 
-export type Face = VertexIndex[];
-export type FaceIndex = number;
+export type Face = VIndex[];
+export type FIndex = number;
+
+export type Edge = [VIndex, VIndex];
 
 // Get the element of the array at the given index,
 // modulo its length
 function mod(a, b) {
   return a >= 0 ? a % b : a % b + b;
 }
-export function getCyclic(array: number[], index: number) {
+export function getCyclic(array: number[], index: number): number {
   return array[mod(index, array.length)];
 }
 
@@ -31,7 +34,7 @@ export function getDirectedEdges(face: Face) {
 export function getBoundary(faces: Face[]) {
   const edges = {};
   // build up a lookup table for every pair of edges to that face
-  _.forEach(faces, (face, index) => {
+  _.forEach(faces, (face: Face, index: FIndex) => {
     // for the pairs of vertices, find the face that contains the corresponding pair
     _.forEach(getDirectedEdges(face), edge => {
       const [i1, i2] = edge;
@@ -58,10 +61,14 @@ export function getBoundary(faces: Face[]) {
   return result;
 }
 
-export function nextVertex(face: Face, vIndex: VertexIndex) {
+export function nextVertex(face: Face, vIndex: VIndex) {
   return getCyclic(face, face.indexOf(vIndex) + 1);
 }
 
-export function prevVertex(face: Face, vIndex: VertexIndex) {
+export function prevVertex(face: Face, vIndex: VIndex) {
   return getCyclic(face, face.indexOf(vIndex) - 1);
+}
+
+export function hasEdge(face: Face, [v1, v2]: Edge) {
+  return _.includes(face, v1) && _.includes(face, v2);
 }

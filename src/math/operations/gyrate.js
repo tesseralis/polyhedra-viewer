@@ -13,14 +13,14 @@ export function gyrate(polyhedron, { peak }) {
 
   // rotate the cupola/rotunda top
   const boundaryVertices = boundary.map(
-    vIndex => polyhedron.vertexVectors()[vIndex]
+    vIndex => polyhedron.vertexVectors()[vIndex],
   );
   const normal = getNormal(boundaryVertices).getNormalized();
   const centroid = getCentroid(boundaryVertices);
   const theta = TAU / numSides(boundary);
 
   const newBoundaryVertices = boundary.map(
-    vIndex => polyhedron.vertices[vIndex]
+    vIndex => polyhedron.vertices[vIndex],
   );
   const oldToNew = mapObject(boundary, (vIndex, i) => [vIndex, i]);
 
@@ -38,7 +38,7 @@ export function gyrate(polyhedron, { peak }) {
 
   const mockPolyhedron = Polyhedron.of(
     polyhedron.vertices.concat(newBoundaryVertices),
-    mockFaces
+    mockFaces,
   );
 
   const newVertices = mockPolyhedron.vertices.map((vertex, vIndex) => {
@@ -64,19 +64,4 @@ export function gyrate(polyhedron, { peak }) {
     },
     result: deduplicateVertices(mockPolyhedron.withVertices(newVertices)),
   };
-
-  // // Rotate all the points on the boundary
-  // // TODO this won't work with animation, so I have to reimplement eventually
-  // const newFaces = polyhedron.faces.map((face, fIndex) => {
-  //   if (!_.includes(peak.faceIndices(), fIndex)) {
-  //     return face
-  //   }
-  //   return face.map((vIndex, i) => {
-  //     return _.includes(boundary, vIndex)
-  //       ? nextVertex(boundary, vIndex)
-  //       : vIndex
-  //   })
-  // })
-
-  // return Polyhedron.of(newVertices, newFaces)
 }

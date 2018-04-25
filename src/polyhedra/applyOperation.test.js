@@ -4,6 +4,7 @@ import { allSolidNames } from 'data';
 import { PRECISION } from 'math/linAlg';
 import { getOperations, getRelations } from 'polyhedra/relations';
 import Polyhedron from 'math/polyhedron';
+import Peak from 'math/Peak';
 import { canAugment } from 'math/operations';
 import applyOperation from './applyOperation';
 
@@ -73,11 +74,11 @@ function getOptsToTest(operation, polyhedron) {
 
       // FIXME this leads to invalid combinations
       return cartesian(gyrateOpts, usingOpts, fIndexOpts).map(
-        ([gyrate, using, fIndex]) => ({ gyrate, using, fIndex })
+        ([gyrate, using, fIndex]) => ({ gyrate, using, fIndex }),
       );
     case '-':
     case 'g':
-      return polyhedron.peaks().map(peak => ({ peak }));
+      return Peak.getAll(polyhedron).map(peak => ({ peak }));
     case 'k':
       if (polyhedron.name === 'cuboctahedron') {
         return [{ polygon: 3 }, { polygon: 4 }];

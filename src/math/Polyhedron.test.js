@@ -1,3 +1,4 @@
+// @flow
 import Polyhedron from './Polyhedron';
 
 describe('Polyhedron', () => {

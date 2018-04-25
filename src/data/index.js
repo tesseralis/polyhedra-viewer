@@ -33,11 +33,11 @@ export const groups = groupData.map(group => ({
 
 export const allSolidNames = _.flatMap(flatGroups, 'polyhedra');
 
-export const isValidSolid = escapedSolidName => {
+export const isValidSolid = (escapedSolidName: string) => {
   return allSolidNames.includes(escapedSolidName.replace(/-/g, ' '));
 };
 
 // TODO make name escaping consistent *again*
-export const getSolidData = solidName => {
+export const getSolidData = (solidName: string) => {
   return require(`data/polyhedra/${solidName.replace(/ /g, '-')}.json`);
 };
