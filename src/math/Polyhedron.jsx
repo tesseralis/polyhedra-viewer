@@ -322,7 +322,7 @@ export default class Polyhedron {
   }
 
   peaks() {
-    return Peak.getAll(this);
+    return Peak.getAll((this: any));
   }
 
   findPeak(point: Vector) {

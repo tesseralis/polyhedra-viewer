@@ -1,11 +1,13 @@
+// @flow
 import _ from 'lodash';
 import {
-  operations,
+  getOperationName,
   getNextPolyhedron,
   getRelations,
   getUsingOpt,
 } from './relations';
 import Polyhedron from 'math/Polyhedron';
+import Peak from 'math/Peak';
 import { operationFunctions } from 'math/operations';
 
 import {
@@ -39,8 +41,23 @@ const updateName = (opResult, name) => {
   };
 };
 
-export default function applyOperation(operation, polyhedron, config = {}) {
-  let options = {};
+type Operation = 't' | 'r' | 'k' | '+' | '-' | 'g';
+interface ApplyConfig {
+  polygon?: number;
+  fIndex?: number;
+  using?: string;
+  gyrate?: 'ortho' | 'gyro';
+  peak?: Peak;
+  direction?: 'forward' | 'back';
+  align?: 'meta' | 'para';
+}
+
+export default function applyOperation(
+  operation: Operation,
+  polyhedron: Polyhedron,
+  config: ApplyConfig = {},
+) {
+  let options: ApplyConfig = {};
   let applyConfig = config;
   const relations = getRelations(polyhedron.name, operation);
   if (operation === 'k') {
@@ -54,6 +71,10 @@ export default function applyOperation(operation, polyhedron, config = {}) {
     applyConfig = { ...applyConfig, faceType: polygon };
   } else if (operation === '+') {
     const { fIndex } = config;
+
+    if (typeof fIndex !== 'number') {
+      throw new Error('Invalid fIndex');
+    }
     const n = polyhedron.faces[fIndex].length;
 
     const using = getUsingOpt(config.using, n);
@@ -65,12 +86,15 @@ export default function applyOperation(operation, polyhedron, config = {}) {
     applyConfig = { ...applyConfig, ...baseConfig };
     options = {
       ...baseConfig,
-      align:
-        hasMultiple(relations, 'align') &&
-        getAugmentAlignment(polyhedron, fIndex),
+      align: hasMultiple(relations, 'align')
+        ? getAugmentAlignment(polyhedron, fIndex)
+        : undefined,
     };
   } else if (operation === '-') {
     const { peak } = config;
+    if (!peak) {
+      throw new Error('Invalid peak');
+    }
     const vIndices = peak.innerVertexIndices();
     // If diminishing a pentagonal cupola/rotunda, check which one it is
     if (vIndices.length === 5) {
@@ -88,13 +112,16 @@ export default function applyOperation(operation, polyhedron, config = {}) {
     }
   } else if (operation === 'g') {
     const { peak } = config;
+    if (!peak) {
+      throw new Error('Invalid peak');
+    }
     if (_.some(relations, 'direction')) {
       options.direction = getGyrateDirection(polyhedron, peak);
       if (
         _.filter(
           relations,
           relation =>
-            relation.direction === options.direction && !!relation.align
+            relation.direction === options.direction && !!relation.align,
         ).length > 1
       ) {
         options.align = getPeakAlignment(polyhedron, peak);
@@ -105,8 +132,7 @@ export default function applyOperation(operation, polyhedron, config = {}) {
   }
 
   const next = getNextPolyhedron(polyhedron.name, operation, _.pickBy(options));
-  const opFunction =
-    operationFunctions[_.find(operations, { symbol: operation }).name];
+  const opFunction = operationFunctions[getOperationName(operation)];
   if (!_.isFunction(opFunction)) {
     // throw new Error(`Function not found for ${operation}`)
     return Polyhedron.get(next);

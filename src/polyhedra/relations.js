@@ -1,8 +1,15 @@
+// @flow
 import _ from 'lodash';
 import { fromConwayNotation, toConwayNotation } from './names';
 import polyhedraGraph from './relationsGraph';
 
-export const operations = [
+interface Operation {
+  name: string;
+  symbol: string;
+  description: string;
+}
+
+export const operations: Operation[] = [
   {
     name: 'truncate',
     symbol: 't',
@@ -76,22 +83,30 @@ export const operations = [
   },
 ];
 
+export function getOperationName(symbol: string) {
+  const operation = _.find(operations, { symbol });
+  if (operation === undefined) {
+    throw new Error(`Could not find operation with symbol ${symbol}`);
+  }
+  return operation.name;
+}
+
 // Get the operations that can be applied to the given solid
-export function getOperations(solid) {
+export function getOperations(solid: string) {
   return _.keys(polyhedraGraph[toConwayNotation(solid)]);
 }
 
-export function getRelations(solid, operation) {
+export function getRelations(solid: string, operation: string) {
   return polyhedraGraph[toConwayNotation(solid)][operation];
 }
 
 const defaultAugmentees = {
-  3: 'Y3',
-  4: 'Y4',
-  5: 'Y5',
-  6: 'U3',
-  8: 'U4',
-  10: 'U5',
+  '3': 'Y3',
+  '4': 'Y4',
+  '5': 'Y5',
+  '6': 'U3',
+  '8': 'U4',
+  '10': 'U5',
 };
 
 const augmenteeSides = {
@@ -100,35 +115,39 @@ const augmenteeSides = {
   R5: 10,
 };
 
-export function getUsingOpts(solid) {
+export function getUsingOpts(solid: string) {
   const augments = getRelations(solid, '+');
   const using = _.uniq(_.map(augments, 'using'));
   const grouped = _.groupBy(using, option => augmenteeSides[option]);
   return _.find(grouped, group => group.length > 1) || [];
 }
 
-export function getUsingOpt(using, numSides) {
+export function getUsingOpt(using: ?string, numSides: number) {
   return using && augmenteeSides[using] === numSides
     ? using
     : defaultAugmentees[numSides];
 }
 
 // Get the polyhedron name as a result of applying the operation to the given polyhedron
-export function getNextPolyhedron(solid, operation, filterOpts) {
+export function getNextPolyhedron(
+  solid: string,
+  operation: string,
+  filterOpts: any,
+) {
   const next = _(polyhedraGraph[toConwayNotation(solid)][operation])
     .filter(!_.isEmpty(filterOpts) ? filterOpts : _.stubTrue)
     .value();
   if (next.length > 1) {
     throw new Error(
       `Multiple possibilities found for operation ${operation} on ${solid} with options ${JSON.stringify(
-        filterOpts
-      )}: ${JSON.stringify(next)}`
+        filterOpts,
+      )}: ${JSON.stringify(next)}`,
     );
   } else if (next.length === 0) {
     throw new Error(
       `No possibilities found for operation ${operation} on ${solid} with options ${JSON.stringify(
-        filterOpts
-      )}. Are you sure you didn't put in too many?`
+        filterOpts,
+      )}. Are you sure you didn't put in too many?`,
     );
   }
 
@@ -137,11 +156,11 @@ export function getNextPolyhedron(solid, operation, filterOpts) {
 
 function hasMultipleOptionsForFace(relations) {
   return _.some(relations, relation =>
-    _.includes(['U2', 'R5'], relation.using)
+    _.includes(['U2', 'R5'], relation.using),
   );
 }
 
-export function applyOptionsFor(solid, operation) {
+export function applyOptionsFor(solid: string, operation: string) {
   if (!solid) return;
   const relations = getRelations(solid, operation);
   const newOpts = {};

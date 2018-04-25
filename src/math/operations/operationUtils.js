@@ -1,7 +1,7 @@
 // @flow
 import _ from 'lodash';
 import Polyhedron from 'math/Polyhedron';
-import { vec, PRECISION } from 'math/linAlg';
+import { PRECISION } from 'math/linAlg';
 import { numSides } from 'math/solidUtils';
 import { VIndex } from 'math/solidTypes';
 

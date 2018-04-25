@@ -1,3 +1,4 @@
+// @flow
 import _ from 'lodash';
 import { cartesian } from 'util.js';
 import { allSolidNames } from 'data';
@@ -8,7 +9,6 @@ import Peak from 'math/Peak';
 import { canAugment } from 'math/operations';
 import applyOperation from './applyOperation';
 
-// const archimedeanOpts = ['t', 'r', '~t', '~r']
 const archimedeanOpts = ['t', 'k', 'r'];
 const johnsonOpts = ['+', '-', 'g', 'P', 'A', '~P', '~A'];
 const opsToTest = archimedeanOpts.concat(johnsonOpts);
@@ -23,11 +23,11 @@ const excludedOperations = {
 
 function isProperPolyhedron(polyhedron) {
   // Make sure edges all have the same length
-  let prevSideLength;
+  let prevSideLength: ?number;
   for (let edge of polyhedron.edges) {
     const [v1, v2] = edge.map(vIndex => polyhedron.vertexVectors()[vIndex]);
-    const sideLength = v1.distanceTo(v2);
-    if (!_.isNil(prevSideLength)) {
+    const sideLength: number = v1.distanceTo(v2);
+    if (prevSideLength !== undefined) {
       if (Math.abs(sideLength - prevSideLength) > PRECISION) {
         return false;
       }
