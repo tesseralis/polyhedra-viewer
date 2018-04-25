@@ -1,16 +1,6 @@
 // @flow
-
 import _ from 'lodash';
-import type { Vector } from './linAlg';
-
-// TODO move this to a solidtypes file or something
-export type Vertex = Vector;
-export type VIndex = number;
-
-export type Face = VIndex[];
-export type FIndex = number;
-
-export type Edge = [VIndex, VIndex];
+import type { Vertex, VIndex, Face, FIndex, Edge } from './solidTypes';
 
 // Get the element of the array at the given index,
 // modulo its length
@@ -25,7 +15,7 @@ export function getCyclic(array: number[], index: number): number {
 export const numSides = (face: Face) => face.length;
 
 export function getDirectedEdges(face: Face) {
-  return _.map(face, (vertex, index) => {
+  return _.map(face, (vertex: Vertex, index: VIndex) => {
     return [vertex, getCyclic(face, index + 1)];
   });
 }

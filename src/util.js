@@ -1,6 +1,10 @@
 // @flow
 import _ from 'lodash';
 
+export function atIndices<T>(arr: T[], indices: number[]): T[] {
+  return indices.map(i => arr[i]);
+}
+
 /**
  * Create an object from the array using the iteratee
  */

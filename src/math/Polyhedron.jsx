@@ -2,6 +2,7 @@
 import _ from 'lodash';
 import { geom } from 'toxiclibsjs';
 import { isValidSolid, getSolidData } from 'data';
+import { atIndices } from 'util.js';
 import {
   vec,
   getMidpoint,
@@ -13,7 +14,7 @@ import {
 } from './linAlg';
 import type { Vector } from './linAlg';
 import { numSides, hasEdge, getCyclic } from './solidUtils';
-import type { Vertex, Face, Edge, VIndex, FIndex } from './solidUtils';
+import type { Vertex, Face, Edge, VIndex, FIndex } from './solidTypes';
 import Peak from './Peak';
 const { Vec3D } = geom;
 
@@ -22,7 +23,7 @@ function getEdge(v1: VIndex, v2: VIndex) {
 }
 
 function getEdges(face: Face): Edge[] {
-  return _.map(face, (vertex, index): Edge => {
+  return _.map(face, (vertex, index: VIndex): Edge => {
     return getEdge(vertex, getCyclic(face, index + 1));
   });
 }
@@ -144,7 +145,7 @@ export default class Polyhedron {
   }
 
   // Return the faces adjacent to the given vertices
-  adjacentFaceIndices(...vIndices: VIndex[]) {
+  adjacentFaceIndices(...vIndices: VIndex[]): FIndex[] {
     return _(vIndices)
       .flatMap(vIndex => this.vertexToFaceGraph()[vIndex])
       .uniq()
@@ -152,9 +153,10 @@ export default class Polyhedron {
   }
 
   adjacentFaces(...vIndices: VIndex[]) {
-    return this.adjacentFaceIndices(...vIndices).map(
-      fIndex => this.faces[fIndex],
-    );
+    return atIndices(this.faces, this.adjacentFaceIndices(...vIndices));
+    // return this.adjacentFaceIndices(...vIndices).map(
+    //   fIndex => this.faces[fIndex],
+    // );
   }
 
   // Return the number of faces by side for the given vertex

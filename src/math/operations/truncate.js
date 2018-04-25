@@ -1,9 +1,11 @@
+// @flow
 import _ from 'lodash';
 
 import Polyhedron from 'math/Polyhedron';
-import { replace } from 'util.js';
+import { replace, atIndices } from 'util.js';
 import { vec } from 'math/linAlg';
 import { prevVertex, nextVertex } from 'math/solidUtils';
+import { VIndex, FIndex } from 'math/solidTypes';
 import {
   removeExtraneousVertices,
   deduplicateVertices,
@@ -13,7 +15,7 @@ function directedAdjacentFaceIndices(polyhedron, vIndex) {
   const { faces } = polyhedron;
   const touchingFaceIndices = _.clone(polyhedron.adjacentFaceIndices(vIndex));
   const result = [];
-  let next = touchingFaceIndices[0];
+  let next: FIndex = touchingFaceIndices[0];
   const checkVertex = f =>
     prevVertex(faces[next], vIndex) === nextVertex(faces[f], vIndex);
   do {
@@ -23,15 +25,20 @@ function directedAdjacentFaceIndices(polyhedron, vIndex) {
   return result;
 }
 
+interface TruncateOptions {
+  mock?: boolean;
+  rectify?: boolean;
+}
+
 function truncateVertex(
   newPolyhedron,
   polyhedron,
   vIndex,
-  { mock, rectify } = {}
+  { mock, rectify } = {},
 ) {
   // const touchingFaces = polyhedron.adjacentFaces(vIndex)
   const touchingFaceIndices = directedAdjacentFaceIndices(polyhedron, vIndex);
-  const touchingFaces = _.at(polyhedron.faces, touchingFaceIndices);
+  const touchingFaces = atIndices(polyhedron.faces, touchingFaceIndices);
   // const touchingFaceIndices = polyhedron.adjacentFaceIndices(vIndex)
   let verticesToAdd = touchingFaces.map(face => {
     if (mock) {
@@ -68,18 +75,18 @@ function truncateVertex(
         face.indexOf(vIndex),
         newPolyhedron.vertices.length +
           mod(touchingFaceIndex + 1, touchingFaces.length),
-        newPolyhedron.vertices.length + touchingFaceIndex
+        newPolyhedron.vertices.length + touchingFaceIndex,
       );
     })
     .concat([_.range(newPolyhedron.vertices.length, newVertices.length)]);
   return Polyhedron.of(newVertices, newFaces);
 }
 
-function doTruncate(polyhedron, options = {}) {
+function doTruncate(polyhedron, options: TruncateOptions = {}) {
   let newPolyhedron = polyhedron;
   let mockPolyhedron = polyhedron;
   // TODO (animation) make this more concise
-  _.forEach(polyhedron.vertices, (vertex, index) => {
+  _.forEach(polyhedron.vertices, (vertex, index: VIndex) => {
     newPolyhedron = truncateVertex(newPolyhedron, polyhedron, index, options);
     mockPolyhedron = truncateVertex(mockPolyhedron, polyhedron, index, {
       ...options,
@@ -95,10 +102,10 @@ function doTruncate(polyhedron, options = {}) {
   };
 }
 
-export function truncate(polyhedron, options) {
+export function truncate(polyhedron: Polyhedron, options: TruncateOptions) {
   return doTruncate(polyhedron);
 }
 
-export function rectify(polyhedron) {
+export function rectify(polyhedron: Polyhedron) {
   return doTruncate(polyhedron, { rectify: true });
 }

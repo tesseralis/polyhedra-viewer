@@ -2,7 +2,7 @@
 import _ from 'lodash';
 import { getSingle } from 'util.js';
 import { getDirectedEdges, numSides } from 'math/solidUtils';
-import type { FIndex } from 'math/solidUtils';
+import type { FIndex } from 'math/solidTypes';
 import Peak from 'math/Peak';
 import Polyhedron from 'math/Polyhedron';
 

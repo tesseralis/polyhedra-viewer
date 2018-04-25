@@ -1,12 +1,19 @@
+// @flow
 import _ from 'lodash';
 
 import { replace } from 'util.js';
 import { vec } from 'math/linAlg';
+import type { Vector } from 'math/linAlg';
 import Polyhedron from 'math/Polyhedron';
 import { numSides, prevVertex, nextVertex } from 'math/solidUtils';
+import type FIndex from 'math/solidtypes';
 import { deduplicateVertices } from './operationUtils';
 
-export function getCumulatePolygon(polyhedron, point) {
+interface CumulateOptions {
+  faceType: number;
+}
+
+export function getCumulatePolygon(polyhedron: Polyhedron, point: Vector) {
   const hitPoint = vec(point);
   const hitFaceIndex = polyhedron.hitFaceIndex(hitPoint);
   // TODO handle octahedron case
@@ -21,8 +28,8 @@ function isRectified(polyhedron) {
 
 function duplicateVertex(newPolyhedron, polyhedron, fIndices, vIndex) {
   const adjacentFaceIndices = polyhedron.adjacentFaceIndices(vIndex);
-  const pivot = _.find(adjacentFaceIndices, fIndex =>
-    _.includes(fIndices, fIndex)
+  const pivot: FIndex = _.find(adjacentFaceIndices, fIndex =>
+    _.includes(fIndices, fIndex),
   );
   const pivotFace = polyhedron.faces[pivot];
   const newVertexIndex = newPolyhedron.numVertices();
@@ -63,7 +70,7 @@ function duplicateVertices(polyhedron, fIndices) {
     (newPolyhedron, vertex, vIndex) => {
       return duplicateVertex(newPolyhedron, polyhedron, fIndices, vIndex);
     },
-    polyhedron
+    polyhedron,
   );
   // Create a new one so we recalculate the edges
   return Polyhedron.of(vertices, faces);
@@ -80,7 +87,7 @@ function cumulateFaceIndices(polyhedron, faceType) {
       .fIndices()
       .filter(
         fIndex =>
-          _.intersection(polyhedron.faces[fIndex], face).length % 2 === 0
+          _.intersection(polyhedron.faces[fIndex], face).length % 2 === 0,
       );
   }
 
@@ -89,7 +96,10 @@ function cumulateFaceIndices(polyhedron, faceType) {
     .filter(fIndex => polyhedron.numSides(fIndex) === faceType);
 }
 
-export function cumulate(polyhedron, { faceType } = {}) {
+export function cumulate(
+  polyhedron: Polyhedron,
+  { faceType }: CumulateOptions = {},
+) {
   // face indices with the right number of sides
   const n = faceType || _.min(polyhedron.faces.map(numSides));
   const fIndices = cumulateFaceIndices(polyhedron, n);
@@ -119,7 +129,9 @@ export function cumulate(polyhedron, { faceType } = {}) {
 
   const mockVertices = vertices.map(
     (vertex, vIndex) =>
-      _.has(oldToNew, vIndex) ? verticesToAdd[oldToNew[vIndex]] : vertex
+      _.has(oldToNew, vIndex.toString())
+        ? verticesToAdd[oldToNew[vIndex]]
+        : vertex,
   );
 
   return {

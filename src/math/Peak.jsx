@@ -2,7 +2,7 @@
 
 import _ from 'lodash';
 import { getBoundary } from './solidUtils';
-import type { Edge, VIndex, FIndex } from './solidUtils';
+import type { Edge, VIndex, FIndex } from './solidTypes';
 import Polyhedron from './Polyhedron';
 
 type PeakType = 'pyramid' | 'cupola' | 'rotunda' | 'fastigium';

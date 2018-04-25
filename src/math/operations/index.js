@@ -1,3 +1,4 @@
+// @flow
 import { truncate, rectify } from './truncate';
 import { cumulate } from './cumulate';
 import { augment, elongate, gyroelongate } from './augment';

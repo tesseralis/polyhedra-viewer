@@ -1,17 +1,19 @@
+// @flow
 import _ from 'lodash';
 import Polyhedron from 'math/Polyhedron';
 import { vec, PRECISION } from 'math/linAlg';
 import { numSides } from 'math/solidUtils';
+import { VIndex } from 'math/solidTypes';
 
 // Remove vertices (and faces) from the polyhedron when they are all the same
-export function deduplicateVertices(polyhedron) {
+export function deduplicateVertices(polyhedron: Polyhedron) {
   // group vertex indices by same
-  const vertices = polyhedron.vertices.map(vec);
+  const vertices = polyhedron.vertexVectors();
   const points = [];
   const verticesByPoint = {};
-  _.forEach(vertices, (vertex, index) => {
+  _.forEach(vertices, (vertex, index: VIndex) => {
     const pointIndex = _.findIndex(points, point =>
-      vertex.equalsWithTolerance(point, PRECISION)
+      vertex.equalsWithTolerance(point, PRECISION),
     );
     if (pointIndex === -1) {
       points.push(vertex);
@@ -28,8 +30,8 @@ export function deduplicateVertices(polyhedron) {
     newFaces = newFaces.map(face =>
       face.map(
         vertex =>
-          _.includes(groupedVertices, vertex) ? groupedVertices[0] : vertex
-      )
+          _.includes(groupedVertices, vertex) ? groupedVertices[0] : vertex,
+      ),
     );
   });
   // remove vertices in faces and extraneous faces
@@ -43,7 +45,7 @@ export function deduplicateVertices(polyhedron) {
  * Remove vertices in the polyhedron that aren't connected to any faces,
  * and remap the faces to the smaller indices
  */
-export function removeExtraneousVertices(polyhedron) {
+export function removeExtraneousVertices(polyhedron: Polyhedron) {
   const { vertices, faces } = polyhedron;
   // Vertex indices to remove
   const toRemove = _.difference(polyhedron.vIndices(), _.flatMap(faces));
@@ -64,7 +66,7 @@ export function removeExtraneousVertices(polyhedron) {
     .dropRight(numToRemove)
     .value();
   const newFaces = faces.map(face =>
-    face.map(vIndex => _.get(newToOld, vIndex, vIndex))
+    face.map((vIndex: VIndex) => _.get(newToOld, vIndex, vIndex)),
   );
   return Polyhedron.of(newVertices, newFaces);
 }
