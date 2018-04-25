@@ -232,7 +232,6 @@ export default class Viewer extends Component {
         onFinish: this.finishAnimation,
       },
       ({ vertices, faceColors }) => {
-        console.log('set interp state')
         this.setState(({ interpolated }) => ({
           interpolated: interpolated.withVertices(vertices),
           faceColors,
