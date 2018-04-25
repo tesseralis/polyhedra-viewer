@@ -7,9 +7,19 @@ import Polyhedron from 'math/polyhedron'
 import { canAugment } from 'math/operations'
 import applyOperation from './applyOperation'
 
-const archimedeanOpts = ['t', 'r', '~t', '~r']
+// const archimedeanOpts = ['t', 'r', '~t', '~r']
+const archimedeanOpts = ['t', 'k', 'r']
 const johnsonOpts = ['+', '-', 'g', 'P', 'A', '~P', '~A']
-const opsToTest = johnsonOpts
+const opsToTest = archimedeanOpts.concat(johnsonOpts)
+
+// map from polyhedron to excluded operations
+const excludedOperations = {
+  octahedron: ['k'],
+  cuboctahedron: ['t'],
+  icosidodecahedron: ['t'],
+  'truncated cuboctahedron': ['k'],
+  'truncated icosidodecahedron': ['k'],
+}
 
 function isProperPolyhedron(polyhedron) {
   // Make sure edges all have the same length
@@ -69,6 +79,13 @@ function getOptsToTest(operation, polyhedron) {
     case '-':
     case 'g':
       return polyhedron.peaks().map(peak => ({ peak }))
+    case 'k':
+      if (polyhedron.name === 'cuboctahedron') {
+        return [{ polygon: 3 }, { polygon: 4 }]
+      } else if (polyhedron.name === 'icosidodecahedron') {
+        return [{ polygon: 3 }, { polygon: 5 }]
+      }
+      return [undefined]
     default:
       return [undefined]
   }
@@ -77,7 +94,9 @@ function getOptsToTest(operation, polyhedron) {
 describe('applyOperation', () => {
   allSolidNames.forEach(solidName => {
     it(`correctly applies all possible operations on ${solidName}`, () => {
-      const operations = _.intersection(getOperations(solidName), opsToTest)
+      const allOperations = _.intersection(getOperations(solidName), opsToTest)
+      const excluded = excludedOperations[solidName]
+      const operations = _.difference(allOperations, excluded)
       operations.forEach(operation => {
         const polyhedron = Polyhedron.get(solidName)
         const optsToTest = getOptsToTest(operation, polyhedron)
