@@ -1,13 +1,25 @@
+// @flow
 import _ from 'lodash'
 import * as d3 from 'd3-ease'
 import { interpolate } from 'd3-interpolate'
+
+interface TransitionOptions<T> {
+  startValue: T;
+  endValue: T;
+  duration: number;
+  ease: 'easePolyInOut' | 'easePolyOut' | 'easePolyIn';
+  onFinish: () => {};
+}
 
 /**
  * An animation function based on d3's interpolate.
  * Returns an _id_ object whose `current` property is the id to call
  * cancelAnimationFrame with.
  */
-export default function transition(options, updateCallback) {
+export default function transition<T>(
+  options: TransitionOptions<T>,
+  updateCallback: T => {},
+) {
   const {
     startValue,
     endValue,
@@ -38,4 +50,3 @@ export default function transition(options, updateCallback) {
   id.current = requestAnimationFrame(step)
   return id
 }
-
