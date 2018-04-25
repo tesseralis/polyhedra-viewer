@@ -3,8 +3,6 @@ import React, { Component } from 'react';
 import _ from 'lodash';
 import EventListener from 'react-event-listener';
 
-import type { Face, FIndex } from 'math/solidTypes';
-import type { Operation } from 'polyhedra/applyOperation';
 import type { Vector } from 'math/linAlg';
 import SolidData from 'math/Polyhedron';
 
