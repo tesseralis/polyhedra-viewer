@@ -129,6 +129,18 @@ function AugmentOptions({ options, solid, onClickOption, disabled }) {
   )
 }
 
+function hasOptions(operation, relations) {
+  switch (operation) {
+    case 'k':
+      if (relations.length > 1) {
+        return true
+      }
+      return false
+    default:
+      return _.includes(hasMode, operation)
+  }
+}
+
 // TODO this could probably use a test to make sure all the buttons are in the right places
 export default function RelatedPolyhedra({
   disabled,
@@ -165,7 +177,7 @@ export default function RelatedPolyhedra({
                     )}
                     disabled={!relations || disabled}
                     onClick={() => {
-                      if (_.includes(hasMode, symbol)) {
+                      if (hasOptions(symbol, relations)) {
                         setOperation(symbol !== operation ? symbol : null)
                       } else {
                         applyOperation(symbol, relation)
