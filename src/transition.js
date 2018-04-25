@@ -8,7 +8,7 @@ interface TransitionOptions<T> {
   endValue: T;
   duration: number;
   ease: 'easePolyInOut' | 'easePolyOut' | 'easePolyIn';
-  onFinish: () => {};
+  onFinish(): void;
 }
 
 /**
@@ -18,7 +18,7 @@ interface TransitionOptions<T> {
  */
 export default function transition<T>(
   options: TransitionOptions<T>,
-  updateCallback: T => {}
+  updateCallback: T => void,
 ) {
   const {
     startValue,

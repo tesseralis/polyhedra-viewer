@@ -7,6 +7,7 @@ import {
   getUsingOpt,
 } from './relations';
 import Polyhedron from 'math/Polyhedron';
+import Vertex from 'math/solidTypes';
 import Peak from 'math/Peak';
 import { operationFunctions } from 'math/operations';
 
@@ -41,7 +42,7 @@ const updateName = (opResult, name) => {
   };
 };
 
-type Operation = 't' | 'r' | 'k' | '+' | '-' | 'g';
+export type Operation = 't' | 'r' | 'k' | '+' | '-' | 'g';
 interface ApplyConfig {
   polygon?: number;
   fIndex?: number;
@@ -52,11 +53,19 @@ interface ApplyConfig {
   align?: 'meta' | 'para';
 }
 
+interface OperationResult {
+  result: Polyhedron;
+  animationData?: {
+    start: Polyhedron,
+    endVertices: Vertex[],
+  };
+}
+
 export default function applyOperation(
   operation: Operation,
   polyhedron: Polyhedron,
   config: ApplyConfig = {},
-) {
+): OperationResult {
   let options: ApplyConfig = {};
   let applyConfig = config;
   const relations = getRelations(polyhedron.name, operation);

@@ -1,3 +1,4 @@
+// @flow
 import React from 'react';
 import { css, StyleSheet } from 'aphrodite/no-important';
 import _ from 'lodash';
@@ -85,7 +86,13 @@ const ResetButton = ({ reset }) => {
   );
 };
 
-export default ({ width, inputValues, setInputValue, reset }) => {
+interface ConfigFormProps {
+  width: number;
+  inputValues: { key: any };
+  setInputValue: (key: string | null, value?: any) => {};
+}
+
+export default ({ width, inputValues, setInputValue }: ConfigFormProps) => {
   const styles = StyleSheet.create({
     configMenu: {
       width,

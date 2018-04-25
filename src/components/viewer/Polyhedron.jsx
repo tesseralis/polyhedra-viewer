@@ -1,8 +1,11 @@
+// @flow
 import React, { Component } from 'react';
 import { rgb } from 'd3-color';
 import _ from 'lodash';
 import EventListener from 'react-event-listener';
 
+import type { Operation } from 'polyhedra/applyOperation';
+import SolidData from 'math/Polyhedron';
 import polygons from 'constants/polygons';
 import { mapObject } from 'util.js';
 import {
@@ -12,7 +15,11 @@ import {
 } from 'math/operations';
 
 // Join a list of lists with an inner and outer separator.
-export const joinListOfLists = (list, outerSep, innerSep) => {
+export const joinListOfLists = (
+  list: any[],
+  outerSep: string,
+  innerSep: string,
+) => {
   return list.map(elem => elem.join(innerSep)).join(outerSep);
 };
 
@@ -34,12 +41,29 @@ const colorIndexForFace = mapObject(polygons, (n, i) => [n, i]);
 const getColorIndex = face => colorIndexForFace[face.length];
 const polygonColors = colors => polygons.map(n => toRgb(colors[n]));
 
-class Faces extends Component {
+interface FacesProps {
+  solidData: SolidData;
+  opacity: number;
+  colors: any;
+  colorMap: any;
+  operation: ?Operation;
+  applyOperation(op: Operation, args: any): void;
+}
+
+interface FacesState {
+  applyArgs: any;
+  augmentInfo?: any;
+  error?: Error;
+}
+
+class Faces extends Component<FacesProps, FacesState> {
+  shape: any;
+  drag: boolean = false;
+
   constructor(props) {
     super(props);
     this.state = {
       applyArgs: {},
-      error: null,
     };
     this.shape = React.createRef();
   }
@@ -105,7 +129,7 @@ class Faces extends Component {
     }
 
     // If we specify that this face has a color, use it
-    if (_.has(colorMap, fIndex)) {
+    if (_.has(colorMap, fIndex.toString())) {
       return toRgb(colorMap[fIndex]);
     }
     return defaultColors[getColorIndex(face)];
@@ -117,7 +141,7 @@ class Faces extends Component {
   };
 
   // Manually adding event listeners swallows errors, so we have to store it in the component itself
-  wrapError = fn => event => {
+  wrapError = (fn: any) => event => {
     try {
       fn(event);
     } catch (error) {
@@ -125,7 +149,7 @@ class Faces extends Component {
     }
   };
 
-  addEventListener(type, fn) {
+  addEventListener(type, fn: EventHandler) {
     this.shape.current.addEventListener(type, this.wrapError(fn));
   }
 
@@ -155,7 +179,7 @@ class Faces extends Component {
     }
   };
 
-  handleMouseMove = event => {
+  handleMouseMove = (event: any) => {
     // TODO replace this with logs
     this.drag = true;
     const { solidData, operation } = this.props;
@@ -207,7 +231,15 @@ const Edges = ({ edges, vertices }) => {
 
 /* Polyhedron */
 
-export default class Polyhedron extends Component {
+interface PolyhedronProps {
+  solidData: SolidData;
+  config: any;
+  operation?: Operation;
+  applyOperation(operation: Operation, args: any): void;
+  faceColors: any;
+}
+
+export default class Polyhedron extends Component<PolyhedronProps> {
   render() {
     const {
       solidData,

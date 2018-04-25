@@ -1,3 +1,4 @@
+// @flow
 import _ from 'lodash';
 import React, { Component } from 'react';
 import { css, StyleSheet } from 'aphrodite/no-important';
@@ -5,9 +6,11 @@ import { css, StyleSheet } from 'aphrodite/no-important';
 import { isValidSolid } from 'data';
 import { andaleMono } from 'styles/fonts';
 import Polyhedron from 'math/Polyhedron';
+import type { Vertex } from 'math/solidTypes';
 import { fixed, fullScreen } from 'styles/common';
 import { unescapeName } from 'polyhedra/names';
-import applyOperation from 'polyhedra/applyOperation';
+import doApplyOperation from 'polyhedra/applyOperation';
+import type { Operation } from 'polyhedra/applyOperation';
 import { getRelations, applyOptionsFor } from 'polyhedra/relations';
 import { defaultConfig, getPolyhedronConfig } from 'constants/configOptions';
 import transition from 'transition.js';
@@ -72,23 +75,47 @@ function viewerStateFromSolidName(name) {
 function getFaceColors(polyhedron, colors) {
   return _.pickBy(
     polyhedron.faces.map(
-      (face, fIndex) => colors[polyhedron.numUniqueSides(fIndex)]
-    )
+      (face, fIndex) => colors[polyhedron.numUniqueSides(fIndex)],
+    ),
   );
 }
 
-export default class Viewer extends Component {
-  constructor(props) {
+interface ViewerProps {
+  solid: string;
+  history: any;
+}
+
+interface ViewerState {
+  polyhedron: Polyhedron;
+  operation: ?Operation;
+  applyOptions: any;
+  interpolated?: Polyhedron;
+  faceColors?: any;
+  config: any;
+  animationData?: any;
+}
+
+interface InterpolatedValues {
+  vertices: Vertex[];
+  faceColors: any;
+}
+
+export default class Viewer extends Component<ViewerProps, ViewerState> {
+  transitionId: ?any;
+
+  constructor(props: ViewerProps) {
     super(props);
     this.state = {
       polyhedron: Polyhedron.get(props.solid),
       config: defaultConfig,
-      operation: null,
       applyOptions: {},
     };
   }
 
-  static getDerivedStateFromProps(nextProps, prevState) {
+  static getDerivedStateFromProps(
+    nextProps: ViewerProps,
+    prevState: ViewerState,
+  ) {
     const { polyhedron } = prevState;
     const { solid } = nextProps;
 
@@ -99,7 +126,7 @@ export default class Viewer extends Component {
     return prevState;
   }
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate(prevProps: ViewerProps) {
     const { history, solid } = this.props;
     const { polyhedron } = this.state;
     if (polyhedron.name !== solid && solid === prevProps.solid) {
@@ -155,7 +182,7 @@ export default class Viewer extends Component {
           </div>
           {_.has(operationDescriptions, operation) && (
             <div className={css(styles.description)}>
-              {operationDescriptions[operation]}
+              {_.get(operationDescriptions, operation)}
             </div>
           )}
         </div>
@@ -163,30 +190,34 @@ export default class Viewer extends Component {
     );
   }
 
-  setConfigValue = (key, value) => {
+  setConfigValue = (key: string, value: any) => {
     if (key === null) {
       this.setState({ config: defaultConfig });
     }
     this.setState(({ config }) => ({ config: { ...config, [key]: value } }));
   };
 
-  setOperation = operation => {
+  setOperation = (operation: Operation) => {
     this.setState(({ polyhedron }) => ({
       operation,
       applyOptions: applyOptionsFor(polyhedron.name, operation),
     }));
   };
 
-  applyOperation = (operation, args) => {
+  applyOperation = (operation: Operation, args: any) => {
     this.setState(({ polyhedron, applyOptions, config }) => {
-      const { result, animationData } = applyOperation(operation, polyhedron, {
-        ...args,
-        ...applyOptions,
-      });
+      const { result, animationData } = doApplyOperation(
+        operation,
+        polyhedron,
+        {
+          ...args,
+          ...applyOptions,
+        },
+      );
       // FIXME gyrate -> twist needs to be unset
       const postOpState = (() => {
         if (_.isEmpty(getRelations(result.name, operation))) {
-          return { operation: null, applyOptions: {} };
+          return { operation: undefined, applyOptions: {} };
         } else {
           return { applyOptions: applyOptionsFor(result.name, operation) };
         }
@@ -208,14 +239,14 @@ export default class Viewer extends Component {
   startAnimation = () => {
     // start the animation
     const { animationData, interpolated, config } = this.state;
-    if (!animationData) return;
+    if (!animationData || !interpolated) return;
     console.log('starting transition');
 
     const { colors, transitionDuration } = getPolyhedronConfig(config);
     const colorStart = getFaceColors(interpolated, colors);
     const colorEnd = getFaceColors(
       interpolated.withVertices(animationData.endVertices),
-      colors
+      colors,
     );
     this.transitionId = transition(
       {
@@ -231,21 +262,21 @@ export default class Viewer extends Component {
         },
         onFinish: this.finishAnimation,
       },
-      ({ vertices, faceColors }) => {
-        this.setState(({ interpolated }) => ({
-          interpolated: interpolated.withVertices(vertices),
+      ({ vertices, faceColors }: InterpolatedValues) => {
+        this.setState(({ interpolated, polyhedron }) => ({
+          interpolated: (interpolated || polyhedron).withVertices(vertices),
           faceColors,
         }));
-      }
+      },
     );
   };
 
   finishAnimation = () => {
     console.log('finish animation');
     this.setState({
-      animationData: null,
-      interpolated: null,
-      faceColors: null,
+      animationData: undefined,
+      interpolated: undefined,
+      faceColors: undefined,
     });
   };
 
@@ -257,7 +288,7 @@ export default class Viewer extends Component {
     }));
   };
 
-  setApplyOpt = (name, value) => {
+  setApplyOpt = (name: string, value: any) => {
     this.setState(({ applyOptions }) => ({
       applyOptions: { ...applyOptions, [name]: value },
     }));
