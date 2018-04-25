@@ -14,7 +14,6 @@ const opsToTest = archimedeanOpts.concat(johnsonOpts)
 
 // map from polyhedron to excluded operations
 const excludedOperations = {
-  octahedron: ['k'],
   cuboctahedron: ['t'],
   icosidodecahedron: ['t'],
   'truncated cuboctahedron': ['k'],
