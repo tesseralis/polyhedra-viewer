@@ -83,8 +83,8 @@ function viewerStateFromSolidName(name) {
 
 type Color = [number, number, number];
 function toRgb(hex: string): Color {
-  const col = rgb(hex);
-  return [col.r / 255, col.g / 255, col.b / 255];
+  const { r, g, b } = rgb(hex);
+  return [r / 255, g / 255, b / 255];
 }
 const colorIndexForFace = mapObject(polygons, (n, i) => [n, i]);
 const getColorIndex = face => colorIndexForFace[face.length];
@@ -218,6 +218,7 @@ export default class Viewer extends Component<ViewerProps, ViewerState> {
     return (interpolated || polyhedron).faces.map(this.getColorForFace);
   };
 
+  // TODO probably move this and the color utility functions to their own file
   getColorForFace = (face: Face, fIndex: FIndex) => {
     const { applyArgs, config, faceColors } = this.state;
     const { colors } = getPolyhedronConfig(config);
@@ -260,6 +261,7 @@ export default class Viewer extends Component<ViewerProps, ViewerState> {
   };
 
   applyCurrentOperation = () => {
+    // TODO could this cause an error since we're referencing the operation?
     if (this.state.operation) {
       this.applyOperation(this.state.operation);
     }
@@ -356,6 +358,7 @@ export default class Viewer extends Component<ViewerProps, ViewerState> {
     }));
   };
 
+  // TODO could probably move to own file
   setApplyArgs = (hitPnt?: Vector) => {
     this.setState(({ polyhedron, operation }) => {
       if (!hitPnt) {
