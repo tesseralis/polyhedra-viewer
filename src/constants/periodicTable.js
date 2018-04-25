@@ -1,4 +1,4 @@
-import * as _ from 'lodash'
+import * as _ from 'lodash';
 
 export default [
   {
@@ -39,7 +39,7 @@ export default [
     columns: ['prism', 'antiprism'],
     data: _.zip(
       ['P3', '!C', 'P5', 'P6', 'P8', 'P10'],
-      ['!O', 'A4', 'A5', 'A6', 'A8', 'A10'],
+      ['!O', 'A4', 'A5', 'A6', 'A8', 'A10']
     ),
   },
 
@@ -95,7 +95,7 @@ export default [
         ['J40', 'J41'],
         ['J42', 'J43'],
       ],
-      ['coplanar', 'J17', '!I', 'concave', 'J44', 'J45', 'J46', 'J47', 'J48'],
+      ['coplanar', 'J17', '!I', 'concave', 'J44', 'J45', 'J46', 'J47', 'J48']
     ),
   },
 
@@ -175,4 +175,4 @@ export default [
     columns: ['', '', '', '', '', '', ''],
     data: [['J86', 'J87', 'J88', 'J89', 'J90', 'J91', 'J92']],
   },
-]
+];

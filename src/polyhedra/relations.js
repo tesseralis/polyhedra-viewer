@@ -1,6 +1,6 @@
-import _ from 'lodash'
-import { fromConwayNotation, toConwayNotation } from './names'
-import polyhedraGraph from './relationsGraph'
+import _ from 'lodash';
+import { fromConwayNotation, toConwayNotation } from './names';
+import polyhedraGraph from './relationsGraph';
 
 export const operations = [
   {
@@ -74,15 +74,15 @@ export const operations = [
     symbol: 'g',
     description: 'Rotate a cupola or rotunda.',
   },
-]
+];
 
 // Get the operations that can be applied to the given solid
 export function getOperations(solid) {
-  return _.keys(polyhedraGraph[toConwayNotation(solid)])
+  return _.keys(polyhedraGraph[toConwayNotation(solid)]);
 }
 
 export function getRelations(solid, operation) {
-  return polyhedraGraph[toConwayNotation(solid)][operation]
+  return polyhedraGraph[toConwayNotation(solid)][operation];
 }
 
 const defaultAugmentees = {
@@ -92,64 +92,66 @@ const defaultAugmentees = {
   6: 'U3',
   8: 'U4',
   10: 'U5',
-}
+};
 
 const augmenteeSides = {
   ..._.invert(defaultAugmentees),
   U2: 4,
   R5: 10,
-}
+};
 
 export function getUsingOpts(solid) {
-  const augments = getRelations(solid, '+')
-  const using = _.uniq(_.map(augments, 'using'))
-  const grouped = _.groupBy(using, option => augmenteeSides[option])
-  return _.find(grouped, group => group.length > 1) || []
+  const augments = getRelations(solid, '+');
+  const using = _.uniq(_.map(augments, 'using'));
+  const grouped = _.groupBy(using, option => augmenteeSides[option]);
+  return _.find(grouped, group => group.length > 1) || [];
 }
 
 export function getUsingOpt(using, numSides) {
   return using && augmenteeSides[using] === numSides
     ? using
-    : defaultAugmentees[numSides]
+    : defaultAugmentees[numSides];
 }
 
 // Get the polyhedron name as a result of applying the operation to the given polyhedron
 export function getNextPolyhedron(solid, operation, filterOpts) {
   const next = _(polyhedraGraph[toConwayNotation(solid)][operation])
     .filter(!_.isEmpty(filterOpts) ? filterOpts : _.stubTrue)
-    .value()
+    .value();
   if (next.length > 1) {
     throw new Error(
       `Multiple possibilities found for operation ${operation} on ${solid} with options ${JSON.stringify(
-        filterOpts,
-      )}: ${JSON.stringify(next)}`,
-    )
+        filterOpts
+      )}: ${JSON.stringify(next)}`
+    );
   } else if (next.length === 0) {
     throw new Error(
       `No possibilities found for operation ${operation} on ${solid} with options ${JSON.stringify(
-        filterOpts,
-      )}. Are you sure you didn't put in too many?`,
-    )
+        filterOpts
+      )}. Are you sure you didn't put in too many?`
+    );
   }
 
-  return fromConwayNotation(next[0].value)
+  return fromConwayNotation(next[0].value);
 }
 
 function hasMultipleOptionsForFace(relations) {
-  return _.some(relations, relation => _.includes(['U2', 'R5'], relation.using))
+  return _.some(relations, relation =>
+    _.includes(['U2', 'R5'], relation.using)
+  );
 }
 
 export function applyOptionsFor(solid, operation) {
-  if (!solid) return
-  const relations = getRelations(solid, operation)
-  const newOpts = {}
+  if (!solid) return;
+  const relations = getRelations(solid, operation);
+  const newOpts = {};
   if (operation === '+') {
     if (_.filter(relations, 'gyrate').length > 1) {
-      newOpts.gyrate = 'ortho'
+      newOpts.gyrate = 'ortho';
     }
     if (hasMultipleOptionsForFace(relations)) {
-      newOpts.using = getUsingOpts(solid)[0]
+      newOpts.using = getUsingOpts(solid)[0];
     }
   }
-  return newOpts
+  return newOpts;
 }

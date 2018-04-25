@@ -1,7 +1,7 @@
-import _ from 'lodash'
-import periodicTable from 'constants/periodicTable'
-import { toConwayNotation } from './names'
-import { mapObject } from 'util.js'
+import _ from 'lodash';
+import periodicTable from 'constants/periodicTable';
+import { toConwayNotation } from './names';
+import { mapObject } from 'util.js';
 // TODO: adapt this from the table to we don't miss anything
 const archimedean = {
   T: {
@@ -51,131 +51,131 @@ const archimedean = {
   eD: {
     p: 'sD',
   },
-}
+};
 
 // Make everything an array
 function normalize(graph) {
   return _.mapValues(graph, ops =>
     _.mapValues(ops, relations => {
       return _.castArray(relations).map(
-        relation => (_.isObject(relation) ? relation : { value: relation }),
-      )
-    }),
-  )
+        relation => (_.isObject(relation) ? relation : { value: relation })
+      );
+    })
+  );
 }
 
 function compact(graph) {
   return _.mapValues(graph, ops =>
     _(ops)
       .mapValues(options => {
-        return _.filter(options, option => !_.isNil(option.value))
+        return _.filter(options, option => !_.isNil(option.value));
       })
       .pickBy('length')
-      .value(),
-  )
+      .value()
+  );
 }
 
 const customizer = (objValue, srcValue) => {
   if (_.isArray(objValue)) {
-    return objValue.concat(srcValue)
+    return objValue.concat(srcValue);
   }
-}
+};
 function graphMerge(object, ...other) {
-  return _.mergeWith(object, ...other, customizer)
+  return _.mergeWith(object, ...other, customizer);
 }
 
 const getInverseOperation = operation => {
-  if ('dgp'.includes(operation)) return operation
-  if (operation === '+') return '-'
-  if (operation === '-') return '+'
-  if ('ta'.includes(operation)) return 'k'
-  if ('es'.includes(operation)) return 'c'
-  if ('PA'.includes(operation)) return 'h'
-  throw new Error(`Invalid operation: ${operation}`)
-}
+  if ('dgp'.includes(operation)) return operation;
+  if (operation === '+') return '-';
+  if (operation === '-') return '+';
+  if ('ta'.includes(operation)) return 'k';
+  if ('es'.includes(operation)) return 'c';
+  if ('PA'.includes(operation)) return 'h';
+  throw new Error(`Invalid operation: ${operation}`);
+};
 
 function makeBidirectional(graph) {
-  const result = {}
+  const result = {};
   for (let [source, operations] of Object.entries(graph)) {
     for (let [operation, sinks] of Object.entries(operations)) {
       for (let sink of sinks) {
-        const sinkValue = sink.value
+        const sinkValue = sink.value;
         if (!sinkValue) {
-          continue
+          continue;
         }
         if (!result[sinkValue]) {
-          result[sinkValue] = {}
+          result[sinkValue] = {};
         }
-        const reverseOp = getInverseOperation(operation)
+        const reverseOp = getInverseOperation(operation);
         if (!result[sinkValue][reverseOp]) {
-          result[sinkValue][reverseOp] = []
+          result[sinkValue][reverseOp] = [];
         }
         if (sinkValue === source) {
-          continue
+          continue;
         }
-        const newValue = { ...sink, value: source }
+        const newValue = { ...sink, value: source };
         if (operation === 'g' && sink.direction) {
-          newValue.direction = 'back'
+          newValue.direction = 'back';
         }
-        result[sinkValue][reverseOp].push(newValue)
+        result[sinkValue][reverseOp].push(newValue);
       }
     }
   }
-  return graphMerge(result, graph)
+  return graphMerge(result, graph);
 }
 
 function getKeyedTable(table) {
-  const result = {}
-  if (!table.rows) return result
+  const result = {};
+  if (!table.rows) return result;
   table.rows.forEach((row, i) => {
-    result[row] = {}
+    result[row] = {};
     table.columns.forEach((column, j) => {
-      const colName = _.isObject(column) ? column.name : column
-      result[row][colName] = table.data[i][j]
-    })
-  })
-  return result
+      const colName = _.isObject(column) ? column.name : column;
+      result[row][colName] = table.data[i][j];
+    });
+  });
+  return result;
 }
 
-const invalidNames = ['concave', 'coplanar']
+const invalidNames = ['concave', 'coplanar'];
 function convertTableNotation(notation) {
-  if (_.isArray(notation)) return notation.map(convertTableNotation)
-  if (notation[0] === '!') return notation.substring(1)
-  if (_.includes(invalidNames, notation)) return null
-  return notation
+  if (_.isArray(notation)) return notation.map(convertTableNotation);
+  if (notation[0] === '!') return notation.substring(1);
+  if (_.includes(invalidNames, notation)) return null;
+  return notation;
 }
 
 function convertTable(table) {
-  if (!table.data) return table
+  if (!table.data) return table;
   return {
     ...table,
     data: table.data.map(row => row.map(convertTableNotation)),
-  }
+  };
 }
 
 const [, prisms, , pyramidsCupolae, augmentations] = periodicTable
   .map(convertTable)
-  .map(getKeyedTable)
+  .map(getKeyedTable);
 
 const hasCupolaRotunda = name =>
-  name.includes('pentagonal') && !name.includes('pyramid')
-const cupolaRotunda = pyramidsCupolae['cupola-rotunda']
+  name.includes('pentagonal') && !name.includes('pyramid');
+const cupolaRotunda = pyramidsCupolae['cupola-rotunda'];
 
 const getOrthoGyroAugment = (value, using) => {
   if (!_.isArray(value)) {
-    return [{ using, value }]
+    return [{ using, value }];
   } else {
     return [
       { using, value: value[0], gyrate: 'ortho' },
       { using, value: value[1], gyrate: 'gyro' },
-    ]
+    ];
   }
-}
+};
 
 const getCupolaRotunda = (using, colName) => {
-  const altUsing = using.includes('U') ? 'R5' : 'U5'
-  return getOrthoGyroAugment(cupolaRotunda[colName], altUsing)
-}
+  const altUsing = using.includes('U') ? 'R5' : 'U5';
+  return getOrthoGyroAugment(cupolaRotunda[colName], altUsing);
+};
 
 const getAugmentations = using => (rowName, colName) => {
   return _([
@@ -184,8 +184,8 @@ const getAugmentations = using => (rowName, colName) => {
   ])
     .flatten()
     .compact()
-    .value()
-}
+    .value();
+};
 
 const nameMapping = {
   digonal: 2,
@@ -195,53 +195,56 @@ const nameMapping = {
   hexagonal: 6,
   octagonal: 8,
   decagonal: 10,
-}
+};
 const divName = name => {
-  const m = nameMapping[name]
-  if (m <= 5) return name
-  return _.invert(nameMapping)[m / 2]
-}
+  const m = nameMapping[name];
+  if (m <= 5) return name;
+  return _.invert(nameMapping)[m / 2];
+};
 
 const getPyramidFromPrism = prismRow => {
-  const isPyramid = _.includes(['triangular', 'square', 'pentagonal'], prismRow)
-  return `${divName(prismRow)} ${isPyramid ? 'pyramid' : 'cupola'}`
-}
+  const isPyramid = _.includes(
+    ['triangular', 'square', 'pentagonal'],
+    prismRow
+  );
+  return `${divName(prismRow)} ${isPyramid ? 'pyramid' : 'cupola'}`;
+};
 
 const getPrismFromPyramid = (name, anti) => {
-  const [prefix, type] = name.split(' ')
-  const isCupola = _.includes(['cupola', 'rotunda', 'cupola-rotunda'], type)
-  const index = nameMapping[prefix] * (isCupola ? 2 : 1)
-  return `${anti ? 'A' : 'P'}${index}`
-}
+  const [prefix, type] = name.split(' ');
+  const isCupola = _.includes(['cupola', 'rotunda', 'cupola-rotunda'], type);
+  const index = nameMapping[prefix] * (isCupola ? 2 : 1);
+  return `${anti ? 'A' : 'P'}${index}`;
+};
 
 const pyramidCupolaConway = {
   pyramid: 'Y',
   cupola: 'U',
   rotunda: 'R', // not official, I don't think
-}
+};
 
 const getPyramidCupolaConway = name => {
-  const [sides, type] = name.split(' ')
-  return `${pyramidCupolaConway[type]}${nameMapping[sides]}`
-}
+  const [sides, type] = name.split(' ');
+  return `${pyramidCupolaConway[type]}${nameMapping[sides]}`;
+};
 
 const getElongations = (prism, antiprism) => (pValue, aValue) => {
   return {
     P: { using: prism, value: pValue },
     A: { using: antiprism, value: aValue },
-  }
-}
+  };
+};
 
 const basePyramidsCupolae = (() => {
-  let graph = {}
+  let graph = {};
   // relation of prisms and antiprisms
   _.forEach(prisms, (row, name) => {
-    const { prism, antiprism } = row
-    const hasRotunda = name.startsWith('decagonal')
-    const pyramidRow = getPyramidFromPrism(name)
-    const { elongated, gyroelongated } = pyramidsCupolae[pyramidRow]
-    const rotundaRow = pyramidsCupolae['pentagonal rotunda']
-    const using = getPyramidCupolaConway(pyramidRow)
+    const { prism, antiprism } = row;
+    const hasRotunda = name.startsWith('decagonal');
+    const pyramidRow = getPyramidFromPrism(name);
+    const { elongated, gyroelongated } = pyramidsCupolae[pyramidRow];
+    const rotundaRow = pyramidsCupolae['pentagonal rotunda'];
+    const using = getPyramidCupolaConway(pyramidRow);
     graph = graphMerge(graph, {
       [prism]: {
         '+': [
@@ -255,10 +258,10 @@ const basePyramidsCupolae = (() => {
           hasRotunda && { value: rotundaRow.gyroelongated, using: 'R5' },
         ],
       },
-    })
-  })
+    });
+  });
   // for diminished icosahedra
-  graph['A5']['+'][0].align = 'para'
+  graph['A5']['+'][0].align = 'para';
 
   _.forEach(pyramidsCupolae, (row, name) => {
     const {
@@ -268,12 +271,12 @@ const basePyramidsCupolae = (() => {
       'bi-': bi,
       'elongated bi-': elongatedBi,
       'gyroelongated bi-': gyroelongatedBi,
-    } = row
-    const prism = getPrismFromPyramid(name)
-    const antiprism = getPrismFromPyramid(name, true)
-    const conway = getPyramidCupolaConway(name)
-    const elongations = getElongations(prism, antiprism)
-    const augmentations = getAugmentations(conway)
+    } = row;
+    const prism = getPrismFromPyramid(name);
+    const antiprism = getPrismFromPyramid(name, true);
+    const conway = getPyramidCupolaConway(name);
+    const elongations = getElongations(prism, antiprism);
+    const augmentations = getAugmentations(conway);
     graph = graphMerge(graph, {
       [base]: {
         ...elongations(elongated, gyroelongated),
@@ -288,7 +291,7 @@ const basePyramidsCupolae = (() => {
       [gyroelongatedBi]: {
         g: _.isArray(bi) ? { value: gyroelongatedBi } : null,
       },
-    })
+    });
 
     // TODO Populate elongations of bipyramids (which we may not even do?)
     // if (!_.isArray(bi)) {
@@ -307,51 +310,51 @@ const basePyramidsCupolae = (() => {
     // gyrate relationships
     _.forEach(row, cell => {
       if (_.isArray(cell)) {
-        const [ortho, gyro] = cell
+        const [ortho, gyro] = cell;
         graph = graphMerge(graph, {
           [ortho]: {
             g: gyro,
           },
-        })
+        });
       }
-    })
-  })
+    });
+  });
 
-  return graph
-})()
+  return graph;
+})();
 
 const getAugmentee = name => {
-  if (name.includes('prism')) return 'Y4'
-  if (name === 'dodecahedron') return 'Y5'
-  const type = name.split(' ')[1]
+  if (name.includes('prism')) return 'Y4';
+  if (name === 'dodecahedron') return 'Y5';
+  const type = name.split(' ')[1];
   switch (type) {
     case 'tetrahedron':
-      return 'U3'
+      return 'U3';
     case 'cube':
-      return 'U4'
+      return 'U4';
     case 'dodecahedron':
-      return 'U5'
+      return 'U5';
     default:
-      return null
+      return null;
   }
-}
+};
 
 const getBiAugmented = (biaugmented, using) => {
   if (!_.isArray(biaugmented)) {
-    return [{ using, value: biaugmented }]
+    return [{ using, value: biaugmented }];
   }
   return [
     { using, value: biaugmented[0], align: 'para' },
     { using, value: biaugmented[1], align: 'meta' },
-  ]
-}
+  ];
+};
 
 const baseAugmentations = (() => {
-  let graph = {}
+  let graph = {};
   _.forEach(augmentations, (row, name) => {
-    const base = toConwayNotation(name)
-    const { augmented, biaugmented, triaugmented } = row
-    const augmentee = getAugmentee(name)
+    const base = toConwayNotation(name);
+    const { augmented, biaugmented, triaugmented } = row;
+    const augmentee = getAugmentee(name);
     graph = graphMerge(graph, {
       [base]: {
         '+': { using: augmentee, value: augmented },
@@ -362,10 +365,10 @@ const baseAugmentations = (() => {
       [_.isArray(biaugmented) ? biaugmented[1] : biaugmented]: {
         '+': { using: augmentee, value: triaugmented },
       },
-    })
-  })
-  return graph
-})()
+    });
+  });
+  return graph;
+})();
 
 const diminishedIcosahedraGraph = (() => {
   return {
@@ -375,14 +378,14 @@ const diminishedIcosahedraGraph = (() => {
     J62: {
       '+': { using: 'Y5', align: 'meta', value: 'J11' },
     },
-  }
-})()
+  };
+})();
 
 const rhombicosidodecahedraGraph = (() => {
   const getAugment = relations =>
-    relations.map(relation => ({ ...relation, using: 'U5' }))
+    relations.map(relation => ({ ...relation, using: 'U5' }));
   const getGyrate = relations =>
-    relations.map(relation => ({ ...relation, direction: 'forward' }))
+    relations.map(relation => ({ ...relation, direction: 'forward' }));
   return {
     // tridiminished
     J83: {
@@ -455,11 +458,11 @@ const rhombicosidodecahedraGraph = (() => {
     J74: {
       g: getGyrate([{ value: 'J75' }]),
     },
-  }
-})()
+  };
+})();
 
 const othersGraph = (() => {
-  const empty = mapObject(_.range(87, 93), j => [`J${j}`, {}])
+  const empty = mapObject(_.range(87, 93), j => [`J${j}`, {}]);
   return {
     ...empty,
     // snub antiprisms
@@ -474,8 +477,8 @@ const othersGraph = (() => {
     J86: {
       '+': { using: 'Y4', value: 'J87' },
     },
-  }
-})()
+  };
+})();
 
 const normalized = [
   archimedean,
@@ -486,7 +489,6 @@ const normalized = [
   othersGraph,
 ]
   .map(normalize)
-  .map(compact)
+  .map(compact);
 
-export default makeBidirectional(graphMerge(...normalized))
-
+export default makeBidirectional(graphMerge(...normalized));

@@ -1,20 +1,20 @@
-import _ from 'lodash'
-import { schemeSet1 } from 'd3-scale-chromatic'
+import _ from 'lodash';
+import { schemeSet1 } from 'd3-scale-chromatic';
 
-import polygons, { polygonNames } from './polygons'
-import { mapObject } from '../util'
+import polygons, { polygonNames } from './polygons';
+import { mapObject } from '../util';
 
-const polygonSchemeIdx = { 3: 4, 4: 0, 5: 1, 6: 2, 8: 6, 10: 3 }
+const polygonSchemeIdx = { 3: 4, 4: 0, 5: 1, 6: 2, 8: 6, 10: 3 };
 
-export const getColorInputKey = n => `${polygonNames[n]}Color`
+export const getColorInputKey = n => `${polygonNames[n]}Color`;
 
 const colorOptionsList = polygons.map(n => {
   return {
     key: getColorInputKey(n),
     type: 'color',
     default: schemeSet1[polygonSchemeIdx[n]],
-  }
-})
+  };
+});
 
 export const configInputs = [
   {
@@ -45,14 +45,14 @@ export const configInputs = [
 ].map(input => ({
   ...input,
   display: input.display || _.startCase(input.key),
-}))
+}));
 
-const configOptions = mapObject(configInputs, value => [value.key, value])
+const configOptions = mapObject(configInputs, value => [value.key, value]);
 
-export const defaultConfig = _.mapValues(configOptions, 'default')
+export const defaultConfig = _.mapValues(configOptions, 'default');
 
 const getColors = config =>
-  mapObject(polygons, n => [n, config[getColorInputKey(n)]])
+  mapObject(polygons, n => [n, config[getColorInputKey(n)]]);
 
 // const getMock = color => _.mapValues(polygonSchemeIdx, () => color)
 
@@ -71,4 +71,4 @@ const getColors = config =>
 export const getPolyhedronConfig = config => ({
   ...config,
   colors: getColors(config),
-})
+});

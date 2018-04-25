@@ -1,9 +1,9 @@
-import _ from 'lodash'
-import React from 'react'
-import { css, StyleSheet } from 'aphrodite/no-important'
+import _ from 'lodash';
+import React from 'react';
+import { css, StyleSheet } from 'aphrodite/no-important';
 
-import { operations, getRelations, getUsingOpts } from 'polyhedra/relations'
-import Tooltip from './Tooltip'
+import { operations, getRelations, getUsingOpts } from 'polyhedra/relations';
+import Tooltip from './Tooltip';
 
 const styles = StyleSheet.create({
   opGrid: {
@@ -65,27 +65,27 @@ const styles = StyleSheet.create({
     gridArea: 'recenter',
     padding: 10,
   },
-})
+});
 
-const hasMode = ['k', '+', '-', 'g']
+const hasMode = ['k', '+', '-', 'g'];
 
 const getOptionName = optValue => {
   switch (optValue) {
     case 'U2':
-      return 'fastigium'
+      return 'fastigium';
     case 'Y4':
-      return 'pyramid'
+      return 'pyramid';
     case 'U5':
-      return 'cupola'
+      return 'cupola';
     case 'R5':
-      return 'rotunda'
+      return 'rotunda';
     default:
-      return optValue
+      return optValue;
   }
-}
+};
 
 function AugmentOptions({ options, solid, onClickOption, disabled }) {
-  const { gyrate, using } = options
+  const { gyrate, using } = options;
 
   const optionArgs = [
     {
@@ -101,7 +101,7 @@ function AugmentOptions({ options, solid, onClickOption, disabled }) {
       value: using,
       description: 'Some solids have more than one option to augment a face.',
     },
-  ]
+  ];
 
   return (
     <div>
@@ -117,7 +117,7 @@ function AugmentOptions({ options, solid, onClickOption, disabled }) {
               disabled={!value || disabled}
               className={css(
                 styles.optionButton,
-                optValue === value && styles.isHighlighted,
+                optValue === value && styles.isHighlighted
               )}
             >
               {getOptionName(optValue)}
@@ -126,18 +126,18 @@ function AugmentOptions({ options, solid, onClickOption, disabled }) {
         </div>
       ))}
     </div>
-  )
+  );
 }
 
 function hasOptions(operation, relations) {
   switch (operation) {
     case 'k':
       if (relations.length > 1) {
-        return true
+        return true;
       }
-      return false
+      return false;
     default:
-      return _.includes(hasMode, operation)
+      return _.includes(hasMode, operation);
   }
 }
 
@@ -155,12 +155,12 @@ export default function RelatedPolyhedra({
   return (
     <div className={css(styles.opGrid)}>
       {operations.map(({ name, symbol, description }) => {
-        const relations = getRelations(solid, symbol)
+        const relations = getRelations(solid, symbol);
         const buttons =
           !relations || _.includes(hasMode, symbol)
             ? [{ value: '' }]
-            : relations
-        const showResult = buttons.length > 1
+            : relations;
+        const showResult = buttons.length > 1;
         return (
           <div key={name} style={{ gridArea: name }}>
             <div className={css(styles.options)}>
@@ -173,14 +173,14 @@ export default function RelatedPolyhedra({
                   <button
                     className={css(
                       styles.modeButton,
-                      operation === symbol && styles.isHighlighted,
+                      operation === symbol && styles.isHighlighted
                     )}
                     disabled={!relations || disabled}
                     onClick={() => {
                       if (hasOptions(symbol, relations)) {
-                        setOperation(symbol !== operation ? symbol : null)
+                        setOperation(symbol !== operation ? symbol : null);
                       } else {
-                        applyOperation(symbol, relation)
+                        applyOperation(symbol, relation);
                       }
                     }}
                   >
@@ -199,7 +199,7 @@ export default function RelatedPolyhedra({
               />
             )}
           </div>
-        )
+        );
       })}
       <button
         disabled={disabled}
@@ -209,5 +209,5 @@ export default function RelatedPolyhedra({
         Recenter
       </button>
     </div>
-  )
+  );
 }

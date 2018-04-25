@@ -1,27 +1,27 @@
-import React from 'react'
-import { MemoryRouter } from 'react-router-dom'
-import { mount } from 'enzyme'
+import React from 'react';
+import { MemoryRouter } from 'react-router-dom';
+import { mount } from 'enzyme';
 
-import Polyhedron from 'math/Polyhedron'
-import AppPage from 'pages/AppPage'
+import Polyhedron from 'math/Polyhedron';
+import AppPage from 'pages/AppPage';
 
 describe('viewer', () => {
-  let appPage
+  let appPage;
 
   function setup(path = '/tetrahedron') {
-    appPage = new AppPage(path)
+    appPage = new AppPage(path);
   }
 
   beforeEach(() => {
-    setup('/tetrahedron')
-  })
+    setup('/tetrahedron');
+  });
 
   it('works', () => {
-    setup()
-  })
+    setup();
+  });
 
   it('can augment and diminish a tetrahedron', () => {
-    setup('/tetrahedron/related')
+    setup('/tetrahedron/related');
 
     appPage
       .clickButtonWithText('augment')
@@ -29,11 +29,11 @@ describe('viewer', () => {
       .expectTransitionTo('triangular-bipyramid')
       .clickButtonWithText('diminish')
       .clickFaceIndex(0)
-      .expectTransitionTo('tetrahedron')
-  })
+      .expectTransitionTo('tetrahedron');
+  });
 
   it('can transition through a pyramid series', () => {
-    setup('/square-pyramid/related')
+    setup('/square-pyramid/related');
 
     appPage
       .clickButtonWithText('augment')
@@ -44,11 +44,11 @@ describe('viewer', () => {
       .expectTransitionTo('square-pyramid')
       .clickButtonWithText('elongate')
       .expectTransitionTo('elongated-square-pyramid')
-      .clickButtonWithText('augment')
-  })
+      .clickButtonWithText('augment');
+  });
 
   it('can triaugment a triangular prism', () => {
-    setup('/triangular-prism/related')
+    setup('/triangular-prism/related');
     appPage
       // test gyrobifastigium
       .clickButtonWithText('augment')
@@ -66,11 +66,11 @@ describe('viewer', () => {
       .clickFaceWithNumSides(4)
       .expectTransitionTo('biaugmented-triangular-prism')
       .clickFaceWithNumSides(4)
-      .expectTransitionTo('triaugmented-triangular-prism')
-  })
+      .expectTransitionTo('triaugmented-triangular-prism');
+  });
 
   it('can go through a simple rhombicosadodecahedron workflow', () => {
-    setup('/tridiminished-rhombicosidodecahedron/related')
+    setup('/tridiminished-rhombicosidodecahedron/related');
     appPage
       .clickButtonWithText('augment')
       .clickFaceWithNumSides(10)
@@ -78,23 +78,23 @@ describe('viewer', () => {
       .clickFaceWithNumSides(10)
       .expectTransitionTo('bigyrate-diminished-rhombicosidodecahedron')
       .clickFaceWithNumSides(10)
-      .expectTransitionTo('trigyrate-rhombicosidodecahedron')
-  })
+      .expectTransitionTo('trigyrate-rhombicosidodecahedron');
+  });
 
   it('unsets the mode and apply args when going to a different polyhedron', () => {
-    setup('/triangular-cupola/related')
+    setup('/triangular-cupola/related');
     appPage
       .clickButtonWithText('augment')
       .clickButtonWithText('elongate')
-      .expectNoButtonWithText('ortho')
-  })
+      .expectNoButtonWithText('ortho');
+  });
 
   it('can go through a truncation and rectification workflow', () => {
-    setup('/tetrahedron/related')
+    setup('/tetrahedron/related');
     appPage
       .clickButtonWithText('rectify')
       .expectTransitionTo('octahedron')
       .clickButtonWithText('truncate')
-      .expectTransitionTo('truncated-octahedron')
-  })
-})
+      .expectTransitionTo('truncated-octahedron');
+  });
+});

@@ -1,9 +1,9 @@
-import React from 'react'
-import { Route, NavLink } from 'react-router-dom'
-import { css, StyleSheet } from 'aphrodite/no-important'
+import React from 'react';
+import { Route, NavLink } from 'react-router-dom';
+import { css, StyleSheet } from 'aphrodite/no-important';
 
-import Icon from './Icon'
-import { resetButton, resetLink } from 'styles/common'
+import Icon from './Icon';
+import { resetButton, resetLink } from 'styles/common';
 
 const styles = StyleSheet.create({
   button: resetButton,
@@ -26,7 +26,7 @@ const styles = StyleSheet.create({
     // FIXME come up with a better one
     fontFamily: 'system-ui',
   },
-})
+});
 
 export default function IconLink({ iconName, title, to, replace, exact }) {
   return (
@@ -42,5 +42,5 @@ export default function IconLink({ iconName, title, to, replace, exact }) {
         <div className={css(styles.title)}>{title || iconName}</div>
       </NavLink>
     </Route>
-  )
+  );
 }

@@ -1,115 +1,115 @@
-import _ from 'lodash'
+import _ from 'lodash';
 import {
   operations,
   getNextPolyhedron,
   getRelations,
   getUsingOpt,
-} from './relations'
-import Polyhedron from 'math/Polyhedron'
-import { operationFunctions } from 'math/operations'
+} from './relations';
+import Polyhedron from 'math/Polyhedron';
+import { operationFunctions } from 'math/operations';
 
 import {
   getAugmentAlignment,
   getPeakAlignment,
   getCupolaGyrate,
   getGyrateDirection,
-} from 'math/applyOptionUtils'
+} from 'math/applyOptionUtils';
 
 const hasMultiple = (relations, property) =>
   _(relations)
     .map(property)
     .uniq()
     .compact()
-    .value().length > 1
+    .value().length > 1;
 
 // FIXME (animation) this is inelegant
 const updateName = (opResult, name) => {
   if (!opResult.animationData) {
     return {
       result: opResult.withName(name),
-    }
+    };
   }
-  const { result, animationData: { start, endVertices } } = opResult
+  const { result, animationData: { start, endVertices } } = opResult;
   return {
     result: result.withName(name),
     animationData: {
       start: start.withName(name),
       endVertices,
     },
-  }
-}
+  };
+};
 
 export default function applyOperation(operation, polyhedron, config = {}) {
-  let options = {}
-  let applyConfig = config
-  const relations = getRelations(polyhedron.name, operation)
+  let options = {};
+  let applyConfig = config;
+  const relations = getRelations(polyhedron.name, operation);
   if (operation === 'k') {
     // since there's so few options, let's just hardcode
-    const { polygon } = config
+    const { polygon } = config;
     if (polyhedron.name === 'cuboctahedron') {
-      options = { value: polygon === 3 ? 'C' : 'O' }
+      options = { value: polygon === 3 ? 'C' : 'O' };
     } else if (polyhedron.name === 'icosidodecahedron') {
-      options = { value: polygon === 3 ? 'D' : 'I' }
+      options = { value: polygon === 3 ? 'D' : 'I' };
     }
-    applyConfig = { ...applyConfig, faceType: polygon }
+    applyConfig = { ...applyConfig, faceType: polygon };
   } else if (operation === '+') {
-    const { fIndex } = config
-    const n = polyhedron.faces[fIndex].length
+    const { fIndex } = config;
+    const n = polyhedron.faces[fIndex].length;
 
-    const using = getUsingOpt(config.using, n)
+    const using = getUsingOpt(config.using, n);
 
     const baseConfig = {
       using,
       gyrate: using === 'U2' ? 'gyro' : config.gyrate,
-    }
-    applyConfig = { ...applyConfig, ...baseConfig }
+    };
+    applyConfig = { ...applyConfig, ...baseConfig };
     options = {
       ...baseConfig,
       align:
         hasMultiple(relations, 'align') &&
         getAugmentAlignment(polyhedron, fIndex),
-    }
+    };
   } else if (operation === '-') {
-    const { peak } = config
-    const vIndices = peak.innerVertexIndices()
+    const { peak } = config;
+    const vIndices = peak.innerVertexIndices();
     // If diminishing a pentagonal cupola/rotunda, check which one it is
     if (vIndices.length === 5) {
-      options.using = 'U5'
+      options.using = 'U5';
     } else if (vIndices.length === 10) {
-      options.using = 'R5'
+      options.using = 'R5';
     }
 
     if (hasMultiple(relations, 'gyrate')) {
-      options.gyrate = getCupolaGyrate(polyhedron, peak)
+      options.gyrate = getCupolaGyrate(polyhedron, peak);
     }
 
     if (options.gyrate !== 'ortho' && hasMultiple(relations, 'align')) {
-      options.align = getPeakAlignment(polyhedron, peak)
+      options.align = getPeakAlignment(polyhedron, peak);
     }
   } else if (operation === 'g') {
-    const { peak } = config
+    const { peak } = config;
     if (_.some(relations, 'direction')) {
-      options.direction = getGyrateDirection(polyhedron, peak)
+      options.direction = getGyrateDirection(polyhedron, peak);
       if (
         _.filter(
           relations,
           relation =>
-            relation.direction === options.direction && !!relation.align,
+            relation.direction === options.direction && !!relation.align
         ).length > 1
       ) {
-        options.align = getPeakAlignment(polyhedron, peak)
+        options.align = getPeakAlignment(polyhedron, peak);
       }
     }
   } else if (_.includes(['k', 'c'], operation)) {
-    options = config
+    options = config;
   }
 
-  const next = getNextPolyhedron(polyhedron.name, operation, _.pickBy(options))
+  const next = getNextPolyhedron(polyhedron.name, operation, _.pickBy(options));
   const opFunction =
-    operationFunctions[_.find(operations, { symbol: operation }).name]
+    operationFunctions[_.find(operations, { symbol: operation }).name];
   if (!_.isFunction(opFunction)) {
     // throw new Error(`Function not found for ${operation}`)
-    return Polyhedron.get(next)
+    return Polyhedron.get(next);
   }
-  return updateName(opFunction(polyhedron, applyConfig), next)
+  return updateName(opFunction(polyhedron, applyConfig), next);
 }

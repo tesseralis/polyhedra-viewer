@@ -1,19 +1,19 @@
-import _ from 'lodash'
-import React, { Component } from 'react'
-import { NavLink, Route } from 'react-router-dom'
-import { css, StyleSheet } from 'aphrodite/no-important'
+import _ from 'lodash';
+import React, { Component } from 'react';
+import { NavLink, Route } from 'react-router-dom';
+import { css, StyleSheet } from 'aphrodite/no-important';
 
-import { groups } from 'data'
-import { escapeName } from 'polyhedra/names'
-import { andaleMono } from 'styles/fonts'
-import { resetLink, hover } from 'styles/common'
+import { groups } from 'data';
+import { escapeName } from 'polyhedra/names';
+import { andaleMono } from 'styles/fonts';
+import { resetLink, hover } from 'styles/common';
 
-import SearchBar from './SearchBar'
-import GroupHeader from './GroupHeader'
-import SubgroupHeader from './SubgroupHeader'
+import SearchBar from './SearchBar';
+import GroupHeader from './GroupHeader';
+import SubgroupHeader from './SubgroupHeader';
 
 const getFilteredPolyhedra = (polyhedra, filter) =>
-  polyhedra.filter(solid => solid.includes(filter.toLowerCase()))
+  polyhedra.filter(solid => solid.includes(filter.toLowerCase()));
 
 const filterGroups = (groups, filterText) =>
   groups
@@ -22,17 +22,17 @@ const filterGroups = (groups, filterText) =>
         return {
           ...group,
           groups: filterGroups(group.groups, filterText),
-        }
+        };
       }
       return {
         ...group,
         polyhedra: getFilteredPolyhedra(group.polyhedra, filterText),
-      }
+      };
     })
     .filter(
       ({ groups, polyhedra }) =>
-        (groups && groups.length > 0) || (polyhedra && polyhedra.length > 0),
-    )
+        (groups && groups.length > 0) || (polyhedra && polyhedra.length > 0)
+    );
 
 const PolyhedronLink = ({ name }) => {
   const styles = StyleSheet.create({
@@ -52,7 +52,7 @@ const PolyhedronLink = ({ name }) => {
       color: 'DarkSlateGray',
       fontWeight: 'bolder',
     },
-  })
+  });
 
   return (
     <Route
@@ -66,8 +66,8 @@ const PolyhedronLink = ({ name }) => {
         </NavLink>
       )}
     />
-  )
-}
+  );
+};
 
 const SubList = ({ polyhedra }) => {
   return (
@@ -78,8 +78,8 @@ const SubList = ({ polyhedra }) => {
         </li>
       ))}
     </ul>
-  )
-}
+  );
+};
 
 const Subgroup = ({ name, polyhedra }) => {
   const styles = StyleSheet.create({
@@ -90,18 +90,18 @@ const Subgroup = ({ name, polyhedra }) => {
     header: {
       margin: '3px 12px',
     },
-  })
+  });
 
   return (
     <div className={css(styles.subgroup)}>
       <SubgroupHeader name={name} styles={styles.header} />
       <SubList polyhedra={polyhedra} />
     </div>
-  )
-}
+  );
+};
 
 const PolyhedronGroup = ({ group }) => {
-  const { display, polyhedra, groups } = group
+  const { display, polyhedra, groups } = group;
   const styles = StyleSheet.create({
     group: {
       padding: '10px 0',
@@ -110,7 +110,7 @@ const PolyhedronGroup = ({ group }) => {
     header: {
       margin: '5px 12px',
     },
-  })
+  });
 
   return (
     <div className={css(styles.group)}>
@@ -122,19 +122,19 @@ const PolyhedronGroup = ({ group }) => {
         </div>
       )}
     </div>
-  )
-}
+  );
+};
 
 export default class PolyhedronList extends Component {
   constructor(props) {
-    super(props)
+    super(props);
     this.state = {
       filterText: '',
-    }
+    };
   }
 
   render() {
-    const { filterText } = this.state
+    const { filterText } = this.state;
     return (
       <div>
         <SearchBar text={filterText} onChange={this.handleFilterChange} />
@@ -142,10 +142,10 @@ export default class PolyhedronList extends Component {
           <PolyhedronGroup key={name} group={group} />
         ))}
       </div>
-    )
+    );
   }
 
   handleFilterChange = value => {
-    this.setState({ filterText: value })
-  }
+    this.setState({ filterText: value });
+  };
 }

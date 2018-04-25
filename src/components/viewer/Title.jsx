@@ -1,8 +1,8 @@
-import _ from 'lodash'
-import React from 'react'
-import { css, StyleSheet } from 'aphrodite/no-important'
+import _ from 'lodash';
+import React from 'react';
+import { css, StyleSheet } from 'aphrodite/no-important';
 
-import { andaleMono } from 'styles/fonts'
+import { andaleMono } from 'styles/fonts';
 
 const Title = ({ name, ...props }) => {
   const styles = StyleSheet.create({
@@ -11,11 +11,11 @@ const Title = ({ name, ...props }) => {
       fontSize: 32,
       fontWeight: 'bold',
     },
-  })
+  });
 
   return (
     <h1 className={css(styles.title, props.styles)}>{_.capitalize(name)}</h1>
-  )
-}
+  );
+};
 
-export default Title
+export default Title;

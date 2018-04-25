@@ -1,10 +1,10 @@
-import React from 'react'
-import * as _ from 'lodash'
-import { css, StyleSheet } from 'aphrodite/no-important'
+import React from 'react';
+import * as _ from 'lodash';
+import { css, StyleSheet } from 'aphrodite/no-important';
 
-import { hoeflerText } from 'styles/fonts'
-import { fromConwayNotation } from 'polyhedra/names'
-import PolyhedronLink from './PolyhedronLink'
+import { hoeflerText } from 'styles/fonts';
+import { fromConwayNotation } from 'polyhedra/names';
+import PolyhedronLink from './PolyhedronLink';
 
 const styles = StyleSheet.create({
   table: {
@@ -23,23 +23,23 @@ const styles = StyleSheet.create({
     fontWeight: hoeflerText,
     color: 'DimGrey',
   },
-})
+});
 
 const Cell = ({ cell, colSpan = 1 }) => {
-  const isFake = cell[0] === '!'
-  const polyhedron = fromConwayNotation(isFake ? cell.substring(1) : cell)
+  const isFake = cell[0] === '!';
+  const polyhedron = fromConwayNotation(isFake ? cell.substring(1) : cell);
 
   // Render a link for each cell, or a grayed-out link when indicated by an "!"
   return (
     <td className={css(styles.cell)} colSpan={colSpan}>
       {polyhedron ? <PolyhedronLink isFake={isFake} name={polyhedron} /> : cell}
     </td>
-  )
-}
+  );
+};
 
 // Return whether this column has subcolumns
 // (Right now, we check if it's a string or an object)
-const hasSubColumn = column => !_.isString(column)
+const hasSubColumn = column => !_.isString(column);
 
 const ColumnHeaders = ({ columns }) => {
   return (
@@ -58,7 +58,7 @@ const ColumnHeaders = ({ columns }) => {
                   {subCol}
                 </th>
               ))
-            ),
+            )
         )}
       </tr>
       {/* Render the main column headers, making sure to span more than one column for those with subcolumns */}
@@ -75,8 +75,8 @@ const ColumnHeaders = ({ columns }) => {
         ))}
       </tr>
     </thead>
-  )
-}
+  );
+};
 
 export default function PolyhedronTable({ caption, rows, columns, data }) {
   return (
@@ -89,22 +89,22 @@ export default function PolyhedronTable({ caption, rows, columns, data }) {
             {/* Row header */}
             <th className={css(styles.cell)}>{rows[i]}</th>
             {_.flatMap(row, (cell, j) => {
-              const col = columns[j]
+              const col = columns[j];
               if (!hasSubColumn(col)) {
-                return <Cell key={j} cell={cell} />
+                return <Cell key={j} cell={cell} />;
               } else if (!_.isArray(cell)) {
                 // If the cell does *not* have subcells, make it span the length of the subcolumns
-                return <Cell key={j} cell={cell} colSpan={col.sub.length} />
+                return <Cell key={j} cell={cell} colSpan={col.sub.length} />;
               } else {
                 // If the cell does have subcells render and return them
                 return cell.map((subcell, k) => (
                   <Cell key={`${j}-${k}`} cell={subcell} />
-                ))
+                ));
               }
             })}
           </tr>
         ))}
       </tbody>
     </table>
-  )
+  );
 }

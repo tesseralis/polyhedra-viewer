@@ -1,13 +1,13 @@
-import React from 'react'
-import { css, StyleSheet } from 'aphrodite/no-important'
-import { Link } from 'react-router-dom'
+import React from 'react';
+import { css, StyleSheet } from 'aphrodite/no-important';
+import { Link } from 'react-router-dom';
 
-import { escapeName } from 'polyhedra/names'
-import { hover } from 'styles/common'
+import { escapeName } from 'polyhedra/names';
+import { hover } from 'styles/common';
 
-const thumbnailSize = 55
+const thumbnailSize = 55;
 
-const largeSize = 80
+const largeSize = 80;
 
 const styles = StyleSheet.create({
   link: {
@@ -40,7 +40,7 @@ const styles = StyleSheet.create({
     opacity: 0.25,
     filter: 'grayscale(50%)',
   },
-})
+});
 
 export default function PolyhedronLink({
   name,
@@ -48,14 +48,14 @@ export default function PolyhedronLink({
   subLink,
   large = false,
 }) {
-  const escapedName = escapeName(name)
-  const img = require(`images/${escapedName}.png`)
+  const escapedName = escapeName(name);
+  const img = require(`images/${escapedName}.png`);
   if (isFake) {
     return (
       <div className={css(styles.link, styles.fake)}>
         <img className={css(styles.image)} src={img} alt={name} />
       </div>
-    )
+    );
   }
   return (
     <Link
@@ -69,5 +69,5 @@ export default function PolyhedronLink({
         alt={name}
       />
     </Link>
-  )
+  );
 }

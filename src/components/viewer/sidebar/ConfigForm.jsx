@@ -1,39 +1,39 @@
-import React from 'react'
-import { css, StyleSheet } from 'aphrodite/no-important'
-import _ from 'lodash'
+import React from 'react';
+import { css, StyleSheet } from 'aphrodite/no-important';
+import _ from 'lodash';
 
-import { configInputs } from 'constants/configOptions'
-import { hover, transition } from 'styles/common'
-import { andaleMono } from 'styles/fonts'
+import { configInputs } from 'constants/configOptions';
+import { hover, transition } from 'styles/common';
+import { andaleMono } from 'styles/fonts';
 
 const getInputValue = (input, el) => {
   switch (input.type) {
     case 'checkbox':
-      return el.checked
+      return el.checked;
     default:
-      return el.value
+      return el.value;
   }
-}
+};
 
 const getInputProps = (input, value) => {
   switch (input.type) {
     case 'checkbox':
-      return { checked: value }
+      return { checked: value };
     case 'range':
       return {
         ..._.pick(input, ['min', 'max', 'step']),
         value,
-      }
+      };
     default:
-      return { value }
+      return { value };
   }
-}
+};
 
 const ConfigInput = ({ input, value, setValue }) => {
-  const inputProps = getInputProps(input, value)
-  const onChange = evt => setValue(getInputValue(input, evt.target))
-  return <input type={input.type} onChange={onChange} {...inputProps} />
-}
+  const inputProps = getInputProps(input, value);
+  const onChange = evt => setValue(getInputValue(input, evt.target));
+  return <input type={input.type} onChange={onChange} {...inputProps} />;
+};
 
 const LabelledInput = ({ input, value, setValue }) => {
   const styles = StyleSheet.create({
@@ -44,15 +44,15 @@ const LabelledInput = ({ input, value, setValue }) => {
       justifyContent: 'space-between',
       fontFamily: andaleMono,
     },
-  })
+  });
 
   return (
     <label className={css(styles.label)}>
       {input.display}
       <ConfigInput input={input} value={value} setValue={setValue} />
     </label>
-  )
-}
+  );
+};
 
 const ResetButton = ({ reset }) => {
   const styles = StyleSheet.create({
@@ -76,14 +76,14 @@ const ResetButton = ({ reset }) => {
         borderColor: 'Gray',
       },
     },
-  })
+  });
 
   return (
     <button type="button" onClick={reset} className={css(styles.resetButton)}>
       Reset
     </button>
-  )
-}
+  );
+};
 
 export default ({ width, inputValues, setInputValue, reset }) => {
   const styles = StyleSheet.create({
@@ -94,7 +94,7 @@ export default ({ width, inputValues, setInputValue, reset }) => {
       alignItems: 'flex-end',
       padding: '0 20px',
     },
-  })
+  });
 
   return (
     <form className={css(styles.configMenu)}>
@@ -108,5 +108,5 @@ export default ({ width, inputValues, setInputValue, reset }) => {
       ))}
       <ResetButton reset={() => setInputValue(null)} />
     </form>
-  )
-}
+  );
+};

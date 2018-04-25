@@ -1,10 +1,10 @@
-import React from 'react'
-import { css, StyleSheet } from 'aphrodite/no-important'
+import React from 'react';
+import { css, StyleSheet } from 'aphrodite/no-important';
 
-import { hoeflerText, andaleMono } from 'styles/fonts'
-import periodicTable from 'constants/periodicTable'
+import { hoeflerText, andaleMono } from 'styles/fonts';
+import periodicTable from 'constants/periodicTable';
 
-import PolyhedronTable from './PolyhedronTable'
+import PolyhedronTable from './PolyhedronTable';
 
 const gridAreaMapping = {
   'Platonic and Archimedean Solids': 'plato',
@@ -16,7 +16,7 @@ const gridAreaMapping = {
   'Snub Antiprisms': 'snub',
   'Other Johnson Solids': 'other',
   'Johnson Solids': 'J',
-}
+};
 
 const styles = StyleSheet.create({
   wrapper: {
@@ -76,32 +76,32 @@ const styles = StyleSheet.create({
       textDecoration: 'underline',
     },
   },
-})
+});
 
 const WikiLink = ({ href, children }) => {
   return (
     <a className={css(styles.wikiLink)} href={href}>
       {children}
     </a>
-  )
-}
+  );
+};
 
 const GridArea = ({ area, children, element = 'div', classes = [] }) => {
-  const El = element
+  const El = element;
   return (
     <El style={{ gridArea: area }} className={css(classes)}>
       {children}
     </El>
-  )
-}
+  );
+};
 
 const PolyhedronTableArea = ({ area, data }) => {
   return (
     <GridArea area={area}>
       <PolyhedronTable {...data} />
     </GridArea>
-  )
-}
+  );
+};
 
 export default function PeriodicTable() {
   return (
@@ -132,7 +132,7 @@ export default function PeriodicTable() {
           </p>
         </GridArea>
         {periodicTable.map(section => {
-          const area = gridAreaMapping[section.caption]
+          const area = gridAreaMapping[section.caption];
           if (section.type === 'subheader') {
             return (
               <GridArea
@@ -143,11 +143,11 @@ export default function PeriodicTable() {
               >
                 {section.caption}
               </GridArea>
-            )
+            );
           }
-          return <PolyhedronTableArea key={area} area={area} data={section} />
+          return <PolyhedronTableArea key={area} area={area} data={section} />;
         })}
       </div>
     </main>
-  )
+  );
 }

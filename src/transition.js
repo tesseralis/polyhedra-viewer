@@ -1,7 +1,7 @@
 // @flow
-import _ from 'lodash'
-import * as d3 from 'd3-ease'
-import { interpolate } from 'd3-interpolate'
+import _ from 'lodash';
+import * as d3 from 'd3-ease';
+import { interpolate } from 'd3-interpolate';
 
 interface TransitionOptions<T> {
   startValue: T;
@@ -18,7 +18,7 @@ interface TransitionOptions<T> {
  */
 export default function transition<T>(
   options: TransitionOptions<T>,
-  updateCallback: T => {},
+  updateCallback: T => {}
 ) {
   const {
     startValue,
@@ -27,26 +27,26 @@ export default function transition<T>(
     duration,
     ease = 'easePolyInOut',
     onFinish = _.noop,
-  } = options
-  let start = 0
-  const id = {}
+  } = options;
+  let start = 0;
+  const id = {};
   // Adapted from:
   // https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame
-  const interp = interpolate(startValue, endValue)
+  const interp = interpolate(startValue, endValue);
   const step = timestamp => {
     if (!start) {
-      start = timestamp
+      start = timestamp;
     }
-    const delta = timestamp - start
-    const progress = Math.min(delta / duration, 1)
-    const currentValue = interp(d3[ease](progress))
-    updateCallback(currentValue)
+    const delta = timestamp - start;
+    const progress = Math.min(delta / duration, 1);
+    const currentValue = interp(d3[ease](progress));
+    updateCallback(currentValue);
     if (delta < duration) {
-      id.current = requestAnimationFrame(step)
+      id.current = requestAnimationFrame(step);
     } else {
-      onFinish()
+      onFinish();
     }
-  }
-  id.current = requestAnimationFrame(step)
-  return id
+  };
+  id.current = requestAnimationFrame(step);
+  return id;
 }

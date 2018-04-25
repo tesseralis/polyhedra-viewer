@@ -1,10 +1,10 @@
-import React, { Component } from 'react'
-import { css, StyleSheet } from 'aphrodite/no-important'
+import React, { Component } from 'react';
+import { css, StyleSheet } from 'aphrodite/no-important';
 
-import { andaleMono } from 'styles/fonts'
-import { transition } from 'styles/common'
+import { andaleMono } from 'styles/fonts';
+import { transition } from 'styles/common';
 
-import Icon from './Icon'
+import Icon from './Icon';
 
 const styles = StyleSheet.create({
   searchBar: {
@@ -46,18 +46,18 @@ const styles = StyleSheet.create({
   iconFocus: {
     color: 'Gray',
   },
-})
+});
 
 export default class SearchBar extends Component {
-  state = { isFocused: false }
+  state = { isFocused: false };
 
   setFocus(value) {
-    this.setState(() => ({ isFocused: value }))
+    this.setState(() => ({ isFocused: value }));
   }
 
   render() {
-    const { value, onChange } = this.props
-    const { isFocused } = this.state
+    const { value, onChange } = this.props;
+    const { isFocused } = this.state;
     return (
       <label className={css(styles.searchBar)}>
         <input
@@ -73,6 +73,6 @@ export default class SearchBar extends Component {
           <Icon name="search" />
         </span>
       </label>
-    )
+    );
   }
 }

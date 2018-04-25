@@ -1,11 +1,11 @@
-import React from 'react'
-import { Route, Redirect } from 'react-router-dom'
-import { css, StyleSheet } from 'aphrodite/no-important'
+import React from 'react';
+import { Route, Redirect } from 'react-router-dom';
+import { css, StyleSheet } from 'aphrodite/no-important';
 
-import IconLink from './IconLink'
-import ConfigForm from './ConfigForm'
-import RelatedPolyhedra from './RelatedPolyhedra'
-import PolyhedronList from './PolyhedronList'
+import IconLink from './IconLink';
+import ConfigForm from './ConfigForm';
+import RelatedPolyhedra from './RelatedPolyhedra';
+import PolyhedronList from './PolyhedronList';
 
 const styles = StyleSheet.create({
   sidebar: {
@@ -20,7 +20,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     padding: '0 10px',
   },
-})
+});
 
 export default function Sidebar({ match, configProps, relatedPolyhedraProps }) {
   return (
@@ -65,5 +65,5 @@ export default function Sidebar({ match, configProps, relatedPolyhedraProps }) {
         </section>
       )}
     />
-  )
+  );
 }

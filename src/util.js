@@ -1,5 +1,5 @@
 // @flow
-import _ from 'lodash'
+import _ from 'lodash';
 
 /**
  * Create an object from the array using the iteratee
@@ -8,7 +8,7 @@ export function mapObject<T, U>(arr: T[], iteratee: T => [T, U]): { T: U } {
   return _(arr)
     .map(iteratee)
     .fromPairs()
-    .value()
+    .value();
 }
 
 /**
@@ -16,23 +16,23 @@ export function mapObject<T, U>(arr: T[], iteratee: T => [T, U]): { T: U } {
  */
 export function getSingle<T>(array: T[]) {
   if (array.length !== 1) {
-    throw new Error(`Expected array to have one element: ${array.toString()}`)
+    throw new Error(`Expected array to have one element: ${array.toString()}`);
   }
-  return array[0]
+  return array[0];
 }
 
 /**
  * Replace the given index in the array with the given values. Alternative to "splice".
  */
 export function replace<T>(array: T[], index: number, ...values: T[]) {
-  const before = _.take(array, index)
-  const after = _.slice(array, index + 1)
-  return [...before, ...values, ...after]
+  const before = _.take(array, index);
+  const after = _.slice(array, index + 1);
+  return [...before, ...values, ...after];
 }
 
-const f = (a, b) => [].concat(...a.map(d => b.map(e => [].concat(d, e))))
+const f = (a, b) => [].concat(...a.map(d => b.map(e => [].concat(d, e))));
 /**
  * Calculate the cartesian product of the given arrays.
  */
 export const cartesian = (a: any[], b: any[], ...c: any[]) =>
-  b ? cartesian(f(a, b), ...c) : a
+  b ? cartesian(f(a, b), ...c) : a;

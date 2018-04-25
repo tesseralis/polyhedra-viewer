@@ -1,21 +1,21 @@
-import _ from 'lodash'
-import React, { Component } from 'react'
-import { css, StyleSheet } from 'aphrodite/no-important'
+import _ from 'lodash';
+import React, { Component } from 'react';
+import { css, StyleSheet } from 'aphrodite/no-important';
 
-import { isValidSolid } from 'data'
-import { andaleMono } from 'styles/fonts'
-import Polyhedron from 'math/Polyhedron'
-import { fixed, fullScreen } from 'styles/common'
-import { unescapeName } from 'polyhedra/names'
-import applyOperation from 'polyhedra/applyOperation'
-import { getRelations, applyOptionsFor } from 'polyhedra/relations'
-import { defaultConfig, getPolyhedronConfig } from 'constants/configOptions'
-import transition from 'transition.js'
+import { isValidSolid } from 'data';
+import { andaleMono } from 'styles/fonts';
+import Polyhedron from 'math/Polyhedron';
+import { fixed, fullScreen } from 'styles/common';
+import { unescapeName } from 'polyhedra/names';
+import applyOperation from 'polyhedra/applyOperation';
+import { getRelations, applyOptionsFor } from 'polyhedra/relations';
+import { defaultConfig, getPolyhedronConfig } from 'constants/configOptions';
+import transition from 'transition.js';
 
-import X3dScene from './X3dScene'
-import X3dPolyhedron from './Polyhedron'
-import { Sidebar } from './sidebar'
-import Title from './Title'
+import X3dScene from './X3dScene';
+import X3dPolyhedron from './Polyhedron';
+import { Sidebar } from './sidebar';
+import Title from './Title';
 
 const styles = StyleSheet.create({
   viewer: {
@@ -50,65 +50,65 @@ const styles = StyleSheet.create({
     fontFamily: andaleMono,
     textAlign: 'right',
   },
-})
+});
 
 const operationDescriptions = {
   '+': 'Click on a face to add a pyramid or cupola.',
   '-': 'Click on a set of faces to remove them.',
   g: 'Click on a set of faces to gyrate them.',
-}
+};
 
 function viewerStateFromSolidName(name) {
   if (!isValidSolid(name)) {
-    throw new Error(`Got a solid with an invalid name: ${name}`)
+    throw new Error(`Got a solid with an invalid name: ${name}`);
   }
   return {
     polyhedron: Polyhedron.get(name),
     operation: null,
     applyOptions: {},
-  }
+  };
 }
 
 function getFaceColors(polyhedron, colors) {
   return _.pickBy(
     polyhedron.faces.map(
-      (face, fIndex) => colors[polyhedron.numUniqueSides(fIndex)],
-    ),
-  )
+      (face, fIndex) => colors[polyhedron.numUniqueSides(fIndex)]
+    )
+  );
 }
 
 export default class Viewer extends Component {
   constructor(props) {
-    super(props)
+    super(props);
     this.state = {
       polyhedron: Polyhedron.get(props.solid),
       config: defaultConfig,
       operation: null,
       applyOptions: {},
-    }
+    };
   }
 
   static getDerivedStateFromProps(nextProps, prevState) {
-    const { polyhedron } = prevState
-    const { solid } = nextProps
+    const { polyhedron } = prevState;
+    const { solid } = nextProps;
 
     if (solid !== polyhedron.name) {
       // If not the result of an operation, update our solid based on the name we got
-      return viewerStateFromSolidName(solid)
+      return viewerStateFromSolidName(solid);
     }
-    return prevState
+    return prevState;
   }
 
   componentDidUpdate(prevProps) {
-    const { history, solid } = this.props
-    const { polyhedron } = this.state
+    const { history, solid } = this.props;
+    const { polyhedron } = this.state;
     if (polyhedron.name !== solid && solid === prevProps.solid) {
-      history.push(`/${polyhedron.name}/related`)
+      history.push(`/${polyhedron.name}/related`);
     }
   }
 
   render() {
-    const { solid } = this.props
+    const { solid } = this.props;
     const {
       polyhedron,
       interpolated,
@@ -116,7 +116,7 @@ export default class Viewer extends Component {
       operation,
       config,
       applyOptions,
-    } = this.state
+    } = this.state;
     // FIXME resizing (decreasing height) for the x3d scene doesn't work well
     return (
       <div className={css(styles.viewer)}>
@@ -160,63 +160,63 @@ export default class Viewer extends Component {
           )}
         </div>
       </div>
-    )
+    );
   }
 
   setConfigValue = (key, value) => {
     if (key === null) {
-      this.setState({ config: defaultConfig })
+      this.setState({ config: defaultConfig });
     }
-    this.setState(({ config }) => ({ config: { ...config, [key]: value } }))
-  }
+    this.setState(({ config }) => ({ config: { ...config, [key]: value } }));
+  };
 
   setOperation = operation => {
     this.setState(({ polyhedron }) => ({
       operation,
       applyOptions: applyOptionsFor(polyhedron.name, operation),
-    }))
-  }
+    }));
+  };
 
   applyOperation = (operation, args) => {
     this.setState(({ polyhedron, applyOptions, config }) => {
       const { result, animationData } = applyOperation(operation, polyhedron, {
         ...args,
         ...applyOptions,
-      })
+      });
       // FIXME gyrate -> twist needs to be unset
       const postOpState = (() => {
         if (_.isEmpty(getRelations(result.name, operation))) {
-          return { operation: null, applyOptions: {} }
+          return { operation: null, applyOptions: {} };
         } else {
-          return { applyOptions: applyOptionsFor(result.name, operation) }
+          return { applyOptions: applyOptionsFor(result.name, operation) };
         }
-      })()
+      })();
       // FIXME figure out how to deduplicate all this logic
-      const { colors } = getPolyhedronConfig(config)
+      const { colors } = getPolyhedronConfig(config);
       const colorStart =
-        animationData && getFaceColors(animationData.start, colors)
+        animationData && getFaceColors(animationData.start, colors);
       return {
         polyhedron: result,
         animationData,
         faceColors: colorStart,
         interpolated: animationData && animationData.start,
         ...postOpState,
-      }
-    }, this.startAnimation)
-  }
+      };
+    }, this.startAnimation);
+  };
 
   startAnimation = () => {
     // start the animation
-    const { animationData, interpolated, config } = this.state
-    if (!animationData) return
-    console.log('starting transition')
+    const { animationData, interpolated, config } = this.state;
+    if (!animationData) return;
+    console.log('starting transition');
 
-    const { colors, transitionDuration } = getPolyhedronConfig(config)
-    const colorStart = getFaceColors(interpolated, colors)
+    const { colors, transitionDuration } = getPolyhedronConfig(config);
+    const colorStart = getFaceColors(interpolated, colors);
     const colorEnd = getFaceColors(
       interpolated.withVertices(animationData.endVertices),
-      colors,
-    )
+      colors
+    );
     this.transitionId = transition(
       {
         duration: transitionDuration,
@@ -235,37 +235,37 @@ export default class Viewer extends Component {
         this.setState(({ interpolated }) => ({
           interpolated: interpolated.withVertices(vertices),
           faceColors,
-        }))
-      },
-    )
-  }
+        }));
+      }
+    );
+  };
 
   finishAnimation = () => {
-    console.log('finish animation')
+    console.log('finish animation');
     this.setState({
       animationData: null,
       interpolated: null,
       faceColors: null,
-    })
-  }
+    });
+  };
 
   // TODO animation recenter
   // (I feel like doing this will reveal a lot of ways to clean up the animation code)
   recenter = () => {
     this.setState(({ polyhedron }) => ({
       polyhedron: polyhedron.center(),
-    }))
-  }
+    }));
+  };
 
   setApplyOpt = (name, value) => {
     this.setState(({ applyOptions }) => ({
       applyOptions: { ...applyOptions, [name]: value },
-    }))
-  }
+    }));
+  };
 
   componentWillUnmount() {
     if (this.transitionId) {
-      cancelAnimationFrame(this.transitionId.current)
+      cancelAnimationFrame(this.transitionId.current);
     }
   }
 }

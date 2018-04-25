@@ -1,2 +1,2 @@
-import Viewer from './Viewer'
-export { Viewer }
+import Viewer from './Viewer';
+export { Viewer };

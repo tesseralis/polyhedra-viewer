@@ -1,2 +1,2 @@
-import PeriodicTable from './PeriodicTable'
-export { PeriodicTable }
+import PeriodicTable from './PeriodicTable';
+export { PeriodicTable };
