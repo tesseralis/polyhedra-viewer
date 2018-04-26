@@ -4,27 +4,12 @@ import _ from 'lodash';
 import Polyhedron from 'math/Polyhedron';
 import { replace, atIndices } from 'util.js';
 import { vec } from 'math/linAlg';
-import { prevVertex, nextVertex } from 'math/solidUtils';
-import { VIndex, FIndex } from 'math/solidTypes';
+import { nextVertex } from 'math/solidUtils';
+import { VIndex } from 'math/solidTypes';
 import {
   removeExtraneousVertices,
   deduplicateVertices,
 } from './operationUtils';
-
-// Get the list of adjacent faces to this polyhedron in ccw order
-function directedAdjacentFaceIndices(polyhedron, vIndex) {
-  const { faces } = polyhedron;
-  const touchingFaceIndices = _.clone(polyhedron.adjacentFaceIndices(vIndex));
-  const result = [];
-  let next: FIndex = touchingFaceIndices[0];
-  const checkVertex = f =>
-    prevVertex(faces[next], vIndex) === nextVertex(faces[f], vIndex);
-  do {
-    result.push(next);
-    next = _.find(touchingFaceIndices, checkVertex);
-  } while (result.length < touchingFaceIndices.length);
-  return result;
-}
 
 interface TruncateOptions {
   mock?: boolean;

@@ -1,8 +1,7 @@
 // @flow
 import _ from 'lodash';
 import Polyhedron from 'math/Polyhedron';
-import { VIndex, FIndex } from 'math/solidTypes';
-import { numSides } from 'math/solidUtils';
+import { VIndex } from 'math/solidTypes';
 
 function getExpansionResult(polyhedron) {
   // Only the platonic solids can be expanded, so it suffices to just iterate over them
