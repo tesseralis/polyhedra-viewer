@@ -2,6 +2,7 @@
 import _ from 'lodash';
 import Polyhedron from 'math/Polyhedron';
 import { VIndex } from 'math/solidTypes';
+import { PRECISION } from 'math/linAlg';
 
 function getExpansionResult(polyhedron) {
   // Only the platonic solids can be expanded, so it suffices to just iterate over them
@@ -21,6 +22,7 @@ function getExpansionResult(polyhedron) {
 
 function isExpansionFace(polyhedron, fIndex, nSides) {
   if (polyhedron.numSides(fIndex) !== nSides) return false;
+  if (polyhedron.edgeLength(fIndex) <= PRECISION) return false;
   return _.every(
     polyhedron.faceGraph()[fIndex],
     fIndex2 => polyhedron.numSides(fIndex2) === 4,
@@ -90,6 +92,8 @@ export function expand(polyhedron: Polyhedron) {
   );
   const f0 = expandFaceIndices[0];
   const baseLength = result.distanceToCenter(f0) / sideLength;
+
+  const alreadyExpanded = [];
 
   // Update the vertices with the expanded-out version
   const endVertices = [...result.vertices];
