@@ -2,6 +2,7 @@
 
 import _ from 'lodash';
 import { getBoundary } from './solidUtils';
+import { vec } from './linAlg';
 import type { Edge, VIndex, FIndex } from './solidTypes';
 import Polyhedron from './Polyhedron';
 
@@ -84,7 +85,7 @@ const Pyramid = withMapper('vIndices')(
     faceConfiguration = () => ({ '3': this.faces().length });
 
     topPoint() {
-      return this.polyhedron.vertices[this.vIndex];
+      return vec(this.polyhedron.vertices[this.vIndex]);
     }
   },
 );
@@ -102,8 +103,7 @@ const Fastigium = withMapper('edges')(
 
     topPoint() {
       const [v1, v2] = this.edge.map(v => this.polyhedron.vertexVectors()[v]);
-      const midpoint = v1.add(v2).scale(0.5);
-      return midpoint.toArray();
+      return v1.add(v2).scale(0.5);
     }
   },
 );
@@ -146,4 +146,3 @@ const Rotunda = withMapper('fIndices')(
     }
   },
 );
-

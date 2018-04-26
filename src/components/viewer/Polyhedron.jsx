@@ -65,7 +65,7 @@ export default class Polyhedron extends Component<
     const { solidData, config } = this.props;
     const { error } = this.state;
     const { vertices, faces, edges } = solidData;
-    const { showFaces, showEdges, opacity } = config;
+    const { showFaces, showEdges, showInnerFaces, opacity } = config;
 
     if (error) {
       throw error;
@@ -87,7 +87,7 @@ export default class Polyhedron extends Component<
               <material transparency={1 - opacity} />
             </appearance>
             <indexedfaceset
-              solid="false"
+              solid={(!showInnerFaces).toString()}
               colorpervertex="false"
               coordindex={joinListOfLists(faces, ' -1 ', ' ')}
             >

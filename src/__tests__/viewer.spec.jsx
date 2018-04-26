@@ -90,11 +90,23 @@ describe('viewer', () => {
   });
 
   it('can go through a truncation and rectification workflow', () => {
+    // FIXME do my usual demo
     setup('/tetrahedron/related');
     appPage
       .clickButtonWithText('rectify')
       .expectTransitionTo('octahedron')
       .clickButtonWithText('truncate')
       .expectTransitionTo('truncated-octahedron');
+  });
+
+  it('can go through an expansion workflow', () => {
+    setup('/dodecahedron/related');
+    // FIXME test contract/snub/twist
+    appPage
+      .clickButtonWithText('expand')
+      .expectTransitionTo('rhombicosidodecahedron')
+      .clickButtonWithText('diminish')
+      .clickFaceIndex(0)
+      .expectTransitionTo('diminished-rhombicosidodecahedron');
   });
 });

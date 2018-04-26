@@ -9,7 +9,7 @@ import { canAugment } from 'math/operations';
 import applyOperation from './applyOperation';
 
 const archimedeanOpts = ['t', 'k', 'r', 'e'];
-const johnsonOpts = ['+', '-', 'g', 'P', 'A', '~P', '~A'];
+const johnsonOpts = ['+', '-', 'g', 'P', 'A', 'h'];
 const opsToTest = archimedeanOpts.concat(johnsonOpts);
 
 // map from polyhedron to excluded operations
@@ -34,6 +34,17 @@ function isProperPolyhedron(polyhedron) {
     prevSideLength = sideLength;
     // Make sure the whole thing is convex
     if (polyhedron.getDihedralAngle(edge) > Math.PI - PRECISION) {
+      return false;
+    }
+  }
+
+  // Make sure all faces are facing the right way
+  for (let fIndex of polyhedron.fIndices()) {
+    const centroid = polyhedron.centroid();
+    const faceCentroid = polyhedron.faceCentroid(fIndex);
+    const normal = polyhedron.faceNormal(fIndex);
+    const expectedNormal = faceCentroid.sub(centroid);
+    if (normal.angleBetween(expectedNormal, true) > Math.PI / 2) {
       return false;
     }
   }

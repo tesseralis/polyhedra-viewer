@@ -28,6 +28,11 @@ export const configInputs = [
     default: true,
   },
   {
+    key: 'showInnerFaces',
+    type: 'checkbox',
+    default: true,
+  },
+  {
     key: 'opacity',
     type: 'range',
     default: 0.9,

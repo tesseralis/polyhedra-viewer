@@ -16,6 +16,9 @@ import type { Vector } from './linAlg';
 import {
   numSides,
   hasEdge,
+  getEdges,
+  hasDirectedEdge,
+  getAllEdges,
   getCyclic,
   prevVertex,
   nextVertex,
@@ -23,20 +26,6 @@ import {
 import type { Vertex, Face, Edge, VIndex, FIndex } from './solidTypes';
 import Peak from './Peak';
 const { Vec3D } = geom;
-
-function getEdge(v1: VIndex, v2: VIndex) {
-  return v1 < v2 ? [v1, v2] : [v2, v1];
-}
-
-function getEdges(face: Face): Edge[] {
-  return _.map(face, (vertex, index: VIndex): Edge => {
-    return getEdge(vertex, getCyclic(face, index + 1));
-  });
-}
-
-function getAllEdges(faces: Face[]) {
-  return _.uniqWith(_.flatMap(faces, getEdges), _.isEqual);
-}
 
 interface BasePolyhedron {
   vertices: Vertex[];
@@ -160,9 +149,6 @@ export default class Polyhedron {
 
   adjacentFaces(...vIndices: VIndex[]) {
     return atIndices(this.faces, this.adjacentFaceIndices(...vIndices));
-    // return this.adjacentFaceIndices(...vIndices).map(
-    //   fIndex => this.faces[fIndex],
-    // );
   }
 
   // Get the list of adjacent faces to this polyhedron in ccw order
@@ -259,14 +245,14 @@ export default class Polyhedron {
   faceCentroid(fIndex: FIndex) {
     return getCentroid(
       this.faces[fIndex].map(vIndex => this.vertexVectors()[vIndex]),
-    ).toArray();
+    );
   }
 
   // TODO decide what should return a Vec3D and what should return an array
   distanceToCenter(fIndex: FIndex) {
     const origin = this.centroid();
     const faceCentroid = this.faceCentroid(fIndex);
-    return origin.distanceTo(vec(faceCentroid));
+    return origin.distanceTo(faceCentroid);
   }
 
   /** Return the normal of the face given by the face index */
@@ -274,8 +260,16 @@ export default class Polyhedron {
     return getNormal(this.vertexVectors(this.faces[fIndex])).getNormalized();
   }
 
-  edgeFaceIndices(edge: Edge) {
-    return this.fIndices().filter(fIndex => hasEdge(this.faces[fIndex], edge));
+  // Get the faces adjacent to this edge, with the directed face first
+  edgeFaceIndices([v1, v2]: Edge) {
+    return [
+      _.find(this.fIndices(), (fIndex: FIndex) =>
+        hasDirectedEdge(this.faces[fIndex], [v1, v2]),
+      ),
+      _.find(this.fIndices(), (fIndex: FIndex) =>
+        hasDirectedEdge(this.faces[fIndex], [v2, v1]),
+      ),
+    ];
   }
 
   edgeFaces(edge: Edge) {
@@ -373,8 +367,6 @@ export default class Polyhedron {
     if (peaks.length === 0) {
       return null;
     }
-    return _.minBy(peaks, peak => vec(peak.topPoint()).distanceTo(hitPoint));
-
-    // return nearestPeak.innerVertexIndices()
+    return _.minBy(peaks, peak => peak.topPoint().distanceTo(hitPoint));
   }
 }

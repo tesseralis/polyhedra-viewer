@@ -58,13 +58,15 @@ function duplicateVertices(polyhedron: Polyhedron) {
   const edgeFaces = polyhedron.edges.map(edge => {
     const [v1, v2] = edge;
     const [f1, f2] = polyhedron.edgeFaceIndices(edge);
+    // get the edges in order of the first face
     return [
-      newVertexMapping[f1][v1],
       newVertexMapping[f1][v2],
-      newVertexMapping[f2][v2],
+      newVertexMapping[f1][v1],
       newVertexMapping[f2][v1],
+      newVertexMapping[f2][v2],
     ];
   });
+
   return Polyhedron.of(
     newVertices,
     _.concat(vertexFaces, edgeFaces, remappedOriginalFaces),
@@ -92,8 +94,6 @@ export function expand(polyhedron: Polyhedron) {
   const f0 = expandFaceIndices[0];
   const baseLength = result.distanceToCenter(f0) / sideLength;
 
-  const alreadyExpanded = [];
-
   // Update the vertices with the expanded-out version
   const endVertices = [...result.vertices];
   _.forEach(expandFaceIndices, fIndex => {
@@ -107,7 +107,6 @@ export function expand(polyhedron: Polyhedron) {
     });
   });
 
-  // FIXME: Expand -> Gyrate breaks!
   return {
     result: result.withVertices(endVertices),
     animationData: {

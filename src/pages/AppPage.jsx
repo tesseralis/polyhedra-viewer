@@ -24,7 +24,6 @@ export default class AppPage {
   }
 
   clickButtonWithText(text) {
-    console.log('click button with text', text);
     this.findButtonWithText(text).simulate('click');
     return this;
   }
@@ -35,7 +34,7 @@ export default class AppPage {
 
   clickFaceIndex(faceIndex) {
     const polyhedron = this.getPolyhedron();
-    const hitPnt = polyhedron.faceCentroid(faceIndex);
+    const hitPnt = polyhedron.faceCentroid(faceIndex).toArray();
     const shape = this.wrapper
       .find('shape')
       .filterWhere(n => !!n.prop('onMouseMove'));

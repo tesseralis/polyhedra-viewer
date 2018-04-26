@@ -112,7 +112,7 @@ export function cumulate(
   const verticesToAdd = fIndices.map(fIndex => {
     const apothem = polyhedron.apothem(fIndex);
     const normal = polyhedron.faceNormal(fIndex);
-    const centroid = vec(polyhedron.faceCentroid(fIndex));
+    const centroid = polyhedron.faceCentroid(fIndex);
     const theta =
       Math.PI -
       polyhedron.getDihedralAngle(_.take(polyhedron.faces[fIndex], 2));
