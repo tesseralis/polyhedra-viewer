@@ -2,6 +2,7 @@
 import _ from 'lodash';
 import Polyhedron from 'math/Polyhedron';
 import { VIndex, FIndex } from 'math/solidTypes';
+import { numSides } from 'math/solidUtils';
 
 function getExpansionResult(polyhedron) {
   // Only the platonic solids can be expanded, so it suffices to just iterate over them
@@ -17,6 +18,14 @@ function getExpansionResult(polyhedron) {
     default:
       throw new Error('Did you try to expand a non-regular solid?');
   }
+}
+
+function isExpansionFace(polyhedron, fIndex, nSides) {
+  if (polyhedron.numSides(fIndex) !== nSides) return false;
+  return _.every(
+    polyhedron.faceGraph()[fIndex],
+    fIndex2 => polyhedron.numSides(fIndex2) === 4,
+  );
 }
 
 function duplicateVertices(polyhedron: Polyhedron) {
@@ -63,17 +72,45 @@ function duplicateVertices(polyhedron: Polyhedron) {
 
 export function expand(polyhedron: Polyhedron) {
   // figure out what this polyhedron expands to
-  const resultName = getExpansionResult(polyhedron);
-  // const result = Polyhedron.get(resultName);
+  const n = polyhedron.numSides(0);
+  const sideLength = polyhedron.edgeLength();
   const result = duplicateVertices(polyhedron);
-  console.log(result);
 
-  // align the faces with the result
+  // Use a reference polyhedron to calculate how far to expand
+  const resultName = getExpansionResult(polyhedron);
+  const reference = Polyhedron.get(resultName);
+  const referenceFaceIndex = _.find(reference.fIndices(), fIndex =>
+    isExpansionFace(reference, fIndex, n),
+  );
+  // FIXME something is wrong with tetrahedron -> cuboctahedron
+  const referenceLength =
+    reference.distanceToCenter(referenceFaceIndex) / reference.edgeLength();
 
-  // calculate how far you need to extend the location
+  const expandFaceIndices = _.filter(result.fIndices(), fIndex =>
+    isExpansionFace(result, fIndex, n),
+  );
+  const f0 = expandFaceIndices[0];
+  const baseLength = result.distanceToCenter(f0) / sideLength;
 
-  // add new faces for each vertex and edge
+  // Update the vertices with the expanded-out version
+  const endVertices = [...result.vertices];
+  _.forEach(expandFaceIndices, fIndex => {
+    const normal = result.faceNormal(fIndex);
+    const expandFace = result.faces[fIndex];
+    _.forEach(expandFace, vIndex => {
+      const vertex = result.vertexVectors()[vIndex];
+      endVertices[vIndex] = vertex
+        .add(normal.scale((referenceLength - baseLength) * sideLength))
+        .toArray();
+    });
+  });
 
-  // determine the mock and unmocked locations
-  return result;
+  // FIXME: Expand -> Gyrate breaks!
+  return {
+    result: result.withVertices(endVertices),
+    animationData: {
+      start: result,
+      endVertices,
+    },
+  };
 }

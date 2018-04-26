@@ -251,11 +251,22 @@ export default class Polyhedron {
     return isPlanar(this.vertexVectors(vIndices));
   }
 
+  centroid() {
+    return getCentroid(this.vertexVectors());
+  }
+
   /** Return the centroid of the face given by the face index */
   faceCentroid(fIndex: FIndex) {
     return getCentroid(
       this.faces[fIndex].map(vIndex => this.vertexVectors()[vIndex]),
     ).toArray();
+  }
+
+  // TODO decide what should return a Vec3D and what should return an array
+  distanceToCenter(fIndex: FIndex) {
+    const origin = this.centroid();
+    const faceCentroid = this.faceCentroid(fIndex);
+    return origin.distanceTo(vec(faceCentroid));
   }
 
   /** Return the normal of the face given by the face index */
@@ -335,7 +346,7 @@ export default class Polyhedron {
    * Center the polyhedron on its centroid.
    */
   center() {
-    const centroid = getCentroid(this.vertexVectors());
+    const centroid = this.centroid();
     return this.withVertices(
       this.vertexVectors().map(v => v.sub(centroid).toArray()),
     );

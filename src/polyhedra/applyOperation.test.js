@@ -8,12 +8,13 @@ import Peak from 'math/Peak';
 import { canAugment } from 'math/operations';
 import applyOperation from './applyOperation';
 
-const archimedeanOpts = ['t', 'k', 'r'];
+const archimedeanOpts = ['t', 'k', 'r', 'e'];
 const johnsonOpts = ['+', '-', 'g', 'P', 'A', '~P', '~A'];
 const opsToTest = archimedeanOpts.concat(johnsonOpts);
 
 // map from polyhedron to excluded operations
 const excludedOperations = {
+  tetrahedron: ['e'],
   cuboctahedron: ['t'],
   icosidodecahedron: ['t'],
   'truncated cuboctahedron': ['k'],
