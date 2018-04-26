@@ -83,7 +83,6 @@ export function expand(polyhedron: Polyhedron) {
   const referenceFaceIndex = _.find(reference.fIndices(), fIndex =>
     isExpansionFace(reference, fIndex, n),
   );
-  // FIXME something is wrong with tetrahedron -> cuboctahedron
   const referenceLength =
     reference.distanceToCenter(referenceFaceIndex) / reference.edgeLength();
 

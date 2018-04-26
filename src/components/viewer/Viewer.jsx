@@ -304,7 +304,6 @@ export default class Viewer extends Component<ViewerProps, ViewerState> {
     // start the animation
     const { animationData, interpolated, config } = this.state;
     if (!animationData || !interpolated) return;
-    console.log('starting transition');
 
     const { colors, transitionDuration } = getPolyhedronConfig(config);
     const colorStart = getFaceColors(interpolated, colors);
@@ -336,7 +335,6 @@ export default class Viewer extends Component<ViewerProps, ViewerState> {
   };
 
   finishAnimation = () => {
-    console.log('finish animation');
     this.setState({
       animationData: undefined,
       interpolated: undefined,
@@ -369,14 +367,12 @@ export default class Viewer extends Component<ViewerProps, ViewerState> {
           // FIXME move to state
           const augmentInfo = getAugmentGraph(polyhedron);
           const fIndex = getAugmentFace(polyhedron, augmentInfo, hitPnt);
-          console.log('fIndex', fIndex);
           return {
             applyArgs: fIndex === -1 ? {} : { fIndex },
           };
         case '-':
         case 'g':
           const peak = polyhedron.findPeak(hitPnt);
-          console.log('peak', peak && peak.innerVertexIndices());
           return {
             applyArgs: peak ? { peak } : {},
           };
