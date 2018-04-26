@@ -11,6 +11,7 @@ import {
   deduplicateVertices,
 } from './operationUtils';
 
+// Get the list of adjacent faces to this polyhedron in ccw order
 function directedAdjacentFaceIndices(polyhedron, vIndex) {
   const { faces } = polyhedron;
   const touchingFaceIndices = _.clone(polyhedron.adjacentFaceIndices(vIndex));
@@ -37,7 +38,7 @@ function truncateVertex(
   { mock, rectify } = {},
 ) {
   // const touchingFaces = polyhedron.adjacentFaces(vIndex)
-  const touchingFaceIndices = directedAdjacentFaceIndices(polyhedron, vIndex);
+  const touchingFaceIndices = polyhedron.directedAdjacentFaceIndices(vIndex);
   const touchingFaces = atIndices(polyhedron.faces, touchingFaceIndices);
   // const touchingFaceIndices = polyhedron.adjacentFaceIndices(vIndex)
   let verticesToAdd = touchingFaces.map(face => {

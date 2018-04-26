@@ -42,7 +42,7 @@ const updateName = (opResult, name) => {
   };
 };
 
-export type Operation = 't' | 'r' | 'k' | '+' | '-' | 'g';
+export type Operation = 't' | 'r' | 'k' | 'e' | '+' | '-' | 'g';
 interface ApplyConfig {
   polygon?: number;
   fIndex?: number;
@@ -144,7 +144,7 @@ export default function applyOperation(
   const opFunction = operationFunctions[getOperationName(operation)];
   if (!_.isFunction(opFunction)) {
     // throw new Error(`Function not found for ${operation}`)
-    return Polyhedron.get(next);
+    return { result: Polyhedron.get(next) };
   }
   return updateName(opFunction(polyhedron, applyConfig), next);
 }

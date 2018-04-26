@@ -13,7 +13,13 @@ import {
   PRECISION,
 } from './linAlg';
 import type { Vector } from './linAlg';
-import { numSides, hasEdge, getCyclic } from './solidUtils';
+import {
+  numSides,
+  hasEdge,
+  getCyclic,
+  prevVertex,
+  nextVertex,
+} from './solidUtils';
 import type { Vertex, Face, Edge, VIndex, FIndex } from './solidTypes';
 import Peak from './Peak';
 const { Vec3D } = geom;
@@ -159,6 +165,21 @@ export default class Polyhedron {
     // );
   }
 
+  // Get the list of adjacent faces to this polyhedron in ccw order
+  directedAdjacentFaceIndices(vIndex: VIndex) {
+    const { faces } = this;
+    const touchingFaceIndices = _.clone(this.adjacentFaceIndices(vIndex));
+    const result = [];
+    let next: FIndex = touchingFaceIndices[0];
+    const checkVertex = f =>
+      prevVertex(faces[next], vIndex) === nextVertex(faces[f], vIndex);
+    do {
+      result.push(next);
+      next = _.find(touchingFaceIndices, checkVertex);
+    } while (result.length < touchingFaceIndices.length);
+    return result;
+  }
+
   // Return the number of faces by side for the given vertex
   adjacentFaceCount(vIndex: VIndex) {
     return _.countBy(this.adjacentFaces(vIndex), numSides);
@@ -242,11 +263,18 @@ export default class Polyhedron {
     return getNormal(this.vertexVectors(this.faces[fIndex])).getNormalized();
   }
 
+  edgeFaceIndices(edge: Edge) {
+    return this.fIndices().filter(fIndex => hasEdge(this.faces[fIndex], edge));
+  }
+
+  edgeFaces(edge: Edge) {
+    return this.faces.filter(face => hasEdge(face, edge));
+  }
+
   getDihedralAngle(edge: Edge) {
     const [v1, v2] = edge.map(vIndex => this.vertexVectors()[vIndex]);
     const midpoint = getMidpoint(v1, v2);
-    const [c1, c2] = this.faces
-      .filter(face => hasEdge(face, edge))
+    const [c1, c2] = this.edgeFaces(edge)
       .map(face =>
         getCentroid(face.map(vIndex => this.vertexVectors()[vIndex])),
       )
