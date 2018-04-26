@@ -286,14 +286,14 @@ export default class Viewer extends Component<ViewerProps, ViewerState> {
         }
       })();
       // FIXME figure out how to deduplicate all this logic
-      const { colors } = getPolyhedronConfig(config);
+      const { colors, enableAnimation } = getPolyhedronConfig(config);
       const colorStart =
         animationData && getFaceColors(animationData.start, colors);
       return {
         polyhedron: result,
         animationData,
         faceColors: colorStart,
-        interpolated: animationData && animationData.start,
+        interpolated: enableAnimation && animationData && animationData.start,
         applyArgs: {},
         ...postOpState,
       };

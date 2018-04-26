@@ -41,6 +41,11 @@ export const configInputs = [
     step: 0.01,
   },
   {
+    key: 'enableAnimation',
+    type: 'checkbox',
+    default: true,
+  },
+  {
     // FIXME help this make more sense
     key: 'transitionDuration',
     type: 'number',
