@@ -262,7 +262,7 @@ export default class Viewer extends Component<ViewerProps, ViewerState> {
 
   applyCurrentOperation = () => {
     // TODO could this cause an error since we're referencing the operation?
-    if (this.state.operation) {
+    if (this.state.operation && !_.isEmpty(this.state.applyArgs)) {
       this.applyOperation(this.state.operation);
     }
   };
@@ -360,7 +360,7 @@ export default class Viewer extends Component<ViewerProps, ViewerState> {
   setApplyArgs = (hitPnt?: Vector) => {
     this.setState(({ polyhedron, operation }) => {
       if (!hitPnt) {
-        return {};
+        return { applyArgs: {} };
       }
       switch (operation) {
         case '+':

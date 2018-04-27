@@ -20,6 +20,19 @@ describe('viewer', () => {
     setup();
   });
 
+  it('does not applyOperation on invalid apply args', () => {
+    setup('/augmented-truncated-tetrahedron/related');
+    appPage.clickButtonWithText('diminish').clickFaceWithNumSides(6);
+  });
+
+  it('unsets the mode and apply args when going to a different polyhedron', () => {
+    setup('/triangular-cupola/related');
+    appPage
+      .clickButtonWithText('augment')
+      .clickButtonWithText('elongate')
+      .expectNoButtonWithText('ortho');
+  });
+
   it('can augment and diminish a tetrahedron', () => {
     setup('/tetrahedron/related');
 
@@ -79,14 +92,6 @@ describe('viewer', () => {
       .expectTransitionTo('bigyrate-diminished-rhombicosidodecahedron')
       .clickFaceWithNumSides(10)
       .expectTransitionTo('trigyrate-rhombicosidodecahedron');
-  });
-
-  it('unsets the mode and apply args when going to a different polyhedron', () => {
-    setup('/triangular-cupola/related');
-    appPage
-      .clickButtonWithText('augment')
-      .clickButtonWithText('elongate')
-      .expectNoButtonWithText('ortho');
   });
 
   it('can go through a truncation and rectification workflow', () => {
