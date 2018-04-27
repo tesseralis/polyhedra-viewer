@@ -224,6 +224,11 @@ export default class Viewer extends Component<ViewerProps, ViewerState> {
     const { colors } = getPolyhedronConfig(config);
     const defaultColors = polygonColors(colors);
 
+    // While doing animation, if we specify that this face has a color, use it
+    if (!!faceColors && _.has(faceColors, fIndex.toString())) {
+      return toRgb(faceColors[fIndex]);
+    }
+
     // TODO pick better colors / have better effects
     if (_.isNumber(applyArgs.fIndex) && fIndex === applyArgs.fIndex) {
       return [0, 1, 0];
@@ -237,11 +242,6 @@ export default class Viewer extends Component<ViewerProps, ViewerState> {
     }
     if (_.isNumber(applyArgs.polygon) && face.length === applyArgs.polygon) {
       return [1, 1, 0];
-    }
-
-    // If we specify that this face has a color, use it
-    if (!!faceColors && _.has(faceColors, fIndex.toString())) {
-      return toRgb(faceColors[fIndex]);
     }
     return defaultColors[getColorIndex(face)];
   };
@@ -261,9 +261,10 @@ export default class Viewer extends Component<ViewerProps, ViewerState> {
   };
 
   applyCurrentOperation = () => {
-    // TODO could this cause an error since we're referencing the operation?
-    if (this.state.operation && !_.isEmpty(this.state.applyArgs)) {
-      this.applyOperation(this.state.operation);
+    // TODO possibility of error since we're referencing state before setting it
+    const { operation, applyArgs, interpolated } = this.state;
+    if (operation && !_.isEmpty(applyArgs) && !interpolated) {
+      this.applyOperation(operation);
     }
   };
 
