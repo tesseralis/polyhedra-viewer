@@ -107,10 +107,28 @@ function duplicateVertices(polyhedron: Polyhedron) {
   );
 }
 
+function getResizedVertices(polyhedron, fIndices, resizedLength) {
+  // Update the vertices with the expanded-out version
+  const f0 = fIndices[0];
+  const sideLength = polyhedron.edgeLength(f0);
+  const baseLength = polyhedron.distanceToCenter(f0) / sideLength;
+  const result = [...polyhedron.vertices];
+  _.forEach(fIndices, fIndex => {
+    const normal = polyhedron.faceNormal(fIndex);
+    const expandFace = polyhedron.faces[fIndex];
+    _.forEach(expandFace, vIndex => {
+      const vertex = polyhedron.vertexVectors()[vIndex];
+      result[vIndex] = vertex
+        .add(normal.scale((resizedLength - baseLength) * sideLength))
+        .toArray();
+    });
+  });
+  return result;
+}
+
 export function expand(polyhedron: Polyhedron) {
   // figure out what this polyhedron expands to
   const n = polyhedron.numSides(0);
-  const sideLength = polyhedron.edgeLength();
   const result = duplicateVertices(polyhedron);
 
   // Use a reference polyhedron to calculate how far to expand
@@ -125,21 +143,13 @@ export function expand(polyhedron: Polyhedron) {
   const expandFaceIndices = _.filter(result.fIndices(), fIndex =>
     isExpansionFace(result, fIndex, n),
   );
-  const f0 = expandFaceIndices[0];
-  const baseLength = result.distanceToCenter(f0) / sideLength;
 
   // Update the vertices with the expanded-out version
-  const endVertices = [...result.vertices];
-  _.forEach(expandFaceIndices, fIndex => {
-    const normal = result.faceNormal(fIndex);
-    const expandFace = result.faces[fIndex];
-    _.forEach(expandFace, vIndex => {
-      const vertex = result.vertexVectors()[vIndex];
-      endVertices[vIndex] = vertex
-        .add(normal.scale((referenceLength - baseLength) * sideLength))
-        .toArray();
-    });
-  });
+  const endVertices = getResizedVertices(
+    result,
+    expandFaceIndices,
+    referenceLength,
+  );
 
   return {
     result: result.withVertices(endVertices),
@@ -188,7 +198,6 @@ export function contract(
   { faceType }: ContractOptions,
 ) {
   // Use a reference polyhedron to calculate how far to expand
-  const sideLength = polyhedron.edgeLength();
   const resultName = getContractResult(polyhedron, faceType);
   const reference = Polyhedron.get(resultName);
   // TODO keep a database of these so we don't have to recalculate every time
@@ -197,21 +206,11 @@ export function contract(
   // Take all the stuff and push it inwards
   // TODO can we like, factor out this logic?
   const contractFaceIndices = getContractFaceIndices(polyhedron, faceType);
-  const f0 = contractFaceIndices[0];
-  const baseLength = polyhedron.distanceToCenter(f0) / sideLength;
-
-  // Update the vertices with the expanded-out version
-  const endVertices = [...polyhedron.vertices];
-  _.forEach(contractFaceIndices, fIndex => {
-    const normal = polyhedron.faceNormal(fIndex);
-    const contractFace = polyhedron.faces[fIndex];
-    _.forEach(contractFace, vIndex => {
-      const vertex = polyhedron.vertexVectors()[vIndex];
-      endVertices[vIndex] = vertex
-        .add(normal.scale((referenceLength - baseLength) * sideLength))
-        .toArray();
-    });
-  });
+  const endVertices = getResizedVertices(
+    polyhedron,
+    contractFaceIndices,
+    referenceLength,
+  );
   return {
     result: deduplicateVertices(polyhedron.withVertices(endVertices)),
     animationData: {
