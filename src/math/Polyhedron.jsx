@@ -1,6 +1,6 @@
 // @flow
 import _ from 'lodash';
-import { geom } from 'toxiclibsjs';
+import { Vec3D } from 'toxiclibsjs/geom';
 import { isValidSolid, getSolidData } from 'data';
 import { atIndices } from 'util.js';
 import {
@@ -25,7 +25,6 @@ import {
 } from './solidUtils';
 import type { Vertex, Face, Edge, VIndex, FIndex } from './solidTypes';
 import Peak from './Peak';
-const { Vec3D } = geom;
 
 interface BasePolyhedron {
   vertices: Vertex[];

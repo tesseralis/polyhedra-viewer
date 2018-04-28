@@ -1,7 +1,6 @@
 // @flow
 import _ from 'lodash';
-import { geom } from 'toxiclibsjs';
-const { Vec3D, Triangle3D, Plane } = geom;
+import { Vec3D, Triangle3D, Plane } from 'toxiclibsjs/geom';
 
 export type Vector = [number, number, number];
 
