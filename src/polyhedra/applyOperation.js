@@ -42,7 +42,7 @@ const updateName = (opResult, name) => {
   };
 };
 
-export type Operation = 't' | 'r' | 'k' | 'e' | '+' | '-' | 'g';
+export type Operation = 't' | 'r' | 'k' | 'c' | 'e' | '+' | '-' | 'g';
 interface ApplyConfig {
   polygon?: number;
   fIndex?: number;
@@ -78,6 +78,15 @@ export default function applyOperation(
       options = { value: polygon === 3 ? 'D' : 'I' };
     }
     applyConfig = { ...applyConfig, faceType: polygon };
+  } else if (operation === 'c') {
+    // since there's so few options, let's just hardcode
+    const { polygon } = config;
+    if (polyhedron.name === 'rhombicuboctahedron') {
+      options = { value: polygon === 3 ? 'O' : 'C' };
+    } else if (polyhedron.name === 'rhombicosidodecahedron') {
+      options = { value: polygon === 3 ? 'I' : 'D' };
+    }
+    applyConfig = { ...applyConfig, faceType: polygon || 3 };
   } else if (operation === '+') {
     const { fIndex } = config;
 
@@ -136,8 +145,6 @@ export default function applyOperation(
         options.align = getPeakAlignment(polyhedron, peak);
       }
     }
-  } else if (_.includes(['k', 'c'], operation)) {
-    options = config;
   }
 
   const next = getNextPolyhedron(polyhedron.name, operation, _.pickBy(options));

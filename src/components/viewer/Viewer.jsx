@@ -11,6 +11,8 @@ import type { Vertex, Face, FIndex } from 'math/solidTypes';
 import type { Vector } from 'math/linAlg';
 import {
   getCumulatePolygon,
+  getContractPolygon,
+  isExpansionFace,
   getAugmentFace,
   getAugmentGraph,
 } from 'math/operations';
@@ -220,7 +222,7 @@ export default class Viewer extends Component<ViewerProps, ViewerState> {
 
   // TODO probably move this and the color utility functions to their own file
   getColorForFace = (face: Face, fIndex: FIndex) => {
-    const { applyArgs, config, faceColors } = this.state;
+    const { applyArgs, polyhedron, operation, config, faceColors } = this.state;
     const { colors } = getPolyhedronConfig(config);
     const defaultColors = polygonColors(colors);
 
@@ -229,19 +231,41 @@ export default class Viewer extends Component<ViewerProps, ViewerState> {
       return toRgb(faceColors[fIndex]);
     }
 
-    // TODO pick better colors / have better effects
-    if (_.isNumber(applyArgs.fIndex) && fIndex === applyArgs.fIndex) {
-      return [0, 1, 0];
-    }
-    if (
-      _.isObject(applyArgs.peak) &&
-      _.includes(applyArgs.peak.faceIndices(), fIndex)
-    ) {
-      // return polygonColors(diminishColors)[getColorIndex(face)]
-      return [1, 1, 0];
-    }
-    if (_.isNumber(applyArgs.polygon) && face.length === applyArgs.polygon) {
-      return [1, 1, 0];
+    switch (operation) {
+      case '+':
+        if (_.isNumber(applyArgs.fIndex) && fIndex === applyArgs.fIndex) {
+          return [0, 1, 0];
+        }
+        break;
+      case '-':
+      case 'g':
+        // TODO pick better colors / have better effects
+        if (
+          _.isObject(applyArgs.peak) &&
+          _.includes(applyArgs.peak.faceIndices(), fIndex)
+        ) {
+          // return polygonColors(diminishColors)[getColorIndex(face)]
+          return [1, 1, 0];
+        }
+        break;
+      case 'k':
+        if (
+          _.isNumber(applyArgs.polygon) &&
+          face.length === applyArgs.polygon
+        ) {
+          return [1, 1, 0];
+        }
+        break;
+      case 'c':
+        if (
+          _.isNumber(applyArgs.polygon) &&
+          isExpansionFace(polyhedron, fIndex, applyArgs.polygon)
+        ) {
+          return [1, 1, 0];
+        }
+        break;
+      default:
+        break;
     }
     return defaultColors[getColorIndex(face)];
   };
@@ -377,11 +401,18 @@ export default class Viewer extends Component<ViewerProps, ViewerState> {
           return {
             applyArgs: peak ? { peak } : {},
           };
-        case 'k':
+        case 'k': {
           const polygon = getCumulatePolygon(polyhedron, hitPnt);
           return {
             applyArgs: polygon === -1 ? {} : { polygon },
           };
+        }
+        case 'c': {
+          const polygon = getContractPolygon(polyhedron, hitPnt);
+          return {
+            applyArgs: polygon === -1 ? {} : { polygon },
+          };
+        }
         default:
           return;
       }

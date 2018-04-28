@@ -67,7 +67,7 @@ const styles = StyleSheet.create({
   },
 });
 
-const hasMode = ['k', '+', '-', 'g'];
+const hasMode = ['k', 'c', '+', '-', 'g'];
 
 const getOptionName = optValue => {
   switch (optValue) {
@@ -132,6 +132,7 @@ function AugmentOptions({ options, solid, onClickOption, disabled }) {
 function hasOptions(operation, relations) {
   switch (operation) {
     case 'k':
+    case 'c':
       if (relations.length > 1) {
         return true;
       }

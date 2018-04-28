@@ -1,8 +1,14 @@
 // @flow
 import _ from 'lodash';
 import Polyhedron from 'math/Polyhedron';
-import { VIndex } from 'math/solidTypes';
-import { PRECISION } from 'math/linAlg';
+import { VIndex, FIndex } from 'math/solidTypes';
+import { vec, PRECISION } from 'math/linAlg';
+import type { Vector } from 'math/linAlg';
+import { deduplicateVertices } from './operationUtils';
+
+interface ContractOptions {
+  faceType: number;
+}
 
 function getExpansionResult(polyhedron) {
   // Only the platonic solids can be expanded, so it suffices to just iterate over them
@@ -20,13 +26,41 @@ function getExpansionResult(polyhedron) {
   }
 }
 
-function isExpansionFace(polyhedron, fIndex, nSides) {
+function getContractResult(polyhedron, faceType) {
+  switch (polyhedron.numFaces()) {
+    case 14:
+      return 'tetrahedron';
+    case 26:
+      return faceType === 3 ? 'octahedron' : 'cube';
+    case 62:
+      return faceType === 3 ? 'icosahedron' : 'dodecahedron';
+    default:
+      throw new Error('Did you try to contract an invalid solid?');
+  }
+}
+
+export function isExpansionFace(
+  polyhedron: Polyhedron,
+  fIndex: FIndex,
+  nSides: number,
+) {
   if (polyhedron.numSides(fIndex) !== nSides) return false;
   if (polyhedron.edgeLength(fIndex) <= PRECISION) return false;
   return _.every(
     polyhedron.faceGraph()[fIndex],
     fIndex2 => polyhedron.numSides(fIndex2) === 4,
   );
+}
+
+export function getContractPolygon(polyhedron: Polyhedron, point: Vector) {
+  const hitPoint = vec(point);
+  const hitFaceIndex = polyhedron.hitFaceIndex(hitPoint);
+  // TODO handle octahedron case
+  const isValid = _.every(
+    polyhedron.faceGraph()[hitFaceIndex],
+    fIndex2 => polyhedron.numSides(fIndex2) === 4,
+  );
+  return isValid ? polyhedron.numSides(hitFaceIndex) : -1;
 }
 
 function duplicateVertices(polyhedron: Polyhedron) {
@@ -111,6 +145,77 @@ export function expand(polyhedron: Polyhedron) {
     result: result.withVertices(endVertices),
     animationData: {
       start: result,
+      endVertices,
+    },
+  };
+}
+
+function getCuboctahedronContractFaceIndices(polyhedron) {
+  const toCheck = polyhedron
+    .fIndices()
+    .filter(fIndex => polyhedron.numSides(fIndex) === 3);
+  const result = [];
+  const invalid = [];
+  while (toCheck.length > 0) {
+    const next = toCheck.pop();
+    if (_.includes(invalid, next)) {
+      continue;
+    }
+    _.forEach(
+      polyhedron.adjacentFaceIndices(...polyhedron.faces[next]),
+      fIndex => {
+        if (polyhedron.numSides(fIndex) === 3) {
+          invalid.push(fIndex);
+        }
+      },
+    );
+    result.push(next);
+  }
+  return result;
+}
+
+function getContractFaceIndices(polyhedron, faceType) {
+  if (polyhedron.numFaces() === 14) {
+    return getCuboctahedronContractFaceIndices(polyhedron);
+  }
+  return _.filter(polyhedron.fIndices(), fIndex =>
+    isExpansionFace(polyhedron, fIndex, faceType),
+  );
+}
+
+export function contract(
+  polyhedron: Polyhedron,
+  { faceType }: ContractOptions,
+) {
+  // Use a reference polyhedron to calculate how far to expand
+  const sideLength = polyhedron.edgeLength();
+  const resultName = getContractResult(polyhedron, faceType);
+  const reference = Polyhedron.get(resultName);
+  // TODO keep a database of these so we don't have to recalculate every time
+  const referenceLength = reference.distanceToCenter() / reference.edgeLength();
+
+  // Take all the stuff and push it inwards
+  // TODO can we like, factor out this logic?
+  const contractFaceIndices = getContractFaceIndices(polyhedron, faceType);
+  const f0 = contractFaceIndices[0];
+  const baseLength = polyhedron.distanceToCenter(f0) / sideLength;
+
+  // Update the vertices with the expanded-out version
+  const endVertices = [...polyhedron.vertices];
+  _.forEach(contractFaceIndices, fIndex => {
+    const normal = polyhedron.faceNormal(fIndex);
+    const contractFace = polyhedron.faces[fIndex];
+    _.forEach(contractFace, vIndex => {
+      const vertex = polyhedron.vertexVectors()[vIndex];
+      endVertices[vIndex] = vertex
+        .add(normal.scale((referenceLength - baseLength) * sideLength))
+        .toArray();
+    });
+  });
+  return {
+    result: deduplicateVertices(polyhedron.withVertices(endVertices)),
+    animationData: {
+      start: polyhedron,
       endVertices,
     },
   };

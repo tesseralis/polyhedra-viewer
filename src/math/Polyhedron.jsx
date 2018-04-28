@@ -248,7 +248,7 @@ export default class Polyhedron {
   }
 
   // TODO decide what should return a Vec3D and what should return an array
-  distanceToCenter(fIndex: FIndex) {
+  distanceToCenter(fIndex: FIndex = 0) {
     const origin = this.centroid();
     const faceCentroid = this.faceCentroid(fIndex);
     return origin.distanceTo(faceCentroid);

@@ -58,9 +58,9 @@ function normalize(graph) {
   return _.mapValues(graph, ops =>
     _.mapValues(ops, relations => {
       return _.castArray(relations).map(
-        relation => (_.isObject(relation) ? relation : { value: relation })
+        relation => (_.isObject(relation) ? relation : { value: relation }),
       );
-    })
+    }),
   );
 }
 
@@ -71,7 +71,7 @@ function compact(graph) {
         return _.filter(options, option => !_.isNil(option.value));
       })
       .pickBy('length')
-      .value()
+      .value(),
   );
 }
 
@@ -205,7 +205,7 @@ const divName = name => {
 const getPyramidFromPrism = prismRow => {
   const isPyramid = _.includes(
     ['triangular', 'square', 'pentagonal'],
-    prismRow
+    prismRow,
   );
   return `${divName(prismRow)} ${isPyramid ? 'pyramid' : 'cupola'}`;
 };
@@ -466,12 +466,12 @@ const othersGraph = (() => {
   return {
     ...empty,
     // snub antiprisms
-    T: {
-      s: 'J84',
-    },
-    A4: {
-      s: 'J85',
-    },
+    // T: {
+    //   s: 'J84',
+    // },
+    // A4: {
+    //   s: 'J85',
+    // },
 
     // "other" johnson solids
     J86: {

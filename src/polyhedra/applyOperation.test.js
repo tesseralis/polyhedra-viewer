@@ -8,12 +8,15 @@ import Peak from 'math/Peak';
 import { canAugment } from 'math/operations';
 import applyOperation from './applyOperation';
 
-const archimedeanOpts = ['t', 'k', 'r', 'e'];
+const archimedeanOpts = ['t', 'k', 'c', 'r', 'e'];
 const johnsonOpts = ['+', '-', 'g', 'P', 'A', 'h'];
 const opsToTest = archimedeanOpts.concat(johnsonOpts);
 
 // map from polyhedron to excluded operations
 const excludedOperations = {
+  icosahedron: ['c'],
+  'snub cube': ['c'],
+  'snub dodecahedron': ['c'],
   cuboctahedron: ['t'],
   icosidodecahedron: ['t'],
   'truncated cuboctahedron': ['k'],
@@ -96,6 +99,14 @@ function getOptsToTest(operation, polyhedron) {
         return [{ polygon: 3 }, { polygon: 5 }];
       }
       return [undefined];
+    case 'c':
+      if (polyhedron.name === 'rhombicuboctahedron') {
+        return [{ polygon: 3 }, { polygon: 4 }];
+      } else if (polyhedron.name === 'rhombicosidodecahedron') {
+        return [{ polygon: 3 }, { polygon: 5 }];
+      }
+      return [undefined];
+
     default:
       return [undefined];
   }
