@@ -30,7 +30,7 @@ export default function applyOperation(
 ): OperationResult {
   const relations = getRelations(polyhedron.name, operation);
   const op = operations[operation];
-  // FIXME don't have to rely on this
+  // FIXME don't have to rely on "invoke"
   const options = _.invoke(
     op,
     'getSearchOptions',
@@ -44,7 +44,7 @@ export default function applyOperation(
   };
 
   const next = getNextPolyhedron(polyhedron.name, operation, _.pickBy(options));
-  if (!_.isFunction(op.apply)) {
+  if (!op) {
     // throw new Error(`Function not found for ${operation}`)
     return { result: Polyhedron.get(next) };
   }

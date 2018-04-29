@@ -7,6 +7,11 @@ import type { Vector } from 'math/linAlg';
 import { deduplicateVertices } from './operationUtils';
 import { Operation } from './operationTypes';
 
+// Result functions
+// ================
+// Since there are only a handful of possibilities for these oprations, it's okay to use shortcuts
+// like switching on number of faces, to determine properties.
+
 function getExpansionResult(polyhedron) {
   // Only the platonic solids can be expanded, so it suffices to just iterate over them
   switch (polyhedron.numFaces()) {
@@ -39,17 +44,31 @@ function getSnubResult(polyhedron) {
   }
 }
 
-// TODO make this more robust
-function getContractResult(polyhedron, faceType) {
+// Return the symmetry group of the *expanded* polyhedron
+function getFamily(polyhedron) {
   switch (polyhedron.numFaces()) {
     case 14: // cuboctahedron
     case 20: // icosahedron
-      return 'tetrahedron';
+      return 'T';
     case 26: // rhombicuboctahedron
     case 38: // snub cube
-      return faceType === 3 ? 'octahedron' : 'cube';
+      return 'O';
     case 62: // rhombicosidodecahedron
     case 92: // snub dodecahedron
+      return 'I';
+    default:
+      throw new Error('Did you try to contract an invalid solid?');
+  }
+}
+
+// TODO make this more robust
+function getContractResult(polyhedron, faceType) {
+  switch (getFamily(polyhedron)) {
+    case 'T':
+      return 'tetrahedron';
+    case 'O':
+      return faceType === 3 ? 'octahedron' : 'cube';
+    case 'I':
       return faceType === 3 ? 'icosahedron' : 'dodecahedron';
     default:
       throw new Error('Did you try to contract an invalid solid?');
@@ -74,7 +93,7 @@ export function isExpansionFace(
 }
 
 // FIXME make better
-function duplicateVertices(polyhedron: Polyhedron, snubFaceType?: number) {
+function duplicateVertices(polyhedron: Polyhedron, twist?: 'left' | 'right') {
   const newVertexMapping = {};
   const vertexFaces = [];
   let newVertices = polyhedron.vertices;
@@ -100,12 +119,12 @@ function duplicateVertices(polyhedron: Polyhedron, snubFaceType?: number) {
   });
 
   const edgeFaces = (() => {
-    if (snubFaceType) {
+    if (twist) {
       return _.flatMap(polyhedron.edges, edge => {
         const [v1, v2] = edge;
         const [f1, f2] = polyhedron.edgeFaceIndices(edge);
         // get the edges in order of the first face
-        if (snubFaceType === 3) {
+        if (twist === 'right') {
           return [
             [
               newVertexMapping[f1][v1],
@@ -257,6 +276,7 @@ function getSnubAngle(polyhedron, numSides) {
     .sub(faceCentroid)
     .angleBetween(projected.sub(faceCentroid), true);
 
+  // This always ensures the same chirality for everything
   return numSides === 3 ? angle : -angle;
 }
 
@@ -264,7 +284,7 @@ function getSnubAngle(polyhedron, numSides) {
 function applySnub(polyhedron: Polyhedron) {
   // figure out what this polyhedron expands to
   const n = polyhedron.numSides(0);
-  const result = duplicateVertices(polyhedron, n);
+  const result = duplicateVertices(polyhedron, n === 3 ? 'right' : 'left');
 
   // Use a reference polyhedron to calculate how far to expand
   const resultName = getSnubResult(polyhedron);
@@ -305,31 +325,7 @@ interface ContractOptions {
   faceType: number;
 }
 
-function getIcosahedronContractFaceIndices(polyhedron) {
-  const toCheck = polyhedron
-    .fIndices()
-    .filter(fIndex => polyhedron.numSides(fIndex) === 3);
-  const result = [];
-  const invalid = [];
-  while (toCheck.length > 0) {
-    const next = toCheck.pop();
-    if (_.includes(invalid, next)) {
-      continue;
-    }
-    _.forEach(
-      polyhedron.adjacentFaceIndices(...polyhedron.faces[next]),
-      fIndex => {
-        if (polyhedron.numSides(fIndex) === 3) {
-          invalid.push(fIndex);
-        }
-      },
-    );
-    result.push(next);
-  }
-  return result;
-}
-
-function getCuboctahedronContractFaceIndices(polyhedron) {
+function getTetrahedralContractFaceIndices(polyhedron) {
   const toCheck = polyhedron
     .fIndices()
     .filter(fIndex => polyhedron.numSides(fIndex) === 3);
@@ -354,11 +350,8 @@ function getCuboctahedronContractFaceIndices(polyhedron) {
 }
 
 function getContractFaceIndices(polyhedron, faceType) {
-  if (polyhedron.numFaces() === 14) {
-    return getCuboctahedronContractFaceIndices(polyhedron);
-  }
-  if (polyhedron.numFaces() === 20) {
-    return getIcosahedronContractFaceIndices(polyhedron);
+  if (getFamily(polyhedron) === 'T') {
+    return getTetrahedralContractFaceIndices(polyhedron);
   }
   return _.filter(
     polyhedron.fIndices(),
@@ -399,21 +392,17 @@ export function applyContract(
   };
 }
 
+// NOTE: We are using the same operation for contracting both expanded and snub solids.
 export const contract: Operation<ContractOptions> = {
   apply: applyContract,
 
   // TODO consolidate with "getContractResult"
   getSearchOptions(polyhedron, config) {
     const { faceType } = config;
-    // FIXME wut
-    switch (polyhedron.name) {
-      case 'rhombicuboctahedron':
-      case 'snub-cube':
-      case 'snub cube':
+    switch (getFamily(polyhedron)) {
+      case 'O':
         return { value: faceType === 3 ? 'O' : 'C' };
-      case 'rhombicosidodecahedron':
-      case 'snub-dodecahedron':
-      case 'snub dodecahedron':
+      case 'I':
         return { value: faceType === 3 ? 'I' : 'D' };
       default:
         return;
@@ -441,14 +430,10 @@ export const contract: Operation<ContractOptions> = {
 
   getAllApplyArgs(polyhedron) {
     // TODO we can do this w/o referencing name
-    switch (polyhedron.name) {
-      case 'rhombicuboctahedron':
-      case 'snub-cube':
-      case 'snub cube':
+    switch (getFamily(polyhedron)) {
+      case 'O':
         return [{ faceType: 3 }, { faceType: 4 }];
-      case 'rhombicosidodecahedron':
-      case 'snub-dodecahedron':
-      case 'snub dodecahedron':
+      case 'I':
         return [{ faceType: 3 }, { faceType: 5 }];
       default:
         return [{}];
