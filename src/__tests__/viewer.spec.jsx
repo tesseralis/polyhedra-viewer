@@ -95,13 +95,24 @@ describe('viewer', () => {
   });
 
   it('can go through a truncation and rectification workflow', () => {
-    // FIXME do my usual demo
     setup('/tetrahedron/related');
     appPage
+      .clickButtonWithText('truncate')
+      .expectTransitionTo('truncated-tetrahedron')
+      .clickButtonWithText('cumulate')
+      .expectTransitionTo('tetrahedron')
       .clickButtonWithText('rectify')
       .expectTransitionTo('octahedron')
+      .clickButtonWithText('rectify')
+      .expectTransitionTo('cuboctahedron')
+      .clickButtonWithText('cumulate')
+      .clickFaceWithNumSides(3)
+      .expectTransitionTo('cube')
       .clickButtonWithText('truncate')
-      .expectTransitionTo('truncated-octahedron');
+      .expectTransitionTo('truncated-cube')
+      .clickButtonWithText('augment')
+      .clickFaceWithNumSides(8)
+      .expectTransitionTo('augmented-truncated-cube');
   });
 
   it('can go through an expansion workflow', () => {
