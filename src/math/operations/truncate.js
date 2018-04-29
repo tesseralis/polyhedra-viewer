@@ -71,7 +71,7 @@ function truncateVertex(
 
 function doTruncate(polyhedron, options: TruncateOptions = {}) {
   let newPolyhedron = polyhedron;
-  let mockPolyhedron = polyhedron;
+  let mockPolyhedron: Polyhedron = polyhedron;
   // TODO (animation) make this more concise
   _.forEach(polyhedron.vertices, (vertex, index: VIndex) => {
     newPolyhedron = truncateVertex(newPolyhedron, polyhedron, index, options);
@@ -90,13 +90,13 @@ function doTruncate(polyhedron, options: TruncateOptions = {}) {
 }
 
 export const truncate: Operation<TruncateOptions> = {
-  apply(polyhedron: Polyhedron, options: TruncateOptions) {
+  apply(polyhedron, options) {
     return doTruncate(polyhedron);
   },
 };
 
 export const rectify: Operation<> = {
-  apply(polyhedron: Polyhedron) {
+  apply(polyhedron) {
     return doTruncate(polyhedron, { rectify: true });
   },
 };

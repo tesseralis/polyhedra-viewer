@@ -48,7 +48,7 @@ interface PolyhedronState {
   error?: Error;
 }
 
-export default class Polyhedron extends Component<
+export default class X3dPolyhedron extends Component<
   PolyhedronProps,
   PolyhedronState,
 > {

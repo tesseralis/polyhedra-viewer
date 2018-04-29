@@ -7,17 +7,17 @@ import { diminish, shorten } from './diminish';
 import { gyrate } from './gyrate';
 
 export const operations = {
-  truncate,
-  rectify,
-  cumulate,
-  expand,
-  contract,
-  augment,
-  elongate,
-  gyroelongate,
-  diminish,
-  shorten,
-  gyrate,
+  t: truncate,
+  a: rectify,
+  k: cumulate,
+  e: expand,
+  c: contract,
+  '+': augment,
+  P: elongate,
+  A: gyroelongate,
+  '-': diminish,
+  h: shorten,
+  g: gyrate,
 };
 
 export type { OperationResult } from './operationTypes';

@@ -29,7 +29,7 @@ export default class AppPage {
   }
 
   getPolyhedron() {
-    return this.wrapper.find('Polyhedron').prop('solidData');
+    return this.wrapper.find('X3dPolyhedron').prop('solidData');
   }
 
   clickFaceIndex(faceIndex) {
@@ -70,7 +70,7 @@ export default class AppPage {
     this.wrapper.update();
     expect(
       this.wrapper
-        .find('Polyhedron')
+        .find('X3dPolyhedron')
         .prop('solidData')
         .isSame(Polyhedron.get(expected)),
     ).toBe(true);

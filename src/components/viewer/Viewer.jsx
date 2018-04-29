@@ -16,16 +16,12 @@ import { fixed, fullScreen } from 'styles/common';
 import { unescapeName } from 'polyhedra/names';
 import doApplyOperation from 'polyhedra/applyOperation';
 import type { Operation } from 'polyhedra/applyOperation';
-import {
-  getOperationName,
-  getRelations,
-  applyOptionsFor,
-} from 'polyhedra/relations';
+import { getRelations, applyOptionsFor } from 'polyhedra/relations';
 import { defaultConfig, getPolyhedronConfig } from 'constants/configOptions';
 import transition from 'transition.js';
 
 import X3dScene from './X3dScene';
-import X3dPolyhedron from './Polyhedron';
+import X3dPolyhedron from './X3dPolyhedron';
 import { Sidebar } from './sidebar';
 import Title from './Title';
 
@@ -232,7 +228,7 @@ export default class Viewer extends Component<ViewerProps, ViewerState> {
     if (operation) {
       if (
         !!_.invoke(
-          operations[getOperationName(operation)],
+          operations[operation],
           'isHighlighted',
           polyhedron,
           applyArgs,
@@ -363,10 +359,9 @@ export default class Viewer extends Component<ViewerProps, ViewerState> {
       if (!operation || !hitPnt) {
         return { applyArgs: {} };
       }
-      const operationName = getOperationName(operation);
-      if (!operations[operationName].getApplyArgs) return;
+      if (!operations[operation].getApplyArgs) return;
       return {
-        applyArgs: operations[operationName].getApplyArgs(polyhedron, hitPnt),
+        applyArgs: operations[operation].getApplyArgs(polyhedron, hitPnt),
       };
     });
   };

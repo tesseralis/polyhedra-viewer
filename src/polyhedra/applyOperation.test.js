@@ -2,11 +2,7 @@ import _ from 'lodash';
 import { cartesian } from 'util.js';
 import { allSolidNames } from 'data';
 import { PRECISION } from 'math/linAlg';
-import {
-  getOperationName,
-  getOperations,
-  getRelations,
-} from 'polyhedra/relations';
+import { getOperations, getRelations } from 'polyhedra/relations';
 import Polyhedron from 'math/polyhedron';
 import Peak from 'math/Peak';
 import { operations, canAugment } from 'math/operations';
@@ -78,11 +74,10 @@ expect.extend({
 });
 
 function getOptsToTest(operation, polyhedron) {
-  const operationName = getOperationName(operation);
   const relations = getRelations(polyhedron.name, operation);
   return (
     _.invoke(
-      operations[operationName],
+      operations[operation],
       'getAllApplyArgs',
       polyhedron,
       relations,

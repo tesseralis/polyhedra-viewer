@@ -1,6 +1,5 @@
-// @flow
 import _ from 'lodash';
-import { getOperationName, getNextPolyhedron, getRelations } from './relations';
+import { getNextPolyhedron, getRelations } from './relations';
 import Polyhedron from 'math/Polyhedron';
 import { operations } from 'math/operations';
 import type { OperationResult } from 'math/operations';
@@ -22,7 +21,7 @@ const updateName = (opResult, name) => {
   };
 };
 
-export type Operation = 't' | 'r' | 'k' | 'c' | 'e' | '+' | '-' | 'g';
+export type Operation = 't' | 'a' | 'k' | 'c' | 'e' | '+' | '-' | 'g';
 
 export default function applyOperation(
   operation: Operation,
@@ -30,8 +29,7 @@ export default function applyOperation(
   config: any = {},
 ): OperationResult {
   const relations = getRelations(polyhedron.name, operation);
-  const operationName = getOperationName(operation);
-  const op = operations[operationName];
+  const op = operations[operation];
   // FIXME don't have to rely on this
   const options = _.invoke(
     op,
