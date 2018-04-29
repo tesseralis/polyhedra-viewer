@@ -237,6 +237,7 @@ function getSnubAngle(polyhedron, numSides) {
     .angleBetween(projected.sub(faceCentroid), true);
 }
 
+// FIXME deduplicate with expand
 function applySnub(polyhedron: Polyhedron) {
   // figure out what this polyhedron expands to
   const n = polyhedron.numSides(0);
@@ -360,7 +361,6 @@ export const contract: Operation<ContractOptions> = {
   getApplyArgs(polyhedron: Polyhedron, point: Vector) {
     const hitPoint = vec(point);
     const hitFaceIndex = polyhedron.hitFaceIndex(hitPoint);
-    // TODO handle octahedron case
     const isValid = _.every(
       polyhedron.faceGraph()[hitFaceIndex],
       fIndex2 => polyhedron.numSides(fIndex2) === 4,
