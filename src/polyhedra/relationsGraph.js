@@ -269,7 +269,7 @@ const basePyramidsCupolae = (() => {
       elongated,
       gyroelongated,
       'bi-': bi,
-      'elongated bi-': elongatedBi,
+      // 'elongated bi-': elongatedBi,
       'gyroelongated bi-': gyroelongatedBi,
     } = row;
     const prism = getPrismFromPyramid(name);
