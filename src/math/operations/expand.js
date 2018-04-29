@@ -7,10 +7,6 @@ import type { Vector } from 'math/linAlg';
 import { deduplicateVertices } from './operationUtils';
 import { Operation } from './operationTypes';
 
-interface ContractOptions {
-  faceType: number;
-}
-
 function getExpansionResult(polyhedron) {
   // Only the platonic solids can be expanded, so it suffices to just iterate over them
   switch (polyhedron.numFaces()) {
@@ -150,9 +146,13 @@ function applyExpand(polyhedron: Polyhedron) {
   };
 }
 
-export const expand: Operation = {
+export const expand: Operation<> = {
   apply: applyExpand,
 };
+
+interface ContractOptions {
+  faceType: number;
+}
 
 function getCuboctahedronContractFaceIndices(polyhedron) {
   const toCheck = polyhedron
@@ -214,7 +214,7 @@ export function applyContract(
   };
 }
 
-export const contract: Operation = {
+export const contract: Operation<ContractOptions> = {
   apply: applyContract,
 
   getSearchOptions(polyhedron, config) {
@@ -248,7 +248,7 @@ export const contract: Operation = {
     } else if (polyhedron.name === 'rhombicosidodecahedron') {
       return [{ faceType: 3 }, { faceType: 5 }];
     }
-    return [undefined];
+    return [{}];
   },
 
   isHighlighted(
@@ -257,7 +257,7 @@ export const contract: Operation = {
     fIndex: FIndex,
   ) {
     if (
-      _.isNumber(applyArgs.faceType) &&
+      typeof applyArgs.faceType === 'number' &&
       isExpansionFace(polyhedron, fIndex, applyArgs.faceType)
     ) {
       return true;

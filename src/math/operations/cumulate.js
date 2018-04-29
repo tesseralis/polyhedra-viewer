@@ -8,17 +8,10 @@ import Polyhedron from 'math/Polyhedron';
 import { numSides, prevVertex, nextVertex } from 'math/solidUtils';
 import type FIndex from 'math/solidtypes';
 import { deduplicateVertices } from './operationUtils';
+import type { Operation } from './operationTypes';
 
 interface CumulateOptions {
-  faceType: number;
-}
-
-export function getCumulatePolygon(polyhedron: Polyhedron, point: Vector) {
-  const hitPoint = vec(point);
-  const hitFaceIndex = polyhedron.hitFaceIndex(hitPoint);
-  // TODO handle octahedron case
-  const n = numSides(polyhedron.faces[hitFaceIndex]);
-  return n <= 5 ? n : -1;
+  faceType?: number;
 }
 
 // Return if the polyhedron is rectified
@@ -96,7 +89,7 @@ function cumulateFaceIndices(polyhedron, faceType) {
     .filter(fIndex => polyhedron.numSides(fIndex) === faceType);
 }
 
-export function cumulate(
+function applyCumulate(
   polyhedron: Polyhedron,
   { faceType }: CumulateOptions = {},
 ) {
@@ -142,3 +135,42 @@ export function cumulate(
     result: deduplicateVertices(polyhedron.withVertices(mockVertices)),
   };
 }
+
+export const cumulate: Operation<CumulateOptions> = {
+  apply: applyCumulate,
+
+  getSearchOptions(polyhedron, config) {
+    const { faceType } = config;
+    if (polyhedron.name === 'cuboctahedron') {
+      return { value: faceType === 3 ? 'C' : 'O' };
+    } else if (polyhedron.name === 'icosidodecahedron') {
+      return { value: faceType === 3 ? 'D' : 'I' };
+    }
+  },
+
+  getAllApplyArgs(polyhedron) {
+    if (polyhedron.name === 'cuboctahedron') {
+      return [{ faceType: 3 }, { faceType: 4 }];
+    } else if (polyhedron.name === 'icosidodecahedron') {
+      return [{ faceType: 3 }, { faceType: 5 }];
+    }
+    return [{}];
+  },
+
+  getApplyArgs(polyhedron, hitPnt) {
+    const hitPoint = vec(hitPnt);
+    const hitFaceIndex = polyhedron.hitFaceIndex(hitPoint);
+    // TODO handle octahedron case
+    const n = numSides(polyhedron.faces[hitFaceIndex]);
+    return n <= 5 ? { faceType: n } : {};
+  },
+
+  isHighlighted(polyhedron, applyArgs, fIndex) {
+    if (
+      _.isNumber(applyArgs.faceType) &&
+      polyhedron.numSides(fIndex) === applyArgs.faceType
+    ) {
+      return true;
+    }
+  },
+};

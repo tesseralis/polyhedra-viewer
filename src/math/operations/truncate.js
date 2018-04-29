@@ -95,7 +95,7 @@ export const truncate: Operation<TruncateOptions> = {
   },
 };
 
-export const rectify: Operation = {
+export const rectify: Operation<> = {
   apply(polyhedron: Polyhedron) {
     return doTruncate(polyhedron, { rectify: true });
   },

@@ -104,13 +104,6 @@ function getOptsToTest(operation, polyhedron) {
     case '-':
     case 'g':
       return Peak.getAll(polyhedron).map(peak => ({ peak }));
-    case 'k':
-      if (polyhedron.name === 'cuboctahedron') {
-        return [{ polygon: 3 }, { polygon: 4 }];
-      } else if (polyhedron.name === 'icosidodecahedron') {
-        return [{ polygon: 3 }, { polygon: 5 }];
-      }
-      return [undefined];
     default:
       return [undefined];
   }

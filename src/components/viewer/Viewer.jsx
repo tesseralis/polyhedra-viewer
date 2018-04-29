@@ -9,12 +9,7 @@ import { andaleMono } from 'styles/fonts';
 import Polyhedron from 'math/Polyhedron';
 import type { Vertex, Face, FIndex } from 'math/solidTypes';
 import type { Vector } from 'math/linAlg';
-import {
-  getCumulatePolygon,
-  getAugmentFace,
-  getAugmentGraph,
-  operations,
-} from 'math/operations';
+import { getAugmentFace, getAugmentGraph, operations } from 'math/operations';
 import polygons from 'constants/polygons';
 import { mapObject } from 'util.js';
 import { fixed, fullScreen } from 'styles/common';
@@ -410,12 +405,6 @@ export default class Viewer extends Component<ViewerProps, ViewerState> {
           return {
             applyArgs: peak ? { peak } : {},
           };
-        case 'k': {
-          const polygon = getCumulatePolygon(polyhedron, hitPnt);
-          return {
-            applyArgs: polygon === -1 ? {} : { polygon },
-          };
-        }
         default:
           return;
       }

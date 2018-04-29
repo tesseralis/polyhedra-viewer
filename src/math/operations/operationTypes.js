@@ -1,5 +1,6 @@
+// @flow
 import Polyhedron from 'math/Polyhedron';
-import type { Vertex } from 'math/solidTypes';
+import type { Vertex, FIndex } from 'math/solidTypes';
 import type { Vector } from 'math/linAlg';
 
 interface OperationResult {
@@ -10,20 +11,20 @@ interface OperationResult {
   };
 }
 
-export interface Operation<Options, ApplyArgs> {
-  getSearchOptions(polyhedron: Polyhedron, options: Options): any;
-
-  getDefaultArgs(polyhedron: Polyhedron, options: Options): any;
-
+export interface Operation<Options = {}, ApplyArgs = {}> {
   apply(polyhedron: Polyhedron, options: Options): Polyhedron | OperationResult;
 
-  getApplyArgs(polyhedron: Polyhedron, hitPnt: Vector): ApplyArgs;
+  getSearchOptions?: (polyhedron: Polyhedron, options: Options) => any;
 
-  getAllApplyArgs(polyhedron: Polyhedron): ApplyArgs[];
+  getDefaultArgs?: (polyhedron: Polyhedron, options: Options) => ApplyArgs;
 
-  isHighlighed(
+  getApplyArgs?: (polyhedron: Polyhedron, hitPnt: Vector) => ApplyArgs;
+
+  getAllApplyArgs?: (polyhedron: Polyhedron) => ApplyArgs[];
+
+  isHighlighed?: (
     polyhedron: Polyhedron,
     applyArgs: ApplyArgs,
     fIndex: FIndex,
-  ): boolean;
+  ) => boolean;
 }
