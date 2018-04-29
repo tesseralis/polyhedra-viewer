@@ -8,12 +8,13 @@ import Peak from 'math/Peak';
 import { operations, canAugment } from 'math/operations';
 import applyOperation from './applyOperation';
 
-const archimedeanOpts = ['t', 'k', 'c', 'r', 'e'];
+const archimedeanOpts = ['t', 'k', 'c', 'r', 'e', 's'];
 const johnsonOpts = ['+', '-', 'g', 'P', 'A', 'h'];
 const opsToTest = archimedeanOpts.concat(johnsonOpts);
 
 // map from polyhedron to excluded operations
 const excludedOperations = {
+  // tetrahedron: ['s'],
   icosahedron: ['c'],
   'snub cube': ['c'],
   'snub dodecahedron': ['c'],
@@ -30,6 +31,9 @@ function isProperPolyhedron(polyhedron) {
     const [v1, v2] = edge.map(vIndex => polyhedron.vertexVectors()[vIndex]);
     const sideLength: number = v1.distanceTo(v2);
     if (prevSideLength !== undefined) {
+      if (_.isNaN(sideLength)) {
+        return false;
+      }
       if (Math.abs(sideLength - prevSideLength) > PRECISION) {
         return false;
       }

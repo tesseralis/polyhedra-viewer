@@ -126,6 +126,10 @@ export default class Polyhedron {
       : this._vertexVectors;
   }
 
+  vertexVector(vIndex: VIndex): Vec3D {
+    return this.vertexVectors([vIndex])[0];
+  }
+
   edgeLength(fIndex: FIndex = 0) {
     const [v0, v1] = this.vertexVectors(this.faces[fIndex]);
     return v0.distanceTo(v1);
@@ -328,6 +332,13 @@ export default class Polyhedron {
       faceAdjacencyCounts,
       ['n', 'adj.length'].concat([3, 4, 5, 6, 8, 10].map(n => `adj[${n}]`)),
     );
+  }
+
+  isFaceValid(fIndex: FIndex) {
+    return _.every(getEdges(this.faces[fIndex]), edge => {
+      const [v0, v1] = this.vertexVectors(edge);
+      return v0.distanceTo(v1) > PRECISION;
+    });
   }
 
   isSame(other: Polyhedron) {

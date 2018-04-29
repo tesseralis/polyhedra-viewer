@@ -2,7 +2,7 @@
 import _ from 'lodash';
 import Polyhedron from 'math/Polyhedron';
 import { VIndex, FIndex } from 'math/solidTypes';
-import { vec, PRECISION } from 'math/linAlg';
+import { vec, getMidpoint, getPlane } from 'math/linAlg';
 import type { Vector } from 'math/linAlg';
 import { deduplicateVertices } from './operationUtils';
 import { Operation } from './operationTypes';
@@ -23,6 +23,23 @@ function getExpansionResult(polyhedron) {
   }
 }
 
+function getSnubResult(polyhedron) {
+  // Only the platonic solids can be expanded, so it suffices to just iterate over them
+  switch (polyhedron.numFaces()) {
+    case 4:
+      return 'icosahedron';
+    case 6:
+    case 8:
+      return 'snub cube';
+    case 12:
+    case 20:
+      return 'snub dodecahedron';
+    default:
+      throw new Error('Did you try to snub a non-regular solid?');
+  }
+}
+
+// TODO make this more robust
 function getContractResult(polyhedron, faceType) {
   switch (polyhedron.numFaces()) {
     case 14:
@@ -42,14 +59,15 @@ export function isExpansionFace(
   nSides: number,
 ) {
   if (polyhedron.numSides(fIndex) !== nSides) return false;
-  if (polyhedron.edgeLength(fIndex) <= PRECISION) return false;
+  if (!polyhedron.isFaceValid(fIndex)) return false;
   return _.every(
     polyhedron.faceGraph()[fIndex],
     fIndex2 => polyhedron.numSides(fIndex2) === 4,
   );
 }
 
-function duplicateVertices(polyhedron: Polyhedron) {
+// FIXME make better
+function duplicateVertices(polyhedron: Polyhedron, snub: boolean = false) {
   const newVertexMapping = {};
   const vertexFaces = [];
   let newVertices = polyhedron.vertices;
@@ -74,18 +92,40 @@ function duplicateVertices(polyhedron: Polyhedron) {
     });
   });
 
-  // Create a square out of each edge originally in the polyhedron
-  const edgeFaces = polyhedron.edges.map(edge => {
-    const [v1, v2] = edge;
-    const [f1, f2] = polyhedron.edgeFaceIndices(edge);
-    // get the edges in order of the first face
-    return [
-      newVertexMapping[f1][v2],
-      newVertexMapping[f1][v1],
-      newVertexMapping[f2][v1],
-      newVertexMapping[f2][v2],
-    ];
-  });
+  const edgeFaces = (() => {
+    if (snub) {
+      return _.flatMap(polyhedron.edges, edge => {
+        const [v1, v2] = edge;
+        const [f1, f2] = polyhedron.edgeFaceIndices(edge);
+        // get the edges in order of the first face
+        return [
+          [
+            newVertexMapping[f1][v2],
+            newVertexMapping[f1][v1],
+            newVertexMapping[f2][v1],
+          ],
+          [
+            newVertexMapping[f2][v1],
+            newVertexMapping[f2][v2],
+            newVertexMapping[f1][v2],
+          ],
+        ];
+      });
+    }
+
+    // Create a square out of each edge originally in the polyhedron
+    return polyhedron.edges.map(edge => {
+      const [v1, v2] = edge;
+      const [f1, f2] = polyhedron.edgeFaceIndices(edge);
+      // get the edges in order of the first face
+      return [
+        newVertexMapping[f1][v2],
+        newVertexMapping[f1][v1],
+        newVertexMapping[f2][v1],
+        newVertexMapping[f2][v2],
+      ];
+    });
+  })();
 
   return Polyhedron.of(
     newVertices,
@@ -93,7 +133,7 @@ function duplicateVertices(polyhedron: Polyhedron) {
   );
 }
 
-function getResizedVertices(polyhedron, fIndices, resizedLength) {
+function getResizedVertices(polyhedron, fIndices, resizedLength, angle = 0) {
   // Update the vertices with the expanded-out version
   const f0 = fIndices[0];
   const sideLength = polyhedron.edgeLength(f0);
@@ -101,12 +141,19 @@ function getResizedVertices(polyhedron, fIndices, resizedLength) {
   const result = [...polyhedron.vertices];
   _.forEach(fIndices, fIndex => {
     const normal = polyhedron.faceNormal(fIndex);
+    const centroid = polyhedron.faceCentroid(fIndex);
     const expandFace = polyhedron.faces[fIndex];
     _.forEach(expandFace, vIndex => {
       const vertex = polyhedron.vertexVectors()[vIndex];
-      result[vIndex] = vertex
-        .add(normal.scale((resizedLength - baseLength) * sideLength))
-        .toArray();
+      const rotated =
+        angle === 0
+          ? vertex
+          : vertex
+              .sub(centroid)
+              .getRotatedAroundAxis(normal, angle)
+              .add(centroid);
+      const scale = (resizedLength - baseLength) * sideLength;
+      result[vIndex] = rotated.add(normal.scale(scale)).toArray();
     });
   });
   return result;
@@ -148,6 +195,86 @@ function applyExpand(polyhedron: Polyhedron) {
 
 export const expand: Operation<> = {
   apply: applyExpand,
+};
+
+function isSnubFace(polyhedron, fIndex, nSides) {
+  if (polyhedron.numSides(fIndex) !== nSides) return false;
+  if (!polyhedron.isFaceValid(fIndex)) return false;
+  return _.every(
+    polyhedron.faceGraph()[fIndex],
+    fIndex2 => polyhedron.numSides(fIndex2) === 3,
+  );
+}
+
+function getSnubAngle(polyhedron, numSides) {
+  const f0 =
+    _.find(polyhedron.fIndices(), fIndex =>
+      isSnubFace(polyhedron, fIndex, numSides),
+    ) || 0;
+  const face0 = polyhedron.faces[f0];
+
+  const faceCentroid = polyhedron.faceCentroid(f0);
+  const snubFaceIndices = _.filter(
+    polyhedron.fIndices(),
+    fIndex =>
+      isSnubFace(polyhedron, fIndex, numSides) &&
+      !_.includes(polyhedron.adjacentFaceIndices(...face0), fIndex),
+  );
+  const [v0, v1] = polyhedron.vertexVectors(face0);
+  const midpoint = getMidpoint(v0, v1);
+  const f1 = _.minBy(snubFaceIndices, fIndex =>
+    midpoint.distanceTo(polyhedron.faceCentroid(fIndex)),
+  );
+  const plane = getPlane([
+    faceCentroid,
+    polyhedron.faceCentroid(f1),
+    polyhedron.centroid(),
+  ]);
+  const projected = plane.getProjectedPoint(midpoint);
+
+  return midpoint
+    .sub(faceCentroid)
+    .angleBetween(projected.sub(faceCentroid), true);
+}
+
+function applySnub(polyhedron: Polyhedron) {
+  // figure out what this polyhedron expands to
+  const n = polyhedron.numSides(0);
+  const result = duplicateVertices(polyhedron, true);
+
+  // Use a reference polyhedron to calculate how far to expand
+  const resultName = getSnubResult(polyhedron);
+  const reference = Polyhedron.get(resultName);
+  const referenceFaceIndex = _.find(reference.fIndices(), fIndex =>
+    isSnubFace(reference, fIndex, n),
+  );
+  const referenceLength =
+    reference.distanceToCenter(referenceFaceIndex) / reference.edgeLength();
+
+  const snubFaceIndices = _.filter(result.fIndices(), fIndex =>
+    isSnubFace(result, fIndex, n),
+  );
+  const snubAngle = getSnubAngle(reference, n);
+
+  // Update the vertices with the expanded-out version
+  const endVertices = getResizedVertices(
+    result,
+    snubFaceIndices,
+    referenceLength,
+    -snubAngle,
+  );
+
+  return {
+    result: result.withVertices(endVertices),
+    animationData: {
+      start: result,
+      endVertices,
+    },
+  };
+}
+
+export const snub: Operation<> = {
+  apply: applySnub,
 };
 
 interface ContractOptions {

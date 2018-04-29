@@ -1,7 +1,7 @@
 // @flow
 import { truncate, rectify } from './truncate';
 import { cumulate } from './cumulate';
-import { expand, contract } from './expand';
+import { expand, snub, contract } from './expand';
 import { augment, elongate, gyroelongate } from './augment';
 import { diminish, shorten } from './diminish';
 import { gyrate } from './gyrate';
@@ -11,6 +11,7 @@ export const operations = {
   a: rectify,
   k: cumulate,
   e: expand,
+  s: snub,
   c: contract,
   '+': augment,
   P: elongate,
