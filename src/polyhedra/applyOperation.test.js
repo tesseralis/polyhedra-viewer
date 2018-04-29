@@ -101,9 +101,6 @@ function getOptsToTest(operation, polyhedron) {
       return cartesian(gyrateOpts, usingOpts, fIndexOpts).map(
         ([gyrate, using, fIndex]) => ({ gyrate, using, fIndex }),
       );
-    case '-':
-    case 'g':
-      return Peak.getAll(polyhedron).map(peak => ({ peak }));
     default:
       return [undefined];
   }

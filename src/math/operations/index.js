@@ -11,9 +11,6 @@ export const operationFunctions = {
   augment,
   elongate,
   gyroelongate,
-  diminish,
-  shorten,
-  gyrate,
 };
 
 export const operations = {
@@ -22,4 +19,7 @@ export const operations = {
   cumulate,
   expand,
   contract,
+  diminish,
+  shorten,
+  gyrate,
 };

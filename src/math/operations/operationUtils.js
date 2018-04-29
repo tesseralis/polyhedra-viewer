@@ -5,6 +5,13 @@ import { PRECISION } from 'math/linAlg';
 import { numSides } from 'math/solidUtils';
 import { VIndex } from 'math/solidTypes';
 
+export const hasMultiple = (relations: any, property: any) =>
+  _(relations)
+    .map(property)
+    .uniq()
+    .compact()
+    .value().length > 1;
+
 // Remove vertices (and faces) from the polyhedron when they are all the same
 export function deduplicateVertices(polyhedron: Polyhedron) {
   // group vertex indices by same

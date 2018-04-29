@@ -242,25 +242,6 @@ export default class Viewer extends Component<ViewerProps, ViewerState> {
           return [0, 1, 0];
         }
         break;
-      case '-':
-      case 'g':
-        // TODO pick better colors / have better effects
-        if (
-          _.isObject(applyArgs.peak) &&
-          _.includes(applyArgs.peak.faceIndices(), fIndex)
-        ) {
-          // return polygonColors(diminishColors)[getColorIndex(face)]
-          return [1, 1, 0];
-        }
-        break;
-      case 'k':
-        if (
-          _.isNumber(applyArgs.polygon) &&
-          face.length === applyArgs.polygon
-        ) {
-          return [1, 1, 0];
-        }
-        break;
       default:
         break;
     }
@@ -398,12 +379,6 @@ export default class Viewer extends Component<ViewerProps, ViewerState> {
           const fIndex = getAugmentFace(polyhedron, augmentInfo, hitPnt);
           return {
             applyArgs: fIndex === -1 ? {} : { fIndex },
-          };
-        case '-':
-        case 'g':
-          const peak = polyhedron.findPeak(hitPnt);
-          return {
-            applyArgs: peak ? { peak } : {},
           };
         default:
           return;

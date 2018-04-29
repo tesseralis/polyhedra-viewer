@@ -15,7 +15,6 @@ import {
   getAugmentAlignment,
   getPeakAlignment,
   getCupolaGyrate,
-  getGyrateDirection,
 } from 'math/applyOptionUtils';
 
 const hasMultiple = (relations, property) =>
@@ -74,7 +73,7 @@ export default function applyOperation(
   if (!!operations[operationName]) {
     const op = operations[operationName];
     // FIXME don't have to rely on this
-    options = _.invoke(op, 'getSearchOptions', polyhedron, config);
+    options = _.invoke(op, 'getSearchOptions', polyhedron, config, relations);
     applyConfig = {
       ...applyConfig,
       ..._.invoke(op, 'getDefaultArgs', polyhedron, config),
@@ -100,43 +99,6 @@ export default function applyOperation(
         ? getAugmentAlignment(polyhedron, fIndex)
         : undefined,
     };
-  } else if (operation === '-') {
-    const { peak } = config;
-    if (!peak) {
-      throw new Error('Invalid peak');
-    }
-    const vIndices = peak.innerVertexIndices();
-    // If diminishing a pentagonal cupola/rotunda, check which one it is
-    if (vIndices.length === 5) {
-      options.using = 'U5';
-    } else if (vIndices.length === 10) {
-      options.using = 'R5';
-    }
-
-    if (hasMultiple(relations, 'gyrate')) {
-      options.gyrate = getCupolaGyrate(polyhedron, peak);
-    }
-
-    if (options.gyrate !== 'ortho' && hasMultiple(relations, 'align')) {
-      options.align = getPeakAlignment(polyhedron, peak);
-    }
-  } else if (operation === 'g') {
-    const { peak } = config;
-    if (!peak) {
-      throw new Error('Invalid peak');
-    }
-    if (_.some(relations, 'direction')) {
-      options.direction = getGyrateDirection(polyhedron, peak);
-      if (
-        _.filter(
-          relations,
-          relation =>
-            relation.direction === options.direction && !!relation.align,
-        ).length > 1
-      ) {
-        options.align = getPeakAlignment(polyhedron, peak);
-      }
-    }
   }
 
   const next = getNextPolyhedron(polyhedron.name, operation, _.pickBy(options));

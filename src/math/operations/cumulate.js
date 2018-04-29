@@ -3,7 +3,6 @@ import _ from 'lodash';
 
 import { replace } from 'util.js';
 import { vec } from 'math/linAlg';
-import type { Vector } from 'math/linAlg';
 import Polyhedron from 'math/Polyhedron';
 import { numSides, prevVertex, nextVertex } from 'math/solidUtils';
 import type FIndex from 'math/solidtypes';

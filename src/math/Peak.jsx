@@ -6,7 +6,7 @@ import { vec } from './linAlg';
 import type { Edge, VIndex, FIndex } from './solidTypes';
 import Polyhedron from './Polyhedron';
 
-type PeakType = 'pyramid' | 'cupola' | 'rotunda' | 'fastigium';
+type PeakType = 'pyramid' | 'cupola' | 'rotunda' | 'fastigium' | 'prism';
 type FaceConfiguration = { [string]: number };
 
 const withMapper = property => Base =>

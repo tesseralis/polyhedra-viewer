@@ -1,13 +1,21 @@
+// @flow
 import _ from 'lodash';
 import { vec, getCentroid, getNormal } from 'math/linAlg';
 import Polyhedron from 'math/Polyhedron';
+import Peak from 'math/Peak';
 import { numSides } from 'math/solidUtils';
+import type { Operation } from './operationTypes';
 import { deduplicateVertices } from './operationUtils';
 import { mapObject } from 'util.js';
+import { getPeakAlignment, getGyrateDirection } from 'math/applyOptionUtils';
 
 const TAU = 2 * Math.PI;
 
-export function gyrate(polyhedron, { peak }) {
+interface GyrateOptions {
+  peak: Peak;
+}
+
+function applyGyrate(polyhedron, { peak }) {
   // get adjacent faces
   const boundary = peak.boundary();
 
@@ -65,3 +73,48 @@ export function gyrate(polyhedron, { peak }) {
     result: deduplicateVertices(mockPolyhedron.withVertices(newVertices)),
   };
 }
+
+export const gyrate: Operation<GyrateOptions> = {
+  apply: applyGyrate,
+
+  getSearchOptions(polyhedron, config, relations) {
+    const options = {};
+    const { peak } = config;
+    if (!peak) {
+      throw new Error('Invalid peak');
+    }
+    // FIXME can we not rely on relations?
+    if (_.some(relations, 'direction')) {
+      options.direction = getGyrateDirection(polyhedron, peak);
+      if (
+        _.filter(
+          relations,
+          relation =>
+            relation.direction === options.direction && !!relation.align,
+        ).length > 1
+      ) {
+        options.align = getPeakAlignment(polyhedron, peak);
+      }
+    }
+    return options;
+  },
+
+  getAllApplyArgs(polyhedron) {
+    return Peak.getAll(polyhedron).map(peak => ({ peak }));
+  },
+
+  getApplyArgs(polyhedron, hitPnt) {
+    const peak = polyhedron.findPeak(hitPnt);
+    return peak ? { peak } : {};
+  },
+
+  isHighlighted(polyhedron, applyArgs, fIndex) {
+    if (
+      _.isObject(applyArgs.peak) &&
+      _.includes(applyArgs.peak.faceIndices(), fIndex)
+    ) {
+      // return polygonColors(diminishColors)[getColorIndex(face)]
+      return true;
+    }
+  },
+};
