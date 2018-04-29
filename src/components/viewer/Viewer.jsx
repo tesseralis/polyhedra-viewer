@@ -9,7 +9,7 @@ import { andaleMono } from 'styles/fonts';
 import Polyhedron from 'math/Polyhedron';
 import type { Vertex, Face, FIndex } from 'math/solidTypes';
 import type { Vector } from 'math/linAlg';
-import { getAugmentFace, getAugmentGraph, operations } from 'math/operations';
+import { operations } from 'math/operations';
 import polygons from 'constants/polygons';
 import { mapObject } from 'util.js';
 import { fixed, fullScreen } from 'styles/common';
@@ -229,22 +229,20 @@ export default class Viewer extends Component<ViewerProps, ViewerState> {
       return toRgb(faceColors[fIndex]);
     }
 
-    if (operation && !!operations[getOperationName(operation)]) {
-      const { isHighlighted } = operations[getOperationName(operation)];
-      if (!!isHighlighted && isHighlighted(polyhedron, applyArgs, fIndex)) {
+    if (operation) {
+      if (
+        !!_.invoke(
+          operations[getOperationName(operation)],
+          'isHighlighted',
+          polyhedron,
+          applyArgs,
+          fIndex,
+        )
+      ) {
         return [1, 1, 0];
       }
     }
 
-    switch (operation) {
-      case '+':
-        if (_.isNumber(applyArgs.fIndex) && fIndex === applyArgs.fIndex) {
-          return [0, 1, 0];
-        }
-        break;
-      default:
-        break;
-    }
     return defaultColors[getColorIndex(face)];
   };
 
@@ -366,23 +364,10 @@ export default class Viewer extends Component<ViewerProps, ViewerState> {
         return { applyArgs: {} };
       }
       const operationName = getOperationName(operation);
-      if (!!operations[operationName]) {
-        if (!operations[operationName].getApplyArgs) return;
-        return {
-          applyArgs: operations[operationName].getApplyArgs(polyhedron, hitPnt),
-        };
-      }
-      switch (operation) {
-        case '+':
-          // FIXME move to state
-          const augmentInfo = getAugmentGraph(polyhedron);
-          const fIndex = getAugmentFace(polyhedron, augmentInfo, hitPnt);
-          return {
-            applyArgs: fIndex === -1 ? {} : { fIndex },
-          };
-        default:
-          return;
-      }
+      if (!operations[operationName].getApplyArgs) return;
+      return {
+        applyArgs: operations[operationName].getApplyArgs(polyhedron, hitPnt),
+      };
     });
   };
 

@@ -5,11 +5,7 @@ import { hasMultiple, removeExtraneousVertices } from './operationUtils';
 import Peak from 'math/Peak';
 import { numSides } from 'math/solidUtils';
 import type { Operation } from './operationTypes';
-import {
-  getAugmentAlignment,
-  getPeakAlignment,
-  getCupolaGyrate,
-} from 'math/applyOptionUtils';
+import { getPeakAlignment, getCupolaGyrate } from 'math/applyOptionUtils';
 
 function removeVertices(polyhedron, peak) {
   const newFaces = polyhedron.faces.concat([peak.boundary()]);

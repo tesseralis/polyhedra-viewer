@@ -6,19 +6,15 @@ import { augment, elongate, gyroelongate } from './augment';
 import { diminish, shorten } from './diminish';
 import { gyrate } from './gyrate';
 
-export { canAugment, getAugmentFace, getAugmentGraph } from './augment';
-export const operationFunctions = {
-  augment,
-  elongate,
-  gyroelongate,
-};
-
 export const operations = {
   truncate,
   rectify,
   cumulate,
   expand,
   contract,
+  augment,
+  elongate,
+  gyroelongate,
   diminish,
   shorten,
   gyrate,

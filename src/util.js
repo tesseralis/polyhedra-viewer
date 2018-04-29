@@ -8,7 +8,10 @@ export function atIndices<T>(arr: T[], indices: number[]): T[] {
 /**
  * Create an object from the array using the iteratee
  */
-export function mapObject<T, U>(arr: T[], iteratee: T => [T, U]): { T: U } {
+export function mapObject<T, U>(
+  arr: T[],
+  iteratee: (T, number) => [string | number, U],
+): { [string]: U } {
   return _(arr)
     .map(iteratee)
     .fromPairs()

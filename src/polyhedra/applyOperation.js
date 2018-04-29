@@ -1,28 +1,10 @@
 // @flow
 import _ from 'lodash';
-import {
-  getOperationName,
-  getNextPolyhedron,
-  getRelations,
-  getUsingOpt,
-} from './relations';
+import { getOperationName, getNextPolyhedron, getRelations } from './relations';
 import Polyhedron from 'math/Polyhedron';
 import Vertex from 'math/solidTypes';
 import Peak from 'math/Peak';
-import { operations, operationFunctions } from 'math/operations';
-
-import {
-  getAugmentAlignment,
-  getPeakAlignment,
-  getCupolaGyrate,
-} from 'math/applyOptionUtils';
-
-const hasMultiple = (relations, property) =>
-  _(relations)
-    .map(property)
-    .uniq()
-    .compact()
-    .value().length > 1;
+import { operations } from 'math/operations';
 
 // FIXME (animation) this is inelegant
 const updateName = (opResult, name) => {
@@ -70,44 +52,18 @@ export default function applyOperation(
   let applyConfig = config;
   const relations = getRelations(polyhedron.name, operation);
   const operationName = getOperationName(operation);
-  if (!!operations[operationName]) {
-    const op = operations[operationName];
-    // FIXME don't have to rely on this
-    options = _.invoke(op, 'getSearchOptions', polyhedron, config, relations);
-    applyConfig = {
-      ...applyConfig,
-      ..._.invoke(op, 'getDefaultArgs', polyhedron, config),
-    };
-  } else if (operation === '+') {
-    const { fIndex } = config;
-
-    if (typeof fIndex !== 'number') {
-      throw new Error('Invalid fIndex');
-    }
-    const n = polyhedron.faces[fIndex].length;
-
-    const using = getUsingOpt(config.using, n);
-
-    const baseConfig = {
-      using,
-      gyrate: using === 'U2' ? 'gyro' : config.gyrate,
-    };
-    applyConfig = { ...applyConfig, ...baseConfig };
-    options = {
-      ...baseConfig,
-      align: hasMultiple(relations, 'align')
-        ? getAugmentAlignment(polyhedron, fIndex)
-        : undefined,
-    };
-  }
+  const op = operations[operationName];
+  // FIXME don't have to rely on this
+  options = _.invoke(op, 'getSearchOptions', polyhedron, config, relations);
+  applyConfig = {
+    ...applyConfig,
+    ..._.invoke(op, 'getDefaultArgs', polyhedron, config),
+  };
 
   const next = getNextPolyhedron(polyhedron.name, operation, _.pickBy(options));
-  const opFunction = !!operations[operationName]
-    ? operations[operationName].apply
-    : operationFunctions[getOperationName(operation)];
-  if (!_.isFunction(opFunction)) {
+  if (!_.isFunction(op.apply)) {
     // throw new Error(`Function not found for ${operation}`)
     return { result: Polyhedron.get(next) };
   }
-  return updateName(opFunction(polyhedron, applyConfig), next);
+  return updateName(op.apply(polyhedron, applyConfig), next);
 }

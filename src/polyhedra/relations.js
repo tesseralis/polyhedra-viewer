@@ -122,12 +122,6 @@ export function getUsingOpts(solid: string) {
   return _.find(grouped, group => group.length > 1) || [];
 }
 
-export function getUsingOpt(using: ?string, numSides: number) {
-  return using && augmenteeSides[using] === numSides
-    ? using
-    : defaultAugmentees[numSides];
-}
-
 // Get the polyhedron name as a result of applying the operation to the given polyhedron
 export function getNextPolyhedron(
   solid: string,

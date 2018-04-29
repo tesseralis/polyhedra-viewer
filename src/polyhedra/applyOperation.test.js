@@ -79,31 +79,15 @@ expect.extend({
 
 function getOptsToTest(operation, polyhedron) {
   const operationName = getOperationName(operation);
-  if (!!operations[operationName]) {
-    return (
-      _.invoke(operations[operationName], 'getAllApplyArgs', polyhedron) || [
-        undefined,
-      ]
-    );
-  }
-  switch (operation) {
-    case '+':
-      const relations = getRelations(polyhedron.name, operation);
-      const rawGyrateOpts = _.compact(_.uniq(_.map(relations, 'gyrate')));
-      const gyrateOpts =
-        rawGyrateOpts.length === 2 ? rawGyrateOpts : [undefined];
-      const usingOpts = _.compact(_.uniq(_.map(relations, 'using')));
-      const fIndexOpts = polyhedron
-        .fIndices()
-        .filter(fIndex => canAugment(polyhedron, fIndex));
-
-      // FIXME this leads to invalid combinations
-      return cartesian(gyrateOpts, usingOpts, fIndexOpts).map(
-        ([gyrate, using, fIndex]) => ({ gyrate, using, fIndex }),
-      );
-    default:
-      return [undefined];
-  }
+  const relations = getRelations(polyhedron.name, operation);
+  return (
+    _.invoke(
+      operations[operationName],
+      'getAllApplyArgs',
+      polyhedron,
+      relations,
+    ) || [undefined]
+  );
 }
 
 describe('applyOperation', () => {
