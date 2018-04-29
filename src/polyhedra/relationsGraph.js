@@ -68,7 +68,7 @@ function compact(graph) {
   return _.mapValues(graph, ops =>
     _(ops)
       .mapValues(options => {
-        return _.filter(options, option => !_.isNil(option.value));
+        return _.filter(options, option => !!option.value);
       })
       .pickBy('length')
       .value(),

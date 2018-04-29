@@ -13,6 +13,10 @@ describe('relationsGraph', () => {
       });
     });
 
+    it("doesn't allow augmenting the octahedron", () => {
+      expect(graph.O).not.toHaveProperty('+');
+    });
+
     it('has truncate operation on the rectification', () => {
       const rectified = ['O', 'aC', 'aD'];
       rectified.forEach(solid => {
@@ -34,13 +38,13 @@ describe('relationsGraph', () => {
         '+',
         expect.arrayContaining([
           expect.objectContaining({ using: 'R5', value: 'J21' }),
-        ])
+        ]),
       );
       expect(graph.A10).toHaveProperty(
         '+',
         expect.arrayContaining([
           expect.objectContaining({ using: 'R5', value: 'J25' }),
-        ])
+        ]),
       );
     });
   });

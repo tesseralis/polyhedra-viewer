@@ -62,8 +62,10 @@ const styles = StyleSheet.create({
 
 const operationDescriptions = {
   '+': 'Click on a face to add a pyramid or cupola.',
-  '-': 'Click on a set of faces to remove them.',
+  '-': 'Click on a pyramid or cupola to remove it.',
   g: 'Click on a set of faces to gyrate them.',
+  k: 'Click on a set of faces to cumulate them.',
+  c: 'Click on a set of faces to contract them.',
 };
 
 function viewerStateFromSolidName(name) {
