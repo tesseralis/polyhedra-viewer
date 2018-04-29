@@ -129,6 +129,7 @@ function AugmentOptions({ options, solid, onClickOption, disabled }) {
   );
 }
 
+// FIXME move this as part of the operation definition
 function hasOptions(operation, relations) {
   switch (operation) {
     case 'k':

@@ -2,10 +2,14 @@ import _ from 'lodash';
 import { cartesian } from 'util.js';
 import { allSolidNames } from 'data';
 import { PRECISION } from 'math/linAlg';
-import { getOperations, getRelations } from 'polyhedra/relations';
+import {
+  getOperationName,
+  getOperations,
+  getRelations,
+} from 'polyhedra/relations';
 import Polyhedron from 'math/polyhedron';
 import Peak from 'math/Peak';
-import { canAugment } from 'math/operations';
+import { operations, canAugment } from 'math/operations';
 import applyOperation from './applyOperation';
 
 const archimedeanOpts = ['t', 'k', 'c', 'r', 'e'];
@@ -74,6 +78,14 @@ expect.extend({
 });
 
 function getOptsToTest(operation, polyhedron) {
+  const operationName = getOperationName(operation);
+  if (!!operations[operationName]) {
+    return (
+      _.invoke(operations[operationName], 'getAllApplyArgs', polyhedron) || [
+        undefined,
+      ]
+    );
+  }
   switch (operation) {
     case '+':
       const relations = getRelations(polyhedron.name, operation);
@@ -99,14 +111,6 @@ function getOptsToTest(operation, polyhedron) {
         return [{ polygon: 3 }, { polygon: 5 }];
       }
       return [undefined];
-    case 'c':
-      if (polyhedron.name === 'rhombicuboctahedron') {
-        return [{ polygon: 3 }, { polygon: 4 }];
-      } else if (polyhedron.name === 'rhombicosidodecahedron') {
-        return [{ polygon: 3 }, { polygon: 5 }];
-      }
-      return [undefined];
-
     default:
       return [undefined];
   }

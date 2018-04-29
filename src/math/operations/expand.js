@@ -5,6 +5,7 @@ import { VIndex, FIndex } from 'math/solidTypes';
 import { vec, PRECISION } from 'math/linAlg';
 import type { Vector } from 'math/linAlg';
 import { deduplicateVertices } from './operationUtils';
+import { Operation } from './operationTypes';
 
 interface ContractOptions {
   faceType: number;
@@ -50,17 +51,6 @@ export function isExpansionFace(
     polyhedron.faceGraph()[fIndex],
     fIndex2 => polyhedron.numSides(fIndex2) === 4,
   );
-}
-
-export function getContractPolygon(polyhedron: Polyhedron, point: Vector) {
-  const hitPoint = vec(point);
-  const hitFaceIndex = polyhedron.hitFaceIndex(hitPoint);
-  // TODO handle octahedron case
-  const isValid = _.every(
-    polyhedron.faceGraph()[hitFaceIndex],
-    fIndex2 => polyhedron.numSides(fIndex2) === 4,
-  );
-  return isValid ? polyhedron.numSides(hitFaceIndex) : -1;
 }
 
 function duplicateVertices(polyhedron: Polyhedron) {
@@ -126,7 +116,7 @@ function getResizedVertices(polyhedron, fIndices, resizedLength) {
   return result;
 }
 
-export function expand(polyhedron: Polyhedron) {
+function applyExpand(polyhedron: Polyhedron) {
   // figure out what this polyhedron expands to
   const n = polyhedron.numSides(0);
   const result = duplicateVertices(polyhedron);
@@ -159,6 +149,10 @@ export function expand(polyhedron: Polyhedron) {
     },
   };
 }
+
+export const expand: Operation = {
+  apply: applyExpand,
+};
 
 function getCuboctahedronContractFaceIndices(polyhedron) {
   const toCheck = polyhedron
@@ -193,7 +187,7 @@ function getContractFaceIndices(polyhedron, faceType) {
   );
 }
 
-export function contract(
+export function applyContract(
   polyhedron: Polyhedron,
   { faceType }: ContractOptions,
 ) {
@@ -219,3 +213,54 @@ export function contract(
     },
   };
 }
+
+export const contract: Operation = {
+  apply: applyContract,
+
+  getSearchOptions(polyhedron, config) {
+    const { faceType } = config;
+    if (polyhedron.name === 'rhombicuboctahedron') {
+      return { value: faceType === 3 ? 'O' : 'C' };
+    } else if (polyhedron.name === 'rhombicosidodecahedron') {
+      return { value: faceType === 3 ? 'I' : 'D' };
+    }
+  },
+
+  getDefaultArgs(polyhedron, config) {
+    return { faceType: config.faceType || 3 };
+  },
+
+  getApplyArgs(polyhedron: Polyhedron, point: Vector) {
+    const hitPoint = vec(point);
+    const hitFaceIndex = polyhedron.hitFaceIndex(hitPoint);
+    // TODO handle octahedron case
+    const isValid = _.every(
+      polyhedron.faceGraph()[hitFaceIndex],
+      fIndex2 => polyhedron.numSides(fIndex2) === 4,
+    );
+    return isValid ? { faceType: polyhedron.numSides(hitFaceIndex) } : {};
+  },
+
+  getAllApplyArgs(polyhedron) {
+    // TODO we can do this w/o referencing name
+    if (polyhedron.name === 'rhombicuboctahedron') {
+      return [{ faceType: 3 }, { faceType: 4 }];
+    } else if (polyhedron.name === 'rhombicosidodecahedron') {
+      return [{ faceType: 3 }, { faceType: 5 }];
+    }
+    return [undefined];
+  },
+
+  isHighlighted(
+    polyhedron: Polyhedron,
+    applyArgs: ContractOptions,
+    fIndex: FIndex,
+  ) {
+    if (
+      _.isNumber(applyArgs.faceType) &&
+      isExpansionFace(polyhedron, fIndex, applyArgs.faceType)
+    ) {
+      return true;
+    }
+  },
+};

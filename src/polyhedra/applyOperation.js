@@ -9,7 +9,7 @@ import {
 import Polyhedron from 'math/Polyhedron';
 import Vertex from 'math/solidTypes';
 import Peak from 'math/Peak';
-import { operationFunctions } from 'math/operations';
+import { operations, operationFunctions } from 'math/operations';
 
 import {
   getAugmentAlignment,
@@ -45,6 +45,7 @@ const updateName = (opResult, name) => {
 export type Operation = 't' | 'r' | 'k' | 'c' | 'e' | '+' | '-' | 'g';
 interface ApplyConfig {
   polygon?: number;
+  faceType?: number;
   fIndex?: number;
   using?: string;
   gyrate?: 'ortho' | 'gyro';
@@ -69,7 +70,16 @@ export default function applyOperation(
   let options: ApplyConfig = {};
   let applyConfig = config;
   const relations = getRelations(polyhedron.name, operation);
-  if (operation === 'k') {
+  const operationName = getOperationName(operation);
+  if (!!operations[operationName]) {
+    const op = operations[operationName];
+    // FIXME don't have to rely on this
+    options = _.invoke(op, 'getSearchOptions', polyhedron, config);
+    applyConfig = {
+      ...applyConfig,
+      ..._.invoke(op, 'getDefaultArgs', polyhedron, config),
+    };
+  } else if (operation === 'k') {
     // since there's so few options, let's just hardcode
     const { polygon } = config;
     if (polyhedron.name === 'cuboctahedron') {
@@ -78,15 +88,6 @@ export default function applyOperation(
       options = { value: polygon === 3 ? 'D' : 'I' };
     }
     applyConfig = { ...applyConfig, faceType: polygon };
-  } else if (operation === 'c') {
-    // since there's so few options, let's just hardcode
-    const { polygon } = config;
-    if (polyhedron.name === 'rhombicuboctahedron') {
-      options = { value: polygon === 3 ? 'O' : 'C' };
-    } else if (polyhedron.name === 'rhombicosidodecahedron') {
-      options = { value: polygon === 3 ? 'I' : 'D' };
-    }
-    applyConfig = { ...applyConfig, faceType: polygon || 3 };
   } else if (operation === '+') {
     const { fIndex } = config;
 
@@ -148,7 +149,9 @@ export default function applyOperation(
   }
 
   const next = getNextPolyhedron(polyhedron.name, operation, _.pickBy(options));
-  const opFunction = operationFunctions[getOperationName(operation)];
+  const opFunction = !!operations[operationName]
+    ? operations[operationName].apply
+    : operationFunctions[getOperationName(operation)];
   if (!_.isFunction(opFunction)) {
     // throw new Error(`Function not found for ${operation}`)
     return { result: Polyhedron.get(next) };

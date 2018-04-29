@@ -10,6 +10,7 @@ import {
   removeExtraneousVertices,
   deduplicateVertices,
 } from './operationUtils';
+import type { Operation } from './operationTypes';
 
 interface TruncateOptions {
   mock?: boolean;
@@ -88,10 +89,14 @@ function doTruncate(polyhedron, options: TruncateOptions = {}) {
   };
 }
 
-export function truncate(polyhedron: Polyhedron, options: TruncateOptions) {
-  return doTruncate(polyhedron);
-}
+export const truncate: Operation<TruncateOptions> = {
+  apply(polyhedron: Polyhedron, options: TruncateOptions) {
+    return doTruncate(polyhedron);
+  },
+};
 
-export function rectify(polyhedron: Polyhedron) {
-  return doTruncate(polyhedron, { rectify: true });
-}
+export const rectify: Operation = {
+  apply(polyhedron: Polyhedron) {
+    return doTruncate(polyhedron, { rectify: true });
+  },
+};

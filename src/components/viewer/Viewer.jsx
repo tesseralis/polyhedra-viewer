@@ -11,10 +11,9 @@ import type { Vertex, Face, FIndex } from 'math/solidTypes';
 import type { Vector } from 'math/linAlg';
 import {
   getCumulatePolygon,
-  getContractPolygon,
-  isExpansionFace,
   getAugmentFace,
   getAugmentGraph,
+  operations,
 } from 'math/operations';
 import polygons from 'constants/polygons';
 import { mapObject } from 'util.js';
@@ -22,7 +21,11 @@ import { fixed, fullScreen } from 'styles/common';
 import { unescapeName } from 'polyhedra/names';
 import doApplyOperation from 'polyhedra/applyOperation';
 import type { Operation } from 'polyhedra/applyOperation';
-import { getRelations, applyOptionsFor } from 'polyhedra/relations';
+import {
+  getOperationName,
+  getRelations,
+  applyOptionsFor,
+} from 'polyhedra/relations';
 import { defaultConfig, getPolyhedronConfig } from 'constants/configOptions';
 import transition from 'transition.js';
 
@@ -231,6 +234,13 @@ export default class Viewer extends Component<ViewerProps, ViewerState> {
       return toRgb(faceColors[fIndex]);
     }
 
+    if (operation && !!operations[getOperationName(operation)]) {
+      const { isHighlighted } = operations[getOperationName(operation)];
+      if (!!isHighlighted && isHighlighted(polyhedron, applyArgs, fIndex)) {
+        return [1, 1, 0];
+      }
+    }
+
     switch (operation) {
       case '+':
         if (_.isNumber(applyArgs.fIndex) && fIndex === applyArgs.fIndex) {
@@ -252,14 +262,6 @@ export default class Viewer extends Component<ViewerProps, ViewerState> {
         if (
           _.isNumber(applyArgs.polygon) &&
           face.length === applyArgs.polygon
-        ) {
-          return [1, 1, 0];
-        }
-        break;
-      case 'c':
-        if (
-          _.isNumber(applyArgs.polygon) &&
-          isExpansionFace(polyhedron, fIndex, applyArgs.polygon)
         ) {
           return [1, 1, 0];
         }
@@ -384,8 +386,15 @@ export default class Viewer extends Component<ViewerProps, ViewerState> {
   // TODO could probably move to own file
   setApplyArgs = (hitPnt?: Vector) => {
     this.setState(({ polyhedron, operation }) => {
-      if (!hitPnt) {
+      if (!operation || !hitPnt) {
         return { applyArgs: {} };
+      }
+      const operationName = getOperationName(operation);
+      if (!!operations[operationName]) {
+        if (!operations[operationName].getApplyArgs) return;
+        return {
+          applyArgs: operations[operationName].getApplyArgs(polyhedron, hitPnt),
+        };
       }
       switch (operation) {
         case '+':
@@ -403,12 +412,6 @@ export default class Viewer extends Component<ViewerProps, ViewerState> {
           };
         case 'k': {
           const polygon = getCumulatePolygon(polyhedron, hitPnt);
-          return {
-            applyArgs: polygon === -1 ? {} : { polygon },
-          };
-        }
-        case 'c': {
-          const polygon = getContractPolygon(polyhedron, hitPnt);
           return {
             applyArgs: polygon === -1 ? {} : { polygon },
           };

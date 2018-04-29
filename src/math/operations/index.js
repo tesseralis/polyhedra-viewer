@@ -8,17 +8,19 @@ import { gyrate } from './gyrate';
 
 export { canAugment, getAugmentFace, getAugmentGraph } from './augment';
 export { getCumulatePolygon } from './cumulate';
-export { getContractPolygon, isExpansionFace } from './expand';
 export const operationFunctions = {
-  truncate,
-  rectify,
   cumulate,
-  expand,
-  contract,
   augment,
   elongate,
   gyroelongate,
   diminish,
   shorten,
   gyrate,
+};
+
+export const operations = {
+  truncate,
+  rectify,
+  expand,
+  contract,
 };
