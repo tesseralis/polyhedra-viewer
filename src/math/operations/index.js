@@ -19,3 +19,5 @@ export const operations = {
   shorten,
   gyrate,
 };
+
+export type { OperationResult } from './operationTypes';

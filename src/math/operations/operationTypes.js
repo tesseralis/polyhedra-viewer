@@ -3,9 +3,9 @@ import Polyhedron from 'math/Polyhedron';
 import type { Vertex, FIndex } from 'math/solidTypes';
 import type { Vector } from 'math/linAlg';
 
-interface OperationResult {
+export interface OperationResult {
   result: Polyhedron;
-  animationData: {
+  animationData?: {
     start: Polyhedron,
     endVertices: Vertex[],
   };
