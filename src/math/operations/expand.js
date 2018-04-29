@@ -75,24 +75,33 @@ function getContractResult(polyhedron, faceType) {
   }
 }
 
-function isSnub(polyhedron) {
-  return _.includes([20, 38, 92], polyhedron.numFaces());
+type ExpansionType = 'cantellate' | 'snub';
+
+function expansionType(polyhedron): ExpansionType {
+  return _.includes([20, 38, 92], polyhedron.numFaces())
+    ? 'snub'
+    : 'cantellate';
 }
 
-export function isExpansionFace(
+const edgeShape = {
+  snub: 3,
+  cantellate: 4,
+};
+
+export function isExpandedFace(
   polyhedron: Polyhedron,
   fIndex: FIndex,
-  nSides: number,
+  nSides?: number,
 ) {
-  if (polyhedron.numSides(fIndex) !== nSides) return false;
+  const type = expansionType(polyhedron);
+  if (nSides && polyhedron.numSides(fIndex) !== nSides) return false;
   if (!polyhedron.isFaceValid(fIndex)) return false;
   return _.every(
     polyhedron.faceGraph()[fIndex],
-    fIndex2 => polyhedron.numSides(fIndex2) === 4,
+    fIndex2 => polyhedron.numSides(fIndex2) === edgeShape[type],
   );
 }
 
-// FIXME make better
 function duplicateVertices(polyhedron: Polyhedron, twist?: 'left' | 'right') {
   const newVertexMapping = {};
   const vertexFaces = [];
@@ -199,57 +208,56 @@ function getResizedVertices(polyhedron, fIndices, resizedLength, angle = 0) {
   return result;
 }
 
-function applyExpand(polyhedron: Polyhedron) {
-  // figure out what this polyhedron expands to
-  const n = polyhedron.numSides(0);
-  const result = duplicateVertices(polyhedron);
+function getTwist(type, numSides) {
+  if (type === 'snub') {
+    return numSides === 3 ? 'right' : 'left';
+  }
+}
 
-  // Use a reference polyhedron to calculate how far to expand
-  const resultName = getExpansionResult(polyhedron);
-  const reference = Polyhedron.get(resultName);
+function doExpansion(polyhedron: Polyhedron, referenceName) {
+  const reference = Polyhedron.get(referenceName);
+  const type = expansionType(reference);
+  const n = polyhedron.numSides(0);
+  polyhedron = duplicateVertices(polyhedron, getTwist(type, n));
+
   const referenceFaceIndex = _.find(reference.fIndices(), fIndex =>
-    isExpansionFace(reference, fIndex, n),
+    isExpandedFace(reference, fIndex, n),
   );
   const referenceLength =
     reference.distanceToCenter(referenceFaceIndex) / reference.edgeLength();
 
-  const expandFaceIndices = _.filter(result.fIndices(), fIndex =>
-    isExpansionFace(result, fIndex, n),
+  const snubFaceIndices = _.filter(polyhedron.fIndices(), fIndex =>
+    isExpandedFace(polyhedron, fIndex, n),
   );
+  const angle = type === 'snub' ? getSnubAngle(reference, n) : 0;
 
   // Update the vertices with the expanded-out version
   const endVertices = getResizedVertices(
-    result,
-    expandFaceIndices,
+    polyhedron,
+    snubFaceIndices,
     referenceLength,
+    angle,
   );
 
   return {
-    result: result.withVertices(endVertices),
+    result: polyhedron.withVertices(endVertices),
     animationData: {
-      start: result,
+      start: polyhedron,
       endVertices,
     },
   };
 }
 
 export const expand: Operation<> = {
-  apply: applyExpand,
+  apply(polyhedron: Polyhedron) {
+    return doExpansion(polyhedron, getExpansionResult(polyhedron));
+  },
 };
-
-function isSnubFace(polyhedron, fIndex, nSides) {
-  if (polyhedron.numSides(fIndex) !== nSides) return false;
-  if (!polyhedron.isFaceValid(fIndex)) return false;
-  return _.every(
-    polyhedron.faceGraph()[fIndex],
-    fIndex2 => polyhedron.numSides(fIndex2) === 3,
-  );
-}
 
 function getSnubAngle(polyhedron, numSides) {
   const f0 =
     _.find(polyhedron.fIndices(), fIndex =>
-      isSnubFace(polyhedron, fIndex, numSides),
+      isExpandedFace(polyhedron, fIndex, numSides),
     ) || 0;
   const face0 = polyhedron.faces[f0];
 
@@ -257,7 +265,7 @@ function getSnubAngle(polyhedron, numSides) {
   const snubFaceIndices = _.filter(
     polyhedron.fIndices(),
     fIndex =>
-      isSnubFace(polyhedron, fIndex, numSides) &&
+      isExpandedFace(polyhedron, fIndex, numSides) &&
       !_.includes(polyhedron.adjacentFaceIndices(...face0), fIndex),
   );
   const [v0, v1] = polyhedron.vertexVectors(face0);
@@ -280,45 +288,10 @@ function getSnubAngle(polyhedron, numSides) {
   return numSides === 3 ? angle : -angle;
 }
 
-// FIXME deduplicate with expand
-function applySnub(polyhedron: Polyhedron) {
-  // figure out what this polyhedron expands to
-  const n = polyhedron.numSides(0);
-  const result = duplicateVertices(polyhedron, n === 3 ? 'right' : 'left');
-
-  // Use a reference polyhedron to calculate how far to expand
-  const resultName = getSnubResult(polyhedron);
-  const reference = Polyhedron.get(resultName);
-  const referenceFaceIndex = _.find(reference.fIndices(), fIndex =>
-    isSnubFace(reference, fIndex, n),
-  );
-  const referenceLength =
-    reference.distanceToCenter(referenceFaceIndex) / reference.edgeLength();
-
-  const snubFaceIndices = _.filter(result.fIndices(), fIndex =>
-    isSnubFace(result, fIndex, n),
-  );
-  const snubAngle = getSnubAngle(reference, n);
-
-  // Update the vertices with the expanded-out version
-  const endVertices = getResizedVertices(
-    result,
-    snubFaceIndices,
-    referenceLength,
-    snubAngle,
-  );
-
-  return {
-    result: result.withVertices(endVertices),
-    animationData: {
-      start: result,
-      endVertices,
-    },
-  };
-}
-
 export const snub: Operation<> = {
-  apply: applySnub,
+  apply(polyhedron: Polyhedron) {
+    return doExpansion(polyhedron, getSnubResult(polyhedron));
+  },
 };
 
 interface ContractOptions {
@@ -353,11 +326,8 @@ function getContractFaceIndices(polyhedron, faceType) {
   if (getFamily(polyhedron) === 'T') {
     return getTetrahedralContractFaceIndices(polyhedron);
   }
-  return _.filter(
-    polyhedron.fIndices(),
-    fIndex =>
-      isExpansionFace(polyhedron, fIndex, faceType) ||
-      isSnubFace(polyhedron, fIndex, faceType),
+  return _.filter(polyhedron.fIndices(), fIndex =>
+    isExpandedFace(polyhedron, fIndex, faceType),
   );
 }
 
@@ -375,7 +345,10 @@ export function applyContract(
   // TODO can we like, factor out this logic?
   const contractFaceIndices = getContractFaceIndices(polyhedron, faceType);
   // FIXME fuuuu the angles actually go the other way depending on the type of polyhedron
-  const angle = isSnub(polyhedron) ? -getSnubAngle(polyhedron, faceType) : 0;
+  const angle =
+    expansionType(polyhedron) === 'snub'
+      ? -getSnubAngle(polyhedron, faceType)
+      : 0;
 
   const endVertices = getResizedVertices(
     polyhedron,
@@ -416,15 +389,7 @@ export const contract: Operation<ContractOptions> = {
   getApplyArgs(polyhedron: Polyhedron, point: Vector) {
     const hitPoint = vec(point);
     const hitFaceIndex = polyhedron.hitFaceIndex(hitPoint);
-    const isValid =
-      _.every(
-        polyhedron.faceGraph()[hitFaceIndex],
-        fIndex2 => polyhedron.numSides(fIndex2) === 4,
-      ) ||
-      _.every(
-        polyhedron.faceGraph()[hitFaceIndex],
-        fIndex2 => polyhedron.numSides(fIndex2) === 3,
-      );
+    const isValid = isExpandedFace(polyhedron, hitFaceIndex);
     return isValid ? { faceType: polyhedron.numSides(hitFaceIndex) } : {};
   },
 
@@ -447,8 +412,7 @@ export const contract: Operation<ContractOptions> = {
   ) {
     if (
       typeof applyArgs.faceType === 'number' &&
-      (isExpansionFace(polyhedron, fIndex, applyArgs.faceType) ||
-        isSnubFace(polyhedron, fIndex, applyArgs.faceType))
+      isExpandedFace(polyhedron, fIndex, applyArgs.faceType)
     ) {
       return true;
     }
