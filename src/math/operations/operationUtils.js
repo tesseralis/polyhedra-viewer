@@ -1,9 +1,9 @@
 // @flow
 import _ from 'lodash';
 import Polyhedron from 'math/Polyhedron';
-import { PRECISION } from 'math/linAlg';
+import { PRECISION, getMidpoint, getPlane } from 'math/linAlg';
 import { numSides } from 'math/solidUtils';
-import { VIndex } from 'math/solidTypes';
+import { VIndex, FIndex } from 'math/solidTypes';
 
 export const hasMultiple = (relations: any, property: any) =>
   _(relations)
@@ -76,4 +76,96 @@ export function removeExtraneousVertices(polyhedron: Polyhedron) {
     face.map((vIndex: VIndex) => _.get(newToOld, vIndex, vIndex)),
   );
   return Polyhedron.of(newVertices, newFaces);
+}
+
+export function getResizedVertices(
+  polyhedron: Polyhedron,
+  fIndices: FIndex[],
+  resizedLength: number,
+  angle: number = 0,
+) {
+  // Update the vertices with the expanded-out version
+  const f0 = fIndices[0];
+  const sideLength = polyhedron.edgeLength(f0);
+  const baseLength = polyhedron.distanceToCenter(f0) / sideLength;
+  const result = [...polyhedron.vertices];
+  _.forEach(fIndices, fIndex => {
+    const normal = polyhedron.faceNormal(fIndex);
+    const centroid = polyhedron.faceCentroid(fIndex);
+    const expandFace = polyhedron.faces[fIndex];
+    _.forEach(expandFace, vIndex => {
+      const vertex = polyhedron.vertexVectors()[vIndex];
+      const rotated =
+        angle === 0
+          ? vertex
+          : vertex
+              .sub(centroid)
+              .getRotatedAroundAxis(normal, angle)
+              .add(centroid);
+      const scale = (resizedLength - baseLength) * sideLength;
+      result[vIndex] = rotated.add(normal.scale(scale)).toArray();
+    });
+  });
+  return result;
+}
+
+type ExpansionType = 'cantellate' | 'snub';
+
+export function expansionType(polyhedron: Polyhedron): ExpansionType {
+  return _.includes([20, 38, 92], polyhedron.numFaces())
+    ? 'snub'
+    : 'cantellate';
+}
+
+const edgeShape = {
+  snub: 3,
+  cantellate: 4,
+};
+
+export function isExpandedFace(
+  polyhedron: Polyhedron,
+  fIndex: FIndex,
+  nSides?: number,
+) {
+  const type = expansionType(polyhedron);
+  if (nSides && polyhedron.numSides(fIndex) !== nSides) return false;
+  if (!polyhedron.isFaceValid(fIndex)) return false;
+  return _.every(
+    polyhedron.faceGraph()[fIndex],
+    fIndex2 => polyhedron.numSides(fIndex2) === edgeShape[type],
+  );
+}
+
+export function getSnubAngle(polyhedron: Polyhedron, numSides: number) {
+  const f0 =
+    _.find(polyhedron.fIndices(), fIndex =>
+      isExpandedFace(polyhedron, fIndex, numSides),
+    ) || 0;
+  const face0 = polyhedron.faces[f0];
+
+  const faceCentroid = polyhedron.faceCentroid(f0);
+  const snubFaceIndices = _.filter(
+    polyhedron.fIndices(),
+    fIndex =>
+      isExpandedFace(polyhedron, fIndex, numSides) &&
+      !_.includes(polyhedron.adjacentFaceIndices(...face0), fIndex),
+  );
+  const [v0, v1] = polyhedron.vertexVectors(face0);
+  const midpoint = getMidpoint(v0, v1);
+  const f1 = _.minBy(snubFaceIndices, fIndex =>
+    midpoint.distanceTo(polyhedron.faceCentroid(fIndex)),
+  );
+  const plane = getPlane([
+    faceCentroid,
+    polyhedron.faceCentroid(f1),
+    polyhedron.centroid(),
+  ]);
+  const projected = plane.getProjectedPoint(midpoint);
+
+  const angle = midpoint
+    .sub(faceCentroid)
+    .angleBetween(projected.sub(faceCentroid), true);
+
+  // This always ensures the same chirality for everything
+  return numSides === 3 ? angle : -angle;
 }
