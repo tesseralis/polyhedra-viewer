@@ -1,6 +1,6 @@
 // @flow
 import _ from 'lodash';
-import { Vec3D, Triangle3D, Plane } from 'toxiclibsjs/geom';
+import { Vec3D, Ray3D, Triangle3D, Plane } from 'toxiclibsjs/geom';
 
 export type Vector = [number, number, number];
 
@@ -34,4 +34,15 @@ export function getCentroid(vectors: Vec3D[]) {
 export function getNormal(vertices: Vec3D[]) {
   const [v0, v1, v2] = vertices;
   return v0.sub(v1).cross(v1.sub(v2));
+}
+
+export function getNormalRay(vertices: Vec3D[]) {
+  return new Ray3D(getCentroid(vertices), getNormal(vertices).getNormalized());
+}
+
+export function rotateAround(point: Vec3D, ray: Ray3D, theta: number) {
+  return point
+    .sub(ray)
+    .getRotatedAroundAxis(ray.getDirection(), theta)
+    .add(ray);
 }

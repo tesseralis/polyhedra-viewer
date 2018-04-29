@@ -94,7 +94,6 @@ export function applyContract(
   // Take all the stuff and push it inwards
   // TODO can we like, factor out this logic?
   const contractFaceIndices = getContractFaceIndices(polyhedron, faceType);
-  // FIXME fuuuu the angles actually go the other way depending on the type of polyhedron
   const angle =
     expansionType(polyhedron) === 'snub'
       ? -getSnubAngle(polyhedron, faceType)

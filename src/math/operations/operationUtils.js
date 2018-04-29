@@ -1,7 +1,7 @@
 // @flow
 import _ from 'lodash';
 import Polyhedron from 'math/Polyhedron';
-import { PRECISION, getMidpoint, getPlane } from 'math/linAlg';
+import { PRECISION, getMidpoint, getPlane, rotateAround } from 'math/linAlg';
 import { numSides } from 'math/solidUtils';
 import { VIndex, FIndex } from 'math/solidTypes';
 
@@ -91,17 +91,13 @@ export function getResizedVertices(
   const result = [...polyhedron.vertices];
   _.forEach(fIndices, fIndex => {
     const normal = polyhedron.faceNormal(fIndex);
-    const centroid = polyhedron.faceCentroid(fIndex);
     const expandFace = polyhedron.faces[fIndex];
     _.forEach(expandFace, vIndex => {
       const vertex = polyhedron.vertexVectors()[vIndex];
       const rotated =
         angle === 0
           ? vertex
-          : vertex
-              .sub(centroid)
-              .getRotatedAroundAxis(normal, angle)
-              .add(centroid);
+          : rotateAround(vertex, polyhedron.normalRay(fIndex), angle);
       const scale = (resizedLength - baseLength) * sideLength;
       result[vIndex] = rotated.add(normal.scale(scale)).toArray();
     });

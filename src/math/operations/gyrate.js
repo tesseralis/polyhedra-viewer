@@ -1,6 +1,6 @@
 // @flow
 import _ from 'lodash';
-import { vec, getCentroid, getNormal } from 'math/linAlg';
+import { getNormalRay, rotateAround } from 'math/linAlg';
 import Polyhedron from 'math/Polyhedron';
 import Peak from 'math/Peak';
 import { numSides } from 'math/solidUtils';
@@ -23,8 +23,7 @@ function applyGyrate(polyhedron, { peak }) {
   const boundaryVertices = boundary.map(
     vIndex => polyhedron.vertexVectors()[vIndex],
   );
-  const normal = getNormal(boundaryVertices).getNormalized();
-  const centroid = getCentroid(boundaryVertices);
+  const normalRay = getNormalRay(boundaryVertices);
   const theta = TAU / numSides(boundary);
 
   const newBoundaryVertices = boundary.map(
@@ -49,22 +48,17 @@ function applyGyrate(polyhedron, { peak }) {
     mockFaces,
   );
 
-  const newVertices = mockPolyhedron.vertices.map((vertex, vIndex) => {
-    // FIXME make more elegant
+  const newVertices = mockPolyhedron.vertexVectors().map((v, vIndex) => {
     if (
       _.includes(peak.innerVertexIndices(), vIndex) ||
       vIndex >= polyhedron.numVertices()
     ) {
-      return vec(vertex)
-        .sub(centroid)
-        .getRotatedAroundAxis(normal, theta)
-        .add(centroid)
-        .toArray();
+      return rotateAround(v, normalRay, theta).toArray();
     }
-    return vertex;
+    return v.toArray();
   });
 
-  // FIXME something's broken also the interpolation doesn't work cause it's radial fuuuu
+  // FIXME the interpolation doesn't work cause it's radial
   return {
     animationData: {
       start: mockPolyhedron,

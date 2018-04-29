@@ -1,6 +1,6 @@
 // @flow
 import _ from 'lodash';
-import { Vec3D } from 'toxiclibsjs/geom';
+import { Vec3D, Ray3D } from 'toxiclibsjs/geom';
 import { isValidSolid, getSolidData } from 'data';
 import { atIndices } from 'util.js';
 import {
@@ -261,6 +261,10 @@ export default class Polyhedron {
   /** Return the normal of the face given by the face index */
   faceNormal(fIndex: FIndex) {
     return getNormal(this.vertexVectors(this.faces[fIndex])).getNormalized();
+  }
+
+  normalRay(fIndex: FIndex) {
+    return new Ray3D(this.faceCentroid(fIndex), this.faceNormal(fIndex));
   }
 
   // Get the faces adjacent to this edge, with the directed face first
