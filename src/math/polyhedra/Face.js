@@ -30,6 +30,14 @@ export default class Face {
     return this.face;
   }
 
+  nextVertex(vIndex: VIndex) {
+    return getCyclic(this.face, this.face.indexOf(vIndex) + 1);
+  }
+
+  prevVertex(vIndex: VIndex) {
+    return getCyclic(this.face, this.face.indexOf(vIndex) - 1);
+  }
+
   numSides(fIndex: FIndex) {
     return numSides(this.face);
   }

@@ -3,7 +3,6 @@ import _ from 'lodash';
 
 import { Polyhedron } from 'math/polyhedra';
 import { VIndex } from 'math/polyhedra';
-import { nextVertex } from 'math/polyhedra/solidUtils';
 import { replace } from 'util.js';
 import { vec } from 'math/linAlg';
 import {
@@ -28,7 +27,7 @@ function truncateVertex(
     if (mock) {
       return polyhedron.vertices[vIndex];
     }
-    const next = nextVertex(face.vIndices(), vIndex);
+    const next = face.nextVertex(vIndex);
     const p1 = vec(polyhedron.vertices[vIndex]);
     const p2 = vec(polyhedron.vertices[next]);
     const sideLength = p1.distanceTo(p2);

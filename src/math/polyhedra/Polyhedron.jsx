@@ -11,8 +11,6 @@ import {
   hasDirectedEdge,
   getAllEdges,
   getCyclic,
-  prevVertex,
-  nextVertex,
 } from './solidUtils';
 import type { Vertex, Face, Edge, VIndex, FIndex } from './solidTypes';
 
@@ -139,7 +137,7 @@ export default class Polyhedron {
     const result = [];
     let next: FaceObj = touchingFaces[0];
     const checkVertex = (f: FaceObj) =>
-      prevVertex(next.vIndices(), vIndex) === nextVertex(f.vIndices(), vIndex);
+      next.prevVertex(vIndex) === f.nextVertex(vIndex);
     do {
       result.push(next);
       next = find(touchingFaces, checkVertex);
@@ -202,6 +200,20 @@ export default class Polyhedron {
 
   addFaces(faces: Face[]) {
     return this.withFaces(this.faces.concat(faces));
+  }
+
+  addPolyhedron(other: Polyhedron) {
+    return this.addVertices(other.vertices).addFaces(
+      other.faces.map(vIndices =>
+        vIndices.map(vIndex => vIndex + this.numVertices()),
+      ),
+    );
+  }
+
+  removeFace(face: FaceObj) {
+    const removed = [...this.faces];
+    _.pullAt(removed, [face.fIndex]);
+    return this.withFaces(removed);
   }
 
   mapVertices(iteratee: (Vertex, VIndex) => Vertex) {

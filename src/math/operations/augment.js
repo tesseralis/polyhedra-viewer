@@ -4,10 +4,10 @@ import _ from 'lodash';
 import { Polyhedron, Face } from 'math/polyhedra';
 import type { VIndex } from 'math/polyhedra';
 import { vec, getPlane, PRECISION } from 'math/linAlg';
-import { getSingle, cartesian, mapObject } from 'util.js';
+import { find, getSingle, cartesian } from 'util.js';
 import { numSides, getCyclic as getMod } from 'math/polyhedra/solidUtils';
 
-import { hasMultiple, removeExtraneousVertices } from './operationUtils';
+import { hasMultiple, deduplicateVertices } from './operationUtils';
 import { faceDistanceBetweenVertices } from './applyOptionUtils';
 import { Operation } from './operationTypes';
 
@@ -269,10 +269,7 @@ function doAugment(polyhedron, base, using, gyrate, mock = false) {
   const augmentType = augmentTypes[prefix];
   // FIXME rename
   let augmentee = augmentData[augmentType][index];
-  const underside = _.find(augmentee.getFaces(), face => face.numSides() === n);
-  if (!underside) {
-    throw new Error('Could not find an underside');
-  }
+  const underside = find(augmentee.getFaces(), face => face.numSides() === n);
   augmentee = mock ? flatten(augmentee, underside) : augmentee;
 
   // rotate and translate so that the face is next to our face
@@ -320,35 +317,18 @@ function doAugment(polyhedron, base, using, gyrate, mock = false) {
         alignedV0.cross(translatedV0).getNormalized(),
         alignVerticesAngle,
       )
-      .add(baseCenter);
+      .add(baseCenter)
+      .toArray();
   });
-
-  // append the faces and vertices
-  const newVertices = polyhedron.vertices.concat(
-    transformedAugmenteeVertices.map(v => v.toArray()),
-  );
-
-  // Map the underside vertices to the base's
-  const undersideMapping = mapObject(
-    base.vIndices(),
-    (vIndex: VIndex, i: number) => {
-      const correspondingIndex = getMod(undersideFace, offset - i);
-      return [correspondingIndex, vIndex];
-    },
-  );
-
-  const newFaces = polyhedron.faces.concat(
-    augmentee.faces.map(face =>
-      face.map(vIndex =>
-        _.get(undersideMapping, vIndex, vIndex + polyhedron.numVertices()),
+  return deduplicateVertices(
+    polyhedron
+      .removeFace(base)
+      .addPolyhedron(
+        augmentee
+          .withVertices(transformedAugmenteeVertices)
+          .removeFace(underside),
       ),
-    ),
   );
-  // Remove the original base and underside
-  _.pullAt(newFaces, [base.fIndex, polyhedron.numFaces() + underside.fIndex]);
-
-  // remove extraneous vertices
-  return removeExtraneousVertices(Polyhedron.of(newVertices, newFaces));
 }
 
 export const elongate: Operation<> = {
