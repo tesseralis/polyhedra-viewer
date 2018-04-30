@@ -7,7 +7,7 @@ import { rgb } from 'd3-color';
 import { isValidSolid } from 'data';
 import { andaleMono } from 'styles/fonts';
 import { Polyhedron } from 'math/polyhedra';
-import type { Vertex, Face, FIndex } from 'math/polyhedra';
+import type { Vertex, Face } from 'math/polyhedra';
 import type { Vector } from 'math/linAlg';
 import { operations } from 'math/operations';
 import polygons from 'constants/polygons';
@@ -85,7 +85,7 @@ function toRgb(hex: string): Color {
   return [r / 255, g / 255, b / 255];
 }
 const colorIndexForFace = mapObject(polygons, (n, i) => [n, i]);
-const getColorIndex = face => colorIndexForFace[face.length];
+const getColorIndex = face => colorIndexForFace[face.numSides()];
 const polygonColors = colors => polygons.map(n => toRgb(colors[n]));
 
 function getFaceColors(polyhedron: Polyhedron, colors: any) {
@@ -213,18 +213,18 @@ export default class Viewer extends Component<ViewerProps, ViewerState> {
 
   getColors = () => {
     const { interpolated, polyhedron } = this.state;
-    return (interpolated || polyhedron).faces.map(this.getColorForFace);
+    return (interpolated || polyhedron).getFaces().map(this.getColorForFace);
   };
 
   // TODO probably move this and the color utility functions to their own file
-  getColorForFace = (face: Face, fIndex: FIndex) => {
+  getColorForFace = (face: Face) => {
     const { applyArgs, polyhedron, operation, config, faceColors } = this.state;
     const { colors } = getPolyhedronConfig(config);
     const defaultColors = polygonColors(colors);
 
     // While doing animation, if we specify that this face has a color, use it
-    if (!!faceColors && _.has(faceColors, fIndex.toString())) {
-      return toRgb(faceColors[fIndex]);
+    if (!!faceColors && _.has(faceColors, face.fIndex.toString())) {
+      return toRgb(faceColors[face.fIndex]);
     }
 
     if (operation) {
@@ -234,7 +234,7 @@ export default class Viewer extends Component<ViewerProps, ViewerState> {
           'isHighlighted',
           polyhedron,
           applyArgs,
-          fIndex,
+          face,
         )
       ) {
         return [1, 1, 0];

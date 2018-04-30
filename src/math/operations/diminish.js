@@ -55,12 +55,11 @@ export const diminish: Operation<DiminishOptions> = {
     return peak ? { peak } : {};
   },
 
-  isHighlighted(polyhedron, applyArgs, fIndex) {
+  isHighlighted(polyhedron, applyArgs, face) {
     if (
       _.isObject(applyArgs.peak) &&
-      _.includes(applyArgs.peak.faceIndices(), fIndex)
+      _.includes(applyArgs.peak.faceIndices(), face.fIndex)
     ) {
-      // return polygonColors(diminishColors)[getColorIndex(face)]
       return true;
     }
   },

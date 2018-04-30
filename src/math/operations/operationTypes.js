@@ -1,6 +1,6 @@
 // @flow
 import { Polyhedron } from 'math/polyhedra';
-import type { Vertex, FIndex } from 'math/polyhedra';
+import type { Vertex, Face } from 'math/polyhedra';
 import type { Vector } from 'math/linAlg';
 
 export interface OperationResult {
@@ -25,6 +25,6 @@ export interface Operation<Options = {}, ApplyArgs = {}> {
   isHighlighed?: (
     polyhedron: Polyhedron,
     applyArgs: ApplyArgs,
-    fIndex: FIndex,
+    face: Face,
   ) => boolean;
 }

@@ -1,7 +1,6 @@
 // @flow
 import _ from 'lodash';
 import { Polyhedron } from 'math/polyhedra';
-import { FIndex } from 'math/polyhedra';
 import { vec } from 'math/linAlg';
 import type { Vector } from 'math/linAlg';
 import {
@@ -149,14 +148,10 @@ export const contract: Operation<ContractOptions> = {
     }
   },
 
-  isHighlighted(
-    polyhedron: Polyhedron,
-    applyArgs: ContractOptions,
-    fIndex: FIndex,
-  ) {
+  isHighlighted(polyhedron, applyArgs, face) {
     if (
       typeof applyArgs.faceType === 'number' &&
-      isExpandedFace(polyhedron, polyhedron.getFace(fIndex), applyArgs.faceType)
+      isExpandedFace(polyhedron, face, applyArgs.faceType)
     ) {
       return true;
     }

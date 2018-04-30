@@ -161,10 +161,10 @@ export const cumulate: Operation<CumulateOptions> = {
     return n <= 5 ? { faceType: n } : {};
   },
 
-  isHighlighted(polyhedron, applyArgs, fIndex) {
+  isHighlighted(polyhedron, applyArgs, face) {
     if (
       _.isNumber(applyArgs.faceType) &&
-      polyhedron.getFace(fIndex).numSides() === applyArgs.faceType
+      face.numSides() === applyArgs.faceType
     ) {
       return true;
     }

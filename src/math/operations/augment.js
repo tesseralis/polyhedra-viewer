@@ -454,8 +454,8 @@ export const augment: Operation<AugmentOptions> = {
     return face ? { face } : {};
   },
 
-  isHighlighted(polyhedron, applyArgs, fIndex) {
-    if (!!applyArgs.face && fIndex === applyArgs.face.fIndex) {
+  isHighlighted(polyhedron, applyArgs, face) {
+    if (!!applyArgs.face && face.fIndex === applyArgs.face.fIndex) {
       return true;
     }
   },
