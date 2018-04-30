@@ -30,11 +30,11 @@ function applyGyrate(polyhedron, { peak }) {
   const oldToNew = mapObject(boundary, (vIndex, i) => [vIndex, i]);
 
   // mock faces for animation
-  const mockFaces = polyhedron.faces.map((face, fIndex) => {
-    if (!_.includes(peak.faceIndices(), fIndex)) {
-      return face;
+  const mockFaces = polyhedron.getFaces().map(face => {
+    if (!face.inSet(peak.faceObjs())) {
+      return face.vIndices();
     }
-    return face.map((vIndex, i) => {
+    return face.vIndices().map((vIndex, i) => {
       return _.includes(boundary, vIndex)
         ? polyhedron.numVertices() + oldToNew[vIndex]
         : vIndex;
@@ -101,10 +101,7 @@ export const gyrate: Operation<GyrateOptions> = {
   },
 
   isHighlighted(polyhedron, applyArgs, face) {
-    if (
-      _.isObject(applyArgs.peak) &&
-      _.includes(applyArgs.peak.faceIndices(), face.fIndex)
-    ) {
+    if (_.isObject(applyArgs.peak) && face.inSet(applyArgs.peak.faceObjs())) {
       return true;
     }
   },

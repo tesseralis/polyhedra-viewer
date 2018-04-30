@@ -116,15 +116,6 @@ export default class Polyhedron {
     return this.getFace(0).edgeLength();
   }
 
-  // Return the faces adjacent to the given vertices
-  adjacentFaceIndices(...vIndices: VIndex[]): FIndex[] {
-    return _(vIndices)
-      .flatMap(vIndex => this.vertexToFaceGraph()[vIndex])
-      .map(face => face.fIndex)
-      .uniq()
-      .value();
-  }
-
   adjacentFaces(...vIndices: VIndex[]) {
     return _(vIndices)
       .flatMap(vIndex => this.vertexToFaceGraph()[vIndex])
@@ -213,6 +204,12 @@ export default class Polyhedron {
   removeFace(face: FaceObj) {
     const removed = [...this.faces];
     _.pullAt(removed, [face.fIndex]);
+    return this.withFaces(removed);
+  }
+
+  removeFaces(faceObjs: FaceObj[]) {
+    const removed = [...this.faces];
+    _.pullAt(removed, _.map(faceObjs, 'fIndex'));
     return this.withFaces(removed);
   }
 
@@ -332,9 +329,7 @@ export default class Polyhedron {
   findPeak(point: Vector) {
     const hitPoint = vec(point);
     const hitFace = this.hitFace(hitPoint);
-    const peaks = this.peaks().filter(peak =>
-      _.includes(peak.faceIndices(), hitFace.fIndex),
-    );
+    const peaks = this.peaks().filter(peak => hitFace.inSet(peak.faceObjs()));
     if (peaks.length === 0) {
       return null;
     }

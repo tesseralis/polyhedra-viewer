@@ -2,7 +2,6 @@
 
 import _ from 'lodash';
 import { getBoundary } from './solidUtils';
-import { vec } from 'math/linAlg';
 import type { Edge, VIndex } from './solidTypes';
 
 import Polyhedron from './Polyhedron';
@@ -52,11 +51,10 @@ export default class Peak {
 
   topPoint() {}
 
-  // faceConfiguration(): FaceConfiguration;
   faceConfiguration: () => FaceConfiguration;
 
-  faceIndices = _.memoize(() => {
-    return this.polyhedron.adjacentFaceIndices(...this.innerVertexIndices());
+  faceObjs = _.memoize(() => {
+    return this.polyhedron.adjacentFaces(...this.innerVertexIndices());
   });
 
   faces = _.memoize(() => {
@@ -86,10 +84,10 @@ const Pyramid = withMapper('vIndices')(
       this.vIndex = vIndex;
     }
 
-    faceConfiguration = () => ({ '3': this.faces().length });
+    faceConfiguration = () => ({ '3': this.faceObjs().length });
 
     topPoint() {
-      return vec(this.polyhedron.vertices[this.vIndex]);
+      return this.polyhedron.vertexVector(this.vIndex);
     }
   },
 );
@@ -106,7 +104,7 @@ const Fastigium = withMapper('edges')(
     faceConfiguration = () => ({ '3': 1, '4': 2 });
 
     topPoint() {
-      const [v1, v2] = this.edge.map(v => this.polyhedron.vertexVectors()[v]);
+      const [v1, v2] = this.edge.map(v => this.polyhedron.vertexVector(v));
       return v1.add(v2).scale(0.5);
     }
   },

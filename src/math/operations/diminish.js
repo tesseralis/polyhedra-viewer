@@ -8,9 +8,9 @@ import type { Operation } from './operationTypes';
 import { getPeakAlignment, getCupolaGyrate } from './applyOptionUtils';
 
 function removeVertices(polyhedron, peak) {
-  const newFaces = polyhedron.faces.concat([peak.boundary()]);
-  _.pullAt(newFaces, peak.faceIndices());
-  return removeExtraneousVertices(polyhedron.withFaces(newFaces));
+  return removeExtraneousVertices(
+    polyhedron.removeFaces(peak.faceObjs()).addFaces([peak.boundary()]),
+  );
 }
 
 interface DiminishOptions {
@@ -56,10 +56,7 @@ export const diminish: Operation<DiminishOptions> = {
   },
 
   isHighlighted(polyhedron, applyArgs, face) {
-    if (
-      _.isObject(applyArgs.peak) &&
-      _.includes(applyArgs.peak.faceIndices(), face.fIndex)
-    ) {
+    if (_.isObject(applyArgs.peak) && face.inSet(applyArgs.peak.faceObjs())) {
       return true;
     }
   },
