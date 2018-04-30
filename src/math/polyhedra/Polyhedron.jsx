@@ -239,16 +239,14 @@ export default class Polyhedron {
   }
 
   edgeFaces(edge: Edge) {
-    return this.faces.filter(face => hasEdge(face, edge));
+    return this.getFaces().filter(face => hasEdge(face.vIndices(), edge));
   }
 
   getDihedralAngle(edge: Edge) {
-    const [v1, v2] = edge.map(vIndex => this.vertexVectors()[vIndex]);
+    const [v1, v2] = this.vertexVectors(edge);
     const midpoint = getMidpoint(v1, v2);
     const [c1, c2] = this.edgeFaces(edge)
-      .map(face =>
-        getCentroid(face.map(vIndex => this.vertexVectors()[vIndex])),
-      )
+      .map(face => face.centroid())
       .map(v => v.sub(midpoint));
 
     if (!c1 || !c2) {
