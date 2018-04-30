@@ -2,7 +2,7 @@
 import _ from 'lodash';
 
 import { Polyhedron, Face } from 'math/polyhedra';
-import type { VIndex, FIndex } from 'math/polyhedra';
+import type { VIndex } from 'math/polyhedra';
 import { vec, getPlane, PRECISION } from 'math/linAlg';
 import { getSingle, cartesian, mapObject } from 'util.js';
 import { numSides, getCyclic as getMod } from 'math/polyhedra/solidUtils';
@@ -61,7 +61,7 @@ const augmentTypes = {
 };
 
 // Return "meta" or "para", or null
-function getAugmentAlignment(polyhedron: Polyhedron, face: FIndex) {
+function getAugmentAlignment(polyhedron, face) {
   // get the existing peak boundary
   const peakBoundary = getSingle(polyhedron.peaks()).boundary();
   const isHexagonalPrism = _.some(
