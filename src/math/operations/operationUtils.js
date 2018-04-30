@@ -2,7 +2,6 @@
 import _ from 'lodash';
 import { Polyhedron, Face } from 'math/polyhedra';
 import { VIndex } from 'math/polyhedra';
-import { numSides } from 'math/polyhedra/solidUtils';
 import { PRECISION, getMidpoint, getPlane, rotateAround } from 'math/linAlg';
 
 export const hasMultiple = (relations: any, property: any) =>
@@ -42,7 +41,7 @@ export function deduplicateVertices(polyhedron: Polyhedron) {
     );
   });
   // remove vertices in faces and extraneous faces
-  newFaces = newFaces.map(_.uniq).filter(face => numSides(face) >= 3);
+  newFaces = newFaces.map(_.uniq).filter(face => face.length >= 3);
 
   // remove extraneous vertices
   return removeExtraneousVertices(polyhedron.withFaces(newFaces));

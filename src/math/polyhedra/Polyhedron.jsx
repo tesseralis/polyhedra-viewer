@@ -226,6 +226,10 @@ export default class Polyhedron {
     return this.withFaces(this.faces.map(iteratee));
   }
 
+  mapFaceObjs(iteratee: FaceObj => Face) {
+    return this.withFaces(this.getFaces().map(iteratee));
+  }
+
   // Returns whether the set of vertices in this polyhedron are planar
   isPlanar(vIndices: VIndex[]) {
     return isPlanar(this.vertexVectors(vIndices));

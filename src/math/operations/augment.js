@@ -135,7 +135,7 @@ const setEquals = (array1, array2) => _.xor(array1, array2).length === 0;
 function getBaseType(faces, base) {
   const adjacentFaces = faces.filter(face => sharesVertex(face, base));
   const adjacentFaceCounts = _(adjacentFaces)
-    .map(numSides)
+    .map('length')
     .uniq()
     .value();
   if (setEquals(adjacentFaceCounts, [3, 4])) {
