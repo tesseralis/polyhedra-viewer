@@ -6,6 +6,7 @@ import { getOperations, getRelations } from 'polyhedra/relations';
 import { Polyhedron, Peak } from 'math/polyhedra';
 import { operations, canAugment } from 'math/operations';
 import applyOperation from './applyOperation';
+const debug = require('debug')('applyOperation.test');
 
 const archimedeanOpts = ['t', 'k', 'c', 'r', 'e', 's'];
 const johnsonOpts = ['+', '-', 'g', 'P', 'A', 'h'];
@@ -27,18 +28,20 @@ function isProperPolyhedron(polyhedron) {
     const sideLength: number = v1.distanceTo(v2);
     if (prevSideLength !== undefined) {
       if (_.isNaN(sideLength)) {
-        console.log('nan');
+        debug(`edge ${edge} has length NaN`);
         return false;
       }
       if (Math.abs(sideLength - prevSideLength) > PRECISION) {
-        console.log('wonky sides', sideLength, prevSideLength);
+        debug(
+          `edge ${edge} has length ${sideLength} which is different from ${prevSideLength}`,
+        );
         return false;
       }
     }
     prevSideLength = sideLength;
     // Make sure the whole thing is convex
     if (polyhedron.getDihedralAngle(edge) > Math.PI - PRECISION) {
-      console.log('concave');
+      debug(`polyhedron concave at edge ${edge}`);
       return false;
     }
   }
@@ -50,7 +53,7 @@ function isProperPolyhedron(polyhedron) {
     const normal = face.normal();
     const expectedNormal = faceCentroid.sub(centroid);
     if (normal.angleBetween(expectedNormal, true) > Math.PI / 2) {
-      console.log('inside out');
+      debug(`polyhedron inside out at ${face}`);
       return false;
     }
   }

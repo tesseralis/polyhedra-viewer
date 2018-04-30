@@ -17,6 +17,7 @@
     "d3-ease": "^1.0.3",
     "d3-interpolate": "^1.1.6",
     "d3-scale-chromatic": "^1.2.0",
+    "debug": "^3.1.0",
     "lodash": "^4.17.5",
     "mdi": "^2.2.43",
     "rc-tooltip": "^3.7.0",
