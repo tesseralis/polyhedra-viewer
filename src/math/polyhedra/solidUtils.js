@@ -7,12 +7,13 @@ import type { Vertex, VIndex, Face, FIndex, Edge } from './solidTypes';
 function mod(a, b) {
   return a >= 0 ? a % b : a % b + b;
 }
-export function getCyclic(array: number[], index: number): number {
-  return array[mod(index, array.length)];
-}
 
 // Return the number of sides of a face
 export const numSides = (face: Face) => face.length;
+
+export function getCyclic(array: number[], index: number): number {
+  return array[mod(index, array.length)];
+}
 
 export function getDirectedEdges(face: Face) {
   return _.map(face, (vertex: Vertex, index: VIndex) => {

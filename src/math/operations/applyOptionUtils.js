@@ -6,7 +6,7 @@ import { getDirectedEdges, numSides } from 'math/polyhedra/solidUtils';
 import type { VIndex } from 'math/polyhedra';
 import { Peak, Polyhedron } from 'math/polyhedra';
 
-// Get what kind of base we are augmenting to
+/** Return the minimum number of faces between the given sets of vertices */
 export function faceDistanceBetweenVertices(
   polyhedron: Polyhedron,
   vIndices1: VIndex[],
@@ -19,8 +19,9 @@ export function faceDistanceBetweenVertices(
   while (_.intersection(foundVertexIndices, vIndices2).length === 0) {
     foundVertexIndices = _(foundVertexIndices)
       .flatMap(vIndex => v2fGraph[vIndex])
-      .map(fIndex => polyhedron.faces[fIndex])
-      .filter(face => !_.includes(exclude, numSides(face)))
+      // .map(fIndex => polyhedron.faces[fIndex])
+      .filter(face => !_.includes(exclude, face.numSides()))
+      .map(face => face.vIndices())
       .flatten()
       .uniq()
       .value();

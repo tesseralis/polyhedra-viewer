@@ -57,9 +57,9 @@ function getTetrahedralContractFaces(polyhedron) {
     if (_.includes(invalid, next.fIndex)) {
       continue;
     }
-    _.forEach(polyhedron.adjacentFaceIndices(...next.vIndices()), fIndex => {
-      if (polyhedron.numSides(fIndex) === 3) {
-        invalid.push(fIndex);
+    _.forEach(polyhedron.adjacentFaces(...next.vIndices()), face => {
+      if (face.numSides() === 3) {
+        invalid.push(face.fIndex);
       }
     });
     result.push(next);

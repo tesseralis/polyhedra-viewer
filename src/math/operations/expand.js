@@ -54,11 +54,11 @@ function duplicateVertices(polyhedron: Polyhedron, twist?: 'left' | 'right') {
   _.forEach(polyhedron.vertices, (vertex, vIndex: VIndex) => {
     // For each vertex, pick one adjacent face to be the "head"
     // for every other adjacent face, map it to a duplicated vertex
-    const [head, ...tail] = polyhedron.directedAdjacentFaceIndices(vIndex);
+    const [head, ...tail] = polyhedron.directedAdjacentFaces(vIndex);
     const start = newVertices.length;
-    _.set(newVertexMapping, [head, vIndex], vIndex);
-    _.forEach(tail, (fIndex, i) => {
-      _.set(newVertexMapping, [fIndex, vIndex], start + i);
+    _.set(newVertexMapping, [head.fIndex, vIndex], vIndex);
+    _.forEach(tail, (face, i) => {
+      _.set(newVertexMapping, [face.fIndex, vIndex], start + i);
     });
     vertexFaces.push([vIndex, ..._.range(start, start + tail.length)]);
     newVertices = newVertices.concat(
@@ -136,7 +136,7 @@ function getTwist(type, numSides) {
 function doExpansion(polyhedron: Polyhedron, referenceName) {
   const reference = Polyhedron.get(referenceName);
   const type = expansionType(reference);
-  const n = polyhedron.numSides(0);
+  const n = polyhedron.getFace(0).numSides();
   polyhedron = duplicateVertices(polyhedron, getTwist(type, n));
 
   const referenceFace =

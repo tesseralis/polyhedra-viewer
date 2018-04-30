@@ -1,7 +1,7 @@
 // @flow
 import _ from 'lodash';
 import { Polyhedron, Face } from 'math/polyhedra';
-import { VIndex, FIndex } from 'math/polyhedra';
+import { VIndex } from 'math/polyhedra';
 import { numSides } from 'math/polyhedra/solidUtils';
 import { PRECISION, getMidpoint, getPlane, rotateAround } from 'math/linAlg';
 
@@ -138,9 +138,9 @@ export function getSnubAngle(polyhedron: Polyhedron, numSides: number) {
   const faceCentroid = face0.centroid();
   const snubFaces = _.filter(
     polyhedron.getFaces(),
-    (face, fIndex: FIndex) =>
+    face =>
       isExpandedFace(polyhedron, face, numSides) &&
-      !_.includes(polyhedron.adjacentFaceIndices(...face0.vIndices()), fIndex),
+      !face.inSet(polyhedron.adjacentFaces(...face0.vIndices())),
   );
   const [v0, v1] = face0.vertices;
   const midpoint = getMidpoint(v0, v1);

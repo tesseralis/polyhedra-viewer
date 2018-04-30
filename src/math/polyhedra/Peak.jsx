@@ -60,7 +60,9 @@ export default class Peak {
   });
 
   faces = _.memoize(() => {
-    return this.polyhedron.adjacentFaces(...this.innerVertexIndices());
+    return this.polyhedron
+      .adjacentFaces(...this.innerVertexIndices())
+      .map(face => face.vIndices());
   });
 
   boundary = _.memoize(() => {

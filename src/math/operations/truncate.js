@@ -4,7 +4,7 @@ import _ from 'lodash';
 import { Polyhedron } from 'math/polyhedra';
 import { VIndex } from 'math/polyhedra';
 import { nextVertex } from 'math/polyhedra/solidUtils';
-import { replace, atIndices } from 'util.js';
+import { replace } from 'util.js';
 import { vec } from 'math/linAlg';
 import {
   removeExtraneousVertices,
@@ -23,20 +23,19 @@ function truncateVertex(
   vIndex,
   { mock, rectify } = {},
 ) {
-  const touchingFaceIndices = polyhedron.directedAdjacentFaceIndices(vIndex);
-  const touchingFaces = atIndices(polyhedron.faces, touchingFaceIndices);
+  const touchingFaces = polyhedron.directedAdjacentFaces(vIndex);
   let verticesToAdd = touchingFaces.map(face => {
     if (mock) {
       return polyhedron.vertices[vIndex];
     }
-    const next = nextVertex(face, vIndex);
+    const next = nextVertex(face.vIndices(), vIndex);
     const p1 = vec(polyhedron.vertices[vIndex]);
     const p2 = vec(polyhedron.vertices[next]);
     const sideLength = p1.distanceTo(p2);
     if (rectify) {
       return p1.add(p2.sub(p1).scale(1 / 2)).toArray();
     }
-    const n = face.length;
+    const n = face.numSides();
     const apothem =
       Math.cos(Math.PI / n) * sideLength / (2 * Math.sin(Math.PI / n));
     const n2 = 2 * n;
@@ -51,13 +50,17 @@ function truncateVertex(
 
   const mod = (a, b) => (a >= 0 ? a % b : a % b + b);
 
-  const newFaces = newPolyhedron.faces
+  const newFaces = newPolyhedron
+    .getFaces()
     .map((face, faceIndex) => {
-      if (!_.includes(touchingFaceIndices, faceIndex)) return face;
-      const touchingFaceIndex = touchingFaceIndices.indexOf(faceIndex);
+      if (!face.inSet(touchingFaces)) return face.vIndices();
+      const touchingFaceIndex = _.findIndex(
+        touchingFaces,
+        f2 => f2.fIndex === faceIndex,
+      );
       return replace(
-        face,
-        face.indexOf(vIndex),
+        face.vIndices(),
+        face.vIndices().indexOf(vIndex),
         newPolyhedron.vertices.length +
           mod(touchingFaceIndex + 1, touchingFaces.length),
         newPolyhedron.vertices.length + touchingFaceIndex,

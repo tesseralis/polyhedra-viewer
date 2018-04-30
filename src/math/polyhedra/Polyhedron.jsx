@@ -1,12 +1,11 @@
 // @flow
 import _ from 'lodash';
 import { Vec3D } from 'toxiclibsjs/geom';
+import { find } from 'util.js';
 import { isValidSolid, getSolidData } from 'data';
-import { atIndices } from 'util.js';
-import { vec, getMidpoint, isPlanar, getPlane, getCentroid } from 'math/linAlg';
+import { vec, getMidpoint, isPlanar, getCentroid } from 'math/linAlg';
 import type { Vector } from 'math/linAlg';
 import {
-  numSides,
   hasEdge,
   getEdges,
   hasDirectedEdge,
@@ -85,10 +84,6 @@ export default class Polyhedron {
     return this.faces.length;
   }
 
-  numSides(fIndex: FIndex) {
-    return numSides(this.faces[fIndex]);
-  }
-
   vIndices = () => {
     return _.range(this.numVertices());
   };
@@ -99,7 +94,7 @@ export default class Polyhedron {
 
   // Return the number of each type of faces of each face
   faceCount() {
-    return _.countBy(this.faces, numSides);
+    return _.countBy(this.getFaces(), face => face.numSides());
   }
 
   _vertexVectors: Vec3D[];
@@ -127,32 +122,33 @@ export default class Polyhedron {
   adjacentFaceIndices(...vIndices: VIndex[]): FIndex[] {
     return _(vIndices)
       .flatMap(vIndex => this.vertexToFaceGraph()[vIndex])
+      .map(face => face.fIndex)
       .uniq()
       .value();
   }
 
   adjacentFaces(...vIndices: VIndex[]) {
-    return atIndices(this.faces, this.adjacentFaceIndices(...vIndices));
+    return _(vIndices)
+      .flatMap(vIndex => this.vertexToFaceGraph()[vIndex])
+      .uniqBy(face => face.fIndex)
+      .value();
   }
 
-  // Get the list of adjacent faces to this polyhedron in ccw order
-  directedAdjacentFaceIndices(vIndex: VIndex) {
-    const { faces } = this;
-    const touchingFaceIndices = _.clone(this.adjacentFaceIndices(vIndex));
+  directedAdjacentFaces(vIndex: VIndex) {
+    const touchingFaces = this.adjacentFaces(vIndex);
     const result = [];
-    let next: FIndex = touchingFaceIndices[0];
-    const checkVertex = f =>
-      prevVertex(faces[next], vIndex) === nextVertex(faces[f], vIndex);
+    let next: FaceObj = touchingFaces[0];
+    const checkVertex = (f: FaceObj) =>
+      prevVertex(next.vIndices(), vIndex) === nextVertex(f.vIndices(), vIndex);
     do {
       result.push(next);
-      next = _.find(touchingFaceIndices, checkVertex);
-    } while (result.length < touchingFaceIndices.length);
+      next = find(touchingFaces, checkVertex);
+    } while (result.length < touchingFaces.length);
     return result;
   }
-
   // Return the number of faces by side for the given vertex
   adjacentFaceCount(vIndex: VIndex) {
-    return _.countBy(this.adjacentFaces(vIndex), numSides);
+    return _.countBy(this.adjacentFaces(vIndex), face => face.numSides());
   }
 
   // Get the vertices adjacent to this set of vertices
@@ -178,9 +174,9 @@ export default class Polyhedron {
 
   vertexToFaceGraph = _.memoize(() => {
     const mapping = this.vertices.map(() => []);
-    this.faces.forEach((face, fIndex) => {
-      face.forEach(vIndex => {
-        mapping[vIndex].push(fIndex);
+    this.getFaces().forEach(face => {
+      face.vIndices().forEach(vIndex => {
+        mapping[vIndex].push(face);
       });
     });
     return mapping;
@@ -288,13 +284,10 @@ export default class Polyhedron {
   });
 
   faceAdjacencyList() {
-    const faceAdjacencyCounts = _.map(
-      this.faceGraph(),
-      (adjFaces: FIndex[], fIndex: string) => ({
-        n: numSides(this.faces[parseInt(fIndex, 10)]),
-        adj: _.countBy(adjFaces, fIndex2 => numSides(this.faces[fIndex2])),
-      }),
-    );
+    const faceAdjacencyCounts = _.map(this.getFaces(), face => ({
+      n: face.numSides(),
+      adj: _.countBy(face.adjacentFaces(), face2 => face2.numSides()),
+    }));
     return _.sortBy(
       faceAdjacencyCounts,
       ['n', 'adj.length'].concat([3, 4, 5, 6, 8, 10].map(n => `adj[${n}]`)),
@@ -316,14 +309,6 @@ export default class Polyhedron {
     );
   }
 
-  hitFaceIndex(point: Vector) {
-    return _.minBy(this.fIndices(), fIndex => {
-      const face = this.faces[fIndex];
-      const plane = getPlane(this.vertexVectors(face));
-      return plane.getDistanceToPoint(point);
-    });
-  }
-
   hitFace(point: Vector) {
     return _.minBy(this.getFaces(), face =>
       face.plane().getDistanceToPoint(point),
@@ -336,9 +321,9 @@ export default class Polyhedron {
 
   findPeak(point: Vector) {
     const hitPoint = vec(point);
-    const hitFaceIndex = this.hitFaceIndex(hitPoint);
+    const hitFace = this.hitFace(hitPoint);
     const peaks = this.peaks().filter(peak =>
-      _.includes(peak.faceIndices(), hitFaceIndex),
+      _.includes(peak.faceIndices(), hitFace.fIndex),
     );
     if (peaks.length === 0) {
       return null;

@@ -3,8 +3,7 @@ import _ from 'lodash';
 
 import { replace } from 'util.js';
 import { vec } from 'math/linAlg';
-import { Polyhedron } from 'math/polyhedra';
-import type FIndex from 'math/polyhedra';
+import { Polyhedron, Face } from 'math/polyhedra';
 import { numSides, prevVertex, nextVertex } from 'math/polyhedra/solidUtils';
 import { deduplicateVertices } from './operationUtils';
 import type { Operation } from './operationTypes';
@@ -15,27 +14,27 @@ interface CumulateOptions {
 
 // Return if the polyhedron is rectified
 function isRectified(polyhedron) {
-  return polyhedron.adjacentFaceIndices(0).length === 4;
+  return polyhedron.adjacentFaces(0).length === 4;
 }
 
 function duplicateVertex(newPolyhedron, polyhedron, fIndices, vIndex) {
-  const adjacentFaceIndices = polyhedron.adjacentFaceIndices(vIndex);
-  const pivot: FIndex = _.find(adjacentFaceIndices, fIndex =>
-    _.includes(fIndices, fIndex),
+  const adjacentFaces = polyhedron.adjacentFaces(vIndex);
+  const pivot: Face = _.find(adjacentFaces, face =>
+    _.includes(fIndices, face.fIndex),
   );
-  const pivotFace = polyhedron.faces[pivot];
+  const pivotFace = pivot.vIndices();
   const newVertexIndex = newPolyhedron.numVertices();
 
   return newPolyhedron
     .addVertices([newPolyhedron.vertices[vIndex]])
     .mapFaces((face, fIndex) => {
       const originalFace = polyhedron.faces[fIndex];
-      if (!_.includes(adjacentFaceIndices, fIndex)) {
+      if (!_.includes(_.map(adjacentFaces, face => face.fIndex), fIndex)) {
         return face;
       }
 
       // If this is the pivot face, return unchanged
-      if (fIndex === pivot) {
+      if (fIndex === pivot.fIndex) {
         return face;
       }
 
@@ -85,7 +84,7 @@ function cumulateFaceIndices(polyhedron, faceType) {
 
   return polyhedron
     .fIndices()
-    .filter(fIndex => polyhedron.numSides(fIndex) === faceType);
+    .filter(fIndex => polyhedron.getFace(fIndex).numSides() === faceType);
 }
 
 function applyCumulate(
@@ -165,7 +164,7 @@ export const cumulate: Operation<CumulateOptions> = {
   isHighlighted(polyhedron, applyArgs, fIndex) {
     if (
       _.isNumber(applyArgs.faceType) &&
-      polyhedron.numSides(fIndex) === applyArgs.faceType
+      polyhedron.getFace(fIndex).numSides() === applyArgs.faceType
     ) {
       return true;
     }

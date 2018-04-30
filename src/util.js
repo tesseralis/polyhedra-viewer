@@ -29,6 +29,17 @@ export function getSingle<T>(array: T[]): T {
 }
 
 /**
+ * Like _.find, but throws an error if no valid element found.
+ */
+export function find<T>(array: T[], predicate: (T, number) => boolean): T {
+  const result = _.find(array, predicate);
+  if (result === undefined) {
+    throw new Error(`Unable to find the predicate in ${array.toString()}`);
+  }
+  return result;
+}
+
+/**
  * Replace the given index in the array with the given values. Alternative to "splice".
  */
 export function replace<T>(array: T[], index: number, ...values: T[]) {

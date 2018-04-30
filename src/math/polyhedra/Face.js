@@ -47,6 +47,10 @@ export default class Face {
     return uniqueVertices.length;
   }
 
+  inSet(faces: Face[]) {
+    return _.some(faces, face => face.fIndex === this.fIndex);
+  }
+
   adjacentFaces() {
     const adjacentFaceIndices = this.polyhedron.faceGraph()[this.fIndex];
     return adjacentFaceIndices.map(fIndex => this.polyhedron.getFace(fIndex));

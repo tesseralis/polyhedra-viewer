@@ -12,15 +12,6 @@ describe('Polyhedron', () => {
     });
   });
 
-  describe('adjacentFaces', () => {
-    it('works on single vertex', () => {
-      expect(polyhedron.adjacentFaceIndices(0)).toEqual([0, 1, 2]);
-    });
-    it('works on multiple vertices', () => {
-      expect(polyhedron.adjacentFaceIndices(0, 1)).toEqual([0, 1, 2, 3]);
-    });
-  });
-
   describe('isSame', () => {
     const testCases = [
       ['rhombicuboctahedron', 'elongated-square-gyrobicupola'],
