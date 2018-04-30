@@ -16,7 +16,6 @@ function isRectified(polyhedron) {
   return polyhedron.adjacentFaces(0).length === 4;
 }
 
-// function duplicateVertex(newPolyhedron, polyhedron, fIndices, vIndex) {
 function duplicateVertex(newPolyhedron, polyhedron, faces, vIndex) {
   const adjacentFaces = polyhedron.adjacentFaces(vIndex);
   const pivot = find(adjacentFaces, nbr => nbr.inSet(faces));
