@@ -47,8 +47,14 @@ export default class Face {
     return uniqueVertices.length;
   }
 
+  // Return true if this face is the same as the given face (within a polyhedron)
+  equals(other: Face) {
+    return this.fIndex === other.fIndex;
+    // return this.polyhedron === other.polyhedron && this.fIndex === other.fIndex;
+  }
+
   inSet(faces: Face[]) {
-    return _.some(faces, face => face.fIndex === this.fIndex);
+    return _.some(faces, face => this.equals(face));
   }
 
   adjacentFaces() {

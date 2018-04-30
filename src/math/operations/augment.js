@@ -245,7 +245,7 @@ function isAligned(
   return isOrtho === (gyrate === 'ortho');
 }
 
-// Flatten a polyhedron to the face given at fIndex
+// Flatten a polyhedron at the given face
 function flatten(polyhedron, face) {
   const vertexVectors = polyhedron.vertexVectors();
   const faceVectors = face.vertices;
@@ -455,7 +455,7 @@ export const augment: Operation<AugmentOptions> = {
   },
 
   isHighlighted(polyhedron, applyArgs, face) {
-    if (!!applyArgs.face && face.fIndex === applyArgs.face.fIndex) {
+    if (!!applyArgs.face && applyArgs.face.equals(face)) {
       return true;
     }
   },

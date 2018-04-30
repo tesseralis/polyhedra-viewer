@@ -52,11 +52,10 @@ function truncateVertex(
 
   const newFaces = newPolyhedron
     .getFaces()
-    .map((face, faceIndex) => {
+    .map(face => {
       if (!face.inSet(touchingFaces)) return face.vIndices();
-      const touchingFaceIndex = _.findIndex(
-        touchingFaces,
-        f2 => f2.fIndex === faceIndex,
+      const touchingFaceIndex = _.findIndex(touchingFaces, f2 =>
+        f2.equals(face),
       );
       return replace(
         face.vIndices(),

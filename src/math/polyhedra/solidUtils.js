@@ -1,6 +1,6 @@
 // @flow
 import _ from 'lodash';
-import type { Vertex, VIndex, Face, FIndex, Edge } from './solidTypes';
+import type { Vertex, VIndex, Face, Edge } from './solidTypes';
 
 // Get the element of the array at the given index,
 // modulo its length
@@ -25,7 +25,7 @@ export function getDirectedEdges(face: Face) {
 export function getBoundary(faces: Face[]) {
   const edges = {};
   // build up a lookup table for every pair of edges to that face
-  _.forEach(faces, (face: Face, index: FIndex) => {
+  _.forEach(faces, face => {
     // for the pairs of vertices, find the face that contains the corresponding pair
     _.forEach(getDirectedEdges(face), edge => {
       const [i1, i2] = edge;

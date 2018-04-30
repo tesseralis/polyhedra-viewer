@@ -19,7 +19,6 @@ export function faceDistanceBetweenVertices(
   while (_.intersection(foundVertexIndices, vIndices2).length === 0) {
     foundVertexIndices = _(foundVertexIndices)
       .flatMap(vIndex => v2fGraph[vIndex])
-      // .map(fIndex => polyhedron.faces[fIndex])
       .filter(face => !_.includes(exclude, face.numSides()))
       .map(face => face.vIndices())
       .flatten()
