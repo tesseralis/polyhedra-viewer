@@ -140,13 +140,13 @@ const Fastigium = withMapper('edges')(
   },
 );
 
-const Cupola = withMapper('fIndices')(
+const Cupola = withMapper('getFaces')(
   class extends Peak {
     face: Face;
 
-    constructor(polyhedron, fIndex) {
-      super(polyhedron, polyhedron.faces[fIndex], 'cupola');
-      this.face = polyhedron.getFace(fIndex);
+    constructor(polyhedron, face) {
+      super(polyhedron, face.vIndices(), 'cupola');
+      this.face = face;
     }
 
     faceConfiguration = () =>
@@ -158,17 +158,17 @@ const Cupola = withMapper('fIndices')(
   },
 );
 
-const Rotunda = withMapper('fIndices')(
+const Rotunda = withMapper('getFaces')(
   class extends Peak {
     face: Face;
 
-    constructor(polyhedron, fIndex) {
+    constructor(polyhedron, face) {
       super(
         polyhedron,
-        polyhedron.adjacentVertexIndices(...polyhedron.faces[fIndex]),
+        polyhedron.adjacentVertexIndices(...face.vIndices()),
         'rotunda',
       );
-      this.face = polyhedron.getFace(fIndex);
+      this.face = face;
     }
 
     faceConfiguration = () => ({ '5': 2, '3': 2 });

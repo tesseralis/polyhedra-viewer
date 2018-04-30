@@ -64,9 +64,9 @@ export default class Polyhedron {
     return new FaceObj((this: any), fIndex);
   });
 
-  getFaces(): FaceObj[] {
+  getFaces = () => {
     return this.fIndices().map(fIndex => this.getFace(fIndex));
-  }
+  };
 
   numVertices() {
     return this.vertices.length;
