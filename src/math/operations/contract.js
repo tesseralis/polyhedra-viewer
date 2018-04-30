@@ -48,36 +48,31 @@ function getContractResult(polyhedron, faceType) {
   }
 }
 
-function getTetrahedralContractFaceIndices(polyhedron) {
-  const toCheck = polyhedron
-    .fIndices()
-    .filter(fIndex => polyhedron.numSides(fIndex) === 3);
+function getTetrahedralContractFaces(polyhedron) {
+  const toCheck = polyhedron.getFaces().filter(face => face.numSides() === 3);
   const result = [];
   const invalid = [];
   while (toCheck.length > 0) {
     const next = toCheck.pop();
-    if (_.includes(invalid, next)) {
+    if (_.includes(invalid, next.fIndex)) {
       continue;
     }
-    _.forEach(
-      polyhedron.adjacentFaceIndices(...polyhedron.faces[next]),
-      fIndex => {
-        if (polyhedron.numSides(fIndex) === 3) {
-          invalid.push(fIndex);
-        }
-      },
-    );
+    _.forEach(polyhedron.adjacentFaceIndices(...next.vIndices()), fIndex => {
+      if (polyhedron.numSides(fIndex) === 3) {
+        invalid.push(fIndex);
+      }
+    });
     result.push(next);
   }
   return result;
 }
 
-function getContractFaceIndices(polyhedron, faceType) {
+function getContractFaces(polyhedron, faceType) {
   if (getFamily(polyhedron) === 'T') {
-    return getTetrahedralContractFaceIndices(polyhedron);
+    return getTetrahedralContractFaces(polyhedron);
   }
-  return _.filter(polyhedron.fIndices(), fIndex =>
-    isExpandedFace(polyhedron, fIndex, faceType),
+  return _.filter(polyhedron.getFaces(), face =>
+    isExpandedFace(polyhedron, face, faceType),
   );
 }
 
@@ -93,7 +88,7 @@ export function applyContract(
 
   // Take all the stuff and push it inwards
   // TODO can we like, factor out this logic?
-  const contractFaceIndices = getContractFaceIndices(polyhedron, faceType);
+  const contractFaces = getContractFaces(polyhedron, faceType);
   const angle =
     expansionType(polyhedron) === 'snub'
       ? -getSnubAngle(polyhedron, faceType)
@@ -101,7 +96,7 @@ export function applyContract(
 
   const endVertices = getResizedVertices(
     polyhedron,
-    contractFaceIndices,
+    contractFaces,
     referenceLength,
     angle,
   );
@@ -137,9 +132,9 @@ export const contract: Operation<ContractOptions> = {
 
   getApplyArgs(polyhedron: Polyhedron, point: Vector) {
     const hitPoint = vec(point);
-    const hitFaceIndex = polyhedron.hitFaceIndex(hitPoint);
-    const isValid = isExpandedFace(polyhedron, hitFaceIndex);
-    return isValid ? { faceType: polyhedron.numSides(hitFaceIndex) } : {};
+    const hitFace = polyhedron.hitFace(hitPoint);
+    const isValid = isExpandedFace(polyhedron, hitFace);
+    return isValid ? { faceType: hitFace.numSides() } : {};
   },
 
   getAllApplyArgs(polyhedron) {
@@ -161,7 +156,7 @@ export const contract: Operation<ContractOptions> = {
   ) {
     if (
       typeof applyArgs.faceType === 'number' &&
-      isExpandedFace(polyhedron, fIndex, applyArgs.faceType)
+      isExpandedFace(polyhedron, polyhedron.getFace(fIndex), applyArgs.faceType)
     ) {
       return true;
     }

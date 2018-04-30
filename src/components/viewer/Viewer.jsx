@@ -90,9 +90,9 @@ const polygonColors = colors => polygons.map(n => toRgb(colors[n]));
 
 function getFaceColors(polyhedron: Polyhedron, colors: any) {
   return _.pickBy(
-    mapObject(polyhedron.faces, (face, fIndex) => [
+    mapObject(polyhedron.getFaces(), (face, fIndex) => [
       fIndex,
-      colors[polyhedron.numUniqueSides(fIndex)],
+      colors[face.numUniqueSides()],
     ]),
   );
 }

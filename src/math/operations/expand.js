@@ -139,21 +139,21 @@ function doExpansion(polyhedron: Polyhedron, referenceName) {
   const n = polyhedron.numSides(0);
   polyhedron = duplicateVertices(polyhedron, getTwist(type, n));
 
-  const referenceFaceIndex = _.find(reference.fIndices(), fIndex =>
-    isExpandedFace(reference, fIndex, n),
-  );
+  const referenceFace =
+    _.find(reference.getFaces(), face => isExpandedFace(reference, face, n)) ||
+    reference.getFace(0);
   const referenceLength =
-    reference.distanceToCenter(referenceFaceIndex) / reference.edgeLength();
+    referenceFace.distanceToCenter() / reference.edgeLength();
 
-  const snubFaceIndices = _.filter(polyhedron.fIndices(), fIndex =>
-    isExpandedFace(polyhedron, fIndex, n),
+  const snubFaces = _.filter(polyhedron.getFaces(), face =>
+    isExpandedFace(polyhedron, face, n),
   );
   const angle = type === 'snub' ? getSnubAngle(reference, n) : 0;
 
   // Update the vertices with the expanded-out version
   const endVertices = getResizedVertices(
     polyhedron,
-    snubFaceIndices,
+    snubFaces,
     referenceLength,
     angle,
   );

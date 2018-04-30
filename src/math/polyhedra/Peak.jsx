@@ -3,9 +3,10 @@
 import _ from 'lodash';
 import { getBoundary } from './solidUtils';
 import { vec } from 'math/linAlg';
-import type { Edge, VIndex, FIndex } from './solidTypes';
+import type { Edge, VIndex } from './solidTypes';
 
 import Polyhedron from './Polyhedron';
+import Face from './Face';
 
 type PeakType = 'pyramid' | 'cupola' | 'rotunda' | 'fastigium' | 'prism';
 type FaceConfiguration = { [string]: number };
@@ -111,25 +112,25 @@ const Fastigium = withMapper('edges')(
 
 const Cupola = withMapper('fIndices')(
   class extends Peak {
-    fIndex: FIndex;
+    face: Face;
 
     constructor(polyhedron, fIndex) {
       super(polyhedron, polyhedron.faces[fIndex], 'cupola');
-      this.fIndex = fIndex;
+      this.face = polyhedron.getFace(fIndex);
     }
 
     faceConfiguration = () =>
       _.countBy([3, 4, 4, this.innerVertexIndices().length]);
 
     topPoint() {
-      return this.polyhedron.faceCentroid(this.fIndex);
+      return this.face.centroid();
     }
   },
 );
 
 const Rotunda = withMapper('fIndices')(
   class extends Peak {
-    fIndex: FIndex;
+    face: Face;
 
     constructor(polyhedron, fIndex) {
       super(
@@ -137,13 +138,13 @@ const Rotunda = withMapper('fIndices')(
         polyhedron.adjacentVertexIndices(...polyhedron.faces[fIndex]),
         'rotunda',
       );
-      this.fIndex = fIndex;
+      this.face = polyhedron.getFace(fIndex);
     }
 
     faceConfiguration = () => ({ '5': 2, '3': 2 });
 
     topPoint() {
-      return this.polyhedron.faceCentroid(this.fIndex);
+      return this.face.centroid();
     }
   },
 );

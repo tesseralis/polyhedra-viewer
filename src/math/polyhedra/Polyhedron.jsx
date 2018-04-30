@@ -1,17 +1,9 @@
 // @flow
 import _ from 'lodash';
-import { Vec3D, Ray3D } from 'toxiclibsjs/geom';
+import { Vec3D } from 'toxiclibsjs/geom';
 import { isValidSolid, getSolidData } from 'data';
 import { atIndices } from 'util.js';
-import {
-  vec,
-  getMidpoint,
-  isPlanar,
-  getPlane,
-  getNormal,
-  getCentroid,
-  PRECISION,
-} from 'math/linAlg';
+import { vec, getMidpoint, isPlanar, getPlane, getCentroid } from 'math/linAlg';
 import type { Vector } from 'math/linAlg';
 import {
   numSides,
@@ -24,7 +16,9 @@ import {
   nextVertex,
 } from './solidUtils';
 import type { Vertex, Face, Edge, VIndex, FIndex } from './solidTypes';
+
 import Peak from './Peak';
+import FaceObj from './Face';
 
 interface BasePolyhedron {
   vertices: Vertex[];
@@ -74,6 +68,15 @@ export default class Polyhedron {
     return _.pick(this, ['vertices', 'faces', 'edges', 'name']);
   }
 
+  getFace = _.memoize((fIndex: FIndex) => {
+    // FIXME why do we need to cast?
+    return new FaceObj((this: any), fIndex);
+  });
+
+  getFaces(): FaceObj[] {
+    return this.fIndices().map(fIndex => this.getFace(fIndex));
+  }
+
   numVertices() {
     return this.vertices.length;
   }
@@ -84,21 +87,6 @@ export default class Polyhedron {
 
   numSides(fIndex: FIndex) {
     return numSides(this.faces[fIndex]);
-  }
-
-  numUniqueSides(fIndex: FIndex) {
-    const face = this.faces[fIndex];
-    const faceVertices = this.vertexVectors(face);
-    const uniqueVertices = _.filter(
-      faceVertices,
-      (vertex: Vec3D, i: VIndex) => {
-        return !vertex.equalsWithTolerance(
-          faceVertices[(i + 1) % faceVertices.length],
-          PRECISION,
-        );
-      },
-    );
-    return uniqueVertices.length;
   }
 
   vIndices = () => {
@@ -130,16 +118,9 @@ export default class Polyhedron {
     return this.vertexVectors([vIndex])[0];
   }
 
-  edgeLength(fIndex: FIndex = 0) {
-    const [v0, v1] = this.vertexVectors(this.faces[fIndex]);
-    return v0.distanceTo(v1);
-  }
-
-  // get the apothem of the given face
-  apothem(fIndex: FIndex) {
-    return (
-      this.edgeLength(fIndex) / (2 * Math.tan(Math.PI / this.numSides(fIndex)))
-    );
+  // Get the edge length of this polyhedron, assuming equal edges
+  edgeLength() {
+    return this.getFace(0).edgeLength();
   }
 
   // Return the faces adjacent to the given vertices
@@ -244,27 +225,9 @@ export default class Polyhedron {
     return getCentroid(this.vertexVectors());
   }
 
-  /** Return the centroid of the face given by the face index */
-  faceCentroid(fIndex: FIndex) {
-    return getCentroid(
-      this.faces[fIndex].map(vIndex => this.vertexVectors()[vIndex]),
-    );
-  }
-
   // TODO decide what should return a Vec3D and what should return an array
-  distanceToCenter(fIndex: FIndex = 0) {
-    const origin = this.centroid();
-    const faceCentroid = this.faceCentroid(fIndex);
-    return origin.distanceTo(faceCentroid);
-  }
-
-  /** Return the normal of the face given by the face index */
-  faceNormal(fIndex: FIndex) {
-    return getNormal(this.vertexVectors(this.faces[fIndex])).getNormalized();
-  }
-
-  normalRay(fIndex: FIndex) {
-    return new Ray3D(this.faceCentroid(fIndex), this.faceNormal(fIndex));
+  distanceToCenter() {
+    return this.getFace(0).distanceToCenter();
   }
 
   // Get the faces adjacent to this edge, with the directed face first
@@ -293,8 +256,8 @@ export default class Polyhedron {
       .map(v => v.sub(midpoint));
 
     if (!c1 || !c2) {
-      // throw new Error(`The edge ${edge} is not connected to two faces.`)
-      return 2 * Math.PI;
+      throw new Error(`The edge ${edge} is not connected to two faces.`);
+      // return 2 * Math.PI;
     }
 
     return c1.angleBetween(c2, true);
@@ -338,13 +301,6 @@ export default class Polyhedron {
     );
   }
 
-  isFaceValid(fIndex: FIndex) {
-    return _.every(getEdges(this.faces[fIndex]), edge => {
-      const [v0, v1] = this.vertexVectors(edge);
-      return v0.distanceTo(v1) > PRECISION;
-    });
-  }
-
   isSame(other: Polyhedron) {
     if (!_.isEqual(this.faceCount(), other.faceCount())) return false;
     return _.isEqual(this.faceAdjacencyList(), other.faceAdjacencyList());
@@ -366,6 +322,12 @@ export default class Polyhedron {
       const plane = getPlane(this.vertexVectors(face));
       return plane.getDistanceToPoint(point);
     });
+  }
+
+  hitFace(point: Vector) {
+    return _.minBy(this.getFaces(), face =>
+      face.plane().getDistanceToPoint(point),
+    );
   }
 
   peaks() {

@@ -102,12 +102,12 @@ function applyCumulate(
   const { vertices, faces } = polyhedron;
 
   const verticesToAdd = fIndices.map(fIndex => {
-    const apothem = polyhedron.apothem(fIndex);
-    const normal = polyhedron.faceNormal(fIndex);
-    const centroid = polyhedron.faceCentroid(fIndex);
+    const face = polyhedron.getFace(fIndex);
+    const apothem = face.apothem();
+    const normal = face.normal();
+    const centroid = face.centroid();
     const theta =
-      Math.PI -
-      polyhedron.getDihedralAngle(_.take(polyhedron.faces[fIndex], 2));
+      Math.PI - polyhedron.getDihedralAngle(_.take(face.vIndices(), 2));
     const scale = apothem * Math.tan(theta);
     return centroid.add(normal.scale(scale)).toArray();
   });
@@ -158,9 +158,7 @@ export const cumulate: Operation<CumulateOptions> = {
 
   getApplyArgs(polyhedron, hitPnt) {
     const hitPoint = vec(hitPnt);
-    const hitFaceIndex = polyhedron.hitFaceIndex(hitPoint);
-    // TODO handle octahedron case
-    const n = numSides(polyhedron.faces[hitFaceIndex]);
+    const n = polyhedron.hitFace(hitPoint).numSides();
     return n <= 5 ? { faceType: n } : {};
   },
 

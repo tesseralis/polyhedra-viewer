@@ -33,8 +33,10 @@ export default class AppPage {
   }
 
   clickFaceIndex(faceIndex) {
-    const polyhedron = this.getPolyhedron();
-    const hitPnt = polyhedron.faceCentroid(faceIndex).toArray();
+    const hitPnt = this.getPolyhedron()
+      .getFace(faceIndex)
+      .centroid()
+      .toArray();
     const shape = this.wrapper
       .find('shape')
       .filterWhere(n => !!n.prop('onMouseMove'));

@@ -3,15 +3,15 @@ import _ from 'lodash';
 import { getSingle } from 'util.js';
 // FIXME don't rely on these
 import { getDirectedEdges, numSides } from 'math/polyhedra/solidUtils';
-import type { FIndex } from 'math/polyhedra';
+import type { VIndex } from 'math/polyhedra';
 import { Peak, Polyhedron } from 'math/polyhedra';
 
 // Get what kind of base we are augmenting to
-function faceDistanceBetweenVertices(
-  polyhedron,
-  vIndices1,
-  vIndices2,
-  exclude = [],
+export function faceDistanceBetweenVertices(
+  polyhedron: Polyhedron,
+  vIndices1: VIndex[],
+  vIndices2: VIndex[],
+  exclude: number[] = [],
 ) {
   const v2fGraph = polyhedron.vertexToFaceGraph();
   let foundVertexIndices = vIndices1;
@@ -31,26 +31,6 @@ function faceDistanceBetweenVertices(
     }
   }
   return distance;
-}
-
-// Return "meta" or "para", or null
-export function getAugmentAlignment(polyhedron: Polyhedron, fIndex: FIndex) {
-  // get the existing peak boundary
-  const peakBoundary = getSingle(polyhedron.peaks()).boundary();
-  const isHexagonalPrism = _.some(
-    polyhedron.faces,
-    face => numSides(face) === 6,
-  );
-
-  // calculate the face distance to the peak's boundary
-  return faceDistanceBetweenVertices(
-    polyhedron,
-    polyhedron.faces[fIndex],
-    peakBoundary,
-    [isHexagonalPrism && 6],
-  ) > 1
-    ? 'para'
-    : 'meta';
 }
 
 export function getPeakAlignment(polyhedron: Polyhedron, peak: Peak) {

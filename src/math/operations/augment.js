@@ -1,14 +1,14 @@
 // @flow
 import _ from 'lodash';
 
-import { Polyhedron } from 'math/polyhedra';
+import { Polyhedron, Face } from 'math/polyhedra';
 import type { VIndex, FIndex } from 'math/polyhedra';
-import { vec, getPlane, getCentroid, getNormal, PRECISION } from 'math/linAlg';
-import { cartesian, mapObject } from 'util.js';
+import { vec, getPlane, PRECISION } from 'math/linAlg';
+import { getSingle, cartesian, mapObject } from 'util.js';
 import { numSides, getCyclic as getMod } from 'math/polyhedra/solidUtils';
 
 import { hasMultiple, removeExtraneousVertices } from './operationUtils';
-import { getAugmentAlignment } from './applyOptionUtils';
+import { faceDistanceBetweenVertices } from './applyOptionUtils';
 import { Operation } from './operationTypes';
 
 const augmentees = {
@@ -60,23 +60,42 @@ const augmentTypes = {
   A: 'antiprism',
 };
 
+// Return "meta" or "para", or null
+function getAugmentAlignment(polyhedron: Polyhedron, face: FIndex) {
+  // get the existing peak boundary
+  const peakBoundary = getSingle(polyhedron.peaks()).boundary();
+  const isHexagonalPrism = _.some(
+    polyhedron.getFaces(),
+    face => face.numSides() === 6,
+  );
+
+  // calculate the face distance to the peak's boundary
+  return faceDistanceBetweenVertices(
+    polyhedron,
+    face.vIndices(),
+    peakBoundary,
+    isHexagonalPrism ? [6] : [],
+  ) > 1
+    ? 'para'
+    : 'meta';
+}
+
 function getPossibleAugmentees(n) {
   const { pyramid, cupola, rotunda } = augmentData;
   return _.compact([pyramid[n], cupola[n / 2], rotunda[n / 2]]);
 }
 
 // Checks to see if the polyhedron can be augmented at the base while remaining convex
-function canAugmentWith(polyhedron, faceIndex, augmentee, offset) {
-  const base = polyhedron.faces[faceIndex];
-  const n = base.length;
+function canAugmentWith(polyhedron, base, augmentee, offset) {
+  const n = base.numSides();
   const undersideIndex = _.findIndex(
     augmentee.faces,
     face => face.length === n,
   );
   const undersideFace = augmentee.faces[undersideIndex];
 
-  return _.every(base, (baseV1, i) => {
-    const baseV2 = getMod(base, i + 1);
+  return _.every(base.vIndices(), (baseV1, i) => {
+    const baseV2 = getMod(base.vIndices(), i + 1);
     const baseAngle = polyhedron.getDihedralAngle([baseV1, baseV2]);
 
     const undersideV1 = getMod(undersideFace, i + offset);
@@ -90,13 +109,12 @@ function canAugmentWith(polyhedron, faceIndex, augmentee, offset) {
   });
 }
 
-function canAugment(polyhedron, faceIndex) {
-  const base = polyhedron.faces[faceIndex];
-  const n = base.length;
+function canAugment(polyhedron, base) {
+  const n = base.numSides();
   const augmentees = getPossibleAugmentees(n);
   for (let augmentee of augmentees) {
     for (let offset of [0, 1]) {
-      if (canAugmentWith(polyhedron, faceIndex, augmentee, offset)) {
+      if (canAugmentWith(polyhedron, base, augmentee, offset)) {
         return true;
       }
     }
@@ -105,13 +123,13 @@ function canAugment(polyhedron, faceIndex) {
 }
 
 function getAugmentGraph(polyhedron) {
-  return polyhedron.fIndices().map(fIndex => canAugment(polyhedron, fIndex));
+  return polyhedron.getFaces().map(face => canAugment(polyhedron, face));
 }
 
 function getAugmentFace(polyhedron, graph, point) {
   const hitPoint = vec(point);
-  const hitFaceIndex = polyhedron.hitFaceIndex(hitPoint);
-  return graph[hitFaceIndex] ? hitFaceIndex : -1;
+  const hitFace = polyhedron.hitFace(hitPoint);
+  return graph[hitFace.fIndex] ? hitFace : undefined;
 }
 
 const sharesVertex = (face1, face2) => {
@@ -228,9 +246,9 @@ function isAligned(
 }
 
 // Flatten a polyhedron to the face given at fIndex
-function flatten(polyhedron, fIndex) {
+function flatten(polyhedron, face) {
   const vertexVectors = polyhedron.vertexVectors();
-  const faceVectors = _.at(vertexVectors, polyhedron.faces[fIndex]);
+  const faceVectors = face.vertices;
   const plane = getPlane(faceVectors);
   const newVertices = vertexVectors.map(v =>
     plane.getProjectedPoint(v).toArray(),
@@ -239,38 +257,31 @@ function flatten(polyhedron, fIndex) {
 }
 
 // Augment the following
-function doAugment(polyhedron, faceIndex, using, gyrate, mock = false) {
-  const { faces, vertices } = polyhedron;
-  const base = faces[faceIndex];
-  const n = base.length;
+function doAugment(polyhedron, base, using, gyrate, mock = false) {
+  const n = base.numSides();
   const prefix = using[0];
   const index = using.substring(1);
-  const baseVertices = base.map(index => vec(vertices[index]));
-  const baseCenter = getCentroid(baseVertices);
-  const sideLength = baseVertices[0].distanceTo(baseVertices[1]);
-  const baseNormal = getNormal(baseVertices);
+  const baseVertices = base.vertices;
+  const baseCenter = base.centroid();
+  const sideLength = base.edgeLength();
+  const baseNormal = base.normal();
 
   const augmentType = augmentTypes[prefix];
   // FIXME rename
-  const _augmentee = augmentData[augmentType][index];
-  const undersideIndex = _.findIndex(
-    _augmentee.faces,
-    face => face.length === n,
-  );
-  const augmentee = mock ? flatten(_augmentee, undersideIndex) : _augmentee;
+  let augmentee = augmentData[augmentType][index];
+  const underside = _.find(augmentee.getFaces(), face => face.numSides() === n);
+  if (!underside) {
+    throw new Error('Could not find an underside');
+  }
+  augmentee = mock ? flatten(augmentee, underside) : augmentee;
 
   // rotate and translate so that the face is next to our face
-  const augmenteeVertices = augmentee.vertices.map(vec);
+  const augmenteeVertices = augmentee.vertexVectors();
 
-  const undersideFace = augmentee.faces[undersideIndex];
-  const undersideVertices = undersideFace.map(
-    index => augmenteeVertices[index],
-  );
-  const undersideNormal = getNormal(undersideVertices);
-  const undersideCenter = getCentroid(undersideVertices);
-  const augmenteeSideLength = undersideVertices[0].distanceTo(
-    undersideVertices[1],
-  );
+  const undersideFace = underside.vIndices();
+  const undersideNormal = underside.normal();
+  const undersideCenter = underside.centroid();
+  const augmenteeSideLength = underside.edgeLength();
 
   const alignBasesNormal = (() => {
     const cross = undersideNormal.cross(baseNormal).getNormalized();
@@ -293,7 +304,7 @@ function doAugment(polyhedron, faceIndex, using, gyrate, mock = false) {
   const translatedV0 = baseVertices[0].sub(baseCenter);
   const baseIsAligned = isAligned(
     polyhedron,
-    base,
+    base.vIndices(),
     augmentee,
     undersideFace,
     gyrate,
@@ -302,7 +313,7 @@ function doAugment(polyhedron, faceIndex, using, gyrate, mock = false) {
   const offset = baseIsAligned ? 0 : 1;
   const alignedV0 = alignedAugmenteeVertices[undersideFace[offset]];
   // align the first vertex of the base face to the first vertex of the underside face
-  const alignVerticesAngle = translatedV0.angleBetween(alignedV0, true);
+  const alignVerticesAngle = translatedV0.angleBetween(alignedV0, true) || 0;
   const transformedAugmenteeVertices = alignedAugmenteeVertices.map(v => {
     return v
       .getRotatedAroundAxis(
@@ -318,10 +329,13 @@ function doAugment(polyhedron, faceIndex, using, gyrate, mock = false) {
   );
 
   // Map the underside vertices to the base's
-  const undersideMapping = mapObject(base, (vIndex: VIndex, i: number) => {
-    const correspondingIndex = getMod(undersideFace, offset - i);
-    return [correspondingIndex, vIndex];
-  });
+  const undersideMapping = mapObject(
+    base.vIndices(),
+    (vIndex: VIndex, i: number) => {
+      const correspondingIndex = getMod(undersideFace, offset - i);
+      return [correspondingIndex, vIndex];
+    },
+  );
 
   const newFaces = polyhedron.faces.concat(
     augmentee.faces.map(face =>
@@ -331,7 +345,7 @@ function doAugment(polyhedron, faceIndex, using, gyrate, mock = false) {
     ),
   );
   // Remove the original base and underside
-  _.pullAt(newFaces, [faceIndex, polyhedron.numFaces() + undersideIndex]);
+  _.pullAt(newFaces, [base.fIndex, polyhedron.numFaces() + underside.fIndex]);
 
   // remove extraneous vertices
   return removeExtraneousVertices(Polyhedron.of(newVertices, newFaces));
@@ -339,28 +353,22 @@ function doAugment(polyhedron, faceIndex, using, gyrate, mock = false) {
 
 export const elongate: Operation<> = {
   apply(polyhedron) {
-    const faceIndex = _.findIndex(
-      polyhedron.faces,
-      face => face === _.maxBy(polyhedron.faces, 'length'),
-    );
-    const using = `P${numSides(polyhedron.faces[faceIndex])}`;
-    return doAugment(polyhedron, faceIndex, using);
+    const base = _.maxBy(polyhedron.getFaces(), face => face.numSides());
+    const using = `P${base.numSides()}`;
+    return doAugment(polyhedron, base, using);
   },
 };
 
 export const gyroelongate: Operation<> = {
   apply(polyhedron) {
-    const faceIndex = _.findIndex(
-      polyhedron.faces,
-      face => face === _.maxBy(polyhedron.faces, 'length'),
-    );
-    const using = `A${numSides(polyhedron.faces[faceIndex])}`;
-    return doAugment(polyhedron, faceIndex, using);
+    const base = _.maxBy(polyhedron.getFaces(), face => face.numSides());
+    const using = `A${base.numSides()}`;
+    return doAugment(polyhedron, base, using);
   },
 };
 
 interface AugmentOptions {
-  fIndex: FIndex;
+  face: Face;
   gyrate: 'ortho' | 'gyro';
   using: string;
 }
@@ -387,18 +395,17 @@ export function getUsingOpt(using: ?string, numSides: number) {
 }
 
 export const augment: Operation<AugmentOptions> = {
-  apply(polyhedron, { fIndex, gyrate, using } = {}) {
-    return doAugment(polyhedron, fIndex, using, gyrate);
+  apply(polyhedron, { face, gyrate, using } = {}) {
+    return doAugment(polyhedron, face, using, gyrate);
   },
 
   getSearchOptions(polyhedron, config, relations) {
-    const { fIndex } = config;
+    const { face } = config;
 
-    if (typeof fIndex !== 'number') {
-      throw new Error('Invalid fIndex');
+    if (!face) {
+      throw new Error('Invalid face');
     }
-    const n = polyhedron.faces[fIndex].length;
-
+    const n = face.numSides();
     const using = getUsingOpt(config.using, n);
 
     const baseConfig = {
@@ -408,19 +415,18 @@ export const augment: Operation<AugmentOptions> = {
     return {
       ...baseConfig,
       align: hasMultiple(relations, 'align')
-        ? getAugmentAlignment(polyhedron, fIndex)
+        ? getAugmentAlignment(polyhedron, face)
         : undefined,
     };
   },
 
   getDefaultArgs(polyhedron, config) {
-    const { fIndex } = config;
+    const { face } = config;
 
-    if (typeof fIndex !== 'number') {
-      throw new Error('Invalid fIndex');
+    if (!face) {
+      throw new Error('Invalid face');
     }
-    const n = polyhedron.faces[fIndex].length;
-
+    const n = face.numSides();
     const using = getUsingOpt(config.using, n);
 
     return {
@@ -433,24 +439,23 @@ export const augment: Operation<AugmentOptions> = {
     const rawGyrateOpts = _.compact(_.uniq(_.map(relations, 'gyrate')));
     const gyrateOpts = rawGyrateOpts.length === 2 ? rawGyrateOpts : [undefined];
     const usingOpts = _.compact(_.uniq(_.map(relations, 'using')));
-    const fIndexOpts = polyhedron
-      .fIndices()
-      .filter(fIndex => canAugment(polyhedron, fIndex));
+    const faceOpts = polyhedron
+      .getFaces()
+      .filter(face => canAugment(polyhedron, face));
 
-    // FIXME this leads to invalid combinations
-    return cartesian(gyrateOpts, usingOpts, fIndexOpts).map(
-      ([gyrate, using, fIndex]) => ({ gyrate, using, fIndex }),
+    return cartesian(gyrateOpts, usingOpts, faceOpts).map(
+      ([gyrate, using, face]) => ({ gyrate, using, face }),
     );
   },
 
   getApplyArgs(polyhedron, hitPnt) {
     const augmentInfo = getAugmentGraph(polyhedron);
-    const fIndex = getAugmentFace(polyhedron, augmentInfo, hitPnt);
-    return fIndex === -1 ? {} : { fIndex };
+    const face = getAugmentFace(polyhedron, augmentInfo, hitPnt);
+    return face ? { face } : {};
   },
 
   isHighlighted(polyhedron, applyArgs, fIndex) {
-    if (_.isNumber(applyArgs.fIndex) && fIndex === applyArgs.fIndex) {
+    if (!!applyArgs.face && fIndex === applyArgs.face.fIndex) {
       return true;
     }
   },

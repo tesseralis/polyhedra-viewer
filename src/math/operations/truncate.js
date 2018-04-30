@@ -23,10 +23,8 @@ function truncateVertex(
   vIndex,
   { mock, rectify } = {},
 ) {
-  // const touchingFaces = polyhedron.adjacentFaces(vIndex)
   const touchingFaceIndices = polyhedron.directedAdjacentFaceIndices(vIndex);
   const touchingFaces = atIndices(polyhedron.faces, touchingFaceIndices);
-  // const touchingFaceIndices = polyhedron.adjacentFaceIndices(vIndex)
   let verticesToAdd = touchingFaces.map(face => {
     if (mock) {
       return polyhedron.vertices[vIndex];

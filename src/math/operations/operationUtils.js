@@ -1,6 +1,6 @@
 // @flow
 import _ from 'lodash';
-import { Polyhedron } from 'math/polyhedra';
+import { Polyhedron, Face } from 'math/polyhedra';
 import { VIndex, FIndex } from 'math/polyhedra';
 import { numSides } from 'math/polyhedra/solidUtils';
 import { PRECISION, getMidpoint, getPlane, rotateAround } from 'math/linAlg';
@@ -80,24 +80,21 @@ export function removeExtraneousVertices(polyhedron: Polyhedron) {
 
 export function getResizedVertices(
   polyhedron: Polyhedron,
-  fIndices: FIndex[],
+  faces: Face[],
   resizedLength: number,
   angle: number = 0,
 ) {
   // Update the vertices with the expanded-out version
-  const f0 = fIndices[0];
-  const sideLength = polyhedron.edgeLength(f0);
-  const baseLength = polyhedron.distanceToCenter(f0) / sideLength;
+  const f0 = faces[0];
+  const sideLength = f0.edgeLength();
+  const baseLength = f0.distanceToCenter() / sideLength;
   const result = [...polyhedron.vertices];
-  _.forEach(fIndices, fIndex => {
-    const normal = polyhedron.faceNormal(fIndex);
-    const expandFace = polyhedron.faces[fIndex];
-    _.forEach(expandFace, vIndex => {
-      const vertex = polyhedron.vertexVectors()[vIndex];
+  _.forEach(faces, face => {
+    const normal = face.normal();
+    _.forEach(face.vIndices(), (vIndex, i) => {
+      const vertex = face.vertices[i];
       const rotated =
-        angle === 0
-          ? vertex
-          : rotateAround(vertex, polyhedron.normalRay(fIndex), angle);
+        angle === 0 ? vertex : rotateAround(vertex, face.normalRay(), angle);
       const scale = (resizedLength - baseLength) * sideLength;
       result[vIndex] = rotated.add(normal.scale(scale)).toArray();
     });
@@ -120,40 +117,39 @@ const edgeShape = {
 
 export function isExpandedFace(
   polyhedron: Polyhedron,
-  fIndex: FIndex,
+  face: Face,
   nSides?: number,
 ) {
   const type = expansionType(polyhedron);
-  if (nSides && polyhedron.numSides(fIndex) !== nSides) return false;
-  if (!polyhedron.isFaceValid(fIndex)) return false;
+  if (nSides && face.numSides() !== nSides) return false;
+  if (!face.isValid()) return false;
   return _.every(
-    polyhedron.faceGraph()[fIndex],
-    fIndex2 => polyhedron.numSides(fIndex2) === edgeShape[type],
+    face.adjacentFaces(),
+    face2 => face2.numSides() === edgeShape[type],
   );
 }
 
 export function getSnubAngle(polyhedron: Polyhedron, numSides: number) {
-  const f0 =
-    _.find(polyhedron.fIndices(), fIndex =>
-      isExpandedFace(polyhedron, fIndex, numSides),
-    ) || 0;
-  const face0 = polyhedron.faces[f0];
+  const face0 =
+    _.find(polyhedron.getFaces(), face =>
+      isExpandedFace(polyhedron, face, numSides),
+    ) || polyhedron.getFace(0);
 
-  const faceCentroid = polyhedron.faceCentroid(f0);
-  const snubFaceIndices = _.filter(
-    polyhedron.fIndices(),
-    fIndex =>
-      isExpandedFace(polyhedron, fIndex, numSides) &&
-      !_.includes(polyhedron.adjacentFaceIndices(...face0), fIndex),
+  const faceCentroid = face0.centroid();
+  const snubFaces = _.filter(
+    polyhedron.getFaces(),
+    (face, fIndex: FIndex) =>
+      isExpandedFace(polyhedron, face, numSides) &&
+      !_.includes(polyhedron.adjacentFaceIndices(...face0.vIndices()), fIndex),
   );
-  const [v0, v1] = polyhedron.vertexVectors(face0);
+  const [v0, v1] = face0.vertices;
   const midpoint = getMidpoint(v0, v1);
-  const f1 = _.minBy(snubFaceIndices, fIndex =>
-    midpoint.distanceTo(polyhedron.faceCentroid(fIndex)),
+  const face1 = _.minBy(snubFaces, face =>
+    midpoint.distanceTo(face.centroid()),
   );
   const plane = getPlane([
     faceCentroid,
-    polyhedron.faceCentroid(f1),
+    face1.centroid(),
     polyhedron.centroid(),
   ]);
   const projected = plane.getProjectedPoint(midpoint);
