@@ -31,7 +31,7 @@ function applyGyrate(polyhedron, { peak }) {
 
   // mock faces for animation
   const mockFaces = polyhedron.getFaces().map(face => {
-    if (!face.inSet(peak.faceObjs())) {
+    if (!face.inSet(peak.faces())) {
       return face.vIndices();
     }
     return face.vIndices().map((vIndex, i) => {
@@ -101,7 +101,7 @@ export const gyrate: Operation<GyrateOptions> = {
   },
 
   isHighlighted(polyhedron, applyArgs, face) {
-    if (_.isObject(applyArgs.peak) && face.inSet(applyArgs.peak.faceObjs())) {
+    if (_.isObject(applyArgs.peak) && face.inSet(applyArgs.peak.faces())) {
       return true;
     }
   },

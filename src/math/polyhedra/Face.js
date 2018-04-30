@@ -3,7 +3,7 @@ import _ from 'lodash';
 import { Vec3D } from 'toxiclibsjs/geom';
 
 import Polyhedron from './Polyhedron';
-import { VIndex, FIndex } from './solidTypes';
+import { VIndex, FIndex, Edge } from './solidTypes';
 import { getCyclic, numSides } from './solidUtils';
 import {
   PRECISION,
@@ -47,6 +47,10 @@ export default class Face {
     return _.map(this.face, vIndex => {
       return [vIndex, this.nextVertex(vIndex)];
     });
+  }
+
+  hasDirectedEdge(edge: Edge) {
+    return _.some(this.directedEdges(), e2 => _.isEqual(edge, e2));
   }
 
   numSides(fIndex: FIndex) {

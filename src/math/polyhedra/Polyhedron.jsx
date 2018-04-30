@@ -5,13 +5,7 @@ import { find } from 'util.js';
 import { isValidSolid, getSolidData } from 'data';
 import { vec, getMidpoint, isPlanar, getCentroid } from 'math/linAlg';
 import type { Vector } from 'math/linAlg';
-import {
-  hasEdge,
-  getEdges,
-  hasDirectedEdge,
-  getAllEdges,
-  getCyclic,
-} from './solidUtils';
+import { hasEdge, getEdges, getAllEdges, getCyclic } from './solidUtils';
 import type { Vertex, Face, Edge, VIndex, FIndex } from './solidTypes';
 
 import Peak from './Peak';
@@ -238,12 +232,8 @@ export default class Polyhedron {
   // Get the faces adjacent to this edge, with the directed face first
   edgeFaceIndices([v1, v2]: Edge) {
     return [
-      _.find(this.fIndices(), (fIndex: FIndex) =>
-        hasDirectedEdge(this.faces[fIndex], [v1, v2]),
-      ),
-      _.find(this.fIndices(), (fIndex: FIndex) =>
-        hasDirectedEdge(this.faces[fIndex], [v2, v1]),
-      ),
+      find(this.getFaces(), face => face.hasDirectedEdge([v1, v2])).fIndex,
+      find(this.getFaces(), face => face.hasDirectedEdge([v2, v1])).fIndex,
     ];
   }
 
@@ -329,7 +319,7 @@ export default class Polyhedron {
   findPeak(point: Vector) {
     const hitPoint = vec(point);
     const hitFace = this.hitFace(hitPoint);
-    const peaks = this.peaks().filter(peak => hitFace.inSet(peak.faceObjs()));
+    const peaks = this.peaks().filter(peak => hitFace.inSet(peak.faces()));
     if (peaks.length === 0) {
       return null;
     }

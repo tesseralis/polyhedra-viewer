@@ -1,7 +1,6 @@
 // @flow
 
 import _ from 'lodash';
-import { getBoundary } from './solidUtils';
 import type { Edge, VIndex } from './solidTypes';
 
 import Polyhedron from './Polyhedron';
@@ -9,6 +8,37 @@ import Face from './Face';
 
 type PeakType = 'pyramid' | 'cupola' | 'rotunda' | 'fastigium' | 'prism';
 type FaceConfiguration = { [string]: number };
+
+// Get a "face" (list of vertices) representing the boundary of the given faces
+function getBoundary(faces: Face[]) {
+  const edges = {};
+  // build up a lookup table for every pair of edges to that face
+  _.forEach(faces, face => {
+    // for the pairs of vertices, find the face that contains the corresponding pair
+    _.forEach(face.directedEdges(), edge => {
+      const [i1, i2] = edge;
+      if (_.includes(edges[i2], i1)) {
+        _.pull(edges[i2], i1);
+      } else {
+        if (!edges[i1]) {
+          edges[i1] = [];
+        }
+        edges[i1].push(i2);
+      }
+    });
+  });
+
+  const cycle = _(edges)
+    .pickBy('length')
+    .mapValues(0)
+    .value();
+  const first = _.values(cycle)[0];
+  const result = [first];
+  for (let i = cycle[first]; i !== first; i = cycle[i]) {
+    result.push(i);
+  }
+  return result;
+}
 
 const withMapper = property => Base =>
   class extends Base {
@@ -53,15 +83,15 @@ export default class Peak {
 
   faceConfiguration: () => FaceConfiguration;
 
-  faceObjs = _.memoize(() => {
+  faces = _.memoize(() => {
     return this.polyhedron.adjacentFaces(...this.innerVertexIndices());
   });
 
-  faces = _.memoize(() => {
-    return this.polyhedron
-      .adjacentFaces(...this.innerVertexIndices())
-      .map(face => face.vIndices());
-  });
+  // faces = _.memoize(() => {
+  //   return this.polyhedron
+  //     .adjacentFaces(...this.innerVertexIndices())
+  //     .map(face => face.vIndices());
+  // });
 
   boundary = _.memoize(() => {
     return getBoundary(this.faces());
@@ -84,7 +114,7 @@ const Pyramid = withMapper('vIndices')(
       this.vIndex = vIndex;
     }
 
-    faceConfiguration = () => ({ '3': this.faceObjs().length });
+    faceConfiguration = () => ({ '3': this.faces().length });
 
     topPoint() {
       return this.polyhedron.vertexVector(this.vIndex);
