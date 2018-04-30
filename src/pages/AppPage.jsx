@@ -5,7 +5,7 @@ import { MemoryRouter } from 'react-router-dom';
 import { mount } from 'enzyme';
 
 import App from 'components/App';
-import Polyhedron from 'math/Polyhedron';
+import { Polyhedron } from 'math/polyhedra';
 
 export default class AppPage {
   constructor(path = '/') {

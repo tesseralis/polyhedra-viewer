@@ -3,8 +3,7 @@ import { cartesian } from 'util.js';
 import { allSolidNames } from 'data';
 import { PRECISION } from 'math/linAlg';
 import { getOperations, getRelations } from 'polyhedra/relations';
-import Polyhedron from 'math/polyhedron';
-import Peak from 'math/Peak';
+import { Polyhedron, Peak } from 'math/polyhedra';
 import { operations, canAugment } from 'math/operations';
 import applyOperation from './applyOperation';
 

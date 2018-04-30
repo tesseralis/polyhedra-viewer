@@ -1,7 +1,7 @@
 // @flow
 import _ from 'lodash';
-import Polyhedron from 'math/Polyhedron';
-import { VIndex } from 'math/solidTypes';
+import { Polyhedron } from 'math/polyhedra';
+import type { VIndex } from 'math/polyhedra';
 import {
   getSnubAngle,
   expansionType,

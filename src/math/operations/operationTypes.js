@@ -1,6 +1,6 @@
 // @flow
-import Polyhedron from 'math/Polyhedron';
-import type { Vertex, FIndex } from 'math/solidTypes';
+import { Polyhedron } from 'math/polyhedra';
+import type { Vertex, FIndex } from 'math/polyhedra';
 import type { Vector } from 'math/linAlg';
 
 export interface OperationResult {

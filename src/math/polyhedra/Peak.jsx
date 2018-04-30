@@ -2,8 +2,9 @@
 
 import _ from 'lodash';
 import { getBoundary } from './solidUtils';
-import { vec } from './linAlg';
+import { vec } from 'math/linAlg';
 import type { Edge, VIndex, FIndex } from './solidTypes';
+
 import Polyhedron from './Polyhedron';
 
 type PeakType = 'pyramid' | 'cupola' | 'rotunda' | 'fastigium' | 'prism';

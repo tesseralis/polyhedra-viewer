@@ -6,8 +6,8 @@ import { rgb } from 'd3-color';
 
 import { isValidSolid } from 'data';
 import { andaleMono } from 'styles/fonts';
-import Polyhedron from 'math/Polyhedron';
-import type { Vertex, Face, FIndex } from 'math/solidTypes';
+import { Polyhedron } from 'math/polyhedra';
+import type { Vertex, Face, FIndex } from 'math/polyhedra';
 import type { Vector } from 'math/linAlg';
 import { operations } from 'math/operations';
 import polygons from 'constants/polygons';

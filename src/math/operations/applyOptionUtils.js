@@ -1,10 +1,10 @@
 // @flow
 import _ from 'lodash';
 import { getSingle } from 'util.js';
-import { getDirectedEdges, numSides } from 'math/solidUtils';
-import type { FIndex } from 'math/solidTypes';
-import Peak from 'math/Peak';
-import Polyhedron from 'math/Polyhedron';
+// FIXME don't rely on these
+import { getDirectedEdges, numSides } from 'math/polyhedra/solidUtils';
+import type { FIndex } from 'math/polyhedra';
+import { Peak, Polyhedron } from 'math/polyhedra';
 
 // Get what kind of base we are augmenting to
 function faceDistanceBetweenVertices(

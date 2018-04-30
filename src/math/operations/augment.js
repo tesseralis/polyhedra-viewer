@@ -1,14 +1,14 @@
 // @flow
 import _ from 'lodash';
 
-import Polyhedron from 'math/Polyhedron';
+import { Polyhedron } from 'math/polyhedra';
+import type { VIndex, FIndex } from 'math/polyhedra';
 import { vec, getPlane, getCentroid, getNormal, PRECISION } from 'math/linAlg';
 import { cartesian, mapObject } from 'util.js';
-import { numSides, getCyclic as getMod } from 'math/solidUtils';
-import type { VIndex, FIndex } from 'math/solidTypes';
+import { numSides, getCyclic as getMod } from 'math/polyhedra/solidUtils';
 
 import { hasMultiple, removeExtraneousVertices } from './operationUtils';
-import { getAugmentAlignment } from 'math/applyOptionUtils';
+import { getAugmentAlignment } from './applyOptionUtils';
 import { Operation } from './operationTypes';
 
 const augmentees = {

@@ -1,11 +1,11 @@
 // @flow
 import _ from 'lodash';
 
-import Polyhedron from 'math/Polyhedron';
+import { Polyhedron } from 'math/polyhedra';
+import { VIndex } from 'math/polyhedra';
+import { nextVertex } from 'math/polyhedra/solidUtils';
 import { replace, atIndices } from 'util.js';
 import { vec } from 'math/linAlg';
-import { nextVertex } from 'math/solidUtils';
-import { VIndex } from 'math/solidTypes';
 import {
   removeExtraneousVertices,
   deduplicateVertices,

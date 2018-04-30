@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import { getNextPolyhedron, getRelations } from './relations';
-import Polyhedron from 'math/Polyhedron';
+import { Polyhedron } from 'math/polyhedra';
 import { operations } from 'math/operations';
 import type { OperationResult } from 'math/operations';
 

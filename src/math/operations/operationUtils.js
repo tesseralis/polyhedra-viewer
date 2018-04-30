@@ -1,9 +1,9 @@
 // @flow
 import _ from 'lodash';
-import Polyhedron from 'math/Polyhedron';
+import { Polyhedron } from 'math/polyhedra';
+import { VIndex, FIndex } from 'math/polyhedra';
+import { numSides } from 'math/polyhedra/solidUtils';
 import { PRECISION, getMidpoint, getPlane, rotateAround } from 'math/linAlg';
-import { numSides } from 'math/solidUtils';
-import { VIndex, FIndex } from 'math/solidTypes';
 
 export const hasMultiple = (relations: any, property: any) =>
   _(relations)

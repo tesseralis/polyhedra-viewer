@@ -11,8 +11,8 @@ import {
   getNormal,
   getCentroid,
   PRECISION,
-} from './linAlg';
-import type { Vector } from './linAlg';
+} from 'math/linAlg';
+import type { Vector } from 'math/linAlg';
 import {
   numSides,
   hasEdge,

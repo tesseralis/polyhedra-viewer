@@ -4,7 +4,7 @@ import _ from 'lodash';
 import EventListener from 'react-event-listener';
 
 import type { Vector } from 'math/linAlg';
-import SolidData from 'math/Polyhedron';
+import { Polyhedron } from 'math/polyhedra';
 
 // Join a list of lists with an inner and outer separator.
 export const joinListOfLists = (
@@ -37,7 +37,7 @@ const Edges = ({ edges, vertices }) => {
 };
 
 interface PolyhedronProps {
-  solidData: SolidData;
+  solidData: Polyhedron;
   config: any;
   faceColors: any;
   applyOperation(): void;

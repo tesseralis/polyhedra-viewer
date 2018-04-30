@@ -3,9 +3,9 @@ import _ from 'lodash';
 
 import { replace } from 'util.js';
 import { vec } from 'math/linAlg';
-import Polyhedron from 'math/Polyhedron';
-import { numSides, prevVertex, nextVertex } from 'math/solidUtils';
-import type FIndex from 'math/solidtypes';
+import { Polyhedron } from 'math/polyhedra';
+import type FIndex from 'math/polyhedra';
+import { numSides, prevVertex, nextVertex } from 'math/polyhedra/solidUtils';
 import { deduplicateVertices } from './operationUtils';
 import type { Operation } from './operationTypes';
 

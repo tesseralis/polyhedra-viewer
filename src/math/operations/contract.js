@@ -1,7 +1,7 @@
 // @flow
 import _ from 'lodash';
-import Polyhedron from 'math/Polyhedron';
-import { FIndex } from 'math/solidTypes';
+import { Polyhedron } from 'math/polyhedra';
+import { FIndex } from 'math/polyhedra';
 import { vec } from 'math/linAlg';
 import type { Vector } from 'math/linAlg';
 import {

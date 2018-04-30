@@ -1,13 +1,11 @@
 // @flow
 import _ from 'lodash';
 import { getNormalRay, rotateAround } from 'math/linAlg';
-import Polyhedron from 'math/Polyhedron';
-import Peak from 'math/Peak';
-import { numSides } from 'math/solidUtils';
+import { Polyhedron, Peak } from 'math/polyhedra';
 import type { Operation } from './operationTypes';
 import { deduplicateVertices } from './operationUtils';
 import { mapObject } from 'util.js';
-import { getPeakAlignment, getGyrateDirection } from 'math/applyOptionUtils';
+import { getPeakAlignment, getGyrateDirection } from './applyOptionUtils';
 
 const TAU = 2 * Math.PI;
 
@@ -24,7 +22,7 @@ function applyGyrate(polyhedron, { peak }) {
     vIndex => polyhedron.vertexVectors()[vIndex],
   );
   const normalRay = getNormalRay(boundaryVertices);
-  const theta = TAU / numSides(boundary);
+  const theta = TAU / boundary.length;
 
   const newBoundaryVertices = boundary.map(
     vIndex => polyhedron.vertices[vIndex],

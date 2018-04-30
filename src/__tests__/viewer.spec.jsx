@@ -2,7 +2,6 @@ import React from 'react';
 import { MemoryRouter } from 'react-router-dom';
 import { mount } from 'enzyme';
 
-import Polyhedron from 'math/Polyhedron';
 import AppPage from 'pages/AppPage';
 
 describe('viewer', () => {
