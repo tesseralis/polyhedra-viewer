@@ -20,11 +20,3 @@ export function getDirectedEdges(face: Face) {
     return [vertex, getCyclic(face, index + 1)];
   });
 }
-
-export function nextVertex(face: Face, vIndex: VIndex) {
-  return getCyclic(face, face.indexOf(vIndex) + 1);
-}
-
-export function prevVertex(face: Face, vIndex: VIndex) {
-  return getCyclic(face, face.indexOf(vIndex) - 1);
-}
