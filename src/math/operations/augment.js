@@ -88,22 +88,13 @@ function getPossibleAugmentees(n) {
 // Checks to see if the polyhedron can be augmented at the base while remaining convex
 function canAugmentWith(polyhedron, base, augmentee, offset) {
   const n = base.numSides();
-  const undersideIndex = _.findIndex(
-    augmentee.faces,
-    face => face.length === n,
-  );
-  const undersideFace = augmentee.faces[undersideIndex];
+  const underside = find(augmentee.getFaces(), face => face.numSides() === n);
 
-  return _.every(base.vIndices(), (baseV1, i) => {
-    const baseV2 = getMod(base.vIndices(), i + 1);
-    const baseAngle = polyhedron.getDihedralAngle([baseV1, baseV2]);
+  return _.every(base.directedEdges(), (edge, i) => {
+    const baseAngle = polyhedron.getDihedralAngle(edge);
 
-    const undersideV1 = getMod(undersideFace, i + offset);
-    const undersideV2 = getMod(undersideFace, i - 1 + offset);
-    const augmenteeAngle = augmentee.getDihedralAngle([
-      undersideV1,
-      undersideV2,
-    ]);
+    const edge2 = underside.directedEdge(i - 1 + offset);
+    const augmenteeAngle = augmentee.getDihedralAngle(edge2);
 
     return baseAngle + augmenteeAngle < Math.PI - PRECISION;
   });

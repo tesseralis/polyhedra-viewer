@@ -38,6 +38,17 @@ export default class Face {
     return getCyclic(this.face, this.face.indexOf(vIndex) - 1);
   }
 
+  directedEdge(i: number) {
+    const vIndex = getCyclic(this.face, i);
+    return [vIndex, this.nextVertex(vIndex)];
+  }
+
+  directedEdges() {
+    return _.map(this.face, vIndex => {
+      return [vIndex, this.nextVertex(vIndex)];
+    });
+  }
+
   numSides(fIndex: FIndex) {
     return numSides(this.face);
   }
