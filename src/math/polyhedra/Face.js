@@ -2,6 +2,7 @@
 import _ from 'lodash';
 import { Vec3D } from 'toxiclibsjs/geom';
 
+import { replace } from 'util.js';
 import Polyhedron from './Polyhedron';
 import { VIndex, FIndex, Edge } from './solidTypes';
 import { getCyclic, numSides } from './solidUtils';
@@ -40,6 +41,10 @@ export default class Face {
 
   prevVertex(vIndex: VIndex) {
     return getCyclic(this.face, this.face.indexOf(vIndex) - 1);
+  }
+
+  replaceVertex(vIndex: VIndex, ...vIndices: VIndex[]) {
+    return replace(this.face, this.face.indexOf(vIndex), ...vIndices);
   }
 
   getEdges(): Edge[] {

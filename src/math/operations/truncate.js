@@ -3,8 +3,6 @@ import _ from 'lodash';
 
 import { Polyhedron } from 'math/polyhedra';
 import { VIndex } from 'math/polyhedra';
-import { replace } from 'util.js';
-import { vec } from 'math/linAlg';
 import {
   removeExtraneousVertices,
   deduplicateVertices,
@@ -28,8 +26,8 @@ function truncateVertex(
       return polyhedron.vertices[vIndex];
     }
     const next = face.nextVertex(vIndex);
-    const p1 = vec(polyhedron.vertices[vIndex]);
-    const p2 = vec(polyhedron.vertices[next]);
+    const p1 = polyhedron.vertexVector(vIndex);
+    const p2 = polyhedron.vertexVector(next);
     const sideLength = p1.distanceTo(p2);
     if (rectify) {
       return p1.add(p2.sub(p1).scale(1 / 2)).toArray();
@@ -56,15 +54,14 @@ function truncateVertex(
       const touchingFaceIndex = _.findIndex(touchingFaces, f2 =>
         f2.equals(face),
       );
-      return replace(
-        face.vIndices(),
-        face.vIndices().indexOf(vIndex),
+      return face.replaceVertex(
+        vIndex,
         newPolyhedron.vertices.length +
           mod(touchingFaceIndex + 1, touchingFaces.length),
         newPolyhedron.vertices.length + touchingFaceIndex,
       );
     })
-    .concat([_.range(newPolyhedron.vertices.length, newVertices.length)]);
+    .concat([_.range(newPolyhedron.numVertices(), newVertices.length)]);
   return Polyhedron.of(newVertices, newFaces);
 }
 
