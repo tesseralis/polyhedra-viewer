@@ -324,7 +324,7 @@ function doAugment(polyhedron, base, using, gyrate, mock = false) {
 
 export const elongate: Operation<> = {
   apply(polyhedron) {
-    const base = _.maxBy(polyhedron.getFaces(), face => face.numSides());
+    const base = polyhedron.biggestFace();
     const using = `P${base.numSides()}`;
     return doAugment(polyhedron, base, using);
   },
@@ -332,7 +332,7 @@ export const elongate: Operation<> = {
 
 export const gyroelongate: Operation<> = {
   apply(polyhedron) {
-    const base = _.maxBy(polyhedron.getFaces(), face => face.numSides());
+    const base = polyhedron.biggestFace();
     const using = `A${base.numSides()}`;
     return doAugment(polyhedron, base, using);
   },

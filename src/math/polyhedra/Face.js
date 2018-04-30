@@ -13,6 +13,10 @@ import {
   getNormalRay,
 } from 'math/linAlg';
 
+function getEdge(v1: VIndex, v2: VIndex) {
+  return v1 < v2 ? [v1, v2] : [v2, v1];
+}
+
 export default class Face {
   polyhedron: Polyhedron;
   fIndex: FIndex;
@@ -36,6 +40,16 @@ export default class Face {
 
   prevVertex(vIndex: VIndex) {
     return getCyclic(this.face, this.face.indexOf(vIndex) - 1);
+  }
+
+  getEdges(): Edge[] {
+    return _.map(this.face, vertex => {
+      return getEdge(vertex, this.nextVertex(vertex));
+    });
+  }
+
+  hasEdge([v1, v2]: Edge) {
+    return _.includes(this.face, v1) && _.includes(this.face, v2);
   }
 
   directedEdge(i: number) {

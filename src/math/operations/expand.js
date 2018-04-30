@@ -73,12 +73,12 @@ function duplicateVertices(polyhedron: Polyhedron, twist?: 'left' | 'right') {
   });
 
   const edgeFaces = (() => {
-    if (twist) {
-      return _.flatMap(polyhedron.edges, edge => {
-        const [v1, v2] = edge;
-        const [f1, f2] = polyhedron.edgeFaceIndices(edge);
-        // get the edges in order of the first face
-        if (twist === 'right') {
+    return _.flatMap(polyhedron.edges, edge => {
+      const [v1, v2] = edge;
+      const [f1, f2] = _.map(polyhedron.edgeFaces(edge), 'fIndex');
+
+      switch (twist) {
+        case 'right':
           return [
             [
               newVertexMapping[f1][v1],
@@ -91,33 +91,29 @@ function duplicateVertices(polyhedron: Polyhedron, twist?: 'left' | 'right') {
               newVertexMapping[f2][v2],
             ],
           ];
-        }
-        return [
-          [
-            newVertexMapping[f1][v2],
-            newVertexMapping[f1][v1],
-            newVertexMapping[f2][v1],
-          ],
-          [
-            newVertexMapping[f2][v1],
-            newVertexMapping[f2][v2],
-            newVertexMapping[f1][v2],
-          ],
-        ];
-      });
-    }
-
-    // Create a square out of each edge originally in the polyhedron
-    return polyhedron.edges.map(edge => {
-      const [v1, v2] = edge;
-      const [f1, f2] = polyhedron.edgeFaceIndices(edge);
-      // get the edges in order of the first face
-      return [
-        newVertexMapping[f1][v2],
-        newVertexMapping[f1][v1],
-        newVertexMapping[f2][v1],
-        newVertexMapping[f2][v2],
-      ];
+        case 'left':
+          return [
+            [
+              newVertexMapping[f1][v2],
+              newVertexMapping[f1][v1],
+              newVertexMapping[f2][v1],
+            ],
+            [
+              newVertexMapping[f2][v1],
+              newVertexMapping[f2][v2],
+              newVertexMapping[f1][v2],
+            ],
+          ];
+        default:
+          return [
+            [
+              newVertexMapping[f1][v2],
+              newVertexMapping[f1][v1],
+              newVertexMapping[f2][v1],
+              newVertexMapping[f2][v2],
+            ],
+          ];
+      }
     });
   })();
 

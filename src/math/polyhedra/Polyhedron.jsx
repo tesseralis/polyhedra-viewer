@@ -5,7 +5,7 @@ import { find } from 'util.js';
 import { isValidSolid, getSolidData } from 'data';
 import { vec, getMidpoint, isPlanar, getCentroid } from 'math/linAlg';
 import type { Vector } from 'math/linAlg';
-import { hasEdge, getEdges, getAllEdges, getCyclic } from './solidUtils';
+import { getCyclic } from './solidUtils';
 import type { Vertex, Face, Edge, VIndex, FIndex } from './solidTypes';
 
 import Peak from './Peak';
@@ -48,9 +48,16 @@ export default class Polyhedron {
     }
   }
 
+  getAllEdges() {
+    return _(this.getFaces())
+      .flatMap(face => face.getEdges())
+      .uniqWith(_.isEqual)
+      .value();
+  }
+
   get edges() {
     if (!this._edges) {
-      this._edges = getAllEdges(this.faces);
+      this._edges = this.getAllEdges();
     }
     return this._edges;
   }
@@ -67,6 +74,10 @@ export default class Polyhedron {
   getFaces = () => {
     return this.fIndices().map(fIndex => this.getFace(fIndex));
   };
+
+  biggestFace() {
+    return _.maxBy(this.getFaces(), face => face.numSides());
+  }
 
   numVertices() {
     return this.vertices.length;
@@ -230,15 +241,11 @@ export default class Polyhedron {
   }
 
   // Get the faces adjacent to this edge, with the directed face first
-  edgeFaceIndices([v1, v2]: Edge) {
+  edgeFaces([v1, v2]: Edge) {
     return [
-      find(this.getFaces(), face => face.hasDirectedEdge([v1, v2])).fIndex,
-      find(this.getFaces(), face => face.hasDirectedEdge([v2, v1])).fIndex,
+      find(this.getFaces(), face => face.hasDirectedEdge([v1, v2])),
+      find(this.getFaces(), face => face.hasDirectedEdge([v2, v1])),
     ];
-  }
-
-  edgeFaces(edge: Edge) {
-    return this.getFaces().filter(face => hasEdge(face.vIndices(), edge));
   }
 
   getDihedralAngle(edge: Edge) {
@@ -259,10 +266,10 @@ export default class Polyhedron {
   faceGraph = _.memoize(() => {
     const edgesToFaces: { [string]: Face } = {};
     // build up a lookup table for every pair of edges to that face
-    _.forEach(this.faces, (face: Face, index: FIndex) => {
+    _.forEach(this.getFaces(), (face, index: FIndex) => {
       // for the pairs of vertices, find the face that contains the corresponding pair
       // ...this is n^2? more? ah who cares I'm too lazy
-      _.forEach(getEdges(face), (edge: string) => {
+      _.forEach(face.getEdges(), (edge: string) => {
         if (!edgesToFaces[edge]) {
           edgesToFaces[edge] = [];
         }

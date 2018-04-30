@@ -3,7 +3,6 @@ import _ from 'lodash';
 
 import { hasMultiple, removeExtraneousVertices } from './operationUtils';
 import { Peak } from 'math/polyhedra';
-import { numSides } from 'math/polyhedra/solidUtils';
 import type { Operation } from './operationTypes';
 import { getPeakAlignment, getCupolaGyrate } from './applyOptionUtils';
 
@@ -64,14 +63,14 @@ export const diminish: Operation<DiminishOptions> = {
 
 function applyShorten(polyhedron) {
   // Find a prism or antiprism face
-  const face = _(polyhedron.faces)
-    .filter((face, fIndex) => {
-      const adjacentFace = polyhedron.faceGraph()[fIndex];
-      const adjacent = adjacentFace.map(fIndex2 => polyhedron.faces[fIndex2]);
-      return _.keys(_.countBy(adjacent, numSides)).length === 1;
-    })
-    .maxBy(numSides);
-  return removeVertices(polyhedron, new Peak(polyhedron, face, 'prism'));
+  const faces = polyhedron.getFaces().filter(face => {
+    return _.uniq(face.adjacentFaces().map(nbr => nbr.numSides())).length === 1;
+  });
+  const face = _.maxBy(faces, face => face.numSides());
+  return removeVertices(
+    polyhedron,
+    new Peak(polyhedron, face.vIndices(), 'prism'),
+  );
 }
 
 export const shorten: Operation<> = {

@@ -2,7 +2,7 @@
 import _ from 'lodash';
 import { getSingle } from 'util.js';
 // FIXME don't rely on these
-import { getDirectedEdges, numSides } from 'math/polyhedra/solidUtils';
+import { getDirectedEdges } from 'math/polyhedra/solidUtils';
 import type { VIndex } from 'math/polyhedra';
 import { Peak, Polyhedron } from 'math/polyhedra';
 
@@ -47,7 +47,7 @@ export function getPeakAlignment(polyhedron: Polyhedron, peak: Peak) {
   const diminishedIndices =
     orthoIndices.length > 0
       ? getSingle(orthoIndices).boundary()
-      : _.maxBy(polyhedron.faces, numSides);
+      : polyhedron.biggestFace().vIndices();
 
   return faceDistanceBetweenVertices(
     polyhedron,
@@ -61,9 +61,10 @@ export function getPeakAlignment(polyhedron: Polyhedron, peak: Peak) {
 export function getCupolaGyrate(polyhedron: Polyhedron, peak: Peak) {
   const boundary = peak.boundary();
   const isOrtho = _.every(getDirectedEdges(boundary), edge => {
-    const [n1, n2] = polyhedron.faces
-      .filter(face => _.intersection(face, edge).length === 2)
-      .map(numSides);
+    const [n1, n2] = polyhedron
+      .getFaces()
+      .filter(face => face.hasEdge(edge))
+      .map(face => face.numSides());
     return (n1 === 4) === (n2 === 4);
   });
   return isOrtho ? 'ortho' : 'gyro';
