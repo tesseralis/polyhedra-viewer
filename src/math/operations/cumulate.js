@@ -24,7 +24,7 @@ function duplicateVertex(newPolyhedron, polyhedron, faces, vIndex) {
 
   return newPolyhedron
     .addVertices([newPolyhedron.vertices[vIndex]])
-    .mapFaceObjs(face => {
+    .mapFaces(face => {
       const originalFace = polyhedron.getFace(face.fIndex);
       if (!face.inSet(adjacentFaces)) {
         return face.vIndices();

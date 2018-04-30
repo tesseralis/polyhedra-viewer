@@ -222,11 +222,7 @@ export default class Polyhedron {
     return this.withVertices(this.vertices.map(iteratee));
   }
 
-  mapFaces(iteratee: (Face, FIndex) => Face) {
-    return this.withFaces(this.faces.map(iteratee));
-  }
-
-  mapFaceObjs(iteratee: FaceObj => Face) {
+  mapFaces(iteratee: FaceObj => Face) {
     return this.withFaces(this.getFaces().map(iteratee));
   }
 
