@@ -93,13 +93,25 @@ function getCumulateFaces(polyhedron, faceType) {
   return polyhedron.getFaces().filter(face => face.numSides() === faceType);
 }
 
-function getVertexToAdd(polyhedron, face) {
+function calculateCumulateDist(polyhedron, face, edge) {
   const apothem = face.apothem();
+  const theta = Math.PI - polyhedron.getDihedralAngle(edge);
+  return apothem * Math.tan(theta);
+}
+
+function getCumulateDist(polyhedron, face) {
+  if (isBevelled(polyhedron)) {
+    return _.meanBy(face.getEdges(), edge =>
+      calculateCumulateDist(polyhedron, face, edge),
+    );
+  }
+  return calculateCumulateDist(polyhedron, face, face.getEdges()[0]);
+}
+
+function getVertexToAdd(polyhedron, face) {
   const normalRay = face.normalRay();
-  const theta =
-    Math.PI - polyhedron.getDihedralAngle(_.take(face.vIndices(), 2));
-  const scale = apothem * Math.tan(theta);
-  return normalRay.getPointAtDistance(scale).toArray();
+  const dist = getCumulateDist(polyhedron, face);
+  return normalRay.getPointAtDistance(dist).toArray();
 }
 
 function applyCumulate(

@@ -16,8 +16,6 @@ const opsToTest = archimedeanOpts.concat(johnsonOpts);
 const excludedOperations = {
   cuboctahedron: ['t'],
   icosidodecahedron: ['t'],
-  'truncated cuboctahedron': ['k'],
-  'truncated icosidodecahedron': ['k'],
 };
 
 function isProperPolyhedron(polyhedron) {

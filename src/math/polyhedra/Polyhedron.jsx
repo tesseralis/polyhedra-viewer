@@ -105,8 +105,8 @@ export default class Polyhedron {
     return _(this.getFaces())
       .map(face => face.numSides())
       .uniq()
-      .sorted()
-      .valude();
+      .sortBy()
+      .value();
   }
 
   _vertexVectors: Vec3D[];
