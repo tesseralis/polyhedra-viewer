@@ -1,87 +1,87 @@
 // @flow
 import _ from 'lodash';
 
+import { find } from 'util.js';
+import { PRECISION } from 'math/linAlg';
 import { Polyhedron } from 'math/polyhedra';
-import { VIndex } from 'math/polyhedra';
-import {
-  removeExtraneousVertices,
-  deduplicateVertices,
-} from './operationUtils';
+import { getCyclic, mod } from 'math/polyhedra/solidUtils';
+import { deduplicateVertices } from './operationUtils';
 import type { Operation } from './operationTypes';
 
 interface TruncateOptions {
-  mock?: boolean;
   rectify?: boolean;
 }
 
-function truncateVertex(
-  newPolyhedron,
-  polyhedron,
-  vIndex,
-  { mock, rectify } = {},
-) {
-  const touchingFaces = polyhedron.directedAdjacentFaces(vIndex);
-  let verticesToAdd = touchingFaces.map(face => {
-    if (mock) {
-      return polyhedron.vertices[vIndex];
-    }
-    const next = face.nextVertex(vIndex);
-    const p1 = polyhedron.vertexVector(vIndex);
-    const p2 = polyhedron.vertexVector(next);
-    const sideLength = p1.distanceTo(p2);
-    if (rectify) {
-      return p1.add(p2.sub(p1).scale(1 / 2)).toArray();
-    }
-    const n = face.numSides();
-    const apothem =
-      Math.cos(Math.PI / n) * sideLength / (2 * Math.sin(Math.PI / n));
-    const n2 = 2 * n;
-    const newSideLength =
-      2 * Math.sin(Math.PI / n2) * apothem / Math.cos(Math.PI / n2);
-    return p1
-      .add(p2.sub(p1).scale((sideLength - newSideLength) / 2 / sideLength))
-      .toArray();
+function duplicateVertex(newPolyhedron, polyhedron, vIndex) {
+  const adjacentFaces = polyhedron.directedAdjacentFaces(vIndex);
+  const pivot = _.last(adjacentFaces);
+  const numVertices = newPolyhedron.numVertices();
+
+  const remappedFacesGraph = {};
+  adjacentFaces.forEach((adjFace, i) => {
+    const newVertexIndex = adjFace.equals(pivot) ? vIndex : numVertices + i;
+    const next = getCyclic(adjacentFaces, i + 1).equals(pivot)
+      ? vIndex
+      : numVertices + mod(i + 1, adjacentFaces.length);
+
+    remappedFacesGraph[adjFace.fIndex] = newPolyhedron
+      .getFace(adjFace.fIndex)
+      .replaceVertex(vIndex, next, newVertexIndex);
   });
 
-  const newVertices = newPolyhedron.vertices.concat(verticesToAdd);
+  const newFace = [
+    ..._.range(numVertices, numVertices + adjacentFaces.length - 1),
+    vIndex,
+  ];
 
-  const mod = (a, b) => (a >= 0 ? a % b : a % b + b);
+  return newPolyhedron
+    .addVertices(
+      _.times(adjacentFaces.length - 1, () => newPolyhedron.vertices[vIndex]),
+    )
+    .mapFaces(face => remappedFacesGraph[face.fIndex] || face.vIndices())
+    .addFaces([newFace]);
+}
 
-  const newFaces = newPolyhedron
-    .getFaces()
-    .map(face => {
-      if (!face.inSet(touchingFaces)) return face.vIndices();
-      const touchingFaceIndex = _.findIndex(touchingFaces, f2 =>
-        f2.equals(face),
-      );
-      return face.replaceVertex(
-        vIndex,
-        newPolyhedron.vertices.length +
-          mod(touchingFaceIndex + 1, touchingFaces.length),
-        newPolyhedron.vertices.length + touchingFaceIndex,
-      );
-    })
-    .concat([_.range(newPolyhedron.numVertices(), newVertices.length)]);
-  return Polyhedron.of(newVertices, newFaces);
+function duplicateVertices(polyhedron) {
+  const { vertices, faces } = polyhedron.vertices.reduce(
+    (newPolyhedron, vertex, vIndex) => {
+      return duplicateVertex(newPolyhedron, polyhedron, vIndex);
+    },
+    polyhedron,
+  );
+  // Create a new one so we recalculate the edges
+  return Polyhedron.of(vertices, faces);
+}
+
+function getTruncateScale(polyhedron) {
+  const face = polyhedron.getFace(0);
+  const sideLength = face.edgeLength();
+  const n = face.numSides();
+  const theta = Math.PI / n;
+  const newTheta = theta / 2;
+  const newSideLength = 2 * face.apothem() * Math.tan(newTheta);
+  return (sideLength - newSideLength) / 2 / sideLength;
 }
 
 function doTruncate(polyhedron, options: TruncateOptions = {}) {
-  let newPolyhedron = polyhedron;
-  let mockPolyhedron: Polyhedron = polyhedron;
-  // TODO (animation) make this more concise
-  _.forEach(polyhedron.vertices, (vertex, index: VIndex) => {
-    newPolyhedron = truncateVertex(newPolyhedron, polyhedron, index, options);
-    mockPolyhedron = truncateVertex(mockPolyhedron, polyhedron, index, {
-      ...options,
-      mock: true,
-    });
+  const { rectify } = options;
+  const truncateScale = getTruncateScale(polyhedron);
+  const duplicated = duplicateVertices(polyhedron);
+
+  const truncatedVertices = duplicated.vertexVectors().map((v, vIndex) => {
+    const adjacentVertices = duplicated.vertexVectors(
+      duplicated.adjacentVertexIndices(vIndex),
+    );
+    const v1 = find(adjacentVertices, adj => adj.distanceTo(v) > PRECISION);
+    return v.interpolateTo(v1, rectify ? 0.5 : truncateScale).toArray();
   });
+  const result = duplicated.withVertices(truncatedVertices);
   return {
     animationData: {
-      start: removeExtraneousVertices(mockPolyhedron),
-      endVertices: removeExtraneousVertices(newPolyhedron).vertices,
+      start: duplicated,
+      endVertices: truncatedVertices,
     },
-    result: deduplicateVertices(newPolyhedron),
+    result: rectify ? deduplicateVertices(result) : result,
   };
 }
 

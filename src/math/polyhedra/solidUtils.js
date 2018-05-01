@@ -2,16 +2,16 @@
 import _ from 'lodash';
 import type { Vertex, VIndex, Face } from './solidTypes';
 
-// Get the element of the array at the given index,
-// modulo its length
-function mod(a, b) {
+export function mod(a: number, b: number) {
   return a >= 0 ? a % b : a % b + b;
 }
 
 // Return the number of sides of a face
 export const numSides = (face: Face) => face.length;
 
-export function getCyclic(array: number[], index: number): number {
+// Get the element of the array at the given index,
+// modulo its length
+export function getCyclic<T>(array: T[], index: number): T {
   return array[mod(index, array.length)];
 }
 
