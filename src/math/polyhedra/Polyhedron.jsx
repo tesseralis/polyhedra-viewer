@@ -100,6 +100,15 @@ export default class Polyhedron {
     return _.countBy(this.getFaces(), face => face.numSides());
   }
 
+  // The list of the type of faces this polyhedron has, ordered
+  faceTypes() {
+    return _(this.getFaces())
+      .map(face => face.numSides())
+      .uniq()
+      .sorted()
+      .valude();
+  }
+
   _vertexVectors: Vec3D[];
 
   // Return the vectors of this polyhedron as vectors

@@ -16,6 +16,10 @@ function isRectified(polyhedron) {
   return polyhedron.adjacentFaces(0).length === 4;
 }
 
+function isBevelled(polyhedron) {
+  return polyhedron.faceTypes().length === 3;
+}
+
 function duplicateVertex(newPolyhedron, polyhedron, faces, vIndex) {
   const adjacentFaces = polyhedron.adjacentFaces(vIndex);
   const pivot = find(adjacentFaces, nbr => nbr.inSet(faces));
@@ -89,6 +93,15 @@ function getCumulateFaces(polyhedron, faceType) {
   return polyhedron.getFaces().filter(face => face.numSides() === faceType);
 }
 
+function getVertexToAdd(polyhedron, face) {
+  const apothem = face.apothem();
+  const normalRay = face.normalRay();
+  const theta =
+    Math.PI - polyhedron.getDihedralAngle(_.take(face.vIndices(), 2));
+  const scale = apothem * Math.tan(theta);
+  return normalRay.getPointAtDistance(scale).toArray();
+}
+
 function applyCumulate(
   polyhedron: Polyhedron,
   { faceType }: CumulateOptions = {},
@@ -104,15 +117,9 @@ function applyCumulate(
   }
   const { vertices } = polyhedron;
 
-  const verticesToAdd = cumulateFaces.map(face => {
-    const apothem = face.apothem();
-    const normal = face.normal();
-    const centroid = face.centroid();
-    const theta =
-      Math.PI - polyhedron.getDihedralAngle(_.take(face.vIndices(), 2));
-    const scale = apothem * Math.tan(theta);
-    return centroid.add(normal.scale(scale)).toArray();
-  });
+  const verticesToAdd = cumulateFaces.map(face =>
+    getVertexToAdd(polyhedron, face),
+  );
 
   const oldToNew = {};
   cumulateFaces.forEach((face, i) => {
