@@ -60,25 +60,26 @@ function isProperPolyhedron(polyhedron) {
 
 expect.extend({
   toBeValidPolyhedron(received) {
-    const isProper = isProperPolyhedron(received);
-    const matchesName = received.isSame(Polyhedron.get(received.name));
+    const { result, name } = received;
+    const isProper = isProperPolyhedron(result);
+    const matchesName = result.isSame(Polyhedron.get(name));
     return {
       message: () => {
         if (!isProper)
           return `expected ${
             this.isNot ? 'an improper' : 'a proper'
           } CRF polyhedron`;
-        return `expected polyhedron to ${this.isNot ? 'not be' : 'be'} a ${
-          received.name
-        }`;
+        return `expected polyhedron to ${
+          this.isNot ? 'not be' : 'be'
+        } a ${name}`;
       },
       pass: isProper && matchesName,
     };
   },
 });
 
-function getOptsToTest(operation, polyhedron) {
-  const relations = getRelations(polyhedron.name, operation);
+function getOptsToTest(operation, name, polyhedron) {
+  const relations = getRelations(name, operation);
   return (
     _.invoke(
       operations[operation],
@@ -97,9 +98,14 @@ describe('applyOperation', () => {
       const operations = _.difference(allOperations, excluded);
       operations.forEach(operation => {
         const polyhedron = Polyhedron.get(solidName);
-        const optsToTest = getOptsToTest(operation, polyhedron);
+        const optsToTest = getOptsToTest(operation, solidName, polyhedron);
         optsToTest.forEach(options => {
-          const { result } = applyOperation(operation, polyhedron, options);
+          const result = applyOperation(
+            operation,
+            solidName,
+            polyhedron,
+            options,
+          );
           expect(result).toBeValidPolyhedron();
         });
       });

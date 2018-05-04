@@ -22,7 +22,7 @@ interface BasePolyhedron {
 export default class Polyhedron {
   vertices: Vertex[];
   faces: Face[];
-  name: string;
+  // name: string;
 
   _edges: Edge[];
 
@@ -43,9 +43,9 @@ export default class Polyhedron {
     if (edges) {
       this._edges = edges;
     }
-    if (name) {
-      this.name = name;
-    }
+    // if (name) {
+    //   this.name = name;
+    // }
   }
 
   getAllEdges() {
@@ -195,9 +195,9 @@ export default class Polyhedron {
     return new Polyhedron({ ...this.toJSON(), faces });
   }
 
-  withName(name: string) {
-    return new Polyhedron({ ...this.toJSON(), name });
-  }
+  // withName(name: string) {
+  //   return new Polyhedron({ ...this.toJSON(), name });
+  // }
 
   addVertices(vertices: Vertex[]) {
     return this.withVertices(this.vertices.concat(vertices));
