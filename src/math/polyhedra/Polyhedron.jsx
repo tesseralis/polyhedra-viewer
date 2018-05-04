@@ -63,8 +63,7 @@ export default class Polyhedron {
   }
 
   getFace = _.memoize((fIndex: FIndex) => {
-    // FIXME why do we need to cast?
-    return new FaceObj((this: any), fIndex);
+    return new FaceObj(this, fIndex);
   });
 
   getFaces = () => {

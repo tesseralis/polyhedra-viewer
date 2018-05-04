@@ -116,7 +116,7 @@ describe('viewer', () => {
 
   it('can go through an expansion workflow', () => {
     setup('/dodecahedron/related');
-    // FIXME test contract/snub/twist
+    // TODO test contract/snub/twist
     appPage
       .clickButtonWithText('expand')
       .expectTransitionTo('rhombicosidodecahedron')

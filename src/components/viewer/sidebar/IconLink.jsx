@@ -23,7 +23,7 @@ const styles = StyleSheet.create({
   title: {
     marginTop: 5,
     fontSize: 12,
-    // FIXME come up with a better one
+    // TODO come up with a better one
     fontFamily: 'system-ui',
   },
 });

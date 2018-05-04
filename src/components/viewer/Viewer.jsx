@@ -34,7 +34,7 @@ const styles = StyleSheet.create({
   },
   sidebar: {
     height: '100%',
-    // FIXME this is really janky and messes with the grid template
+    // TODO (UI) this is really janky and messes with the grid template
     position: 'fixed',
     left: 0,
     gridArea: 'sidebar',
@@ -166,7 +166,7 @@ export default class Viewer extends Component<ViewerProps, ViewerState> {
       config,
       applyOptions,
     } = this.state;
-    // FIXME resizing (decreasing height) for the x3d scene doesn't work well
+    // TODO resizing (decreasing height) for the x3d scene doesn't work well
     return (
       <div className={css(styles.viewer)}>
         <div className={css(styles.sidebar)}>

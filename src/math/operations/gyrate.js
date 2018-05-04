@@ -56,7 +56,8 @@ function applyGyrate(polyhedron, { peak }) {
     return v.toArray();
   });
 
-  // FIXME the interpolation doesn't work cause it's radial
+  // TODO the animation makes the cupola shrink and expand.
+  // Make it not do that.
   return {
     animationData: {
       start: mockPolyhedron,

@@ -21,7 +21,6 @@ export default function applyOperation(
 ): OperationResult {
   const relations = getRelations(name, operation);
   const op = operations[operation];
-  // FIXME don't have to rely on "invoke"
   const options = _.invoke(
     op,
     'getSearchOptions',

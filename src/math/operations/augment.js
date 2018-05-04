@@ -258,7 +258,6 @@ function doAugment(polyhedron, base, using, gyrate, mock = false) {
   const baseNormal = base.normal();
 
   const augmentType = augmentTypes[prefix];
-  // FIXME rename
   let augmentee = augmentData[augmentType][index];
   const underside = find(augmentee.getFaces(), face => face.numSides() === n);
   augmentee = mock ? flatten(augmentee, underside) : augmentee;
