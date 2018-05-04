@@ -47,7 +47,31 @@ function getContractResult(polyhedron, faceType) {
   }
 }
 
-function getTetrahedralContractFaces(polyhedron) {
+function getFaceDistance(face1, face2) {
+  let dist = 0;
+  let current = [face1];
+  while (!face2.inSet(current)) {
+    dist++;
+    current = _(current)
+      .flatMap(face => face.adjacentFaces())
+      .uniqBy('fIndex')
+      .value();
+  }
+  return dist;
+}
+
+function getIcosahedronContractFaces(polyhedron) {
+  let result = [];
+  let toTest = polyhedron.getFaces();
+  while (toTest.length > 0) {
+    const [next, ...rest] = toTest;
+    result.push(next);
+    toTest = _.filter(rest, face => getFaceDistance(face, next) === 3);
+  }
+  return result;
+}
+
+function getCuboctahedronContractFaces(polyhedron) {
   const toCheck = polyhedron.getFaces().filter(face => face.numSides() === 3);
   const result = [];
   const invalid = [];
@@ -68,7 +92,9 @@ function getTetrahedralContractFaces(polyhedron) {
 
 function getContractFaces(polyhedron, faceType) {
   if (getFamily(polyhedron) === 'T') {
-    return getTetrahedralContractFaces(polyhedron);
+    return expansionType(polyhedron) === 'snub'
+      ? getIcosahedronContractFaces(polyhedron)
+      : getCuboctahedronContractFaces(polyhedron);
   }
   return _.filter(polyhedron.getFaces(), face =>
     isExpandedFace(polyhedron, face, faceType),

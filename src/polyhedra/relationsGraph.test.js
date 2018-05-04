@@ -1,7 +1,18 @@
+import _ from 'lodash';
 import graph from './relationsGraph';
+import { allSolidNames } from 'data';
+import { toConwayNotation } from './names';
 
 // Tests on the relations graph, mostly focusing on edge cases
 describe('relationsGraph', () => {
+  it('has an entry for every polyhedron', () => {
+    _.forEach(allSolidNames, name => {
+      const symbol = toConwayNotation(name);
+      expect(graph).toHaveProperty(symbol);
+      expect(graph[symbol]).toBeDefined();
+    });
+  });
+
   describe('archimedean', () => {
     it('has all archimedean operations to the platonic solids', () => {
       const platonic = ['T', 'C', 'O', 'D', 'I'];

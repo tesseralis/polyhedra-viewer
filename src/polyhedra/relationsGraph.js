@@ -472,6 +472,8 @@ const othersGraph = (() => {
     // A4: {
     //   s: 'J85',
     // },
+    J84: {},
+    J85: {},
 
     // "other" johnson solids
     J86: {
