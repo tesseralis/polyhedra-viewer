@@ -11,6 +11,20 @@ interface CumulateOptions {
   faceType?: number;
 }
 
+// Return the symmetry group of the *rectified* polyhedron
+function getFamily(polyhedron) {
+  switch (polyhedron.numFaces()) {
+    case 8: // octahedron
+      return 'T';
+    case 14: // cuboctahedron
+      return 'O';
+    case 32: // icosidodecahedron
+      return 'I';
+    default:
+      throw new Error('Did you try to cumulate an invalid solid?');
+  }
+}
+
 // Return if the polyhedron is rectified
 function isRectified(polyhedron) {
   return polyhedron.adjacentFaces(0).length === 4;
@@ -161,20 +175,31 @@ export const cumulate: Operation<CumulateOptions> = {
 
   getSearchOptions(polyhedron, config) {
     const { faceType } = config;
-    if (polyhedron.name === 'cuboctahedron') {
-      return { value: faceType === 3 ? 'C' : 'O' };
-    } else if (polyhedron.name === 'icosidodecahedron') {
-      return { value: faceType === 3 ? 'D' : 'I' };
+    if (!isRectified(polyhedron)) {
+      return {};
+    }
+    switch (getFamily(polyhedron)) {
+      case 'O':
+        return { value: faceType === 3 ? 'C' : 'O' };
+      case 'I':
+        return { value: faceType === 3 ? 'D' : 'I' };
+      default:
+        return {};
     }
   },
 
   getAllApplyArgs(polyhedron) {
-    if (polyhedron.name === 'cuboctahedron') {
-      return [{ faceType: 3 }, { faceType: 4 }];
-    } else if (polyhedron.name === 'icosidodecahedron') {
-      return [{ faceType: 3 }, { faceType: 5 }];
+    if (!isRectified(polyhedron)) {
+      return [{}];
     }
-    return [{}];
+    switch (getFamily(polyhedron)) {
+      case 'O':
+        return [{ faceType: 3 }, { faceType: 4 }];
+      case 'I':
+        return [{ faceType: 3 }, { faceType: 5 }];
+      default:
+        return [{}];
+    }
   },
 
   getApplyArgs(polyhedron, hitPnt) {

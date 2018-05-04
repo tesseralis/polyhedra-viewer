@@ -4,25 +4,11 @@ import { Polyhedron } from 'math/polyhedra';
 import { operations } from 'math/operations';
 import type { OperationResult } from 'math/operations';
 
-// FIXME (animation) this is inelegant
 const updateName = (opResult, name) => {
   if (!opResult.animationData) {
-    return {
-      // result: opResult.withName(name),
-      result: opResult,
-      name,
-    };
+    return { result: opResult, name };
   }
-  const { result, animationData: { start, endVertices } } = opResult;
-  return {
-    name,
-    ...opResult,
-    // result: result.withName(name),
-    // animationData: {
-    //   start: start.withName(name),
-    //   endVertices,
-    // },
-  };
+  return { name, ...opResult };
 };
 
 export type Operation = 't' | 'a' | 'k' | 'c' | 'e' | '+' | '-' | 'g';
@@ -51,7 +37,7 @@ export default function applyOperation(
   const next = getNextPolyhedron(name, operation, _.pickBy(options));
   if (!op) {
     // throw new Error(`Function not found for ${operation}`)
-    return { result: Polyhedron.get(next), name };
+    return { result: Polyhedron.get(next), name: next };
   }
   return updateName(op.apply(polyhedron, applyConfig), next);
 }

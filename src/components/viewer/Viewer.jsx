@@ -74,6 +74,7 @@ function viewerStateFromSolidName(name) {
   }
   return {
     polyhedron: Polyhedron.get(name),
+    solidName: name,
     operation: null,
     applyOptions: {},
   };
@@ -104,6 +105,7 @@ interface ViewerProps {
 
 interface ViewerState {
   polyhedron: Polyhedron;
+  solidName: string;
   operation: ?Operation;
   // TODO consolidate applyArgs (which are determined by the polyhedron)
   // and applyOptions (which are determined by the the panel)
@@ -127,6 +129,7 @@ export default class Viewer extends Component<ViewerProps, ViewerState> {
     super(props);
     this.state = {
       polyhedron: Polyhedron.get(props.solid),
+      solidName: props.solid,
       config: defaultConfig,
       operation: undefined,
       applyOptions: {},
@@ -138,10 +141,9 @@ export default class Viewer extends Component<ViewerProps, ViewerState> {
     nextProps: ViewerProps,
     prevState: ViewerState,
   ) {
-    const { polyhedron } = prevState;
     const { solid } = nextProps;
 
-    if (solid !== polyhedron.name) {
+    if (solid !== prevState.solidName) {
       // If not the result of an operation, update our solid based on the name we got
       return viewerStateFromSolidName(solid);
     }
@@ -150,9 +152,8 @@ export default class Viewer extends Component<ViewerProps, ViewerState> {
 
   componentDidUpdate(prevProps: ViewerProps) {
     const { history, solid } = this.props;
-    const { polyhedron } = this.state;
-    if (polyhedron.name !== solid && solid === prevProps.solid) {
-      history.push(`/${polyhedron.name}/related`);
+    if (this.state.solidName !== solid && solid === prevProps.solid) {
+      history.push(`/${this.state.solidName}/related`);
     }
   }
 
@@ -252,9 +253,9 @@ export default class Viewer extends Component<ViewerProps, ViewerState> {
   };
 
   setOperation = (operation: Operation) => {
-    this.setState(({ polyhedron }) => ({
+    this.setState(({ polyhedron, solidName }) => ({
       operation,
-      applyOptions: applyOptionsFor(polyhedron.name, operation),
+      applyOptions: applyOptionsFor(solidName, operation),
     }));
   };
 
@@ -267,36 +268,41 @@ export default class Viewer extends Component<ViewerProps, ViewerState> {
   };
 
   applyOperation = (operation: Operation) => {
-    this.setState(({ polyhedron, applyOptions, applyArgs, config }) => {
-      const { result, animationData } = doApplyOperation(
-        operation,
-        polyhedron,
-        {
-          ...applyArgs,
-          ...applyOptions,
-        },
-      );
-      // FIXME gyrate -> twist needs to be unset
-      const postOpState = (() => {
-        if (_.isEmpty(getRelations(result.name, operation))) {
-          return { operation: undefined, applyOptions: {} };
-        } else {
-          return { applyOptions: applyOptionsFor(result.name, operation) };
-        }
-      })();
-      // FIXME figure out how to deduplicate all this logic
-      const { colors, enableAnimation } = getPolyhedronConfig(config);
-      const colorStart =
-        animationData && getFaceColors(animationData.start, colors);
-      return {
-        polyhedron: result,
-        animationData,
-        faceColors: colorStart,
-        interpolated: enableAnimation && animationData && animationData.start,
-        applyArgs: {},
-        ...postOpState,
-      };
-    }, this.startAnimation);
+    this.setState(
+      ({ polyhedron, solidName, applyOptions, applyArgs, config }) => {
+        const { result, name, animationData } = doApplyOperation(
+          operation,
+          solidName,
+          polyhedron,
+          {
+            ...applyArgs,
+            ...applyOptions,
+          },
+        );
+        // FIXME gyrate -> twist needs to be unset
+        const postOpState = (() => {
+          if (_.isEmpty(getRelations(name, operation))) {
+            return { operation: undefined, applyOptions: {} };
+          } else {
+            return { applyOptions: applyOptionsFor(name, operation) };
+          }
+        })();
+        // FIXME figure out how to deduplicate all this logic
+        const { colors, enableAnimation } = getPolyhedronConfig(config);
+        const colorStart =
+          animationData && getFaceColors(animationData.start, colors);
+        return {
+          polyhedron: result,
+          solidName: name,
+          animationData,
+          faceColors: colorStart,
+          interpolated: enableAnimation && animationData && animationData.start,
+          applyArgs: {},
+          ...postOpState,
+        };
+      },
+      this.startAnimation,
+    );
   };
 
   startAnimation = () => {
