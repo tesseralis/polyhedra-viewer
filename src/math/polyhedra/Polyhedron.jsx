@@ -181,6 +181,28 @@ export default class Polyhedron {
     return mapping;
   });
 
+  faceGraph = _.memoize(() => {
+    const graph = {};
+    _.forEach(this.edges, edge => {
+      const [f1, f2] = this.edgeFaces(edge);
+      if (!graph[f1.fIndex]) graph[f1.fIndex] = [];
+      if (!graph[f2.fIndex]) graph[f2.fIndex] = [];
+      graph[f1.fIndex].push(f2);
+      graph[f2.fIndex].push(f1);
+    });
+    return graph;
+  });
+
+  directedEdgeToFaceGraph = _.memoize(() => {
+    const edgesToFaces = {};
+    _.forEach(this.getFaces(), face => {
+      _.forEach(face.directedEdges(), ([v1, v2]) => {
+        _.set(edgesToFaces, [v1, v2], face);
+      });
+    });
+    return edgesToFaces;
+  });
+
   // return a new polyhedron with the given vertices
   withVertices(vertices: Vertex[]) {
     return new Polyhedron({ ...this.toJSON(), vertices });
@@ -243,10 +265,8 @@ export default class Polyhedron {
 
   // Get the faces adjacent to this edge, with the directed face first
   edgeFaces([v1, v2]: Edge) {
-    return [
-      find(this.getFaces(), face => face.hasDirectedEdge([v1, v2])),
-      find(this.getFaces(), face => face.hasDirectedEdge([v2, v1])),
-    ];
+    const graph = this.directedEdgeToFaceGraph();
+    return [graph[v1][v2], graph[v2][v1]];
   }
 
   getDihedralAngle(edge: Edge) {
@@ -263,30 +283,6 @@ export default class Polyhedron {
 
     return c1.angleBetween(c2, true);
   }
-
-  faceGraph = _.memoize(() => {
-    const edgesToFaces: { [string]: Face } = {};
-    // build up a lookup table for every pair of edges to that face
-    _.forEach(this.getFaces(), (face, index: FIndex) => {
-      // for the pairs of vertices, find the face that contains the corresponding pair
-      // ...this is n^2? more? ah who cares I'm too lazy
-      _.forEach(face.getEdges(), (edge: string) => {
-        if (!edgesToFaces[edge]) {
-          edgesToFaces[edge] = [];
-        }
-        // NOTE: this indexes the edge as a string (e.g. "1,2")
-        edgesToFaces[edge].push(index);
-      });
-    });
-    const graph = {};
-    _.forEach(edgesToFaces, ([f1, f2]) => {
-      if (!graph[f1]) graph[f1] = [];
-      if (!graph[f2]) graph[f2] = [];
-      graph[f1].push(f2);
-      graph[f2].push(f1);
-    });
-    return graph;
-  });
 
   faceAdjacencyList() {
     const faceAdjacencyCounts = _.map(this.getFaces(), face => ({

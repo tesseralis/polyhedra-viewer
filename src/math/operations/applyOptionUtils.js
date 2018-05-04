@@ -61,10 +61,7 @@ export function getPeakAlignment(polyhedron: Polyhedron, peak: Peak) {
 export function getCupolaGyrate(polyhedron: Polyhedron, peak: Peak) {
   const boundary = peak.boundary();
   const isOrtho = _.every(getDirectedEdges(boundary), edge => {
-    const [n1, n2] = polyhedron
-      .getFaces()
-      .filter(face => face.hasEdge(edge))
-      .map(face => face.numSides());
+    const [n1, n2] = polyhedron.edgeFaces(edge).map(face => face.numSides());
     return (n1 === 4) === (n2 === 4);
   });
   return isOrtho ? 'ortho' : 'gyro';

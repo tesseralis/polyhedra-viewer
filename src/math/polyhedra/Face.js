@@ -53,10 +53,6 @@ export default class Face {
     });
   }
 
-  hasEdge([v1, v2]: Edge) {
-    return _.includes(this.face, v1) && _.includes(this.face, v2);
-  }
-
   directedEdge(i: number) {
     const vIndex = getCyclic(this.face, i);
     return [vIndex, this.nextVertex(vIndex)];
@@ -66,10 +62,6 @@ export default class Face {
     return _.map(this.face, vIndex => {
       return [vIndex, this.nextVertex(vIndex)];
     });
-  }
-
-  hasDirectedEdge(edge: Edge) {
-    return _.some(this.directedEdges(), e2 => _.isEqual(edge, e2));
   }
 
   numSides(fIndex: FIndex) {
@@ -100,8 +92,7 @@ export default class Face {
   }
 
   adjacentFaces() {
-    const adjacentFaceIndices = this.polyhedron.faceGraph()[this.fIndex];
-    return adjacentFaceIndices.map(fIndex => this.polyhedron.getFace(fIndex));
+    return this.polyhedron.faceGraph()[this.fIndex];
   }
 
   edgeLength() {
