@@ -28,7 +28,7 @@ export default function Sidebar({ match, configProps, relatedPolyhedraProps }) {
       render={({ match }) => (
         <section className={css(styles.sidebar)}>
           <div className={css(styles.menu)}>
-            <IconLink to="/" title="Home" iconName="home" exact />
+            <IconLink to="/" title="Table" iconName="periodic-table" exact />
             <IconLink
               replace
               to={`${match.url}/list`}
