@@ -33,11 +33,14 @@ export function getCentroid(vectors: Vec3D[]) {
 // Get the normal of a polygon given its ordered vertices
 export function getNormal(vertices: Vec3D[]) {
   const [v0, v1, v2] = vertices;
-  return v0.sub(v1).cross(v1.sub(v2));
+  return v0
+    .sub(v1)
+    .cross(v1.sub(v2))
+    .getNormalized();
 }
 
 export function getNormalRay(vertices: Vec3D[]) {
-  return new Ray3D(getCentroid(vertices), getNormal(vertices).getNormalized());
+  return new Ray3D(getCentroid(vertices), getNormal(vertices));
 }
 
 export function rotateAround(point: Vec3D, ray: Ray3D, theta: number) {

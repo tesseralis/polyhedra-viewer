@@ -122,7 +122,7 @@ export default class Face {
   /** Return the normal of the face given by the face index */
   normal() {
     // FIXME make the `getNormal` function normalize
-    return getNormal(this.vertices).getNormalized();
+    return getNormal(this.vertices);
   }
 
   normalRay() {
