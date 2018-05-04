@@ -124,4 +124,14 @@ describe('viewer', () => {
       .clickFaceIndex(0)
       .expectTransitionTo('diminished-rhombicosidodecahedron');
   });
+
+  it('can augment and contract an icosahedron', () => {
+    setup('/gyroelongated-pentagonal-pyramid/related');
+    appPage
+      .clickButtonWithText('augment')
+      .clickFaceWithNumSides(5)
+      .expectTransitionTo('icosahedron')
+      .clickButtonWithText('contract')
+      .expectTransitionTo('tetrahedron');
+  });
 });

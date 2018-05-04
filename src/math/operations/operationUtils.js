@@ -135,6 +135,7 @@ export function getSnubAngle(polyhedron: Polyhedron, numSides: number) {
     ) || polyhedron.getFace(0);
 
   const faceCentroid = face0.centroid();
+  const faceNormal = face0.normal();
   const snubFaces = _.filter(
     polyhedron.getFaces(),
     face =>
@@ -151,12 +152,15 @@ export function getSnubAngle(polyhedron: Polyhedron, numSides: number) {
     face1.centroid(),
     polyhedron.centroid(),
   ]);
-  const projected = plane.getProjectedPoint(midpoint);
-
-  const angle = midpoint
-    .sub(faceCentroid)
-    .angleBetween(projected.sub(faceCentroid), true);
-
-  // This always ensures the same chirality for everything
-  return numSides === 3 ? angle : -angle;
+  const normMidpoint = midpoint.sub(faceCentroid);
+  const projected = plane.getProjectedPoint(midpoint).sub(faceCentroid);
+  const angle = normMidpoint.angleBetween(projected, true);
+  // Return a positive angle if it's a ccw turn, a negative angle otherwise
+  const sign = normMidpoint
+    .cross(projected)
+    .getNormalized()
+    .equalsWithTolerance(faceNormal, PRECISION)
+    ? -1
+    : 1;
+  return angle * sign;
 }
