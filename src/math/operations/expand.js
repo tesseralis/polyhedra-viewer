@@ -123,9 +123,11 @@ function duplicateVertices(polyhedron: Polyhedron, twist?: 'left' | 'right') {
   );
 }
 
-function getTwist(type, numSides) {
-  if (type === 'snub') {
-    return numSides === 3 ? 'right' : 'left';
+function getTwist(angle) {
+  if (angle > 0) {
+    return 'right';
+  } else if (angle < 0) {
+    return 'left';
   }
 }
 
@@ -133,7 +135,8 @@ function doExpansion(polyhedron: Polyhedron, referenceName) {
   const reference = Polyhedron.get(referenceName);
   const type = expansionType(reference);
   const n = polyhedron.getFace(0).numSides();
-  polyhedron = duplicateVertices(polyhedron, getTwist(type, n));
+  const angle = type === 'snub' ? getSnubAngle(reference, n) : 0;
+  polyhedron = duplicateVertices(polyhedron, getTwist(angle));
 
   const referenceFace =
     _.find(reference.getFaces(), face => isExpandedFace(reference, face, n)) ||
@@ -144,7 +147,6 @@ function doExpansion(polyhedron: Polyhedron, referenceName) {
   const snubFaces = _.filter(polyhedron.getFaces(), face =>
     isExpandedFace(polyhedron, face, n),
   );
-  const angle = type === 'snub' ? getSnubAngle(reference, n) : 0;
 
   // Update the vertices with the expanded-out version
   const endVertices = getResizedVertices(
