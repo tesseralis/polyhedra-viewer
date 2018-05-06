@@ -35,6 +35,7 @@ function getReference(type) {
 }
 
 // Side ratios gotten when calling our "cumulate" operation on a bevelled polyhedron
+// I couldn't actually figure out the math for this so I reverse engineered it.
 function getRectifiedMultiplier(type) {
   switch (type) {
     case 'O':
@@ -89,76 +90,68 @@ function duplicateVertices(polyhedron) {
 
 function getTruncateLength(polyhedron) {
   const face = polyhedron.smallestFace();
-  // const sideLength = face.edgeLength();
   const n = face.numSides();
   const theta = Math.PI / n;
   const newTheta = theta / 2;
   return 2 * face.apothem() * Math.tan(newTheta);
 }
 
-function truncateRectified(polyhedron) {
+function getTruncateTransform(polyhedron, duplicated) {
+  if (isPlatonic(polyhedron)) {
+    return (vertex, vIndex) => vertex;
+  }
+
+  // If we're doing a bevel, we need to do some fidgeting to make sure the created
+  // faces are all regular
   const family = getFamily(polyhedron);
-  const multiplier = getRectifiedMultiplier(family);
-  const reference = Polyhedron.get(getReference(family));
-  const duplicated = duplicateVertices(polyhedron);
   const truncateLength = getTruncateLength(polyhedron);
   const oldSideLength = polyhedron.edgeLength();
-  const truncateScale = (oldSideLength - truncateLength) / 2 / oldSideLength;
-  const newSideLength = oldSideLength * multiplier;
 
+  const multiplier = getRectifiedMultiplier(family);
+  const newSideLength = oldSideLength * multiplier;
   const faceResizeScale = newSideLength / truncateLength;
+
+  const reference = Polyhedron.get(getReference(family));
   const normalizedResizeAmount =
     reference.faceWithNumSides(6).distanceToCenter() / reference.edgeLength() -
     polyhedron.smallestFace().distanceToCenter() / newSideLength;
 
-  const truncatedVertices = duplicated.vertexVectors().map((v, vIndex) => {
-    const adjacentVertices = duplicated.vertexVectors(
-      duplicated.adjacentVertexIndices(vIndex),
-    );
-    const v1 = find(adjacentVertices, adj => adj.distanceTo(v) > PRECISION);
-    const truncated = v.interpolateTo(v1, truncateScale);
+  return (vertex, vIndex) => {
     const nearestHexagon = find(
       duplicated.adjacentFaces(vIndex),
       face => face.numSides() === 6,
     );
     const scaled = scaleAround(
-      truncated,
+      vertex,
       nearestHexagon.centroid(),
       faceResizeScale,
     );
+    // Our normal (heh) normal function doesn't work on just the hexagon,
+    // since it has duplicated vertices
     const verts = _.at(nearestHexagon.vertices, [0, 2, 4]);
     const normal = getNormal(verts);
     const translated = scaled.add(
       normal.scale(normalizedResizeAmount * newSideLength),
     );
-    return translated.toArray();
-  });
-  const result = duplicated.withVertices(truncatedVertices);
-  return {
-    animationData: {
-      start: duplicated,
-      endVertices: truncatedVertices,
-    },
-    result: rectify ? deduplicateVertices(result) : result,
+    return translated;
   };
 }
 
 function doTruncate(polyhedron, options: TruncateOptions = {}) {
-  if (!isPlatonic(polyhedron)) {
-    return truncateRectified(polyhedron);
-  }
   const { rectify } = options;
   const truncateLength = getTruncateLength(polyhedron);
   const oldSideLength = polyhedron.edgeLength();
   const truncateScale = (oldSideLength - truncateLength) / 2 / oldSideLength;
   const duplicated = duplicateVertices(polyhedron);
+  const transform = getTruncateTransform(polyhedron, duplicated);
 
   const truncatedVertices = duplicated.vertexVectors().map((v, vIndex) => {
     const adjacentVertices = duplicated.vertexVectors(
       duplicated.adjacentVertexIndices(vIndex),
     );
     const v1 = find(adjacentVertices, adj => adj.distanceTo(v) > PRECISION);
-    return v.interpolateTo(v1, rectify ? 0.5 : truncateScale).toArray();
+    const truncated = v.interpolateTo(v1, rectify ? 0.5 : truncateScale);
+    return (!!transform ? transform(truncated, vIndex) : truncated).toArray();
   });
   const result = duplicated.withVertices(truncatedVertices);
   return {

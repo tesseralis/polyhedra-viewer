@@ -13,19 +13,9 @@ const johnsonOpts = ['+', '-', 'g', 'P', 'A', 'h'];
 const opsToTest = archimedeanOpts.concat(johnsonOpts);
 
 // map from polyhedron to excluded operations
-const excludedOperations = {
-  // cuboctahedron: ['t'],
-  // icosidodecahedron: ['t'],
-};
+const excludedOperations = {};
 
 function isProperPolyhedron(polyhedron) {
-  // Make sure edges all have the same length
-  for (let face of polyhedron.getFaces()) {
-    if (!isPlanar(face.vertices)) {
-      console.log(`face vertices arent planar`);
-      return false;
-    }
-  }
   let prevSideLength: ?number;
   for (let edge of polyhedron.edges) {
     const [v1, v2] = polyhedron.vertexVectors(edge);
