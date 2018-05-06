@@ -279,9 +279,9 @@ export default class Polyhedron {
   getDihedralAngle(edge: Edge) {
     const [v1, v2] = this.vertexVectors(edge);
     const midpoint = getMidpoint(v1, v2);
-    const [c1, c2] = this.edgeFaces(edge)
-      .map(face => face.centroid())
-      .map(v => v.sub(midpoint));
+    const [c1, c2] = this.edgeFaces(edge).map(face =>
+      face.centroid().sub(midpoint),
+    );
 
     if (!c1 || !c2) {
       throw new Error(`The edge ${edge} is not connected to two faces.`);

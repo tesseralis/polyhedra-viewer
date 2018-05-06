@@ -48,19 +48,19 @@ export default class Face {
   }
 
   getEdges(): Edge[] {
-    return _.map(this.face, vertex => {
-      return getEdge(vertex, this.nextVertex(vertex));
+    return _.map(this.face, (vertex, i) => {
+      return getEdge(vertex, getCyclic(this.face, i + 1));
     });
   }
 
   directedEdge(i: number) {
     const vIndex = getCyclic(this.face, i);
-    return [vIndex, this.nextVertex(vIndex)];
+    return [vIndex, getCyclic(this.face, i + 1)];
   }
 
   directedEdges() {
-    return _.map(this.face, vIndex => {
-      return [vIndex, this.nextVertex(vIndex)];
+    return _.map(this.face, (vIndex, i) => {
+      return [vIndex, getCyclic(this.face, i + 1)];
     });
   }
 
