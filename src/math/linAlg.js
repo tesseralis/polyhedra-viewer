@@ -49,3 +49,10 @@ export function rotateAround(point: Vec3D, ray: Ray3D, theta: number) {
     .getRotatedAroundAxis(ray.getDirection(), theta)
     .add(ray);
 }
+
+export function scaleAround(point: Vec3D, origin: Vec3D, scale: number) {
+  return point
+    .sub(origin)
+    .scale(scale)
+    .add(origin);
+}

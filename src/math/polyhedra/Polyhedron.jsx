@@ -74,6 +74,14 @@ export default class Polyhedron {
     return _.maxBy(this.getFaces(), face => face.numSides());
   }
 
+  smallestFace() {
+    return _.minBy(this.getFaces(), face => face.numSides());
+  }
+
+  faceWithNumSides(n: number) {
+    return find(this.getFaces(), face => face.numSides() === n);
+  }
+
   numVertices() {
     return this.vertices.length;
   }

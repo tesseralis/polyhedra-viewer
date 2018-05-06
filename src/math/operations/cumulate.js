@@ -160,13 +160,14 @@ function applyCumulate(
         ? verticesToAdd[oldToNew[vIndex]]
         : vertex,
   );
+  const result = deduplicateVertices(polyhedron.withVertices(endVertices));
 
   return {
     animationData: {
       start: polyhedron,
       endVertices,
     },
-    result: deduplicateVertices(polyhedron.withVertices(endVertices)),
+    result,
   };
 }
 

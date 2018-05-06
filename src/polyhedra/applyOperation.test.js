@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import { cartesian } from 'util.js';
 import { allSolidNames } from 'data';
-import { PRECISION } from 'math/linAlg';
+import { PRECISION, isPlanar } from 'math/linAlg';
 import { getOperations, getRelations } from 'polyhedra/relations';
 import { Polyhedron, Peak } from 'math/polyhedra';
 import { operations, canAugment } from 'math/operations';
@@ -14,23 +14,29 @@ const opsToTest = archimedeanOpts.concat(johnsonOpts);
 
 // map from polyhedron to excluded operations
 const excludedOperations = {
-  cuboctahedron: ['t'],
-  icosidodecahedron: ['t'],
+  // cuboctahedron: ['t'],
+  // icosidodecahedron: ['t'],
 };
 
 function isProperPolyhedron(polyhedron) {
   // Make sure edges all have the same length
+  for (let face of polyhedron.getFaces()) {
+    if (!isPlanar(face.vertices)) {
+      console.log(`face vertices arent planar`);
+      return false;
+    }
+  }
   let prevSideLength: ?number;
   for (let edge of polyhedron.edges) {
     const [v1, v2] = polyhedron.vertexVectors(edge);
     const sideLength: number = v1.distanceTo(v2);
     if (prevSideLength !== undefined) {
       if (_.isNaN(sideLength)) {
-        debug(`edge ${edge} has length NaN`);
+        console.log(`edge ${edge} has length NaN`);
         return false;
       }
       if (Math.abs(sideLength - prevSideLength) > PRECISION) {
-        debug(
+        console.log(
           `edge ${edge} has length ${sideLength} which is different from ${prevSideLength}`,
         );
         return false;
@@ -39,7 +45,7 @@ function isProperPolyhedron(polyhedron) {
     prevSideLength = sideLength;
     // Make sure the whole thing is convex
     if (polyhedron.getDihedralAngle(edge) > Math.PI - PRECISION) {
-      debug(`polyhedron concave at edge ${edge}`);
+      console.log(`polyhedron concave at edge ${edge}`);
       return false;
     }
   }
@@ -51,7 +57,7 @@ function isProperPolyhedron(polyhedron) {
     const normal = face.normal();
     const expectedNormal = faceCentroid.sub(centroid);
     if (normal.angleBetween(expectedNormal, true) > Math.PI / 2) {
-      debug(`polyhedron inside out at ${face}`);
+      console.log(`polyhedron inside out at ${face}`);
       return false;
     }
   }
