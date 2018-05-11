@@ -91,7 +91,7 @@ function getCumulateFaces(polyhedron, faceType) {
   // Special octahedron case
   if (
     polyhedron.numFaces() === 8 &&
-    _.every(polyhedron.getFaces(), face => face.numSides() === 3)
+    _.every(polyhedron.getFaces(), { numSides: 3 })
   ) {
     // const face = polyhedron.faces[0];
     const face0 = polyhedron.getFace(0);
@@ -104,7 +104,7 @@ function getCumulateFaces(polyhedron, faceType) {
       );
   }
 
-  return polyhedron.getFaces().filter(face => face.numSides() === faceType);
+  return _.filter(polyhedron.getFaces(), { numSides: faceType });
 }
 
 function calculateCumulateDist(polyhedron, face, edge) {
@@ -133,8 +133,7 @@ function applyCumulate(
   { faceType }: CumulateOptions = {},
 ) {
   // face indices with the right number of sides
-  const n =
-    faceType || _.min(polyhedron.getFaces().map(face => face.numSides()));
+  const n = faceType || _.min(polyhedron.getFaces().map(face => face.numSides));
   let cumulateFaces = getCumulateFaces(polyhedron, n);
 
   if (isRectified(polyhedron)) {
@@ -205,14 +204,14 @@ export const cumulate: Operation<CumulateOptions> = {
 
   getApplyArgs(polyhedron, hitPnt) {
     const hitPoint = vec(hitPnt);
-    const n = polyhedron.hitFace(hitPoint).numSides();
+    const n = polyhedron.hitFace(hitPoint).numSides;
     return n <= 5 ? { faceType: n } : {};
   },
 
   isHighlighted(polyhedron, applyArgs, face) {
     if (
       _.isNumber(applyArgs.faceType) &&
-      face.numSides() === applyArgs.faceType
+      face.numSides === applyArgs.faceType
     ) {
       return true;
     }

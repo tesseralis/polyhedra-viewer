@@ -5,7 +5,7 @@ import { Vec3D } from 'toxiclibsjs/geom';
 import { replace } from 'util.js';
 import Polyhedron from './Polyhedron';
 import { VIndex, FIndex, Edge } from './solidTypes';
-import { getCyclic, numSides } from './solidUtils';
+import { getCyclic } from './solidUtils';
 import {
   PRECISION,
   getPlane,
@@ -29,6 +29,10 @@ export default class Face {
     this.fIndex = fIndex;
     this.face = polyhedron.faces[fIndex];
     this.vertices = polyhedron.vertexVectors(this.face);
+  }
+
+  get numSides() {
+    return this.face.length;
   }
 
   vIndices() {
@@ -62,10 +66,6 @@ export default class Face {
     return _.map(this.face, (vIndex, i) => {
       return [vIndex, getCyclic(this.face, i + 1)];
     });
-  }
-
-  numSides(fIndex: FIndex) {
-    return numSides(this.face);
   }
 
   numUniqueSides() {
@@ -105,7 +105,7 @@ export default class Face {
   }
 
   apothem() {
-    return this.edgeLength() / (2 * Math.tan(Math.PI / this.numSides()));
+    return this.edgeLength() / (2 * Math.tan(Math.PI / this.numSides));
   }
 
   /** Return the centroid of the face given by the face index */

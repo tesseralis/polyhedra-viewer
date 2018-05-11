@@ -86,7 +86,7 @@ function toRgb(hex: string): Color {
   return [r / 255, g / 255, b / 255];
 }
 const colorIndexForFace = mapObject(polygons, (n, i) => [n, i]);
-const getColorIndex = face => colorIndexForFace[face.numSides()];
+const getColorIndex = face => colorIndexForFace[face.numSides];
 const polygonColors = colors => polygons.map(n => toRgb(colors[n]));
 
 function getFaceColors(polyhedron: Polyhedron, colors: any) {

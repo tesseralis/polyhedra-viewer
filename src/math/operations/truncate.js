@@ -90,7 +90,7 @@ function duplicateVertices(polyhedron) {
 
 function getTruncateLength(polyhedron) {
   const face = polyhedron.smallestFace();
-  const n = face.numSides();
+  const n = face.numSides;
   const theta = Math.PI / n;
   const newTheta = theta / 2;
   return 2 * face.apothem() * Math.tan(newTheta);
@@ -117,10 +117,9 @@ function getTruncateTransform(polyhedron, duplicated) {
     polyhedron.smallestFace().distanceToCenter() / newSideLength;
 
   return (vertex, vIndex) => {
-    const nearestHexagon = find(
-      duplicated.adjacentFaces(vIndex),
-      face => face.numSides() === 6,
-    );
+    const nearestHexagon = find(duplicated.adjacentFaces(vIndex), {
+      numSides: 6,
+    });
     const scaled = scaleAround(
       vertex,
       nearestHexagon.centroid(),

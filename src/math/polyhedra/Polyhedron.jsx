@@ -71,15 +71,15 @@ export default class Polyhedron {
   };
 
   biggestFace() {
-    return _.maxBy(this.getFaces(), face => face.numSides());
+    return _.maxBy(this.getFaces(), 'numSides');
   }
 
   smallestFace() {
-    return _.minBy(this.getFaces(), face => face.numSides());
+    return _.minBy(this.getFaces(), 'numSides');
   }
 
   faceWithNumSides(n: number) {
-    return find(this.getFaces(), face => face.numSides() === n);
+    return find(this.getFaces(), { numSides: n });
   }
 
   numVertices() {
@@ -100,13 +100,13 @@ export default class Polyhedron {
 
   // Return the number of each type of faces of each face
   faceCount() {
-    return _.countBy(this.getFaces(), face => face.numSides());
+    return _.countBy(this.getFaces(), 'numSides');
   }
 
   // The list of the type of faces this polyhedron has, ordered
   faceTypes() {
     return _(this.getFaces())
-      .map(face => face.numSides())
+      .map('numSides')
       .uniq()
       .sortBy()
       .value();
@@ -154,7 +154,7 @@ export default class Polyhedron {
   }
   // Return the number of faces by side for the given vertex
   adjacentFaceCount(vIndex: VIndex) {
-    return _.countBy(this.adjacentFaces(vIndex), face => face.numSides());
+    return _.countBy(this.adjacentFaces(vIndex), 'numSides');
   }
 
   // Get the vertices adjacent to this set of vertices
@@ -293,8 +293,8 @@ export default class Polyhedron {
 
   faceAdjacencyList() {
     const faceAdjacencyCounts = _.map(this.getFaces(), face => ({
-      n: face.numSides(),
-      adj: _.countBy(face.adjacentFaces(), face2 => face2.numSides()),
+      n: face.numSides,
+      adj: _.countBy(face.adjacentFaces(), face2 => face2.numSides),
     }));
     return _.sortBy(
       faceAdjacencyCounts,

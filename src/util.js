@@ -1,5 +1,6 @@
 // @flow
 import _ from 'lodash';
+import type { Predicate } from 'lodash';
 
 export function atIndices<T>(arr: T[], indices: number[]): T[] {
   return indices.map(i => arr[i]);
@@ -31,7 +32,7 @@ export function getSingle<T>(array: T[]): T {
 /**
  * Like _.find, but throws an error if no valid element found.
  */
-export function find<T>(array: T[], predicate: (T, number) => boolean): T {
+export function find<T>(array: T[], predicate: Predicate<T>): T {
   const result = _.find(array, predicate);
   if (result === undefined) {
     throw new Error(`Unable to find the predicate in ${array.toString()}`);

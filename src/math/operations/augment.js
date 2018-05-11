@@ -64,10 +64,7 @@ const augmentTypes = {
 function getAugmentAlignment(polyhedron, face) {
   // get the existing peak boundary
   const peakBoundary = getSingle(polyhedron.peaks()).boundary();
-  const isHexagonalPrism = _.some(
-    polyhedron.getFaces(),
-    face => face.numSides() === 6,
-  );
+  const isHexagonalPrism = _.some(polyhedron.getFaces(), { numSides: 6 });
 
   // calculate the face distance to the peak's boundary
   return faceDistanceBetweenVertices(
@@ -87,8 +84,8 @@ function getPossibleAugmentees(n) {
 
 // Checks to see if the polyhedron can be augmented at the base while remaining convex
 function canAugmentWith(polyhedron, base, augmentee, offset) {
-  const n = base.numSides();
-  const underside = find(augmentee.getFaces(), face => face.numSides() === n);
+  const n = base.numSides;
+  const underside = find(augmentee.getFaces(), { numSides: n });
 
   return _.every(base.directedEdges(), (edge, i) => {
     const baseAngle = polyhedron.getDihedralAngle(edge);
@@ -101,7 +98,7 @@ function canAugmentWith(polyhedron, base, augmentee, offset) {
 }
 
 function canAugment(polyhedron, base) {
-  const n = base.numSides();
+  const n = base.numSides;
   const augmentees = getPossibleAugmentees(n);
   for (let augmentee of augmentees) {
     for (let offset of [0, 1]) {
@@ -249,7 +246,7 @@ function flatten(polyhedron, face) {
 
 // Augment the following
 function doAugment(polyhedron, base, using, gyrate, mock = false) {
-  const n = base.numSides();
+  const n = base.numSides;
   const prefix = using[0];
   const index = using.substring(1);
   const baseVertices = base.vertices;
@@ -259,7 +256,7 @@ function doAugment(polyhedron, base, using, gyrate, mock = false) {
 
   const augmentType = augmentTypes[prefix];
   let augmentee = augmentData[augmentType][index];
-  const underside = find(augmentee.getFaces(), face => face.numSides() === n);
+  const underside = find(augmentee.getFaces(), { numSides: n });
   augmentee = mock ? flatten(augmentee, underside) : augmentee;
 
   // rotate and translate so that the face is next to our face
@@ -324,7 +321,7 @@ function doAugment(polyhedron, base, using, gyrate, mock = false) {
 export const elongate: Operation<> = {
   apply(polyhedron) {
     const base = polyhedron.biggestFace();
-    const using = `P${base.numSides()}`;
+    const using = `P${base.numSides}`;
     return doAugment(polyhedron, base, using);
   },
 };
@@ -332,7 +329,7 @@ export const elongate: Operation<> = {
 export const gyroelongate: Operation<> = {
   apply(polyhedron) {
     const base = polyhedron.biggestFace();
-    const using = `A${base.numSides()}`;
+    const using = `A${base.numSides}`;
     return doAugment(polyhedron, base, using);
   },
 };
@@ -375,7 +372,7 @@ export const augment: Operation<AugmentOptions> = {
     if (!face) {
       throw new Error('Invalid face');
     }
-    const n = face.numSides();
+    const n = face.numSides;
     const using = getUsingOpt(config.using, n);
 
     const baseConfig = {
@@ -396,7 +393,7 @@ export const augment: Operation<AugmentOptions> = {
     if (!face) {
       throw new Error('Invalid face');
     }
-    const n = face.numSides();
+    const n = face.numSides;
     const using = getUsingOpt(config.using, n);
 
     return {

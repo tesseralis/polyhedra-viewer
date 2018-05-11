@@ -19,7 +19,7 @@ export function faceDistanceBetweenVertices(
   while (_.intersection(foundVertexIndices, vIndices2).length === 0) {
     foundVertexIndices = _(foundVertexIndices)
       .flatMap(vIndex => v2fGraph[vIndex])
-      .filter(face => !_.includes(exclude, face.numSides()))
+      .filter(face => !_.includes(exclude, face.numSides))
       .map(face => face.vIndices())
       .flatten()
       .uniq()
@@ -61,7 +61,7 @@ export function getPeakAlignment(polyhedron: Polyhedron, peak: Peak) {
 export function getCupolaGyrate(polyhedron: Polyhedron, peak: Peak) {
   const boundary = peak.boundary();
   const isOrtho = _.every(getDirectedEdges(boundary), edge => {
-    const [n1, n2] = polyhedron.edgeFaces(edge).map(face => face.numSides());
+    const [n1, n2] = _.map(polyhedron.edgeFaces(edge), 'numSides');
     return (n1 === 4) === (n2 === 4);
   });
   return isOrtho ? 'ortho' : 'gyro';

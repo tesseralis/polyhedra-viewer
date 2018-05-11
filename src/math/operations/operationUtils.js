@@ -120,12 +120,9 @@ export function isExpandedFace(
   nSides?: number,
 ) {
   const type = expansionType(polyhedron);
-  if (nSides && face.numSides() !== nSides) return false;
+  if (nSides && face.numSides !== nSides) return false;
   if (!face.isValid()) return false;
-  return _.every(
-    face.adjacentFaces(),
-    face2 => face2.numSides() === edgeShape[type],
-  );
+  return _.every(face.adjacentFaces(), { numSides: edgeShape[type] });
 }
 
 export function getSnubAngle(polyhedron: Polyhedron, numSides: number) {

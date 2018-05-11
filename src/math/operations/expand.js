@@ -134,7 +134,7 @@ function getTwist(angle) {
 function doExpansion(polyhedron: Polyhedron, referenceName) {
   const reference = Polyhedron.get(referenceName);
   const type = expansionType(reference);
-  const n = polyhedron.getFace(0).numSides();
+  const n = polyhedron.getFace(0).numSides;
   const angle = type === 'snub' ? getSnubAngle(reference, n) : 0;
   polyhedron = duplicateVertices(polyhedron, getTwist(angle));
 

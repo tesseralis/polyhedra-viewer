@@ -72,7 +72,7 @@ function getIcosahedronContractFaces(polyhedron) {
 }
 
 function getCuboctahedronContractFaces(polyhedron) {
-  const toCheck = polyhedron.getFaces().filter(face => face.numSides() === 3);
+  const toCheck = _.filter(polyhedron.getFaces(), { numSides: 3 });
   const result = [];
   const invalid = [];
   while (toCheck.length > 0) {
@@ -81,7 +81,7 @@ function getCuboctahedronContractFaces(polyhedron) {
       continue;
     }
     _.forEach(polyhedron.adjacentFaces(...next.vIndices()), face => {
-      if (face.numSides() === 3) {
+      if (face.numSides === 3) {
         invalid.push(face.fIndex);
       }
     });
@@ -159,7 +159,7 @@ export const contract: Operation<ContractOptions> = {
     const hitPoint = vec(point);
     const hitFace = polyhedron.hitFace(hitPoint);
     const isValid = isExpandedFace(polyhedron, hitFace);
-    return isValid ? { faceType: hitFace.numSides() } : {};
+    return isValid ? { faceType: hitFace.numSides } : {};
   },
 
   getAllApplyArgs(polyhedron) {
