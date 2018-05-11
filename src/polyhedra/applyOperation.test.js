@@ -1,5 +1,4 @@
 import _ from 'lodash';
-import { cartesian } from 'util.js';
 import { allSolidNames } from 'data';
 import { PRECISION, isPlanar } from 'math/linAlg';
 import { getOperations, getRelations } from 'polyhedra/relations';

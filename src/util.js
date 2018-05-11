@@ -48,9 +48,11 @@ export function replace<T>(array: T[], index: number, ...values: T[]) {
   return [...before, ...values, ...after];
 }
 
-const f = (a, b) => [].concat(...a.map(d => b.map(e => [].concat(d, e))));
+// const f = (a, b) => [].concat(...a.map(d => b.map(e => [].concat(d, e))));
+const f = (a: any, b) => _.flatMap(a, x => b.map(y => [...x, y]));
 /**
  * Calculate the cartesian product of the given arrays.
  */
-export const cartesian = (a: any[], b: any[], ...c: any[]) =>
-  b ? cartesian(f(a, b), ...c) : a;
+export const cartesian = (a: any[], ...arrays: any[][]) => {
+  return arrays.length ? _.reduce(arrays, f, a.map(x => [x])) : a;
+};
