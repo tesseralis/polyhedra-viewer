@@ -38,6 +38,10 @@ export default class Face {
     return this.face;
   }
 
+  getVertices() {
+    return _.map(this.face, vIndex => this.polyhedron.vertexObjs[vIndex]);
+  }
+
   nextVertex(vIndex: VIndex) {
     return getCyclic(this.face, this.face.indexOf(vIndex) + 1);
   }
