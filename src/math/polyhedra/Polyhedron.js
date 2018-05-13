@@ -1,10 +1,12 @@
 // @flow
 import _ from 'lodash';
+import type { Iteratee } from 'lodash';
+
 import { find, getCyclic } from 'util.js';
 import { isValidSolid, getSolidData } from 'data';
 import { getCentroid } from 'math/linAlg';
 import type { Point } from 'math/linAlg';
-import type { Vertex, Face, Edge, VIndex } from './solidTypes';
+import type { Vertex, Face, Edge } from './solidTypes';
 
 import Peak from './Peak';
 import FaceObj from './Face';
@@ -18,7 +20,7 @@ interface BasePolyhedron {
   name?: string;
 }
 
-function getEdge(v1: VIndex, v2: VIndex) {
+function getEdge(v1, v2) {
   return v1 < v2 ? [v1, v2] : [v2, v1];
 }
 
@@ -231,8 +233,8 @@ export default class Polyhedron {
     return this.withFaces(removed);
   }
 
-  mapVertices(iteratee: (Vertex, VIndex) => Vertex) {
-    return this.withVertices(this.vertices.map(iteratee));
+  mapVertices(iteratee: Iteratee<Vertex>) {
+    return this.withVertices(_.map(this.vertices, iteratee));
   }
 
   mapFaces(iteratee: FaceObj => Face) {
