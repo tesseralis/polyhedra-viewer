@@ -34,7 +34,6 @@ export function faceDistanceBetweenVertices(
 }
 
 export function getPeakAlignment(polyhedron: Polyhedron, peak: Peak) {
-  // const peakBoundary = peak.boundary();
   const peakBoundary = peak.boundaryVertices();
 
   const isRhombicosidodecahedron = peak.type === 'cupola';
