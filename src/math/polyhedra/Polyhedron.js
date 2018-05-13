@@ -5,7 +5,7 @@ import { find, getCyclic } from 'util.js';
 import { isValidSolid, getSolidData } from 'data';
 import { vec, getMidpoint, getCentroid } from 'math/linAlg';
 import type { Vector } from 'math/linAlg';
-import type { Vertex, Face, Edge, VIndex, FIndex } from './solidTypes';
+import type { Vertex, Face, Edge, VIndex } from './solidTypes';
 
 import Peak from './Peak';
 import FaceObj from './Face';
@@ -20,6 +20,7 @@ interface BasePolyhedron {
 export default class Polyhedron {
   vertices: Vertex[];
   faces: Face[];
+  faceObjs: FaceObj[];
 
   _edges: Edge[];
 
@@ -37,6 +38,9 @@ export default class Polyhedron {
   constructor({ vertices, faces, edges, name }: BasePolyhedron) {
     this.vertices = vertices;
     this.faces = faces;
+    this.faceObjs = faces.map(
+      (face, fIndex) => new FaceObj((this: any), fIndex),
+    );
     if (edges) {
       this._edges = edges;
     }
@@ -60,12 +64,12 @@ export default class Polyhedron {
     return _.pick(this, ['vertices', 'faces', 'edges', 'name']);
   }
 
-  getFace = _.memoize((fIndex: FIndex) => {
-    return new FaceObj((this: any), fIndex);
-  });
+  getFace() {
+    return this.faceObjs[0];
+  }
 
   getFaces = () => {
-    return _.map(this.faces, (face, fIndex) => this.getFace(fIndex));
+    return this.faceObjs;
   };
 
   biggestFace() {
@@ -124,7 +128,7 @@ export default class Polyhedron {
 
   // Get the edge length of this polyhedron, assuming equal edges
   edgeLength() {
-    return this.getFace(0).edgeLength();
+    return this.getFace().edgeLength();
   }
 
   adjacentFaces(...vIndices: VIndex[]) {
@@ -255,7 +259,7 @@ export default class Polyhedron {
   }
 
   distanceToCenter() {
-    return this.getFace(0).distanceToCenter();
+    return this.getFace().distanceToCenter();
   }
 
   // Get the faces adjacent to this edge, with the directed face first

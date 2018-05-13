@@ -42,7 +42,7 @@ function duplicateVertex(newPolyhedron, polyhedron, faces, vIndex) {
   return newPolyhedron
     .addVertices([newPolyhedron.vertices[vIndex]])
     .mapFaces(face => {
-      const originalFace = polyhedron.getFace(face.fIndex);
+      const originalFace = face.withPolyhedron(polyhedron);
       if (!face.inSet(adjacentFaces)) {
         return face.vIndices();
       }
@@ -93,7 +93,7 @@ function getCumulateFaces(polyhedron, faceType) {
     polyhedron.numFaces() === 8 &&
     _.every(polyhedron.getFaces(), { numSides: 3 })
   ) {
-    const face0 = polyhedron.getFace(0);
+    const face0 = polyhedron.getFace();
 
     return polyhedron
       .getFaces()
@@ -137,7 +137,7 @@ function applyCumulate(
 
   if (isRectified(polyhedron)) {
     polyhedron = duplicateVertices(polyhedron, cumulateFaces);
-    cumulateFaces = cumulateFaces.map(face => polyhedron.getFace(face.fIndex));
+    cumulateFaces = cumulateFaces.map(face => face.withPolyhedron(polyhedron));
   }
   const { vertices } = polyhedron;
 

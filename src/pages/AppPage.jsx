@@ -44,7 +44,7 @@ export default class AppPage {
   }
 
   clickAnyFace() {
-    return this.clickFace(this.getPolyhedron().getFace(0));
+    return this.clickFace(this.getPolyhedron().getFace());
   }
 
   clickFaceWithNumSides(n) {

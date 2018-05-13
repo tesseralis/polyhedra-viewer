@@ -122,7 +122,7 @@ export function getSnubAngle(polyhedron: Polyhedron, numSides: number) {
   const face0 =
     _.find(polyhedron.getFaces(), face =>
       isExpandedFace(polyhedron, face, numSides),
-    ) || polyhedron.getFace(0);
+    ) || polyhedron.getFace();
 
   const faceCentroid = face0.centroid();
   const faceNormal = face0.normal();

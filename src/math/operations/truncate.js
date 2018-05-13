@@ -58,8 +58,8 @@ function duplicateVertex(newPolyhedron, polyhedron, vIndex) {
       ? vIndex
       : numVertices + mod(i + 1, adjacentFaces.length);
 
-    remappedFacesGraph[adjFace.fIndex] = newPolyhedron
-      .getFace(adjFace.fIndex)
+    remappedFacesGraph[adjFace.fIndex] = adjFace
+      .withPolyhedron(newPolyhedron)
       .replaceVertex(vIndex, next, newVertexIndex);
   });
 

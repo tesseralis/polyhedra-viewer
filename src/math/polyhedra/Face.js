@@ -131,4 +131,8 @@ export default class Face {
       return v.distanceTo(v1) > PRECISION;
     });
   }
+
+  withPolyhedron(polyhedron: Polyhedron) {
+    return new Face(polyhedron, this.fIndex);
+  }
 }
