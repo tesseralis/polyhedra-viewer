@@ -1,10 +1,9 @@
 // @flow
 import _ from 'lodash';
 
-import { find } from 'util.js';
+import { find, mod, getCyclic } from 'util.js';
 import { getNormal, scaleAround, PRECISION } from 'math/linAlg';
 import { Polyhedron } from 'math/polyhedra';
-import { getCyclic, mod } from 'math/polyhedra/solidUtils';
 import { deduplicateVertices } from './operationUtils';
 import type { Operation } from './operationTypes';
 

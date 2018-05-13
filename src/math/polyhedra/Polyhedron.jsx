@@ -1,11 +1,10 @@
 // @flow
 import _ from 'lodash';
 import { Vec3D } from 'toxiclibsjs/geom';
-import { find } from 'util.js';
+import { find, getCyclic } from 'util.js';
 import { isValidSolid, getSolidData } from 'data';
 import { vec, getMidpoint, isPlanar, getCentroid } from 'math/linAlg';
 import type { Vector } from 'math/linAlg';
-import { getCyclic } from './solidUtils';
 import type { Vertex, Face, Edge, VIndex, FIndex } from './solidTypes';
 
 import Peak from './Peak';

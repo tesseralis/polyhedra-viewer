@@ -2,10 +2,8 @@
 import _ from 'lodash';
 
 import { Polyhedron, Face } from 'math/polyhedra';
-import type { VIndex } from 'math/polyhedra';
 import { vec, getPlane, PRECISION } from 'math/linAlg';
 import { find, getSingle, cartesian } from 'util.js';
-import { numSides, getCyclic as getMod } from 'math/polyhedra/solidUtils';
 
 import { hasMultiple, deduplicateVertices } from './operationUtils';
 import { faceDistanceBetweenVertices } from './applyOptionUtils';
@@ -150,19 +148,6 @@ function getBaseType(faces, base) {
   }
 }
 
-function hasDirectedEdge(face, edge) {
-  const [u1, u2] = edge;
-  return _.some(face, (v1: VIndex, i: number) => {
-    const v2 = getMod(face, i + 1);
-    return u1 === v1 && u2 === v2;
-  });
-}
-
-// Get the face in the polyhedron with the given directed edge
-function getFaceWithDirectedEdge(faces, edge) {
-  return _.find(faces, face => hasDirectedEdge(face, edge));
-}
-
 // Get the opposite side of the given prism base
 // ensuring that the vertex indices match up
 function getOppositePrismSide(polyhedron, base) {
@@ -203,22 +188,16 @@ function isAligned(
   const faceToCheck =
     baseType === 'prism' ? getOppositePrismSide(polyhedron, base) : base;
 
-  const adjFace = getFaceWithDirectedEdge(polyhedron.faces, [
-    faceToCheck[1],
-    faceToCheck[0],
-  ]);
-  const alignedFace = getFaceWithDirectedEdge(augmentee.faces, [
-    underside[0],
-    _.last(underside),
-  ]);
+  const [adjFace] = polyhedron.edgeFaces([faceToCheck[1], faceToCheck[0]]);
+  const [alignedFace] = augmentee.edgeFaces([underside[0], _.last(underside)]);
 
   if (baseType === 'rhombicosidodecahedron') {
-    const isOrtho = (numSides(adjFace) !== 4) === (numSides(alignedFace) !== 4);
+    const isOrtho = (adjFace.numSides !== 4) === (alignedFace.numSides !== 4);
     return isOrtho === (gyrate === 'ortho');
   }
 
   // It's orthogonal if triangle faces are aligned or non-triangle faces are aligned
-  const isOrtho = (numSides(adjFace) !== 3) === (numSides(alignedFace) !== 3);
+  const isOrtho = (adjFace.numSides !== 3) === (alignedFace.numSides !== 3);
 
   if (baseType === 'truncated') {
     return !isOrtho;

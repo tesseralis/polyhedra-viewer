@@ -2,6 +2,26 @@
 import _ from 'lodash';
 import type { Predicate } from 'lodash';
 
+/**
+ * Variation of the mod function that keeps sign of the dividend
+ */
+export function mod(a: number, b: number) {
+  return a >= 0 ? a % b : a % b + b;
+}
+
+/**
+ * Get the element of the array at the given index, modulo its length
+ */
+export function getCyclic<T>(array: T[], index: number): T {
+  return array[mod(index, array.length)];
+}
+
+export function getCyclicPairs<T>(array: T[]) {
+  return _.map(array, (item, index) => {
+    return [item, getCyclic(array, index + 1)];
+  });
+}
+
 export function atIndices<T>(arr: T[], indices: number[]): T[] {
   return indices.map(i => arr[i]);
 }
@@ -49,7 +69,6 @@ export function replace<T>(array: T[], index: number, ...values: T[]) {
   return [...before, ...values, ...after];
 }
 
-// const f = (a, b) => [].concat(...a.map(d => b.map(e => [].concat(d, e))));
 const f = (a: any, b) => _.flatMap(a, x => b.map(y => [...x, y]));
 /**
  * Calculate the cartesian product of the given arrays.

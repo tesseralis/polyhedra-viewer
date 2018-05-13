@@ -2,10 +2,9 @@
 import _ from 'lodash';
 import { Vec3D } from 'toxiclibsjs/geom';
 
-import { replace } from 'util.js';
+import { replace, getCyclic } from 'util.js';
 import Polyhedron from './Polyhedron';
 import { VIndex, FIndex, Edge } from './solidTypes';
-import { getCyclic } from './solidUtils';
 import {
   PRECISION,
   getPlane,

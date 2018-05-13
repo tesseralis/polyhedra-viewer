@@ -1,8 +1,6 @@
 // @flow
 import _ from 'lodash';
-import { getSingle } from 'util.js';
-// FIXME don't rely on these
-import { getDirectedEdges } from 'math/polyhedra/solidUtils';
+import { getSingle, getCyclicPairs } from 'util.js';
 import type { VIndex } from 'math/polyhedra';
 import { Peak, Polyhedron } from 'math/polyhedra';
 
@@ -60,7 +58,7 @@ export function getPeakAlignment(polyhedron: Polyhedron, peak: Peak) {
 
 export function getCupolaGyrate(polyhedron: Polyhedron, peak: Peak) {
   const boundary = peak.boundary();
-  const isOrtho = _.every(getDirectedEdges(boundary), edge => {
+  const isOrtho = _.every(getCyclicPairs(boundary), edge => {
     const [n1, n2] = _.map(polyhedron.edgeFaces(edge), 'numSides');
     return (n1 === 4) === (n2 === 4);
   });
