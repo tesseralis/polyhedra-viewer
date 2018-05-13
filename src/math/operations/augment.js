@@ -2,7 +2,7 @@
 import _ from 'lodash';
 
 import { Polyhedron, Face } from 'math/polyhedra';
-import { vec, PRECISION } from 'math/linAlg';
+import { PRECISION } from 'math/linAlg';
 import { find, getCyclic, getSingle, cartesian } from 'util.js';
 
 import { hasMultiple, deduplicateVertices } from './operationUtils';
@@ -113,8 +113,7 @@ function getAugmentGraph(polyhedron) {
 }
 
 function getAugmentFace(polyhedron, graph, point) {
-  const hitPoint = vec(point);
-  const hitFace = polyhedron.hitFace(hitPoint);
+  const hitFace = polyhedron.hitFace(point);
   return graph[hitFace.fIndex] ? hitFace : undefined;
 }
 

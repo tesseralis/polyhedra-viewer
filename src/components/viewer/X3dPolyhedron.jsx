@@ -2,8 +2,9 @@
 import React, { Component } from 'react';
 import _ from 'lodash';
 import EventListener from 'react-event-listener';
+import { Vec3D } from 'toxiclibsjs/geom';
 
-import type { Vector } from 'math/linAlg';
+import { vec } from 'math/linAlg';
 import { Polyhedron } from 'math/polyhedra';
 
 // Join a list of lists with an inner and outer separator.
@@ -41,7 +42,7 @@ interface PolyhedronProps {
   config: any;
   faceColors: any;
   applyOperation(): void;
-  setApplyArgs(hitPnt?: Vector): void;
+  setApplyArgs(hitPnt?: Vec3D): void;
 }
 
 interface PolyhedronState {
@@ -140,7 +141,7 @@ export default class X3dPolyhedron extends Component<
     // TODO replace this with logs
     this.drag = true;
     const { setApplyArgs } = this.props;
-    setApplyArgs(event.hitPnt);
+    setApplyArgs(vec(event.hitPnt));
   };
 
   handleMouseOut = () => {

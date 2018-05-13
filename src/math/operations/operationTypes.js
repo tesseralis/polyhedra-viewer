@@ -1,7 +1,8 @@
 // @flow
+import { Vec3D } from 'toxiclibsjs/geom';
+
 import { Polyhedron } from 'math/polyhedra';
 import type { Vertex, Face } from 'math/polyhedra';
-import type { Vector } from 'math/linAlg';
 
 export interface OperationResult {
   result: Polyhedron;
@@ -19,7 +20,7 @@ export interface Operation<Options = {}, ApplyArgs = {}> {
 
   getDefaultArgs?: (polyhedron: Polyhedron, options: Options) => ApplyArgs;
 
-  getApplyArgs?: (polyhedron: Polyhedron, hitPnt: Vector) => ApplyArgs;
+  getApplyArgs?: (polyhedron: Polyhedron, hitPnt: Vec3D) => ApplyArgs;
 
   getAllApplyArgs?: (polyhedron: Polyhedron) => ApplyArgs[];
 

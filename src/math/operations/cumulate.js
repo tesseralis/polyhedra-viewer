@@ -2,7 +2,6 @@
 import _ from 'lodash';
 
 import { find } from 'util.js';
-import { vec } from 'math/linAlg';
 import { Polyhedron } from 'math/polyhedra';
 import { deduplicateVertices } from './operationUtils';
 import type { Operation } from './operationTypes';
@@ -201,8 +200,7 @@ export const cumulate: Operation<CumulateOptions> = {
     }
   },
 
-  getApplyArgs(polyhedron, hitPnt) {
-    const hitPoint = vec(hitPnt);
+  getApplyArgs(polyhedron, hitPoint) {
     const n = polyhedron.hitFace(hitPoint).numSides;
     return n <= 5 ? { faceType: n } : {};
   },

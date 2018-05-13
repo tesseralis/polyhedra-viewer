@@ -2,8 +2,8 @@
 import _ from 'lodash';
 import { find } from 'util.js';
 import { isValidSolid, getSolidData } from 'data';
-import { vec, getCentroid } from 'math/linAlg';
-import type { Vector } from 'math/linAlg';
+import { getCentroid } from 'math/linAlg';
+import type { Point } from 'math/linAlg';
 import type { Vertex, Face, Edge, VIndex } from './solidTypes';
 
 import Peak from './Peak';
@@ -265,7 +265,7 @@ export default class Polyhedron {
     );
   }
 
-  hitFace(point: Vector) {
+  hitFace(point: Point) {
     return _.minBy(this.getFaces(), face =>
       face.plane().getDistanceToPoint(point),
     );
@@ -275,8 +275,7 @@ export default class Polyhedron {
     return Peak.getAll((this: any));
   }
 
-  findPeak(point: Vector) {
-    const hitPoint = vec(point);
+  findPeak(hitPoint: Point) {
     const hitFace = this.hitFace(hitPoint);
     const peaks = this.peaks().filter(peak => hitFace.inSet(peak.faces()));
     if (peaks.length === 0) {

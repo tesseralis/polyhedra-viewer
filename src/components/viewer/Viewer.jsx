@@ -3,12 +3,12 @@ import _ from 'lodash';
 import React, { Component } from 'react';
 import { css, StyleSheet } from 'aphrodite/no-important';
 import { rgb } from 'd3-color';
+import { Vec3D } from 'toxiclibsjs/geom';
 
 import { isValidSolid } from 'data';
 import { andaleMono } from 'styles/fonts';
 import { Polyhedron } from 'math/polyhedra';
 import type { Vertex, Face } from 'math/polyhedra';
-import type { Vector } from 'math/linAlg';
 import { operations } from 'math/operations';
 import polygons from 'constants/polygons';
 import { mapObject } from 'util.js';
@@ -362,7 +362,7 @@ export default class Viewer extends Component<ViewerProps, ViewerState> {
   };
 
   // TODO could probably move to own file
-  setApplyArgs = (hitPnt?: Vector) => {
+  setApplyArgs = (hitPnt?: Vec3D) => {
     this.setState(({ polyhedron, operation }) => {
       if (!operation || !hitPnt) {
         return { applyArgs: {} };

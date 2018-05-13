@@ -2,13 +2,13 @@
 import _ from 'lodash';
 import { Vec3D, Ray3D, Triangle3D, Plane } from 'toxiclibsjs/geom';
 
-export type Vector = [number, number, number];
+export type Point = [number, number, number];
 
 export const PRECISION_DIGITS = 3;
 export const PRECISION = Math.pow(10, -PRECISION_DIGITS);
 
 // convert an array of vertices into a vector
-export const vec = (p: Vector) => new Vec3D(...p);
+export const vec = (p: Point) => new Vec3D(...p);
 
 export const getMidpoint = (v1: Vec3D, v2: Vec3D) => v1.add(v2).scale(0.5);
 // Get the plane containing the given points

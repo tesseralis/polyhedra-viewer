@@ -1,8 +1,6 @@
 // @flow
 import _ from 'lodash';
 import { Polyhedron } from 'math/polyhedra';
-import { vec } from 'math/linAlg';
-import type { Vector } from 'math/linAlg';
 import {
   expansionType,
   getSnubAngle,
@@ -157,8 +155,7 @@ export const contract: Operation<ContractOptions> = {
     return { faceType: config.faceType || 3 };
   },
 
-  getApplyArgs(polyhedron: Polyhedron, point: Vector) {
-    const hitPoint = vec(point);
+  getApplyArgs(polyhedron, hitPoint) {
     const hitFace = polyhedron.hitFace(hitPoint);
     const isValid = isExpandedFace(polyhedron, hitFace);
     return isValid ? { faceType: hitFace.numSides } : {};
