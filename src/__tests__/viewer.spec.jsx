@@ -37,10 +37,10 @@ describe('viewer', () => {
 
     appPage
       .clickButtonWithText('augment')
-      .clickFaceIndex(0)
+      .clickAnyFace()
       .expectTransitionTo('triangular-bipyramid')
       .clickButtonWithText('diminish')
-      .clickFaceIndex(0)
+      .clickAnyFace()
       .expectTransitionTo('tetrahedron');
   });
 
@@ -121,7 +121,7 @@ describe('viewer', () => {
       .clickButtonWithText('expand')
       .expectTransitionTo('rhombicosidodecahedron')
       .clickButtonWithText('diminish')
-      .clickFaceIndex(0)
+      .clickAnyFace()
       .expectTransitionTo('diminished-rhombicosidodecahedron');
   });
 

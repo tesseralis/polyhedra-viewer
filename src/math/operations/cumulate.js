@@ -93,7 +93,6 @@ function getCumulateFaces(polyhedron, faceType) {
     polyhedron.numFaces() === 8 &&
     _.every(polyhedron.getFaces(), { numSides: 3 })
   ) {
-    // const face = polyhedron.faces[0];
     const face0 = polyhedron.getFace(0);
 
     return polyhedron

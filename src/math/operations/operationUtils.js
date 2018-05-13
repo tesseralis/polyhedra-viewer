@@ -16,32 +16,25 @@ export function deduplicateVertices(polyhedron: Polyhedron) {
   // group vertex indices by same
   const vertices = polyhedron.vertexVectors();
   const points = [];
-  const verticesByPoint = {};
-  _.forEach(vertices, (vertex, index: VIndex) => {
-    const pointIndex = _.findIndex(points, point =>
-      vertex.equalsWithTolerance(point, PRECISION),
+  const oldToNew = {};
+
+  _.forEach(vertices, (vertex, vIndex: VIndex) => {
+    const pointIndex = _.find(points, point =>
+      vertex.equalsWithTolerance(polyhedron.vertexVector(point), PRECISION),
     );
-    if (pointIndex === -1) {
-      points.push(vertex);
-      verticesByPoint[points.length - 1] = [index];
+    if (pointIndex === undefined) {
+      points.push(vIndex);
+      oldToNew[vIndex] = vIndex;
     } else {
-      verticesByPoint[pointIndex].push(index);
+      oldToNew[vIndex] = pointIndex;
     }
   });
 
   // replace vertices that are the same
-  let newFaces = polyhedron.faces;
-  _.forEach(verticesByPoint, groupedVertices => {
-    if (groupedVertices.length <= 1) return;
-    newFaces = newFaces.map(face =>
-      face.map(
-        vertex =>
-          _.includes(groupedVertices, vertex) ? groupedVertices[0] : vertex,
-      ),
-    );
-  });
-  // remove vertices in faces and extraneous faces
-  newFaces = newFaces.map(_.uniq).filter(face => face.length >= 3);
+  let newFaces = polyhedron
+    .getFaces()
+    .map(face => _.uniq(face.vIndices().map(vIndex => oldToNew[vIndex])))
+    .filter(vIndices => vIndices.length >= 3);
 
   // remove extraneous vertices
   return removeExtraneousVertices(polyhedron.withFaces(newFaces));

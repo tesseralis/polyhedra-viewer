@@ -32,11 +32,8 @@ export default class AppPage {
     return this.wrapper.find('X3dPolyhedron').prop('solidData');
   }
 
-  clickFaceIndex(faceIndex) {
-    const hitPnt = this.getPolyhedron()
-      .getFace(faceIndex)
-      .centroid()
-      .toArray();
+  clickFace(face) {
+    const hitPnt = face.centroid().toArray();
     const shape = this.wrapper
       .find('shape')
       .filterWhere(n => !!n.prop('onMouseMove'));
@@ -46,10 +43,12 @@ export default class AppPage {
     return this;
   }
 
+  clickAnyFace() {
+    return this.clickFace(this.getPolyhedron().getFace(0));
+  }
+
   clickFaceWithNumSides(n) {
-    const polyhedron = this.getPolyhedron();
-    const fIndex = _.findIndex(polyhedron.faces, face => face.length === n);
-    return this.clickFaceIndex(fIndex);
+    return this.clickFace(this.getPolyhedron().faceWithNumSides(n));
   }
 
   expectNoButtonWithText(text) {

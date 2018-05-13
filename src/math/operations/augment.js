@@ -118,19 +118,13 @@ function getAugmentFace(polyhedron, graph, point) {
   return graph[hitFace.fIndex] ? hitFace : undefined;
 }
 
-const sharesVertex = (face1, face2) => {
-  const intersectionCount = _.intersection(face1, face2).length;
-  // Make sure they're not the same face
-  return intersectionCount > 0 && intersectionCount < face1.length;
-};
-
 // Computes the set equality of two arrays
 const setEquals = (array1, array2) => _.xor(array1, array2).length === 0;
 
-function getBaseType(faces, base) {
-  const adjacentFaces = faces.filter(face => sharesVertex(face, base));
+function getBaseType(base) {
+  const adjacentFaces = base.adjacentFaces();
   const adjacentFaceCounts = _(adjacentFaces)
-    .map('length')
+    .map('numSides')
     .uniq()
     .value();
   if (setEquals(adjacentFaceCounts, [3, 4])) {
@@ -172,7 +166,7 @@ function isAligned(
   augmentType,
 ) {
   if (_.includes(['pyramid', 'prism', 'antiprism'], augmentType)) return true;
-  const baseType = getBaseType(polyhedron.faces, base);
+  const baseType = getBaseType(base);
   if (baseType === 'pyramid' || baseType === 'antiprism') {
     return true;
   }
@@ -186,7 +180,9 @@ function isAligned(
   }
 
   const faceToCheck =
-    baseType === 'prism' ? getOppositePrismSide(polyhedron, base) : base;
+    baseType === 'prism'
+      ? getOppositePrismSide(polyhedron, base.vIndices())
+      : base.vIndices();
 
   const [adjFace] = polyhedron.edgeFaces([faceToCheck[1], faceToCheck[0]]);
   const [alignedFace] = augmentee.edgeFaces([underside[0], _.last(underside)]);
@@ -267,7 +263,7 @@ function doAugment(polyhedron, base, using, gyrate, mock = false) {
   const translatedV0 = baseVertices[0].sub(baseCenter);
   const baseIsAligned = isAligned(
     polyhedron,
-    base.vIndices(),
+    base,
     augmentee,
     undersideFace,
     gyrate,
