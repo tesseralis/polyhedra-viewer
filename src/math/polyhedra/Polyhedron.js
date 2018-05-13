@@ -17,7 +17,6 @@ interface BasePolyhedron {
   name?: string;
 }
 
-// NOTE: this file is .jsx because otherwise class properties won't be highlighted in sublime
 export default class Polyhedron {
   vertices: Vertex[];
   faces: Face[];
@@ -255,7 +254,6 @@ export default class Polyhedron {
     return getCentroid(this.vertexVectors());
   }
 
-  // TODO decide what should return a Vec3D and what should return an array
   distanceToCenter() {
     return this.getFace(0).distanceToCenter();
   }
