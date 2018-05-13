@@ -131,7 +131,7 @@ export function getSnubAngle(polyhedron: Polyhedron, numSides: number) {
       isExpandedFace(polyhedron, face, numSides) &&
       !face.inSet(face0AdjacentFaces),
   );
-  const midpoint = face0.directedEdgeObj(0).midpoint();
+  const midpoint = face0.edge(0).midpoint();
   const face1 = _.minBy(snubFaces, face =>
     midpoint.distanceTo(face.centroid()),
   );

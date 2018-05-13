@@ -8,6 +8,7 @@ export default class Edge {
   polyhedron: Polyhedron;
   a: VIndex;
   b: VIndex;
+  id: string;
   va: Vertex;
   vb: Vertex;
 
@@ -15,6 +16,7 @@ export default class Edge {
     this.polyhedron = polyhedron;
     this.a = a;
     this.b = b;
+    this.id = `${a},${b}`;
     this.va = polyhedron.vertexObjs[a];
     this.vb = polyhedron.vertexObjs[b];
   }
@@ -38,7 +40,7 @@ export default class Edge {
   // Get the faces adjacent to this edge, with the directed face first
   adjacentFaces() {
     const { a, b } = this;
-    const graph = this.polyhedron.directedEdgeToFaceGraph();
+    const graph = this.polyhedron.edgeToFaceGraph();
     return [graph[a][b], graph[b][a]];
   }
 

@@ -1,6 +1,6 @@
 // @flow
 import _ from 'lodash';
-import { find } from 'util.js';
+import { find, getCyclic } from 'util.js';
 import { isValidSolid, getSolidData } from 'data';
 import { getCentroid } from 'math/linAlg';
 import type { Point } from 'math/linAlg';
@@ -16,6 +16,10 @@ interface BasePolyhedron {
   faces: Face[];
   edges?: Edge[];
   name?: string;
+}
+
+function getEdge(v1: VIndex, v2: VIndex) {
+  return v1 < v2 ? [v1, v2] : [v2, v1];
 }
 
 export default class Polyhedron {
@@ -52,8 +56,12 @@ export default class Polyhedron {
   }
 
   getAllEdges() {
-    return _(this.getFaces())
-      .flatMap(face => face.getEdges())
+    return _(this.faces)
+      .flatMap(vIndices =>
+        vIndices.map((vertex, i) =>
+          getEdge(vertex, getCyclic(vIndices, i + 1)),
+        ),
+      )
       .uniqWith(_.isEqual)
       .value();
   }
@@ -143,7 +151,7 @@ export default class Polyhedron {
   vertexGraph = _.memoize(() => {
     const graph = {};
     _.forEach(this.getFaces(), face => {
-      _.forEach(face.directedEdgeObjs(), edge => {
+      _.forEach(face.edges(), edge => {
         if (!graph[edge.a]) {
           graph[edge.a] = [];
         }
@@ -175,10 +183,10 @@ export default class Polyhedron {
     return graph;
   });
 
-  directedEdgeToFaceGraph = _.memoize(() => {
+  edgeToFaceGraph = _.memoize(() => {
     const edgesToFaces = {};
     _.forEach(this.getFaces(), face => {
-      _.forEach(face.directedEdgeObjs(), ({ a, b }) => {
+      _.forEach(face.edges(), ({ a, b }) => {
         _.set(edgesToFaces, [a, b], face);
       });
     });
