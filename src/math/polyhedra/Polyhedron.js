@@ -9,6 +9,7 @@ import type { Vertex, Face, Edge, VIndex } from './solidTypes';
 
 import Peak from './Peak';
 import FaceObj from './Face';
+import VertexObj from './Vertex';
 
 interface BasePolyhedron {
   vertices: Vertex[];
@@ -21,6 +22,7 @@ export default class Polyhedron {
   vertices: Vertex[];
   faces: Face[];
   faceObjs: FaceObj[];
+  vertexObjs: VertexObj[];
 
   _edges: Edge[];
 
@@ -40,6 +42,9 @@ export default class Polyhedron {
     this.faces = faces;
     this.faceObjs = faces.map(
       (face, fIndex) => new FaceObj((this: any), fIndex),
+    );
+    this.vertexObjs = vertices.map(
+      (vertex, vIndex) => new VertexObj((this: any), vIndex),
     );
     if (edges) {
       this._edges = edges;
@@ -70,6 +75,10 @@ export default class Polyhedron {
 
   getFaces = () => {
     return this.faceObjs;
+  };
+
+  getVertices = () => {
+    return this.vertexObjs;
   };
 
   biggestFace() {
