@@ -48,7 +48,7 @@ function applyGyrate(polyhedron, { peak }) {
 
   const newVertices = mockPolyhedron.vertexVectors().map((v, vIndex) => {
     if (
-      _.includes(peak.innerVertexIndices(), vIndex) ||
+      _.includes(_.map(peak.innerVertices(), 'index'), vIndex) ||
       vIndex >= polyhedron.numVertices()
     ) {
       return rotateAround(v, normalRay, theta).toArray();

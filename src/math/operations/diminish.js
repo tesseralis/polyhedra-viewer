@@ -27,11 +27,11 @@ export const diminish: Operation<DiminishOptions> = {
     if (!peak) {
       throw new Error('Invalid peak');
     }
-    const vIndices = peak.innerVertexIndices();
+    const vertices = peak.innerVertices();
     // If diminishing a pentagonal cupola/rotunda, check which one it is
-    if (vIndices.length === 5) {
+    if (vertices.length === 5) {
       options.using = 'U5';
-    } else if (vIndices.length === 10) {
+    } else if (vertices.length === 10) {
       options.using = 'R5';
     }
 
@@ -69,7 +69,7 @@ function applyShorten(polyhedron) {
   const face = _.maxBy(faces, 'numSides');
   return removeVertices(
     polyhedron,
-    new Peak(polyhedron, face.vIndices(), 'prism'),
+    new Peak(polyhedron, face.getVertices(), 'prism'),
   );
 }
 

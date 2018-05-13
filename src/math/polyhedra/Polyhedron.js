@@ -172,6 +172,16 @@ export default class Polyhedron {
       .value();
   }
 
+  // Get the vertices adjacent to this set of vertices
+  adjacentVertices(...vertices: VertexObj[]) {
+    return _(vertices)
+      .map('index')
+      .flatMap(_.propertyOf(this.vertexGraph()))
+      .uniq()
+      .map(vIndex => this.vertexObjs[vIndex])
+      .value();
+  }
+
   vertexGraph = _.memoize(() => {
     const graph = {};
     _.forEach(this.faces, face => {

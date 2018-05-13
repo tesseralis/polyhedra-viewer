@@ -2,10 +2,11 @@
 
 import _ from 'lodash';
 import { isPlanar } from 'math/linAlg';
-import type { Edge, VIndex } from './solidTypes';
+import type { Edge } from './solidTypes';
 
 import Polyhedron from './Polyhedron';
 import Face from './Face';
+import Vertex from './Vertex';
 
 type PeakType = 'pyramid' | 'cupola' | 'rotunda' | 'fastigium' | 'prism';
 type FaceConfiguration = { [string]: number };
@@ -53,7 +54,7 @@ const withMapper = property => Base =>
 
 export default class Peak {
   polyhedron: Polyhedron;
-  vIndices: VIndex[];
+  vertices: Vertex[];
   type: PeakType;
 
   static getAll(polyhedron: Polyhedron) {
@@ -70,14 +71,15 @@ export default class Peak {
     return [];
   }
 
-  constructor(polyhedron: Polyhedron, vIndices: VIndex[], type: PeakType) {
+  constructor(polyhedron: Polyhedron, vertices: Vertex[], type: PeakType) {
     this.polyhedron = polyhedron;
-    this.vIndices = vIndices;
+    // this.vIndices = vIndices;
+    this.vertices = vertices;
     this.type = type;
   }
 
-  innerVertexIndices() {
-    return this.vIndices;
+  innerVertices() {
+    return this.vertices;
   }
 
   topPoint() {}
@@ -85,7 +87,9 @@ export default class Peak {
   faceConfiguration: () => FaceConfiguration;
 
   faces = _.memoize(() => {
-    return this.polyhedron.adjacentFaces(...this.innerVertexIndices());
+    return this.polyhedron.adjacentFaces(
+      ..._.map(this.innerVertices(), 'index'),
+    );
   });
 
   boundary = _.memoize(() => {
@@ -93,8 +97,8 @@ export default class Peak {
   });
 
   isValid() {
-    const matchFaces = _.every(this.innerVertexIndices(), vIndex => {
-      const faceCount = this.polyhedron.adjacentFaceCount(vIndex);
+    const matchFaces = _.every(this.innerVertices(), vertex => {
+      const faceCount = this.polyhedron.adjacentFaceCount(vertex.index);
       return _.isEqual(faceCount, this.faceConfiguration());
     });
     return (
@@ -102,19 +106,19 @@ export default class Peak {
     );
   }
 }
-const Pyramid = withMapper('vIndices')(
+const Pyramid = withMapper('getVertices')(
   class extends Peak {
-    vIndex: VIndex;
+    vertex: Vertex;
 
-    constructor(polyhedron, vIndex) {
-      super(polyhedron, [vIndex], 'pyramid');
-      this.vIndex = vIndex;
+    constructor(polyhedron, vertex) {
+      super(polyhedron, [vertex], 'pyramid');
+      this.vertex = vertex;
     }
 
     faceConfiguration = () => ({ '3': this.faces().length });
 
     topPoint() {
-      return this.polyhedron.vertexVector(this.vIndex);
+      return this.vertex.value;
     }
   },
 );
@@ -124,14 +128,18 @@ const Fastigium = withMapper('edges')(
     edge: Edge;
 
     constructor(polyhedron, edge) {
-      super(polyhedron, edge, 'fastigium');
+      super(
+        polyhedron,
+        edge.map(vIndex => polyhedron.getVertices()[vIndex]),
+        'fastigium',
+      );
       this.edge = edge;
     }
 
     faceConfiguration = () => ({ '3': 1, '4': 2 });
 
     topPoint() {
-      const [v1, v2] = this.edge.map(v => this.polyhedron.vertexVector(v));
+      const [v1, v2] = this.polyhedron.vertexVectors(this.edge);
       return v1.add(v2).scale(0.5);
     }
   },
@@ -142,12 +150,11 @@ const Cupola = withMapper('getFaces')(
     face: Face;
 
     constructor(polyhedron, face) {
-      super(polyhedron, face.vIndices(), 'cupola');
+      super(polyhedron, face.getVertices(), 'cupola');
       this.face = face;
     }
 
-    faceConfiguration = () =>
-      _.countBy([3, 4, 4, this.innerVertexIndices().length]);
+    faceConfiguration = () => _.countBy([3, 4, 4, this.innerVertices().length]);
 
     topPoint() {
       return this.face.centroid();
@@ -162,7 +169,7 @@ const Rotunda = withMapper('getFaces')(
     constructor(polyhedron, face) {
       super(
         polyhedron,
-        polyhedron.adjacentVertexIndices(...face.vIndices()),
+        polyhedron.adjacentVertices(...face.getVertices()),
         'rotunda',
       );
       this.face = face;
