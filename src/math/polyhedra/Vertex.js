@@ -8,11 +8,13 @@ export default class Vertex {
   polyhedron: Polyhedron;
   index: VIndex;
   value: Vec3D;
+  vec: Vec3D;
 
   constructor(polyhedron: Polyhedron, index: VIndex) {
     this.polyhedron = polyhedron;
     this.index = index;
     this.value = polyhedron.vertexVector(index);
+    this.vec = this.value;
   }
 
   adjacentVertices() {

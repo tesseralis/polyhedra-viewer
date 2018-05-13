@@ -143,13 +143,15 @@ function doTruncate(polyhedron, options: TruncateOptions = {}) {
   const duplicated = duplicateVertices(polyhedron);
   const transform = getTruncateTransform(polyhedron, duplicated);
 
-  const truncatedVertices = duplicated.vertexVectors().map((v, vIndex) => {
-    const adjacentVertices = duplicated.vertexVectors(
-      duplicated.adjacentVertexIndices(vIndex),
-    );
-    const v1 = find(adjacentVertices, adj => adj.distanceTo(v) > PRECISION);
-    const truncated = v.interpolateTo(v1, rectify ? 0.5 : truncateScale);
-    return (!!transform ? transform(truncated, vIndex) : truncated).toArray();
+  const truncatedVertices = duplicated.getVertices().map(vertex => {
+    const adjacentVertices = vertex.adjacentVertices();
+    const v = vertex.vec;
+    const v1 = find(adjacentVertices, adj => adj.vec.distanceTo(v) > PRECISION);
+    const truncated = v.interpolateTo(v1.vec, rectify ? 0.5 : truncateScale);
+    return (!!transform
+      ? transform(truncated, vertex.index)
+      : truncated
+    ).toArray();
   });
   const result = duplicated.withVertices(truncatedVertices);
   return {

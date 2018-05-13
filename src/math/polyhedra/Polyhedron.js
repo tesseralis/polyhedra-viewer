@@ -153,41 +153,21 @@ export default class Polyhedron {
   }
 
   // Get the vertices adjacent to this set of vertices
-  adjacentVertexIndices(...vIndices: VIndex[]) {
-    return _(vIndices)
-      .flatMap(_.propertyOf(this.vertexGraph()))
-      .uniq()
-      .value();
-  }
-
-  // Get the vertices adjacent to this set of vertices
   adjacentVertices(...vertices: VertexObj[]) {
     return _(vertices)
-      .map('index')
-      .flatMap(_.propertyOf(this.vertexGraph()))
-      .uniq()
-      .map(vIndex => this.vertexObjs[vIndex])
+      .flatMap(vertex => vertex.adjacentVertices())
+      .uniqBy('index')
       .value();
   }
-
-  vertexObjGraph = _.memoize(() => {
-    const graph = {};
-    _.forEach(this.getFaces, face => {
-      _.forEach(face.directedEdges(), edge => {
-        graph[edge.a.index].push(edge.b);
-      });
-    });
-    return graph;
-  });
 
   vertexGraph = _.memoize(() => {
     const graph = {};
     _.forEach(this.getFaces(), face => {
-      _.forEach(face.directedEdges(), ([a, b]) => {
-        if (!graph[a]) {
-          graph[a] = [];
+      _.forEach(face.directedEdgeObjs(), edge => {
+        if (!graph[edge.a]) {
+          graph[edge.a] = [];
         }
-        graph[a].push(b);
+        graph[edge.a].push(edge.vb);
       });
     });
     return graph;
@@ -218,8 +198,8 @@ export default class Polyhedron {
   directedEdgeToFaceGraph = _.memoize(() => {
     const edgesToFaces = {};
     _.forEach(this.getFaces(), face => {
-      _.forEach(face.directedEdges(), ([v1, v2]) => {
-        _.set(edgesToFaces, [v1, v2], face);
+      _.forEach(face.directedEdgeObjs(), ({ a, b }) => {
+        _.set(edgesToFaces, [a, b], face);
       });
     });
     return edgesToFaces;
