@@ -6,6 +6,7 @@ import { replace, getCyclic } from 'util.js';
 import Polyhedron from './Polyhedron';
 import { VIndex, FIndex, Edge } from './solidTypes';
 import EdgeObj from './Edge';
+import Vertex from './Vertex';
 import {
   PRECISION,
   getPlane,
@@ -22,13 +23,15 @@ export default class Face {
   polyhedron: Polyhedron;
   fIndex: FIndex;
   face: VIndex[];
-  vertices: $ReadOnly<Vec3D>[];
+  vertices: Vertex[];
+  vectors: $ReadOnly<Vec3D>[];
 
   constructor(polyhedron: Polyhedron, fIndex: FIndex) {
     this.polyhedron = polyhedron;
     this.fIndex = fIndex;
     this.face = polyhedron.faces[fIndex];
-    this.vertices = polyhedron.vertexVectors(this.face);
+    this.vertices = _.map(this.face, vIndex => polyhedron.vertexObjs[vIndex]);
+    this.vectors = _.map(this.vertices, 'vec');
   }
 
   get numSides() {
@@ -40,7 +43,7 @@ export default class Face {
   }
 
   getVertices() {
-    return _.map(this.face, vIndex => this.polyhedron.vertexObjs[vIndex]);
+    return this.vertices;
   }
 
   nextVertex(vIndex: VIndex) {
@@ -89,16 +92,10 @@ export default class Face {
   }
 
   numUniqueSides() {
-    const uniqueVertices = _.filter(
-      this.vertices,
-      (vertex: Vec3D, i: VIndex) => {
-        return !vertex.equalsWithTolerance(
-          getCyclic(this.vertices, i + 1),
-          PRECISION,
-        );
-      },
+    return _.countBy(
+      this.directedEdgeObjs(),
+      edge => edge.length() > PRECISION,
     );
-    return uniqueVertices.length;
   }
 
   // Return true if this face is the same as the given face (within a polyhedron)
@@ -122,7 +119,7 @@ export default class Face {
 
   /** Return the set of faces that share a vertex to this face (including itself) */
   vertexAdjacentFaces() {
-    return _(this.getVertices())
+    return _(this.vertices)
       .flatMap(vertex => vertex.adjacentFaces())
       .uniqBy('fIndex')
       .value();
@@ -133,12 +130,11 @@ export default class Face {
   }
 
   edgeLength() {
-    const [v0, v1] = this.vertices;
-    return v0.distanceTo(v1);
+    return this.directedEdgeObj(0).length();
   }
 
   plane() {
-    return getPlane(this.vertices);
+    return getPlane(this.vectors);
   }
 
   apothem() {
@@ -147,7 +143,7 @@ export default class Face {
 
   /** Return the centroid of the face given by the face index */
   centroid() {
-    return getCentroid(this.vertices);
+    return getCentroid(this.vectors);
   }
 
   // TODO decide what should return a Vec3D and what should return an array
@@ -158,18 +154,15 @@ export default class Face {
 
   /** Return the normal of the face given by the face index */
   normal() {
-    return getNormal(this.vertices);
+    return getNormal(this.vectors);
   }
 
   normalRay() {
-    return getNormalRay(this.vertices);
+    return getNormalRay(this.vectors);
   }
 
   isValid() {
-    return _.every(this.vertices, (v, i: number) => {
-      const v1 = getCyclic(this.vertices, i + 1);
-      return v.distanceTo(v1) > PRECISION;
-    });
+    return _.every(this.directedEdgeObjs(), edge => edge.length() > PRECISION);
   }
 
   withPolyhedron(polyhedron: Polyhedron) {

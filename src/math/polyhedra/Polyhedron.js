@@ -1,6 +1,5 @@
 // @flow
 import _ from 'lodash';
-import { Vec3D } from 'toxiclibsjs/geom';
 import { find } from 'util.js';
 import { isValidSolid, getSolidData } from 'data';
 import { vec, getCentroid } from 'math/linAlg';
@@ -41,11 +40,11 @@ export default class Polyhedron {
   constructor({ vertices, faces, edges, name }: BasePolyhedron) {
     this.vertices = vertices;
     this.faces = faces;
-    this.faceObjs = faces.map(
-      (face, fIndex) => new FaceObj((this: any), fIndex),
-    );
     this.vertexObjs = vertices.map(
       (vertex, vIndex) => new VertexObj((this: any), vIndex),
+    );
+    this.faceObjs = faces.map(
+      (face, fIndex) => new FaceObj((this: any), fIndex),
     );
     if (edges) {
       this._edges = edges;
@@ -126,22 +125,6 @@ export default class Polyhedron {
       .uniq()
       .sortBy()
       .value();
-  }
-
-  _vertexVectors: Vec3D[];
-
-  // Return the vectors of this polyhedron as vectors
-  vertexVectors(vIndices?: VIndex[]): Vec3D[] {
-    if (!this._vertexVectors) {
-      this._vertexVectors = this.vertices.map(vec);
-    }
-    return vIndices
-      ? vIndices.map((vIndex: VIndex) => this._vertexVectors[vIndex])
-      : this._vertexVectors;
-  }
-
-  vertexVector(vIndex: VIndex): Vec3D {
-    return this.vertexVectors([vIndex])[0];
   }
 
   // Get the edge length of this polyhedron, assuming equal edges
@@ -249,7 +232,7 @@ export default class Polyhedron {
   }
 
   centroid() {
-    return getCentroid(this.vertexVectors());
+    return getCentroid(_.map(this.vertexObjs, 'vec'));
   }
 
   distanceToCenter() {
@@ -278,7 +261,7 @@ export default class Polyhedron {
   center() {
     const centroid = this.centroid();
     return this.withVertices(
-      this.vertexVectors().map(v => v.sub(centroid).toArray()),
+      this.vertexObjs.map(v => v.vec.sub(centroid).toArray()),
     );
   }
 

@@ -19,8 +19,16 @@ export default class Edge {
     this.vb = polyhedron.vertexObjs[b];
   }
 
+  get vertices() {
+    return [this.va, this.vb];
+  }
+
   length() {
     return this.va.vec.distanceTo(this.vb.vec);
+  }
+
+  midpoint() {
+    return getMidpoint(this.va.vec, this.vb.vec);
   }
 
   twin() {
@@ -35,7 +43,7 @@ export default class Edge {
   }
 
   dihedralAngle() {
-    const midpoint = getMidpoint(this.va.vec, this.vb.vec);
+    const midpoint = this.midpoint();
     const [c1, c2] = this.adjacentFaces().map(face =>
       face.centroid().sub(midpoint),
     );

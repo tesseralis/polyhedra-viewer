@@ -2,7 +2,7 @@
 import _ from 'lodash';
 import { Polyhedron, Face } from 'math/polyhedra';
 import { VIndex } from 'math/polyhedra';
-import { PRECISION, getMidpoint, getPlane, rotateAround } from 'math/linAlg';
+import { PRECISION, getPlane, rotateAround } from 'math/linAlg';
 
 export const hasMultiple = (relations: any, property: any) =>
   _(relations)
@@ -82,12 +82,11 @@ export function getResizedVertices(
   const result = [...polyhedron.vertices];
   _.forEach(faces, face => {
     const normal = face.normal();
-    _.forEach(face.vIndices(), (vIndex, i) => {
-      const vertex = face.vertices[i];
+    _.forEach(face.getVertices(), v => {
       const rotated =
-        angle === 0 ? vertex : rotateAround(vertex, face.normalRay(), angle);
+        angle === 0 ? v.vec : rotateAround(v.vec, face.normalRay(), angle);
       const scale = (resizedLength - baseLength) * sideLength;
-      result[vIndex] = rotated.add(normal.scale(scale)).toArray();
+      result[v.index] = rotated.add(normal.scale(scale)).toArray();
     });
   });
   return result;
@@ -132,8 +131,7 @@ export function getSnubAngle(polyhedron: Polyhedron, numSides: number) {
       isExpandedFace(polyhedron, face, numSides) &&
       !face.inSet(face0AdjacentFaces),
   );
-  const [v0, v1] = face0.vertices;
-  const midpoint = getMidpoint(v0, v1);
+  const midpoint = face0.directedEdgeObj(0).midpoint();
   const face1 = _.minBy(snubFaces, face =>
     midpoint.distanceTo(face.centroid()),
   );

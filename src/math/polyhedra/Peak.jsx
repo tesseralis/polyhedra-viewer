@@ -2,11 +2,11 @@
 
 import _ from 'lodash';
 import { isPlanar } from 'math/linAlg';
-import type { Edge } from './solidTypes';
 
 import Polyhedron from './Polyhedron';
 import Face from './Face';
 import Vertex from './Vertex';
+import Edge from './Edge';
 
 type PeakType = 'pyramid' | 'cupola' | 'rotunda' | 'fastigium' | 'prism';
 type FaceConfiguration = { [string]: number };
@@ -106,9 +106,7 @@ export default class Peak {
       const faceCount = _.countBy(vertex.adjacentFaces(), 'numSides');
       return _.isEqual(faceCount, this.faceConfiguration());
     });
-    return (
-      matchFaces && isPlanar(this.polyhedron.vertexVectors(this.boundary()))
-    );
+    return matchFaces && isPlanar(_.map(this.boundaryVertices(), 'vec'));
   }
 }
 const Pyramid = withMapper('getVertices')(
@@ -128,24 +126,19 @@ const Pyramid = withMapper('getVertices')(
   },
 );
 
-const Fastigium = withMapper('edges')(
+const Fastigium = withMapper('getEdges')(
   class extends Peak {
     edge: Edge;
 
     constructor(polyhedron, edge) {
-      super(
-        polyhedron,
-        edge.map(vIndex => polyhedron.getVertices()[vIndex]),
-        'fastigium',
-      );
+      super(polyhedron, edge.vertices, 'fastigium');
       this.edge = edge;
     }
 
     faceConfiguration = () => ({ '3': 1, '4': 2 });
 
     topPoint() {
-      const [v1, v2] = this.polyhedron.vertexVectors(this.edge);
-      return v1.add(v2).scale(0.5);
+      return this.edge.midpoint();
     }
   },
 );

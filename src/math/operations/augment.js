@@ -2,7 +2,7 @@
 import _ from 'lodash';
 
 import { Polyhedron, Face } from 'math/polyhedra';
-import { vec, getPlane, PRECISION } from 'math/linAlg';
+import { vec, PRECISION } from 'math/linAlg';
 import { find, getCyclic, getSingle, cartesian } from 'util.js';
 
 import { hasMultiple, deduplicateVertices } from './operationUtils';
@@ -198,8 +198,7 @@ function isAligned(polyhedron, base, underside, gyrate, augmentType) {
 
 // Flatten a polyhedron at the given face
 function flatten(polyhedron, face) {
-  const faceVectors = face.vertices;
-  const plane = getPlane(faceVectors);
+  const plane = face.plane();
   const newVertices = polyhedron
     .getVertices()
     .map(v => plane.getProjectedPoint(v.vec).toArray());
@@ -211,7 +210,7 @@ function doAugment(polyhedron, base, using, gyrate, mock = false) {
   const n = base.numSides;
   const prefix = using[0];
   const index = using.substring(1);
-  const baseVertices = base.vertices;
+  const baseV0 = base.getVertices()[0].vec;
   const baseCenter = base.centroid();
   const sideLength = base.edgeLength();
   const baseNormal = base.normal();
@@ -233,7 +232,7 @@ function doAugment(polyhedron, base, using, gyrate, mock = false) {
     const cross = undersideNormal.cross(baseNormal).getNormalized();
     // If they're the same (e.g. augmenting something with itself), use a random vertex on the base
     if (cross.magnitude() < PRECISION) {
-      return baseVertices[0].sub(baseCenter).getNormalized();
+      return baseV0.sub(baseCenter).getNormalized();
     }
     return cross;
   })();
@@ -247,7 +246,7 @@ function doAugment(polyhedron, base, using, gyrate, mock = false) {
       .getRotatedAroundAxis(alignBasesNormal, alignBasesAngle - Math.PI);
   });
 
-  const translatedV0 = baseVertices[0].sub(baseCenter);
+  const translatedV0 = baseV0.sub(baseCenter);
   const baseIsAligned = isAligned(
     polyhedron,
     base,
