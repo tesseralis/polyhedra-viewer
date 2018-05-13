@@ -5,6 +5,7 @@ import { Vec3D } from 'toxiclibsjs/geom';
 import { replace, getCyclic } from 'util.js';
 import Polyhedron from './Polyhedron';
 import { VIndex, FIndex, Edge } from './solidTypes';
+import EdgeObj from './Edge';
 import {
   PRECISION,
   getPlane,
@@ -60,6 +61,15 @@ export default class Face {
     });
   }
 
+  edges(): EdgeObj[] {
+    return _.map(this.face, (vertex, i) => {
+      return new EdgeObj(
+        this.polyhedron,
+        ...getEdge(vertex, getCyclic(this.face, i + 1)),
+      );
+    });
+  }
+
   directedEdge(i: number) {
     const vIndex = getCyclic(this.face, i);
     return [vIndex, getCyclic(this.face, i + 1)];
@@ -67,6 +77,15 @@ export default class Face {
 
   directedEdges() {
     return _.map(this.face, (vIndex, i) => this.directedEdge(i));
+  }
+
+  // FIXME
+  directedEdgeObj(i: number) {
+    return new EdgeObj(this.polyhedron, ...this.directedEdge(i));
+  }
+
+  directedEdgeObjs() {
+    return _.map(this.face, (vIndex, i) => this.directedEdgeObj(i));
   }
 
   numUniqueSides() {
@@ -92,8 +111,16 @@ export default class Face {
     return _.some(faces, face => this.equals(face));
   }
 
+  indexIn(faces: Face[]) {
+    return _.findIndex(faces, face => this.equals(face));
+  }
+
   adjacentFaces() {
     return this.polyhedron.faceGraph()[this.fIndex];
+  }
+
+  directedAdjacentFaces() {
+    return _.map(this.directedEdgeObjs(), edge => edge.adjacentFaces()[1]);
   }
 
   edgeLength() {

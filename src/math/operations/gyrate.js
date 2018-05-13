@@ -1,7 +1,7 @@
 // @flow
 import _ from 'lodash';
 import { getNormalRay, rotateAround } from 'math/linAlg';
-import { Polyhedron, Peak } from 'math/polyhedra';
+import { Peak } from 'math/polyhedra';
 import type { Operation } from './operationTypes';
 import { deduplicateVertices } from './operationUtils';
 import { mapObject } from 'util.js';
@@ -41,10 +41,9 @@ function applyGyrate(polyhedron, { peak }) {
     });
   });
 
-  const mockPolyhedron = Polyhedron.of(
-    polyhedron.vertices.concat(newBoundaryVertices),
-    mockFaces,
-  );
+  const mockPolyhedron = polyhedron
+    .addVertices(newBoundaryVertices)
+    .withFaces(mockFaces);
 
   const newVertices = mockPolyhedron.vertexVectors().map((v, vIndex) => {
     if (

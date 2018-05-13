@@ -1,15 +1,16 @@
 // @flow
 import _ from 'lodash';
 import { Vec3D } from 'toxiclibsjs/geom';
-import { find, getCyclic } from 'util.js';
+import { find } from 'util.js';
 import { isValidSolid, getSolidData } from 'data';
-import { vec, getMidpoint, getCentroid } from 'math/linAlg';
+import { vec, getCentroid } from 'math/linAlg';
 import type { Vector } from 'math/linAlg';
 import type { Vertex, Face, Edge, VIndex } from './solidTypes';
 
 import Peak from './Peak';
 import FaceObj from './Face';
 import VertexObj from './Vertex';
+import EdgeObj from './Edge';
 
 interface BasePolyhedron {
   vertices: Vertex[];
@@ -73,12 +74,16 @@ export default class Polyhedron {
     return this.faceObjs[0];
   }
 
+  getVertices = () => {
+    return this.vertexObjs;
+  };
+
   getFaces = () => {
     return this.faceObjs;
   };
 
-  getVertices = () => {
-    return this.vertexObjs;
+  getEdges = () => {
+    return _.map(this.edges, ([a, b]) => new EdgeObj((this: any), a, b));
   };
 
   biggestFace() {
@@ -147,23 +152,6 @@ export default class Polyhedron {
       .value();
   }
 
-  directedAdjacentFaces(vIndex: VIndex) {
-    const touchingFaces = this.adjacentFaces(vIndex);
-    const result = [];
-    let next: FaceObj = touchingFaces[0];
-    const checkVertex = (f: FaceObj) =>
-      next.prevVertex(vIndex) === f.nextVertex(vIndex);
-    do {
-      result.push(next);
-      next = find(touchingFaces, checkVertex);
-    } while (result.length < touchingFaces.length);
-    return result;
-  }
-  // Return the number of faces by side for the given vertex
-  adjacentFaceCount(vIndex: VIndex) {
-    return _.countBy(this.adjacentFaces(vIndex), 'numSides');
-  }
-
   // Get the vertices adjacent to this set of vertices
   adjacentVertexIndices(...vIndices: VIndex[]) {
     return _(vIndices)
@@ -182,14 +170,24 @@ export default class Polyhedron {
       .value();
   }
 
+  vertexObjGraph = _.memoize(() => {
+    const graph = {};
+    _.forEach(this.getFaces, face => {
+      _.forEach(face.directedEdges(), edge => {
+        graph[edge.a.index].push(edge.b);
+      });
+    });
+    return graph;
+  });
+
   vertexGraph = _.memoize(() => {
     const graph = {};
-    _.forEach(this.faces, face => {
-      _.forEach(face, (vIndex: VIndex, i: number) => {
-        if (!graph[vIndex]) {
-          graph[vIndex] = [];
+    _.forEach(this.getFaces(), face => {
+      _.forEach(face.directedEdges(), ([a, b]) => {
+        if (!graph[a]) {
+          graph[a] = [];
         }
-        graph[vIndex].push(getCyclic(face, i + 1));
+        graph[a].push(b);
       });
     });
     return graph;
@@ -207,8 +205,8 @@ export default class Polyhedron {
 
   faceGraph = _.memoize(() => {
     const graph = {};
-    _.forEach(this.edges, edge => {
-      const [f1, f2] = this.edgeFaces(edge);
+    _.forEach(this.getEdges(), edge => {
+      const [f1, f2] = edge.adjacentFaces();
       if (!graph[f1.fIndex]) graph[f1.fIndex] = [];
       if (!graph[f2.fIndex]) graph[f2.fIndex] = [];
       graph[f1.fIndex].push(f2);
@@ -279,27 +277,6 @@ export default class Polyhedron {
 
   distanceToCenter() {
     return this.getFace().distanceToCenter();
-  }
-
-  // Get the faces adjacent to this edge, with the directed face first
-  edgeFaces([v1, v2]: Edge) {
-    const graph = this.directedEdgeToFaceGraph();
-    return [graph[v1][v2], graph[v2][v1]];
-  }
-
-  getDihedralAngle(edge: Edge) {
-    const [v1, v2] = this.vertexVectors(edge);
-    const midpoint = getMidpoint(v1, v2);
-    const [c1, c2] = this.edgeFaces(edge).map(face =>
-      face.centroid().sub(midpoint),
-    );
-
-    if (!c1 || !c2) {
-      throw new Error(`The edge ${edge} is not connected to two faces.`);
-      // return 2 * Math.PI;
-    }
-
-    return c1.angleBetween(c2, true);
   }
 
   faceAdjacencyList() {

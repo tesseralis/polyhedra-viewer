@@ -16,9 +16,8 @@ const excludedOperations = {};
 
 function isProperPolyhedron(polyhedron) {
   let prevSideLength: ?number;
-  for (let edge of polyhedron.edges) {
-    const [v1, v2] = polyhedron.vertexVectors(edge);
-    const sideLength: number = v1.distanceTo(v2);
+  for (let edge of polyhedron.getEdges()) {
+    const sideLength: number = edge.length();
     if (prevSideLength !== undefined) {
       if (_.isNaN(sideLength)) {
         console.log(`edge ${edge} has length NaN`);
@@ -33,7 +32,7 @@ function isProperPolyhedron(polyhedron) {
     }
     prevSideLength = sideLength;
     // Make sure the whole thing is convex
-    if (polyhedron.getDihedralAngle(edge) > Math.PI - PRECISION) {
+    if (edge.dihedralAngle() > Math.PI - PRECISION) {
       console.log(`polyhedron concave at edge ${edge}`);
       return false;
     }

@@ -108,17 +108,17 @@ function getCumulateFaces(polyhedron, faceType) {
 
 function calculateCumulateDist(polyhedron, face, edge) {
   const apothem = face.apothem();
-  const theta = Math.PI - polyhedron.getDihedralAngle(edge);
+  const theta = Math.PI - edge.dihedralAngle();
   return apothem * Math.tan(theta);
 }
 
 function getCumulateDist(polyhedron, face) {
   if (isBevelled(polyhedron)) {
-    return _.meanBy(face.getEdges(), edge =>
+    return _.meanBy(face.edges(), edge =>
       calculateCumulateDist(polyhedron, face, edge),
     );
   }
-  return calculateCumulateDist(polyhedron, face, face.getEdges()[0]);
+  return calculateCumulateDist(polyhedron, face, face.edges()[0]);
 }
 
 function getVertexToAdd(polyhedron, face) {

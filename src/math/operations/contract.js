@@ -80,10 +80,12 @@ function getCuboctahedronContractFaces(polyhedron) {
     if (_.includes(invalid, next.fIndex)) {
       continue;
     }
-    _.forEach(polyhedron.adjacentFaces(...next.vIndices()), face => {
-      if (face.numSides === 3) {
-        invalid.push(face.fIndex);
-      }
+    _.forEach(next.getVertices(), vertex => {
+      _.forEach(vertex.adjacentFaces(), face => {
+        if (face.numSides === 3) {
+          invalid.push(face.fIndex);
+        }
+      });
     });
     result.push(next);
   }

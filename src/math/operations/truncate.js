@@ -46,8 +46,9 @@ function getRectifiedMultiplier(type) {
   }
 }
 
-function duplicateVertex(newPolyhedron, polyhedron, vIndex) {
-  const adjacentFaces = polyhedron.directedAdjacentFaces(vIndex);
+function duplicateVertex(newPolyhedron, polyhedron, vertex) {
+  const adjacentFaces = vertex.directedAdjacentFaces();
+  const vIndex = vertex.index;
   const pivot = _.last(adjacentFaces);
   const numVertices = newPolyhedron.numVertices();
 
@@ -77,12 +78,11 @@ function duplicateVertex(newPolyhedron, polyhedron, vIndex) {
 }
 
 function duplicateVertices(polyhedron) {
-  const { vertices, faces } = polyhedron.vertices.reduce(
-    (newPolyhedron, vertex, vIndex) => {
-      return duplicateVertex(newPolyhedron, polyhedron, vIndex);
-    },
-    polyhedron,
-  );
+  const { vertices, faces } = polyhedron
+    .getVertices()
+    .reduce((newPolyhedron, vertex) => {
+      return duplicateVertex(newPolyhedron, polyhedron, vertex);
+    }, polyhedron);
   // Create a new one so we recalculate the edges
   return Polyhedron.of(vertices, faces);
 }

@@ -1,26 +1,28 @@
 // @flow
 import _ from 'lodash';
 import { getSingle, getCyclic } from 'util.js';
-import type { VIndex } from 'math/polyhedra';
-import { Peak, Polyhedron } from 'math/polyhedra';
+import { Peak, Polyhedron, Vertex, Edge } from 'math/polyhedra';
 
 /** Return the minimum number of faces between the given sets of vertices */
 export function faceDistanceBetweenVertices(
   polyhedron: Polyhedron,
-  vIndices1: VIndex[],
-  vIndices2: VIndex[],
+  vertices1: Vertex[],
+  vertices2: Vertex[],
   exclude: number[] = [],
 ) {
   const v2fGraph = polyhedron.vertexToFaceGraph();
-  let foundVertexIndices = vIndices1;
+  let foundVertices = vertices1;
   let distance = 0;
-  while (_.intersection(foundVertexIndices, vIndices2).length === 0) {
-    foundVertexIndices = _(foundVertexIndices)
-      .flatMap(vIndex => v2fGraph[vIndex])
+  while (
+    _.intersection(_.map(foundVertices, 'index'), _.map(vertices2, 'index'))
+      .length === 0
+  ) {
+    foundVertices = _(foundVertices)
+      .flatMap(vertex => v2fGraph[vertex.index])
       .filter(face => !_.includes(exclude, face.numSides))
-      .map(face => face.vIndices())
+      .map(face => face.getVertices())
       .flatten()
-      .uniq()
+      .uniqBy('index')
       .value();
     distance++;
 
@@ -32,24 +34,26 @@ export function faceDistanceBetweenVertices(
 }
 
 export function getPeakAlignment(polyhedron: Polyhedron, peak: Peak) {
-  const peakBoundary = peak.boundary();
+  // const peakBoundary = peak.boundary();
+  const peakBoundary = peak.boundaryVertices();
 
   const isRhombicosidodecahedron = peak.type === 'cupola';
 
-  const orthoIndices = isRhombicosidodecahedron
+  const orthoPeaks = isRhombicosidodecahedron
     ? _.filter(
         Peak.getAll(polyhedron),
         peak => getCupolaGyrate(polyhedron, peak) === 'ortho',
       )
     : [];
-  const diminishedIndices =
-    orthoIndices.length > 0
-      ? getSingle(orthoIndices).boundary()
-      : polyhedron.biggestFace().vIndices();
+  // const diminishedIndices =
+  const diminishedVertices =
+    orthoPeaks.length > 0
+      ? getSingle(orthoPeaks).boundaryVertices()
+      : polyhedron.biggestFace().getVertices();
 
   return faceDistanceBetweenVertices(
     polyhedron,
-    diminishedIndices,
+    diminishedVertices,
     peakBoundary,
   ) >= (isRhombicosidodecahedron ? 2 : 1)
     ? 'para'
@@ -64,8 +68,9 @@ function getCyclicPairs<T>(array: T[]) {
 
 export function getCupolaGyrate(polyhedron: Polyhedron, peak: Peak) {
   const boundary = peak.boundary();
-  const isOrtho = _.every(getCyclicPairs(boundary), edge => {
-    const [n1, n2] = _.map(polyhedron.edgeFaces(edge), 'numSides');
+  const isOrtho = _.every(getCyclicPairs(boundary), ([a, b]) => {
+    const edge = new Edge(polyhedron, a, b);
+    const [n1, n2] = _.map(edge.adjacentFaces(), 'numSides');
     return (n1 === 4) === (n2 === 4);
   });
   return isOrtho ? 'ortho' : 'gyro';

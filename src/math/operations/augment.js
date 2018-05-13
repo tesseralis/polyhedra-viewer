@@ -3,7 +3,7 @@ import _ from 'lodash';
 
 import { Polyhedron, Face } from 'math/polyhedra';
 import { vec, getPlane, PRECISION } from 'math/linAlg';
-import { find, getSingle, cartesian } from 'util.js';
+import { find, getCyclic, getSingle, cartesian } from 'util.js';
 
 import { hasMultiple, deduplicateVertices } from './operationUtils';
 import { faceDistanceBetweenVertices } from './applyOptionUtils';
@@ -61,13 +61,13 @@ const augmentTypes = {
 // Return "meta" or "para", or null
 function getAugmentAlignment(polyhedron, face) {
   // get the existing peak boundary
-  const peakBoundary = getSingle(polyhedron.peaks()).boundary();
+  const peakBoundary = getSingle(polyhedron.peaks()).boundaryVertices();
   const isHexagonalPrism = _.some(polyhedron.getFaces(), { numSides: 6 });
 
   // calculate the face distance to the peak's boundary
   return faceDistanceBetweenVertices(
     polyhedron,
-    face.vIndices(),
+    face.getVertices(),
     peakBoundary,
     isHexagonalPrism ? [6] : [],
   ) > 1
@@ -81,26 +81,26 @@ function getPossibleAugmentees(n) {
 }
 
 // Checks to see if the polyhedron can be augmented at the base while remaining convex
-function canAugmentWith(polyhedron, base, augmentee, offset) {
+function canAugmentWith(base, augmentee, offset) {
   const n = base.numSides;
   const underside = find(augmentee.getFaces(), { numSides: n });
 
-  return _.every(base.directedEdges(), (edge, i) => {
-    const baseAngle = polyhedron.getDihedralAngle(edge);
+  return _.every(base.directedEdgeObjs(), (edge, i) => {
+    const baseAngle = edge.dihedralAngle();
 
-    const edge2 = underside.directedEdge(i - 1 + offset);
-    const augmenteeAngle = augmentee.getDihedralAngle(edge2);
+    const edge2 = underside.directedEdgeObj(i - 1 + offset);
+    const augmenteeAngle = edge2.dihedralAngle();
 
     return baseAngle + augmenteeAngle < Math.PI - PRECISION;
   });
 }
 
-function canAugment(polyhedron, base) {
+function canAugment(base) {
   const n = base.numSides;
   const augmentees = getPossibleAugmentees(n);
   for (let augmentee of augmentees) {
     for (let offset of [0, 1]) {
-      if (canAugmentWith(polyhedron, base, augmentee, offset)) {
+      if (canAugmentWith(base, augmentee, offset)) {
         return true;
       }
     }
@@ -109,7 +109,7 @@ function canAugment(polyhedron, base) {
 }
 
 function getAugmentGraph(polyhedron) {
-  return polyhedron.getFaces().map(face => canAugment(polyhedron, face));
+  return polyhedron.getFaces().map(face => canAugment(face));
 }
 
 function getAugmentFace(polyhedron, graph, point) {
@@ -142,14 +142,11 @@ function getBaseType(base) {
   }
 }
 
-// Get the opposite side of the given prism base
-// ensuring that the vertex indices match up
-function getOppositePrismSide(polyhedron, base) {
-  return _.map(base, vIndex => {
-    // Get the neighbor of each vertex that isn't also in the prism
-    const nbrs = polyhedron.adjacentVertexIndices(vIndex);
-    return _.find(nbrs, vIndex2 => !_.includes(base, vIndex2));
-  });
+function getOppositePrismFace(polyhedron, base) {
+  const square = base.directedAdjacentFaces()[0];
+  const squareAdjFaces = square.directedAdjacentFaces();
+  const i = base.indexIn(squareAdjFaces);
+  return getCyclic(squareAdjFaces, i + 2);
 }
 
 function isCupolaRotunda(baseType, augmentType) {
@@ -157,14 +154,7 @@ function isCupolaRotunda(baseType, augmentType) {
 }
 
 // Return true if the base and augmentee are aligned
-function isAligned(
-  polyhedron,
-  base,
-  augmentee,
-  underside,
-  gyrate,
-  augmentType,
-) {
+function isAligned(polyhedron, base, underside, gyrate, augmentType) {
   if (_.includes(['pyramid', 'prism', 'antiprism'], augmentType)) return true;
   const baseType = getBaseType(base);
   if (baseType === 'pyramid' || baseType === 'antiprism') {
@@ -179,13 +169,11 @@ function isAligned(
     throw new Error(`Must define 'gyrate' for augmenting ${baseType} `);
   }
 
-  const faceToCheck =
+  const adjFace =
     baseType === 'prism'
-      ? getOppositePrismSide(polyhedron, base.vIndices())
-      : base.vIndices();
-
-  const [adjFace] = polyhedron.edgeFaces([faceToCheck[1], faceToCheck[0]]);
-  const [alignedFace] = augmentee.edgeFaces([underside[0], _.last(underside)]);
+      ? getOppositePrismFace(polyhedron, base)
+      : base.directedAdjacentFaces()[0];
+  const alignedFace = getCyclic(underside.directedAdjacentFaces(), -1);
 
   if (baseType === 'rhombicosidodecahedron') {
     const isOrtho = (adjFace.numSides !== 4) === (alignedFace.numSides !== 4);
@@ -264,8 +252,7 @@ function doAugment(polyhedron, base, using, gyrate, mock = false) {
   const baseIsAligned = isAligned(
     polyhedron,
     base,
-    augmentee,
-    undersideFace,
+    underside,
     gyrate,
     augmentType,
   );
@@ -381,9 +368,7 @@ export const augment: Operation<AugmentOptions> = {
     const rawGyrateOpts = _.compact(_.uniq(_.map(relations, 'gyrate')));
     const gyrateOpts = rawGyrateOpts.length === 2 ? rawGyrateOpts : [undefined];
     const usingOpts = _.compact(_.uniq(_.map(relations, 'using')));
-    const faceOpts = polyhedron
-      .getFaces()
-      .filter(face => canAugment(polyhedron, face));
+    const faceOpts = polyhedron.getFaces().filter(face => canAugment(face));
 
     return cartesian(gyrateOpts, usingOpts, faceOpts).map(
       ([gyrate, using, face]) => ({ gyrate, using, face }),

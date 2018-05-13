@@ -1,7 +1,9 @@
 import Polyhedron from './Polyhedron';
-import Peak from './Peak';
+import Vertex from './Vertex';
 import Face from './Face';
+import Edge from './Edge';
+import Peak from './Peak';
 
-export { Polyhedron, Face, Peak };
+export { Polyhedron, Vertex, Face, Edge, Peak };
 
 export * from './solidTypes';

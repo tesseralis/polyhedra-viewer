@@ -92,13 +92,18 @@ export default class Peak {
     );
   });
 
+  // FIXME
   boundary = _.memoize(() => {
     return getBoundary(this.faces());
   });
 
+  boundaryVertices() {
+    return this.boundary().map(vIndex => this.polyhedron.vertexObjs[vIndex]);
+  }
+
   isValid() {
     const matchFaces = _.every(this.innerVertices(), vertex => {
-      const faceCount = this.polyhedron.adjacentFaceCount(vertex.index);
+      const faceCount = _.countBy(vertex.adjacentFaces(), 'numSides');
       return _.isEqual(faceCount, this.faceConfiguration());
     });
     return (
