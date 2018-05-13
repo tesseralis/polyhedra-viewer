@@ -70,6 +70,10 @@ export default class Polyhedron {
     return _.pick(this, ['vertices', 'faces', 'edges', 'name']);
   }
 
+  getVertex() {
+    return this.vertexObjs[0];
+  }
+
   getFace() {
     return this.faceObjs[0];
   }
@@ -143,13 +147,6 @@ export default class Polyhedron {
   // Get the edge length of this polyhedron, assuming equal edges
   edgeLength() {
     return this.getFace().edgeLength();
-  }
-
-  adjacentFaces(...vIndices: VIndex[]) {
-    return _(vIndices)
-      .flatMap(vIndex => this.vertexToFaceGraph()[vIndex])
-      .uniqBy(face => face.fIndex)
-      .value();
   }
 
   // Get the vertices adjacent to this set of vertices

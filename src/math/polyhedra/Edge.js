@@ -20,7 +20,7 @@ export default class Edge {
   }
 
   length() {
-    return this.va.value.distanceTo(this.vb.value);
+    return this.va.vec.distanceTo(this.vb.vec);
   }
 
   twin() {
@@ -35,7 +35,7 @@ export default class Edge {
   }
 
   dihedralAngle() {
-    const midpoint = getMidpoint(this.va.value, this.vb.value);
+    const midpoint = getMidpoint(this.va.vec, this.vb.vec);
     const [c1, c2] = this.adjacentFaces().map(face =>
       face.centroid().sub(midpoint),
     );

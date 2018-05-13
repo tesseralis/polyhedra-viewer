@@ -14,19 +14,18 @@ export const hasMultiple = (relations: any, property: any) =>
 // Remove vertices (and faces) from the polyhedron when they are all the same
 export function deduplicateVertices(polyhedron: Polyhedron) {
   // group vertex indices by same
-  const vertices = polyhedron.vertexVectors();
-  const points = [];
+  const unique = [];
   const oldToNew = {};
 
-  _.forEach(vertices, (vertex, vIndex: VIndex) => {
-    const pointIndex = _.find(points, point =>
-      vertex.equalsWithTolerance(polyhedron.vertexVector(point), PRECISION),
+  _.forEach(polyhedron.getVertices(), (v, vIndex: VIndex) => {
+    const match = _.find(unique, point =>
+      v.vec.equalsWithTolerance(point.vec, PRECISION),
     );
-    if (pointIndex === undefined) {
-      points.push(vIndex);
+    if (match === undefined) {
+      unique.push(v);
       oldToNew[vIndex] = vIndex;
     } else {
-      oldToNew[vIndex] = pointIndex;
+      oldToNew[vIndex] = match.index;
     }
   });
 
@@ -124,13 +123,14 @@ export function getSnubAngle(polyhedron: Polyhedron, numSides: number) {
       isExpandedFace(polyhedron, face, numSides),
     ) || polyhedron.getFace();
 
+  const face0AdjacentFaces = face0.vertexAdjacentFaces();
   const faceCentroid = face0.centroid();
   const faceNormal = face0.normal();
   const snubFaces = _.filter(
     polyhedron.getFaces(),
     face =>
       isExpandedFace(polyhedron, face, numSides) &&
-      !face.inSet(polyhedron.adjacentFaces(...face0.vIndices())),
+      !face.inSet(face0AdjacentFaces),
   );
   const [v0, v1] = face0.vertices;
   const midpoint = getMidpoint(v0, v1);

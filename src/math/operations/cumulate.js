@@ -27,15 +27,16 @@ function getFamily(polyhedron) {
 
 // Return if the polyhedron is rectified
 function isRectified(polyhedron) {
-  return polyhedron.adjacentFaces(0).length === 4;
+  return polyhedron.getVertex().adjacentFaces().length === 4;
 }
 
 function isBevelled(polyhedron) {
   return polyhedron.faceTypes().length === 3;
 }
 
-function duplicateVertex(newPolyhedron, polyhedron, faces, vIndex) {
-  const adjacentFaces = polyhedron.adjacentFaces(vIndex);
+function duplicateVertex(newPolyhedron, polyhedron, faces, vertex) {
+  const vIndex = vertex.index;
+  const adjacentFaces = vertex.adjacentFaces();
   const pivot = find(adjacentFaces, nbr => nbr.inSet(faces));
   const newVertexIndex = newPolyhedron.numVertices();
 
@@ -71,17 +72,16 @@ function duplicateVertex(newPolyhedron, polyhedron, faces, vIndex) {
 }
 
 function duplicateVertices(polyhedron, facesToCumulate) {
-  const { vertices, faces } = polyhedron.vertices.reduce(
-    (newPolyhedron, vertex, vIndex) => {
+  const { vertices, faces } = polyhedron
+    .getVertices()
+    .reduce((newPolyhedron, vertex) => {
       return duplicateVertex(
         newPolyhedron,
         polyhedron,
         facesToCumulate,
-        vIndex,
+        vertex,
       );
-    },
-    polyhedron,
-  );
+    }, polyhedron);
   // Create a new one so we recalculate the edges
   return Polyhedron.of(vertices, faces);
 }

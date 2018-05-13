@@ -73,7 +73,6 @@ export default class Peak {
 
   constructor(polyhedron: Polyhedron, vertices: Vertex[], type: PeakType) {
     this.polyhedron = polyhedron;
-    // this.vIndices = vIndices;
     this.vertices = vertices;
     this.type = type;
   }
@@ -87,9 +86,10 @@ export default class Peak {
   faceConfiguration: () => FaceConfiguration;
 
   faces = _.memoize(() => {
-    return this.polyhedron.adjacentFaces(
-      ..._.map(this.innerVertices(), 'index'),
-    );
+    return _(this.innerVertices())
+      .flatMap(v => v.adjacentFaces())
+      .uniqBy('fIndex')
+      .value();
   });
 
   // FIXME
@@ -123,7 +123,7 @@ const Pyramid = withMapper('getVertices')(
     faceConfiguration = () => ({ '3': this.faces().length });
 
     topPoint() {
-      return this.vertex.value;
+      return this.vertex.vec;
     }
   },
 );

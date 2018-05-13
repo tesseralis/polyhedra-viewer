@@ -198,12 +198,11 @@ function isAligned(polyhedron, base, underside, gyrate, augmentType) {
 
 // Flatten a polyhedron at the given face
 function flatten(polyhedron, face) {
-  const vertexVectors = polyhedron.vertexVectors();
   const faceVectors = face.vertices;
   const plane = getPlane(faceVectors);
-  const newVertices = vertexVectors.map(v =>
-    plane.getProjectedPoint(v).toArray(),
-  );
+  const newVertices = polyhedron
+    .getVertices()
+    .map(v => plane.getProjectedPoint(v.vec).toArray());
   return polyhedron.withVertices(newVertices);
 }
 
@@ -223,7 +222,7 @@ function doAugment(polyhedron, base, using, gyrate, mock = false) {
   augmentee = mock ? flatten(augmentee, underside) : augmentee;
 
   // rotate and translate so that the face is next to our face
-  const augmenteeVertices = augmentee.vertexVectors();
+  const augmenteeVertices = augmentee.getVertices();
 
   const undersideFace = underside.vIndices();
   const undersideNormal = underside.normal();
@@ -242,7 +241,7 @@ function doAugment(polyhedron, base, using, gyrate, mock = false) {
   const alignBasesAngle = baseNormal.angleBetween(undersideNormal, true) || 0;
 
   const alignedAugmenteeVertices = augmenteeVertices.map(v => {
-    return v
+    return v.vec
       .sub(undersideCenter)
       .scale(sideLength / augmenteeSideLength)
       .getRotatedAroundAxis(alignBasesNormal, alignBasesAngle - Math.PI);

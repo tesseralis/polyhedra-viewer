@@ -15,44 +15,40 @@ interface GyrateOptions {
 
 function applyGyrate(polyhedron, { peak }) {
   // get adjacent faces
-  const boundary = peak.boundary();
+  const boundary = peak.boundaryVertices();
 
   // rotate the cupola/rotunda top
-  const boundaryVertices = boundary.map(
-    vIndex => polyhedron.vertexVectors()[vIndex],
-  );
-  const normalRay = getNormalRay(boundaryVertices);
+  const boundaryVectors = _.map(boundary, 'vec');
+  const normalRay = getNormalRay(boundaryVectors);
   const theta = TAU / boundary.length;
 
-  const newBoundaryVertices = boundary.map(
-    vIndex => polyhedron.vertices[vIndex],
-  );
-  const oldToNew = mapObject(boundary, (vIndex, i) => [vIndex, i]);
+  const newBoundaryVertices = _.map(boundary, 'value');
+  const oldToNew = mapObject(boundary, (vertex, i) => [vertex.index, i]);
 
   // mock faces for animation
-  const mockFaces = polyhedron.getFaces().map(face => {
+  const newFaces = polyhedron.getFaces().map(face => {
     if (!face.inSet(peak.faces())) {
       return face.vIndices();
     }
-    return face.vIndices().map((vIndex, i) => {
-      return _.includes(boundary, vIndex)
-        ? polyhedron.numVertices() + oldToNew[vIndex]
-        : vIndex;
+    return face.getVertices().map(vertex => {
+      return vertex.inSet(boundary)
+        ? polyhedron.numVertices() + oldToNew[vertex.index]
+        : vertex.index;
     });
   });
 
   const mockPolyhedron = polyhedron
     .addVertices(newBoundaryVertices)
-    .withFaces(mockFaces);
+    .withFaces(newFaces);
 
-  const newVertices = mockPolyhedron.vertexVectors().map((v, vIndex) => {
+  const newVertices = mockPolyhedron.getVertices().map((v, vIndex) => {
     if (
       _.includes(_.map(peak.innerVertices(), 'index'), vIndex) ||
       vIndex >= polyhedron.numVertices()
     ) {
-      return rotateAround(v, normalRay, theta).toArray();
+      return rotateAround(v.vec, normalRay, theta).toArray();
     }
-    return v.toArray();
+    return v.value;
   });
 
   // TODO the animation makes the cupola shrink and expand.

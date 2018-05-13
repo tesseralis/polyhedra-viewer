@@ -97,7 +97,7 @@ function getTruncateLength(polyhedron) {
 
 function getTruncateTransform(polyhedron, duplicated) {
   if (isPlatonic(polyhedron)) {
-    return (vertex, vIndex) => vertex;
+    return (vector, vertex) => vector;
   }
 
   // If we're doing a bevel, we need to do some fidgeting to make sure the created
@@ -115,12 +115,12 @@ function getTruncateTransform(polyhedron, duplicated) {
     reference.faceWithNumSides(6).distanceToCenter() / reference.edgeLength() -
     polyhedron.smallestFace().distanceToCenter() / newSideLength;
 
-  return (vertex, vIndex) => {
-    const nearestHexagon = find(duplicated.adjacentFaces(vIndex), {
+  return (vector, vertex) => {
+    const nearestHexagon = find(vertex.adjacentFaces(), {
       numSides: 6,
     });
     const scaled = scaleAround(
-      vertex,
+      vector,
       nearestHexagon.centroid(),
       faceResizeScale,
     );
@@ -148,10 +148,7 @@ function doTruncate(polyhedron, options: TruncateOptions = {}) {
     const v = vertex.vec;
     const v1 = find(adjacentVertices, adj => adj.vec.distanceTo(v) > PRECISION);
     const truncated = v.interpolateTo(v1.vec, rectify ? 0.5 : truncateScale);
-    return (!!transform
-      ? transform(truncated, vertex.index)
-      : truncated
-    ).toArray();
+    return (!!transform ? transform(truncated, vertex) : truncated).toArray();
   });
   const result = duplicated.withVertices(truncatedVertices);
   return {
