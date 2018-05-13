@@ -62,11 +62,11 @@ export default class Polyhedron {
   }
 
   getFace = _.memoize((fIndex: FIndex) => {
-    return new FaceObj(this, fIndex);
+    return new FaceObj((this: any), fIndex);
   });
 
   getFaces = () => {
-    return this.fIndices().map(fIndex => this.getFace(fIndex));
+    return _.map(this.faces, (face, fIndex) => this.getFace(fIndex));
   };
 
   biggestFace() {
@@ -91,10 +91,6 @@ export default class Polyhedron {
 
   vIndices = () => {
     return _.range(this.numVertices());
-  };
-
-  fIndices = () => {
-    return _.range(this.numFaces());
   };
 
   // Return the number of each type of faces of each face
