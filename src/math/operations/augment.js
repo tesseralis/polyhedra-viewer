@@ -67,7 +67,7 @@ function getAugmentAlignment(polyhedron, face) {
   // calculate the face distance to the peak's boundary
   return faceDistanceBetweenVertices(
     polyhedron,
-    face.getVertices(),
+    face.vertices,
     peakBoundary,
     isHexagonalPrism ? [6] : [],
   ) > 1
@@ -141,7 +141,7 @@ function getBaseType(base) {
   }
 }
 
-function getOppositePrismFace(polyhedron, base) {
+function getOppositePrismFace(base) {
   const square = base.directedAdjacentFaces()[0];
   const squareAdjFaces = square.directedAdjacentFaces();
   const i = base.indexIn(squareAdjFaces);
@@ -170,7 +170,7 @@ function isAligned(polyhedron, base, underside, gyrate, augmentType) {
 
   const adjFace =
     baseType === 'prism'
-      ? getOppositePrismFace(polyhedron, base)
+      ? getOppositePrismFace(base)
       : base.directedAdjacentFaces()[0];
   const alignedFace = getCyclic(underside.directedAdjacentFaces(), -1);
 
@@ -209,7 +209,7 @@ function doAugment(polyhedron, base, using, gyrate, mock = false) {
   const n = base.numSides;
   const prefix = using[0];
   const index = using.substring(1);
-  const baseV0 = base.getVertices()[0].vec;
+  const baseV0 = base.vertices[0].vec;
   const baseCenter = base.centroid();
   const sideLength = base.edgeLength();
   const baseNormal = base.normal();
@@ -222,7 +222,6 @@ function doAugment(polyhedron, base, using, gyrate, mock = false) {
   // rotate and translate so that the face is next to our face
   const augmenteeVertices = augmentee.getVertices();
 
-  const undersideFace = underside.vIndices();
   const undersideNormal = underside.normal();
   const undersideCenter = underside.centroid();
   const augmenteeSideLength = underside.edgeLength();
@@ -254,7 +253,7 @@ function doAugment(polyhedron, base, using, gyrate, mock = false) {
     augmentType,
   );
   const offset = baseIsAligned ? 0 : 1;
-  const alignedV0 = alignedAugmenteeVertices[undersideFace[offset]];
+  const alignedV0 = alignedAugmenteeVertices[underside.vertices[offset].index];
   // align the first vertex of the base face to the first vertex of the underside face
   const alignVerticesAngle = translatedV0.angleBetween(alignedV0, true) || 0;
   const transformedAugmenteeVertices = alignedAugmenteeVertices.map(v => {

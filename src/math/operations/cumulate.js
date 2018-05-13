@@ -58,11 +58,11 @@ function duplicateVertex(newPolyhedron, polyhedron, faces, vertex) {
       }
 
       // If this is the face next to the pivot, insert the duplicated point to the left of the pivot
-      if (_.includes(originalFace.vIndices(), pivot.nextVertex(vIndex))) {
+      if (pivot.nextVertex(vertex).inSet(originalFace.vertices)) {
         return face.replaceVertex(vIndex, vIndex, newVertexIndex);
       }
 
-      if (_.includes(originalFace.vIndices(), pivot.prevVertex(vIndex))) {
+      if (pivot.prevVertex(vertex).inSet(originalFace.vertices)) {
         return face.replaceVertex(vIndex, newVertexIndex, vIndex);
       }
 

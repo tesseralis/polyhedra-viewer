@@ -9,6 +9,7 @@ export default class Edge {
   a: VIndex;
   b: VIndex;
   id: string;
+  // FIXME this is kind of confusing
   va: Vertex;
   vb: Vertex;
 

@@ -30,10 +30,10 @@ function applyGyrate(polyhedron, { peak }) {
     if (!face.inSet(peak.faces())) {
       return face.vIndices();
     }
-    return face.getVertices().map(vertex => {
-      return vertex.inSet(boundary)
-        ? polyhedron.numVertices() + oldToNew[vertex.index]
-        : vertex.index;
+    return face.vertices.map(v => {
+      return v.inSet(boundary)
+        ? polyhedron.numVertices() + oldToNew[v.index]
+        : v.index;
     });
   });
 

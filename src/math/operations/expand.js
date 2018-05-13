@@ -67,9 +67,7 @@ function duplicateVertices(polyhedron: Polyhedron, twist?: 'left' | 'right') {
   });
 
   const remappedOriginalFaces = polyhedron.getFaces().map((face, fIndex) => {
-    return face.getVertices().map(vertex => {
-      return newVertexMapping[fIndex][vertex.index];
-    });
+    return face.vertices.map(v => newVertexMapping[fIndex][v.index]);
   });
 
   const edgeFaces = (() => {

@@ -20,7 +20,7 @@ export function faceDistanceBetweenVertices(
     foundVertices = _(foundVertices)
       .flatMap(vertex => v2fGraph[vertex.index])
       .filter(face => !_.includes(exclude, face.numSides))
-      .map(face => face.getVertices())
+      .map('vertices')
       .flatten()
       .uniqBy('index')
       .value();
@@ -48,7 +48,7 @@ export function getPeakAlignment(polyhedron: Polyhedron, peak: Peak) {
   const diminishedVertices =
     orthoPeaks.length > 0
       ? getSingle(orthoPeaks).boundaryVertices()
-      : polyhedron.biggestFace().getVertices();
+      : polyhedron.biggestFace().vertices;
 
   return faceDistanceBetweenVertices(
     polyhedron,

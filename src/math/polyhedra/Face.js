@@ -38,18 +38,15 @@ export default class Face {
     return this.face;
   }
 
-  getVertices() {
-    return this.vertices;
+  nextVertex(v: Vertex) {
+    return getCyclic(this.vertices, this.face.indexOf(v.index) + 1);
   }
 
-  nextVertex(vIndex: VIndex) {
-    return getCyclic(this.face, this.face.indexOf(vIndex) + 1);
+  prevVertex(v: Vertex) {
+    return getCyclic(this.vertices, this.face.indexOf(v.index) - 1);
   }
 
-  prevVertex(vIndex: VIndex) {
-    return getCyclic(this.face, this.face.indexOf(vIndex) - 1);
-  }
-
+  // FIXME get rid
   replaceVertex(vIndex: VIndex, ...vIndices: VIndex[]) {
     return replace(this.face, this.face.indexOf(vIndex), ...vIndices);
   }

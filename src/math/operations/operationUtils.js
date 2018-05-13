@@ -82,7 +82,7 @@ export function getResizedVertices(
   const result = [...polyhedron.vertices];
   _.forEach(faces, face => {
     const normal = face.normal();
-    _.forEach(face.getVertices(), v => {
+    _.forEach(face.vertices, v => {
       const rotated =
         angle === 0 ? v.vec : rotateAround(v.vec, face.normalRay(), angle);
       const scale = (resizedLength - baseLength) * sideLength;

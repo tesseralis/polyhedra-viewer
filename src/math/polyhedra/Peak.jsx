@@ -148,7 +148,7 @@ const Cupola = withMapper('getFaces')(
     face: Face;
 
     constructor(polyhedron, face) {
-      super(polyhedron, face.getVertices(), 'cupola');
+      super(polyhedron, face.vertices, 'cupola');
       this.face = face;
     }
 
@@ -167,7 +167,7 @@ const Rotunda = withMapper('getFaces')(
     constructor(polyhedron, face) {
       super(
         polyhedron,
-        polyhedron.adjacentVertices(...face.getVertices()),
+        polyhedron.adjacentVertices(...face.vertices),
         'rotunda',
       );
       this.face = face;

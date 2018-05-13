@@ -126,7 +126,7 @@ function getTruncateTransform(polyhedron, duplicated) {
     );
     // Our normal (heh) normal function doesn't work on just the hexagon,
     // since it has duplicated vertices
-    const verts = _.at(nearestHexagon.getVertices(), [0, 2, 4]);
+    const verts = _.at(nearestHexagon.vertices, [0, 2, 4]);
     const normal = getNormal(_.map(verts, 'vec'));
     const translated = scaled.add(
       normal.scale(normalizedResizeAmount * newSideLength),

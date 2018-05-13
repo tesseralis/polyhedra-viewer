@@ -166,8 +166,8 @@ export default class Polyhedron {
   vertexToFaceGraph = _.memoize(() => {
     const mapping = this.vertices.map(() => []);
     this.getFaces().forEach(face => {
-      face.getVertices().forEach(vertex => {
-        mapping[vertex.index].push(face);
+      face.vertices.forEach(v => {
+        mapping[v.index].push(face);
       });
     });
     return mapping;

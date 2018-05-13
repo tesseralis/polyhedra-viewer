@@ -69,7 +69,7 @@ function applyShorten(polyhedron) {
   const face = _.maxBy(faces, 'numSides');
   return removeVertices(
     polyhedron,
-    new Peak(polyhedron, face.getVertices(), 'prism'),
+    new Peak(polyhedron, face.vertices, 'prism'),
   );
 }
 

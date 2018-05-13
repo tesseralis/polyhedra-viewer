@@ -39,8 +39,7 @@ export default class Vertex {
     const touchingFaces = this.adjacentFaces();
     const result = [];
     let next = touchingFaces[0];
-    const checkVertex = f =>
-      next.prevVertex(this.index) === f.nextVertex(this.index);
+    const checkVertex = f => next.prevVertex(this).equals(f.nextVertex(this));
     do {
       result.push(next);
       next = find(touchingFaces, checkVertex);

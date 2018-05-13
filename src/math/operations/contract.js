@@ -78,7 +78,7 @@ function getCuboctahedronContractFaces(polyhedron) {
     if (_.includes(invalid, next.fIndex)) {
       continue;
     }
-    _.forEach(next.getVertices(), vertex => {
+    _.forEach(next.vertices, vertex => {
       _.forEach(vertex.adjacentFaces(), face => {
         if (face.numSides === 3) {
           invalid.push(face.fIndex);
