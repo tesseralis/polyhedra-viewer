@@ -16,12 +16,6 @@ export function getCyclic<T>(array: T[], index: number): T {
   return array[mod(index, array.length)];
 }
 
-export function getCyclicPairs<T>(array: T[]) {
-  return _.map(array, (item, index) => {
-    return [item, getCyclic(array, index + 1)];
-  });
-}
-
 export function atIndices<T>(arr: T[], indices: number[]): T[] {
   return indices.map(i => arr[i]);
 }

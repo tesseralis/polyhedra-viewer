@@ -62,9 +62,7 @@ export default class Face {
   }
 
   directedEdges() {
-    return _.map(this.face, (vIndex, i) => {
-      return [vIndex, getCyclic(this.face, i + 1)];
-    });
+    return _.map(this.face, (vIndex, i) => this.directedEdge(i));
   }
 
   numUniqueSides() {

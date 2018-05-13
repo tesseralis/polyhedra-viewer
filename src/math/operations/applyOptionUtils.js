@@ -1,6 +1,6 @@
 // @flow
 import _ from 'lodash';
-import { getSingle, getCyclicPairs } from 'util.js';
+import { getSingle, getCyclic } from 'util.js';
 import type { VIndex } from 'math/polyhedra';
 import { Peak, Polyhedron } from 'math/polyhedra';
 
@@ -54,6 +54,12 @@ export function getPeakAlignment(polyhedron: Polyhedron, peak: Peak) {
   ) >= (isRhombicosidodecahedron ? 2 : 1)
     ? 'para'
     : 'meta';
+}
+
+function getCyclicPairs<T>(array: T[]) {
+  return _.map(array, (item, index) => {
+    return [item, getCyclic(array, index + 1)];
+  });
 }
 
 export function getCupolaGyrate(polyhedron: Polyhedron, peak: Peak) {

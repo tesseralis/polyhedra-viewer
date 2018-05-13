@@ -5,7 +5,8 @@ import type { Vector } from 'math/linAlg';
 
 export interface OperationResult {
   result: Polyhedron;
-  animationData?: {
+  name?: ?string;
+  animationData?: ?{
     start: Polyhedron,
     endVertices: Vertex[],
   };
