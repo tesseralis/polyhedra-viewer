@@ -1,6 +1,7 @@
 // @flow
 
 import _ from 'lodash';
+import { isPlanar } from 'math/linAlg';
 import type { Edge, VIndex } from './solidTypes';
 
 import Polyhedron from './Polyhedron';
@@ -96,7 +97,9 @@ export default class Peak {
       const faceCount = this.polyhedron.adjacentFaceCount(vIndex);
       return _.isEqual(faceCount, this.faceConfiguration());
     });
-    return matchFaces && this.polyhedron.isPlanar(this.boundary());
+    return (
+      matchFaces && isPlanar(this.polyhedron.vertexVectors(this.boundary()))
+    );
   }
 }
 const Pyramid = withMapper('vIndices')(

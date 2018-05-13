@@ -3,7 +3,7 @@ import _ from 'lodash';
 import { Vec3D } from 'toxiclibsjs/geom';
 import { find, getCyclic } from 'util.js';
 import { isValidSolid, getSolidData } from 'data';
-import { vec, getMidpoint, isPlanar, getCentroid } from 'math/linAlg';
+import { vec, getMidpoint, getCentroid } from 'math/linAlg';
 import type { Vector } from 'math/linAlg';
 import type { Vertex, Face, Edge, VIndex, FIndex } from './solidTypes';
 
@@ -249,11 +249,6 @@ export default class Polyhedron {
 
   mapFaces(iteratee: FaceObj => Face) {
     return this.withFaces(this.getFaces().map(iteratee));
-  }
-
-  // Returns whether the set of vertices in this polyhedron are planar
-  isPlanar(vIndices: VIndex[]) {
-    return isPlanar(this.vertexVectors(vIndices));
   }
 
   centroid() {
