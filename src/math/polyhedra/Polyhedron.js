@@ -204,10 +204,6 @@ export default class Polyhedron {
     return getCentroid(_.map(this.vertexObjs, 'vec'));
   }
 
-  distanceToCenter() {
-    return this.getFace().distanceToCenter();
-  }
-
   faceAdjacencyList() {
     const faceAdjacencyCounts = _.map(this.getFaces(), face => ({
       n: face.numSides,
