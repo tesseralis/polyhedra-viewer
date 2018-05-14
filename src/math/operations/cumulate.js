@@ -146,8 +146,8 @@ function applyCumulate(
 
   const oldToNew = {};
   cumulateFaces.forEach((face, i) => {
-    face.vIndices().forEach(vIndex => {
-      oldToNew[vIndex] = i;
+    face.vertices.forEach(v => {
+      oldToNew[v.index] = i;
     });
   });
 
