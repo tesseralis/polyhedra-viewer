@@ -17,7 +17,7 @@ function getBoundary(faces: Face[]) {
   // build up a lookup table for every pair of edges to that face
   _.forEach(faces, face => {
     // for the pairs of vertices, find the face that contains the corresponding pair
-    _.forEach(face.edges(), edge => {
+    _.forEach(face.edges, edge => {
       const { a: i1, b: i2 } = edge;
       if (_.includes(edges[i2], i1)) {
         _.pull(edges[i2], i1);

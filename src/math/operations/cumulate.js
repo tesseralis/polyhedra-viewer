@@ -32,7 +32,7 @@ function isBevelled(polyhedron) {
 }
 
 function getAdjacentFaces(vertex, facesToCumulate) {
-  const adjFaces = vertex.directedAdjacentFaces();
+  const adjFaces = vertex.adjacentFaces();
   const [first, ...last] = adjFaces;
   if (first.inSet(facesToCumulate)) {
     return adjFaces;
@@ -83,11 +83,11 @@ function calculateCumulateDist(polyhedron, face, edge) {
 
 function getCumulateDist(polyhedron, face) {
   if (isBevelled(polyhedron)) {
-    return _.meanBy(face.edges(), edge =>
+    return _.meanBy(face.edges, edge =>
       calculateCumulateDist(polyhedron, face, edge),
     );
   }
-  return calculateCumulateDist(polyhedron, face, face.edges()[0]);
+  return calculateCumulateDist(polyhedron, face, face.edges[0]);
 }
 
 function getVertexToAdd(polyhedron, face) {

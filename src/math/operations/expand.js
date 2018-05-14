@@ -54,7 +54,7 @@ function duplicateVertices(polyhedron: Polyhedron, twist?: 'left' | 'right') {
   _.forEach(polyhedron.getVertices(), (vertex, vIndex: VIndex) => {
     // For each vertex, pick one adjacent face to be the "head"
     // for every other adjacent face, map it to a duplicated vertex
-    const [head, ...tail] = vertex.directedAdjacentFaces();
+    const [head, ...tail] = vertex.adjacentFaces();
     const start = newVertices.length;
     _.set(newVertexMapping, [head.index, vIndex], vIndex);
     _.forEach(tail, (face, i) => {

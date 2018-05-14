@@ -30,6 +30,14 @@ export default class Edge {
     return this.polyhedron.edgeToFaceGraph()[this.a][this.b];
   }
 
+  prev() {
+    return this.face.prevEdge(this);
+  }
+
+  next() {
+    return this.face.nextEdge(this);
+  }
+
   length() {
     return this.va.vec.distanceTo(this.vb.vec);
   }
@@ -58,5 +66,9 @@ export default class Edge {
     }
 
     return c1.angleBetween(c2, true);
+  }
+
+  equals(e: Edge) {
+    return this.a === e.a && this.b === e.b;
   }
 }

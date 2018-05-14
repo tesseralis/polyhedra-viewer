@@ -85,10 +85,10 @@ function canAugmentWith(base, augmentee, offset) {
   const n = base.numSides;
   const underside = augmentee.faceWithNumSides(n);
 
-  return _.every(base.edges(), (edge, i) => {
+  return _.every(base.edges, (edge, i) => {
     const baseAngle = edge.dihedralAngle();
 
-    const edge2 = underside.edge(i - 1 + offset);
+    const edge2 = getCyclic(underside.edges, i - 1 + offset);
     const augmenteeAngle = edge2.dihedralAngle();
 
     return baseAngle + augmenteeAngle < Math.PI - PRECISION;

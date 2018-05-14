@@ -49,7 +49,7 @@ function duplicateVertices(polyhedron) {
   const mapping = {};
   const count = polyhedron.getVertex().adjacentFaces().length;
   _.forEach(polyhedron.getVertices(), v => {
-    _.forEach(v.directedAdjacentFaces(), (face, i) => {
+    _.forEach(v.adjacentFaces(), (face, i) => {
       _.set(mapping, [face.index, v.index], i);
     });
   });

@@ -1,10 +1,10 @@
 // @flow
 import _ from 'lodash';
 import { Vec3D } from 'toxiclibsjs/geom';
-import { find } from 'util.js';
 import { vec } from 'math/linAlg';
 import { VIndex } from './solidTypes';
 import Polyhedron from './Polyhedron';
+import Edge from './Edge';
 
 export default class Vertex {
   polyhedron: Polyhedron;
@@ -27,23 +27,27 @@ export default class Vertex {
     return _.some(vertices, vertex => this.equals(vertex));
   }
 
+  adjacentEdges() {
+    // find an edge with this as a source
+    const v2 = _.findIndex(this.polyhedron.edgeToFaceGraph()[this.index]);
+    const e0 = new Edge(this.polyhedron, this.index, v2);
+    let e = e0;
+    const result = [];
+    let count = 0;
+    do {
+      count++;
+      result.push(e);
+      e = e.prev().twin();
+      if (count > 10) throw new Error('we done messed up');
+    } while (!e.equals(e0));
+    return result;
+  }
+
   adjacentVertices() {
-    return this.polyhedron.vertexGraph()[this.index];
+    return _.map(this.adjacentEdges(), 'vb');
   }
 
   adjacentFaces() {
-    return this.polyhedron.vertexToFaceGraph()[this.index];
-  }
-
-  directedAdjacentFaces() {
-    const touchingFaces = this.adjacentFaces();
-    const result = [];
-    let next = touchingFaces[0];
-    const checkVertex = f => next.prevVertex(this).equals(f.nextVertex(this));
-    do {
-      result.push(next);
-      next = find(touchingFaces, checkVertex);
-    } while (result.length < touchingFaces.length);
-    return result;
+    return _.map(this.adjacentEdges(), 'face');
   }
 }

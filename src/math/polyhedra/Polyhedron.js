@@ -139,33 +139,10 @@ export default class Polyhedron {
     return this.getFace().edgeLength();
   }
 
-  vertexGraph = _.memoize(() => {
-    const graph = {};
-    _.forEach(this.getFaces(), face => {
-      _.forEach(face.edges(), edge => {
-        if (!graph[edge.a]) {
-          graph[edge.a] = [];
-        }
-        graph[edge.a].push(edge.vb);
-      });
-    });
-    return graph;
-  });
-
-  vertexToFaceGraph = _.memoize(() => {
-    const mapping = this.vertices.map(() => []);
-    this.getFaces().forEach(face => {
-      face.vertices.forEach(v => {
-        mapping[v.index].push(face);
-      });
-    });
-    return mapping;
-  });
-
   edgeToFaceGraph = _.memoize(() => {
     const edgesToFaces = {};
     _.forEach(this.getFaces(), face => {
-      _.forEach(face.edges(), ({ a, b }) => {
+      _.forEach(face.edges, ({ a, b }) => {
         _.set(edgesToFaces, [a, b], face);
       });
     });

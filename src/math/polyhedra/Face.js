@@ -2,7 +2,7 @@
 import _ from 'lodash';
 import { Vec3D } from 'toxiclibsjs/geom';
 
-import { getCyclic } from 'util.js';
+import { find, getCyclic } from 'util.js';
 import Polyhedron from './Polyhedron';
 import { VIndex, FIndex } from './solidTypes';
 import Edge from './Edge';
@@ -20,6 +20,7 @@ export default class Face {
   index: FIndex;
   face: VIndex[];
   vertices: Vertex[];
+  edges: Edge[];
   vectors: $ReadOnly<Vec3D>[];
 
   constructor(polyhedron: Polyhedron, index: FIndex) {
@@ -27,6 +28,11 @@ export default class Face {
     this.index = index;
     this.face = polyhedron.faces[index];
     this.vertices = _.map(this.face, vIndex => polyhedron.vertexObjs[vIndex]);
+    this.edges = _.map(
+      this.face,
+      (vIndex, i) =>
+        new Edge(this.polyhedron, vIndex, getCyclic(this.face, i + 1)),
+    );
     this.vectors = _.map(this.vertices, 'vec');
   }
 
@@ -38,25 +44,16 @@ export default class Face {
     return this.face;
   }
 
-  nextVertex(v: Vertex) {
-    return getCyclic(this.vertices, this.face.indexOf(v.index) + 1);
+  nextEdge(e: Edge) {
+    return find(this.edges, e2 => e2.a === e.b);
   }
 
-  prevVertex(v: Vertex) {
-    return getCyclic(this.vertices, this.face.indexOf(v.index) - 1);
-  }
-
-  edge(i: number) {
-    const vIndex = getCyclic(this.face, i);
-    return new Edge(this.polyhedron, vIndex, getCyclic(this.face, i + 1));
-  }
-
-  edges() {
-    return _.map(this.face, (vIndex, i) => this.edge(i));
+  prevEdge(e: Edge) {
+    return find(this.edges, e2 => e2.b === e.a);
   }
 
   numUniqueSides() {
-    return _.countBy(this.edges(), edge => edge.length() > PRECISION);
+    return _.countBy(this.edges, edge => edge.length() > PRECISION);
   }
 
   // Return true if this face is the same as the given face (within a polyhedron)
@@ -82,11 +79,11 @@ export default class Face {
   }
 
   adjacentFaces() {
-    return _.map(this.edges(), edge => edge.twin().face);
+    return _.map(this.edges, edge => edge.twin().face);
   }
 
   edgeLength() {
-    return this.edge(0).length();
+    return this.edges[0].length();
   }
 
   plane() {
@@ -117,7 +114,7 @@ export default class Face {
   }
 
   isValid() {
-    return _.every(this.edges(), edge => edge.length() > PRECISION);
+    return _.every(this.edges, edge => edge.length() > PRECISION);
   }
 
   withPolyhedron(polyhedron: Polyhedron) {
