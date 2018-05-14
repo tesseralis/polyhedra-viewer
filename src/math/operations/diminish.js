@@ -6,7 +6,7 @@ import { Peak } from 'math/polyhedra';
 import type { Operation } from './operationTypes';
 import { getPeakAlignment, getCupolaGyrate } from './applyOptionUtils';
 
-function removeVertices(polyhedron, peak) {
+function removePeak(polyhedron, peak) {
   return removeExtraneousVertices(
     polyhedron.removeFaces(peak.faces()).addFaces([peak.boundary()]),
   );
@@ -18,7 +18,7 @@ interface DiminishOptions {
 
 export const diminish: Operation<DiminishOptions> = {
   apply(polyhedron, { peak }) {
-    return removeVertices(polyhedron, peak);
+    return removePeak(polyhedron, peak);
   },
 
   getSearchOptions(polyhedron, config, relations) {
@@ -67,10 +67,7 @@ function applyShorten(polyhedron) {
     return _.uniqBy(face.adjacentFaces(), 'numSides').length === 1;
   });
   const face = _.maxBy(faces, 'numSides');
-  return removeVertices(
-    polyhedron,
-    new Peak(polyhedron, face.vertices, 'prism'),
-  );
+  return removePeak(polyhedron, new Peak(polyhedron, face.vertices, 'prism'));
 }
 
 export const shorten: Operation<> = {

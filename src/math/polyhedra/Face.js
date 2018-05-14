@@ -2,7 +2,7 @@
 import _ from 'lodash';
 import { Vec3D } from 'toxiclibsjs/geom';
 
-import { replace, getCyclic } from 'util.js';
+import { getCyclic } from 'util.js';
 import Polyhedron from './Polyhedron';
 import { VIndex, FIndex } from './solidTypes';
 import Edge from './Edge';
@@ -18,6 +18,7 @@ import {
 export default class Face {
   polyhedron: Polyhedron;
   fIndex: FIndex;
+  index: FIndex; // alias
   face: VIndex[];
   vertices: Vertex[];
   vectors: $ReadOnly<Vec3D>[];
@@ -25,6 +26,7 @@ export default class Face {
   constructor(polyhedron: Polyhedron, fIndex: FIndex) {
     this.polyhedron = polyhedron;
     this.fIndex = fIndex;
+    this.index = fIndex;
     this.face = polyhedron.faces[fIndex];
     this.vertices = _.map(this.face, vIndex => polyhedron.vertexObjs[vIndex]);
     this.vectors = _.map(this.vertices, 'vec');
@@ -44,11 +46,6 @@ export default class Face {
 
   prevVertex(v: Vertex) {
     return getCyclic(this.vertices, this.face.indexOf(v.index) - 1);
-  }
-
-  // FIXME get rid
-  replaceVertex(vIndex: VIndex, ...vIndices: VIndex[]) {
-    return replace(this.face, this.face.indexOf(vIndex), ...vIndices);
   }
 
   edge(i: number) {

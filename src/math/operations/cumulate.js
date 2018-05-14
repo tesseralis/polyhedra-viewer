@@ -1,7 +1,6 @@
 // @flow
 import _ from 'lodash';
 
-import { find } from 'util.js';
 import { Polyhedron } from 'math/polyhedra';
 import { deduplicateVertices } from './operationUtils';
 import type { Operation } from './operationTypes';
@@ -33,59 +32,36 @@ function isBevelled(polyhedron) {
   return polyhedron.faceTypes().length === 3;
 }
 
-function duplicateVertex(newPolyhedron, polyhedron, faces, vertex) {
-  const vIndex = vertex.index;
-  const adjacentFaces = vertex.adjacentFaces();
-  const pivot = find(adjacentFaces, nbr => nbr.inSet(faces));
-  const newVertexIndex = newPolyhedron.numVertices();
+function getAdjacentFaces(vertex, facesToCumulate) {
+  const adjFaces = vertex.directedAdjacentFaces();
+  const [first, ...last] = adjFaces;
+  if (first.inSet(facesToCumulate)) {
+    return adjFaces;
+  }
+  return [...last, first];
+}
 
-  return newPolyhedron
-    .addVertices([newPolyhedron.vertices[vIndex]])
-    .mapFaces(face => {
-      const originalFace = face.withPolyhedron(polyhedron);
-      if (!face.inSet(adjacentFaces)) {
-        return face.vIndices();
-      }
+function duplicateVertices2(polyhedron, facesToCumulate) {
+  const offset = polyhedron.numVertices();
+  const mapping = {};
+  _.forEach(polyhedron.getVertices(), vertex => {
+    const v = vertex.index;
+    const v2 = v + offset;
+    const values = [v, [v2, v], v2, [v, v2]];
 
-      // If this is the pivot face, return unchanged
-      if (face.equals(pivot)) {
-        return face.vIndices();
-      }
-
-      // If this is the *other* cumulated face, use the duplicated vertex
-      if (face.inSet(faces)) {
-        return face.replaceVertex(vIndex, newVertexIndex);
-      }
-
-      // If this is the face next to the pivot, insert the duplicated point to the left of the pivot
-      if (pivot.nextVertex(vertex).inSet(originalFace.vertices)) {
-        return face.replaceVertex(vIndex, vIndex, newVertexIndex);
-      }
-
-      if (pivot.prevVertex(vertex).inSet(originalFace.vertices)) {
-        return face.replaceVertex(vIndex, newVertexIndex, vIndex);
-      }
-
-      throw new Error('Cannot classify face');
+    const faces = getAdjacentFaces(vertex, facesToCumulate);
+    _.forEach(faces, (f, i) => {
+      _.set(mapping, [f.index, v], values[i]);
+    });
+  });
+  // Double the amount of vertices
+  return polyhedron
+    .addVertices(_.map(polyhedron.getVertices(), 'value'))
+    .mapFaces(f => {
+      return _.flatMapDeep(f.vertices, v => mapping[f.index][v.index]);
     });
 }
 
-function duplicateVertices(polyhedron, facesToCumulate) {
-  const { vertices, faces } = polyhedron
-    .getVertices()
-    .reduce((newPolyhedron, vertex) => {
-      return duplicateVertex(
-        newPolyhedron,
-        polyhedron,
-        facesToCumulate,
-        vertex,
-      );
-    }, polyhedron);
-  // Create a new one so we recalculate the edges
-  return Polyhedron.of(vertices, faces);
-}
-
-// function cumulateFaceIndices(polyhedron, faceType) {
 function getCumulateFaces(polyhedron, faceType) {
   // Special octahedron case
   if (
@@ -135,7 +111,7 @@ function applyCumulate(
   let cumulateFaces = getCumulateFaces(polyhedron, n);
 
   if (isRectified(polyhedron)) {
-    polyhedron = duplicateVertices(polyhedron, cumulateFaces);
+    polyhedron = duplicateVertices2(polyhedron, cumulateFaces);
     cumulateFaces = cumulateFaces.map(face => face.withPolyhedron(polyhedron));
   }
   const { vertices } = polyhedron;

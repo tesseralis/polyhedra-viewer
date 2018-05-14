@@ -20,6 +20,10 @@ export function atIndices<T>(arr: T[], indices: number[]): T[] {
   return indices.map(i => arr[i]);
 }
 
+export function repeat<T>(value: T, n: number) {
+  return _.times(n, _.constant(value));
+}
+
 /**
  * Create an object from the array using the iteratee
  */
@@ -52,15 +56,6 @@ export function find<T>(array: T[], predicate: Predicate<T>): T {
     throw new Error(`Unable to find the predicate in ${array.toString()}`);
   }
   return result;
-}
-
-/**
- * Replace the given index in the array with the given values. Alternative to "splice".
- */
-export function replace<T>(array: T[], index: number, ...values: T[]) {
-  const before = _.take(array, index);
-  const after = _.slice(array, index + 1);
-  return [...before, ...values, ...after];
 }
 
 const f = (a: any, b) => _.flatMap(a, x => b.map(y => [...x, y]));

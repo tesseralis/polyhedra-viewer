@@ -1,7 +1,7 @@
 // @flow
 import _ from 'lodash';
 
-import { find, mod, getCyclic } from 'util.js';
+import { repeat, find, mod } from 'util.js';
 import { getNormal, scaleAround, PRECISION } from 'math/linAlg';
 import { Polyhedron } from 'math/polyhedra';
 import { deduplicateVertices } from './operationUtils';
@@ -46,44 +46,31 @@ function getRectifiedMultiplier(type) {
   }
 }
 
-function duplicateVertex(newPolyhedron, polyhedron, vertex) {
-  const adjacentFaces = vertex.directedAdjacentFaces();
-  const vIndex = vertex.index;
-  const pivot = _.last(adjacentFaces);
-  const numVertices = newPolyhedron.numVertices();
-
-  const remappedFacesGraph = {};
-  adjacentFaces.forEach((adjFace, i) => {
-    const newVertexIndex = adjFace.equals(pivot) ? vIndex : numVertices + i;
-    const next = getCyclic(adjacentFaces, i + 1).equals(pivot)
-      ? vIndex
-      : numVertices + mod(i + 1, adjacentFaces.length);
-
-    remappedFacesGraph[adjFace.fIndex] = adjFace
-      .withPolyhedron(newPolyhedron)
-      .replaceVertex(vIndex, next, newVertexIndex);
+function duplicateVertices(polyhedron) {
+  const mapping = {};
+  const count = polyhedron.getVertex().adjacentFaces().length;
+  _.forEach(polyhedron.getVertices(), v => {
+    _.forEach(v.directedAdjacentFaces(), (face, i) => {
+      _.set(mapping, [face.index, v.index], i);
+    });
   });
 
-  const newFace = [
-    ..._.range(numVertices, numVertices + adjacentFaces.length - 1),
-    vIndex,
-  ];
-
-  return newPolyhedron
-    .addVertices(
-      _.times(adjacentFaces.length - 1, () => newPolyhedron.vertices[vIndex]),
-    )
-    .mapFaces(face => remappedFacesGraph[face.fIndex] || face.vIndices())
-    .addFaces([newFace]);
-}
-
-function duplicateVertices(polyhedron) {
   const { vertices, faces } = polyhedron
-    .getVertices()
-    .reduce((newPolyhedron, vertex) => {
-      return duplicateVertex(newPolyhedron, polyhedron, vertex);
-    }, polyhedron);
-  // Create a new one so we recalculate the edges
+    .withVertices(
+      _.flatMap(polyhedron.getVertices(), v => repeat(v.value, count)),
+    )
+    .mapFaces(face => {
+      return _.flatMap(face.vertices, v => {
+        const base = count * v.index;
+        const j = mapping[face.index][v.index];
+        return [base + mod(j + 1, count), base + j];
+      });
+    })
+    .addFaces(
+      _.map(polyhedron.getVertices(), v =>
+        _.range(v.index * count, (v.index + 1) * count),
+      ),
+    );
   return Polyhedron.of(vertices, faces);
 }
 
