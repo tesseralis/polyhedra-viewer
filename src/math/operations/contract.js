@@ -5,7 +5,6 @@ import {
   expansionType,
   getSnubAngle,
   isExpandedFace,
-  deduplicateVertices,
   getResizedVertices,
 } from './operationUtils';
 import { Operation } from './operationTypes';
@@ -130,7 +129,6 @@ export function applyContract(
     angle,
   );
   return {
-    result: deduplicateVertices(polyhedron.withVertices(endVertices)),
     animationData: {
       start: polyhedron,
       endVertices,

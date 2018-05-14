@@ -155,7 +155,6 @@ function doExpansion(polyhedron: Polyhedron, referenceName) {
   );
 
   return {
-    result: polyhedron.withVertices(endVertices),
     animationData: {
       start: polyhedron,
       endVertices,

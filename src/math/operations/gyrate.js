@@ -3,7 +3,6 @@ import _ from 'lodash';
 import { getNormalRay, rotateAround } from 'math/linAlg';
 import { Peak } from 'math/polyhedra';
 import type { Operation } from './operationTypes';
-import { deduplicateVertices } from './operationUtils';
 import { mapObject } from 'util.js';
 import { getPeakAlignment, getGyrateDirection } from './applyOptionUtils';
 
@@ -41,14 +40,14 @@ function applyGyrate(polyhedron, { peak }) {
     .addVertices(newBoundaryVertices)
     .withFaces(newFaces);
 
-  const newVertices = mockPolyhedron.getVertices().map((v, vIndex) => {
+  const endVertices = mockPolyhedron.getVertices().map((v, vIndex) => {
     if (
-      _.includes(_.map(peak.innerVertices(), 'index'), vIndex) ||
-      vIndex >= polyhedron.numVertices()
+      _.includes(_.map(peak.innerVertices(), 'index'), v.index) ||
+      v.index >= polyhedron.numVertices()
     ) {
-      return rotateAround(v.vec, normalRay, theta).toArray();
+      return rotateAround(v.vec, normalRay, theta);
     }
-    return v.value;
+    return v.vec;
   });
 
   // TODO the animation makes the cupola shrink and expand.
@@ -56,9 +55,8 @@ function applyGyrate(polyhedron, { peak }) {
   return {
     animationData: {
       start: mockPolyhedron,
-      endVertices: newVertices,
+      endVertices,
     },
-    result: deduplicateVertices(mockPolyhedron.withVertices(newVertices)),
   };
 }
 

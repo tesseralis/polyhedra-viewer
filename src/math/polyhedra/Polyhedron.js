@@ -1,6 +1,7 @@
 // @flow
 import _ from 'lodash';
 import type { Iteratee } from 'lodash';
+import { Vec3D } from 'toxiclibsjs/geom';
 
 import { find, getCyclic } from 'util.js';
 import { isValidSolid, getSolidData } from 'data';
@@ -188,6 +189,11 @@ export default class Polyhedron {
     return new Polyhedron({ ...this.toJSON(), vertices });
   }
 
+  withVertexVectors(vecs: Vec3D[]) {
+    const vertices = vecs.map(v => v.toArray());
+    return this.withVertices(vertices);
+  }
+
   // return a new polyhedron with the given faces
   withFaces(faces: Face[]) {
     return new Polyhedron({ ...this.toJSON(), faces });
@@ -258,8 +264,8 @@ export default class Polyhedron {
    */
   center() {
     const centroid = this.centroid();
-    return this.withVertices(
-      this.vertexObjs.map(v => v.vec.sub(centroid).toArray()),
+    return this.withVertexVectors(
+      this.vertexObjs.map(v => v.vec.sub(centroid)),
     );
   }
 

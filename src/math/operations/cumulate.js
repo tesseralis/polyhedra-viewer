@@ -2,7 +2,6 @@
 import _ from 'lodash';
 
 import { Polyhedron } from 'math/polyhedra';
-import { deduplicateVertices } from './operationUtils';
 import type { Operation } from './operationTypes';
 
 interface CumulateOptions {
@@ -94,7 +93,7 @@ function getCumulateDist(polyhedron, face) {
 function getVertexToAdd(polyhedron, face) {
   const normalRay = face.normalRay();
   const dist = getCumulateDist(polyhedron, face);
-  return normalRay.getPointAtDistance(dist).toArray();
+  return normalRay.getPointAtDistance(dist);
 }
 
 function applyCumulate(
@@ -109,7 +108,6 @@ function applyCumulate(
     polyhedron = duplicateVertices2(polyhedron, cumulateFaces);
     cumulateFaces = cumulateFaces.map(face => face.withPolyhedron(polyhedron));
   }
-  const { vertices } = polyhedron;
 
   const verticesToAdd = cumulateFaces.map(face =>
     getVertexToAdd(polyhedron, face),
@@ -122,20 +120,20 @@ function applyCumulate(
     });
   });
 
-  const endVertices = vertices.map(
-    (vertex, vIndex) =>
-      _.has(oldToNew, vIndex.toString())
-        ? verticesToAdd[oldToNew[vIndex]]
-        : vertex,
-  );
-  const result = deduplicateVertices(polyhedron.withVertices(endVertices));
+  const endVertices = polyhedron
+    .getVertices()
+    .map(
+      (v, vIndex) =>
+        _.has(oldToNew, vIndex.toString())
+          ? verticesToAdd[oldToNew[vIndex]]
+          : v.vec,
+    );
 
   return {
     animationData: {
       start: polyhedron,
       endVertices,
     },
-    result,
   };
 }
 

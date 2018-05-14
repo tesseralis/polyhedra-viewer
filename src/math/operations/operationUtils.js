@@ -90,7 +90,7 @@ export function getResizedVertices(
       const rotated =
         angle === 0 ? v.vec : rotateAround(v.vec, face.normalRay(), angle);
       const scale = (resizedLength - baseLength) * sideLength;
-      result[v.index] = rotated.add(normal.scale(scale)).toArray();
+      result[v.index] = rotated.add(normal.scale(scale));
     });
   });
   return result;

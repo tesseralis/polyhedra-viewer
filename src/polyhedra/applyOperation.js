@@ -1,15 +1,22 @@
 import _ from 'lodash';
 import { getNextPolyhedron, getRelations } from './relations';
 import { Polyhedron } from 'math/polyhedra';
-import { operations } from 'math/operations';
+import { operations, deduplicateVertices } from 'math/operations';
 import type { OperationResult } from 'math/operations';
 
-const updateName = (opResult, name) => {
+function setDefaults(opResult) {
   if (!opResult.animationData) {
-    return { result: opResult, name };
+    return { result: opResult };
   }
-  return { name, ...opResult };
-};
+  const { result, animationData: { start, endVertices } } = opResult;
+  return {
+    result: result || deduplicateVertices(start.withVertexVectors(endVertices)),
+    animationData: {
+      start,
+      endVertices: endVertices.map(v => v.toArray()),
+    },
+  };
+}
 
 export type Operation = 't' | 'a' | 'k' | 'c' | 'e' | '+' | '-' | 'g';
 
@@ -38,5 +45,5 @@ export default function applyOperation(
     // throw new Error(`Function not found for ${operation}`)
     return { result: Polyhedron.get(next), name: next };
   }
-  return updateName(op.apply(polyhedron, applyConfig), next);
+  return { name: next, ...setDefaults(op.apply(polyhedron, applyConfig)) };
 }

@@ -83,7 +83,7 @@ function getPossibleAugmentees(n) {
 // Checks to see if the polyhedron can be augmented at the base while remaining convex
 function canAugmentWith(base, augmentee, offset) {
   const n = base.numSides;
-  const underside = find(augmentee.getFaces(), { numSides: n });
+  const underside = augmentee.faceWithNumSides(n);
 
   return _.every(base.edges(), (edge, i) => {
     const baseAngle = edge.dihedralAngle();
@@ -200,8 +200,8 @@ function flatten(polyhedron, face) {
   const plane = face.plane();
   const newVertices = polyhedron
     .getVertices()
-    .map(v => plane.getProjectedPoint(v.vec).toArray());
-  return polyhedron.withVertices(newVertices);
+    .map(v => plane.getProjectedPoint(v.vec));
+  return polyhedron.withVertexVectors(newVertices);
 }
 
 // Augment the following
@@ -262,15 +262,14 @@ function doAugment(polyhedron, base, using, gyrate, mock = false) {
         alignedV0.cross(translatedV0).getNormalized(),
         alignVerticesAngle,
       )
-      .add(baseCenter)
-      .toArray();
+      .add(baseCenter);
   });
   return deduplicateVertices(
     polyhedron
       .removeFace(base)
       .addPolyhedron(
         augmentee
-          .withVertices(transformedAugmenteeVertices)
+          .withVertexVectors(transformedAugmenteeVertices)
           .removeFace(underside),
       ),
   );

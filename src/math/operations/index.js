@@ -22,4 +22,6 @@ export const operations = {
   g: gyrate,
 };
 
+export { deduplicateVertices } from './operationUtils';
+
 export type { OperationResult } from './operationTypes';

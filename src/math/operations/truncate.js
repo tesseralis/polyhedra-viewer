@@ -4,7 +4,6 @@ import _ from 'lodash';
 import { repeat, find, mod } from 'util.js';
 import { getNormal, scaleAround, PRECISION } from 'math/linAlg';
 import { Polyhedron } from 'math/polyhedra';
-import { deduplicateVertices } from './operationUtils';
 import type { Operation } from './operationTypes';
 
 interface TruncateOptions {
@@ -135,15 +134,13 @@ function doTruncate(polyhedron, options: TruncateOptions = {}) {
     const v = vertex.vec;
     const v1 = find(adjacentVertices, adj => adj.vec.distanceTo(v) > PRECISION);
     const truncated = v.interpolateTo(v1.vec, rectify ? 0.5 : truncateScale);
-    return (!!transform ? transform(truncated, vertex) : truncated).toArray();
+    return !!transform ? transform(truncated, vertex) : truncated;
   });
-  const result = duplicated.withVertices(truncatedVertices);
   return {
     animationData: {
       start: duplicated,
       endVertices: truncatedVertices,
     },
-    result: rectify ? deduplicateVertices(result) : result,
   };
 }
 
