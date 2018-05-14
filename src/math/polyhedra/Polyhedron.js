@@ -173,10 +173,10 @@ export default class Polyhedron {
     const graph = {};
     _.forEach(this.getEdges(), edge => {
       const [f1, f2] = edge.adjacentFaces();
-      if (!graph[f1.fIndex]) graph[f1.fIndex] = [];
-      if (!graph[f2.fIndex]) graph[f2.fIndex] = [];
-      graph[f1.fIndex].push(f2);
-      graph[f2.fIndex].push(f1);
+      if (!graph[f1.index]) graph[f1.index] = [];
+      if (!graph[f2.index]) graph[f2.index] = [];
+      graph[f1.index].push(f2);
+      graph[f2.index].push(f1);
     });
     return graph;
   });
@@ -219,13 +219,13 @@ export default class Polyhedron {
 
   removeFace(face: FaceObj) {
     const removed = [...this.faces];
-    _.pullAt(removed, [face.fIndex]);
+    _.pullAt(removed, [face.index]);
     return this.withFaces(removed);
   }
 
   removeFaces(faceObjs: FaceObj[]) {
     const removed = [...this.faces];
-    _.pullAt(removed, _.map(faceObjs, 'fIndex'));
+    _.pullAt(removed, _.map(faceObjs, 'index'));
     return this.withFaces(removed);
   }
 

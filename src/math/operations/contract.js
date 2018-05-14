@@ -52,8 +52,12 @@ function getFaceDistance(face1, face2) {
     dist++;
     current = _(current)
       .flatMap(face => face.adjacentFaces())
-      .uniqBy('fIndex')
+      .uniqBy('index')
       .value();
+
+    if (dist > 10) {
+      throw new Error('we went toooooo far');
+    }
   }
   return dist;
 }
@@ -75,13 +79,13 @@ function getCuboctahedronContractFaces(polyhedron) {
   const invalid = [];
   while (toCheck.length > 0) {
     const next = toCheck.pop();
-    if (_.includes(invalid, next.fIndex)) {
+    if (_.includes(invalid, next.index)) {
       continue;
     }
     _.forEach(next.vertices, vertex => {
       _.forEach(vertex.adjacentFaces(), face => {
         if (face.numSides === 3) {
-          invalid.push(face.fIndex);
+          invalid.push(face.index);
         }
       });
     });

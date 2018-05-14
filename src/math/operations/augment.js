@@ -114,7 +114,7 @@ function getAugmentGraph(polyhedron) {
 
 function getAugmentFace(polyhedron, graph, point) {
   const hitFace = polyhedron.hitFace(point);
-  return graph[hitFace.fIndex] ? hitFace : undefined;
+  return graph[hitFace.index] ? hitFace : undefined;
 }
 
 // Computes the set equality of two arrays

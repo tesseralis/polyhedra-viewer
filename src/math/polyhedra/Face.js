@@ -17,17 +17,15 @@ import {
 
 export default class Face {
   polyhedron: Polyhedron;
-  fIndex: FIndex;
-  index: FIndex; // alias
+  index: FIndex;
   face: VIndex[];
   vertices: Vertex[];
   vectors: $ReadOnly<Vec3D>[];
 
-  constructor(polyhedron: Polyhedron, fIndex: FIndex) {
+  constructor(polyhedron: Polyhedron, index: FIndex) {
     this.polyhedron = polyhedron;
-    this.fIndex = fIndex;
-    this.index = fIndex;
-    this.face = polyhedron.faces[fIndex];
+    this.index = index;
+    this.face = polyhedron.faces[index];
     this.vertices = _.map(this.face, vIndex => polyhedron.vertexObjs[vIndex]);
     this.vectors = _.map(this.vertices, 'vec');
   }
@@ -63,8 +61,8 @@ export default class Face {
 
   // Return true if this face is the same as the given face (within a polyhedron)
   equals(other: Face) {
-    return this.fIndex === other.fIndex;
-    // return this.polyhedron === other.polyhedron && this.fIndex === other.fIndex;
+    return this.index === other.index;
+    // return this.polyhedron === other.polyhedron && this.index === other.index;
   }
 
   inSet(faces: Face[]) {
@@ -77,14 +75,14 @@ export default class Face {
 
   /** Return the set of faces connected by an edge */
   adjacentFaces() {
-    return this.polyhedron.faceGraph()[this.fIndex];
+    return this.polyhedron.faceGraph()[this.index];
   }
 
   /** Return the set of faces that share a vertex to this face (including itself) */
   vertexAdjacentFaces() {
     return _(this.vertices)
       .flatMap(vertex => vertex.adjacentFaces())
-      .uniqBy('fIndex')
+      .uniqBy('index')
       .value();
   }
 
@@ -128,6 +126,6 @@ export default class Face {
   }
 
   withPolyhedron(polyhedron: Polyhedron) {
-    return new Face(polyhedron, this.fIndex);
+    return new Face(polyhedron, this.index);
   }
 }

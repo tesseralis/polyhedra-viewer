@@ -88,7 +88,7 @@ export default class Peak {
   faces = _.memoize(() => {
     return _(this.innerVertices())
       .flatMap(v => v.adjacentFaces())
-      .uniqBy('fIndex')
+      .uniqBy('index')
       .value();
   });
 

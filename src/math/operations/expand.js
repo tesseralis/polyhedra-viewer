@@ -56,9 +56,9 @@ function duplicateVertices(polyhedron: Polyhedron, twist?: 'left' | 'right') {
     // for every other adjacent face, map it to a duplicated vertex
     const [head, ...tail] = vertex.directedAdjacentFaces();
     const start = newVertices.length;
-    _.set(newVertexMapping, [head.fIndex, vIndex], vIndex);
+    _.set(newVertexMapping, [head.index, vIndex], vIndex);
     _.forEach(tail, (face, i) => {
-      _.set(newVertexMapping, [face.fIndex, vIndex], start + i);
+      _.set(newVertexMapping, [face.index, vIndex], start + i);
     });
     vertexFaces.push([vIndex, ..._.range(start, start + tail.length)]);
     newVertices = newVertices.concat(
@@ -73,7 +73,7 @@ function duplicateVertices(polyhedron: Polyhedron, twist?: 'left' | 'right') {
   const edgeFaces = (() => {
     return _.flatMap(polyhedron.getEdges(), edge => {
       const { a: v1, b: v2 } = edge;
-      const [f1, f2] = _.map(edge.adjacentFaces(), 'fIndex');
+      const [f1, f2] = _.map(edge.adjacentFaces(), 'index');
 
       switch (twist) {
         case 'right':

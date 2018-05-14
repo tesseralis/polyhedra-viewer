@@ -224,8 +224,8 @@ export default class Viewer extends Component<ViewerProps, ViewerState> {
     const defaultColors = polygonColors(colors);
 
     // While doing animation, if we specify that this face has a color, use it
-    if (!!faceColors && _.has(faceColors, face.fIndex.toString())) {
-      return toRgb(faceColors[face.fIndex]);
+    if (!!faceColors && _.has(faceColors, face.index.toString())) {
+      return toRgb(faceColors[face.index]);
     }
 
     if (operation) {
