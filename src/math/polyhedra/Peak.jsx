@@ -167,7 +167,10 @@ const Rotunda = withMapper('getFaces')(
     constructor(polyhedron, face) {
       super(
         polyhedron,
-        polyhedron.adjacentVertices(...face.vertices),
+        _(face.vertices)
+          .flatMap(v => v.adjacentVertices())
+          .uniqBy('index')
+          .value(),
         'rotunda',
       );
       this.face = face;

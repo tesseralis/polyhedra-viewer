@@ -138,14 +138,6 @@ export default class Polyhedron {
     return this.getFace().edgeLength();
   }
 
-  // Get the vertices adjacent to this set of vertices
-  adjacentVertices(...vertices: VertexObj[]) {
-    return _(vertices)
-      .flatMap(vertex => vertex.adjacentVertices())
-      .uniqBy('index')
-      .value();
-  }
-
   vertexGraph = _.memoize(() => {
     const graph = {};
     _.forEach(this.getFaces(), face => {
