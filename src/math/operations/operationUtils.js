@@ -32,7 +32,7 @@ export function deduplicateVertices(polyhedron: Polyhedron) {
   // replace vertices that are the same
   let newFaces = polyhedron
     .getFaces()
-    .map(face => _.uniq(face.vIndices().map(vIndex => oldToNew[vIndex])))
+    .map(face => _.uniq(face.vertices.map(v => oldToNew[v.index])))
     .filter(vIndices => vIndices.length >= 3);
 
   // remove extraneous vertices
@@ -46,15 +46,19 @@ export function deduplicateVertices(polyhedron: Polyhedron) {
 export function removeExtraneousVertices(polyhedron: Polyhedron) {
   const { vertices, faces } = polyhedron;
   // Vertex indices to remove
-  const toRemove = _.difference(polyhedron.vIndices(), _.flatMap(faces));
+  const vertsInFaces = _.flatMap(polyhedron.getFaces(), 'vertices');
+  const toRemove = _.filter(
+    polyhedron.getVertices(),
+    v => !v.inSet(vertsInFaces),
+  );
   const numToRemove = toRemove.length;
 
   // Map the `numToRemove` last vertices of the polyhedron (that don't overlap)
   // to the first few removed vertices
-  const newToOld = _(polyhedron.vIndices())
+  const newToOld = _(polyhedron.getVertices())
     .takeRight(numToRemove)
-    .difference(toRemove)
-    .map((vIndex, i) => [vIndex, toRemove[i]])
+    .filter(v => !v.inSet(toRemove))
+    .map((v, i) => [v.index, toRemove[i].index])
     .fromPairs()
     .value();
   const oldToNew = _.invert(newToOld);

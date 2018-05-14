@@ -119,10 +119,6 @@ export default class Polyhedron {
     return this.faces.length;
   }
 
-  vIndices = () => {
-    return _.range(this.numVertices());
-  };
-
   // Return the number of each type of faces of each face
   faceCount() {
     return _.countBy(this.getFaces(), 'numSides');

@@ -69,13 +69,8 @@ function getCumulateFaces(polyhedron, faceType) {
     _.every(polyhedron.getFaces(), { numSides: 3 })
   ) {
     const face0 = polyhedron.getFace();
-
-    return polyhedron
-      .getFaces()
-      .filter(
-        face =>
-          _.intersection(face.vIndices(), face0.vIndices()).length % 2 === 0,
-      );
+    const adjacentFaces = face0.adjacentFaces();
+    return _.filter(face0.vertexAdjacentFaces(), f => !f.inSet(adjacentFaces));
   }
 
   return _.filter(polyhedron.getFaces(), { numSides: faceType });
