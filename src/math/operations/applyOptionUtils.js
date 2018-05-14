@@ -10,7 +10,6 @@ export function faceDistanceBetweenVertices(
   vertices2: Vertex[],
   exclude: number[] = [],
 ) {
-  const v2fGraph = polyhedron.vertexToFaceGraph();
   let foundVertices = vertices1;
   let distance = 0;
   while (
@@ -18,7 +17,7 @@ export function faceDistanceBetweenVertices(
       .length === 0
   ) {
     foundVertices = _(foundVertices)
-      .flatMap(vertex => v2fGraph[vertex.index])
+      .flatMap(vertex => vertex.adjacentFaces())
       .filter(face => !_.includes(exclude, face.numSides))
       .map('vertices')
       .flatten()

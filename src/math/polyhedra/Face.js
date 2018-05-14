@@ -73,11 +73,6 @@ export default class Face {
     return _.findIndex(faces, face => this.equals(face));
   }
 
-  /** Return the set of faces connected by an edge */
-  adjacentFaces() {
-    return this.polyhedron.faceGraph()[this.index];
-  }
-
   /** Return the set of faces that share a vertex to this face (including itself) */
   vertexAdjacentFaces() {
     return _(this.vertices)
@@ -86,8 +81,8 @@ export default class Face {
       .value();
   }
 
-  directedAdjacentFaces() {
-    return _.map(this.edges(), edge => edge.adjacentFaces()[1]);
+  adjacentFaces() {
+    return _.map(this.edges(), edge => edge.twin().face);
   }
 
   edgeLength() {

@@ -162,18 +162,6 @@ export default class Polyhedron {
     return mapping;
   });
 
-  faceGraph = _.memoize(() => {
-    const graph = {};
-    _.forEach(this.getEdges(), edge => {
-      const [f1, f2] = edge.adjacentFaces();
-      if (!graph[f1.index]) graph[f1.index] = [];
-      if (!graph[f2.index]) graph[f2.index] = [];
-      graph[f1.index].push(f2);
-      graph[f2.index].push(f1);
-    });
-    return graph;
-  });
-
   edgeToFaceGraph = _.memoize(() => {
     const edgesToFaces = {};
     _.forEach(this.getFaces(), face => {

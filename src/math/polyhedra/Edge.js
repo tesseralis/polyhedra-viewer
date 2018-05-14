@@ -26,6 +26,10 @@ export default class Edge {
     return [this.va, this.vb];
   }
 
+  get face() {
+    return this.polyhedron.edgeToFaceGraph()[this.a][this.b];
+  }
+
   length() {
     return this.va.vec.distanceTo(this.vb.vec);
   }
@@ -40,9 +44,7 @@ export default class Edge {
 
   // Get the faces adjacent to this edge, with the directed face first
   adjacentFaces() {
-    const { a, b } = this;
-    const graph = this.polyhedron.edgeToFaceGraph();
-    return [graph[a][b], graph[b][a]];
+    return [this.face, this.twin().face];
   }
 
   dihedralAngle() {

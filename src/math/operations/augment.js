@@ -142,8 +142,8 @@ function getBaseType(base) {
 }
 
 function getOppositePrismFace(base) {
-  const square = base.directedAdjacentFaces()[0];
-  const squareAdjFaces = square.directedAdjacentFaces();
+  const square = base.adjacentFaces()[0];
+  const squareAdjFaces = square.adjacentFaces();
   const i = base.indexIn(squareAdjFaces);
   return getCyclic(squareAdjFaces, i + 2);
 }
@@ -169,10 +169,8 @@ function isAligned(polyhedron, base, underside, gyrate, augmentType) {
   }
 
   const adjFace =
-    baseType === 'prism'
-      ? getOppositePrismFace(base)
-      : base.directedAdjacentFaces()[0];
-  const alignedFace = getCyclic(underside.directedAdjacentFaces(), -1);
+    baseType === 'prism' ? getOppositePrismFace(base) : base.adjacentFaces()[0];
+  const alignedFace = getCyclic(underside.adjacentFaces(), -1);
 
   if (baseType === 'rhombicosidodecahedron') {
     const isOrtho = (adjFace.numSides !== 4) === (alignedFace.numSides !== 4);
