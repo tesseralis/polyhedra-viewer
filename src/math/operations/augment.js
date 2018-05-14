@@ -3,7 +3,7 @@ import _ from 'lodash';
 
 import { Polyhedron, Face } from 'math/polyhedra';
 import { PRECISION } from 'math/linAlg';
-import { find, getCyclic, getSingle, cartesian } from 'util.js';
+import { getCyclic, getSingle, cartesian } from 'util.js';
 
 import { hasMultiple, deduplicateVertices } from './operationUtils';
 import { faceDistanceBetweenVertices } from './applyOptionUtils';
@@ -206,25 +206,19 @@ function flatten(polyhedron, face) {
 
 // Augment the following
 function doAugment(polyhedron, base, using, gyrate, mock = false) {
-  const n = base.numSides;
   const prefix = using[0];
   const index = using.substring(1);
   const baseV0 = base.vertices[0].vec;
   const baseCenter = base.centroid();
-  const sideLength = base.edgeLength();
   const baseNormal = base.normal();
 
   const augmentType = augmentTypes[prefix];
   let augmentee = augmentData[augmentType][index];
-  const underside = find(augmentee.getFaces(), { numSides: n });
+  const underside = augmentee.faceWithNumSides(base.numSides);
   augmentee = mock ? flatten(augmentee, underside) : augmentee;
 
   // rotate and translate so that the face is next to our face
-  const augmenteeVertices = augmentee.getVertices();
-
   const undersideNormal = underside.normal();
-  const undersideCenter = underside.centroid();
-  const augmenteeSideLength = underside.edgeLength();
 
   const alignBasesNormal = (() => {
     const cross = undersideNormal.cross(baseNormal).getNormalized();
@@ -237,10 +231,10 @@ function doAugment(polyhedron, base, using, gyrate, mock = false) {
   // The `|| 0` is because this sometimes returns NaN if the angle is 0
   const alignBasesAngle = baseNormal.angleBetween(undersideNormal, true) || 0;
 
-  const alignedAugmenteeVertices = augmenteeVertices.map(v => {
+  const alignedAugmenteeVertices = augmentee.getVertices().map(v => {
     return v.vec
-      .sub(undersideCenter)
-      .scale(sideLength / augmenteeSideLength)
+      .sub(underside.centroid())
+      .scale(base.edgeLength() / augmentee.edgeLength())
       .getRotatedAroundAxis(alignBasesNormal, alignBasesAngle - Math.PI);
   });
 
