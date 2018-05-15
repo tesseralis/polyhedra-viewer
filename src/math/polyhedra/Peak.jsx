@@ -92,21 +92,19 @@ export default class Peak {
       .value();
   });
 
-  // FIXME
+  // TODO I'm still not a fan of this; I think the best would be to make this a face-like object
+  // so you can get the things underneath it
   boundary = _.memoize(() => {
-    return getBoundary(this.faces());
+    const boundary = getBoundary(this.faces());
+    return boundary.map(vIndex => this.polyhedron.vertexObjs[vIndex]);
   });
-
-  boundaryVertices() {
-    return this.boundary().map(vIndex => this.polyhedron.vertexObjs[vIndex]);
-  }
 
   isValid() {
     const matchFaces = _.every(this.innerVertices(), vertex => {
       const faceCount = _.countBy(vertex.adjacentFaces(), 'numSides');
       return _.isEqual(faceCount, this.faceConfiguration());
     });
-    return matchFaces && isPlanar(_.map(this.boundaryVertices(), 'vec'));
+    return matchFaces && isPlanar(_.map(this.boundary(), 'vec'));
   }
 }
 const Pyramid = withMapper('getVertices')(

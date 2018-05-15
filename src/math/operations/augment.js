@@ -61,7 +61,7 @@ const augmentTypes = {
 // Return "meta" or "para", or null
 function getAugmentAlignment(polyhedron, face) {
   // get the existing peak boundary
-  const peakBoundary = getSingle(polyhedron.peaks()).boundaryVertices();
+  const peakBoundary = getSingle(polyhedron.peaks()).boundary();
   const isHexagonalPrism = _.some(polyhedron.getFaces(), { numSides: 6 });
 
   // calculate the face distance to the peak's boundary

@@ -8,7 +8,6 @@ export default class Edge {
   polyhedron: Polyhedron;
   a: VIndex;
   b: VIndex;
-  id: string;
   // FIXME this is kind of confusing
   va: Vertex;
   vb: Vertex;
@@ -17,7 +16,6 @@ export default class Edge {
     this.polyhedron = polyhedron;
     this.a = a;
     this.b = b;
-    this.id = `${a},${b}`;
     this.va = polyhedron.vertexObjs[a];
     this.vb = polyhedron.vertexObjs[b];
   }

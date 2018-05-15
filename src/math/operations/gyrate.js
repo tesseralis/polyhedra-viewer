@@ -14,14 +14,14 @@ interface GyrateOptions {
 
 function applyGyrate(polyhedron, { peak }) {
   // get adjacent faces
-  const boundary = peak.boundaryVertices();
+  const boundary = peak.boundary();
 
   // rotate the cupola/rotunda top
   const boundaryVectors = _.map(boundary, 'vec');
   const normalRay = getNormalRay(boundaryVectors);
   const theta = TAU / boundary.length;
 
-  const newBoundaryVertices = _.map(boundary, 'value');
+  const newboundary = _.map(boundary, 'value');
   const oldToNew = mapObject(boundary, (vertex, i) => [vertex.index, i]);
 
   // mock faces for animation
@@ -37,7 +37,7 @@ function applyGyrate(polyhedron, { peak }) {
   });
 
   const mockPolyhedron = polyhedron
-    .addVertices(newBoundaryVertices)
+    .addVertices(newboundary)
     .withFaces(newFaces);
 
   const endVertices = mockPolyhedron.getVertices().map((v, vIndex) => {

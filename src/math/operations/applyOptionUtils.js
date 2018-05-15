@@ -33,7 +33,7 @@ export function faceDistanceBetweenVertices(
 }
 
 export function getPeakAlignment(polyhedron: Polyhedron, peak: Peak) {
-  const peakBoundary = peak.boundaryVertices();
+  const peakBoundary = peak.boundary();
 
   const isRhombicosidodecahedron = peak.type === 'cupola';
 
@@ -46,7 +46,7 @@ export function getPeakAlignment(polyhedron: Polyhedron, peak: Peak) {
   // const diminishedIndices =
   const diminishedVertices =
     orthoPeaks.length > 0
-      ? getSingle(orthoPeaks).boundaryVertices()
+      ? getSingle(orthoPeaks).boundary()
       : polyhedron.biggestFace().vertices;
 
   return faceDistanceBetweenVertices(
@@ -66,8 +66,8 @@ function getCyclicPairs<T>(array: T[]) {
 
 export function getCupolaGyrate(polyhedron: Polyhedron, peak: Peak) {
   const boundary = peak.boundary();
-  const isOrtho = _.every(getCyclicPairs(boundary), ([a, b]) => {
-    const edge = new Edge(polyhedron, a, b);
+  const isOrtho = _.every(getCyclicPairs(boundary), vPair => {
+    const edge = new Edge(polyhedron, ..._.map(vPair, 'index'));
     const [n1, n2] = _.map(edge.adjacentFaces(), 'numSides');
     return (n1 === 4) === (n2 === 4);
   });
