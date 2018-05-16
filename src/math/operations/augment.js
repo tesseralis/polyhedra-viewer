@@ -196,7 +196,7 @@ function isAligned(polyhedron, base, underside, gyrate, augmentType) {
 // Flatten a polyhedron at the given face
 function flatten(polyhedron, face) {
   const plane = face.plane();
-  polyhedron.withVertices(
+  return polyhedron.withVertices(
     polyhedron.vertices.map(v => plane.getProjectedPoint(v.vec)),
   );
 }

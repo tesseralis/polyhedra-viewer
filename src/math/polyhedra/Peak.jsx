@@ -12,34 +12,29 @@ import Edge from './Edge';
 type PeakType = 'pyramid' | 'cupola' | 'rotunda' | 'fastigium' | 'prism';
 type FaceConfiguration = { [string]: number };
 
-// Get a "face" (list of vertices) representing the boundary of the given faces
+// Find the boundary of a connected set of faces
 function getBoundary(faces: Face[]) {
-  const edges = {};
-  // build up a lookup table for every pair of edges to that face
-  _.forEach(faces, face => {
-    // for the pairs of vertices, find the face that contains the corresponding pair
-    _.forEach(face.edges, edge => {
-      const [i1, i2] = _.map(edge.vertices, 'index');
-      if (_.includes(edges[i2], i1)) {
-        _.pull(edges[i2], i1);
-      } else {
-        if (!edges[i1]) {
-          edges[i1] = [];
-        }
-        edges[i1].push(i2);
-      }
-    });
-  });
+  const e0 = _(faces)
+    .flatMap('edges')
+    .find(e => !e.twin().face.inSet(faces));
 
-  const cycle = _(edges)
-    .pickBy('length')
-    .mapValues(0)
-    .value();
-  const first = _.values(cycle)[0];
-  const result = [first];
-  for (let i = cycle[first]; i !== first; i = cycle[i]) {
-    result.push(i);
-  }
+  const result = [];
+  let e = e0;
+  let count = 0;
+  do {
+    if (count++ > 20) throw new Error('we done goofed');
+    if (!e.twin().face.inSet(faces)) {
+      result.push(e.v1);
+      const nextTwin = e.next().twin();
+      if (nextTwin.face.inSet(faces)) {
+        e = nextTwin.next();
+      } else {
+        e = e.next();
+      }
+    } else {
+      e = e.twin().next();
+    }
+  } while (!e.equals(e0));
   return result;
 }
 
@@ -107,8 +102,7 @@ export default class Peak {
   // TODO I'm still not a fan of this; I think the best would be to make this a face-like object
   // so you can get the things underneath it
   boundary = _.once(() => {
-    const boundary = getBoundary(this.faces());
-    return boundary.map(vIndex => this.polyhedron.vertices[vIndex]);
+    return getBoundary(this.faces());
   });
 
   isValid() {
