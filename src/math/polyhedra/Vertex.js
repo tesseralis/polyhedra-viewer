@@ -15,7 +15,7 @@ export default class Vertex {
   constructor(polyhedron: Polyhedron, index: VIndex) {
     this.polyhedron = polyhedron;
     this.index = index;
-    this.value = polyhedron.vertices[index];
+    this.value = polyhedron._vertices[index];
     this.vec = vec(this.value);
   }
 

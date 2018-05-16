@@ -1,13 +1,13 @@
 // @flow
 import _ from 'lodash';
 import { Polyhedron } from 'math/polyhedra';
-import type { VIndex } from 'math/polyhedra';
 import {
   getSnubAngle,
   expansionType,
   isExpandedFace,
   getResizedVertices,
 } from './operationUtils';
+import { repeat } from 'util.js';
 import { Operation } from './operationTypes';
 
 // Result functions
@@ -50,8 +50,8 @@ function getSnubResult(polyhedron) {
 function duplicateVertices(polyhedron: Polyhedron, twist?: 'left' | 'right') {
   const newVertexMapping = {};
   const vertexFaces = [];
-  let newVertices = polyhedron.vertices;
-  _.forEach(polyhedron.getVertices(), (vertex, vIndex: VIndex) => {
+  let newVertices = _.map(polyhedron.getVertices(), 'value');
+  _.forEach(polyhedron.getVertices(), (vertex, vIndex) => {
     // For each vertex, pick one adjacent face to be the "head"
     // for every other adjacent face, map it to a duplicated vertex
     const [head, ...tail] = vertex.adjacentFaces();
@@ -61,13 +61,11 @@ function duplicateVertices(polyhedron: Polyhedron, twist?: 'left' | 'right') {
       _.set(newVertexMapping, [face.index, vIndex], start + i);
     });
     vertexFaces.push([vIndex, ..._.range(start, start + tail.length)]);
-    newVertices = newVertices.concat(
-      _.times(tail.length, () => polyhedron.vertices[vIndex]),
-    );
+    newVertices = newVertices.concat(repeat(vertex.value, tail.length));
   });
 
-  const remappedOriginalFaces = polyhedron.getFaces().map((face, fIndex) => {
-    return face.vertices.map(v => newVertexMapping[fIndex][v.index]);
+  const remappedOriginalFaces = polyhedron.getFaces().map(face => {
+    return face.vertices.map(v => newVertexMapping[face.index][v.index]);
   });
 
   const edgeFaces = (() => {

@@ -1,7 +1,6 @@
 // @flow
 import _ from 'lodash';
 import { Polyhedron, Face } from 'math/polyhedra';
-import { VIndex } from 'math/polyhedra';
 import { PRECISION, getPlane, rotateAround } from 'math/linAlg';
 
 export const hasMultiple = (relations: any, property: any) =>
@@ -17,7 +16,7 @@ export function deduplicateVertices(polyhedron: Polyhedron) {
   const unique = [];
   const oldToNew = {};
 
-  _.forEach(polyhedron.getVertices(), (v, vIndex: VIndex) => {
+  _.forEach(polyhedron.getVertices(), (v, vIndex) => {
     const match = _.find(unique, point =>
       v.vec.equalsWithTolerance(point.vec, PRECISION),
     );
@@ -44,7 +43,6 @@ export function deduplicateVertices(polyhedron: Polyhedron) {
  * and remap the faces to the smaller indices
  */
 export function removeExtraneousVertices(polyhedron: Polyhedron) {
-  const { vertices, faces } = polyhedron;
   // Vertex indices to remove
   const vertsInFaces = _.flatMap(polyhedron.getFaces(), 'vertices');
   const toRemove = _.filter(
@@ -63,13 +61,15 @@ export function removeExtraneousVertices(polyhedron: Polyhedron) {
     .value();
   const oldToNew = _.invert(newToOld);
 
-  const newVertices = _(vertices)
-    .map((vertex, vIndex) => vertices[_.get(oldToNew, vIndex, vIndex)])
+  const vertexVals = _.map(polyhedron.getVertices(), 'value');
+  const newVertices = _(polyhedron.getVertices())
+    .map(v => vertexVals[_.get(oldToNew, v.index, v.index)])
     .dropRight(numToRemove)
     .value();
-  const newFaces = faces.map(face =>
-    face.map((vIndex: VIndex) => _.get(newToOld, vIndex, vIndex)),
-  );
+
+  const newFaces = _.map(polyhedron.getFaces(), face => {
+    return _.map(face.vertices, v => _.get(newToOld, v.index, v.index));
+  });
   return Polyhedron.of(newVertices, newFaces);
 }
 
@@ -83,7 +83,7 @@ export function getResizedVertices(
   const f0 = faces[0];
   const sideLength = f0.edgeLength();
   const baseLength = f0.distanceToCenter() / sideLength;
-  const result = [...polyhedron.vertices];
+  const result = _.map(polyhedron.getVertices(), 'value');
   _.forEach(faces, face => {
     const normal = face.normal();
     _.forEach(face.vertices, v => {

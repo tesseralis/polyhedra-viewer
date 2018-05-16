@@ -69,7 +69,8 @@ function duplicateVertices(polyhedron) {
       _.map(polyhedron.getVertices(), v =>
         _.range(v.index * count, (v.index + 1) * count),
       ),
-    );
+    )
+    .toJSON();
   return Polyhedron.of(vertices, faces);
 }
 

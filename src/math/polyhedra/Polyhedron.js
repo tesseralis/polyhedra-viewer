@@ -1,6 +1,5 @@
 // @flow
 import _ from 'lodash';
-import type { Iteratee } from 'lodash';
 import { Vec3D } from 'toxiclibsjs/geom';
 
 import { find, getCyclic } from 'util.js';
@@ -14,7 +13,7 @@ import FaceObj from './Face';
 import VertexObj from './Vertex';
 import EdgeObj from './Edge';
 
-interface BasePolyhedron {
+interface PolyhedronArgs {
   vertices: Vertex[];
   faces: Face[];
   edges?: Edge[];
@@ -26,8 +25,8 @@ function getEdge(v1, v2) {
 }
 
 export default class Polyhedron {
-  vertices: Vertex[];
-  faces: Face[];
+  _vertices: Vertex[];
+  _faces: Face[];
   faceObjs: FaceObj[];
   vertexObjs: VertexObj[];
 
@@ -44,9 +43,9 @@ export default class Polyhedron {
     return new Polyhedron({ vertices, faces });
   }
 
-  constructor({ vertices, faces, edges, name }: BasePolyhedron) {
-    this.vertices = vertices;
-    this.faces = faces;
+  constructor({ vertices, faces, edges, name }: PolyhedronArgs) {
+    this._vertices = vertices;
+    this._faces = faces;
     this.vertexObjs = vertices.map(
       (vertex, vIndex) => new VertexObj((this: any), vIndex),
     );
@@ -59,7 +58,7 @@ export default class Polyhedron {
   }
 
   getAllEdges() {
-    return _(this.faces)
+    return _(this._faces)
       .flatMap(vIndices =>
         vIndices.map((vertex, i) =>
           getEdge(vertex, getCyclic(vIndices, i + 1)),
@@ -77,7 +76,11 @@ export default class Polyhedron {
   }
 
   toJSON() {
-    return _.pick(this, ['vertices', 'faces', 'edges', 'name']);
+    return {
+      vertices: this._vertices,
+      faces: this._faces,
+      edges: this.edges,
+    };
   }
 
   getVertex() {
@@ -116,11 +119,11 @@ export default class Polyhedron {
   }
 
   numVertices() {
-    return this.vertices.length;
+    return this._vertices.length;
   }
 
   numFaces() {
-    return this.faces.length;
+    return this._faces.length;
   }
 
   // Return the number of each type of faces of each face
@@ -164,39 +167,35 @@ export default class Polyhedron {
 
   // return a new polyhedron with the given faces
   withFaces(faces: Face[]) {
-    return new Polyhedron({ ...this.toJSON(), faces });
+    return new Polyhedron({ ...this.toJSON(), faces, edges: undefined });
   }
 
   addVertices(vertices: Vertex[]) {
-    return this.withVertices(this.vertices.concat(vertices));
+    return this.withVertices(this._vertices.concat(vertices));
   }
 
   addFaces(faces: Face[]) {
-    return this.withFaces(this.faces.concat(faces));
+    return this.withFaces(this._faces.concat(faces));
   }
 
   addPolyhedron(other: Polyhedron) {
-    return this.addVertices(other.vertices).addFaces(
-      other.faces.map(vIndices =>
+    return this.addVertices(other._vertices).addFaces(
+      other._faces.map(vIndices =>
         vIndices.map(vIndex => vIndex + this.numVertices()),
       ),
     );
   }
 
   removeFace(face: FaceObj) {
-    const removed = [...this.faces];
+    const removed = [...this._faces];
     _.pullAt(removed, [face.index]);
     return this.withFaces(removed);
   }
 
   removeFaces(faceObjs: FaceObj[]) {
-    const removed = [...this.faces];
+    const removed = [...this._faces];
     _.pullAt(removed, _.map(faceObjs, 'index'));
     return this.withFaces(removed);
-  }
-
-  mapVertices(iteratee: Iteratee<Vertex>) {
-    return this.withVertices(_.map(this.vertices, iteratee));
   }
 
   mapFaces(iteratee: FaceObj => Face) {

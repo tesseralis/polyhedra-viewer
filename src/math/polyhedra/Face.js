@@ -26,7 +26,7 @@ export default class Face {
   constructor(polyhedron: Polyhedron, index: FIndex) {
     this.polyhedron = polyhedron;
     this.index = index;
-    this.face = polyhedron.faces[index];
+    this.face = polyhedron._faces[index];
     this.vertices = _.map(this.face, vIndex => polyhedron.vertexObjs[vIndex]);
     this.edges = _.map(
       this.vertices,

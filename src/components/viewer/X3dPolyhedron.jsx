@@ -65,7 +65,7 @@ export default class X3dPolyhedron extends Component<
   render() {
     const { solidData, config } = this.props;
     const { error } = this.state;
-    const { vertices, faces, edges } = solidData;
+    const { vertices, faces, edges } = solidData.toJSON();
     const { showFaces, showEdges, showInnerFaces, opacity } = config;
 
     if (error) {
