@@ -1,8 +1,8 @@
 // @flow
 
 import _ from 'lodash';
-import { Vec3D } from 'toxiclibsjs/geom';
 
+import { Vec3D } from 'math/linAlg';
 import Polyhedron from './Polyhedron';
 import Face from './Face';
 import Vertex from './Vertex';

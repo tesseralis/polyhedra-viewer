@@ -2,6 +2,8 @@
 import _ from 'lodash';
 import { Vec3D, Ray3D, Triangle3D, Plane } from 'toxiclibsjs/geom';
 
+// Re-export Vec3D so its easier to switch
+export { Vec3D };
 export type Point = [number, number, number];
 
 export const PRECISION_DIGITS = 3;

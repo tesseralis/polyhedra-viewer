@@ -1,7 +1,6 @@
 // @flow
 import _ from 'lodash';
-import { Vec3D } from 'toxiclibsjs/geom';
-import { vec } from 'math/linAlg';
+import { vec, Vec3D } from 'math/linAlg';
 import { VIndex } from './solidTypes';
 import Polyhedron from './Polyhedron';
 import Edge from './Edge';

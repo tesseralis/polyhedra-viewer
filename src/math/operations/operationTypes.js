@@ -1,6 +1,6 @@
 // @flow
-import { Vec3D } from 'toxiclibsjs/geom';
 
+import { Vec3D } from 'math/linAlg';
 import { Polyhedron } from 'math/polyhedra';
 import type { Vertex, Face } from 'math/polyhedra';
 

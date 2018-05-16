@@ -2,9 +2,8 @@
 import React, { Component } from 'react';
 import _ from 'lodash';
 import EventListener from 'react-event-listener';
-import { Vec3D } from 'toxiclibsjs/geom';
 
-import { vec } from 'math/linAlg';
+import { vec, Vec3D } from 'math/linAlg';
 import { Polyhedron } from 'math/polyhedra';
 
 // Join a list of lists with an inner and outer separator.

@@ -1,7 +1,7 @@
 // @flow
 import _ from 'lodash';
-import { Vec3D } from 'toxiclibsjs/geom';
 
+import { Vec3D } from 'math/linAlg';
 import type { Point } from 'math/linAlg';
 import type { VIndex, SolidData } from './solidTypes';
 import Vertex from './Vertex';

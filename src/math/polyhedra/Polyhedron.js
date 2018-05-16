@@ -1,10 +1,9 @@
 // @flow
 import _ from 'lodash';
-import { Vec3D } from 'toxiclibsjs/geom';
 
 import { find } from 'util.js';
 import { isValidSolid, getSolidData } from 'data';
-import { getCentroid } from 'math/linAlg';
+import { Vec3D, getCentroid } from 'math/linAlg';
 import type { SolidData } from './solidTypes';
 
 import Face from './Face';
