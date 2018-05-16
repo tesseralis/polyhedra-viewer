@@ -47,75 +47,55 @@ function getSnubResult(polyhedron) {
   }
 }
 
+function getEdgeFacePaths(edge, twist) {
+  const [v1, v2] = _.map(edge.vertices, 'index');
+  const [f1, f2] = _.map(edge.adjacentFaces(), 'index');
+  switch (twist) {
+    case 'right':
+      return [
+        [[f1, v1], [f2, v2], [f1, v2]], // face 1
+        [[f1, v1], [f2, v1], [f2, v2]], // face 2
+      ];
+    case 'left':
+      return [
+        [[f1, v2], [f1, v1], [f2, v1]], // face 1
+        [[f2, v1], [f2, v2], [f1, v2]], // face 2
+      ];
+    default:
+      return [[[f1, v2], [f1, v1], [f2, v1], [f2, v2]]];
+  }
+}
+
 function duplicateVertices(polyhedron: Polyhedron, twist?: 'left' | 'right') {
+  const count = polyhedron.getVertex().adjacentFaces().length;
+
   const newVertexMapping = {};
-  const vertexFaces = [];
-  let newVertices = _.map(polyhedron.vertices, 'value');
-  _.forEach(polyhedron.vertices, (vertex, vIndex) => {
+  _.forEach(polyhedron.vertices, (v, vIndex) => {
     // For each vertex, pick one adjacent face to be the "head"
     // for every other adjacent face, map it to a duplicated vertex
-    const [head, ...tail] = vertex.adjacentFaces();
-    const start = newVertices.length;
-    _.set(newVertexMapping, [head.index, vIndex], vIndex);
-    _.forEach(tail, (face, i) => {
-      _.set(newVertexMapping, [face.index, vIndex], start + i);
+    _.forEach(v.adjacentFaces(), (f, i) => {
+      _.set(newVertexMapping, [f.index, v.index], v.index * count + i);
     });
-    vertexFaces.push([vIndex, ..._.range(start, start + tail.length)]);
-    newVertices = newVertices.concat(repeat(vertex.value, tail.length));
   });
 
-  const remappedOriginalFaces = polyhedron.faces.map(face => {
-    return face.vertices.map(v => newVertexMapping[face.index][v.index]);
-  });
-
-  const edgeFaces = (() => {
-    return _.flatMap(polyhedron.edges, edge => {
-      const [v1, v2] = _.map(edge.vertices, 'index');
-      const [f1, f2] = _.map(edge.adjacentFaces(), 'index');
-
-      switch (twist) {
-        case 'right':
-          return [
-            [
-              newVertexMapping[f1][v1],
-              newVertexMapping[f2][v2],
-              newVertexMapping[f1][v2],
-            ],
-            [
-              newVertexMapping[f1][v1],
-              newVertexMapping[f2][v1],
-              newVertexMapping[f2][v2],
-            ],
-          ];
-        case 'left':
-          return [
-            [
-              newVertexMapping[f1][v2],
-              newVertexMapping[f1][v1],
-              newVertexMapping[f2][v1],
-            ],
-            [
-              newVertexMapping[f2][v1],
-              newVertexMapping[f2][v2],
-              newVertexMapping[f1][v2],
-            ],
-          ];
-        default:
-          return [
-            [
-              newVertexMapping[f1][v2],
-              newVertexMapping[f1][v1],
-              newVertexMapping[f2][v1],
-              newVertexMapping[f2][v2],
-            ],
-          ];
-      }
-    });
-  })();
-
-  return Polyhedron.of(
-    newVertices,
-    _.concat(vertexFaces, edgeFaces, remappedOriginalFaces),
+  return polyhedron.withChanges(solid =>
+    solid
+      .withVertices(_.flatMap(polyhedron.vertices, v => repeat(v.value, count)))
+      .mapFaces(face =>
+        face.vertices.map(v => newVertexMapping[face.index][v.index]),
+      )
+      .addFaces(
+        _.map(polyhedron.vertices, v =>
+          _.range(v.index * count, (v.index + 1) * count),
+        ),
+      )
+      .addFaces(
+        _.flatMap(polyhedron.edges, edge =>
+          _.map(getEdgeFacePaths(edge, twist), face =>
+            _.map(face, path => _.get(newVertexMapping, path)),
+          ),
+        ),
+      ),
   );
 }
 

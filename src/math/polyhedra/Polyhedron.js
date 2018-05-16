@@ -5,8 +5,7 @@ import { Vec3D } from 'toxiclibsjs/geom';
 import { find } from 'util.js';
 import { isValidSolid, getSolidData } from 'data';
 import { getCentroid } from 'math/linAlg';
-import type { Point } from 'math/linAlg';
-import type { VIndex, SolidData } from './solidTypes';
+import type { SolidData } from './solidTypes';
 
 import Face from './Face';
 import Vertex from './Vertex';
@@ -32,10 +31,6 @@ export default class Polyhedron {
       throw new Error(`Invalid solid name: ${name}`);
     }
     return new Polyhedron(getSolidData(name));
-  }
-
-  static of(vertices: Point[], faces: VIndex[][]) {
-    return new Polyhedron({ vertices, faces });
   }
 
   constructor(solidData: SolidData) {
