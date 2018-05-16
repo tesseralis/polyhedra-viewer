@@ -232,7 +232,7 @@ function doAugment(polyhedron, base, using, gyrate, mock = false) {
   const alignedAugmenteeVertices = augmentee.vertices.map(v => {
     return v.vec
       .sub(underside.centroid())
-      .scale(base.sideLength() / augmentee.sideLength())
+      .scale(base.sideLength() / augmentee.edgeLength())
       .getRotatedAroundAxis(alignBasesNormal, alignBasesAngle - Math.PI);
   });
 

@@ -89,7 +89,7 @@ function getTruncateTransform(polyhedron, duplicated) {
   // faces are all regular
   const family = getFamily(polyhedron);
   const truncateLength = getTruncateLength(polyhedron);
-  const oldSideLength = polyhedron.sideLength();
+  const oldSideLength = polyhedron.edgeLength();
 
   const multiplier = getRectifiedMultiplier(family);
   const newSideLength = oldSideLength * multiplier;
@@ -97,7 +97,7 @@ function getTruncateTransform(polyhedron, duplicated) {
 
   const reference = Polyhedron.get(getReference(family));
   const normalizedResizeAmount =
-    reference.faceWithNumSides(6).distanceToCenter() / reference.sideLength() -
+    reference.faceWithNumSides(6).distanceToCenter() / reference.edgeLength() -
     polyhedron.smallestFace().distanceToCenter() / newSideLength;
 
   return (vector, vertex) => {
@@ -123,7 +123,7 @@ function getTruncateTransform(polyhedron, duplicated) {
 function doTruncate(polyhedron, options: TruncateOptions = {}) {
   const { rectify } = options;
   const truncateLength = getTruncateLength(polyhedron);
-  const oldSideLength = polyhedron.sideLength();
+  const oldSideLength = polyhedron.edgeLength();
   const truncateScale = (oldSideLength - truncateLength) / 2 / oldSideLength;
   const duplicated = duplicateVertices(polyhedron);
   const transform = getTruncateTransform(polyhedron, duplicated);

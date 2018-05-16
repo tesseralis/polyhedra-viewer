@@ -105,7 +105,7 @@ export default class Polyhedron {
   }
 
   // Get the edge length of this polyhedron, assuming equal edges
-  sideLength() {
+  edgeLength() {
     return this.getFace().sideLength();
   }
 
