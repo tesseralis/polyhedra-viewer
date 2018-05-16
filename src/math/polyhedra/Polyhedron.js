@@ -70,7 +70,7 @@ export default class Polyhedron {
     return this._edges;
   }
 
-  biggestFace() {
+  largestFace() {
     return _.maxBy(this.faces, 'numSides');
   }
 

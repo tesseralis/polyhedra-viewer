@@ -47,7 +47,7 @@ export function getPeakAlignment(polyhedron: Polyhedron, peak: Peak) {
   const diminishedVertices =
     orthoPeaks.length > 0
       ? getSingle(orthoPeaks).boundary()
-      : polyhedron.biggestFace().vertices;
+      : polyhedron.largestFace().vertices;
 
   return faceDistanceBetweenVertices(
     polyhedron,
