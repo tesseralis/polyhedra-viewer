@@ -84,7 +84,7 @@ export function getResizedVertices(
   const f0 = faces[0];
   const sideLength = f0.sideLength();
   const baseLength = f0.distanceToCenter() / sideLength;
-  const result = _.map(polyhedron.vertices, 'value');
+  const result = [...polyhedron.vertices];
   _.forEach(faces, face => {
     const normal = face.normal();
     _.forEach(face.vertices, v => {
