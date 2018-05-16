@@ -1,7 +1,7 @@
 // @flow
 import _ from 'lodash';
 
-import { VIndex, FIndex } from './solidTypes';
+import type { VIndex, FIndex } from './solidTypes';
 import Polyhedron from './Polyhedron';
 import VEList from './VEList';
 

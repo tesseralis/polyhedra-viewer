@@ -69,7 +69,7 @@ export default class Polyhedron {
     const edgesToFaces = {};
     _.forEach(this.faces, face => {
       _.forEach(face.edges, ({ v1, v2 }) => {
-        _.set(edgesToFaces, [v1.index, v2.index], face);
+        _.set(edgesToFaces, [v1.index.toString(), v2.index.toString()], face);
       });
     });
     return edgesToFaces;

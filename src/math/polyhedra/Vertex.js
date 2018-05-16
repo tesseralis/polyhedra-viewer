@@ -1,14 +1,15 @@
 // @flow
 import _ from 'lodash';
 import { vec, Vec3D } from 'math/linAlg';
-import { VIndex } from './solidTypes';
+import type { Point } from 'math/linAlg';
+import type { VIndex } from './solidTypes';
 import Polyhedron from './Polyhedron';
 import Edge from './Edge';
 
 export default class Vertex {
   polyhedron: Polyhedron;
   index: VIndex;
-  value: number[];
+  value: Point;
   vec: Vec3D;
 
   constructor(polyhedron: Polyhedron, index: VIndex) {

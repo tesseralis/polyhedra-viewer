@@ -10,7 +10,7 @@ import Polyhedron from './Polyhedron';
 
 export type VertexArg = Point | Vec3D | Vertex;
 
-type FaceArg = (VIndex | Vertex)[] | Face;
+type FaceArg = VIndex[] | (VIndex | Vertex)[] | Face;
 
 function normalizeVertex(v: VertexArg) {
   // If it's a raw point
@@ -64,7 +64,7 @@ export default class Builder {
     return this.withVertices(this.solidData.vertices.concat(vertices));
   }
 
-  addFaces(faces: VIndex[][]) {
+  addFaces(faces: FaceArg[]) {
     return this.withFaces(this.solidData.faces.concat(faces));
   }
 

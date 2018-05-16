@@ -1,13 +1,13 @@
-// TODO move this to a solidtypes file or something
-export type Vertex = Vector;
-export type VIndex = number;
+// @flow
 
-export type Face = VIndex[];
+import type { Point } from 'math/linAlg';
+// TODO move this to a solidtypes file or something
+export type VIndex = number;
 export type FIndex = number;
 
-export type Edge = [VIndex, VIndex];
+type Edge = [VIndex, VIndex];
 export interface SolidData {
-  vertices: Vertex[];
-  faces: Face[];
-  edges?: Edge[];
+  vertices: Point[];
+  faces: VIndex[][];
+  edges?: ?(Edge[]);
 }
