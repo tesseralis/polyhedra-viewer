@@ -1,31 +1,25 @@
 // @flow
 import { getMidpoint } from 'math/linAlg';
 import Polyhedron from './Polyhedron';
-import { VIndex } from './solidTypes';
 import Vertex from './Vertex';
 
 export default class Edge {
   polyhedron: Polyhedron;
-  a: VIndex;
-  b: VIndex;
-  // FIXME this is kind of confusing
-  va: Vertex;
-  vb: Vertex;
+  v1: Vertex;
+  v2: Vertex;
 
-  constructor(polyhedron: Polyhedron, a: VIndex, b: VIndex) {
-    this.polyhedron = polyhedron;
-    this.a = a;
-    this.b = b;
-    this.va = polyhedron.vertexObjs[a];
-    this.vb = polyhedron.vertexObjs[b];
+  constructor(v1: Vertex, v2: Vertex) {
+    this.polyhedron = v1.polyhedron;
+    this.v1 = v1;
+    this.v2 = v2;
   }
 
   get vertices() {
-    return [this.va, this.vb];
+    return [this.v1, this.v2];
   }
 
   get face() {
-    return this.polyhedron.edgeToFaceGraph()[this.a][this.b];
+    return this.polyhedron.edgeToFaceGraph()[this.v1.index][this.v2.index];
   }
 
   prev() {
@@ -37,15 +31,15 @@ export default class Edge {
   }
 
   length() {
-    return this.va.vec.distanceTo(this.vb.vec);
+    return this.v1.vec.distanceTo(this.v2.vec);
   }
 
   midpoint() {
-    return getMidpoint(this.va.vec, this.vb.vec);
+    return getMidpoint(this.v1.vec, this.v2.vec);
   }
 
   twin() {
-    return new Edge(this.polyhedron, this.b, this.a);
+    return new Edge(this.v2, this.v1);
   }
 
   // Get the faces adjacent to this edge, with the directed face first
@@ -66,7 +60,7 @@ export default class Edge {
     return c1.angleBetween(c2, true);
   }
 
-  equals(e: Edge) {
-    return this.a === e.a && this.b === e.b;
+  equals(edge: Edge) {
+    return this.v1.equals(edge.v1) && this.v2.equals(edge.v2);
   }
 }

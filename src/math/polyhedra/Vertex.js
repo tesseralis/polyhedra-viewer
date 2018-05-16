@@ -30,7 +30,7 @@ export default class Vertex {
   adjacentEdges() {
     // find an edge with this as a source
     const v2 = _.findIndex(this.polyhedron.edgeToFaceGraph()[this.index]);
-    const e0 = new Edge(this.polyhedron, this.index, v2);
+    const e0 = new Edge((this: any), this.polyhedron.vertexObjs[v2]);
     let e = e0;
     const result = [];
     let count = 0;
@@ -44,7 +44,7 @@ export default class Vertex {
   }
 
   adjacentVertices() {
-    return _.map(this.adjacentEdges(), 'vb');
+    return _.map(this.adjacentEdges(), 'v2');
   }
 
   adjacentFaces() {

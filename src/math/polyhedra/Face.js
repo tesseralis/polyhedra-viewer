@@ -29,9 +29,8 @@ export default class Face {
     this.face = polyhedron.faces[index];
     this.vertices = _.map(this.face, vIndex => polyhedron.vertexObjs[vIndex]);
     this.edges = _.map(
-      this.face,
-      (vIndex, i) =>
-        new Edge(this.polyhedron, vIndex, getCyclic(this.face, i + 1)),
+      this.vertices,
+      (v, i) => new Edge(v, getCyclic(this.vertices, i + 1)),
     );
     this.vectors = _.map(this.vertices, 'vec');
   }
@@ -45,11 +44,11 @@ export default class Face {
   }
 
   nextEdge(e: Edge) {
-    return find(this.edges, e2 => e2.a === e.b);
+    return find(this.edges, e2 => e2.v1.equals(e.v2));
   }
 
   prevEdge(e: Edge) {
-    return find(this.edges, e2 => e2.b === e.a);
+    return find(this.edges, e2 => e2.v2.equals(e.v1));
   }
 
   numUniqueSides() {

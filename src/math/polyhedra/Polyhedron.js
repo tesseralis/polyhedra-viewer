@@ -97,7 +97,10 @@ export default class Polyhedron {
   };
 
   getEdges = () => {
-    return _.map(this.edges, ([a, b]) => new EdgeObj((this: any), a, b));
+    return _.map(
+      this.edges,
+      ([a, b]) => new EdgeObj(this.vertexObjs[a], this.vertexObjs[b]),
+    );
   };
 
   biggestFace() {
@@ -142,8 +145,8 @@ export default class Polyhedron {
   edgeToFaceGraph = _.memoize(() => {
     const edgesToFaces = {};
     _.forEach(this.getFaces(), face => {
-      _.forEach(face.edges, ({ a, b }) => {
-        _.set(edgesToFaces, [a, b], face);
+      _.forEach(face.edges, ({ v1, v2 }) => {
+        _.set(edgesToFaces, [v1.index, v2.index], face);
       });
     });
     return edgesToFaces;

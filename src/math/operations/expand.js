@@ -72,7 +72,7 @@ function duplicateVertices(polyhedron: Polyhedron, twist?: 'left' | 'right') {
 
   const edgeFaces = (() => {
     return _.flatMap(polyhedron.getEdges(), edge => {
-      const { a: v1, b: v2 } = edge;
+      const [v1, v2] = _.map(edge.vertices, 'index');
       const [f1, f2] = _.map(edge.adjacentFaces(), 'index');
 
       switch (twist) {

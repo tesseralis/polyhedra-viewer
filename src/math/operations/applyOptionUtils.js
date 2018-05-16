@@ -67,7 +67,7 @@ function getCyclicPairs<T>(array: T[]) {
 export function getCupolaGyrate(polyhedron: Polyhedron, peak: Peak) {
   const boundary = peak.boundary();
   const isOrtho = _.every(getCyclicPairs(boundary), vPair => {
-    const edge = new Edge(polyhedron, ..._.map(vPair, 'index'));
+    const edge = new Edge(...vPair);
     const [n1, n2] = _.map(edge.adjacentFaces(), 'numSides');
     return (n1 === 4) === (n2 === 4);
   });
