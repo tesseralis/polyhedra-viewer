@@ -45,7 +45,7 @@ function isProperPolyhedron(polyhedron) {
     const normal = face.normal();
     const expectedNormal = faceCentroid.sub(centroid);
     if (normal.angleBetween(expectedNormal, true) > Math.PI / 2) {
-      console.log(`polyhedron inside out at ${face}`);
+      console.log(`polyhedron inside out at ${face.index}`);
       return false;
     }
   }

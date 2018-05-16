@@ -1,6 +1,6 @@
 // @flow
 import _ from 'lodash';
-import { getNormalRay, rotateAround } from 'math/linAlg';
+import { rotateAround } from 'math/linAlg';
 import { Peak } from 'math/polyhedra';
 import type { Operation } from './operationTypes';
 import { mapObject } from 'util.js';
@@ -17,18 +17,21 @@ function applyGyrate(polyhedron, { peak }) {
   const boundary = peak.boundary();
 
   // rotate the cupola/rotunda top
-  const normalRay = getNormalRay(peak.boundaryVectors());
-  const theta = TAU / boundary.length;
+  const normalRay = boundary.normalRay();
+  const theta = TAU / boundary.numSides;
 
-  const oldToNew = mapObject(boundary, (vertex, i) => [vertex.index, i]);
+  const oldToNew = mapObject(boundary.vertices, (vertex, i) => [
+    vertex.index,
+    i,
+  ]);
 
   const mockPolyhedron = polyhedron.withChanges(solid =>
-    solid.addVertices(boundary).mapFaces(face => {
+    solid.addVertices(boundary.vertices).mapFaces(face => {
       if (!face.inSet(peak.faces())) {
         return face;
       }
       return face.vertices.map(v => {
-        return v.inSet(boundary)
+        return v.inSet(boundary.vertices)
           ? polyhedron.numVertices() + oldToNew[v.index]
           : v.index;
       });

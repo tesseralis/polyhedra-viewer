@@ -2,12 +2,12 @@
 
 import _ from 'lodash';
 import { Vec3D } from 'toxiclibsjs/geom';
-import { isPlanar } from 'math/linAlg';
 
 import Polyhedron from './Polyhedron';
 import Face from './Face';
 import Vertex from './Vertex';
 import Edge from './Edge';
+import VEList from './VEList';
 
 type PeakType = 'pyramid' | 'cupola' | 'rotunda' | 'fastigium' | 'prism';
 type FaceConfiguration = { [string]: number };
@@ -18,13 +18,13 @@ function getBoundary(faces: Face[]) {
     .flatMap('edges')
     .find(e => !e.twin().face.inSet(faces));
 
-  const result = [];
+  const result: Edge[] = [];
   let e = e0;
   let count = 0;
   do {
     if (count++ > 20) throw new Error('we done goofed');
     if (!e.twin().face.inSet(faces)) {
-      result.push(e.v1);
+      result.push(e);
       const nextTwin = e.next().twin();
       if (nextTwin.face.inSet(faces)) {
         e = nextTwin.next();
@@ -35,7 +35,7 @@ function getBoundary(faces: Face[]) {
       e = e.twin().next();
     }
   } while (!e.equals(e0));
-  return result;
+  return new VEList(result);
 }
 
 const withMapper = property => Base =>
@@ -114,7 +114,7 @@ export default class Peak {
       const faceCount = _.countBy(vertex.adjacentFaces(), 'numSides');
       return _.isEqual(faceCount, this.faceConfiguration());
     });
-    return matchFaces && isPlanar(this.boundaryVectors());
+    return matchFaces && this.boundary().isPlanar();
   }
 }
 const Pyramid = withMapper('vertices')(

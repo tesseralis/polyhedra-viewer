@@ -1,11 +1,11 @@
 // @flow
 import _ from 'lodash';
-import { getSingle, getCyclic } from 'util.js';
-import { Peak, Polyhedron, Edge } from 'math/polyhedra';
-import { isInverse, getNormal } from 'math/linAlg';
+import { getSingle } from 'util.js';
+import { Peak, Polyhedron } from 'math/polyhedra';
+import { isInverse } from 'math/linAlg';
 
 export function getPeakAlignment(polyhedron: Polyhedron, peak: Peak) {
-  const peakNormal = getNormal(peak.boundaryVectors());
+  const peakNormal = peak.boundary().normal();
 
   const isRhombicosidodecahedron = peak.type === 'cupola';
   const orthoPeaks = isRhombicosidodecahedron
@@ -17,22 +17,16 @@ export function getPeakAlignment(polyhedron: Polyhedron, peak: Peak) {
 
   const otherNormal =
     orthoPeaks.length > 0
-      ? getNormal(getSingle(orthoPeaks).boundaryVectors())
+      ? getSingle(orthoPeaks)
+          .boundary()
+          .normal()
       : polyhedron.largestFace().normal();
 
   return isInverse(peakNormal, otherNormal) ? 'para' : 'meta';
 }
 
-function getCyclicPairs<T>(array: T[]) {
-  return _.map(array, (item, index) => {
-    return [item, getCyclic(array, index + 1)];
-  });
-}
-
 export function getCupolaGyrate(polyhedron: Polyhedron, peak: Peak) {
-  const boundary = peak.boundary();
-  const isOrtho = _.every(getCyclicPairs(boundary), vPair => {
-    const edge = new Edge(...vPair);
+  const isOrtho = _.every(peak.boundary().edges, edge => {
     const [n1, n2] = _.map(edge.adjacentFaces(), 'numSides');
     return (n1 === 4) === (n2 === 4);
   });

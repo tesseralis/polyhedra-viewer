@@ -9,7 +9,7 @@ import { getPeakAlignment, getCupolaGyrate } from './applyOptionUtils';
 function removePeak(polyhedron, peak) {
   return removeExtraneousVertices(
     polyhedron.withChanges(solid =>
-      solid.withoutFaces(peak.faces()).addFaces([peak.boundary()]),
+      solid.withoutFaces(peak.faces()).addFaces([peak.boundary().vertices]),
     ),
   );
 }
