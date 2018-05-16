@@ -21,10 +21,6 @@ function normalizeVertex(v: VertexArg) {
   return v.value;
 }
 
-function normalizeVertices(vertices: VertexArg[]) {
-  return _.map(vertices, normalizeVertex);
-}
-
 function normalizeFace(face: FaceArg) {
   if (Array.isArray(face)) {
     return _.map(face, v => {
@@ -33,10 +29,6 @@ function normalizeFace(face: FaceArg) {
     });
   }
   return face.value;
-}
-
-function normalizeFaces(faces: FaceArg[]) {
-  return _.map(faces, normalizeFace);
 }
 
 export default class Builder {
@@ -54,7 +46,7 @@ export default class Builder {
 
   // return a new polyhedron with the given vertices
   withVertices(vertices: VertexArg[]) {
-    _.extend(this.solidData, { vertices: normalizeVertices(vertices) });
+    _.extend(this.solidData, { vertices: vertices.map(normalizeVertex) });
     return this;
   }
 
@@ -62,7 +54,7 @@ export default class Builder {
   withFaces(faces: FaceArg[]) {
     // reset edges, since faces might have changed
     _.extend(this.solidData, {
-      faces: normalizeFaces(faces),
+      faces: faces.map(normalizeFace),
       edges: undefined,
     });
     return this;
