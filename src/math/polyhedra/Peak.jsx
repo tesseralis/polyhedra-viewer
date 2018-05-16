@@ -97,7 +97,7 @@ export default class Peak {
 
   faceConfiguration: () => FaceConfiguration;
 
-  faces = _.memoize(() => {
+  faces = _.once(() => {
     return _(this.innerVertices())
       .flatMap(v => v.adjacentFaces())
       .uniqBy('index')
@@ -106,7 +106,7 @@ export default class Peak {
 
   // TODO I'm still not a fan of this; I think the best would be to make this a face-like object
   // so you can get the things underneath it
-  boundary = _.memoize(() => {
+  boundary = _.once(() => {
     const boundary = getBoundary(this.faces());
     return boundary.map(vIndex => this.polyhedron.vertices[vIndex]);
   });

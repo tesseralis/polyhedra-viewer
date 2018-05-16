@@ -66,7 +66,7 @@ export default class Polyhedron {
   }
 
   // Memoized mapping of edges to faces, used for quickly finding adjacency
-  edgeToFaceGraph = _.memoize(() => {
+  edgeToFaceGraph = _.once(() => {
     const edgesToFaces = {};
     _.forEach(this.faces, face => {
       _.forEach(face.edges, ({ v1, v2 }) => {
