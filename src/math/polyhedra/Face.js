@@ -48,7 +48,7 @@ export default class Face {
   }
 
   numUniqueSides() {
-    return _.countBy(this.edges, edge => edge.length() > PRECISION);
+    return _.filter(this.edges, edge => edge.length() > PRECISION).length;
   }
 
   // Return true if this face is the same as the given face (within a polyhedron)
