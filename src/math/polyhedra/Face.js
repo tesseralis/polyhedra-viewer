@@ -27,7 +27,7 @@ export default class Face {
     this.polyhedron = polyhedron;
     this.index = index;
     this.face = polyhedron.solidData.faces[index];
-    this.vertices = _.map(this.face, vIndex => polyhedron.vertexObjs[vIndex]);
+    this.vertices = _.map(this.face, vIndex => polyhedron.vertices[vIndex]);
     this.edges = _.map(
       this.vertices,
       (v, i) => new Edge(v, getCyclic(this.vertices, i + 1)),

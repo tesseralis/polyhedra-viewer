@@ -16,7 +16,7 @@ const excludedOperations = {};
 
 function isProperPolyhedron(polyhedron) {
   let prevSideLength: ?number;
-  for (let edge of polyhedron.getEdges()) {
+  for (let edge of polyhedron.edges) {
     const sideLength: number = edge.length();
     if (prevSideLength !== undefined) {
       if (_.isNaN(sideLength)) {
@@ -40,7 +40,7 @@ function isProperPolyhedron(polyhedron) {
 
   // Make sure all faces are facing the right way
   const centroid = polyhedron.centroid();
-  for (let face of polyhedron.getFaces()) {
+  for (let face of polyhedron.faces) {
     const faceCentroid = face.centroid();
     const normal = face.normal();
     const expectedNormal = faceCentroid.sub(centroid);

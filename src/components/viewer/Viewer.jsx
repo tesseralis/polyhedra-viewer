@@ -91,7 +91,7 @@ const polygonColors = colors => polygons.map(n => toRgb(colors[n]));
 
 function getFaceColors(polyhedron: Polyhedron, colors: any) {
   return _.pickBy(
-    mapObject(polyhedron.getFaces(), (face, fIndex) => [
+    mapObject(polyhedron.faces, (face, fIndex) => [
       fIndex,
       colors[face.numUniqueSides()],
     ]),
@@ -192,7 +192,7 @@ export default class Viewer extends Component<ViewerProps, ViewerState> {
         <div className={css(styles.scene)}>
           <X3dScene>
             <X3dPolyhedron
-              solidData={interpolated || polyhedron}
+              polyhedron={interpolated || polyhedron}
               faceColors={this.getColors()}
               config={config}
               setApplyArgs={this.setApplyArgs}
@@ -214,7 +214,7 @@ export default class Viewer extends Component<ViewerProps, ViewerState> {
 
   getColors = () => {
     const { interpolated, polyhedron } = this.state;
-    return (interpolated || polyhedron).getFaces().map(this.getColorForFace);
+    return (interpolated || polyhedron).faces.map(this.getColorForFace);
   };
 
   // TODO probably move this and the color utility functions to their own file
@@ -321,7 +321,7 @@ export default class Viewer extends Component<ViewerProps, ViewerState> {
         duration: transitionDuration,
         ease: 'easePolyOut',
         startValue: {
-          vertices: interpolated.vertices,
+          vertices: interpolated.solidData.vertices,
           faceColors: { ...colorEnd, ...colorStart },
         },
         endValue: {

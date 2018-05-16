@@ -96,7 +96,7 @@ export default class Peak {
   // so you can get the things underneath it
   boundary = _.memoize(() => {
     const boundary = getBoundary(this.faces());
-    return boundary.map(vIndex => this.polyhedron.vertexObjs[vIndex]);
+    return boundary.map(vIndex => this.polyhedron.vertices[vIndex]);
   });
 
   isValid() {
@@ -107,7 +107,7 @@ export default class Peak {
     return matchFaces && isPlanar(_.map(this.boundary(), 'vec'));
   }
 }
-const Pyramid = withMapper('getVertices')(
+const Pyramid = withMapper('vertices')(
   class extends Peak {
     vertex: Vertex;
 
@@ -124,7 +124,7 @@ const Pyramid = withMapper('getVertices')(
   },
 );
 
-const Fastigium = withMapper('getEdges')(
+const Fastigium = withMapper('edges')(
   class extends Peak {
     edge: Edge;
 
@@ -141,7 +141,7 @@ const Fastigium = withMapper('getEdges')(
   },
 );
 
-const Cupola = withMapper('getFaces')(
+const Cupola = withMapper('faces')(
   class extends Peak {
     face: Face;
 
@@ -158,7 +158,7 @@ const Cupola = withMapper('getFaces')(
   },
 );
 
-const Rotunda = withMapper('getFaces')(
+const Rotunda = withMapper('faces')(
   class extends Peak {
     face: Face;
 

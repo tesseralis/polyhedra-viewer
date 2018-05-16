@@ -43,7 +43,7 @@ function getAdjacentFaces(vertex, facesToCumulate) {
 function duplicateVertices(polyhedron, facesToCumulate) {
   const offset = polyhedron.numVertices();
   const mapping = {};
-  _.forEach(polyhedron.getVertices(), vertex => {
+  _.forEach(polyhedron.vertices, vertex => {
     const v = vertex.index;
     const v2 = v + offset;
     const values = [v, [v2, v], v2, [v, v2]];
@@ -55,7 +55,7 @@ function duplicateVertices(polyhedron, facesToCumulate) {
   });
   // Double the amount of vertices
   return polyhedron
-    .addVertices(_.map(polyhedron.getVertices(), 'value'))
+    .addVertices(_.map(polyhedron.vertices, 'value'))
     .mapFaces(f => {
       return _.flatMapDeep(f.vertices, v => mapping[f.index][v.index]);
     });
@@ -65,14 +65,14 @@ function getCumulateFaces(polyhedron, faceType) {
   // Special octahedron case
   if (
     polyhedron.numFaces() === 8 &&
-    _.every(polyhedron.getFaces(), { numSides: 3 })
+    _.every(polyhedron.faces, { numSides: 3 })
   ) {
     const face0 = polyhedron.getFace();
     const adjacentFaces = face0.adjacentFaces();
     return _.filter(face0.vertexAdjacentFaces(), f => !f.inSet(adjacentFaces));
   }
 
-  return _.filter(polyhedron.getFaces(), { numSides: faceType });
+  return _.filter(polyhedron.faces, { numSides: faceType });
 }
 
 function calculateCumulateDist(polyhedron, face, edge) {
@@ -101,7 +101,7 @@ function applyCumulate(
   { faceType }: CumulateOptions = {},
 ) {
   // face indices with the right number of sides
-  const n = faceType || _.min(polyhedron.getFaces().map(face => face.numSides));
+  const n = faceType || _.min(polyhedron.faces.map(face => face.numSides));
   let cumulateFaces = getCumulateFaces(polyhedron, n);
 
   if (isRectified(polyhedron)) {
@@ -120,14 +120,12 @@ function applyCumulate(
     });
   });
 
-  const endVertices = polyhedron
-    .getVertices()
-    .map(
-      (v, vIndex) =>
-        _.has(oldToNew, vIndex.toString())
-          ? verticesToAdd[oldToNew[vIndex]]
-          : v.vec,
-    );
+  const endVertices = polyhedron.vertices.map(
+    (v, vIndex) =>
+      _.has(oldToNew, vIndex.toString())
+        ? verticesToAdd[oldToNew[vIndex]]
+        : v.vec,
+  );
 
   return {
     animationData: {

@@ -62,7 +62,7 @@ const augmentTypes = {
 function getAugmentAlignment(polyhedron, face) {
   // get the existing peak boundary
   const peakBoundary = getSingle(polyhedron.peaks()).boundary();
-  const isHexagonalPrism = _.some(polyhedron.getFaces(), { numSides: 6 });
+  const isHexagonalPrism = _.some(polyhedron.faces, { numSides: 6 });
 
   // calculate the face distance to the peak's boundary
   return faceDistanceBetweenVertices(
@@ -109,7 +109,7 @@ function canAugment(base) {
 }
 
 function getAugmentGraph(polyhedron) {
-  return polyhedron.getFaces().map(face => canAugment(face));
+  return polyhedron.faces.map(face => canAugment(face));
 }
 
 function getAugmentFace(polyhedron, graph, point) {
@@ -196,9 +196,9 @@ function isAligned(polyhedron, base, underside, gyrate, augmentType) {
 // Flatten a polyhedron at the given face
 function flatten(polyhedron, face) {
   const plane = face.plane();
-  const newVertices = polyhedron
-    .getVertices()
-    .map(v => plane.getProjectedPoint(v.vec));
+  const newVertices = polyhedron.vertices.map(v =>
+    plane.getProjectedPoint(v.vec),
+  );
   return polyhedron.withVertexVectors(newVertices);
 }
 
@@ -229,7 +229,7 @@ function doAugment(polyhedron, base, using, gyrate, mock = false) {
   // The `|| 0` is because this sometimes returns NaN if the angle is 0
   const alignBasesAngle = baseNormal.angleBetween(undersideNormal, true) || 0;
 
-  const alignedAugmenteeVertices = augmentee.getVertices().map(v => {
+  const alignedAugmenteeVertices = augmentee.vertices.map(v => {
     return v.vec
       .sub(underside.centroid())
       .scale(base.edgeLength() / augmentee.edgeLength())
@@ -355,7 +355,7 @@ export const augment: Operation<AugmentOptions> = {
     const rawGyrateOpts = _.compact(_.uniq(_.map(relations, 'gyrate')));
     const gyrateOpts = rawGyrateOpts.length === 2 ? rawGyrateOpts : [undefined];
     const usingOpts = _.compact(_.uniq(_.map(relations, 'using')));
-    const faceOpts = polyhedron.getFaces().filter(face => canAugment(face));
+    const faceOpts = polyhedron.faces.filter(face => canAugment(face));
 
     return cartesian(gyrateOpts, usingOpts, faceOpts).map(
       ([gyrate, using, face]) => ({ gyrate, using, face }),

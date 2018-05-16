@@ -25,7 +25,7 @@ function applyGyrate(polyhedron, { peak }) {
   const oldToNew = mapObject(boundary, (vertex, i) => [vertex.index, i]);
 
   // mock faces for animation
-  const newFaces = polyhedron.getFaces().map(face => {
+  const newFaces = polyhedron.faces.map(face => {
     if (!face.inSet(peak.faces())) {
       return face.vIndices();
     }
@@ -40,7 +40,7 @@ function applyGyrate(polyhedron, { peak }) {
     .addVertices(newboundary)
     .withFaces(newFaces);
 
-  const endVertices = mockPolyhedron.getVertices().map((v, vIndex) => {
+  const endVertices = mockPolyhedron.vertices.map((v, vIndex) => {
     if (
       _.includes(_.map(peak.innerVertices(), 'index'), v.index) ||
       v.index >= polyhedron.numVertices()

@@ -14,6 +14,10 @@ export default class Edge {
     this.v2 = v2;
   }
 
+  get value() {
+    return [this.v1.index, this.v2.index];
+  }
+
   get vertices() {
     return [this.v1, this.v2];
   }
@@ -40,6 +44,12 @@ export default class Edge {
 
   twin() {
     return new Edge(this.v2, this.v1);
+  }
+
+  // Get the "undirected" version of this edge, represented by
+  // the version where its vertices are ordered by their index
+  undirected() {
+    return this.v2.index > this.v1.index ? this : this.twin();
   }
 
   // Get the faces adjacent to this edge, with the directed face first

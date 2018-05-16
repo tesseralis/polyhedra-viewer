@@ -48,16 +48,14 @@ function getRectifiedMultiplier(type) {
 function duplicateVertices(polyhedron) {
   const mapping = {};
   const count = polyhedron.getVertex().adjacentFaces().length;
-  _.forEach(polyhedron.getVertices(), v => {
+  _.forEach(polyhedron.vertices, v => {
     _.forEach(v.adjacentFaces(), (face, i) => {
       _.set(mapping, [face.index, v.index], i);
     });
   });
 
   const { vertices, faces } = polyhedron
-    .withVertices(
-      _.flatMap(polyhedron.getVertices(), v => repeat(v.value, count)),
-    )
+    .withVertices(_.flatMap(polyhedron.vertices, v => repeat(v.value, count)))
     .mapFaces(face => {
       return _.flatMap(face.vertices, v => {
         const base = count * v.index;
@@ -66,7 +64,7 @@ function duplicateVertices(polyhedron) {
       });
     })
     .addFaces(
-      _.map(polyhedron.getVertices(), v =>
+      _.map(polyhedron.vertices, v =>
         _.range(v.index * count, (v.index + 1) * count),
       ),
     )
@@ -130,7 +128,7 @@ function doTruncate(polyhedron, options: TruncateOptions = {}) {
   const duplicated = duplicateVertices(polyhedron);
   const transform = getTruncateTransform(polyhedron, duplicated);
 
-  const truncatedVertices = duplicated.getVertices().map(vertex => {
+  const truncatedVertices = duplicated.vertices.map(vertex => {
     const adjacentVertices = vertex.adjacentVertices();
     const v = vertex.vec;
     const v1 = find(adjacentVertices, adj => adj.vec.distanceTo(v) > PRECISION);

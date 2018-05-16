@@ -29,7 +29,7 @@ export default class AppPage {
   }
 
   getPolyhedron() {
-    return this.wrapper.find('X3dPolyhedron').prop('solidData');
+    return this.wrapper.find('X3dPolyhedron').prop('polyhedron');
   }
 
   clickFace(face) {
@@ -69,12 +69,7 @@ export default class AppPage {
     viewer.instance().finishAnimation();
     this.wrapper.update();
     this.expectPath(`/${expected}/related`);
-    expect(
-      this.wrapper
-        .find('X3dPolyhedron')
-        .prop('solidData')
-        .isSame(Polyhedron.get(expected)),
-    ).toBe(true);
+    expect(this.getPolyhedron().isSame(Polyhedron.get(expected))).toBe(true);
     return this;
   }
 }

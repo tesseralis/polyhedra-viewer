@@ -16,7 +16,7 @@ export function deduplicateVertices(polyhedron: Polyhedron) {
   const unique = [];
   const oldToNew = {};
 
-  _.forEach(polyhedron.getVertices(), (v, vIndex) => {
+  _.forEach(polyhedron.vertices, (v, vIndex) => {
     const match = _.find(unique, point =>
       v.vec.equalsWithTolerance(point.vec, PRECISION),
     );
@@ -29,8 +29,7 @@ export function deduplicateVertices(polyhedron: Polyhedron) {
   });
 
   // replace vertices that are the same
-  let newFaces = polyhedron
-    .getFaces()
+  let newFaces = polyhedron.faces
     .map(face => _.uniq(face.vertices.map(v => oldToNew[v.index])))
     .filter(vIndices => vIndices.length >= 3);
 
@@ -44,16 +43,13 @@ export function deduplicateVertices(polyhedron: Polyhedron) {
  */
 export function removeExtraneousVertices(polyhedron: Polyhedron) {
   // Vertex indices to remove
-  const vertsInFaces = _.flatMap(polyhedron.getFaces(), 'vertices');
-  const toRemove = _.filter(
-    polyhedron.getVertices(),
-    v => !v.inSet(vertsInFaces),
-  );
+  const vertsInFaces = _.flatMap(polyhedron.faces, 'vertices');
+  const toRemove = _.filter(polyhedron.vertices, v => !v.inSet(vertsInFaces));
   const numToRemove = toRemove.length;
 
   // Map the `numToRemove` last vertices of the polyhedron (that don't overlap)
   // to the first few removed vertices
-  const newToOld = _(polyhedron.getVertices())
+  const newToOld = _(polyhedron.vertices)
     .takeRight(numToRemove)
     .filter(v => !v.inSet(toRemove))
     .map((v, i) => [v.index, toRemove[i].index])
@@ -61,13 +57,13 @@ export function removeExtraneousVertices(polyhedron: Polyhedron) {
     .value();
   const oldToNew = _.invert(newToOld);
 
-  const vertexVals = _.map(polyhedron.getVertices(), 'value');
-  const newVertices = _(polyhedron.getVertices())
+  const vertexVals = _.map(polyhedron.vertices, 'value');
+  const newVertices = _(polyhedron.vertices)
     .map(v => vertexVals[_.get(oldToNew, v.index, v.index)])
     .dropRight(numToRemove)
     .value();
 
-  const newFaces = _.map(polyhedron.getFaces(), face => {
+  const newFaces = _.map(polyhedron.faces, face => {
     return _.map(face.vertices, v => _.get(newToOld, v.index, v.index));
   });
   return Polyhedron.of(newVertices, newFaces);
@@ -83,7 +79,7 @@ export function getResizedVertices(
   const f0 = faces[0];
   const sideLength = f0.edgeLength();
   const baseLength = f0.distanceToCenter() / sideLength;
-  const result = _.map(polyhedron.getVertices(), 'value');
+  const result = _.map(polyhedron.vertices, 'value');
   _.forEach(faces, face => {
     const normal = face.normal();
     _.forEach(face.vertices, v => {
@@ -122,7 +118,7 @@ export function isExpandedFace(
 
 export function getSnubAngle(polyhedron: Polyhedron, numSides: number) {
   const face0 =
-    _.find(polyhedron.getFaces(), face =>
+    _.find(polyhedron.faces, face =>
       isExpandedFace(polyhedron, face, numSides),
     ) || polyhedron.getFace();
 
@@ -130,7 +126,7 @@ export function getSnubAngle(polyhedron: Polyhedron, numSides: number) {
   const faceCentroid = face0.centroid();
   const faceNormal = face0.normal();
   const snubFaces = _.filter(
-    polyhedron.getFaces(),
+    polyhedron.faces,
     face =>
       isExpandedFace(polyhedron, face, numSides) &&
       !face.inSet(face0AdjacentFaces),

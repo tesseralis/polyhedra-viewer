@@ -63,7 +63,7 @@ function getFaceDistance(face1, face2) {
 
 function getIcosahedronContractFaces(polyhedron) {
   let result = [];
-  let toTest = polyhedron.getFaces();
+  let toTest = polyhedron.faces;
   while (toTest.length > 0) {
     const [next, ...rest] = toTest;
     result.push(next);
@@ -73,7 +73,7 @@ function getIcosahedronContractFaces(polyhedron) {
 }
 
 function getCuboctahedronContractFaces(polyhedron) {
-  const toCheck = _.filter(polyhedron.getFaces(), { numSides: 3 });
+  const toCheck = _.filter(polyhedron.faces, { numSides: 3 });
   const result = [];
   const invalid = [];
   while (toCheck.length > 0) {
@@ -99,7 +99,7 @@ function getContractFaces(polyhedron, faceType) {
       ? getIcosahedronContractFaces(polyhedron)
       : getCuboctahedronContractFaces(polyhedron);
   }
-  return _.filter(polyhedron.getFaces(), face =>
+  return _.filter(polyhedron.faces, face =>
     isExpandedFace(polyhedron, face, faceType),
   );
 }

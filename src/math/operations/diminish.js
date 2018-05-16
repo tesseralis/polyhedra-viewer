@@ -65,7 +65,7 @@ export const diminish: Operation<DiminishOptions> = {
 
 function applyShorten(polyhedron) {
   // Find a prism or antiprism face
-  const faces = polyhedron.getFaces().filter(face => {
+  const faces = polyhedron.faces.filter(face => {
     return _.uniqBy(face.adjacentFaces(), 'numSides').length === 1;
   });
   const face = _.maxBy(faces, 'numSides');
