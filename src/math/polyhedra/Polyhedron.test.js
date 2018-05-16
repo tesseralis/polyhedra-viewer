@@ -8,7 +8,7 @@ describe('Polyhedron', () => {
 
   describe('edges', () => {
     it('populates on load if not provided', () => {
-      expect(polyhedron.edges).toHaveLength(6);
+      expect(polyhedron.getEdges()).toHaveLength(6);
     });
   });
 

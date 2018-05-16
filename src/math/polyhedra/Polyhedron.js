@@ -6,81 +6,61 @@ import { find, getCyclic } from 'util.js';
 import { isValidSolid, getSolidData } from 'data';
 import { getCentroid } from 'math/linAlg';
 import type { Point } from 'math/linAlg';
-import type { Vertex, Face, Edge } from './solidTypes';
+import type { Vertex, Face, SolidData } from './solidTypes';
 
 import Peak from './Peak';
 import FaceObj from './Face';
 import VertexObj from './Vertex';
 import EdgeObj from './Edge';
 
-interface PolyhedronArgs {
-  vertices: Vertex[];
-  faces: Face[];
-  edges?: Edge[];
-  name?: string;
-}
-
 function getEdge(v1, v2) {
   return v1 < v2 ? [v1, v2] : [v2, v1];
 }
 
+function getEdges(faces) {
+  return _(faces)
+    .flatMap(vIndices =>
+      vIndices.map((vertex, i) => getEdge(vertex, getCyclic(vIndices, i + 1))),
+    )
+    .uniqWith(_.isEqual)
+    .value();
+}
+
 export default class Polyhedron {
-  _vertices: Vertex[];
-  _faces: Face[];
+  solidData: SolidData;
   faceObjs: FaceObj[];
   vertexObjs: VertexObj[];
-
-  _edges: Edge[];
+  edgeObjs: EdgeObj[];
 
   static get(name: string) {
     if (!isValidSolid(name)) {
       throw new Error(`Invalid solid name: ${name}`);
     }
-    return new Polyhedron({ ...getSolidData(name), name });
+    return new Polyhedron(getSolidData(name));
   }
 
   static of(vertices: Vertex[], faces: Face[]) {
     return new Polyhedron({ vertices, faces });
   }
 
-  constructor({ vertices, faces, edges, name }: PolyhedronArgs) {
-    this._vertices = vertices;
-    this._faces = faces;
-    this.vertexObjs = vertices.map(
+  constructor(solidData: SolidData) {
+    this.solidData = {
+      ...solidData,
+      edges: solidData.edges || getEdges(solidData.faces),
+    };
+    this.vertexObjs = solidData.vertices.map(
       (vertex, vIndex) => new VertexObj((this: any), vIndex),
     );
-    this.faceObjs = faces.map(
+    this.faceObjs = solidData.faces.map(
       (face, fIndex) => new FaceObj((this: any), fIndex),
     );
-    if (edges) {
-      this._edges = edges;
-    }
-  }
-
-  getAllEdges() {
-    return _(this._faces)
-      .flatMap(vIndices =>
-        vIndices.map((vertex, i) =>
-          getEdge(vertex, getCyclic(vIndices, i + 1)),
-        ),
-      )
-      .uniqWith(_.isEqual)
-      .value();
-  }
-
-  get edges() {
-    if (!this._edges) {
-      this._edges = this.getAllEdges();
-    }
-    return this._edges;
+    this.edgeObjs = this.solidData.edges.map(
+      ([a, b]) => new EdgeObj(this.vertexObjs[a], this.vertexObjs[b]),
+    );
   }
 
   toJSON() {
-    return {
-      vertices: this._vertices,
-      faces: this._faces,
-      edges: this.edges,
-    };
+    return this.solidData;
   }
 
   getVertex() {
@@ -101,7 +81,7 @@ export default class Polyhedron {
 
   getEdges = () => {
     return _.map(
-      this.edges,
+      this.solidData.edges,
       ([a, b]) => new EdgeObj(this.vertexObjs[a], this.vertexObjs[b]),
     );
   };
@@ -119,11 +99,11 @@ export default class Polyhedron {
   }
 
   numVertices() {
-    return this._vertices.length;
+    return this.vertexObjs.length;
   }
 
   numFaces() {
-    return this._faces.length;
+    return this.faceObjs.length;
   }
 
   // Return the number of each type of faces of each face
@@ -171,29 +151,29 @@ export default class Polyhedron {
   }
 
   addVertices(vertices: Vertex[]) {
-    return this.withVertices(this._vertices.concat(vertices));
+    return this.withVertices(this.solidData.vertices.concat(vertices));
   }
 
   addFaces(faces: Face[]) {
-    return this.withFaces(this._faces.concat(faces));
+    return this.withFaces(this.solidData.faces.concat(faces));
   }
 
   addPolyhedron(other: Polyhedron) {
-    return this.addVertices(other._vertices).addFaces(
-      other._faces.map(vIndices =>
+    return this.addVertices(other.solidData.vertices).addFaces(
+      other.solidData.faces.map(vIndices =>
         vIndices.map(vIndex => vIndex + this.numVertices()),
       ),
     );
   }
 
   removeFace(face: FaceObj) {
-    const removed = [...this._faces];
+    const removed = [...this.solidData.faces];
     _.pullAt(removed, [face.index]);
     return this.withFaces(removed);
   }
 
   removeFaces(faceObjs: FaceObj[]) {
-    const removed = [...this._faces];
+    const removed = [...this.solidData.faces];
     _.pullAt(removed, _.map(faceObjs, 'index'));
     return this.withFaces(removed);
   }

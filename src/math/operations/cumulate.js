@@ -40,7 +40,7 @@ function getAdjacentFaces(vertex, facesToCumulate) {
   return [...last, first];
 }
 
-function duplicateVertices2(polyhedron, facesToCumulate) {
+function duplicateVertices(polyhedron, facesToCumulate) {
   const offset = polyhedron.numVertices();
   const mapping = {};
   _.forEach(polyhedron.getVertices(), vertex => {
@@ -105,7 +105,7 @@ function applyCumulate(
   let cumulateFaces = getCumulateFaces(polyhedron, n);
 
   if (isRectified(polyhedron)) {
-    polyhedron = duplicateVertices2(polyhedron, cumulateFaces);
+    polyhedron = duplicateVertices(polyhedron, cumulateFaces);
     cumulateFaces = cumulateFaces.map(face => face.withPolyhedron(polyhedron));
   }
 
