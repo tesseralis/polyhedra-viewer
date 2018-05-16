@@ -61,10 +61,6 @@ export default class Face {
     return _.some(faces, face => this.equals(face));
   }
 
-  indexIn(faces: Face[]) {
-    return _.findIndex(faces, face => this.equals(face));
-  }
-
   /** Return the set of faces that share a vertex to this face (including itself) */
   vertexAdjacentFaces() {
     return _(this.vertices)

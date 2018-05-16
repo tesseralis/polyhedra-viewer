@@ -2,7 +2,7 @@
 import _ from 'lodash';
 
 import { repeat, find, mod } from 'util.js';
-import { getNormal, scaleAround, PRECISION } from 'math/linAlg';
+import { scaleAround, PRECISION } from 'math/linAlg';
 import { Polyhedron } from 'math/polyhedra';
 import type { Operation } from './operationTypes';
 
@@ -101,18 +101,13 @@ function getTruncateTransform(polyhedron, duplicated) {
     polyhedron.smallestFace().distanceToCenter() / newSideLength;
 
   return (vector, vertex) => {
-    const nearestHexagon = find(vertex.adjacentFaces(), {
+    const smallFace = find(vertex.adjacentFaces(), {
       numSides: 6,
     });
-    const scaled = scaleAround(
-      vector,
-      nearestHexagon.centroid(),
-      faceResizeScale,
-    );
+    const scaled = scaleAround(vector, smallFace.centroid(), faceResizeScale);
     // Our normal (heh) normal function doesn't work on just the hexagon,
     // since it has duplicated vertices
-    const verts = _.at(nearestHexagon.vertices, [0, 2, 4]);
-    const normal = getNormal(_.map(verts, 'vec'));
+    const normal = smallFace.withPolyhedron(polyhedron).normal();
     const translated = scaled.add(
       normal.scale(normalizedResizeAmount * newSideLength),
     );

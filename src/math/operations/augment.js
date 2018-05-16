@@ -133,7 +133,7 @@ function getBaseType(base) {
 function getOppositePrismFace(base) {
   const square = base.adjacentFaces()[0];
   const squareAdjFaces = square.adjacentFaces();
-  const i = base.indexIn(squareAdjFaces);
+  const i = _.findIndex(squareAdjFaces, face => base.equals(face));
   return getCyclic(squareAdjFaces, i + 2);
 }
 
