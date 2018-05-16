@@ -54,22 +54,22 @@ function duplicateVertices(polyhedron) {
     });
   });
 
-  const { vertices, faces } = polyhedron
-    .withVertices(_.flatMap(polyhedron.vertices, v => repeat(v.value, count)))
-    .mapFaces(face => {
-      return _.flatMap(face.vertices, v => {
-        const base = count * v.index;
-        const j = mapping[face.index][v.index];
-        return [base + mod(j + 1, count), base + j];
-      });
-    })
-    .addFaces(
-      _.map(polyhedron.vertices, v =>
-        _.range(v.index * count, (v.index + 1) * count),
-      ),
-    )
-    .toJSON();
-  return Polyhedron.of(vertices, faces);
+  return polyhedron.withChanges(solid => {
+    return solid
+      .withVertices(_.flatMap(polyhedron.vertices, v => repeat(v.value, count)))
+      .mapFaces(face => {
+        return _.flatMap(face.vertices, v => {
+          const base = count * v.index;
+          const j = mapping[face.index][v.index];
+          return [base + mod(j + 1, count), base + j];
+        });
+      })
+      .addFaces(
+        _.map(polyhedron.vertices, v =>
+          _.range(v.index * count, (v.index + 1) * count),
+        ),
+      );
+  });
 }
 
 function getTruncateLength(polyhedron) {

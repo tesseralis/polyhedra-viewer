@@ -196,10 +196,9 @@ function isAligned(polyhedron, base, underside, gyrate, augmentType) {
 // Flatten a polyhedron at the given face
 function flatten(polyhedron, face) {
   const plane = face.plane();
-  const newVertices = polyhedron.vertices.map(v =>
-    plane.getProjectedPoint(v.vec),
+  polyhedron.withVertices(
+    polyhedron.vertices.map(v => plane.getProjectedPoint(v.vec)),
   );
-  return polyhedron.withVertexVectors(newVertices);
 }
 
 // Augment the following
@@ -256,14 +255,13 @@ function doAugment(polyhedron, base, using, gyrate, mock = false) {
       )
       .add(baseCenter);
   });
+  const newAugmentee = augmentee.withChanges(solid =>
+    solid.withVertices(transformedAugmenteeVertices).withoutFaces([underside]),
+  );
   return deduplicateVertices(
-    polyhedron
-      .removeFace(base)
-      .addPolyhedron(
-        augmentee
-          .withVertexVectors(transformedAugmenteeVertices)
-          .removeFace(underside),
-      ),
+    polyhedron.withChanges(solid =>
+      solid.withoutFaces([base]).addPolyhedron(newAugmentee),
+    ),
   );
 }
 

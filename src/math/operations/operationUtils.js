@@ -29,12 +29,15 @@ export function deduplicateVertices(polyhedron: Polyhedron) {
   });
 
   // replace vertices that are the same
+  // TODO create a filterFaces method?
   let newFaces = polyhedron.faces
     .map(face => _.uniq(face.vertices.map(v => oldToNew[v.index])))
     .filter(vIndices => vIndices.length >= 3);
 
   // remove extraneous vertices
-  return removeExtraneousVertices(polyhedron.withFaces(newFaces));
+  return removeExtraneousVertices(
+    polyhedron.withChanges(s => s.withFaces(newFaces)),
+  );
 }
 
 /**
@@ -57,16 +60,18 @@ export function removeExtraneousVertices(polyhedron: Polyhedron) {
     .value();
   const oldToNew = _.invert(newToOld);
 
-  const vertexVals = _.map(polyhedron.vertices, 'value');
   const newVertices = _(polyhedron.vertices)
-    .map(v => vertexVals[_.get(oldToNew, v.index, v.index)])
+    .map(v => polyhedron.vertices[_.get(oldToNew, v.index, v.index)])
     .dropRight(numToRemove)
     .value();
 
-  const newFaces = _.map(polyhedron.faces, face => {
-    return _.map(face.vertices, v => _.get(newToOld, v.index, v.index));
-  });
-  return Polyhedron.of(newVertices, newFaces);
+  return polyhedron.withChanges(solid =>
+    solid
+      .withVertices(newVertices)
+      .mapFaces(face =>
+        _.map(face.vertices, v => _.get(newToOld, v.index, v.index)),
+      ),
+  );
 }
 
 export function getResizedVertices(

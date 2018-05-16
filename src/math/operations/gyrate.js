@@ -17,28 +17,23 @@ function applyGyrate(polyhedron, { peak }) {
   const boundary = peak.boundary();
 
   // rotate the cupola/rotunda top
-  const boundaryVectors = _.map(boundary, 'vec');
-  const normalRay = getNormalRay(boundaryVectors);
+  const normalRay = getNormalRay(_.map(boundary, 'vec'));
   const theta = TAU / boundary.length;
 
-  const newboundary = _.map(boundary, 'value');
   const oldToNew = mapObject(boundary, (vertex, i) => [vertex.index, i]);
 
-  // mock faces for animation
-  const newFaces = polyhedron.faces.map(face => {
-    if (!face.inSet(peak.faces())) {
-      return face.vIndices();
-    }
-    return face.vertices.map(v => {
-      return v.inSet(boundary)
-        ? polyhedron.numVertices() + oldToNew[v.index]
-        : v.index;
-    });
-  });
-
-  const mockPolyhedron = polyhedron
-    .addVertices(newboundary)
-    .withFaces(newFaces);
+  const mockPolyhedron = polyhedron.withChanges(solid =>
+    solid.addVertices(boundary).mapFaces(face => {
+      if (!face.inSet(peak.faces())) {
+        return face;
+      }
+      return face.vertices.map(v => {
+        return v.inSet(boundary)
+          ? polyhedron.numVertices() + oldToNew[v.index]
+          : v.index;
+      });
+    }),
+  );
 
   const endVertices = mockPolyhedron.vertices.map((v, vIndex) => {
     if (

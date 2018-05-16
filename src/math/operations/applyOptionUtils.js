@@ -43,7 +43,7 @@ export function getPeakAlignment(polyhedron: Polyhedron, peak: Peak) {
         peak => getCupolaGyrate(polyhedron, peak) === 'ortho',
       )
     : [];
-  // const diminishedIndices =
+
   const diminishedVertices =
     orthoPeaks.length > 0
       ? getSingle(orthoPeaks).boundary()

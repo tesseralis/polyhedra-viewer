@@ -11,6 +11,8 @@ import type { VIndex, SolidData } from './solidTypes';
 import Face from './Face';
 import Vertex from './Vertex';
 import Edge from './Edge';
+import Builder from './SolidBuilder';
+import type { VertexArg } from './SolidBuilder';
 
 function calculateEdges(faces: Face[]) {
   return _(faces)
@@ -19,64 +21,8 @@ function calculateEdges(faces: Face[]) {
     .value();
 }
 
-class Builder {
-  solidData: SolidData;
-
-  constructor(solidData: SolidData) {
-    this.solidData = solidData;
-  }
-
-  build() {
-    return this.solidData;
-  }
-
-  // return a new polyhedron with the given vertices
-  withVertices(vertices: Point[]) {
-    _.assign(this.solidData, { vertices });
-  }
-
-  withVertexVectors(vecs: Vec3D[]) {
-    const vertices = vecs.map(v => v.toArray());
-    return this.withVertices(vertices);
-  }
-
-  // return a new polyhedron with the given faces
-  withFaces(faces: VIndex[][]) {
-    // reset edges, since faces might have changed
-    _.assign(this.solidData, { faces, edges: undefined });
-  }
-
-  addVertices(vertices: Point[]) {
-    return this.withVertices(this.solidData.vertices.concat(vertices));
-  }
-
-  addFaces(faces: VIndex[][]) {
-    return this.withFaces(this.solidData.faces.concat(faces));
-  }
-
-  // addPolyhedron(other: Polyhedron) {
-  //   return this.addVertices(other.solidData.vertices).addFaces(
-  //     other.solidData.faces.map(vIndices =>
-  //       vIndices.map(vIndex => vIndex + this.numVertices()),
-  //     ),
-  //   );
-  // }
-
-  removeFace(face: Face) {
-    const removed = [...this.solidData.faces];
-    _.pullAt(removed, [face.index]);
-    return this.withFaces(removed);
-  }
-
-  removeFaces(faces: Face[]) {
-    const removed = [...this.solidData.faces];
-    _.pullAt(removed, _.map(faces, 'index'));
-    return this.withFaces(removed);
-  }
-}
-
 export default class Polyhedron {
-  solidData: SolidData;
+  _solidData: SolidData;
   faces: Face[];
   vertices: Vertex[];
   _edges: Edge[];
@@ -93,7 +39,7 @@ export default class Polyhedron {
   }
 
   constructor(solidData: SolidData) {
-    this.solidData = solidData;
+    this._solidData = solidData;
     this.vertices = solidData.vertices.map(
       (vertex, vIndex) => new Vertex((this: any), vIndex),
     );
@@ -109,12 +55,19 @@ export default class Polyhedron {
     return this._edges;
   }
 
+  get solidData() {
+    if (!this._solidData.edges) {
+      this._solidData.edges = _.map(this.edges, 'value');
+    }
+    return this._solidData;
+  }
+
+  toString() {
+    return `Polyhedron { V=${this.numVertices()}, E=${this.numEdges()}, F=${this.numFaces()} }`;
+  }
+
   toJSON() {
-    if (this.solidData.edges) return this.solidData;
-    return {
-      ...this.solidData,
-      edges: _.map(this.edges, 'value'),
-    };
+    return this.solidData;
   }
 
   // Memoized mapping of edges to faces, used for quickly finding adjacency
@@ -137,6 +90,10 @@ export default class Polyhedron {
 
   numFaces() {
     return this.faces.length;
+  }
+
+  numEdges() {
+    return this.edges.length;
   }
 
   // Search functions
@@ -190,62 +147,20 @@ export default class Polyhedron {
 
   // Mutations
   // =========
-  withChanges(builder: Builder => Builder) {
-    const newSolidData = builder(new Builder(this.toJSON()));
-    return new Polyhedron(newSolidData.build());
+
+  withChanges(changes: Builder => Builder) {
+    return changes(new Builder((this: any))).build();
   }
 
   // return a new polyhedron with the given vertices
-  withVertices(vertices: Point[]) {
-    return new Polyhedron({ ...this.toJSON(), vertices });
-  }
-
-  withVertexVectors(vecs: Vec3D[]) {
-    const vertices = vecs.map(v => v.toArray());
-    return this.withVertices(vertices);
-  }
-
-  // return a new polyhedron with the given faces
-  withFaces(faces: VIndex[][]) {
-    return new Polyhedron({ ...this.toJSON(), faces, edges: undefined });
-  }
-
-  addVertices(vertices: Point[]) {
-    return this.withVertices(this.solidData.vertices.concat(vertices));
-  }
-
-  addFaces(faces: VIndex[][]) {
-    return this.withFaces(this.solidData.faces.concat(faces));
-  }
-
-  addPolyhedron(other: Polyhedron) {
-    return this.addVertices(other.solidData.vertices).addFaces(
-      other.solidData.faces.map(vIndices =>
-        vIndices.map(vIndex => vIndex + this.numVertices()),
-      ),
-    );
-  }
-
-  removeFace(face: Face) {
-    const removed = [...this.solidData.faces];
-    _.pullAt(removed, [face.index]);
-    return this.withFaces(removed);
-  }
-
-  removeFaces(faces: Face[]) {
-    const removed = [...this.solidData.faces];
-    _.pullAt(removed, _.map(faces, 'index'));
-    return this.withFaces(removed);
-  }
-
-  mapFaces(iteratee: Face => VIndex[][]) {
-    return this.withFaces(this.faces.map(iteratee));
+  withVertices(vertices: VertexArg[]) {
+    return this.withChanges(s => s.withVertices(vertices));
   }
 
   /** Center the polyhedron on its centroid. */
   center() {
     const centroid = this.centroid();
-    return this.withVertexVectors(this.vertices.map(v => v.vec.sub(centroid)));
+    return this.withVertices(this.vertices.map(v => v.vec.sub(centroid)));
   }
 
   // Test functions
@@ -254,7 +169,7 @@ export default class Polyhedron {
   faceAdjacencyList() {
     const faceAdjacencyCounts = _.map(this.faces, face => ({
       n: face.numSides,
-      adj: _.countBy(face.adjacentFaces(), face2 => face2.numSides),
+      adj: _.countBy(face.adjacentFaces(), 'numSides'),
     }));
     return _.sortBy(
       faceAdjacencyCounts,

@@ -18,7 +18,7 @@ import {
 export default class Face {
   polyhedron: Polyhedron;
   index: FIndex;
-  face: VIndex[];
+  value: VIndex[];
   vertices: Vertex[];
   edges: Edge[];
   vectors: $ReadOnly<Vec3D>[];
@@ -26,8 +26,8 @@ export default class Face {
   constructor(polyhedron: Polyhedron, index: FIndex) {
     this.polyhedron = polyhedron;
     this.index = index;
-    this.face = polyhedron.solidData.faces[index];
-    this.vertices = _.map(this.face, vIndex => polyhedron.vertices[vIndex]);
+    this.value = polyhedron._solidData.faces[index];
+    this.vertices = _.map(this.value, vIndex => polyhedron.vertices[vIndex]);
     this.edges = _.map(
       this.vertices,
       (v, i) => new Edge(v, getCyclic(this.vertices, i + 1)),
@@ -36,11 +36,7 @@ export default class Face {
   }
 
   get numSides() {
-    return this.face.length;
-  }
-
-  vIndices() {
-    return this.face;
+    return this.value.length;
   }
 
   nextEdge(e: Edge) {

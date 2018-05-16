@@ -10,7 +10,7 @@ function setDefaults(opResult) {
   }
   const { result, animationData: { start, endVertices } } = opResult;
   return {
-    result: result || deduplicateVertices(start.withVertexVectors(endVertices)),
+    result: result || deduplicateVertices(start.withVertices(endVertices)),
     animationData: {
       start,
       endVertices: endVertices.map(v => v.toArray()),

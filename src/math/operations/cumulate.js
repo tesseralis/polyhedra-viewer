@@ -53,12 +53,13 @@ function duplicateVertices(polyhedron, facesToCumulate) {
       _.set(mapping, [f.index, v], values[i]);
     });
   });
+
   // Double the amount of vertices
-  return polyhedron
-    .addVertices(_.map(polyhedron.vertices, 'value'))
-    .mapFaces(f => {
+  return polyhedron.withChanges(solid =>
+    solid.addVertices(polyhedron.vertices).mapFaces(f => {
       return _.flatMapDeep(f.vertices, v => mapping[f.index][v.index]);
-    });
+    }),
+  );
 }
 
 function getCumulateFaces(polyhedron, faceType) {
