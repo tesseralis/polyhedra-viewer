@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import { getNextPolyhedron, getRelations } from './relations';
+import { getNextPolyhedron, getRelations } from './operations';
 import { Polyhedron } from 'math/polyhedra';
 import { operations, deduplicateVertices } from 'math/operations';
 import type { OperationResult } from 'math/operations';

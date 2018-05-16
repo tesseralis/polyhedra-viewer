@@ -1,36 +1,30 @@
 import _ from 'lodash';
 import { allSolidNames } from 'data';
 import { PRECISION, isPlanar } from 'math/linAlg';
-import { getOperations, getRelations } from 'polyhedra/relations';
+import { getOperations, getRelations } from 'polyhedra/operations';
 import { Polyhedron, Peak } from 'math/polyhedra';
 import { operations, canAugment } from 'math/operations';
 import applyOperation from './applyOperation';
 const debug = require('debug')('applyOperation.test');
-
-const archimedeanOpts = ['t', 'k', 'c', 'r', 'e', 's'];
-const johnsonOpts = ['+', '-', 'g', 'P', 'A', 'h'];
-const opsToTest = archimedeanOpts.concat(johnsonOpts);
 
 // map from polyhedron to excluded operations
 const excludedOperations = {};
 
 function isProperPolyhedron(polyhedron) {
   let prevSideLength: ?number;
+  const expectedSideLength = polyhedron.edgeLength();
   for (let edge of polyhedron.edges) {
     const sideLength: number = edge.length();
-    if (prevSideLength !== undefined) {
-      if (_.isNaN(sideLength)) {
-        console.log(`edge ${edge} has length NaN`);
-        return false;
-      }
-      if (Math.abs(sideLength - prevSideLength) > PRECISION) {
-        console.log(
-          `edge ${edge} has length ${sideLength} which is different from ${prevSideLength}`,
-        );
-        return false;
-      }
+    if (_.isNaN(sideLength)) {
+      console.log(`edge ${edge} has length NaN`);
+      return false;
     }
-    prevSideLength = sideLength;
+    if (Math.abs(sideLength - expectedSideLength) > PRECISION) {
+      console.log(
+        `edge ${edge} has length ${sideLength} which is different from ${prevSideLength}`,
+      );
+      return false;
+    }
     // Make sure the whole thing is convex
     if (edge.dihedralAngle() > Math.PI - PRECISION) {
       console.log(`polyhedron concave at edge ${edge}`);
@@ -87,7 +81,7 @@ function getOptsToTest(operation, name, polyhedron) {
 describe('applyOperation', () => {
   allSolidNames.forEach(solidName => {
     it(`correctly applies all possible operations on ${solidName}`, () => {
-      const allOperations = _.intersection(getOperations(solidName), opsToTest);
+      const allOperations = getOperations(solidName);
       const excluded = excludedOperations[solidName];
       const operations = _.difference(allOperations, excluded);
       operations.forEach(operation => {

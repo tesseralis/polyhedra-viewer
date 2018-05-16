@@ -2,7 +2,7 @@ import _ from 'lodash';
 import React from 'react';
 import { css, StyleSheet } from 'aphrodite/no-important';
 
-import { operations, getRelations, getUsingOpts } from 'polyhedra/relations';
+import { operations, getRelations, getUsingOpts } from 'polyhedra/operations';
 import Tooltip from './Tooltip';
 
 const styles = StyleSheet.create({

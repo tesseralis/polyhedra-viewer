@@ -16,7 +16,7 @@ import { fixed, fullScreen } from 'styles/common';
 import { unescapeName } from 'polyhedra/names';
 import doApplyOperation from 'polyhedra/applyOperation';
 import type { Operation } from 'polyhedra/applyOperation';
-import { getRelations, applyOptionsFor } from 'polyhedra/relations';
+import { getRelations, applyOptionsFor } from 'polyhedra/operations';
 import { defaultConfig, getPolyhedronConfig } from 'constants/configOptions';
 import transition from 'transition.js';
 
