@@ -2,6 +2,7 @@
 
 import _ from 'lodash';
 
+import { flatMapUniq } from 'util.js';
 import { Vec3D } from 'math/linAlg';
 import Polyhedron from './Polyhedron';
 import Face from './Face';
@@ -93,10 +94,7 @@ export default class Peak {
   faceConfiguration: () => FaceConfiguration;
 
   faces = _.once(() => {
-    return _(this.innerVertices())
-      .flatMap(v => v.adjacentFaces())
-      .uniqBy('index')
-      .value();
+    return flatMapUniq(this.innerVertices(), v => v.adjacentFaces(), 'index');
   });
 
   // TODO I'm still not a fan of this; I think the best would be to make this a face-like object
@@ -175,10 +173,7 @@ const Rotunda = withMapper('faces')(
     constructor(polyhedron, face) {
       super(
         polyhedron,
-        _(face.vertices)
-          .flatMap(v => v.adjacentVertices())
-          .uniqBy('index')
-          .value(),
+        flatMapUniq(face.vertices, v => v.adjacentVertices(), 'index'),
         'rotunda',
       );
       this.face = face;

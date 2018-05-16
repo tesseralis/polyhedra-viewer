@@ -1,6 +1,7 @@
 // @flow
 import _ from 'lodash';
 
+import { flatMapUniq } from 'util.js';
 import type { VIndex, FIndex } from './solidTypes';
 import Polyhedron from './Polyhedron';
 import VEList from './VEList';
@@ -30,10 +31,11 @@ export default class Face extends VEList {
 
   /** Return the set of faces that share a vertex to this face (including itself) */
   vertexAdjacentFaces() {
-    return _(this.vertices)
-      .flatMap(vertex => vertex.adjacentFaces())
-      .uniqBy('index')
-      .value();
+    return flatMapUniq(
+      this.vertices,
+      vertex => vertex.adjacentFaces(),
+      'index',
+    );
   }
 
   adjacentFaces() {

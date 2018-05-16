@@ -1,5 +1,6 @@
 // @flow
 import _ from 'lodash';
+import { flatMapUniq } from 'util.js';
 import { Polyhedron } from 'math/polyhedra';
 import {
   expansionType,
@@ -49,10 +50,7 @@ function getFaceDistance(face1, face2) {
   let current = [face1];
   while (!face2.inSet(current)) {
     dist++;
-    current = _(current)
-      .flatMap(face => face.adjacentFaces())
-      .uniqBy('index')
-      .value();
+    current = flatMapUniq(current, face => face.adjacentFaces(), 'index');
 
     if (dist > 10) {
       throw new Error('we went toooooo far');

@@ -1,6 +1,6 @@
 // @flow
 import _ from 'lodash';
-import type { Predicate } from 'lodash';
+import type { Predicate, ValueOnlyIteratee } from 'lodash';
 
 /**
  * Variation of the mod function that keeps sign of the dividend
@@ -14,10 +14,6 @@ export function mod(a: number, b: number) {
  */
 export function getCyclic<T>(array: T[], index: number): T {
   return array[mod(index, array.length)];
-}
-
-export function atIndices<T>(arr: T[], indices: number[]): T[] {
-  return indices.map(i => arr[i]);
 }
 
 export function repeat<T>(value: T, n: number) {
@@ -34,6 +30,17 @@ export function mapObject<T, U>(
   return _(arr)
     .map(iteratee)
     .fromPairs()
+    .value();
+}
+
+export function flatMapUniq<T, U>(
+  arr: T[],
+  iteratee1: T => U[],
+  iteratee2: ValueOnlyIteratee<U>,
+) {
+  return _(arr)
+    .flatMap(iteratee1)
+    .uniqBy(iteratee2)
     .value();
 }
 
