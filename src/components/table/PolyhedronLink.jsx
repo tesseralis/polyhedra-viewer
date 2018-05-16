@@ -1,3 +1,4 @@
+// no flow (nonstatic require)
 import React from 'react';
 import { css, StyleSheet } from 'aphrodite/no-important';
 import { Link } from 'react-router-dom';
@@ -7,10 +8,9 @@ import { hover } from 'styles/common';
 
 const thumbnailSize = 55;
 
-const largeSize = 80;
-
 const styles = StyleSheet.create({
   link: {
+    ...hover,
     width: thumbnailSize,
     height: thumbnailSize,
     display: 'flex',
@@ -21,19 +21,8 @@ const styles = StyleSheet.create({
     margin: 'auto', // center inside a table
   },
 
-  largeLink: {
-    width: largeSize,
-    height: largeSize,
-  },
-
-  real: hover,
-
   image: {
     height: thumbnailSize + 10,
-  },
-
-  largeImage: {
-    height: largeSize + 10,
   },
 
   fake: {
@@ -42,32 +31,21 @@ const styles = StyleSheet.create({
   },
 });
 
-export default function PolyhedronLink({
-  name,
-  isFake,
-  subLink,
-  large = false,
-}) {
+interface Props {
+  name: string;
+  isFake: boolean;
+}
+
+export default function PolyhedronLink({ name, isFake }: Props) {
   const escapedName = escapeName(name);
   const img = require(`images/${escapedName}.png`);
-  if (isFake) {
-    return (
-      <div className={css(styles.link, styles.fake)}>
-        <img className={css(styles.image)} src={img} alt={name} />
-      </div>
-    );
-  }
   return (
     <Link
-      to={'/' + escapedName + (subLink ? '/' + subLink : '')}
-      className={css(styles.link, styles.real, large && styles.largeLink)}
+      to={'/' + escapedName}
+      className={css(styles.link, isFake && styles.fake)}
       title={name}
     >
-      <img
-        className={css(styles.image, large && styles.largeImage)}
-        src={img}
-        alt={name}
-      />
+      <img className={css(styles.image)} src={img} alt={name} />
     </Link>
   );
 }
