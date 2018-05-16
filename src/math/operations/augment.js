@@ -2,7 +2,7 @@
 import _ from 'lodash';
 
 import { Polyhedron, Face, Peak } from 'math/polyhedra';
-import { getNormal, PRECISION } from 'math/linAlg';
+import { isInverse, getNormal, PRECISION } from 'math/linAlg';
 import { getCyclic, getSingle, cartesian } from 'util.js';
 
 import { hasMultiple, deduplicateVertices } from './operationUtils';
@@ -59,9 +59,7 @@ const augmentTypes = {
 
 function getAugmentAlignment(polyhedron, face) {
   const boundary = getSingle(Peak.getAll(polyhedron)).boundaryVectors();
-  const peakNormal = getNormal(boundary);
-  const isParallel = Math.abs(peakNormal.dot(face.normal()) + 1) < PRECISION;
-  return isParallel ? 'para' : 'meta';
+  return isInverse(getNormal(boundary), face.normal()) ? 'para' : 'meta';
 }
 
 function getPossibleAugmentees(n) {

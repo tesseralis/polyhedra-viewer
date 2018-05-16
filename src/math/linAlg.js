@@ -11,6 +11,11 @@ export const PRECISION = Math.pow(10, -PRECISION_DIGITS);
 export const vec = (p: Point) => new Vec3D(...p);
 
 export const getMidpoint = (v1: Vec3D, v2: Vec3D) => v1.add(v2).scale(0.5);
+
+export function isInverse(v1: Vec3D, v2: Vec3D) {
+  return v1.getInverted().equalsWithTolerance(v2, PRECISION);
+}
+
 // Get the plane containing the given points
 export function getPlane(points: Vec3D[]) {
   if (points.length < 3) {

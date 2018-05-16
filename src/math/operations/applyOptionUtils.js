@@ -2,7 +2,7 @@
 import _ from 'lodash';
 import { getSingle, getCyclic } from 'util.js';
 import { Peak, Polyhedron, Edge } from 'math/polyhedra';
-import { getNormal, PRECISION } from 'math/linAlg';
+import { isInverse, getNormal } from 'math/linAlg';
 
 export function getPeakAlignment(polyhedron: Polyhedron, peak: Peak) {
   const peakNormal = getNormal(peak.boundaryVectors());
@@ -20,8 +20,7 @@ export function getPeakAlignment(polyhedron: Polyhedron, peak: Peak) {
       ? getNormal(getSingle(orthoPeaks).boundaryVectors())
       : polyhedron.largestFace().normal();
 
-  const isParallel = Math.abs(peakNormal.dot(otherNormal) + 1) < PRECISION;
-  return isParallel ? 'para' : 'meta';
+  return isInverse(peakNormal, otherNormal) ? 'para' : 'meta';
 }
 
 function getCyclicPairs<T>(array: T[]) {
