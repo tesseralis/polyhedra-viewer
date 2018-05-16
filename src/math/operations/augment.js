@@ -2,11 +2,10 @@
 import _ from 'lodash';
 
 import { Polyhedron, Face, Peak } from 'math/polyhedra';
-import { PRECISION } from 'math/linAlg';
+import { getNormal, PRECISION } from 'math/linAlg';
 import { getCyclic, getSingle, cartesian } from 'util.js';
 
 import { hasMultiple, deduplicateVertices } from './operationUtils';
-import { faceDistanceBetweenVertices } from './applyOptionUtils';
 import { Operation } from './operationTypes';
 
 const augmentees = {
@@ -58,21 +57,11 @@ const augmentTypes = {
   A: 'antiprism',
 };
 
-// Return "meta" or "para", or null
 function getAugmentAlignment(polyhedron, face) {
-  // get the existing peak boundary
-  const peakBoundary = getSingle(Peak.getAll(polyhedron)).boundary();
-  const isHexagonalPrism = _.some(polyhedron.faces, { numSides: 6 });
-
-  // calculate the face distance to the peak's boundary
-  return faceDistanceBetweenVertices(
-    polyhedron,
-    face.vertices,
-    peakBoundary,
-    isHexagonalPrism ? [6] : [],
-  ) > 1
-    ? 'para'
-    : 'meta';
+  const boundary = getSingle(Peak.getAll(polyhedron)).boundaryVectors();
+  const peakNormal = getNormal(boundary);
+  const isParallel = Math.abs(peakNormal.dot(face.normal()) + 1) < PRECISION;
+  return isParallel ? 'para' : 'meta';
 }
 
 function getPossibleAugmentees(n) {

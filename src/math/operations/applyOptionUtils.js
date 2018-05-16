@@ -1,42 +1,13 @@
 // @flow
 import _ from 'lodash';
 import { getSingle, getCyclic } from 'util.js';
-import { Peak, Polyhedron, Vertex, Edge } from 'math/polyhedra';
-
-/** Return the minimum number of faces between the given sets of vertices */
-export function faceDistanceBetweenVertices(
-  polyhedron: Polyhedron,
-  vertices1: Vertex[],
-  vertices2: Vertex[],
-  exclude: number[] = [],
-) {
-  let foundVertices = vertices1;
-  let distance = 0;
-  while (
-    _.intersection(_.map(foundVertices, 'index'), _.map(vertices2, 'index'))
-      .length === 0
-  ) {
-    foundVertices = _(foundVertices)
-      .flatMap(vertex => vertex.adjacentFaces())
-      .filter(face => !_.includes(exclude, face.numSides))
-      .map('vertices')
-      .flatten()
-      .uniqBy('index')
-      .value();
-    distance++;
-
-    if (distance > 10) {
-      throw new Error('Reached some unreachable state');
-    }
-  }
-  return distance;
-}
+import { Peak, Polyhedron, Edge } from 'math/polyhedra';
+import { getNormal, PRECISION } from 'math/linAlg';
 
 export function getPeakAlignment(polyhedron: Polyhedron, peak: Peak) {
-  const peakBoundary = peak.boundary();
+  const peakNormal = getNormal(peak.boundaryVectors());
 
   const isRhombicosidodecahedron = peak.type === 'cupola';
-
   const orthoPeaks = isRhombicosidodecahedron
     ? _.filter(
         Peak.getAll(polyhedron),
@@ -44,18 +15,13 @@ export function getPeakAlignment(polyhedron: Polyhedron, peak: Peak) {
       )
     : [];
 
-  const diminishedVertices =
+  const otherNormal =
     orthoPeaks.length > 0
-      ? getSingle(orthoPeaks).boundary()
-      : polyhedron.largestFace().vertices;
+      ? getNormal(getSingle(orthoPeaks).boundaryVectors())
+      : polyhedron.largestFace().normal();
 
-  return faceDistanceBetweenVertices(
-    polyhedron,
-    diminishedVertices,
-    peakBoundary,
-  ) >= (isRhombicosidodecahedron ? 2 : 1)
-    ? 'para'
-    : 'meta';
+  const isParallel = Math.abs(peakNormal.dot(otherNormal) + 1) < PRECISION;
+  return isParallel ? 'para' : 'meta';
 }
 
 function getCyclicPairs<T>(array: T[]) {

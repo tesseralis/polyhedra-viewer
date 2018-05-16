@@ -17,7 +17,7 @@ function applyGyrate(polyhedron, { peak }) {
   const boundary = peak.boundary();
 
   // rotate the cupola/rotunda top
-  const normalRay = getNormalRay(_.map(boundary, 'vec'));
+  const normalRay = getNormalRay(peak.boundaryVectors());
   const theta = TAU / boundary.length;
 
   const oldToNew = mapObject(boundary, (vertex, i) => [vertex.index, i]);

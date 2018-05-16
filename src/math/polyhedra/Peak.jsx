@@ -105,12 +105,16 @@ export default class Peak {
     return getBoundary(this.faces());
   });
 
+  boundaryVectors = _.once(() => {
+    return _.map(this.boundary(), 'vec');
+  });
+
   isValid() {
     const matchFaces = _.every(this.innerVertices(), vertex => {
       const faceCount = _.countBy(vertex.adjacentFaces(), 'numSides');
       return _.isEqual(faceCount, this.faceConfiguration());
     });
-    return matchFaces && isPlanar(_.map(this.boundary(), 'vec'));
+    return matchFaces && isPlanar(this.boundaryVectors());
   }
 }
 const Pyramid = withMapper('vertices')(
