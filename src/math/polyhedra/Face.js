@@ -81,7 +81,7 @@ export default class Face {
     return _.map(this.edges, edge => edge.twin().face);
   }
 
-  edgeLength() {
+  sideLength() {
     return this.edges[0].length();
   }
 
@@ -90,7 +90,7 @@ export default class Face {
   }
 
   apothem() {
-    return this.edgeLength() / (2 * Math.tan(Math.PI / this.numSides));
+    return this.sideLength() / (2 * Math.tan(Math.PI / this.numSides));
   }
 
   /** Return the centroid of the face given by the face index */

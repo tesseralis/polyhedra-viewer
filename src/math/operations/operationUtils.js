@@ -77,7 +77,7 @@ export function getResizedVertices(
 ) {
   // Update the vertices with the expanded-out version
   const f0 = faces[0];
-  const sideLength = f0.edgeLength();
+  const sideLength = f0.sideLength();
   const baseLength = f0.distanceToCenter() / sideLength;
   const result = _.map(polyhedron.vertices, 'value');
   _.forEach(faces, face => {

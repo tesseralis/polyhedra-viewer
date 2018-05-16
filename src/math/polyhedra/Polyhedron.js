@@ -9,15 +9,22 @@ import type { Point } from 'math/linAlg';
 import type { VIndex, SolidData } from './solidTypes';
 
 import Peak from './Peak';
-import FaceObj from './Face';
-import VertexObj from './Vertex';
-import EdgeObj from './Edge';
+import Face from './Face';
+import Vertex from './Vertex';
+import Edge from './Edge';
+
+function calculateEdges(faces: Face[]) {
+  return _(faces)
+    .flatMap(face => face.edges.map(e => e.undirected()))
+    .uniqWith((e1, e2) => e1.equals(e2))
+    .value();
+}
 
 export default class Polyhedron {
   solidData: SolidData;
-  faces: FaceObj[];
-  vertices: VertexObj[];
-  _edges: EdgeObj[];
+  faces: Face[];
+  vertices: Vertex[];
+  _edges: Edge[];
 
   static get(name: string) {
     if (!isValidSolid(name)) {
@@ -33,11 +40,18 @@ export default class Polyhedron {
   constructor(solidData: SolidData) {
     this.solidData = solidData;
     this.vertices = solidData.vertices.map(
-      (vertex, vIndex) => new VertexObj((this: any), vIndex),
+      (vertex, vIndex) => new Vertex((this: any), vIndex),
     );
     this.faces = solidData.faces.map(
-      (face, fIndex) => new FaceObj((this: any), fIndex),
+      (face, fIndex) => new Face((this: any), fIndex),
     );
+  }
+
+  get edges() {
+    if (!this._edges) {
+      this._edges = calculateEdges(this.faces);
+    }
+    return this._edges;
   }
 
   toJSON() {
@@ -54,20 +68,6 @@ export default class Polyhedron {
 
   getFace() {
     return this.faces[0];
-  }
-
-  calculateEdges() {
-    return _(this.faces)
-      .flatMap(face => face.edges.map(e => e.undirected()))
-      .uniqWith((e1, e2) => e1.equals(e2))
-      .value();
-  }
-
-  get edges() {
-    if (!this._edges) {
-      this._edges = this.calculateEdges();
-    }
-    return this._edges;
   }
 
   largestFace() {
@@ -105,8 +105,8 @@ export default class Polyhedron {
   }
 
   // Get the edge length of this polyhedron, assuming equal edges
-  edgeLength() {
-    return this.getFace().edgeLength();
+  sideLength() {
+    return this.getFace().sideLength();
   }
 
   edgeToFaceGraph = _.memoize(() => {
@@ -150,19 +150,19 @@ export default class Polyhedron {
     );
   }
 
-  removeFace(face: FaceObj) {
+  removeFace(face: Face) {
     const removed = [...this.solidData.faces];
     _.pullAt(removed, [face.index]);
     return this.withFaces(removed);
   }
 
-  removeFaces(faces: FaceObj[]) {
+  removeFaces(faces: Face[]) {
     const removed = [...this.solidData.faces];
     _.pullAt(removed, _.map(faces, 'index'));
     return this.withFaces(removed);
   }
 
-  mapFaces(iteratee: FaceObj => VIndex[][]) {
+  mapFaces(iteratee: Face => VIndex[][]) {
     return this.withFaces(this.faces.map(iteratee));
   }
 

@@ -138,7 +138,7 @@ function doExpansion(polyhedron: Polyhedron, referenceName) {
     _.find(reference.faces, face => isExpandedFace(reference, face, n)) ||
     reference.getFace();
   const referenceLength =
-    referenceFace.distanceToCenter() / reference.edgeLength();
+    referenceFace.distanceToCenter() / reference.sideLength();
 
   const snubFaces = _.filter(polyhedron.faces, face =>
     isExpandedFace(polyhedron, face, n),

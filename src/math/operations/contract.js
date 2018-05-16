@@ -113,7 +113,7 @@ export function applyContract(
   const reference = Polyhedron.get(resultName);
   // TODO keep a database of these so we don't have to recalculate every time
   const referenceLength =
-    reference.getFace().distanceToCenter() / reference.edgeLength();
+    reference.getFace().distanceToCenter() / reference.sideLength();
 
   // Take all the stuff and push it inwards
   // TODO can we like, factor out this logic?
