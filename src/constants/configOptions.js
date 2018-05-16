@@ -64,20 +64,6 @@ export const defaultConfig = _.mapValues(configOptions, 'default');
 const getColors = config =>
   mapObject(polygons, n => [n, config[getColorInputKey(n)]]);
 
-// const getMock = color => _.mapValues(polygonSchemeIdx, () => color)
-
-// TODO implement interpolated colors
-// export const getPolyhedronConfig = config => {
-//   const colors = getColors(config)
-//   const diminishColors = interpolate(colors, getMock('red'))(0.5)
-
-//   return {
-//     ...config,
-//     colors,
-//     diminishColors,
-//   }
-// }
-
 export const getPolyhedronConfig = config => ({
   ...config,
   colors: getColors(config),

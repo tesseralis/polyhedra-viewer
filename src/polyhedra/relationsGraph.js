@@ -25,7 +25,7 @@ const archimedean = {
     s: 'sC',
   },
   aC: {
-    // TODO (possibly) coxeter snub and rectify relations
+    // TODO (possibly) coxeter snub (semi-snub) and rectify relations
     t: 'bC',
     p: 'I',
   },
@@ -465,6 +465,7 @@ const othersGraph = (() => {
   const empty = mapObject(_.range(87, 93), j => [`J${j}`, {}]);
   return {
     ...empty,
+    // TODO semisnub to create snub antiprisms
     // snub antiprisms
     // T: {
     //   s: 'J84',
@@ -475,7 +476,7 @@ const othersGraph = (() => {
     J84: {},
     J85: {},
 
-    // "other" johnson solids
+    // other johnson solids
     J86: {
       '+': { using: 'Y4', value: 'J87' },
     },

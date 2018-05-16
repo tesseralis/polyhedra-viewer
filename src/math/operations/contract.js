@@ -1,6 +1,6 @@
 // @flow
 import _ from 'lodash';
-import { flatMapUniq } from 'util.js';
+import { mapObject, flatMapUniq } from 'util.js';
 import { Polyhedron } from 'math/polyhedra';
 import {
   expansionType,
@@ -44,6 +44,20 @@ function getContractResult(polyhedron, faceType) {
       throw new Error('Did you try to contract an invalid solid?');
   }
 }
+
+const contractResults = [
+  'tetrahedron',
+  'cube',
+  'octahedron',
+  'dodecahedron',
+  'icosahedron',
+];
+const resultLengths = mapObject(contractResults, name => {
+  const reference = Polyhedron.get(name);
+  const length =
+    reference.getFace().distanceToCenter() / reference.edgeLength();
+  return [name, length];
+});
 
 function getFaceDistance(face1, face2) {
   let dist = 0;
@@ -108,13 +122,9 @@ export function applyContract(
 ) {
   // Use a reference polyhedron to calculate how far to expand
   const resultName = getContractResult(polyhedron, faceType);
-  const reference = Polyhedron.get(resultName);
-  // TODO keep a database of these so we don't have to recalculate every time
-  const referenceLength =
-    reference.getFace().distanceToCenter() / reference.edgeLength();
+  const resultLength = resultLengths[resultName];
 
   // Take all the stuff and push it inwards
-  // TODO can we like, factor out this logic?
   const contractFaces = getContractFaces(polyhedron, faceType);
   const angle =
     expansionType(polyhedron) === 'snub'
@@ -124,7 +134,7 @@ export function applyContract(
   const endVertices = getResizedVertices(
     polyhedron,
     contractFaces,
-    referenceLength,
+    resultLength,
     angle,
   );
   return {
@@ -139,7 +149,6 @@ export function applyContract(
 export const contract: Operation<ContractOptions> = {
   apply: applyContract,
 
-  // TODO consolidate with "getContractResult"
   getSearchOptions(polyhedron, config) {
     const { faceType } = config;
     switch (getFamily(polyhedron)) {
@@ -163,7 +172,6 @@ export const contract: Operation<ContractOptions> = {
   },
 
   getAllApplyArgs(polyhedron) {
-    // TODO we can do this w/o referencing name
     switch (getFamily(polyhedron)) {
       case 'O':
         return [{ faceType: 3 }, { faceType: 4 }];

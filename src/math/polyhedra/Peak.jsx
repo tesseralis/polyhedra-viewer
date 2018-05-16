@@ -97,14 +97,8 @@ export default class Peak {
     return flatMapUniq(this.innerVertices(), v => v.adjacentFaces(), 'index');
   });
 
-  // TODO I'm still not a fan of this; I think the best would be to make this a face-like object
-  // so you can get the things underneath it
   boundary = _.once(() => {
     return getBoundary(this.faces());
-  });
-
-  boundaryVectors = _.once(() => {
-    return _.map(this.boundary(), 'vec');
   });
 
   isValid() {

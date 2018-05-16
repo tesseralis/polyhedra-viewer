@@ -361,7 +361,6 @@ export default class Viewer extends Component<ViewerProps, ViewerState> {
     }));
   };
 
-  // TODO could probably move to own file
   setApplyArgs = (hitPnt?: Vec3D) => {
     this.setState(({ polyhedron, operation }) => {
       if (!operation || !hitPnt) {
