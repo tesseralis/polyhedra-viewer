@@ -67,7 +67,7 @@ export const gyrate: Operation<GyrateOptions> = {
     if (!peak) {
       throw new Error('Invalid peak');
     }
-    // FIXME can we not rely on relations?
+    // TODO can we not rely on relations?
     if (_.some(relations, 'direction')) {
       options.direction = getGyrateDirection(polyhedron, peak);
       if (

@@ -46,7 +46,7 @@ export const configInputs = [
     default: true,
   },
   {
-    // FIXME help this make more sense
+    // TODO more UI friendly version of this option
     key: 'transitionDuration',
     type: 'number',
     default: 750,

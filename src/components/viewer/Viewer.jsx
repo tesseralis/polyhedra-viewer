@@ -287,7 +287,7 @@ export default class Viewer extends Component<ViewerProps, ViewerState> {
             return { applyOptions: applyOptionsFor(name, operation) };
           }
         })();
-        // FIXME figure out how to deduplicate all this logic
+        // TODO figure out how to deduplicate all this logic
         const { colors, enableAnimation } = getPolyhedronConfig(config);
         const colorStart =
           animationData && getFaceColors(animationData.start, colors);
