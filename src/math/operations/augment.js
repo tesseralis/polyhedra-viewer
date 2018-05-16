@@ -1,7 +1,7 @@
 // @flow
 import _ from 'lodash';
 
-import { Polyhedron, Face } from 'math/polyhedra';
+import { Polyhedron, Face, Peak } from 'math/polyhedra';
 import { PRECISION } from 'math/linAlg';
 import { getCyclic, getSingle, cartesian } from 'util.js';
 
@@ -61,7 +61,7 @@ const augmentTypes = {
 // Return "meta" or "para", or null
 function getAugmentAlignment(polyhedron, face) {
   // get the existing peak boundary
-  const peakBoundary = getSingle(polyhedron.peaks()).boundary();
+  const peakBoundary = getSingle(Peak.getAll(polyhedron)).boundary();
   const isHexagonalPrism = _.some(polyhedron.faces, { numSides: 6 });
 
   // calculate the face distance to the peak's boundary
@@ -160,7 +160,7 @@ function isAligned(polyhedron, base, underside, gyrate, augmentType) {
     return true;
   }
 
-  if (baseType === 'prism' && polyhedron.peaks().length === 0) {
+  if (baseType === 'prism' && Peak.getAll(polyhedron).length === 0) {
     return true;
   }
 
@@ -186,7 +186,7 @@ function isAligned(polyhedron, base, underside, gyrate, augmentType) {
 
   // "ortho" or "gyro" is actually determined by whether the *tops* are aligned, not the bottoms
   // So for a cupola-rotunda, it's actually the opposite of everything else
-  if (isCupolaRotunda(polyhedron.peaks()[0].type, augmentType)) {
+  if (isCupolaRotunda(Peak.getAll(polyhedron)[0].type, augmentType)) {
     return isOrtho !== (gyrate === 'ortho');
   }
 

@@ -90,7 +90,7 @@ export const gyrate: Operation<GyrateOptions> = {
   },
 
   getApplyArgs(polyhedron, hitPnt) {
-    const peak = polyhedron.findPeak(hitPnt);
+    const peak = Peak.find(polyhedron, hitPnt);
     return peak ? { peak } : {};
   },
 

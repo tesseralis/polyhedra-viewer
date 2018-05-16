@@ -1,6 +1,7 @@
 // @flow
 
 import _ from 'lodash';
+import { Vec3D } from 'toxiclibsjs/geom';
 import { isPlanar } from 'math/linAlg';
 
 import Polyhedron from './Polyhedron';
@@ -56,6 +57,17 @@ export default class Peak {
   polyhedron: Polyhedron;
   vertices: Vertex[];
   type: PeakType;
+
+  static find(polyhedron: Polyhedron, hitPoint: Vec3D) {
+    const hitFace = polyhedron.hitFace(hitPoint);
+    const peaks = Peak.getAll(polyhedron).filter(peak =>
+      hitFace.inSet(peak.faces()),
+    );
+    if (peaks.length === 0) {
+      return null;
+    }
+    return _.minBy(peaks, peak => peak.topPoint().distanceTo(hitPoint));
+  }
 
   static getAll(polyhedron: Polyhedron) {
     const pyramids = Pyramid.getAll(polyhedron);
