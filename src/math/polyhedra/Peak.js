@@ -36,7 +36,7 @@ function getBoundary(faces: Face[]) {
       e = e.twin().next();
     }
   } while (!e.equals(e0));
-  return new VEList(result);
+  return new VEList(_.map(result, 'v1'), result);
 }
 
 const withMapper = property => Base =>

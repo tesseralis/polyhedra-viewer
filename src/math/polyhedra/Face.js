@@ -1,10 +1,11 @@
 // @flow
 import _ from 'lodash';
 
-import { flatMapUniq } from 'util.js';
+import { getCyclic, flatMapUniq } from 'util.js';
 import type { VIndex, FIndex } from './solidTypes';
 import Polyhedron from './Polyhedron';
 import VEList from './VEList';
+import Edge from './Edge';
 
 export default class Face extends VEList {
   index: FIndex;
@@ -12,12 +13,13 @@ export default class Face extends VEList {
 
   constructor(polyhedron: Polyhedron, index: FIndex) {
     const value = polyhedron._solidData.faces[index];
-    const vertices = _.map(
-      value,
-      (vIndex: VIndex) => polyhedron.vertices[vIndex],
+    const vertices = _.map(value, vIndex => polyhedron.vertices[vIndex]);
+    const edges = _.map(
+      vertices,
+      (v, i) => new Edge(v, getCyclic(vertices, i + 1)),
     );
 
-    super(vertices);
+    super(vertices, edges);
     this.index = index;
     this.value = value;
   }

@@ -10,7 +10,7 @@ import {
   getNormal,
   getNormalRay,
 } from 'math/linAlg';
-import { find, getCyclic } from 'util.js';
+import { find } from 'util.js';
 import Polyhedron from './Polyhedron';
 import Edge from './Edge';
 import Vertex from './Vertex';
@@ -22,18 +22,10 @@ export default class VEList {
   edges: Edge[];
   vectors: Vec3D[];
 
-  constructor(veList: Vertex[] | Edge[]) {
-    this.polyhedron = veList[0].polyhedron;
-    if (veList[0] instanceof Vertex) {
-      this.vertices = (veList: any);
-      this.edges = _.map(
-        this.vertices,
-        (v, i: number) => new Edge(v, getCyclic(this.vertices, i + 1)),
-      );
-    } else {
-      this.edges = (veList: any);
-      this.vertices = _.map(this.edges, 'v1');
-    }
+  constructor(vertices: Vertex[], edges: Edge[]) {
+    this.polyhedron = vertices[0].polyhedron;
+    this.vertices = vertices;
+    this.edges = edges;
     this.vectors = _.map(this.vertices, 'vec');
   }
 
