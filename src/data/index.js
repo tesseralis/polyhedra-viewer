@@ -1,11 +1,12 @@
-// @flow
+// @flow strict
 import _ from 'lodash';
+import johnsonSubgroups from './johnsonSubgroups';
+import groupData from './groups';
 
 const getPolyhedra = groupName => require(`./groups/${groupName}.json`);
 
 /* Johnson Solid Subgroups */
 export const johnsonSolids = getPolyhedra('johnson');
-const johnsonSubgroups = require('./johnsonSubgroups.json');
 const getEndIndex = i =>
   i === johnsonSubgroups.length - 1 ? 92 : johnsonSubgroups[i + 1].index;
 const getJohnsonPolyhedra = () => {
@@ -19,8 +20,6 @@ const getNestedPolyhedra = groupName => {
   if (groupName === 'johnson') return { groups: getJohnsonPolyhedra() };
   return { polyhedra: getPolyhedra(groupName) };
 };
-
-const groupData = require('./groups.json');
 
 const flatGroups = groupData.map(group => ({
   ...group,
