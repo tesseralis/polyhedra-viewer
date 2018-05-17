@@ -1,18 +1,19 @@
+// @flow
 import _ from 'lodash';
 
 import { johnsonSolids } from 'data';
 
-export const escapeName = name => name.replace(/ /g, '-');
+export const escapeName = (name: string) => name.replace(/ /g, '-');
 
-export const unescapeName = name => name.replace(/-/g, ' ');
+export const unescapeName = (name: string) => name.replace(/-/g, ' ');
 
 const prismNames = {
-  3: 'triangular',
-  4: 'square',
-  5: 'pentagonal',
-  6: 'hexagonal',
-  8: 'octagonal',
-  10: 'decagonal',
+  '3': 'triangular',
+  '4': 'square',
+  '5': 'pentagonal',
+  '6': 'hexagonal',
+  '8': 'octagonal',
+  '10': 'decagonal',
 };
 
 const inversePrismNames = _.invert(prismNames);
@@ -55,7 +56,7 @@ const fromConwayNotationUnescaped = notation => {
     return archimedeanMapping[notation];
   }
   if (prefix === 'J') {
-    return johnsonSolids[number - 1];
+    return johnsonSolids[parseInt(number, 10) - 1];
   }
   if (prefix === 'P') {
     return `${prismNames[number]} prism`;
@@ -66,10 +67,10 @@ const fromConwayNotationUnescaped = notation => {
   return '';
 };
 
-export const fromConwayNotation = notation =>
+export const fromConwayNotation = (notation: string) =>
   escapeName(fromConwayNotationUnescaped(notation));
 
-export const toConwayNotation = solid => {
+export const toConwayNotation = (solid: string) => {
   const name = unescapeName(solid);
   if (inversePlatonicMapping[name]) {
     return inversePlatonicMapping[name];
@@ -88,5 +89,6 @@ export const toConwayNotation = solid => {
     const [prefix] = name.split(' ');
     return 'P' + inversePrismNames[prefix];
   }
-  return null;
+  // return null;
+  throw new Error(`Invalid solid name ${solid}`);
 };
