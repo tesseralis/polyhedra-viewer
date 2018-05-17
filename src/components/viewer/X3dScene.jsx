@@ -1,4 +1,5 @@
-import React, { Component } from 'react';
+// @flow
+import * as React from 'react';
 import { StyleSheet, css } from 'aphrodite/no-important';
 
 // TODO put this in the webpack config when ejecting create-react-app
@@ -24,7 +25,11 @@ const styles = StyleSheet.create({
   },
 });
 
-export default class X3dScene extends Component {
+interface Props {
+  children: React.Node;
+}
+
+export default class X3dScene extends React.Component<Props> {
   componentDidMount() {
     // Reload X3DOM asynchronously so that it tracks the re-created instance
     setTimeout(() => x3dom.reload());

@@ -1,3 +1,4 @@
+// @flow
 import _ from 'lodash';
 
 const getPolyhedra = groupName => require(`./groups/${groupName}.json`);
