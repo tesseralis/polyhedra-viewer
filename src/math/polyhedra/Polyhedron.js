@@ -35,11 +35,9 @@ export default class Polyhedron {
   constructor(solidData: SolidData) {
     this._solidData = solidData;
     this.vertices = solidData.vertices.map(
-      (vertex, vIndex) => new Vertex((this: any), vIndex),
+      (vertex, vIndex) => new Vertex(this, vIndex),
     );
-    this.faces = solidData.faces.map(
-      (face, fIndex) => new Face((this: any), fIndex),
-    );
+    this.faces = solidData.faces.map((face, fIndex) => new Face(this, fIndex));
   }
 
   get edges() {
@@ -143,7 +141,7 @@ export default class Polyhedron {
   // =========
 
   withChanges(changes: Builder => Builder) {
-    return changes(new Builder((this: any))).build();
+    return changes(new Builder(this)).build();
   }
 
   // return a new polyhedron with the given vertices

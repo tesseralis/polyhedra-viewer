@@ -11,7 +11,7 @@ export default class Face extends VEList {
   index: FIndex;
   value: VIndex[];
 
-  constructor(polyhedron: Polyhedron, index: FIndex) {
+  constructor(polyhedron: *, index: FIndex) {
     const value = polyhedron._solidData.faces[index];
     const vertices = _.map(value, vIndex => polyhedron.vertices[vIndex]);
     const edges = _.map(

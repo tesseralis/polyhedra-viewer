@@ -35,7 +35,7 @@ export default class Builder {
   polyhedron: Polyhedron;
   solidData: SolidData;
 
-  constructor(polyhedron: Polyhedron) {
+  constructor(polyhedron: *) {
     this.polyhedron = polyhedron;
     this.solidData = { ...polyhedron.solidData };
   }

@@ -12,7 +12,7 @@ export default class Vertex {
   value: Point;
   vec: Vec3D;
 
-  constructor(polyhedron: Polyhedron, index: VIndex) {
+  constructor(polyhedron: *, index: VIndex) {
     this.polyhedron = polyhedron;
     this.index = index;
     this.value = polyhedron._solidData.vertices[index];
@@ -30,7 +30,7 @@ export default class Vertex {
   adjacentEdges() {
     // find an edge with this as a source
     const v2 = _.findIndex(this.polyhedron.edgeToFaceGraph()[this.index]);
-    const e0 = new Edge((this: any), this.polyhedron.vertices[v2]);
+    const e0 = new Edge(this, this.polyhedron.vertices[v2]);
     let e = e0;
     const result = [];
     let count = 0;
