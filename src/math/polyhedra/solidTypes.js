@@ -1,4 +1,4 @@
-// @flow
+// @flow strict
 
 import type { Point } from 'math/linAlg';
 export type VIndex = number;

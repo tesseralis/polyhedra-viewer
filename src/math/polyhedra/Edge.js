@@ -1,4 +1,4 @@
-// @flow
+// @flow strict
 import { getMidpoint } from 'math/linAlg';
 import Polyhedron from './Polyhedron';
 import Vertex from './Vertex';

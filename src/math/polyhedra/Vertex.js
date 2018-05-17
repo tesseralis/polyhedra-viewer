@@ -1,4 +1,4 @@
-// @flow
+// @flow strict
 import _ from 'lodash';
 import { vec, Vec3D } from 'math/linAlg';
 import type { Point } from 'math/linAlg';

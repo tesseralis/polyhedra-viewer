@@ -1,11 +1,11 @@
-// @flow
+// @flow strict
 import _ from 'lodash';
 
 import { find } from 'util.js';
 import { isValidSolid, getSolidData } from 'data';
 import { Vec3D, getCentroid } from 'math/linAlg';
-import type { SolidData } from './solidTypes';
 
+import type { SolidData } from './solidTypes';
 import Face from './Face';
 import Vertex from './Vertex';
 import Edge from './Edge';
