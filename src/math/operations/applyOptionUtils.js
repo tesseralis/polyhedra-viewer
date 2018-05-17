@@ -1,4 +1,4 @@
-// @flow
+// @flow strict
 import _ from 'lodash';
 import { getSingle } from 'util.js';
 import { Peak, Polyhedron } from 'math/polyhedra';

@@ -1,4 +1,4 @@
-// @flow
+// @flow strict
 import _ from 'lodash';
 
 import { Polyhedron, Face, Peak } from 'math/polyhedra';
@@ -290,7 +290,7 @@ const augmenteeSides = {
 };
 
 export function getUsingOpt(using: ?string, numSides: number) {
-  return using && augmenteeSides[using] === numSides
+  return typeof using === 'string' && augmenteeSides[using] === numSides
     ? using
     : defaultAugmentees[numSides];
 }

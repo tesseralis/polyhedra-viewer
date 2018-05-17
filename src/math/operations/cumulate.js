@@ -1,4 +1,4 @@
-// @flow
+// @flow strict
 import _ from 'lodash';
 
 import { Polyhedron } from 'math/polyhedra';
@@ -99,20 +99,20 @@ function getVertexToAdd(polyhedron, face) {
 
 function applyCumulate(
   polyhedron: Polyhedron,
-  { faceType }: CumulateOptions = {},
+  { faceType = polyhedron.smallestFace().numSides }: CumulateOptions = {},
 ) {
   // face indices with the right number of sides
-  const n = faceType || _.min(polyhedron.faces.map(face => face.numSides));
-  let cumulateFaces = getCumulateFaces(polyhedron, n);
+  let cumulateFaces = getCumulateFaces(polyhedron, faceType);
 
+  let mock;
   if (isRectified(polyhedron)) {
-    polyhedron = duplicateVertices(polyhedron, cumulateFaces);
-    cumulateFaces = cumulateFaces.map(face => face.withPolyhedron(polyhedron));
+    mock = duplicateVertices(polyhedron, cumulateFaces);
+    cumulateFaces = cumulateFaces.map(face => face.withPolyhedron(mock));
+  } else {
+    mock = polyhedron;
   }
 
-  const verticesToAdd = cumulateFaces.map(face =>
-    getVertexToAdd(polyhedron, face),
-  );
+  const verticesToAdd = cumulateFaces.map(face => getVertexToAdd(mock, face));
 
   const oldToNew = {};
   cumulateFaces.forEach((face, i) => {
@@ -121,7 +121,7 @@ function applyCumulate(
     });
   });
 
-  const endVertices = polyhedron.vertices.map(
+  const endVertices = mock.vertices.map(
     (v, vIndex) =>
       _.has(oldToNew, vIndex.toString())
         ? verticesToAdd[oldToNew[vIndex]]
@@ -130,7 +130,7 @@ function applyCumulate(
 
   return {
     animationData: {
-      start: polyhedron,
+      start: mock,
       endVertices,
     },
   };

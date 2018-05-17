@@ -1,4 +1,4 @@
-// @flow
+// @flow strict
 import Polyhedron from './Polyhedron';
 import Vertex from './Vertex';
 import Face from './Face';

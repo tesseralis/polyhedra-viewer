@@ -1,4 +1,4 @@
-// @flow
+// @flow strict
 import _ from 'lodash';
 import { mapObject, flatMapUniq } from 'util.js';
 import { Polyhedron } from 'math/polyhedra';

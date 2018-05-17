@@ -1,4 +1,4 @@
-// @flow
+// @flow strict
 import _ from 'lodash';
 
 import { hasMultiple, removeExtraneousVertices } from './operationUtils';

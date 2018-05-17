@@ -1,9 +1,10 @@
-// @flow
+// @flow strict
 import _ from 'lodash';
 import { Polyhedron, Face } from 'math/polyhedra';
 import { PRECISION, getPlane, rotateAround } from 'math/linAlg';
+import { type Relation } from './operationTypes';
 
-export const hasMultiple = (relations: any, property: any) =>
+export const hasMultiple = (relations: ?(Relation[]), property: string) =>
   _(relations)
     .map(property)
     .uniq()
@@ -117,7 +118,7 @@ export function isExpandedFace(
   nSides?: number,
 ) {
   const type = expansionType(polyhedron);
-  if (nSides && face.numSides !== nSides) return false;
+  if (typeof nSides === 'number' && face.numSides !== nSides) return false;
   if (!face.isValid()) return false;
   return _.every(face.adjacentFaces(), { numSides: edgeShape[type] });
 }

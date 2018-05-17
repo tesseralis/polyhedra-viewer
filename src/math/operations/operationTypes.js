@@ -1,4 +1,4 @@
-// @flow
+// @flow strict
 
 import { Vec3D } from 'math/linAlg';
 import { Polyhedron } from 'math/polyhedra';
@@ -33,10 +33,12 @@ export interface OperationResult {
 
 export type PartialOpResult = $Shape<OperationResult>;
 
+export type Relation = {};
+
 export interface Operation<Options = {}, ApplyArgs = {}> {
   apply(polyhedron: Polyhedron, options: Options): Polyhedron | PartialOpResult;
 
-  getSearchOptions?: (polyhedron: Polyhedron, options: Options) => any;
+  getSearchOptions?: (polyhedron: Polyhedron, options: Options) => ?{};
 
   getDefaultArgs?: (polyhedron: Polyhedron, options: Options) => ApplyArgs;
 

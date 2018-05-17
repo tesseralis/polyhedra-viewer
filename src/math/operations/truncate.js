@@ -1,4 +1,4 @@
-// @flow
+// @flow strict
 import _ from 'lodash';
 
 import { flatMap, repeat, find, mod } from 'util.js';
@@ -117,8 +117,7 @@ function getTruncateTransform(polyhedron, duplicated) {
   };
 }
 
-function doTruncate(polyhedron, options: TruncateOptions = {}) {
-  const { rectify } = options;
+function doTruncate(polyhedron, { rectify = false }: TruncateOptions = {}) {
   const truncateLength = getTruncateLength(polyhedron);
   const oldSideLength = polyhedron.edgeLength();
   const truncateScale = (oldSideLength - truncateLength) / 2 / oldSideLength;

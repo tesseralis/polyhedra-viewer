@@ -1,4 +1,4 @@
-// @flow
+// @flow strict
 import { truncate, rectify } from './truncate';
 import { cumulate } from './cumulate';
 import { expand, snub } from './expand';

@@ -1,4 +1,4 @@
-// @flow
+// @flow strict
 import _ from 'lodash';
 import { Polyhedron } from 'math/polyhedra';
 import {
@@ -112,7 +112,7 @@ function doExpansion(polyhedron: Polyhedron, referenceName) {
   const type = expansionType(reference);
   const n = polyhedron.getFace().numSides;
   const angle = type === 'snub' ? getSnubAngle(reference, n) : 0;
-  polyhedron = duplicateVertices(polyhedron, getTwist(angle));
+  const duplicated = duplicateVertices(polyhedron, getTwist(angle));
 
   const referenceFace =
     _.find(reference.faces, face => isExpandedFace(reference, face, n)) ||
@@ -120,13 +120,13 @@ function doExpansion(polyhedron: Polyhedron, referenceName) {
   const referenceLength =
     referenceFace.distanceToCenter() / reference.edgeLength();
 
-  const snubFaces = _.filter(polyhedron.faces, face =>
-    isExpandedFace(polyhedron, face, n),
+  const snubFaces = _.filter(duplicated.faces, face =>
+    isExpandedFace(duplicated, face, n),
   );
 
   // Update the vertices with the expanded-out version
   const endVertices = getResizedVertices(
-    polyhedron,
+    duplicated,
     snubFaces,
     referenceLength,
     angle,
@@ -134,7 +134,7 @@ function doExpansion(polyhedron: Polyhedron, referenceName) {
 
   return {
     animationData: {
-      start: polyhedron,
+      start: duplicated,
       endVertices,
     },
   };

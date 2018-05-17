@@ -235,14 +235,14 @@ declare module 'toxiclibsjs/geom' {
     constructor(): Plane;
     constructor(t: Triangle3D): Plane;
     constructor(origin: Vec3D, norm: Vec3D): Plane;
-    // classifyPoint(ReadonlyVec3D p, float tolerance)
+    // classifyPoint(p: Vec3D, tolerance: float)
     containsPoint(p: Vec3D): boolean;
     getDistanceToPoint(p: Vec3D): number;
     getIntersectionWithRay(r: Ray3D): Vec3D;
     getProjectedPoint(p: Vec3D): Vec3D;
     intersectRayDistance(ray: Ray3D): number;
     // toMesh(float size): Mesh3D
-    // toMesh(Mesh3D mesh, float size)
+    // toMesh(Mesh3D mesh, float size): Mesh3D
     toString(): string;
   }
 
