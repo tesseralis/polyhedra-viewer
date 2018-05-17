@@ -16,7 +16,7 @@ export function deduplicateVertices(polyhedron: Polyhedron) {
   const unique = [];
   const oldToNew = {};
 
-  _.forEach(polyhedron.vertices, (v, vIndex) => {
+  _.forEach(polyhedron.vertices, (v, vIndex: number) => {
     const match = _.find(unique, point =>
       v.vec.equalsWithTolerance(point.vec, PRECISION),
     );
@@ -30,9 +30,10 @@ export function deduplicateVertices(polyhedron: Polyhedron) {
 
   // replace vertices that are the same
   // TODO create a filterFaces method?
-  let newFaces = polyhedron.faces
+  let newFaces = _(polyhedron.faces)
     .map(face => _.uniq(face.vertices.map(v => oldToNew[v.index])))
-    .filter(vIndices => vIndices.length >= 3);
+    .filter(vIndices => vIndices.length >= 3)
+    .value();
 
   // remove extraneous vertices
   return removeExtraneousVertices(

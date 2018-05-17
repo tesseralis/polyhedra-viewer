@@ -65,6 +65,13 @@ export function find<T>(array: T[], predicate: Predicate<T>): T {
   return result;
 }
 
+// Wrap the lodash flatMap with better typign
+type FlatMap<T, U> = (
+  array: T[],
+  iteratee: (item: T, index: number) => U[],
+) => U[];
+export const flatMap: FlatMap<*, *> = _.flatMap;
+
 function f(a: mixed[][], b: mixed[]) {
   const mapper: FlatMapIteratee<mixed, mixed[]> = (x: mixed[]) =>
     b.map(y => [...x, y]);

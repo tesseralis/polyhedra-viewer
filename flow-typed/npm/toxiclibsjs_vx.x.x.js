@@ -241,7 +241,7 @@ declare module 'toxiclibsjs/geom' {
     getIntersectionWithRay(r: Ray3D): Vec3D;
     getProjectedPoint(p: Vec3D): Vec3D;
     intersectRayDistance(ray: Ray3D): number;
-    // toMesh(float size)
+    // toMesh(float size): Mesh3D
     // toMesh(Mesh3D mesh, float size)
     toString(): string;
   }

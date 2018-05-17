@@ -7,7 +7,7 @@ import {
   isExpandedFace,
   getResizedVertices,
 } from './operationUtils';
-import { repeat } from 'util.js';
+import { flatMap, repeat } from 'util.js';
 import { Operation } from './operationTypes';
 
 // Result functions
@@ -70,7 +70,7 @@ function duplicateVertices(polyhedron: Polyhedron, twist?: 'left' | 'right') {
   const count = polyhedron.getVertex().adjacentFaces().length;
 
   const newVertexMapping = {};
-  _.forEach(polyhedron.vertices, (v, vIndex) => {
+  _.forEach(polyhedron.vertices, (v, vIndex: number) => {
     // For each vertex, pick one adjacent face to be the "head"
     // for every other adjacent face, map it to a duplicated vertex
     _.forEach(v.adjacentFaces(), (f, i) => {
@@ -80,7 +80,7 @@ function duplicateVertices(polyhedron: Polyhedron, twist?: 'left' | 'right') {
 
   return polyhedron.withChanges(solid =>
     solid
-      .withVertices(_.flatMap(polyhedron.vertices, v => repeat(v.value, count)))
+      .withVertices(flatMap(polyhedron.vertices, v => repeat(v.value, count)))
       .mapFaces(face =>
         face.vertices.map(v => newVertexMapping[face.index][v.index]),
       )

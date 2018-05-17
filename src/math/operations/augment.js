@@ -72,7 +72,7 @@ function canAugmentWith(base, augmentee, offset) {
   const n = base.numSides;
   const underside = augmentee.faceWithNumSides(n);
 
-  return _.every(base.edges, (edge, i) => {
+  return _.every(base.edges, (edge, i: number) => {
     const baseAngle = edge.dihedralAngle();
 
     const edge2 = getCyclic(underside.edges, i - 1 + offset);
@@ -340,7 +340,7 @@ export const augment: Operation<AugmentOptions> = {
     const rawGyrateOpts = _.compact(_.uniq(_.map(relations, 'gyrate')));
     const gyrateOpts = rawGyrateOpts.length === 2 ? rawGyrateOpts : [undefined];
     const usingOpts = _.compact(_.uniq(_.map(relations, 'using')));
-    const faceOpts = polyhedron.faces.filter(face => canAugment(face));
+    const faceOpts = _.map(polyhedron.faces.filter(face => canAugment(face)));
 
     return cartesian(gyrateOpts, usingOpts, faceOpts).map(
       ([gyrate, using, face]) => ({ gyrate, using, face }),

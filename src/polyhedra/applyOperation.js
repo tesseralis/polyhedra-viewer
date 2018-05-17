@@ -43,7 +43,11 @@ export default function applyOperation(
   const next = getNextPolyhedron(name, operation, _.pickBy(options));
   if (!op) {
     // throw new Error(`Function not found for ${operation}`)
-    return { result: Polyhedron.get(next), name: next };
+    return {
+      result: Polyhedron.get(next),
+      name: next,
+      animationData: undefined,
+    };
   }
   return { name: next, ...setDefaults(op.apply(polyhedron, applyConfig)) };
 }

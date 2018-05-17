@@ -3,12 +3,12 @@ import _ from 'lodash';
 import React, { Component } from 'react';
 import { css, StyleSheet } from 'aphrodite/no-important';
 import { rgb } from 'd3-color';
-import { Vec3D } from 'math/linAlg';
+import { type Point, Vec3D } from 'math/linAlg';
 
 import { isValidSolid } from 'data';
 import { andaleMono } from 'styles/fonts';
 import { Polyhedron } from 'math/polyhedra';
-import type { Vertex, Face } from 'math/polyhedra';
+import type { Face } from 'math/polyhedra';
 import { operations } from 'math/operations';
 import type { OpName } from 'math/operations';
 import polygons from 'constants/polygons';
@@ -80,8 +80,7 @@ function viewerStateFromSolidName(name) {
   };
 }
 
-type Color = [number, number, number];
-function toRgb(hex: string): Color {
+function toRgb(hex: string) {
   const { r, g, b } = rgb(hex);
   return [r / 255, g / 255, b / 255];
 }
@@ -118,7 +117,7 @@ interface ViewerState {
 }
 
 interface InterpolatedValues {
-  vertices: Vertex[];
+  vertices: Point[];
   faceColors: any;
 }
 
@@ -297,7 +296,8 @@ export default class Viewer extends Component<ViewerProps, ViewerState> {
           solidName: name,
           animationData,
           faceColors: colorStart,
-          interpolated: enableAnimation && animationData && animationData.start,
+          interpolated:
+            enableAnimation && animationData ? animationData.start : undefined,
           applyArgs: {},
           ...postOpState,
         };
@@ -333,7 +333,9 @@ export default class Viewer extends Component<ViewerProps, ViewerState> {
       },
       ({ vertices, faceColors }: InterpolatedValues) => {
         this.setState(({ interpolated, polyhedron }) => ({
-          interpolated: (interpolated || polyhedron).withVertices(vertices),
+          interpolated: (interpolated || polyhedron).withVertices(
+            (vertices: any),
+          ),
           faceColors,
         }));
       },

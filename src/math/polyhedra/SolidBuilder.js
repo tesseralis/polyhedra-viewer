@@ -18,7 +18,8 @@ function normalizeVertex(v: VertexArg) {
   // if it's a vector
   if (v instanceof Vec3D) return v.toArray();
   // If it's a vertex object
-  return v.value;
+  if (v instanceof Vertex) return v.value;
+  throw new Error('Invalid vertex');
 }
 
 function normalizeFace(face: FaceArg) {
@@ -60,7 +61,7 @@ export default class Builder {
     return this;
   }
 
-  addVertices(vertices: Point[]) {
+  addVertices(vertices: Vertex[] | VertexArg[]) {
     return this.withVertices(this.solidData.vertices.concat(vertices));
   }
 
@@ -80,7 +81,7 @@ export default class Builder {
   }
 
   addPolyhedron(other: Polyhedron) {
-    return this.addVertices(other.solidData.vertices).addFaces(
+    return this.addVertices(other.vertices).addFaces(
       other.faces.map(face =>
         face.vertices.map(v => v.index + this.polyhedron.numVertices()),
       ),

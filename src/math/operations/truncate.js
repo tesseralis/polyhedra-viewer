@@ -1,7 +1,7 @@
 // @flow
 import _ from 'lodash';
 
-import { repeat, find, mod } from 'util.js';
+import { flatMap, repeat, find, mod } from 'util.js';
 import { scaleAround, PRECISION } from 'math/linAlg';
 import { Polyhedron } from 'math/polyhedra';
 import type { Operation } from './operationTypes';
@@ -56,7 +56,9 @@ function duplicateVertices(polyhedron) {
 
   return polyhedron.withChanges(solid => {
     return solid
-      .withVertices(_.flatMap(polyhedron.vertices, v => repeat(v.value, count)))
+      .withVertices(
+        flatMap(polyhedron.vertices, (v, i) => repeat(v.value, count)),
+      )
       .mapFaces(face => {
         return _.flatMap(face.vertices, v => {
           const base = count * v.index;

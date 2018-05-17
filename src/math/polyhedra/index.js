@@ -1,3 +1,4 @@
+// @flow
 import Polyhedron from './Polyhedron';
 import Vertex from './Vertex';
 import Face from './Face';
@@ -7,3 +8,5 @@ import Peak from './Peak';
 export { Polyhedron, Vertex, Face, Edge, Peak };
 
 export * from './solidTypes';
+
+export { VertexArg } from './SolidBuilder';
