@@ -67,8 +67,6 @@ const styles = StyleSheet.create({
   },
 });
 
-const hasMode = ['k', 'c', '+', '-', 'g'];
-
 const getOptionName = optValue => {
   switch (optValue) {
     case 'U2':
@@ -129,11 +127,13 @@ function AugmentOptions({ options, solid, onClickOption, disabled }) {
   );
 }
 
+const hasMode = ['contract', 'cumulate', 'augment', 'diminish', 'gyrate'];
+
 // TODO possibly move this as part of the operation definition
 function hasOptions(operation, relations) {
   switch (operation) {
-    case 'k':
-    case 'c':
+    case 'cumulate':
+    case 'contract':
       if (relations.length > 1) {
         return true;
       }
@@ -157,9 +157,9 @@ export default function RelatedPolyhedra({
   return (
     <div className={css(styles.opGrid)}>
       {operations.map(({ name, symbol, description }) => {
-        const relations = getRelations(solid, symbol);
+        const relations = getRelations(solid, name);
         const buttons =
-          !relations || _.includes(hasMode, symbol)
+          !relations || hasOptions(name, relations)
             ? [{ value: '' }]
             : relations;
         const showResult = buttons.length > 1;
@@ -175,14 +175,14 @@ export default function RelatedPolyhedra({
                   <button
                     className={css(
                       styles.modeButton,
-                      operation === symbol && styles.isHighlighted,
+                      operation === name && styles.isHighlighted,
                     )}
                     disabled={!relations || disabled}
                     onClick={() => {
-                      if (hasOptions(symbol, relations)) {
-                        setOperation(symbol !== operation ? symbol : null);
+                      if (hasOptions(name, relations)) {
+                        setOperation(name !== operation ? name : null);
                       } else {
-                        applyOperation(symbol);
+                        applyOperation(name);
                       }
                     }}
                   >
@@ -192,7 +192,7 @@ export default function RelatedPolyhedra({
                 </Tooltip>
               ))}
             </div>
-            {symbol === '+' && (
+            {name === 'augment' && (
               <AugmentOptions
                 solid={solid}
                 options={applyOptions}

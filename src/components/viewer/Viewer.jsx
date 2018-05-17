@@ -10,12 +10,12 @@ import { andaleMono } from 'styles/fonts';
 import { Polyhedron } from 'math/polyhedra';
 import type { Vertex, Face } from 'math/polyhedra';
 import { operations } from 'math/operations';
+import type { OpName } from 'math/operations';
 import polygons from 'constants/polygons';
 import { mapObject } from 'util.js';
 import { fixed, fullScreen } from 'styles/common';
 import { unescapeName } from 'polyhedra/names';
 import doApplyOperation from 'polyhedra/applyOperation';
-import type { Operation } from 'polyhedra/applyOperation';
 import { getRelations, applyOptionsFor } from 'polyhedra/operations';
 import { defaultConfig, getPolyhedronConfig } from 'constants/configOptions';
 import transition from 'transition.js';
@@ -61,11 +61,11 @@ const styles = StyleSheet.create({
 });
 
 const operationDescriptions = {
-  '+': 'Click on a face to add a pyramid or cupola.',
-  '-': 'Click on a pyramid or cupola to remove it.',
-  g: 'Click on a set of faces to gyrate them.',
-  k: 'Click on a set of faces to cumulate them.',
-  c: 'Click on a set of faces to contract them.',
+  augment: 'Click on a face to add a pyramid or cupola.',
+  diminish: 'Click on a pyramid or cupola to remove it.',
+  gyrate: 'Click on a set of faces to gyrate them.',
+  cumulate: 'Click on a set of faces to cumulate them.',
+  contract: 'Click on a set of faces to contract them.',
 };
 
 function viewerStateFromSolidName(name) {
@@ -106,7 +106,7 @@ interface ViewerProps {
 interface ViewerState {
   polyhedron: Polyhedron;
   solidName: string;
-  operation: ?Operation;
+  operation: ?OpName;
   // TODO consolidate applyArgs (which are determined by the polyhedron)
   // and applyOptions (which are determined by the the panel)
   applyOptions: any;
@@ -252,7 +252,7 @@ export default class Viewer extends Component<ViewerProps, ViewerState> {
     this.setState(({ config }) => ({ config: { ...config, [key]: value } }));
   };
 
-  setOperation = (operation: Operation) => {
+  setOperation = (operation: OpName) => {
     this.setState(({ polyhedron, solidName }) => ({
       operation,
       applyOptions: applyOptionsFor(solidName, operation),
@@ -267,7 +267,7 @@ export default class Viewer extends Component<ViewerProps, ViewerState> {
     }
   };
 
-  applyOperation = (operation: Operation) => {
+  applyOperation = (operation: OpName) => {
     this.setState(
       ({ polyhedron, solidName, applyOptions, applyArgs, config }) => {
         const { result, name, animationData } = doApplyOperation(
@@ -279,6 +279,7 @@ export default class Viewer extends Component<ViewerProps, ViewerState> {
             ...applyOptions,
           },
         );
+        if (!name) throw new Error('Name not found on new polyhedron');
         // FIXME gyrate -> twist needs to be unset
         const postOpState = (() => {
           if (_.isEmpty(getRelations(name, operation))) {

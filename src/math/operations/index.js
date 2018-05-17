@@ -8,20 +8,20 @@ import { diminish, shorten } from './diminish';
 import { gyrate } from './gyrate';
 
 export const operations = {
-  t: truncate,
-  a: rectify,
-  k: cumulate,
-  e: expand,
-  s: snub,
-  c: contract,
-  '+': augment,
-  P: elongate,
-  A: gyroelongate,
-  '-': diminish,
-  h: shorten,
-  g: gyrate,
+  truncate,
+  rectify,
+  cumulate,
+  expand,
+  snub,
+  contract,
+  augment,
+  elongate,
+  gyroelongate,
+  diminish,
+  shorten,
+  gyrate,
 };
 
 export { deduplicateVertices } from './operationUtils';
 
-export type { OperationResult } from './operationTypes';
+export type { OpName, OperationResult } from './operationTypes';

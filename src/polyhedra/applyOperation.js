@@ -1,14 +1,16 @@
+// @flow
 import _ from 'lodash';
 import { getNextPolyhedron, getRelations } from './operations';
 import { Polyhedron } from 'math/polyhedra';
 import { operations, deduplicateVertices } from 'math/operations';
-import type { OperationResult } from 'math/operations';
+import type { OpName, OperationResult } from 'math/operations';
 
 function setDefaults(opResult) {
   if (!opResult.animationData) {
     return { result: opResult };
   }
-  const { result, animationData: { start, endVertices } } = opResult;
+  const { result, animationData } = opResult;
+  const { start, endVertices } = animationData;
   return {
     result: result || deduplicateVertices(start.withVertices(endVertices)),
     animationData: {
@@ -18,16 +20,14 @@ function setDefaults(opResult) {
   };
 }
 
-export type Operation = 't' | 'a' | 'k' | 'c' | 'e' | '+' | '-' | 'g';
-
 export default function applyOperation(
-  operation: Operation,
+  operation: OpName,
   name: string,
   polyhedron: Polyhedron,
   config: any = {},
 ): OperationResult {
   const relations = getRelations(name, operation);
-  const op = operations[operation];
+  const op = _.get(operations, operation);
   const options = _.invoke(
     op,
     'getSearchOptions',

@@ -4,8 +4,26 @@ import { Vec3D } from 'math/linAlg';
 import { Polyhedron } from 'math/polyhedra';
 import type { Vertex, Face } from 'math/polyhedra';
 
+export type OpName =
+  | 'truncate'
+  | 'rectify'
+  | 'cumulate'
+  // | 'dual'
+  | 'expand'
+  | 'snub'
+  | 'contract'
+  | 'elongate'
+  | 'gyroelongate'
+  | 'shorten'
+  // | 'twist'
+  | 'augment'
+  | 'diminish'
+  | 'gyrate';
+
 export interface OperationResult {
   result: Polyhedron;
+  // TODO This is optional because we "fill in" an option result with defaults
+  // but then we have to check for something we're sure to have...
   name?: ?string;
   animationData?: ?{
     start: Polyhedron,
