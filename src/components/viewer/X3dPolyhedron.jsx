@@ -3,12 +3,18 @@ import React, { Component } from 'react';
 import _ from 'lodash';
 import EventListener from 'react-event-listener';
 
-import { vec, Vec3D } from 'math/linAlg';
+import { type Point, vec, Vec3D } from 'math/linAlg';
 import { Polyhedron } from 'math/polyhedra';
+
+type SyntheticEventHandler = (e: $Subtype<SyntheticEvent<*>>) => void;
+
+interface SyntheticX3DMouseEvent extends SyntheticEvent<> {
+  hitPnt: Point;
+}
 
 // Join a list of lists with an inner and outer separator.
 export const joinListOfLists = (
-  list: any[],
+  list: mixed[][],
   outerSep: string,
   innerSep: string,
 ) => {
@@ -40,8 +46,8 @@ interface PolyhedronProps {
   // TODO Use the raw solid data (or vertices) instead
   // (can't do right now because the Page object relies on it)
   polyhedron: Polyhedron;
-  config: any;
-  faceColors: any;
+  config: *;
+  faceColors: *;
   applyOperation(): void;
   setApplyArgs(hitPnt?: Vec3D): void;
 }
@@ -54,7 +60,7 @@ export default class X3dPolyhedron extends Component<
   PolyhedronProps,
   PolyhedronState,
 > {
-  shape: any;
+  shape: *;
   drag: boolean = false;
 
   constructor(props: PolyhedronProps) {
@@ -108,7 +114,7 @@ export default class X3dPolyhedron extends Component<
   };
 
   // Manually adding event listeners swallows errors, so we have to store it in the component itself
-  wrapError = (fn: any) => (event: any) => {
+  wrapError = (fn: SyntheticEventHandler) => (event: SyntheticEvent<*>) => {
     try {
       fn(event);
     } catch (error) {
@@ -116,8 +122,10 @@ export default class X3dPolyhedron extends Component<
     }
   };
 
-  addEventListener(type: string, fn: EventHandler) {
-    this.shape.current.addEventListener(type, this.wrapError(fn));
+  addEventListener(type: string, fn: SyntheticEventHandler) {
+    if (this.shape.current !== null) {
+      this.shape.current.addEventListener(type, this.wrapError(fn));
+    }
   }
 
   handleLoad = () => {
@@ -138,7 +146,7 @@ export default class X3dPolyhedron extends Component<
     applyOperation();
   };
 
-  handleMouseMove = (event: any) => {
+  handleMouseMove = (event: SyntheticX3DMouseEvent) => {
     // TODO replace this with logs
     this.drag = true;
     const { setApplyArgs } = this.props;
