@@ -171,7 +171,96 @@ declare module 'toxiclibsjs/color/ToneMap' {
 }
 
 declare module 'toxiclibsjs/geom' {
-  declare module.exports: any;
+  declare export class Vec3D {
+    constructor(): Vec3D;
+    constructor(x: number, y: number, z: number): Vec3D;
+    constructor(v: Vec3D): Vec3D;
+    add(a: number, b: number, c: number): Vec3D;
+    add(v: Vec3D): Vec3D;
+    angleBetween(v: Vec3D): number;
+    angleBetween(v: Vec3D, forceNormalize: boolean): number;
+    compareTo(v: Vec3D): number;
+    copy(): Vec3D;
+    cross(v: Vec3D): Vec3D;
+    distanceTo(v: Vec3D): number;
+    distanceToSquared(v: Vec3D): number;
+    dot(v: Vec3D): number;
+    equals(obj: Object): boolean;
+    equalsWithTolerance(v: Vec3D, tolerance: number): boolean;
+    getAbs(): Vec3D;
+    getComponent(id: number): number;
+    // getComponent(id: Vec3D.Axis): number;
+    // getConstrained(box: AABB): Vec3D;
+    getFloored(): Vec3D;
+    getFrac(): Vec3D;
+    getInverted(): Vec3D;
+    getLimited(lim: number): Vec3D;
+    getNormalized(): Vec3D;
+    getNormalizedTo(length: number): Vec3D;
+    getReciprocal(): Vec3D;
+    getReflected(normal: Vec3D): Vec3D;
+    getRotatedAroundAxis(axis: Vec3D, theta: number): Vec3D;
+    getRotatedX(theta: number): Vec3D;
+    getRotatedY(theta: number): Vec3D;
+    getRotatedZ(theta: number): Vec3D;
+    getSignum(): Vec3D;
+    headingXY(): number;
+    headingXZ(): number;
+    headingYZ(): number;
+    interpolateTo(v: Vec3D, f: number): Vec3D;
+    // interpolateTo(v: Vec3D, f: number, s: InterpolateStrategy): Vec3D
+    // isInAABB(box: AABB): boolean
+    // isInAABB(boxOrigin: AABB, boxExtent: Vec3D): boolean
+    isMajorAxis(tolerance: number): boolean;
+    isZeroVector(): boolean;
+    magnitude(): number;
+    magSquared(): number;
+    scale(s: number): Vec3D;
+    scale(a: number, b: number, c: number): Vec3D;
+    scale(s: Vec3D): Vec3D;
+    sub(a: number, b: number, c: number): Vec3D;
+    sub(v: Vec3D): Vec3D;
+    // to2DXY(): Vec2D;
+    // to2DXZ(): Vec2D;
+    // to2DYZ(): Vec2D;
+    toArray(): [number, number, number];
+    toCartesian(): Vec3D;
+    toSpherical(): Vec3D;
+    x(): number;
+    y(): number;
+    z(): number;
+  }
+
+  declare export class Plane extends Vec3D {
+    constructor(): Plane;
+    constructor(t: Triangle3D): Plane;
+    constructor(origin: Vec3D, norm: Vec3D): Plane;
+    // classifyPoint(ReadonlyVec3D p, float tolerance)
+    containsPoint(p: Vec3D): boolean;
+    getDistanceToPoint(p: Vec3D): number;
+    getIntersectionWithRay(r: Ray3D): Vec3D;
+    getProjectedPoint(p: Vec3D): Vec3D;
+    intersectRayDistance(ray: Ray3D): number;
+    // toMesh(float size)
+    // toMesh(Mesh3D mesh, float size)
+    toString(): string;
+  }
+
+  declare export class Ray3D extends Vec3D {
+    constructor(): Ray3D;
+    constructor(x: number, y: number, z: number, d: Vec3D): Ray3D;
+    constructor(o: Vec3D, d: Vec3D): Ray3D;
+    getDirection(): Vec3D;
+    getDistanceToPoint(p: Vec3D): number;
+    getPointAtDistance(dist: number): Vec3D;
+    // toLine3DWithPointAtDistance(dist: number): Line3D;
+    toString(): string;
+  }
+
+  declare export class Triangle3D {
+    constructor(): Triangle3D;
+    constructor(a: Vec3D, b: Vec3D, c: Vec3D): Triangle3D;
+  }
 }
 
 declare module 'toxiclibsjs/geom/AABB' {
@@ -800,40 +889,62 @@ declare module 'toxiclibsjs/color/theory.js' {
   declare module.exports: $Exports<'toxiclibsjs/color/theory'>;
 }
 declare module 'toxiclibsjs/color/theory/AnalagousStrategy.js' {
-  declare module.exports: $Exports<'toxiclibsjs/color/theory/AnalagousStrategy'>;
+  declare module.exports: $Exports<
+    'toxiclibsjs/color/theory/AnalagousStrategy',
+  >;
 }
 declare module 'toxiclibsjs/color/theory/colorTheoryRegistry.js' {
-  declare module.exports: $Exports<'toxiclibsjs/color/theory/colorTheoryRegistry'>;
+  declare module.exports: $Exports<
+    'toxiclibsjs/color/theory/colorTheoryRegistry',
+  >;
 }
 declare module 'toxiclibsjs/color/theory/ComplementaryStrategy.js' {
-  declare module.exports: $Exports<'toxiclibsjs/color/theory/ComplementaryStrategy'>;
+  declare module.exports: $Exports<
+    'toxiclibsjs/color/theory/ComplementaryStrategy',
+  >;
 }
 declare module 'toxiclibsjs/color/theory/CompoundTheoryStrategy.js' {
-  declare module.exports: $Exports<'toxiclibsjs/color/theory/CompoundTheoryStrategy'>;
+  declare module.exports: $Exports<
+    'toxiclibsjs/color/theory/CompoundTheoryStrategy',
+  >;
 }
 declare module 'toxiclibsjs/color/theory/LeftSplitComplementaryStrategy.js' {
-  declare module.exports: $Exports<'toxiclibsjs/color/theory/LeftSplitComplementaryStrategy'>;
+  declare module.exports: $Exports<
+    'toxiclibsjs/color/theory/LeftSplitComplementaryStrategy',
+  >;
 }
 declare module 'toxiclibsjs/color/theory/MonochromeTheoryStrategy.js' {
-  declare module.exports: $Exports<'toxiclibsjs/color/theory/MonochromeTheoryStrategy'>;
+  declare module.exports: $Exports<
+    'toxiclibsjs/color/theory/MonochromeTheoryStrategy',
+  >;
 }
 declare module 'toxiclibsjs/color/theory/RightSplitComplementaryStrategy.js' {
-  declare module.exports: $Exports<'toxiclibsjs/color/theory/RightSplitComplementaryStrategy'>;
+  declare module.exports: $Exports<
+    'toxiclibsjs/color/theory/RightSplitComplementaryStrategy',
+  >;
 }
 declare module 'toxiclibsjs/color/theory/SingleComplementStrategy.js' {
-  declare module.exports: $Exports<'toxiclibsjs/color/theory/SingleComplementStrategy'>;
+  declare module.exports: $Exports<
+    'toxiclibsjs/color/theory/SingleComplementStrategy',
+  >;
 }
 declare module 'toxiclibsjs/color/theory/SplitComplementaryStrategy.js' {
-  declare module.exports: $Exports<'toxiclibsjs/color/theory/SplitComplementaryStrategy'>;
+  declare module.exports: $Exports<
+    'toxiclibsjs/color/theory/SplitComplementaryStrategy',
+  >;
 }
 declare module 'toxiclibsjs/color/theory/strategies.js' {
   declare module.exports: $Exports<'toxiclibsjs/color/theory/strategies'>;
 }
 declare module 'toxiclibsjs/color/theory/TetradTheoryStrategy.js' {
-  declare module.exports: $Exports<'toxiclibsjs/color/theory/TetradTheoryStrategy'>;
+  declare module.exports: $Exports<
+    'toxiclibsjs/color/theory/TetradTheoryStrategy',
+  >;
 }
 declare module 'toxiclibsjs/color/theory/TriadTheoryStrategy.js' {
-  declare module.exports: $Exports<'toxiclibsjs/color/theory/TriadTheoryStrategy'>;
+  declare module.exports: $Exports<
+    'toxiclibsjs/color/theory/TriadTheoryStrategy',
+  >;
 }
 declare module 'toxiclibsjs/color/ToneMap.js' {
   declare module.exports: $Exports<'toxiclibsjs/color/ToneMap'>;
@@ -917,34 +1028,54 @@ declare module 'toxiclibsjs/geom/mesh/subdiv.js' {
   declare module.exports: $Exports<'toxiclibsjs/geom/mesh/subdiv'>;
 }
 declare module 'toxiclibsjs/geom/mesh/subdiv/DisplacementSubdivision.js' {
-  declare module.exports: $Exports<'toxiclibsjs/geom/mesh/subdiv/DisplacementSubdivision'>;
+  declare module.exports: $Exports<
+    'toxiclibsjs/geom/mesh/subdiv/DisplacementSubdivision',
+  >;
 }
 declare module 'toxiclibsjs/geom/mesh/subdiv/DualDisplacementSubdivision.js' {
-  declare module.exports: $Exports<'toxiclibsjs/geom/mesh/subdiv/DualDisplacementSubdivision'>;
+  declare module.exports: $Exports<
+    'toxiclibsjs/geom/mesh/subdiv/DualDisplacementSubdivision',
+  >;
 }
 declare module 'toxiclibsjs/geom/mesh/subdiv/DualSubdivision.js' {
-  declare module.exports: $Exports<'toxiclibsjs/geom/mesh/subdiv/DualSubdivision'>;
+  declare module.exports: $Exports<
+    'toxiclibsjs/geom/mesh/subdiv/DualSubdivision',
+  >;
 }
 declare module 'toxiclibsjs/geom/mesh/subdiv/EdgeLengthComparator.js' {
-  declare module.exports: $Exports<'toxiclibsjs/geom/mesh/subdiv/EdgeLengthComparator'>;
+  declare module.exports: $Exports<
+    'toxiclibsjs/geom/mesh/subdiv/EdgeLengthComparator',
+  >;
 }
 declare module 'toxiclibsjs/geom/mesh/subdiv/FaceCountComparator.js' {
-  declare module.exports: $Exports<'toxiclibsjs/geom/mesh/subdiv/FaceCountComparator'>;
+  declare module.exports: $Exports<
+    'toxiclibsjs/geom/mesh/subdiv/FaceCountComparator',
+  >;
 }
 declare module 'toxiclibsjs/geom/mesh/subdiv/MidpointDisplacementSubdivision.js' {
-  declare module.exports: $Exports<'toxiclibsjs/geom/mesh/subdiv/MidpointDisplacementSubdivision'>;
+  declare module.exports: $Exports<
+    'toxiclibsjs/geom/mesh/subdiv/MidpointDisplacementSubdivision',
+  >;
 }
 declare module 'toxiclibsjs/geom/mesh/subdiv/MidpointSubdivision.js' {
-  declare module.exports: $Exports<'toxiclibsjs/geom/mesh/subdiv/MidpointSubdivision'>;
+  declare module.exports: $Exports<
+    'toxiclibsjs/geom/mesh/subdiv/MidpointSubdivision',
+  >;
 }
 declare module 'toxiclibsjs/geom/mesh/subdiv/NormalDisplacementSubdivision.js' {
-  declare module.exports: $Exports<'toxiclibsjs/geom/mesh/subdiv/NormalDisplacementSubdivision'>;
+  declare module.exports: $Exports<
+    'toxiclibsjs/geom/mesh/subdiv/NormalDisplacementSubdivision',
+  >;
 }
 declare module 'toxiclibsjs/geom/mesh/subdiv/SubdivisionStrategy.js' {
-  declare module.exports: $Exports<'toxiclibsjs/geom/mesh/subdiv/SubdivisionStrategy'>;
+  declare module.exports: $Exports<
+    'toxiclibsjs/geom/mesh/subdiv/SubdivisionStrategy',
+  >;
 }
 declare module 'toxiclibsjs/geom/mesh/subdiv/TriSubdivision.js' {
-  declare module.exports: $Exports<'toxiclibsjs/geom/mesh/subdiv/TriSubdivision'>;
+  declare module.exports: $Exports<
+    'toxiclibsjs/geom/mesh/subdiv/TriSubdivision',
+  >;
 }
 declare module 'toxiclibsjs/geom/mesh/SuperEllipsoid.js' {
   declare module.exports: $Exports<'toxiclibsjs/geom/mesh/SuperEllipsoid'>;
@@ -1007,7 +1138,9 @@ declare module 'toxiclibsjs/geom/Spline3D.js' {
   declare module.exports: $Exports<'toxiclibsjs/geom/Spline3D'>;
 }
 declare module 'toxiclibsjs/geom/SutherlandHodgemanClipper.js' {
-  declare module.exports: $Exports<'toxiclibsjs/geom/SutherlandHodgemanClipper'>;
+  declare module.exports: $Exports<
+    'toxiclibsjs/geom/SutherlandHodgemanClipper',
+  >;
 }
 declare module 'toxiclibsjs/geom/Triangle2D.js' {
   declare module.exports: $Exports<'toxiclibsjs/geom/Triangle2D'>;
@@ -1097,7 +1230,9 @@ declare module 'toxiclibsjs/math/conversion/index.js' {
   declare module.exports: $Exports<'toxiclibsjs/math/conversion/index'>;
 }
 declare module 'toxiclibsjs/math/conversion/UnitTranslator.js' {
-  declare module.exports: $Exports<'toxiclibsjs/math/conversion/UnitTranslator'>;
+  declare module.exports: $Exports<
+    'toxiclibsjs/math/conversion/UnitTranslator',
+  >;
 }
 declare module 'toxiclibsjs/math/CosineInterpolation.js' {
   declare module.exports: $Exports<'toxiclibsjs/math/CosineInterpolation'>;
@@ -1151,7 +1286,9 @@ declare module 'toxiclibsjs/math/waves/ConstantWave.js' {
   declare module.exports: $Exports<'toxiclibsjs/math/waves/ConstantWave'>;
 }
 declare module 'toxiclibsjs/math/waves/FMHarmonicSquareWave.js' {
-  declare module.exports: $Exports<'toxiclibsjs/math/waves/FMHarmonicSquareWave'>;
+  declare module.exports: $Exports<
+    'toxiclibsjs/math/waves/FMHarmonicSquareWave',
+  >;
 }
 declare module 'toxiclibsjs/math/waves/FMSawtoothWave.js' {
   declare module.exports: $Exports<'toxiclibsjs/math/waves/FMSawtoothWave'>;
@@ -1181,34 +1318,52 @@ declare module 'toxiclibsjs/physics2d/behaviors.js' {
   declare module.exports: $Exports<'toxiclibsjs/physics2d/behaviors'>;
 }
 declare module 'toxiclibsjs/physics2d/behaviors/AttractionBehavior.js' {
-  declare module.exports: $Exports<'toxiclibsjs/physics2d/behaviors/AttractionBehavior'>;
+  declare module.exports: $Exports<
+    'toxiclibsjs/physics2d/behaviors/AttractionBehavior',
+  >;
 }
 declare module 'toxiclibsjs/physics2d/behaviors/ConstantForceBehavior.js' {
-  declare module.exports: $Exports<'toxiclibsjs/physics2d/behaviors/ConstantForceBehavior'>;
+  declare module.exports: $Exports<
+    'toxiclibsjs/physics2d/behaviors/ConstantForceBehavior',
+  >;
 }
 declare module 'toxiclibsjs/physics2d/behaviors/GravityBehavior.js' {
-  declare module.exports: $Exports<'toxiclibsjs/physics2d/behaviors/GravityBehavior'>;
+  declare module.exports: $Exports<
+    'toxiclibsjs/physics2d/behaviors/GravityBehavior',
+  >;
 }
 declare module 'toxiclibsjs/physics2d/constraints.js' {
   declare module.exports: $Exports<'toxiclibsjs/physics2d/constraints'>;
 }
 declare module 'toxiclibsjs/physics2d/constraints/AngularConstraint.js' {
-  declare module.exports: $Exports<'toxiclibsjs/physics2d/constraints/AngularConstraint'>;
+  declare module.exports: $Exports<
+    'toxiclibsjs/physics2d/constraints/AngularConstraint',
+  >;
 }
 declare module 'toxiclibsjs/physics2d/constraints/AxisConstraint.js' {
-  declare module.exports: $Exports<'toxiclibsjs/physics2d/constraints/AxisConstraint'>;
+  declare module.exports: $Exports<
+    'toxiclibsjs/physics2d/constraints/AxisConstraint',
+  >;
 }
 declare module 'toxiclibsjs/physics2d/constraints/CircularConstraint.js' {
-  declare module.exports: $Exports<'toxiclibsjs/physics2d/constraints/CircularConstraint'>;
+  declare module.exports: $Exports<
+    'toxiclibsjs/physics2d/constraints/CircularConstraint',
+  >;
 }
 declare module 'toxiclibsjs/physics2d/constraints/MaxConstraint.js' {
-  declare module.exports: $Exports<'toxiclibsjs/physics2d/constraints/MaxConstraint'>;
+  declare module.exports: $Exports<
+    'toxiclibsjs/physics2d/constraints/MaxConstraint',
+  >;
 }
 declare module 'toxiclibsjs/physics2d/constraints/MinConstraint.js' {
-  declare module.exports: $Exports<'toxiclibsjs/physics2d/constraints/MinConstraint'>;
+  declare module.exports: $Exports<
+    'toxiclibsjs/physics2d/constraints/MinConstraint',
+  >;
 }
 declare module 'toxiclibsjs/physics2d/constraints/RectConstraint.js' {
-  declare module.exports: $Exports<'toxiclibsjs/physics2d/constraints/RectConstraint'>;
+  declare module.exports: $Exports<
+    'toxiclibsjs/physics2d/constraints/RectConstraint',
+  >;
 }
 declare module 'toxiclibsjs/physics2d/ParticlePath2D.js' {
   declare module.exports: $Exports<'toxiclibsjs/physics2d/ParticlePath2D'>;
@@ -1220,10 +1375,14 @@ declare module 'toxiclibsjs/physics2d/PullBackString2D.js' {
   declare module.exports: $Exports<'toxiclibsjs/physics2d/PullBackString2D'>;
 }
 declare module 'toxiclibsjs/physics2d/VerletConstrainedSpring2D.js' {
-  declare module.exports: $Exports<'toxiclibsjs/physics2d/VerletConstrainedSpring2D'>;
+  declare module.exports: $Exports<
+    'toxiclibsjs/physics2d/VerletConstrainedSpring2D',
+  >;
 }
 declare module 'toxiclibsjs/physics2d/VerletMinDistanceSpring2D.js' {
-  declare module.exports: $Exports<'toxiclibsjs/physics2d/VerletMinDistanceSpring2D'>;
+  declare module.exports: $Exports<
+    'toxiclibsjs/physics2d/VerletMinDistanceSpring2D',
+  >;
 }
 declare module 'toxiclibsjs/physics2d/VerletParticle2D.js' {
   declare module.exports: $Exports<'toxiclibsjs/physics2d/VerletParticle2D'>;
@@ -1259,5 +1418,7 @@ declare module 'toxiclibsjs/util/datatypes/FloatRange.js' {
   declare module.exports: $Exports<'toxiclibsjs/util/datatypes/FloatRange'>;
 }
 declare module 'toxiclibsjs/util/datatypes/UndirectedGraph.js' {
-  declare module.exports: $Exports<'toxiclibsjs/util/datatypes/UndirectedGraph'>;
+  declare module.exports: $Exports<
+    'toxiclibsjs/util/datatypes/UndirectedGraph',
+  >;
 }
