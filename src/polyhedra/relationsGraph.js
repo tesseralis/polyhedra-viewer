@@ -1,3 +1,4 @@
+// @flow
 import _ from 'lodash';
 import periodicTable from 'constants/periodicTable';
 import { toConwayNotation } from './names';
@@ -80,8 +81,13 @@ const customizer = (objValue, srcValue) => {
     return objValue.concat(srcValue);
   }
 };
-function graphMerge(object, ...other) {
-  return _.mergeWith(object, ...other, customizer);
+
+function graphMerge(object, other) {
+  return _.mergeWith(object, other, customizer);
+}
+
+function graphMergeAll(...objects) {
+  return _.reduce(objects, graphMerge);
 }
 
 const getInverseOperation = operation => {
@@ -96,8 +102,8 @@ const getInverseOperation = operation => {
 
 function makeBidirectional(graph) {
   const result = {};
-  for (let [source, operations] of Object.entries(graph)) {
-    for (let [operation, sinks] of Object.entries(operations)) {
+  for (let [source, operations] of _.entries(graph)) {
+    for (let [operation, sinks] of _.entries(operations)) {
       for (let sink of sinks) {
         const sinkValue = sink.value;
         if (!sinkValue) {
@@ -494,4 +500,4 @@ const normalized = [
   .map(normalize)
   .map(compact);
 
-export default makeBidirectional(graphMerge(...normalized));
+export default makeBidirectional(graphMergeAll(...normalized));
