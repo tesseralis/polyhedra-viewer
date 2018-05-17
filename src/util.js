@@ -1,6 +1,6 @@
-// @flow
+// @flow strict
 import _ from 'lodash';
-import type { Predicate, ValueOnlyIteratee } from 'lodash';
+import type { Predicate, ValueOnlyIteratee, FlatMapIteratee } from 'lodash';
 
 /**
  * Variation of the mod function that keeps sign of the dividend
@@ -65,10 +65,14 @@ export function find<T>(array: T[], predicate: Predicate<T>): T {
   return result;
 }
 
-const f = (a: any, b) => _.flatMap(a, x => b.map(y => [...x, y]));
+function f(a: mixed[][], b: mixed[]) {
+  const mapper: FlatMapIteratee<mixed, mixed[]> = (x: mixed[]) =>
+    b.map(y => [...x, y]);
+  return _.flatMap(a, mapper);
+}
 /**
  * Calculate the cartesian product of the given arrays.
  */
-export const cartesian = (a: any[], ...arrays: any[][]) => {
-  return arrays.length ? _.reduce(arrays, f, a.map(x => [x])) : a;
-};
+export function cartesian(a: mixed[], ...arrays: mixed[][]): mixed[][] {
+  return _.reduce(arrays, f, a.map(x => [x]));
+}
