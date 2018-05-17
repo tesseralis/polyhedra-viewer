@@ -69,8 +69,8 @@ export default class Builder {
   }
 
   /** Map the faces of the *original* solid to new ones */
-  mapFaces(iteratee: Face => FaceArg[]) {
-    return this.withFaces((_.map(this.polyhedron.faces, iteratee): any));
+  mapFaces(iteratee: Face => FaceArg) {
+    return this.withFaces(_.map(this.polyhedron.faces, iteratee));
   }
 
   withoutFaces(faces: Face[]) {
