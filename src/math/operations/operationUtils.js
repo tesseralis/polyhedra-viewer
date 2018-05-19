@@ -3,7 +3,7 @@ import _ from 'lodash';
 
 import { flatMap, repeat } from 'util.js';
 import { Polyhedron, Vertex, Face, type VertexArg } from 'math/polyhedra';
-import { PRECISION, getPlane, rotateAround } from 'math/linAlg';
+import { vec, PRECISION, getPlane, rotateAround } from 'math/linAlg';
 import { type Relation } from './operationTypes';
 
 export const hasMultiple = (relations: ?(Relation[]), property: string) =>
@@ -228,3 +228,29 @@ export function getSnubAngle(polyhedron: Polyhedron, numSides: number) {
     : 1;
   return angle * sign;
 }
+
+// export function makeOperation(op: Operation) {
+//   return {
+//     apply(polyhedron, options) {
+//       const opResult = op.apply(polyhedron, options);
+//       if (!opResult.animationData) {
+//         return { result: opResult };
+//       }
+//       const { result, animationData } = opResult;
+//       const { start, endVertices } = animationData;
+//       return {
+//         result: result || deduplicateVertices(start.withVertices(endVertices)),
+//         animationData: {
+//           start,
+//           endVertices: endVertices.map(v => v.toArray()),
+//         },
+//       };
+//     },
+//     getSearchOptions(polyhedron, options) {
+//       return op.getSearchOptions && op.getSearchOptions(polyhedron, options);
+//     },
+//     getApplyArgs(polyhedron, hitPnt) {
+//       return op.getApplyArgs(polyhedron, vec(hitPnt));
+//     },
+//   };
+// }

@@ -156,10 +156,6 @@ export const contract: Operation<ContractOptions> = {
     }
   },
 
-  getDefaultArgs(polyhedron, config) {
-    return { faceType: config.faceType || 3 };
-  },
-
   getApplyArgs(polyhedron, hitPoint) {
     const hitFace = polyhedron.hitFace(hitPoint);
     const isValid = isExpandedFace(polyhedron, hitFace);

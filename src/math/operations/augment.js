@@ -188,16 +188,34 @@ function flatten(polyhedron, face) {
   );
 }
 
-// Augment the following
-function doAugment(polyhedron, base, using, gyrate, mock = false) {
+function getAugmentee(using) {
   const prefix = using[0];
   const index = using.substring(1);
+
+  const augmentType = augmentTypes[prefix];
+  return augmentData[augmentType][index];
+}
+
+// Augment the following
+function doAugment(
+  polyhedron,
+  base,
+  _using = defaultAugmentees[base.numSides],
+  gyrate,
+  mock = false,
+) {
+  // TODO disallow cases in the viewer where this is needed
+  const using =
+    getAugmenteeNumSides(_using) === base.numSides
+      ? _using
+      : defaultAugmentees[base.numSides];
+  const augmentType = augmentTypes[using[0]];
+
   const baseV0 = base.vertices[0].vec;
   const baseCenter = base.centroid();
   const baseNormal = base.normal();
 
-  const augmentType = augmentTypes[prefix];
-  let augmentee = augmentData[augmentType][index];
+  let augmentee = getAugmentee(using);
   const underside = augmentee.faceWithNumSides(base.numSides);
   augmentee = mock ? flatten(augmentee, underside) : augmentee;
 
@@ -227,7 +245,7 @@ function doAugment(polyhedron, base, using, gyrate, mock = false) {
     polyhedron,
     base,
     underside,
-    gyrate,
+    using === 'U2' ? 'gyro' : gyrate,
     augmentType,
   );
   const offset = baseIsAligned ? 0 : 1;
@@ -283,14 +301,14 @@ const defaultAugmentees = {
   '10': 'U5',
 };
 
-const augmenteeSides = {
-  ..._.invert(defaultAugmentees),
-  U2: 4,
-  R5: 10,
-};
+function getAugmenteeNumSides(using: string) {
+  const prefix = using[0];
+  const index = parseInt(using.substring(1), 10);
+  return 'RU'.includes(prefix) ? index * 2 : index;
+}
 
 export function getUsingOpt(using: ?string, numSides: number) {
-  return typeof using === 'string' && augmenteeSides[using] === numSides
+  return typeof using === 'string' && getAugmenteeNumSides(using) === numSides
     ? using
     : defaultAugmentees[numSides];
 }
@@ -321,25 +339,16 @@ export const augment: Operation<AugmentOptions> = {
     };
   },
 
-  getDefaultArgs(polyhedron, config) {
-    const { face } = config;
-
-    if (!face) {
-      throw new Error('Invalid face');
-    }
-    const n = face.numSides;
-    const using = getUsingOpt(config.using, n);
-
-    return {
-      using,
-      gyrate: using === 'U2' ? 'gyro' : config.gyrate,
-    };
-  },
-
   getAllApplyArgs(polyhedron, relations) {
     const rawGyrateOpts = _.compact(_.uniq(_.map(relations, 'gyrate')));
     const gyrateOpts = rawGyrateOpts.length === 2 ? rawGyrateOpts : [undefined];
-    const usingOpts = _.compact(_.uniq(_.map(relations, 'using')));
+    const rawUsingOpts = _.compact(_.uniq(_.map(relations, 'using')));
+    // Only do using opts if we can do more than one of each type
+    const usingOpts = _(rawUsingOpts)
+      .countBy(using => getAugmenteeNumSides(using))
+      .some(count => count > 1)
+      ? rawUsingOpts
+      : [undefined];
     const faceOpts = _.map(polyhedron.faces.filter(face => canAugment(face)));
 
     return cartesian(gyrateOpts, usingOpts, faceOpts).map(
@@ -348,6 +357,7 @@ export const augment: Operation<AugmentOptions> = {
   },
 
   getApplyArgs(polyhedron, hitPnt) {
+    // TODO disallow augmenting a triangular prism when fastigium is selected
     const augmentInfo = getAugmentGraph(polyhedron);
     const face = getAugmentFace(polyhedron, augmentInfo, hitPnt);
     return face ? { face } : {};
