@@ -165,13 +165,11 @@ export function getResizedVertices(
 ) {
   // Update the vertices with the expanded-out version
   const f0 = faces[0];
-  const sideLength = f0.sideLength();
-  const baseLength = f0.distanceToCenter() / sideLength;
   return getMappedVertices(faces, (v, face) => {
     const normal = face.normal();
     const rotated =
       angle === 0 ? v.vec : rotateAround(v.vec, face.normalRay(), angle);
-    const scale = (resizedLength - baseLength) * sideLength;
+    const scale = resizedLength - f0.distanceToCenter();
     return rotated.add(normal.scale(scale));
   });
 }

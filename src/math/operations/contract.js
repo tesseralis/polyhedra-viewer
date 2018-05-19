@@ -1,6 +1,6 @@
 // @flow strict
 import _ from 'lodash';
-import { mapObject, flatMapUniq } from 'util.js';
+import { flatMapUniq } from 'util.js';
 import { Polyhedron } from 'math/polyhedra';
 import {
   expansionType,
@@ -31,33 +31,23 @@ function getFamily(polyhedron) {
   }
 }
 
-// TODO make this more robust
-function getContractResult(polyhedron, faceType) {
-  switch (getFamily(polyhedron)) {
-    case 'T':
-      return 'tetrahedron';
-    case 'O':
-      return faceType === 3 ? 'octahedron' : 'cube';
-    case 'I':
-      return faceType === 3 ? 'icosahedron' : 'dodecahedron';
-    default:
-      throw new Error('Did you try to contract an invalid solid?');
-  }
-}
+const familyMap = { T: 3, O: 4, I: 5 };
+const coxeterNum = { T: 4, O: 6, I: 10 };
 
-const contractResults = [
-  'tetrahedron',
-  'cube',
-  'octahedron',
-  'dodecahedron',
-  'icosahedron',
-];
-const resultLengths = mapObject(contractResults, name => {
-  const reference = Polyhedron.get(name);
-  const length =
-    reference.getFace().distanceToCenter() / reference.edgeLength();
-  return [name, length];
-});
+function getContractLength(polyhedron, faceType) {
+  // Calculate dihedral angle
+  // https://en.wikipedia.org/wiki/Platonic_solid#Angles
+  const family = getFamily(polyhedron);
+  const s = polyhedron.edgeLength();
+  const p = faceType;
+  const q = 3 + familyMap[family] - p;
+  const h = coxeterNum[family];
+  const tanTheta2 = Math.cos(Math.PI / q) / Math.sin(Math.PI / h);
+
+  // Calculate the inradius
+  // https://en.wikipedia.org/wiki/Platonic_solid#Radii,_area,_and_volume
+  return s / 2 / Math.tan(Math.PI / p) * tanTheta2;
+}
 
 function getFaceDistance(face1, face2) {
   let dist = 0;
@@ -118,14 +108,13 @@ function getContractFaces(polyhedron, faceType) {
 
 export function applyContract(
   polyhedron: Polyhedron,
-  { faceType }: ContractOptions,
+  { faceType = 3 }: ContractOptions,
 ) {
-  // Use a reference polyhedron to calculate how far to expand
-  const resultName = getContractResult(polyhedron, faceType);
-  const resultLength = resultLengths[resultName];
+  const resultLength = getContractLength(polyhedron, faceType);
 
   // Take all the stuff and push it inwards
   const contractFaces = getContractFaces(polyhedron, faceType);
+
   const angle =
     expansionType(polyhedron) === 'snub'
       ? -getSnubAngle(polyhedron, faceType)

@@ -66,7 +66,9 @@ function doExpansion(polyhedron: Polyhedron, referenceName) {
     _.find(reference.faces, face => isExpandedFace(reference, face, n)) ||
     reference.getFace();
   const referenceLength =
-    referenceFace.distanceToCenter() / reference.edgeLength();
+    referenceFace.distanceToCenter() /
+    reference.edgeLength() *
+    polyhedron.edgeLength();
 
   const expandFaces = _.filter(duplicated.faces, face =>
     isExpandedFace(duplicated, face, n),
