@@ -25,24 +25,6 @@ const augmentees = {
   rotunda: {
     '5': 'pentagonal-rotunda',
   },
-
-  prism: {
-    '3': 'triangular-prism',
-    '4': 'cube',
-    '5': 'pentagonal-prism',
-    '6': 'hexagonal-prism',
-    '8': 'octagonal-prism',
-    '10': 'decagonal-prism',
-  },
-
-  antiprism: {
-    '3': 'octahedron',
-    '4': 'square-antiprism',
-    '5': 'pentagonal-antiprism',
-    '6': 'hexagonal-antiprism',
-    '8': 'octagonal-antiprism',
-    '10': 'decagonal-antiprism',
-  },
 };
 
 const augmentData = _.mapValues(augmentees, type =>
@@ -53,8 +35,6 @@ const augmentTypes = {
   Y: 'pyramid',
   U: 'cupola',
   R: 'rotunda',
-  P: 'prism',
-  A: 'antiprism',
 };
 
 function getAugmentAlignment(polyhedron, face) {
@@ -141,7 +121,7 @@ function isCupolaRotunda(baseType, augmentType) {
 
 // Return true if the base and augmentee are aligned
 function isAligned(polyhedron, base, underside, gyrate, augmentType) {
-  if (_.includes(['pyramid', 'prism', 'antiprism'], augmentType)) return true;
+  if (augmentType === 'pyramid') return true;
   const baseType = getBaseType(base);
   if (baseType === 'pyramid' || baseType === 'antiprism') {
     return true;
@@ -267,18 +247,6 @@ function doAugment(
     solid.withoutFaces([base]).addPolyhedron(newAugmentee),
   );
 }
-
-export const elongate = (polyhedron: Polyhedron) => {
-  const base = polyhedron.largestFace();
-  const using = `P${base.numSides}`;
-  return doAugment(polyhedron, base, using);
-};
-
-export const gyroelongate = (polyhedron: Polyhedron) => {
-  const base = polyhedron.largestFace();
-  const using = `A${base.numSides}`;
-  return doAugment(polyhedron, base, using);
-};
 
 interface AugmentOptions {
   face: Face;

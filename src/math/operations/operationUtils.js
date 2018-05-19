@@ -1,8 +1,13 @@
 // @flow strict
 import _ from 'lodash';
 
-import { flatMap, repeat } from 'util.js';
-import { Polyhedron, Vertex, Face, type VertexArg } from 'math/polyhedra';
+import {
+  Polyhedron,
+  Vertex,
+  Face,
+  normalizeVertex,
+  type VertexArg,
+} from 'math/polyhedra';
 import {
   type Point,
   vec,
@@ -18,6 +23,13 @@ export const hasMultiple = (relations: ?(Relation[]), property: string) =>
     .uniq()
     .compact()
     .value().length > 1;
+
+export function antiprismHeight(face: Face) {
+  const n = face.numSides;
+  const s = face.sideLength();
+  const sec = 1 / Math.cos(Math.PI / (2 * n));
+  return s * Math.sqrt(1 - sec * sec / 4);
+}
 
 // Remove vertices (and faces) from the polyhedron when they are all the same
 function deduplicateVertices(polyhedron: Polyhedron) {
@@ -82,65 +94,6 @@ export function removeExtraneousVertices(polyhedron: Polyhedron) {
       .withVertices(newVertices)
       .mapFaces(face =>
         _.map(face.vertices, v => _.get(newToOld, v.index, v.index)),
-      ),
-  );
-}
-
-function getEdgeFacePaths(edge, twist) {
-  const [v1, v2] = _.map(edge.vertices, 'index');
-  const [f1, f2] = _.map(edge.adjacentFaces(), 'index');
-  switch (twist) {
-    case 'right':
-      return [
-        [[f1, v1], [f2, v2], [f1, v2]], // face 1
-        [[f1, v1], [f2, v1], [f2, v2]], // face 2
-      ];
-    case 'left':
-      return [
-        [[f1, v2], [f1, v1], [f2, v1]], // face 1
-        [[f2, v1], [f2, v2], [f1, v2]], // face 2
-      ];
-    default:
-      return [[[f1, v2], [f1, v1], [f2, v1], [f2, v2]]];
-  }
-}
-
-/**
- * Duplicate the vertices, so that each face has its own unique set of vertices,
- * and create a new face for each edge and new vertex set.
- */
-export function duplicateVertices(
-  polyhedron: Polyhedron,
-  twist?: 'left' | 'right',
-) {
-  const count = polyhedron.getVertex().adjacentFaces().length;
-
-  const newVertexMapping = {};
-  _.forEach(polyhedron.vertices, (v, vIndex: number) => {
-    // For each vertex, pick one adjacent face to be the "head"
-    // for every other adjacent face, map it to a duplicated vertex
-    _.forEach(v.adjacentFaces(), (f, i) => {
-      _.set(newVertexMapping, [f.index, v.index], v.index * count + i);
-    });
-  });
-
-  return polyhedron.withChanges(solid =>
-    solid
-      .withVertices(flatMap(polyhedron.vertices, v => repeat(v.value, count)))
-      .mapFaces(face =>
-        face.vertices.map(v => newVertexMapping[face.index][v.index]),
-      )
-      .addFaces(
-        _.map(polyhedron.vertices, v =>
-          _.range(v.index * count, (v.index + 1) * count),
-        ),
-      )
-      .addFaces(
-        _.flatMap(polyhedron.edges, edge =>
-          _.map(getEdgeFacePaths(edge, twist), face =>
-            _.map(face, path => _.get(newVertexMapping, path)),
-          ),
-        ),
       ),
   );
 }
@@ -297,7 +250,7 @@ export function normalizeOperation(op: *): Operation<*, *> {
         result: result || deduplicateVertices(start.withVertices(endVertices)),
         animationData: {
           start,
-          endVertices: endVertices.map(v => v.toArray()),
+          endVertices: endVertices.map(normalizeVertex),
         },
       };
     },

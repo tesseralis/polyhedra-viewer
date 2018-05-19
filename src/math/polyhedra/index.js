@@ -9,4 +9,4 @@ export { Polyhedron, Vertex, Face, Edge, Peak };
 
 export * from './solidTypes';
 
-export { VertexArg } from './SolidBuilder';
+export { VertexArg, normalizeVertex } from './SolidBuilder';

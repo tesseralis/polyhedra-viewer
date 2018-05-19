@@ -12,7 +12,7 @@ export type VertexArg = Point | Vec3D | Vertex;
 
 type FaceArg = VIndex[] | (VIndex | Vertex)[] | Face;
 
-function normalizeVertex(v: VertexArg) {
+export function normalizeVertex(v: VertexArg) {
   // If it's a raw point
   if (Array.isArray(v)) return v;
   // if it's a vector

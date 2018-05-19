@@ -7,7 +7,10 @@ import {
   getSnubAngle,
   isExpandedFace,
   getResizedVertices,
+  getMappedVertices,
+  antiprismHeight,
 } from './operationUtils';
+import { rotateAround } from 'math/linAlg';
 import { Operation } from './operationTypes';
 
 interface ContractOptions {
@@ -171,3 +174,23 @@ export const contract: Operation<ContractOptions> = {
     }
   },
 };
+
+export function shorten(polyhedron: Polyhedron) {
+  const faces = polyhedron.faces.filter(face => {
+    return _.uniqBy(face.adjacentFaces(), 'numSides').length === 1;
+  });
+  const face = _.maxBy(faces, 'numSides');
+  const isAntiprism = face.adjacentFaces()[0].numSides === 3;
+  const scale = isAntiprism ? antiprismHeight(face) : face.sideLength();
+  const theta = isAntiprism ? Math.PI / face.numSides : 0;
+  // TODO handle bi case
+  const endVertices = getMappedVertices([face], (v, f) =>
+    rotateAround(v.vec.sub(f.normal().scale(scale)), face.normalRay(), theta),
+  );
+  return {
+    animationData: {
+      start: polyhedron,
+      endVertices,
+    },
+  };
+}

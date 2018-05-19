@@ -1,12 +1,11 @@
 // @flow strict
 import _ from 'lodash';
-import { dual } from './dual';
 import { truncate, rectify } from './truncate';
 import { cumulate } from './cumulate';
-import { expand, snub } from './expand';
-import { contract } from './contract';
-import { augment, elongate, gyroelongate } from './augment';
-import { diminish, shorten } from './diminish';
+import { expand, snub, dual, elongate, gyroelongate } from './expand';
+import { contract, shorten } from './contract';
+import { augment } from './augment';
+import { diminish } from './diminish';
 import { gyrate } from './gyrate';
 import { normalizeOperation } from './operationUtils';
 
