@@ -136,6 +136,18 @@ export default class Polyhedron {
     return getCentroid(_.map(this.vertices, 'vec'));
   }
 
+  surfaceArea() {
+    return _(this.faces)
+      .map(face => face.area())
+      .sum();
+  }
+
+  volume() {
+    return _(this.faces)
+      .map(face => face.area() * face.distanceToCenter() / 3)
+      .sum();
+  }
+
   /** Get the face that is closest to the given point. */
   hitFace(point: Vec3D) {
     return _.minBy(this.faces, face => face.plane().getDistanceToPoint(point));
@@ -157,6 +169,11 @@ export default class Polyhedron {
   center() {
     const centroid = this.centroid();
     return this.withVertices(this.vertices.map(v => v.vec.sub(centroid)));
+  }
+
+  normalizeToVolume(volume: number) {
+    const scale = Math.cbrt(volume / this.volume());
+    return this.withVertices(this.vertices.map(v => v.vec.scale(scale)));
   }
 
   // Property predicates

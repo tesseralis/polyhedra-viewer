@@ -6,7 +6,7 @@ import { fromConwayNotation, toConwayNotation } from './names';
 import polyhedraGraph from './relationsGraph';
 import type { OpName } from 'math/operations';
 
-type OpNamePlus = OpName | 'dual' | 'twist';
+type OpNamePlus = OpName | 'twist';
 
 interface Operation {
   name: OpNamePlus;

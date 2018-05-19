@@ -61,6 +61,11 @@ export default class VEList {
     return this.sideLength() / (2 * Math.tan(Math.PI / this.numSides));
   }
 
+  /** Get the area of a *regular* polygon */
+  area() {
+    return this.numSides * this.sideLength() * this.apothem();
+  }
+
   /** Return the centroid of the face given by the face index */
   centroid() {
     return getCentroid(this.vectors);

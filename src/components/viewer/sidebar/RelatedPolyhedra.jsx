@@ -19,7 +19,7 @@ const styles = StyleSheet.create({
       "shorten  shorten      twist"
       "augment  augment      gyrate"
       "diminish diminish     gyrate"
-      "recenter recenter     recenter"
+      "recenter resize       x"
     `,
   },
 
@@ -63,6 +63,13 @@ const styles = StyleSheet.create({
     borderColor: 'Gray',
     marginTop: 10,
     gridArea: 'recenter',
+    padding: 10,
+  },
+
+  resizeButton: {
+    borderColor: 'Gray',
+    marginTop: 10,
+    gridArea: 'resize',
     padding: 10,
   },
 });
@@ -151,6 +158,7 @@ export default function RelatedPolyhedra({
   applyOptions,
   applyOperation,
   recenter,
+  resize,
   setOperation,
   setApplyOpt,
 }) {
@@ -209,6 +217,13 @@ export default function RelatedPolyhedra({
         className={css(styles.recenterButton)}
       >
         Recenter
+      </button>
+      <button
+        disabled={disabled}
+        onClick={resize}
+        className={css(styles.resizeButton)}
+      >
+        Resize
       </button>
     </div>
   );

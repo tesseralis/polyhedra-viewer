@@ -63,3 +63,4 @@ export function scaleAround(point: Vec3D, origin: Vec3D, scale: number) {
     .scale(scale)
     .add(origin);
 }
+

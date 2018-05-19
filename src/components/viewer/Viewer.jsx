@@ -182,6 +182,7 @@ export default class Viewer extends Component<ViewerProps, ViewerState> {
               ..._.pick(this, [
                 'applyOperation',
                 'recenter',
+                'resize',
                 'setOperation',
                 'setApplyOpt',
               ]),
@@ -355,6 +356,12 @@ export default class Viewer extends Component<ViewerProps, ViewerState> {
   recenter = () => {
     this.setState(({ polyhedron }) => ({
       polyhedron: polyhedron.center(),
+    }));
+  };
+
+  resize = () => {
+    this.setState(({ polyhedron }) => ({
+      polyhedron: polyhedron.normalizeToVolume(5),
     }));
   };
 
