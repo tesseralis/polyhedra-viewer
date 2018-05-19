@@ -3,8 +3,10 @@ import _ from 'lodash';
 
 import { find } from 'util.js';
 import { fromConwayNotation, toConwayNotation } from './names';
+import { Polyhedron } from 'math/polyhedra';
 import polyhedraGraph from './relationsGraph';
-import type { OpName } from 'math/operations';
+import { operations as mathOps } from 'math/operations';
+import type { OpName, OperationResult } from 'math/operations';
 
 type OpNamePlus = OpName | 'twist';
 
@@ -128,11 +130,7 @@ export function getUsingOpts(solid: string) {
 }
 
 // Get the polyhedron name as a result of applying the operation to the given polyhedron
-export function getNextPolyhedron(
-  solid: string,
-  operation: OpName,
-  filterOpts: any,
-) {
+function getNextPolyhedron(solid: string, operation: OpName, filterOpts: any) {
   const relations = getRelations(solid, operation);
   const next = _(relations)
     .filter(!_.isEmpty(filterOpts) ? filterOpts : _.stubTrue)
@@ -173,4 +171,25 @@ export function applyOptionsFor(solid: string, operation: OpName) {
     }
   }
   return newOpts;
+}
+
+export function applyOperation(
+  operation: OpName,
+  name: string,
+  polyhedron: Polyhedron,
+  config: any = {},
+): OperationResult {
+  const relations = getRelations(name, operation);
+  const op = mathOps[operation];
+  const options = op.getSearchOptions(polyhedron, config, relations);
+
+  const next = getNextPolyhedron(name, operation, _.pickBy(options));
+  if (!op) {
+    return {
+      result: Polyhedron.get(next),
+      name: next,
+      animationData: undefined,
+    };
+  }
+  return { name: next, ...op.apply(polyhedron, config) };
 }

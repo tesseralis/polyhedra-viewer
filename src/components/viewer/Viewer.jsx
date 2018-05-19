@@ -14,8 +14,11 @@ import polygons from 'constants/polygons';
 import { mapObject } from 'util.js';
 import { fixed, fullScreen } from 'styles/common';
 import { unescapeName } from 'polyhedra/names';
-import applyOperation from 'polyhedra/applyOperation';
-import { getRelations, applyOptionsFor } from 'polyhedra/operations';
+import {
+  applyOperation,
+  getRelations,
+  applyOptionsFor,
+} from 'polyhedra/operations';
 import { defaultConfig, getPolyhedronConfig } from 'constants/configOptions';
 import transition from 'transition.js';
 

@@ -1,10 +1,9 @@
 import _ from 'lodash';
 import { allSolidNames } from 'data';
 import { PRECISION, isPlanar } from 'math/linAlg';
-import { getOperations, getRelations } from 'polyhedra/operations';
+import { applyOperation, getOperations, getRelations } from './operations';
 import { Polyhedron, Peak } from 'math/polyhedra';
 import { operations, canAugment } from 'math/operations';
-import applyOperation from './applyOperation';
 const debug = require('debug')('applyOperation.test');
 
 // map from polyhedron to excluded operations
