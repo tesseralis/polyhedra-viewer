@@ -3,7 +3,7 @@ import _ from 'lodash';
 import React, { Component } from 'react';
 import { css, StyleSheet } from 'aphrodite/no-important';
 import { rgb } from 'd3-color';
-import { type Point, Vec3D } from 'math/linAlg';
+import { type Point } from 'math/linAlg';
 
 import { isValidSolid } from 'data';
 import { andaleMono } from 'styles/fonts';
@@ -228,15 +228,7 @@ export default class Viewer extends Component<ViewerProps, ViewerState> {
     }
 
     if (operation) {
-      if (
-        !!_.invoke(
-          operations[operation],
-          'isHighlighted',
-          polyhedron,
-          applyArgs,
-          face,
-        )
-      ) {
+      if (operations[operation].isHighlighted(polyhedron, applyArgs, face)) {
         return [1, 1, 0];
       }
     }
@@ -370,7 +362,7 @@ export default class Viewer extends Component<ViewerProps, ViewerState> {
     }));
   };
 
-  setApplyArgs = (hitPnt?: Vec3D) => {
+  setApplyArgs = (hitPnt?: Point) => {
     this.setState(({ polyhedron, operation }) => {
       if (!operation || !hitPnt) {
         return { applyArgs: {} };

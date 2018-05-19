@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import _ from 'lodash';
 import EventListener from 'react-event-listener';
 
-import { type Point, vec, Vec3D } from 'math/linAlg';
+import { type Point } from 'math/linAlg';
 import { Polyhedron } from 'math/polyhedra';
 
 type SyntheticEventHandler = (e: $Subtype<SyntheticEvent<*>>) => void;
@@ -49,7 +49,7 @@ interface PolyhedronProps {
   config: *;
   faceColors: *;
   applyOperation(): void;
-  setApplyArgs(hitPnt?: Vec3D): void;
+  setApplyArgs(hitPnt?: Point): void;
 }
 
 interface PolyhedronState {
@@ -150,7 +150,7 @@ export default class X3dPolyhedron extends Component<
     // TODO replace this with logs
     this.drag = true;
     const { setApplyArgs } = this.props;
-    setApplyArgs(vec(event.hitPnt));
+    setApplyArgs(event.hitPnt);
   };
 
   handleMouseOut = () => {

@@ -3,7 +3,13 @@ import _ from 'lodash';
 
 import { flatMap, repeat } from 'util.js';
 import { Polyhedron, Vertex, Face, type VertexArg } from 'math/polyhedra';
-import { vec, PRECISION, getPlane, rotateAround } from 'math/linAlg';
+import {
+  type Point,
+  vec,
+  PRECISION,
+  getPlane,
+  rotateAround,
+} from 'math/linAlg';
 import { type Relation } from './operationTypes';
 
 export const hasMultiple = (relations: ?(Relation[]), property: string) =>
@@ -14,7 +20,7 @@ export const hasMultiple = (relations: ?(Relation[]), property: string) =>
     .value().length > 1;
 
 // Remove vertices (and faces) from the polyhedron when they are all the same
-export function deduplicateVertices(polyhedron: Polyhedron) {
+function deduplicateVertices(polyhedron: Polyhedron) {
   // group vertex indices by same
   const unique = [];
   const oldToNew = {};
@@ -30,6 +36,8 @@ export function deduplicateVertices(polyhedron: Polyhedron) {
       oldToNew[vIndex] = match.index;
     }
   });
+
+  if (_.isEmpty(oldToNew)) return polyhedron;
 
   // replace vertices that are the same
   // TODO create a filterFaces method?
@@ -229,28 +237,74 @@ export function getSnubAngle(polyhedron: Polyhedron, numSides: number) {
   return angle * sign;
 }
 
-// export function makeOperation(op: Operation) {
-//   return {
-//     apply(polyhedron, options) {
-//       const opResult = op.apply(polyhedron, options);
-//       if (!opResult.animationData) {
-//         return { result: opResult };
-//       }
-//       const { result, animationData } = opResult;
-//       const { start, endVertices } = animationData;
-//       return {
-//         result: result || deduplicateVertices(start.withVertices(endVertices)),
-//         animationData: {
-//           start,
-//           endVertices: endVertices.map(v => v.toArray()),
-//         },
-//       };
-//     },
-//     getSearchOptions(polyhedron, options) {
-//       return op.getSearchOptions && op.getSearchOptions(polyhedron, options);
-//     },
-//     getApplyArgs(polyhedron, hitPnt) {
-//       return op.getApplyArgs(polyhedron, vec(hitPnt));
-//     },
-//   };
-// }
+const methodDefaults = {
+  getApplyArgs: {},
+  getAllApplyArgs: [undefined],
+  getSearchOptions: undefined,
+  isHighlighted: false,
+};
+
+function fillDefaults(op) {
+  return {
+    ..._.mapValues(
+      methodDefaults,
+      (fnDefault, fn) => op[fn] || _.constant(fnDefault),
+    ),
+    ...op,
+  };
+}
+
+export interface OperationResult {
+  result: Polyhedron;
+  // TODO This is optional because we "fill in" an option result with defaults
+  // but then we have to check for something we're sure to have...
+  name: string;
+  animationData: ?{
+    start: Polyhedron,
+    endVertices: Point[],
+  };
+}
+
+// TODO consolidate these with the one in operationTypes
+interface Operation<Options = {}, ApplyArgs = {}> {
+  apply(polyhedron: Polyhedron, options: Options): OperationResult;
+
+  getSearchOptions(polyhedron: Polyhedron, options: Options): ?{};
+
+  getApplyArgs(polyhedron: Polyhedron, hitPnt: Point): ApplyArgs;
+
+  getAllApplyArgs(polyhedron: Polyhedron): ApplyArgs[];
+
+  isHighlighed(
+    polyhedron: Polyhedron,
+    applyArgs: ApplyArgs,
+    face: Face,
+  ): boolean;
+}
+
+export function normalizeOperation(op: *): Operation<*, *> {
+  const withDefaults = fillDefaults(
+    typeof op === 'function' ? { apply: op } : op,
+  );
+  return {
+    ...withDefaults,
+    apply(polyhedron, options) {
+      const opResult = withDefaults.apply(polyhedron, options);
+      if (!opResult.animationData) {
+        return { result: deduplicateVertices(opResult) };
+      }
+      const { result, animationData } = opResult;
+      const { start, endVertices } = animationData;
+      return {
+        result: result || deduplicateVertices(start.withVertices(endVertices)),
+        animationData: {
+          start,
+          endVertices: endVertices.map(v => v.toArray()),
+        },
+      };
+    },
+    getApplyArgs(polyhedron, hitPnt) {
+      return withDefaults.getApplyArgs(polyhedron, vec(hitPnt));
+    },
+  };
+}

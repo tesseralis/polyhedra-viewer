@@ -1,4 +1,5 @@
 // @flow strict
+import _ from 'lodash';
 import { dual } from './dual';
 import { truncate, rectify } from './truncate';
 import { cumulate } from './cumulate';
@@ -7,23 +8,24 @@ import { contract } from './contract';
 import { augment, elongate, gyroelongate } from './augment';
 import { diminish, shorten } from './diminish';
 import { gyrate } from './gyrate';
+import { normalizeOperation } from './operationUtils';
 
-export const operations = {
-  dual,
-  truncate,
-  rectify,
-  cumulate,
-  expand,
-  snub,
-  contract,
-  augment,
-  elongate,
-  gyroelongate,
-  diminish,
-  shorten,
-  gyrate,
+const rawOps = {
+    dual,
+    truncate,
+    rectify,
+    cumulate,
+    expand,
+    snub,
+    contract,
+    augment,
+    elongate,
+    gyroelongate,
+    diminish,
+    shorten,
+    gyrate,
 };
 
-export { deduplicateVertices } from './operationUtils';
+export const operations = _.mapValues(rawOps, normalizeOperation);
 
 export type { OpName, OperationResult } from './operationTypes';

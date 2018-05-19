@@ -4,7 +4,6 @@ import _ from 'lodash';
 import { flatMap, repeat, find, mod } from 'util.js';
 import { scaleAround, PRECISION } from 'math/linAlg';
 import { Polyhedron } from 'math/polyhedra';
-import type { Operation } from './operationTypes';
 
 function getFamily(polyhedron) {
   const faceTypes = polyhedron.faceTypes();
@@ -129,14 +128,10 @@ function doTruncate(polyhedron, rectify = false) {
   };
 }
 
-export const truncate: Operation<> = {
-  apply(polyhedron) {
-    return doTruncate(polyhedron);
-  },
-};
+export function truncate(polyhedron: Polyhedron) {
+  return doTruncate(polyhedron);
+}
 
-export const rectify: Operation<> = {
-  apply(polyhedron) {
-    return doTruncate(polyhedron, true);
-  },
-};
+export function rectify(polyhedron: Polyhedron) {
+  return doTruncate(polyhedron, true);
+}

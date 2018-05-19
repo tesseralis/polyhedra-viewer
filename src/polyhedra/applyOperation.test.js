@@ -69,12 +69,7 @@ expect.extend({
 function getOptsToTest(operation, name, polyhedron) {
   const relations = getRelations(name, operation);
   return (
-    _.invoke(
-      operations[operation],
-      'getAllApplyArgs',
-      polyhedron,
-      relations,
-    ) || [undefined]
+    operations[operation].getAllApplyArgs(polyhedron, relations) || [undefined]
   );
 }
 

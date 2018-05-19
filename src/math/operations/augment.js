@@ -5,7 +5,7 @@ import { Polyhedron, Face, Peak } from 'math/polyhedra';
 import { isInverse, PRECISION } from 'math/linAlg';
 import { getCyclic, getSingle, cartesian } from 'util.js';
 
-import { hasMultiple, deduplicateVertices } from './operationUtils';
+import { hasMultiple } from './operationUtils';
 import { Operation } from './operationTypes';
 
 const augmentees = {
@@ -263,27 +263,21 @@ function doAugment(
   const newAugmentee = augmentee.withChanges(solid =>
     solid.withVertices(transformedAugmenteeVertices).withoutFaces([underside]),
   );
-  return deduplicateVertices(
-    polyhedron.withChanges(solid =>
-      solid.withoutFaces([base]).addPolyhedron(newAugmentee),
-    ),
+  return polyhedron.withChanges(solid =>
+    solid.withoutFaces([base]).addPolyhedron(newAugmentee),
   );
 }
 
-export const elongate: Operation<> = {
-  apply(polyhedron) {
-    const base = polyhedron.largestFace();
-    const using = `P${base.numSides}`;
-    return doAugment(polyhedron, base, using);
-  },
+export const elongate = (polyhedron: Polyhedron) => {
+  const base = polyhedron.largestFace();
+  const using = `P${base.numSides}`;
+  return doAugment(polyhedron, base, using);
 };
 
-export const gyroelongate: Operation<> = {
-  apply(polyhedron) {
-    const base = polyhedron.largestFace();
-    const using = `A${base.numSides}`;
-    return doAugment(polyhedron, base, using);
-  },
+export const gyroelongate = (polyhedron: Polyhedron) => {
+  const base = polyhedron.largestFace();
+  const using = `A${base.numSides}`;
+  return doAugment(polyhedron, base, using);
 };
 
 interface AugmentOptions {

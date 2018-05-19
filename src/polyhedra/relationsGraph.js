@@ -28,10 +28,10 @@ const archimedean = {
   aC: {
     // TODO (possibly) coxeter snub (semi-snub) and rectify relations
     t: 'bC',
-    p: 'I',
+    // p: 'I',
   },
   eC: {
-    p: 'sC',
+    // p: 'sC',
   },
   D: {
     d: 'I',
@@ -50,7 +50,7 @@ const archimedean = {
     t: 'bD',
   },
   eD: {
-    p: 'sD',
+    // p: 'sD',
   },
 };
 

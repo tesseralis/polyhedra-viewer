@@ -2,7 +2,7 @@
 import _ from 'lodash';
 
 import { hasMultiple, removeExtraneousVertices } from './operationUtils';
-import { Peak } from 'math/polyhedra';
+import { Polyhedron, Peak } from 'math/polyhedra';
 import type { Operation } from './operationTypes';
 import { getPeakAlignment, getCupolaGyrate } from './applyOptionUtils';
 
@@ -63,7 +63,7 @@ export const diminish: Operation<DiminishOptions> = {
   },
 };
 
-function applyShorten(polyhedron) {
+export function shorten(polyhedron: Polyhedron) {
   // Find a prism or antiprism face
   const faces = polyhedron.faces.filter(face => {
     return _.uniqBy(face.adjacentFaces(), 'numSides').length === 1;
@@ -71,7 +71,3 @@ function applyShorten(polyhedron) {
   const face = _.maxBy(faces, 'numSides');
   return removePeak(polyhedron, new Peak(polyhedron, face.vertices, 'prism'));
 }
-
-export const shorten: Operation<> = {
-  apply: applyShorten,
-};
