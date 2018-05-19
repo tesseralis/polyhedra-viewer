@@ -22,16 +22,8 @@ function getFamily(polyhedron) {
   }
 }
 
-// Return if the polyhedron is rectified
-function isRectified(polyhedron) {
-  return polyhedron.getVertex().adjacentFaces().length === 4;
-}
-
-function isBevelled(polyhedron) {
-  return polyhedron.faceTypes().length === 3;
-}
-
-function getAdjacentFaces(vertex, facesToCumulate) {
+// Adjacent faces of the vertex with a cumulate face first
+function getShiftedAdjacentFaces(vertex, facesToCumulate) {
   const adjFaces = vertex.adjacentFaces();
   const [first, ...last] = adjFaces;
   if (first.inSet(facesToCumulate)) {
@@ -48,7 +40,7 @@ function duplicateVertices(polyhedron, facesToCumulate) {
     const v2 = v + offset;
     const values = [v, [v2, v], v2, [v, v2]];
 
-    const faces = getAdjacentFaces(vertex, facesToCumulate);
+    const faces = getShiftedAdjacentFaces(vertex, facesToCumulate);
     _.forEach(faces, (f, i) => {
       _.set(mapping, [f.index, v], values[i]);
     });
@@ -83,7 +75,7 @@ function calculateCumulateDist(polyhedron, face, edge) {
 }
 
 function getCumulateDist(polyhedron, face) {
-  if (isBevelled(polyhedron)) {
+  if (!polyhedron.isRegular() && !polyhedron.isQuasiRegular()) {
     return _.meanBy(face.edges, edge =>
       calculateCumulateDist(polyhedron, face, edge),
     );
@@ -105,7 +97,7 @@ function applyCumulate(
   let cumulateFaces = getCumulateFaces(polyhedron, faceType);
 
   let mock;
-  if (isRectified(polyhedron)) {
+  if (polyhedron.isQuasiRegular()) {
     mock = duplicateVertices(polyhedron, cumulateFaces);
     cumulateFaces = cumulateFaces.map(face => face.withPolyhedron(mock));
   } else {
@@ -141,7 +133,7 @@ export const cumulate: Operation<CumulateOptions> = {
 
   getSearchOptions(polyhedron, config) {
     const { faceType } = config;
-    if (!isRectified(polyhedron)) {
+    if (!polyhedron.isQuasiRegular()) {
       return {};
     }
     switch (getFamily(polyhedron)) {
@@ -155,7 +147,7 @@ export const cumulate: Operation<CumulateOptions> = {
   },
 
   getAllApplyArgs(polyhedron) {
-    if (!isRectified(polyhedron)) {
+    if (!polyhedron.isQuasiRegular()) {
       return [{}];
     }
     switch (getFamily(polyhedron)) {

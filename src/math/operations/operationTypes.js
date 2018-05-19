@@ -8,7 +8,7 @@ export type OpName =
   | 'truncate'
   | 'rectify'
   | 'cumulate'
-  // | 'dual'
+  | 'dual'
   | 'expand'
   | 'snub'
   | 'contract'

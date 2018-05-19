@@ -6,8 +6,8 @@ import {
   expansionType,
   isExpandedFace,
   getResizedVertices,
+  duplicateVertices,
 } from './operationUtils';
-import { flatMap, repeat } from 'util.js';
 import { Operation } from './operationTypes';
 
 // Result functions
@@ -47,58 +47,6 @@ function getSnubResult(polyhedron) {
   }
 }
 
-function getEdgeFacePaths(edge, twist) {
-  const [v1, v2] = _.map(edge.vertices, 'index');
-  const [f1, f2] = _.map(edge.adjacentFaces(), 'index');
-  switch (twist) {
-    case 'right':
-      return [
-        [[f1, v1], [f2, v2], [f1, v2]], // face 1
-        [[f1, v1], [f2, v1], [f2, v2]], // face 2
-      ];
-    case 'left':
-      return [
-        [[f1, v2], [f1, v1], [f2, v1]], // face 1
-        [[f2, v1], [f2, v2], [f1, v2]], // face 2
-      ];
-    default:
-      return [[[f1, v2], [f1, v1], [f2, v1], [f2, v2]]];
-  }
-}
-
-function duplicateVertices(polyhedron: Polyhedron, twist?: 'left' | 'right') {
-  const count = polyhedron.getVertex().adjacentFaces().length;
-
-  const newVertexMapping = {};
-  _.forEach(polyhedron.vertices, (v, vIndex: number) => {
-    // For each vertex, pick one adjacent face to be the "head"
-    // for every other adjacent face, map it to a duplicated vertex
-    _.forEach(v.adjacentFaces(), (f, i) => {
-      _.set(newVertexMapping, [f.index, v.index], v.index * count + i);
-    });
-  });
-
-  return polyhedron.withChanges(solid =>
-    solid
-      .withVertices(flatMap(polyhedron.vertices, v => repeat(v.value, count)))
-      .mapFaces(face =>
-        face.vertices.map(v => newVertexMapping[face.index][v.index]),
-      )
-      .addFaces(
-        _.map(polyhedron.vertices, v =>
-          _.range(v.index * count, (v.index + 1) * count),
-        ),
-      )
-      .addFaces(
-        _.flatMap(polyhedron.edges, edge =>
-          _.map(getEdgeFacePaths(edge, twist), face =>
-            _.map(face, path => _.get(newVertexMapping, path)),
-          ),
-        ),
-      ),
-  );
-}
-
 function getTwist(angle) {
   if (angle > 0) {
     return 'right';
@@ -120,17 +68,12 @@ function doExpansion(polyhedron: Polyhedron, referenceName) {
   const referenceLength =
     referenceFace.distanceToCenter() / reference.edgeLength();
 
-  const snubFaces = _.filter(duplicated.faces, face =>
+  const expandFaces = _.filter(duplicated.faces, face =>
     isExpandedFace(duplicated, face, n),
   );
 
   // Update the vertices with the expanded-out version
-  const endVertices = getResizedVertices(
-    duplicated,
-    snubFaces,
-    referenceLength,
-    angle,
-  );
+  const endVertices = getResizedVertices(expandFaces, referenceLength, angle);
 
   return {
     animationData: {

@@ -1,6 +1,8 @@
 // @flow strict
 import _ from 'lodash';
-import { Polyhedron, Face } from 'math/polyhedra';
+
+import { flatMap, repeat } from 'util.js';
+import { Polyhedron, Vertex, Face, type VertexArg } from 'math/polyhedra';
 import { PRECISION, getPlane, rotateAround } from 'math/linAlg';
 import { type Relation } from './operationTypes';
 
@@ -76,8 +78,79 @@ export function removeExtraneousVertices(polyhedron: Polyhedron) {
   );
 }
 
-export function getResizedVertices(
+function getEdgeFacePaths(edge, twist) {
+  const [v1, v2] = _.map(edge.vertices, 'index');
+  const [f1, f2] = _.map(edge.adjacentFaces(), 'index');
+  switch (twist) {
+    case 'right':
+      return [
+        [[f1, v1], [f2, v2], [f1, v2]], // face 1
+        [[f1, v1], [f2, v1], [f2, v2]], // face 2
+      ];
+    case 'left':
+      return [
+        [[f1, v2], [f1, v1], [f2, v1]], // face 1
+        [[f2, v1], [f2, v2], [f1, v2]], // face 2
+      ];
+    default:
+      return [[[f1, v2], [f1, v1], [f2, v1], [f2, v2]]];
+  }
+}
+
+/**
+ * Duplicate the vertices, so that each face has its own unique set of vertices,
+ * and create a new face for each edge and new vertex set.
+ */
+export function duplicateVertices(
   polyhedron: Polyhedron,
+  twist?: 'left' | 'right',
+) {
+  const count = polyhedron.getVertex().adjacentFaces().length;
+
+  const newVertexMapping = {};
+  _.forEach(polyhedron.vertices, (v, vIndex: number) => {
+    // For each vertex, pick one adjacent face to be the "head"
+    // for every other adjacent face, map it to a duplicated vertex
+    _.forEach(v.adjacentFaces(), (f, i) => {
+      _.set(newVertexMapping, [f.index, v.index], v.index * count + i);
+    });
+  });
+
+  return polyhedron.withChanges(solid =>
+    solid
+      .withVertices(flatMap(polyhedron.vertices, v => repeat(v.value, count)))
+      .mapFaces(face =>
+        face.vertices.map(v => newVertexMapping[face.index][v.index]),
+      )
+      .addFaces(
+        _.map(polyhedron.vertices, v =>
+          _.range(v.index * count, (v.index + 1) * count),
+        ),
+      )
+      .addFaces(
+        _.flatMap(polyhedron.edges, edge =>
+          _.map(getEdgeFacePaths(edge, twist), face =>
+            _.map(face, path => _.get(newVertexMapping, path)),
+          ),
+        ),
+      ),
+  );
+}
+
+export function getMappedVertices(
+  faces: Face[],
+  iteratee: (v: Vertex, f: Face) => VertexArg,
+) {
+  const result = [...faces[0].polyhedron.vertices];
+  _.forEach(faces, face => {
+    _.forEach(face.vertices, v => {
+      result[v.index] = iteratee(v, face);
+    });
+  });
+  return result;
+}
+
+export function getResizedVertices(
   faces: Face[],
   resizedLength: number,
   angle: number = 0,
@@ -86,17 +159,13 @@ export function getResizedVertices(
   const f0 = faces[0];
   const sideLength = f0.sideLength();
   const baseLength = f0.distanceToCenter() / sideLength;
-  const result = [...polyhedron.vertices];
-  _.forEach(faces, face => {
+  return getMappedVertices(faces, (v, face) => {
     const normal = face.normal();
-    _.forEach(face.vertices, v => {
-      const rotated =
-        angle === 0 ? v.vec : rotateAround(v.vec, face.normalRay(), angle);
-      const scale = (resizedLength - baseLength) * sideLength;
-      result[v.index] = rotated.add(normal.scale(scale));
-    });
+    const rotated =
+      angle === 0 ? v.vec : rotateAround(v.vec, face.normalRay(), angle);
+    const scale = (resizedLength - baseLength) * sideLength;
+    return rotated.add(normal.scale(scale));
   });
-  return result;
 }
 
 type ExpansionType = 'cantellate' | 'snub';

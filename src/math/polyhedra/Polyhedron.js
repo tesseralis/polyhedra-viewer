@@ -99,6 +99,10 @@ export default class Polyhedron {
     return this.faces[0];
   }
 
+  getEdge() {
+    return this.edges[0];
+  }
+
   largestFace() {
     return _.maxBy(this.faces, 'numSides');
   }
@@ -155,13 +159,44 @@ export default class Polyhedron {
     return this.withVertices(this.vertices.map(v => v.vec.sub(centroid)));
   }
 
-  // Test functions
-  // ==============
+  // Property predicates
+  // ===================
 
+  isSemiRegular = _.once(() => {
+    const vertexRegular =
+      _(this.vertices)
+        .map(v => v.adjacentFaceCounts())
+        .uniqWith(_.isEqual)
+        .size() === 1;
+    if (!vertexRegular) return false;
+
+    // Make sure it's face regular as well
+    return _(this.faces)
+      .groupBy('numSides')
+      .every(
+        (nFaces, n) =>
+          _(nFaces)
+            .map(f => f.adjacentFaceCounts())
+            .uniqWith(_.isEqual)
+            .size() === 1,
+      );
+  });
+
+  isQuasiRegular() {
+    if (!this.isSemiRegular()) return false;
+    const adjFaces = this.getVertex().adjacentFaceCounts();
+    return _.every(adjFaces, count => count % 2 === 0);
+  }
+
+  isRegular() {
+    return this.isSemiRegular() && this.faceTypes().length === 1;
+  }
+
+  // TODO reimplement this in terms of face functions
   faceAdjacencyList() {
     const faceAdjacencyCounts = _.map(this.faces, face => ({
       n: face.numSides,
-      adj: _.countBy(face.adjacentFaces(), 'numSides'),
+      adj: face.adjacentFaceCounts(),
     }));
     return _.sortBy(
       faceAdjacencyCounts,

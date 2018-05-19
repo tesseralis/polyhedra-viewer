@@ -47,6 +47,11 @@ export default class Face extends VEList {
     return _.map(this.edges, edge => edge.twin().face);
   }
 
+  /** Return adjacent faces counted by number of sides */
+  adjacentFaceCounts() {
+    return _.countBy(this.adjacentFaces(), 'numSides');
+  }
+
   withPolyhedron(polyhedron: Polyhedron) {
     return new Face(polyhedron, this.index);
   }

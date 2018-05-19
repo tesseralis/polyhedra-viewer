@@ -10,10 +10,6 @@ interface TruncateOptions {
   rectify?: boolean;
 }
 
-function isPlatonic(polyhedron) {
-  return polyhedron.faceTypes().length === 1;
-}
-
 function getFamily(polyhedron) {
   const faceTypes = polyhedron.faceTypes();
   if (_.includes(faceTypes, 5)) return 'I';
@@ -56,9 +52,7 @@ function duplicateVertices(polyhedron) {
 
   return polyhedron.withChanges(solid => {
     return solid
-      .withVertices(
-        flatMap(polyhedron.vertices, (v, i) => repeat(v.value, count)),
-      )
+      .withVertices(flatMap(polyhedron.vertices, v => repeat(v.value, count)))
       .mapFaces(face => {
         return _.flatMap(face.vertices, v => {
           const base = count * v.index;
@@ -83,7 +77,7 @@ function getTruncateLength(polyhedron) {
 }
 
 function getTruncateTransform(polyhedron, duplicated) {
-  if (isPlatonic(polyhedron)) {
+  if (polyhedron.isRegular()) {
     return (vector, vertex) => vector;
   }
 

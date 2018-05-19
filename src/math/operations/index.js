@@ -1,4 +1,5 @@
 // @flow strict
+import { dual } from './dual';
 import { truncate, rectify } from './truncate';
 import { cumulate } from './cumulate';
 import { expand, snub } from './expand';
@@ -8,6 +9,7 @@ import { diminish, shorten } from './diminish';
 import { gyrate } from './gyrate';
 
 export const operations = {
+  dual,
   truncate,
   rectify,
   cumulate,

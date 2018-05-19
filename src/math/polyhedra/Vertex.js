@@ -50,4 +50,9 @@ export default class Vertex {
   adjacentFaces() {
     return _.map(this.adjacentEdges(), 'face');
   }
+
+  /** Return adjacent faces counted by number of sides */
+  adjacentFaceCounts() {
+    return _.countBy(this.adjacentFaces(), 'numSides');
+  }
 }

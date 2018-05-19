@@ -12,6 +12,19 @@ describe('Polyhedron', () => {
     });
   });
 
+  describe('isSemiRegular', () => {
+    it('counts prisms and antiprisms', () => {
+      expect(Polyhedron.get('decagonal-prism').isSemiRegular()).toBe(true);
+      expect(Polyhedron.get('decagonal-antiprism').isSemiRegular()).toBe(true);
+    });
+
+    it("doesn't count the pseudorhombicuboctaheron", () => {
+      expect(
+        Polyhedron.get('elongated-square-gyrobicupola').isSemiRegular(),
+      ).toBe(false);
+    });
+  });
+
   describe('isSame', () => {
     const testCases = [
       ['rhombicuboctahedron', 'elongated-square-gyrobicupola'],

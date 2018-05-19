@@ -57,6 +57,11 @@ export default class Edge {
     return [this.face, this.twin().face];
   }
 
+  // Distance of this midpoint to polyhedron center
+  distanceToCenter() {
+    return this.midpoint().distanceTo(this.polyhedron.centroid());
+  }
+
   dihedralAngle() {
     const midpoint = this.midpoint();
     const [c1, c2] = this.adjacentFaces().map(face =>

@@ -131,12 +131,7 @@ export function applyContract(
       ? -getSnubAngle(polyhedron, faceType)
       : 0;
 
-  const endVertices = getResizedVertices(
-    polyhedron,
-    contractFaces,
-    resultLength,
-    angle,
-  );
+  const endVertices = getResizedVertices(contractFaces, resultLength, angle);
   return {
     animationData: {
       start: polyhedron,
