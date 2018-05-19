@@ -8,14 +8,13 @@ import { type Point, Vec3D } from 'math/linAlg';
 import { isValidSolid } from 'data';
 import { andaleMono } from 'styles/fonts';
 import { Polyhedron } from 'math/polyhedra';
-import type { Face } from 'math/polyhedra';
 import { operations } from 'math/operations';
 import type { OpName } from 'math/operations';
 import polygons from 'constants/polygons';
 import { mapObject } from 'util.js';
 import { fixed, fullScreen } from 'styles/common';
 import { unescapeName } from 'polyhedra/names';
-import doApplyOperation from 'polyhedra/applyOperation';
+import applyOperation from 'polyhedra/applyOperation';
 import { getRelations, applyOptionsFor } from 'polyhedra/operations';
 import { defaultConfig, getPolyhedronConfig } from 'constants/configOptions';
 import transition from 'transition.js';
@@ -88,7 +87,7 @@ const colorIndexForFace = mapObject(polygons, (n, i) => [n, i]);
 const getColorIndex = face => colorIndexForFace[face.numSides];
 const polygonColors = colors => polygons.map(n => toRgb(colors[n]));
 
-function getFaceColors(polyhedron: Polyhedron, colors: any) {
+function getFaceColors(polyhedron, colors) {
   return _.pickBy(
     mapObject(polyhedron.faces, (face, fIndex) => [
       fIndex,
@@ -218,7 +217,7 @@ export default class Viewer extends Component<ViewerProps, ViewerState> {
   };
 
   // TODO probably move this and the color utility functions to their own file
-  getColorForFace = (face: Face) => {
+  getColorForFace = (face: *) => {
     const { applyArgs, polyhedron, operation, config, faceColors } = this.state;
     const { colors } = getPolyhedronConfig(config);
     const defaultColors = polygonColors(colors);
@@ -270,7 +269,7 @@ export default class Viewer extends Component<ViewerProps, ViewerState> {
   applyOperation = (operation: OpName) => {
     this.setState(
       ({ polyhedron, solidName, applyOptions, applyArgs, config }) => {
-        const { result, name, animationData } = doApplyOperation(
+        const { result, name, animationData } = applyOperation(
           operation,
           solidName,
           polyhedron,

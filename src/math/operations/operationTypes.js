@@ -31,10 +31,14 @@ export interface OperationResult {
   };
 }
 
-export type PartialOpResult = $Shape<OperationResult>;
-
 export type Relation = {};
 
+export type PartialOpResult = $Shape<OperationResult>;
+
+/**
+ * Object that describes the shape of an operation applied on a polyhedron
+ * and the related functionality.
+ */
 export interface Operation<Options = {}, ApplyArgs = {}> {
   apply(polyhedron: Polyhedron, options: Options): Polyhedron | PartialOpResult;
 

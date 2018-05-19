@@ -6,10 +6,6 @@ import { scaleAround, PRECISION } from 'math/linAlg';
 import { Polyhedron } from 'math/polyhedra';
 import type { Operation } from './operationTypes';
 
-interface TruncateOptions {
-  rectify?: boolean;
-}
-
 function getFamily(polyhedron) {
   const faceTypes = polyhedron.faceTypes();
   if (_.includes(faceTypes, 5)) return 'I';
@@ -111,7 +107,7 @@ function getTruncateTransform(polyhedron, duplicated) {
   };
 }
 
-function doTruncate(polyhedron, { rectify = false }: TruncateOptions = {}) {
+function doTruncate(polyhedron, rectify = false) {
   const truncateLength = getTruncateLength(polyhedron);
   const oldSideLength = polyhedron.edgeLength();
   const truncateScale = (oldSideLength - truncateLength) / 2 / oldSideLength;
@@ -133,14 +129,14 @@ function doTruncate(polyhedron, { rectify = false }: TruncateOptions = {}) {
   };
 }
 
-export const truncate: Operation<TruncateOptions> = {
-  apply(polyhedron, options) {
+export const truncate: Operation<> = {
+  apply(polyhedron) {
     return doTruncate(polyhedron);
   },
 };
 
 export const rectify: Operation<> = {
   apply(polyhedron) {
-    return doTruncate(polyhedron, { rectify: true });
+    return doTruncate(polyhedron, true);
   },
 };
