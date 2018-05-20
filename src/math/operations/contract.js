@@ -1,16 +1,13 @@
 // @flow strict
 import _ from 'lodash';
 import { flatMapUniq } from 'util.js';
-import { Polyhedron, Peak } from 'math/polyhedra';
+import { Polyhedron } from 'math/polyhedra';
 import {
   expansionType,
   getSnubAngle,
   isExpandedFace,
   getResizedVertices,
-  getMappedVertices,
-  getMappedPeakVertices,
 } from './operationUtils';
-import { isInverse, rotateAround } from 'math/linAlg';
 import { Operation } from './operationTypes';
 
 interface ContractOptions {
@@ -175,70 +172,3 @@ export const contract: Operation<ContractOptions> = {
   },
 };
 
-function getOppositePeaks(polyhedron) {
-  const peaks = Peak.getAll(polyhedron);
-  // FIXME maybe expensive
-  for (let peak of peaks) {
-    const peak2 = _.find(peaks, peak2 =>
-      isInverse(peak.boundary().normal(), peak2.boundary().normal()),
-    );
-    if (peak2) return [peak, peak2];
-  }
-  return undefined;
-}
-
-function antiprismHeight(n) {
-  const sec = 1 / Math.cos(Math.PI / (2 * n));
-  return Math.sqrt(1 - sec * sec / 4);
-}
-
-export function shorten(polyhedron: Polyhedron) {
-  // FIXME deduplicate this logic with the non-bi case
-  const oppositePeaks = getOppositePeaks(polyhedron);
-  if (oppositePeaks) {
-    const boundary = oppositePeaks[0].boundary();
-    const isAntiprism = boundary.edges[0].twin().face.numSides === 3;
-    console.log(isAntiprism);
-    const scale = isAntiprism ? antiprismHeight(boundary.numSides) : 1;
-    const theta = isAntiprism ? Math.PI / boundary.numSides : 0;
-    const endVertices = getMappedPeakVertices(oppositePeaks, (v, peak) =>
-      rotateAround(
-        v.vec.sub(
-          peak
-            .boundary()
-            .normal()
-            .scale(scale / 2 * polyhedron.edgeLength()),
-        ),
-        peak.boundary().normalRay(),
-        theta / 2,
-      ),
-    );
-    return {
-      animationData: {
-        start: polyhedron,
-        endVertices,
-      },
-    };
-  }
-  const faces = polyhedron.faces.filter(face => {
-    return _.uniqBy(face.adjacentFaces(), 'numSides').length === 1;
-  });
-  const face = _.maxBy(faces, 'numSides');
-  const isAntiprism = face.adjacentFaces()[0].numSides === 3;
-  const scale = isAntiprism ? antiprismHeight(face.numSides) : 1;
-  const theta = isAntiprism ? Math.PI / face.numSides : 0;
-  // TODO handle bi case
-  const endVertices = getMappedVertices([face], (v, f) =>
-    rotateAround(
-      v.vec.sub(f.normal().scale(scale * polyhedron.edgeLength())),
-      face.normalRay(),
-      theta,
-    ),
-  );
-  return {
-    animationData: {
-      start: polyhedron,
-      endVertices,
-    },
-  };
-}

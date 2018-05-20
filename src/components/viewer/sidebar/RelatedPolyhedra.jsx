@@ -134,13 +134,21 @@ function AugmentOptions({ options, solid, onClickOption, disabled }) {
   );
 }
 
-const hasMode = ['contract', 'cumulate', 'augment', 'diminish', 'gyrate'];
+const hasMode = [
+  'contract',
+  'shorten',
+  'cumulate',
+  'augment',
+  'diminish',
+  'gyrate',
+];
 
 // TODO possibly move this as part of the operation definition
 function hasOptions(operation, relations) {
   switch (operation) {
     case 'cumulate':
     case 'contract':
+    case 'shorten':
       if (relations.length > 1) {
         return true;
       }
@@ -166,39 +174,30 @@ export default function RelatedPolyhedra({
     <div className={css(styles.opGrid)}>
       {operations.map(({ name, symbol, description }) => {
         const relations = getRelations(solid, name);
-        const buttons =
-          !relations || hasOptions(name, relations)
-            ? [{ value: '' }]
-            : relations;
-        const showResult = buttons.length > 1;
         return (
           <div key={name} style={{ gridArea: name }}>
             <div className={css(styles.options)}>
-              {buttons.map(relation => (
-                <Tooltip
-                  key={relation.value}
-                  content={description}
-                  trigger={!!relations ? ['hover'] : []}
+              <Tooltip
+                content={description}
+                trigger={!!relations ? ['hover'] : []}
+              >
+                <button
+                  className={css(
+                    styles.modeButton,
+                    operation === name && styles.isHighlighted,
+                  )}
+                  disabled={!relations || disabled}
+                  onClick={() => {
+                    if (hasOptions(name, relations)) {
+                      setOperation(name !== operation ? name : null);
+                    } else {
+                      applyOperation(name);
+                    }
+                  }}
                 >
-                  <button
-                    className={css(
-                      styles.modeButton,
-                      operation === name && styles.isHighlighted,
-                    )}
-                    disabled={!relations || disabled}
-                    onClick={() => {
-                      if (hasOptions(name, relations)) {
-                        setOperation(name !== operation ? name : null);
-                      } else {
-                        applyOperation(name);
-                      }
-                    }}
-                  >
-                    {name}
-                    {showResult ? `: ${relation.value}` : ''}
-                  </button>
-                </Tooltip>
-              ))}
+                  {name}
+                </button>
+              </Tooltip>
             </div>
             {name === 'augment' && (
               <AugmentOptions
