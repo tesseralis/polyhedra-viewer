@@ -225,13 +225,15 @@ export function shorten(polyhedron: Polyhedron) {
   });
   const face = _.maxBy(faces, 'numSides');
   const isAntiprism = face.adjacentFaces()[0].numSides === 3;
-  const scale = isAntiprism
-    ? antiprismHeight(face.numSides)
-    : face.sideLength();
+  const scale = isAntiprism ? antiprismHeight(face.numSides) : 1;
   const theta = isAntiprism ? Math.PI / face.numSides : 0;
   // TODO handle bi case
   const endVertices = getMappedVertices([face], (v, f) =>
-    rotateAround(v.vec.sub(f.normal().scale(scale)), face.normalRay(), theta),
+    rotateAround(
+      v.vec.sub(f.normal().scale(scale * polyhedron.edgeLength())),
+      face.normalRay(),
+      theta,
+    ),
   );
   return {
     animationData: {
