@@ -1,7 +1,7 @@
 // @flow strict
 import _ from 'lodash';
 import { Polyhedron } from 'math/polyhedra';
-import { scaleAround } from 'math/linAlg';
+import { withOrigin } from 'math/linAlg';
 import { flatMap, repeat } from 'util.js';
 import {
   getTwist,
@@ -9,7 +9,7 @@ import {
   getEdgeFacePaths,
   expansionType,
   isExpandedFace,
-  getMappedVertices,
+  getTransformedVertices,
   getResizedVertices,
 } from './operationUtils';
 
@@ -127,9 +127,9 @@ export function dual(polyhedron: Polyhedron) {
     return e * e / (f * f);
   })();
   const duplicated = duplicateVertices(polyhedron);
-  const endVertices = getMappedVertices(
-    polyhedron.faces.map(face => face.withPolyhedron(duplicated)),
-    (v, f) => scaleAround(f.centroid(), polyhedron.centroid(), scale),
+  const faces = polyhedron.faces.map(face => face.withPolyhedron(duplicated));
+  const endVertices = getTransformedVertices(faces, f => () =>
+    withOrigin(polyhedron.centroid(), v => v.scale(scale))(f.centroid()),
   );
 
   return {
@@ -148,4 +148,3 @@ export function snub(polyhedron: Polyhedron) {
   //  TODO figure out how to calculate this without relying on a reference
   return doExpansion(polyhedron, getSnubResult(polyhedron));
 }
-

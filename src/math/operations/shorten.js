@@ -3,8 +3,8 @@ import _ from 'lodash';
 import { find } from 'util.js';
 import type { Twist } from 'types';
 import { Polyhedron, Peak } from 'math/polyhedra';
-import { isInverse, rotateAround } from 'math/linAlg';
-import { antiprismHeight, getMappedVertices } from './operationUtils';
+import { isInverse, withOrigin } from 'math/linAlg';
+import { antiprismHeight, getTransformedVertices } from './operationUtils';
 import { Operation } from './operationTypes';
 
 function getOppositePeaks(polyhedron) {
@@ -18,8 +18,18 @@ function getOppositePeaks(polyhedron) {
   return undefined;
 }
 
+function getSign(twist) {
+  switch (twist) {
+    case 'left':
+      return -1;
+    case 'right':
+      return 1;
+    default:
+      return 0;
+  }
+}
+
 function doShorten(polyhedron: Polyhedron, options) {
-  const { twist } = options;
   const [setToMap, boundary, multiplier] = (() => {
     const oppositePeaks = getOppositePeaks(polyhedron);
     if (oppositePeaks) {
@@ -34,18 +44,19 @@ function doShorten(polyhedron: Polyhedron, options) {
       return [[face], face, 1];
     }
   })();
-  // FIXME geez, this is basically just the opposite operation
   const isAntiprism = boundary.adjacentFaces()[0].numSides === 3;
-  const scale = isAntiprism ? antiprismHeight(boundary.numSides) : 1;
-  const theta = isAntiprism ? Math.PI / boundary.numSides : 0;
+  const { twist = isAntiprism && 'left' } = options;
+  // FIXME geez, this is basically just the opposite operation
+  const scale =
+    polyhedron.edgeLength() *
+    (isAntiprism ? antiprismHeight(boundary.numSides) : 1);
+  const theta = getSign(twist) * Math.PI / boundary.numSides;
 
-  const endVertices = getMappedVertices(setToMap, (v, set) =>
-    rotateAround(
-      v.vec.sub(
-        set.normal().scale(scale * polyhedron.edgeLength() * multiplier),
-      ),
-      set.normalRay(),
-      (twist === 'left' ? -1 : 1) * theta * multiplier,
+  const endVertices = getTransformedVertices(setToMap, set =>
+    withOrigin(set.normalRay(), v =>
+      v
+        .sub(set.normal().scale(scale * multiplier))
+        .getRotatedAroundAxis(set.normal(), theta * multiplier),
     ),
   );
   return {

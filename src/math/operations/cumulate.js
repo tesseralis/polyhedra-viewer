@@ -84,9 +84,8 @@ function getCumulateDist(polyhedron, face) {
 }
 
 function getVertexToAdd(polyhedron, face) {
-  const normalRay = face.normalRay();
   const dist = getCumulateDist(polyhedron, face);
-  return normalRay.getPointAtDistance(dist);
+  return face.normalRay().getPointAtDistance(dist);
 }
 
 function applyCumulate(

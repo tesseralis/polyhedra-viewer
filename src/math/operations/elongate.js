@@ -2,11 +2,11 @@
 import _ from 'lodash';
 import { type Twist } from 'types';
 import { Polyhedron, Peak } from 'math/polyhedra';
-import { rotateAround } from 'math/linAlg';
+import { withOrigin } from 'math/linAlg';
 import { mod } from 'util.js';
 import {
   antiprismHeight,
-  getMappedVertices,
+  getTransformedVertices,
   getEdgeFacePaths,
 } from './operationUtils';
 
@@ -57,8 +57,6 @@ function doElongate(polyhedron, twist) {
   const peaks = Peak.getAll(polyhedron);
   const boundary = peaks[0].boundary();
   const n = boundary.numSides;
-  const height = twist ? antiprismHeight(n) : 1;
-  const angle = getSign(twist) * Math.PI / n;
   const duplicated = duplicateVertices(polyhedron, boundary, twist);
   const [transformVertices, multiplier] = (() => {
     const duplicatedPeaks = Peak.getAll(duplicated);
@@ -71,15 +69,16 @@ function doElongate(polyhedron, twist) {
     }
   })();
 
-  const endVertices = getMappedVertices(transformVertices, (v, set) => {
-    return rotateAround(
-      v.vec.add(
-        set.normal().scale(height * polyhedron.edgeLength() * multiplier),
-      ),
-      set.normalRay(),
-      angle * multiplier,
-    );
-  });
+  const height = polyhedron.edgeLength() * (twist ? antiprismHeight(n) : 1);
+  const angle = getSign(twist) * Math.PI / n;
+
+  const endVertices = getTransformedVertices(transformVertices, set =>
+    withOrigin(set.normalRay(), v =>
+      v
+        .add(set.normal().scale(height * multiplier))
+        .getRotatedAroundAxis(set.normal(), angle * multiplier),
+    ),
+  );
   return {
     animationData: {
       start: duplicated,

@@ -2,7 +2,7 @@
 import _ from 'lodash';
 
 import { flatMap, repeat, find, mod } from 'util.js';
-import { scaleAround, PRECISION } from 'math/linAlg';
+import { withOrigin, PRECISION } from 'math/linAlg';
 import { Polyhedron } from 'math/polyhedra';
 
 function getFamily(polyhedron) {
@@ -95,12 +95,13 @@ function getTruncateTransform(polyhedron, duplicated) {
     const smallFace = find(vertex.adjacentFaces(), {
       numSides: 6,
     });
-    const scaled = scaleAround(vector, smallFace.centroid(), faceResizeScale);
     const normal = smallFace.withPolyhedron(polyhedron).normal();
-    const translated = scaled.add(
-      normal.scale(normalizedResizeAmount * newSideLength),
+    const transform = withOrigin(smallFace.centroid(), v =>
+      v
+        .scale(faceResizeScale)
+        .add(normal.scale(normalizedResizeAmount * newSideLength)),
     );
-    return translated;
+    return transform(vector);
   };
 }
 

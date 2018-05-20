@@ -4,15 +4,19 @@ import _ from 'lodash';
 import type { Point, Twist } from 'types';
 import {
   Polyhedron,
-  Vertex,
   Face,
   Edge,
   normalizeVertex,
   VertexList,
-  type VertexArg,
 } from 'math/polyhedra';
-import { vec, PRECISION, getPlane, rotateAround } from 'math/linAlg';
-import { type Relation } from './operationTypes';
+import {
+  vec,
+  PRECISION,
+  getPlane,
+  withOrigin,
+  type Transform,
+} from 'math/linAlg';
+import type { Relation } from './operationTypes';
 
 export const hasMultiple = (relations: ?(Relation[]), property: string) =>
   _(relations)
@@ -123,15 +127,14 @@ export function getEdgeFacePaths(edge: Edge, twist?: Twist) {
   }
 }
 
-// FIXME play with using a transform matrix instead of an iteratee
-export function getMappedVertices<T: VertexList>(
+export function getTransformedVertices<T: VertexList>(
   vLists: T[],
-  iteratee: (v: Vertex, t: T) => VertexArg,
+  iteratee: T => Transform,
 ) {
   const result = [...vLists[0].polyhedron.vertices];
   _.forEach(vLists, vList => {
     _.forEach(vList.vertices, v => {
-      result[v.index] = iteratee(v, vList);
+      result[v.index] = iteratee(vList)(v.vec);
     });
   });
   return result;
@@ -144,13 +147,12 @@ export function getResizedVertices(
 ) {
   // Update the vertices with the expanded-out version
   const f0 = faces[0];
-  return getMappedVertices(faces, (v, face) => {
-    const normal = face.normal();
-    const rotated =
-      angle === 0 ? v.vec : rotateAround(v.vec, face.normalRay(), angle);
-    const scale = resizedLength - f0.distanceToCenter();
-    return rotated.add(normal.scale(scale));
-  });
+  const scale = resizedLength - f0.distanceToCenter();
+  return getTransformedVertices(faces, f =>
+    withOrigin(f.centroid(), v =>
+      v.getRotatedAroundAxis(f.normal(), angle).add(f.normal().scale(scale)),
+    ),
+  );
 }
 
 type ExpansionType = 'cantellate' | 'snub';

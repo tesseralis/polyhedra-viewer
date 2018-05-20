@@ -50,17 +50,8 @@ export function getNormalRay(vertices: Vec3D[]) {
   return new Ray3D(getCentroid(vertices), getNormal(vertices));
 }
 
-export function rotateAround(point: Vec3D, ray: Ray3D, theta: number) {
-  return point
-    .sub(ray)
-    .getRotatedAroundAxis(ray.getDirection(), theta)
-    .add(ray);
-}
+export type Transform = Vec3D => Vec3D;
 
-export function scaleAround(point: Vec3D, origin: Vec3D, scale: number) {
-  return point
-    .sub(origin)
-    .scale(scale)
-    .add(origin);
+export function withOrigin(o: Vec3D, t: Transform): Transform {
+  return v => t(v.sub(o)).add(o);
 }
-
