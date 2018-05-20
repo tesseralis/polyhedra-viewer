@@ -1,8 +1,8 @@
 // @flow strict
 import _ from 'lodash';
 
+import type { Point } from 'types';
 import { Vec3D } from 'math/linAlg';
-import type { Point } from 'math/linAlg';
 import type { VIndex, SolidData } from './solidTypes';
 import Vertex from './Vertex';
 import Face from './Face';

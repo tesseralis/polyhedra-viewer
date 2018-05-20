@@ -3,7 +3,7 @@ import _ from 'lodash';
 import React, { Component } from 'react';
 import { css, StyleSheet } from 'aphrodite/no-important';
 import { rgb } from 'd3-color';
-import { type Point } from 'math/linAlg';
+import { type Point } from 'types';
 
 import { isValidSolid } from 'data';
 import { andaleMono } from 'styles/fonts';
@@ -271,7 +271,7 @@ export default class Viewer extends Component<ViewerProps, ViewerState> {
     }
   };
 
-  applyTwistOperation = (twist: 'left' | 'right') => {
+  applyTwistOperation = (twist: *) => {
     this.setState(
       ({ applyArgs }) => {
         return { applyArgs: { ...applyArgs, twist } };

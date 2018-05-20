@@ -49,6 +49,6 @@ export default class Face extends VEList {
   }
 
   withPolyhedron(polyhedron: Polyhedron) {
-    return new Face(polyhedron, this.index);
+    return polyhedron.faces[this.index];
   }
 }

@@ -1,6 +1,6 @@
 // @flow strict
 
-import type { Point } from 'math/linAlg';
+import type { Point } from 'types';
 export type VIndex = number;
 export type FIndex = number;
 

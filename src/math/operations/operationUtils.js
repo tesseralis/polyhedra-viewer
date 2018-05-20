@@ -1,6 +1,7 @@
 // @flow strict
 import _ from 'lodash';
 
+import type { Point, Twist } from 'types';
 import {
   Polyhedron,
   Vertex,
@@ -10,13 +11,7 @@ import {
   VertexList,
   type VertexArg,
 } from 'math/polyhedra';
-import {
-  type Point,
-  vec,
-  PRECISION,
-  getPlane,
-  rotateAround,
-} from 'math/linAlg';
+import { vec, PRECISION, getPlane, rotateAround } from 'math/linAlg';
 import { type Relation } from './operationTypes';
 
 export const hasMultiple = (relations: ?(Relation[]), property: string) =>
@@ -109,7 +104,7 @@ export function getTwist(angle: number) {
 
 // Return the indices required to create faces when duplicating vertices
 // along an edge
-export function getEdgeFacePaths(edge: Edge, twist?: 'left' | 'right') {
+export function getEdgeFacePaths(edge: Edge, twist?: Twist) {
   const [v1, v2] = _.map(edge.vertices, 'index');
   const [f1, f2] = _.map(edge.adjacentFaces(), 'index');
   switch (twist) {

@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import _ from 'lodash';
 import EventListener from 'react-event-listener';
 
-import { type Point } from 'math/linAlg';
+import { type Point } from 'types';
 import { Polyhedron } from 'math/polyhedra';
 
 type SyntheticEventHandler = (e: $Subtype<SyntheticEvent<*>>) => void;

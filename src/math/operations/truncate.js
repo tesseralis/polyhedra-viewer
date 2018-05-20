@@ -96,8 +96,6 @@ function getTruncateTransform(polyhedron, duplicated) {
       numSides: 6,
     });
     const scaled = scaleAround(vector, smallFace.centroid(), faceResizeScale);
-    // Our normal (heh) normal function doesn't work on just the hexagon,
-    // since it has duplicated vertices
     const normal = smallFace.withPolyhedron(polyhedron).normal();
     const translated = scaled.add(
       normal.scale(normalizedResizeAmount * newSideLength),

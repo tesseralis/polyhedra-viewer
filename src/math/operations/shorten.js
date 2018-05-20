@@ -1,6 +1,7 @@
 // @flow strict
 import _ from 'lodash';
 import { find } from 'util.js';
+import type { Twist } from 'types';
 import { Polyhedron, Peak } from 'math/polyhedra';
 import { isInverse, rotateAround } from 'math/linAlg';
 import { antiprismHeight, getMappedVertices } from './operationUtils';
@@ -86,7 +87,7 @@ function getChirality(polyhedron) {
 }
 
 interface ShortenOptions {
-  twist?: 'left' | 'right';
+  twist?: Twist;
 }
 
 export const shorten: Operation<ShortenOptions> = {

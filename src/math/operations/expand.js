@@ -54,7 +54,7 @@ function getSnubResult(polyhedron) {
  * Duplicate the vertices, so that each face has its own unique set of vertices,
  * and create a new face for each edge and new vertex set.
  */
-function duplicateVertices(polyhedron: Polyhedron, twist?: 'left' | 'right') {
+function duplicateVertices(polyhedron, twist) {
   const count = polyhedron.getVertex().adjacentFaces().length;
 
   const newVertexMapping = {};

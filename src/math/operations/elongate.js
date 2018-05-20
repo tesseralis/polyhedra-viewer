@@ -1,5 +1,6 @@
 // @flow strict
 import _ from 'lodash';
+import { type Twist } from 'types';
 import { Polyhedron, Peak } from 'math/polyhedra';
 import { rotateAround } from 'math/linAlg';
 import { mod } from 'util.js';
@@ -9,11 +10,7 @@ import {
   getEdgeFacePaths,
 } from './operationUtils';
 
-function duplicateVertices(
-  polyhedron: Polyhedron,
-  boundary,
-  twist?: 'left' | 'right',
-) {
+function duplicateVertices(polyhedron: Polyhedron, boundary, twist?: Twist) {
   const newVertexMapping = {};
   _.forEach(boundary.edges, (edge, i) => {
     const oppositeFace = edge.twin().face;
@@ -56,7 +53,7 @@ function getSign(twist) {
 }
 
 // TODO add twist option to elongate
-function doElongate(polyhedron, twist?: 'left' | 'right') {
+function doElongate(polyhedron, twist) {
   const peaks = Peak.getAll(polyhedron);
   const boundary = peaks[0].boundary();
   const n = boundary.numSides;

@@ -2,6 +2,7 @@
 import React from 'react';
 import { css, StyleSheet } from 'aphrodite/no-important';
 
+import { type Twist } from 'types';
 import Icon from './sidebar/Icon';
 
 const styles = StyleSheet.create({
@@ -30,8 +31,7 @@ function TwistOption({ orientation, onClick }) {
 }
 
 interface Props {
-  // FIXME move this to a damn type
-  onClick(twist: 'left' | 'right'): void;
+  onClick(twist: Twist): void;
 }
 
 export default function TwistOptions({ onClick }: Props) {
