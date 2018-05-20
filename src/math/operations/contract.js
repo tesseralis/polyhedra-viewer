@@ -9,7 +9,6 @@ import {
   getResizedVertices,
   getMappedVertices,
   getMappedPeakVertices,
-  antiprismHeight,
 } from './operationUtils';
 import { isInverse, rotateAround } from 'math/linAlg';
 import { Operation } from './operationTypes';
@@ -188,15 +187,19 @@ function getOppositePeaks(polyhedron) {
   return undefined;
 }
 
+function antiprismHeight(n) {
+  const sec = 1 / Math.cos(Math.PI / (2 * n));
+  return Math.sqrt(1 - sec * sec / 4);
+}
+
 export function shorten(polyhedron: Polyhedron) {
-  // FIXME deduplicate this logic
+  // FIXME deduplicate this logic with the non-bi case
   const oppositePeaks = getOppositePeaks(polyhedron);
   if (oppositePeaks) {
     const boundary = oppositePeaks[0].boundary();
-    const isAntiprism = boundary.edges[0].twin().numSides === 3;
-    const scale = isAntiprism
-      ? antiprismHeight(boundary)
-      : polyhedron.edgeLength();
+    const isAntiprism = boundary.edges[0].twin().face.numSides === 3;
+    console.log(isAntiprism);
+    const scale = isAntiprism ? antiprismHeight(boundary.numSides) : 1;
     const theta = isAntiprism ? Math.PI / boundary.numSides : 0;
     const endVertices = getMappedPeakVertices(oppositePeaks, (v, peak) =>
       rotateAround(
@@ -204,7 +207,7 @@ export function shorten(polyhedron: Polyhedron) {
           peak
             .boundary()
             .normal()
-            .scale(scale / 2),
+            .scale(scale / 2 * polyhedron.edgeLength()),
         ),
         peak.boundary().normalRay(),
         theta / 2,
@@ -222,7 +225,9 @@ export function shorten(polyhedron: Polyhedron) {
   });
   const face = _.maxBy(faces, 'numSides');
   const isAntiprism = face.adjacentFaces()[0].numSides === 3;
-  const scale = isAntiprism ? antiprismHeight(face) : face.sideLength();
+  const scale = isAntiprism
+    ? antiprismHeight(face.numSides)
+    : face.sideLength();
   const theta = isAntiprism ? Math.PI / face.numSides : 0;
   // TODO handle bi case
   const endVertices = getMappedVertices([face], (v, f) =>

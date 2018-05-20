@@ -209,27 +209,36 @@ export function snub(polyhedron: Polyhedron) {
   return doExpansion(polyhedron, getSnubResult(polyhedron));
 }
 
-export function elongate(polyhedron: Polyhedron) {
+function doElongate(polyhedron, height = 1, angle = 0) {
   const peaks = Peak.getAll(polyhedron);
   const boundary = peaks[0].boundary();
-  const duplicated = duplicateBoundaryVertices(polyhedron, boundary);
+  const twist = getTwist(angle);
+  const duplicated = duplicateBoundaryVertices(polyhedron, boundary, twist);
 
   const endVertices = (() => {
     const duplicatedPeaks = Peak.getAll(duplicated);
     if (duplicatedPeaks.length === 2) {
       return getMappedPeakVertices(duplicatedPeaks, (v, peak) =>
-        v.vec.add(
-          peak
-            .boundary()
-            .normal()
-            .scale(polyhedron.edgeLength() / 2),
+        rotateAround(
+          v.vec.add(
+            peak
+              .boundary()
+              .normal()
+              .scale(height * polyhedron.edgeLength() / 2),
+          ),
+          peak.boundary().normalRay(),
+          angle / 2,
         ),
       );
     } else {
       const base = boundary.edges[0].twin().face.withPolyhedron(duplicated);
 
       return getMappedVertices([base], (v, f) =>
-        v.vec.add(f.normal().scale(f.sideLength())),
+        rotateAround(
+          v.vec.add(f.normal().scale(height * polyhedron.edgeLength())),
+          f.normalRay(),
+          angle,
+        ),
       );
     }
   })();
@@ -241,27 +250,21 @@ export function elongate(polyhedron: Polyhedron) {
   };
 }
 
-function antiprismHeight(s, n) {
-  const sec = 1 / Math.cos(Math.PI / (2 * n));
-  return s * Math.sqrt(1 - sec * sec / 4);
+export function elongate(polyhedron: Polyhedron) {
+  return doElongate(polyhedron);
 }
 
-// FIXME dedupe...
+function antiprismHeight(n) {
+  const sec = 1 / Math.cos(Math.PI / (2 * n));
+  return Math.sqrt(1 - sec * sec / 4);
+}
+
 export function gyroelongate(polyhedron: Polyhedron) {
+  // FIXME can we not do this?
   const peaks = Peak.getAll(polyhedron);
   const boundary = peaks[0].boundary();
-  const duplicated = duplicateBoundaryVertices(polyhedron, boundary, 'right');
-  const base = boundary.edges[0].twin().face.withPolyhedron(duplicated);
-  const scale = antiprismHeight(base.sideLength(), base.numSides);
-  const normal = base.normalRay();
-  const theta = Math.PI / base.numSides;
-  const endVertices = getMappedVertices([base], (v, f) =>
-    rotateAround(v.vec.add(f.normal().scale(scale)), normal, theta),
-  );
-  return {
-    animationData: {
-      start: duplicated,
-      endVertices,
-    },
-  };
+  const n = boundary.numSides;
+  const theta = Math.PI / n;
+  return doElongate(polyhedron, antiprismHeight(n), theta);
 }
+
