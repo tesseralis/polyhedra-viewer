@@ -93,7 +93,9 @@ export default class Peak {
     return _.concat(this.innerVertices(), this.boundary().vertices);
   }
 
-  topPoint() {}
+  topPoint(): Vec3D {
+    return new Vec3D();
+  }
 
   faceConfiguration: () => FaceConfiguration;
 
