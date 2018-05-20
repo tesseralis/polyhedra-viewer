@@ -5,6 +5,7 @@ import {
   Polyhedron,
   Vertex,
   Face,
+  Peak,
   normalizeVertex,
   type VertexArg,
 } from 'math/polyhedra';
@@ -106,6 +107,19 @@ export function getMappedVertices(
   _.forEach(faces, face => {
     _.forEach(face.vertices, v => {
       result[v.index] = iteratee(v, face);
+    });
+  });
+  return result;
+}
+
+export function getMappedPeakVertices(
+  peaks: Peak[],
+  iteratee: (v: Vertex, peak: Peak) => VertexArg,
+) {
+  const result = [...peaks[0].polyhedron.vertices];
+  _.forEach(peaks, peak => {
+    _.forEach(peak.allVertices(), v => {
+      result[v.index] = iteratee(v, peak);
     });
   });
   return result;

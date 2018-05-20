@@ -315,7 +315,6 @@ export default class Viewer extends Component<ViewerProps, ViewerState> {
     this.transitionId = transition(
       {
         duration: transitionDuration,
-        ease: 'easePolyOut',
         startValue: {
           vertices: interpolated.solidData.vertices,
           faceColors: { ...colorEnd, ...colorStart },

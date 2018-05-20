@@ -1,16 +1,17 @@
 // @flow strict
 import _ from 'lodash';
 import { flatMapUniq } from 'util.js';
-import { Polyhedron } from 'math/polyhedra';
+import { Polyhedron, Peak } from 'math/polyhedra';
 import {
   expansionType,
   getSnubAngle,
   isExpandedFace,
   getResizedVertices,
   getMappedVertices,
+  getMappedPeakVertices,
   antiprismHeight,
 } from './operationUtils';
-import { rotateAround } from 'math/linAlg';
+import { isInverse, rotateAround } from 'math/linAlg';
 import { Operation } from './operationTypes';
 
 interface ContractOptions {
@@ -175,7 +176,47 @@ export const contract: Operation<ContractOptions> = {
   },
 };
 
+function getOppositePeaks(polyhedron) {
+  const peaks = Peak.getAll(polyhedron);
+  // FIXME maybe expensive
+  for (let peak of peaks) {
+    const peak2 = _.find(peaks, peak2 =>
+      isInverse(peak.boundary().normal(), peak2.boundary().normal()),
+    );
+    if (peak2) return [peak, peak2];
+  }
+  return undefined;
+}
+
 export function shorten(polyhedron: Polyhedron) {
+  // FIXME deduplicate this logic
+  const oppositePeaks = getOppositePeaks(polyhedron);
+  if (oppositePeaks) {
+    const boundary = oppositePeaks[0].boundary();
+    const isAntiprism = boundary.edges[0].twin().numSides === 3;
+    const scale = isAntiprism
+      ? antiprismHeight(boundary)
+      : polyhedron.edgeLength();
+    const theta = isAntiprism ? Math.PI / boundary.numSides : 0;
+    const endVertices = getMappedPeakVertices(oppositePeaks, (v, peak) =>
+      rotateAround(
+        v.vec.sub(
+          peak
+            .boundary()
+            .normal()
+            .scale(scale / 2),
+        ),
+        peak.boundary().normalRay(),
+        theta / 2,
+      ),
+    );
+    return {
+      animationData: {
+        start: polyhedron,
+        endVertices,
+      },
+    };
+  }
   const faces = polyhedron.faces.filter(face => {
     return _.uniqBy(face.adjacentFaces(), 'numSides').length === 1;
   });

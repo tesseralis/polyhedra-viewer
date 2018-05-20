@@ -7,7 +7,7 @@ interface TransitionOptions<T> {
   startValue: T;
   endValue: T;
   duration: number;
-  ease: 'easePolyInOut' | 'easePolyOut' | 'easePolyIn';
+  ease?: 'easePolyInOut' | 'easePolyOut' | 'easePolyIn';
   onFinish(): void;
 }
 

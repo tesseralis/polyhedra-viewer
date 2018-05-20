@@ -2,12 +2,13 @@
 import _ from 'lodash';
 import { Polyhedron, Peak } from 'math/polyhedra';
 import { rotateAround, scaleAround } from 'math/linAlg';
-import { flatMap, repeat } from 'util.js';
+import { flatMap, repeat, mod } from 'util.js';
 import {
   getSnubAngle,
   expansionType,
   isExpandedFace,
   getMappedVertices,
+  getMappedPeakVertices,
   getResizedVertices,
 } from './operationUtils';
 
@@ -113,11 +114,14 @@ function duplicateBoundaryVertices(
 ) {
   const newVertexMapping = {};
   _.forEach(boundary.edges, (edge, i) => {
-    _.set(
-      newVertexMapping,
-      [edge.twin().face.index, edge.v1.index],
-      polyhedron.numVertices() + i,
-    );
+    const oppositeFace = edge.twin().face;
+    _.forEach(edge.vertices, (v, j) => {
+      _.set(
+        newVertexMapping,
+        [oppositeFace.index, v.index],
+        polyhedron.numVertices() + mod(i + j, boundary.numSides),
+      );
+    });
   });
 
   return polyhedron.withChanges(solid =>
@@ -209,10 +213,26 @@ export function elongate(polyhedron: Polyhedron) {
   const peaks = Peak.getAll(polyhedron);
   const boundary = peaks[0].boundary();
   const duplicated = duplicateBoundaryVertices(polyhedron, boundary);
-  const base = boundary.edges[0].twin().face.withPolyhedron(duplicated);
-  const endVertices = getMappedVertices([base], (v, f) =>
-    v.vec.add(f.normal().scale(f.sideLength())),
-  );
+
+  const endVertices = (() => {
+    const duplicatedPeaks = Peak.getAll(duplicated);
+    if (duplicatedPeaks.length === 2) {
+      return getMappedPeakVertices(duplicatedPeaks, (v, peak) =>
+        v.vec.add(
+          peak
+            .boundary()
+            .normal()
+            .scale(polyhedron.edgeLength() / 2),
+        ),
+      );
+    } else {
+      const base = boundary.edges[0].twin().face.withPolyhedron(duplicated);
+
+      return getMappedVertices([base], (v, f) =>
+        v.vec.add(f.normal().scale(f.sideLength())),
+      );
+    }
+  })();
   return {
     animationData: {
       start: duplicated,
@@ -226,6 +246,7 @@ function antiprismHeight(s, n) {
   return s * Math.sqrt(1 - sec * sec / 4);
 }
 
+// FIXME dedupe...
 export function gyroelongate(polyhedron: Polyhedron) {
   const peaks = Peak.getAll(polyhedron);
   const boundary = peaks[0].boundary();

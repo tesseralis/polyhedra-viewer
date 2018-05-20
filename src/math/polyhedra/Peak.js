@@ -89,6 +89,10 @@ export default class Peak {
     return this.vertices;
   }
 
+  allVertices() {
+    return _.concat(this.innerVertices(), this.boundary().vertices);
+  }
+
   topPoint() {}
 
   faceConfiguration: () => FaceConfiguration;
@@ -106,7 +110,11 @@ export default class Peak {
       const faceCount = _.countBy(vertex.adjacentFaces(), 'numSides');
       return _.isEqual(faceCount, this.faceConfiguration());
     });
-    return matchFaces && this.boundary().isPlanar();
+    return (
+      matchFaces &&
+      _.every(this.faces(), face => face.isValid()) &&
+      this.boundary().isPlanar()
+    );
   }
 }
 const Pyramid = withMapper('vertices')(
