@@ -25,8 +25,8 @@ import transition from 'transition.js';
 import X3dScene from './X3dScene';
 import X3dPolyhedron from './X3dPolyhedron';
 import { Sidebar } from './sidebar';
+import TwistOptions from './TwistOptions';
 import Title from './Title';
-import Icon from './sidebar/Icon';
 
 const styles = StyleSheet.create({
   viewer: {
@@ -38,6 +38,7 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   scene: {
+    position: 'relative',
     width: '100%',
     height: '100%',
     minHeight: '100%',
@@ -55,21 +56,12 @@ const styles = StyleSheet.create({
     fontFamily: andaleMono,
     textAlign: 'right',
   },
-  twistOptions: {
-    position: 'fixed',
+  overlayContainer: {
+    position: 'absolute',
     right: 0,
-    left: 400, // FIXME awkward...
+    left: 0,
     top: 0,
     bottom: 0,
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    pointerEvents: 'none',
-  },
-  twistOption: {
-    border: 'none',
-    pointerEvents: 'initial',
-    margin: 50,
   },
 });
 
@@ -80,18 +72,6 @@ const operationDescriptions = {
   cumulate: 'Click on a set of faces to cumulate them.',
   contract: 'Click on a set of faces to contract them.',
 };
-
-function TwistOption({ orientation, onClick }) {
-  return (
-    <button
-      onClick={onClick}
-      className={css(styles.twistOption)}
-      style={orientation === 'right' ? { [orientation]: 0 } : {}}
-    >
-      <Icon name={`rotate-${orientation}`} angle={180} size={48} />
-    </button>
-  );
-}
 
 function viewerStateFromSolidName(name) {
   if (!isValidSolid(name)) {
@@ -232,21 +212,11 @@ export default class Viewer extends Component<ViewerProps, ViewerState> {
               {_.get(operationDescriptions, operation)}
             </div>
           )}
-          {/* FIXME this needs a separate component! */}
-          <div className={css(styles.twistOptions)}>
-            {_.includes(['shorten'], operation) && (
-              <TwistOption
-                orientation="left"
-                onClick={() => this.applyTwistOperation('left')}
-              />
-            )}
-            {_.includes(['shorten'], operation) && (
-              <TwistOption
-                orientation="right"
-                onClick={() => this.applyTwistOperation('right')}
-              />
-            )}
-          </div>
+          {_.includes(['shorten'], operation) && (
+            <div className={css(styles.overlayContainer)}>
+              <TwistOptions onClick={this.applyTwistOperation} />
+            </div>
+          )}
         </div>
       </div>
     );
