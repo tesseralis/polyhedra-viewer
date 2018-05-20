@@ -43,10 +43,6 @@ export default class Face extends VEList {
     );
   }
 
-  adjacentFaces() {
-    return _.map(this.edges, edge => edge.twin().face);
-  }
-
   /** Return adjacent faces counted by number of sides */
   adjacentFaceCounts() {
     return _.countBy(this.adjacentFaces(), 'numSides');

@@ -56,3 +56,9 @@ export default class Vertex {
     return _.countBy(this.adjacentFaces(), 'numSides');
   }
 }
+
+export interface VertexList {
+  +vertices: Vertex[];
+  // TODO make this a more generic thing?
+  +polyhedron: Polyhedron;
+}

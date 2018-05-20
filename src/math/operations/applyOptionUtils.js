@@ -5,8 +5,6 @@ import { Peak, Polyhedron } from 'math/polyhedra';
 import { isInverse } from 'math/linAlg';
 
 export function getPeakAlignment(polyhedron: Polyhedron, peak: Peak) {
-  const peakNormal = peak.boundary().normal();
-
   const isRhombicosidodecahedron = peak.type === 'cupola';
   const orthoPeaks = isRhombicosidodecahedron
     ? _.filter(
@@ -22,7 +20,7 @@ export function getPeakAlignment(polyhedron: Polyhedron, peak: Peak) {
           .normal()
       : polyhedron.largestFace().normal();
 
-  return isInverse(peakNormal, otherNormal) ? 'para' : 'meta';
+  return isInverse(peak.normal(), otherNormal) ? 'para' : 'meta';
 }
 
 export function getCupolaGyrate(polyhedron: Polyhedron, peak: Peak) {

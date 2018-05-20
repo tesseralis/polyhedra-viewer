@@ -2,8 +2,9 @@
 import _ from 'lodash';
 import { truncate, rectify } from './truncate';
 import { cumulate } from './cumulate';
-import { expand, snub, dual, elongate, gyroelongate } from './expand';
+import { expand, snub, dual } from './expand';
 import { contract } from './contract';
+import { elongate, gyroelongate } from './elongate';
 import { shorten } from './shorten';
 import { augment } from './augment';
 import { diminish } from './diminish';

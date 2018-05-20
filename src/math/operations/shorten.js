@@ -3,20 +3,14 @@ import _ from 'lodash';
 import { find } from 'util.js';
 import { Polyhedron, Peak } from 'math/polyhedra';
 import { isInverse, rotateAround } from 'math/linAlg';
-import { getMappedVertices, getMappedPeakVertices } from './operationUtils';
+import { antiprismHeight, getMappedVertices } from './operationUtils';
 import { Operation } from './operationTypes';
-
-function antiprismHeight(n) {
-  const sec = 1 / Math.cos(Math.PI / (2 * n));
-  return Math.sqrt(1 - sec * sec / 4);
-}
 
 function getOppositePeaks(polyhedron) {
   const peaks = Peak.getAll(polyhedron);
-  // FIXME maybe expensive?
   for (let peak of peaks) {
     const peak2 = _.find(peaks, peak2 =>
-      isInverse(peak.boundary().normal(), peak2.boundary().normal()),
+      isInverse(peak.normal(), peak2.normal()),
     );
     if (peak2) return [peak, peak2];
   }
@@ -25,44 +19,32 @@ function getOppositePeaks(polyhedron) {
 
 function doShorten(polyhedron: Polyhedron, options) {
   const { twist } = options;
-  // FIXME deduplicate this logic with the non-bi case
-  const oppositePeaks = getOppositePeaks(polyhedron);
-  if (oppositePeaks) {
-    const boundary = oppositePeaks[0].boundary();
-    const isAntiprism = boundary.edges[0].twin().face.numSides === 3;
-    const scale = isAntiprism ? antiprismHeight(boundary.numSides) : 1;
-    const theta = isAntiprism ? Math.PI / boundary.numSides : 0;
-    const endVertices = getMappedPeakVertices(oppositePeaks, (v, peak) =>
-      rotateAround(
-        v.vec.sub(
-          peak
-            .boundary()
-            .normal()
-            .scale(scale / 2 * polyhedron.edgeLength()),
-        ),
-        peak.boundary().normalRay(),
-        (twist === 'left' ? -1 : 1) * theta / 2,
-      ),
-    );
-    return {
-      animationData: {
-        start: polyhedron,
-        endVertices,
-      },
-    };
-  }
-  const faces = polyhedron.faces.filter(face => {
-    return _.uniqBy(face.adjacentFaces(), 'numSides').length === 1;
-  });
-  const face = _.maxBy(faces, 'numSides');
-  const isAntiprism = face.adjacentFaces()[0].numSides === 3;
-  const scale = isAntiprism ? antiprismHeight(face.numSides) : 1;
-  const theta = isAntiprism ? Math.PI / face.numSides : 0;
-  const endVertices = getMappedVertices([face], (v, f) =>
+  const [setToMap, boundary, multiplier] = (() => {
+    const oppositePeaks = getOppositePeaks(polyhedron);
+    if (oppositePeaks) {
+      // This is an elongated bi-peak
+      return [oppositePeaks, oppositePeaks[0].boundary(), 1 / 2];
+    } else {
+      // Otherwise it's an elongated single peak
+      const faces = polyhedron.faces.filter(face => {
+        return _.uniqBy(face.adjacentFaces(), 'numSides').length === 1;
+      });
+      const face = _.maxBy(faces, 'numSides');
+      return [[face], face, 1];
+    }
+  })();
+  // FIXME geez, this is basically just the opposite operation
+  const isAntiprism = boundary.adjacentFaces()[0].numSides === 3;
+  const scale = isAntiprism ? antiprismHeight(boundary.numSides) : 1;
+  const theta = isAntiprism ? Math.PI / boundary.numSides : 0;
+
+  const endVertices = getMappedVertices(setToMap, (v, set) =>
     rotateAround(
-      v.vec.sub(f.normal().scale(scale * polyhedron.edgeLength())),
-      face.normalRay(),
-      theta,
+      v.vec.sub(
+        set.normal().scale(scale * polyhedron.edgeLength() * multiplier),
+      ),
+      set.normalRay(),
+      (twist === 'left' ? -1 : 1) * theta * multiplier,
     ),
   );
   return {
@@ -79,10 +61,11 @@ function isGyroelongatedBiCupola(polyhedron) {
   return (
     peaks.length === 2 &&
     boundary.numSides > 5 &&
-    boundary.edges[0].twin().face.numSides === 3
+    boundary.adjacentFaces()[0].numSides === 3
   );
 }
 
+// FIXME can we deduplicate with the snub cube?
 function getChirality(polyhedron) {
   const [peak1, peak2] = Peak.getAll(polyhedron);
   const boundary = peak1.boundary();
@@ -95,6 +78,7 @@ function getChirality(polyhedron) {
     .twin()
     .next()
     .twin().face;
+  // I'm pretty sure this is the same logic as in augment
   if (isCupolaRotunda) {
     return rightFaceAcross.numSides !== 3 ? 'right' : 'left';
   }

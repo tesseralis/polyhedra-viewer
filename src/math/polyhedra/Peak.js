@@ -6,7 +6,7 @@ import { flatMapUniq } from 'util.js';
 import { Vec3D } from 'math/linAlg';
 import Polyhedron from './Polyhedron';
 import Face from './Face';
-import Vertex from './Vertex';
+import Vertex, { VertexList } from './Vertex';
 import Edge from './Edge';
 import VEList from './VEList';
 
@@ -49,9 +49,9 @@ const withMapper = property => Base =>
     }
   };
 
-export default class Peak {
+export default class Peak implements VertexList {
   polyhedron: Polyhedron;
-  vertices: Vertex[];
+  _innerVertices: Vertex[];
   type: PeakType;
 
   static find(polyhedron: Polyhedron, hitPoint: Vec3D) {
@@ -79,19 +79,23 @@ export default class Peak {
     return [];
   }
 
-  constructor(polyhedron: Polyhedron, vertices: Vertex[], type: PeakType) {
+  constructor(polyhedron: Polyhedron, innerVertices: Vertex[], type: PeakType) {
     this.polyhedron = polyhedron;
-    this.vertices = vertices;
+    this._innerVertices = innerVertices;
     this.type = type;
   }
 
   innerVertices() {
-    return this.vertices;
+    return this._innerVertices;
   }
 
-  allVertices() {
-    return _.concat(this.innerVertices(), this.boundary().vertices);
+  get vertices() {
+    return this.allVertices();
   }
+
+  allVertices = _.once(() => {
+    return _.concat(this.innerVertices(), this.boundary().vertices);
+  });
 
   topPoint(): Vec3D {
     return new Vec3D();
@@ -106,6 +110,15 @@ export default class Peak {
   boundary = _.once(() => {
     return getBoundary(this.faces());
   });
+
+  // TODO can we dedupe or generate these properties automatically?
+  normal() {
+    return this.boundary().normal();
+  }
+
+  normalRay() {
+    return this.boundary().normalRay();
+  }
 
   isValid() {
     const matchFaces = _.every(this.innerVertices(), vertex => {

@@ -5,8 +5,9 @@ import {
   Polyhedron,
   Vertex,
   Face,
-  Peak,
+  Edge,
   normalizeVertex,
+  VertexList,
   type VertexArg,
 } from 'math/polyhedra';
 import {
@@ -25,11 +26,11 @@ export const hasMultiple = (relations: ?(Relation[]), property: string) =>
     .compact()
     .value().length > 1;
 
-export function antiprismHeight(face: Face) {
-  const n = face.numSides;
-  const s = face.sideLength();
+// TODO maybe this goes in a math/geom file?
+// Get antiprism height of a unit antiprism with n sides
+export function antiprismHeight(n: number) {
   const sec = 1 / Math.cos(Math.PI / (2 * n));
-  return s * Math.sqrt(1 - sec * sec / 4);
+  return Math.sqrt(1 - sec * sec / 4);
 }
 
 // Remove vertices (and faces) from the polyhedron when they are all the same
@@ -64,7 +65,6 @@ function deduplicateVertices(polyhedron: Polyhedron) {
     polyhedron.withChanges(s => s.withFaces(newFaces)),
   );
 }
-
 /**
  * Remove vertices in the polyhedron that aren't connected to any faces,
  * and remap the faces to the smaller indices
@@ -99,27 +99,44 @@ export function removeExtraneousVertices(polyhedron: Polyhedron) {
   );
 }
 
-export function getMappedVertices(
-  faces: Face[],
-  iteratee: (v: Vertex, f: Face) => VertexArg,
-) {
-  const result = [...faces[0].polyhedron.vertices];
-  _.forEach(faces, face => {
-    _.forEach(face.vertices, v => {
-      result[v.index] = iteratee(v, face);
-    });
-  });
-  return result;
+export function getTwist(angle: number) {
+  if (angle > 0) {
+    return 'right';
+  } else if (angle < 0) {
+    return 'left';
+  }
 }
 
-export function getMappedPeakVertices(
-  peaks: Peak[],
-  iteratee: (v: Vertex, peak: Peak) => VertexArg,
+// Return the indices required to create faces when duplicating vertices
+// along an edge
+export function getEdgeFacePaths(edge: Edge, twist?: 'left' | 'right') {
+  const [v1, v2] = _.map(edge.vertices, 'index');
+  const [f1, f2] = _.map(edge.adjacentFaces(), 'index');
+  switch (twist) {
+    case 'right':
+      return [
+        [[f1, v1], [f2, v2], [f1, v2]], // face 1
+        [[f1, v1], [f2, v1], [f2, v2]], // face 2
+      ];
+    case 'left':
+      return [
+        [[f1, v2], [f1, v1], [f2, v1]], // face 1
+        [[f2, v1], [f2, v2], [f1, v2]], // face 2
+      ];
+    default:
+      return [[[f1, v2], [f1, v1], [f2, v1], [f2, v2]]];
+  }
+}
+
+// FIXME play with using a transform matrix instead of an iteratee
+export function getMappedVertices<T: VertexList>(
+  vLists: T[],
+  iteratee: (v: Vertex, t: T) => VertexArg,
 ) {
-  const result = [...peaks[0].polyhedron.vertices];
-  _.forEach(peaks, peak => {
-    _.forEach(peak.allVertices(), v => {
-      result[v.index] = iteratee(v, peak);
+  const result = [...vLists[0].polyhedron.vertices];
+  _.forEach(vLists, vList => {
+    _.forEach(vList.vertices, v => {
+      result[v.index] = iteratee(v, vList);
     });
   });
   return result;

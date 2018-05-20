@@ -1,9 +1,9 @@
 // @flow strict
 import { getMidpoint } from 'math/linAlg';
 import Polyhedron from './Polyhedron';
-import Vertex from './Vertex';
+import Vertex, { VertexList } from './Vertex';
 
-export default class Edge {
+export default class Edge implements VertexList {
   polyhedron: Polyhedron;
   v1: Vertex;
   v2: Vertex;

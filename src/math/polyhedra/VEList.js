@@ -13,10 +13,10 @@ import {
 import { find } from 'util.js';
 import Polyhedron from './Polyhedron';
 import Edge from './Edge';
-import Vertex from './Vertex';
+import Vertex, { VertexList } from './Vertex';
 
 // A list of vertices connected by edges
-export default class VEList {
+export default class VEList implements VertexList {
   polyhedron: Polyhedron;
   vertices: Vertex[];
   edges: Edge[];
@@ -39,6 +39,10 @@ export default class VEList {
 
   prevEdge(e: Edge) {
     return find(this.edges, e2 => e2.v2.equals(e.v1));
+  }
+
+  adjacentFaces() {
+    return _.map(this.edges, edge => edge.twin().face);
   }
 
   numUniqueSides() {

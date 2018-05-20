@@ -1,14 +1,15 @@
 // @flow strict
 import _ from 'lodash';
-import { Polyhedron, Peak } from 'math/polyhedra';
-import { rotateAround, scaleAround } from 'math/linAlg';
-import { flatMap, repeat, mod } from 'util.js';
+import { Polyhedron } from 'math/polyhedra';
+import { scaleAround } from 'math/linAlg';
+import { flatMap, repeat } from 'util.js';
 import {
+  getTwist,
   getSnubAngle,
+  getEdgeFacePaths,
   expansionType,
   isExpandedFace,
   getMappedVertices,
-  getMappedPeakVertices,
   getResizedVertices,
 } from './operationUtils';
 
@@ -46,25 +47,6 @@ function getSnubResult(polyhedron) {
       return 'snub dodecahedron';
     default:
       throw new Error('Did you try to snub a non-regular solid?');
-  }
-}
-
-function getEdgeFacePaths(edge, twist) {
-  const [v1, v2] = _.map(edge.vertices, 'index');
-  const [f1, f2] = _.map(edge.adjacentFaces(), 'index');
-  switch (twist) {
-    case 'right':
-      return [
-        [[f1, v1], [f2, v2], [f1, v2]], // face 1
-        [[f1, v1], [f2, v1], [f2, v2]], // face 2
-      ];
-    case 'left':
-      return [
-        [[f1, v2], [f1, v1], [f2, v1]], // face 1
-        [[f2, v1], [f2, v2], [f1, v2]], // face 2
-      ];
-    default:
-      return [[[f1, v2], [f1, v1], [f2, v1], [f2, v2]]];
   }
 }
 
@@ -107,54 +89,12 @@ function duplicateVertices(polyhedron: Polyhedron, twist?: 'left' | 'right') {
   );
 }
 
-function duplicateBoundaryVertices(
-  polyhedron: Polyhedron,
-  boundary,
-  twist?: 'left' | 'right',
-) {
-  const newVertexMapping = {};
-  _.forEach(boundary.edges, (edge, i) => {
-    const oppositeFace = edge.twin().face;
-    _.forEach(edge.vertices, (v, j) => {
-      _.set(
-        newVertexMapping,
-        [oppositeFace.index, v.index],
-        polyhedron.numVertices() + mod(i + j, boundary.numSides),
-      );
-    });
-  });
-
-  return polyhedron.withChanges(solid =>
-    solid
-      .addVertices(boundary.vertices)
-      .mapFaces(face =>
-        face.vertices.map(v =>
-          _.get(newVertexMapping, [face.index, v.index], v.index),
-        ),
-      )
-      .addFaces(
-        _.flatMap(boundary.edges, edge =>
-          _.map(getEdgeFacePaths(edge, twist), face =>
-            _.map(face, path => _.get(newVertexMapping, path, path[1])),
-          ),
-        ),
-      ),
-  );
-}
-
-function getTwist(angle) {
-  if (angle > 0) {
-    return 'right';
-  } else if (angle < 0) {
-    return 'left';
-  }
-}
-
 function doExpansion(polyhedron: Polyhedron, referenceName) {
   const reference = Polyhedron.get(referenceName);
   const type = expansionType(reference);
   const n = polyhedron.getFace().numSides;
   const angle = type === 'snub' ? getSnubAngle(reference, n) : 0;
+  // FIXME reverse this; get the twist from the property
   const duplicated = duplicateVertices(polyhedron, getTwist(angle));
 
   const referenceFace =
@@ -207,64 +147,5 @@ export function expand(polyhedron: Polyhedron) {
 export function snub(polyhedron: Polyhedron) {
   //  TODO figure out how to calculate this without relying on a reference
   return doExpansion(polyhedron, getSnubResult(polyhedron));
-}
-
-function doElongate(polyhedron, height = 1, angle = 0) {
-  const peaks = Peak.getAll(polyhedron);
-  const boundary = peaks[0].boundary();
-  const twist = getTwist(angle);
-  const duplicated = duplicateBoundaryVertices(polyhedron, boundary, twist);
-
-  const endVertices = (() => {
-    const duplicatedPeaks = Peak.getAll(duplicated);
-    if (duplicatedPeaks.length === 2) {
-      return getMappedPeakVertices(duplicatedPeaks, (v, peak) =>
-        rotateAround(
-          v.vec.add(
-            peak
-              .boundary()
-              .normal()
-              .scale(height * polyhedron.edgeLength() / 2),
-          ),
-          peak.boundary().normalRay(),
-          angle / 2,
-        ),
-      );
-    } else {
-      const base = boundary.edges[0].twin().face.withPolyhedron(duplicated);
-
-      return getMappedVertices([base], (v, f) =>
-        rotateAround(
-          v.vec.add(f.normal().scale(height * polyhedron.edgeLength())),
-          f.normalRay(),
-          angle,
-        ),
-      );
-    }
-  })();
-  return {
-    animationData: {
-      start: duplicated,
-      endVertices,
-    },
-  };
-}
-
-export function elongate(polyhedron: Polyhedron) {
-  return doElongate(polyhedron);
-}
-
-function antiprismHeight(n) {
-  const sec = 1 / Math.cos(Math.PI / (2 * n));
-  return Math.sqrt(1 - sec * sec / 4);
-}
-
-export function gyroelongate(polyhedron: Polyhedron) {
-  // FIXME can we not do this?
-  const peaks = Peak.getAll(polyhedron);
-  const boundary = peaks[0].boundary();
-  const n = boundary.numSides;
-  const theta = Math.PI / n;
-  return doElongate(polyhedron, antiprismHeight(n), theta);
 }
 
