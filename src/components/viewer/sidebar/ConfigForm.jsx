@@ -109,7 +109,7 @@ export default ({ width, inputValues, setInputValue }: ConfigFormProps) => {
         <LabelledInput
           key={key}
           input={input}
-          value={inputValues[key]}
+          value={_.get(inputValues, key)}
           setValue={value => setInputValue(key, value)}
         />
       ))}

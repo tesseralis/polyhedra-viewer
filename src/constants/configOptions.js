@@ -2,7 +2,6 @@ import _ from 'lodash';
 import { schemeSet1 } from 'd3-scale-chromatic';
 
 import polygons, { polygonNames } from './polygons';
-import { mapObject } from '../util';
 
 const polygonSchemeIdx = { 3: 4, 4: 0, 5: 1, 6: 2, 8: 6, 10: 3 };
 
@@ -10,7 +9,9 @@ export const getColorInputKey = n => `${polygonNames[n]}Color`;
 
 const colorOptionsList = polygons.map(n => {
   return {
-    key: getColorInputKey(n),
+    key: `colors[${n}]`,
+    display: `${_.startCase(polygonNames[n])} Color`,
+    // key: getColorInputKey(n),
     type: 'color',
     default: schemeSet1[polygonSchemeIdx[n]],
   };
@@ -57,14 +58,11 @@ export const configInputs = [
   display: input.display || _.startCase(input.key),
 }));
 
-const configOptions = mapObject(configInputs, value => [value.key, value]);
-
-export const defaultConfig = _.mapValues(configOptions, 'default');
-
-const getColors = config =>
-  mapObject(polygons, n => [n, config[getColorInputKey(n)]]);
-
-export const getPolyhedronConfig = config => ({
-  ...config,
-  colors: getColors(config),
-});
+export const defaultConfig = _.reduce(
+  configInputs,
+  (obj, option) => {
+    _.set(obj, option.key, option.default);
+    return obj;
+  },
+  {},
+);

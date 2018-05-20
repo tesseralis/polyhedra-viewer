@@ -19,7 +19,7 @@ import {
   getRelations,
   applyOptionsFor,
 } from 'polyhedra/operations';
-import { defaultConfig, getPolyhedronConfig } from 'constants/configOptions';
+import { defaultConfig } from 'constants/configOptions';
 import transition from 'transition.js';
 
 import X3dScene from './X3dScene';
@@ -260,7 +260,7 @@ export default class Viewer extends Component<ViewerProps, ViewerState> {
   // TODO probably move this and the color utility functions to their own file
   getColorForFace = (face: *) => {
     const { applyArgs, polyhedron, operation, config, faceColors } = this.state;
-    const { colors } = getPolyhedronConfig(config);
+    const { colors } = config;
     const defaultColors = polygonColors(colors);
 
     // While doing animation, if we specify that this face has a color, use it
@@ -281,7 +281,9 @@ export default class Viewer extends Component<ViewerProps, ViewerState> {
     if (key === null) {
       this.setState({ config: defaultConfig });
     }
-    this.setState(({ config }) => ({ config: { ...config, [key]: value } }));
+    this.setState(({ config }) => ({
+      config: _.set({ ...config }, key, value),
+    }));
   };
 
   setOperation = (operation: OpName) => {
@@ -332,7 +334,7 @@ export default class Viewer extends Component<ViewerProps, ViewerState> {
           }
         })();
         // TODO figure out how to deduplicate all this logic
-        const { colors, enableAnimation } = getPolyhedronConfig(config);
+        const { colors, enableAnimation } = config;
         const colorStart =
           animationData && getFaceColors(animationData.start, colors);
         return {
@@ -355,7 +357,7 @@ export default class Viewer extends Component<ViewerProps, ViewerState> {
     const { animationData, interpolated, config } = this.state;
     if (!animationData || !interpolated) return;
 
-    const { colors, transitionDuration } = getPolyhedronConfig(config);
+    const { colors, transitionDuration } = config;
     const colorStart = getFaceColors(interpolated, colors);
     const colorEnd = getFaceColors(
       interpolated.withVertices(animationData.endVertices),
