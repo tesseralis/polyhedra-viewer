@@ -14,43 +14,6 @@ import {
 } from './operationUtils';
 import { Operation } from './operationTypes';
 
-// Result functions
-// ================
-// Since there are only a handful of possibilities for these oprations, it's okay to use shortcuts
-// like switching on number of faces, to determine properties.
-
-function getExpansionResult(polyhedron) {
-  // Only the platonic solids can be expanded, so it suffices to just iterate over them
-  switch (polyhedron.numFaces()) {
-    case 4:
-      return 'cuboctahedron';
-    case 6:
-    case 8:
-      return 'rhombicuboctahedron';
-    case 12:
-    case 20:
-      return 'rhombicosidodecahedron';
-    default:
-      throw new Error('Did you try to expand a non-regular solid?');
-  }
-}
-
-function getSnubResult(polyhedron) {
-  // Only the platonic solids can be expanded, so it suffices to just iterate over them
-  switch (polyhedron.numFaces()) {
-    case 4:
-      return 'icosahedron';
-    case 6:
-    case 8:
-      return 'snub cube';
-    case 12:
-    case 20:
-      return 'snub dodecahedron';
-    default:
-      throw new Error('Did you try to snub a non-regular solid?');
-  }
-}
-
 /**
  * Duplicate the vertices, so that each face has its own unique set of vertices,
  * and create a new face for each edge and new vertex set.
@@ -122,14 +85,26 @@ function doExpansion(polyhedron, referenceName, twist) {
   };
 }
 
+const expansionResults = {
+  T: 'cuboctahedron',
+  O: 'rhombicuboctahedron',
+  I: 'rhombicosidodecahedron',
+};
+
 export function expand(polyhedron: Polyhedron) {
-  return doExpansion(polyhedron, getExpansionResult(polyhedron));
+  return doExpansion(polyhedron, expansionResults[polyhedron.symmetry()]);
 }
+
+const snubResults = {
+  T: 'icosahedron',
+  O: 'snub cube',
+  I: 'snub dodecahedron',
+};
 
 // TODO test chirality
 export const snub: Operation<{ twist: Twist }> = {
   apply(polyhedron, { twist }) {
-    return doExpansion(polyhedron, getSnubResult(polyhedron), twist);
+    return doExpansion(polyhedron, snubResults[polyhedron.symmetry()], twist);
   },
   getAllApplyArgs(polyhedron) {
     return [{ twist: 'left' }, { twist: 'right' }];

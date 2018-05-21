@@ -88,6 +88,10 @@ export default class Polyhedron {
     return this.edges.length;
   }
 
+  numFacesBySides() {
+    return _.countBy(this.faces, 'numSides');
+  }
+
   // Search functions
   // ================
 
@@ -224,4 +228,43 @@ export default class Polyhedron {
   isSame(other: Polyhedron) {
     return _.isEqual(this.faceAdjacencyList(), other.faceAdjacencyList());
   }
+
+  // Symmetry
+  // ========
+
+  // TODO Handle chirality
+  symmetry = _.once(() => {
+    if (!this.isSemiRegular()) {
+      throw new Error('Only uniform solids are supported right now');
+    }
+
+    const tCounts = { '3': 4, '6': 4 };
+    const oCounts = { '3': 8, '4': 6, '6': 8, '8': 6 };
+    const iCounts = { '3': 20, '5': 12, '6': 20, '10': 12 };
+
+    const faceCounts = this.numFacesBySides();
+
+    if (
+      _.some(faceCounts, (numSides, face: number) => numSides === tCounts[face])
+    ) {
+      return 'T';
+    }
+
+    if (
+      _.some(faceCounts, (numSides, face: number) => numSides === oCounts[face])
+    ) {
+      return 'O';
+    }
+    if (
+      _.some(faceCounts, (numSides, face: number) => numSides === iCounts[face])
+    ) {
+      return 'I';
+    }
+    if (faceCounts[4] > 3) {
+      return `P${faceCounts[4]}`;
+    }
+    if (faceCounts[3] > 6) {
+      return `A${faceCounts[3] / 2}`;
+    }
+  });
 }
