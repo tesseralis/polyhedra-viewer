@@ -8,7 +8,7 @@ import polyhedraGraph from './relationsGraph';
 import { operations as mathOps } from 'math/operations';
 import type { OpName, OperationResult } from 'math/operations';
 
-type OpNamePlus = OpName | 'twist';
+type OpNamePlus = OpName | 'twist' | 'turn';
 
 interface Operation {
   name: OpNamePlus;
@@ -53,6 +53,12 @@ export const operations: Operation[] = [
     description: 'Opposite of expand/snub. Shrink faces in, removing faces.',
   },
   {
+    name: 'twist',
+    symbol: 'p',
+    description:
+      'Replace each square face with two triangular faces, or vice versa.',
+  },
+  {
     name: 'elongate',
     symbol: 'P',
     description: 'Extend with a prism.',
@@ -68,10 +74,9 @@ export const operations: Operation[] = [
     description: 'Remove a prism or antiprism',
   },
   {
-    name: 'twist',
-    symbol: 'p',
-    description:
-      'Replace each square face with two triangular faces, or vice versa.',
+    name: 'turn',
+    symbol: 'u',
+    description: 'Rotate a prism to an antiprism or vice versa',
   },
   {
     name: 'augment',
