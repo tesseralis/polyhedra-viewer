@@ -238,28 +238,20 @@ export default class Polyhedron {
       throw new Error('Only uniform solids are supported right now');
     }
 
-    const tCounts = { '3': 4, '6': 4 };
-    const oCounts = { '3': 8, '4': 6, '6': 8, '8': 6 };
-    const iCounts = { '3': 20, '5': 12, '6': 20, '10': 12 };
+    const symmetryCounts = {
+      T: { '3': 4, '6': 4 },
+      O: { '3': 8, '4': 6, '6': 8, '8': 6 },
+      I: { '3': 20, '5': 12, '6': 20, '10': 12 },
+    };
 
     const faceCounts = this.numFacesBySides();
 
-    if (
-      _.some(faceCounts, (numSides, face: number) => numSides === tCounts[face])
-    ) {
-      return 'T';
+    for (let [symmetry, counts] of _.entries(symmetryCounts)) {
+      if (_.some(faceCounts, (n, face: number) => n === counts[face])) {
+        return symmetry;
+      }
     }
 
-    if (
-      _.some(faceCounts, (numSides, face: number) => numSides === oCounts[face])
-    ) {
-      return 'O';
-    }
-    if (
-      _.some(faceCounts, (numSides, face: number) => numSides === iCounts[face])
-    ) {
-      return 'I';
-    }
     if (faceCounts[4] > 3) {
       return `P${faceCounts[4]}`;
     }
