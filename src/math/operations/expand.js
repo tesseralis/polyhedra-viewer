@@ -94,7 +94,6 @@ function doExpansion(polyhedron: Polyhedron, referenceName) {
   const type = expansionType(reference);
   const n = polyhedron.getFace().numSides;
   const angle = type === 'snub' ? getSnubAngle(reference, n) : 0;
-  // FIXME reverse this; get the twist from the property
   const duplicated = duplicateVertices(polyhedron, getTwist(angle));
 
   const referenceFace =

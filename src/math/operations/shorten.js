@@ -46,11 +46,11 @@ function doShorten(polyhedron: Polyhedron, options) {
   })();
   const isAntiprism = boundary.adjacentFaces()[0].numSides === 3;
   const { twist = isAntiprism && 'left' } = options;
-  // FIXME geez, this is basically just the opposite operation
-  const scale =
-    polyhedron.edgeLength() *
-    (isAntiprism ? antiprismHeight(boundary.numSides) : 1);
-  const theta = getSign(twist) * Math.PI / boundary.numSides;
+
+  // TODO there is logic here that's duplicated in elongate. Maybe consider combining?
+  const n = boundary.numSides;
+  const scale = polyhedron.edgeLength() * (twist ? antiprismHeight(n) : 1);
+  const theta = getSign(twist) * Math.PI / n;
 
   const endVertices = getTransformedVertices(setToMap, set =>
     withOrigin(set.normalRay(), v =>
@@ -77,7 +77,7 @@ function isGyroelongatedBiCupola(polyhedron) {
   );
 }
 
-// FIXME can we deduplicate with the snub cube?
+// TODO deduplicate with snub polyhedra if possible
 function getChirality(polyhedron) {
   const [peak1, peak2] = Peak.getAll(polyhedron);
   const boundary = peak1.boundary();
