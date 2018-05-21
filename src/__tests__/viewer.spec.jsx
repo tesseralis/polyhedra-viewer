@@ -19,6 +19,14 @@ describe('viewer', () => {
     setup();
   });
 
+  it('resets the operation when unset', () => {
+    setup('/triangular-cupola/related');
+    appPage
+      .clickButtonWithText('augment')
+      .clickButtonWithText('augment')
+      .expectNoButtonWithText('ortho');
+  });
+
   it('does not applyOperation on invalid apply args', () => {
     setup('/augmented-truncated-tetrahedron/related');
     appPage.clickButtonWithText('diminish').clickFaceWithNumSides(6);
