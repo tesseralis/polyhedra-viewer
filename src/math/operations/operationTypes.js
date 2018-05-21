@@ -11,6 +11,7 @@ export type OpName =
   | 'dual'
   | 'expand'
   | 'snub'
+  // | 'turn'
   | 'contract'
   | 'elongate'
   | 'gyroelongate'

@@ -160,7 +160,7 @@ function hasOptions(operation, relations) {
 }
 
 // TODO this could probably use a test to make sure all the buttons are in the right places
-export default function RelatedPolyhedra({
+export default function OperationsPanel({
   disabled,
   solid,
   operation,
@@ -190,7 +190,7 @@ export default function RelatedPolyhedra({
                   disabled={!relations || disabled}
                   onClick={() => {
                     if (hasOptions(name, relations)) {
-                      setOperation(name !== operation ? name : null);
+                      setOperation(name);
                     } else {
                       applyOperation(name);
                     }

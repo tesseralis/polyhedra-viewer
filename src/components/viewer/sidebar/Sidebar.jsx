@@ -4,7 +4,7 @@ import { css, StyleSheet } from 'aphrodite/no-important';
 
 import IconLink from './IconLink';
 import ConfigForm from './ConfigForm';
-import RelatedPolyhedra from './RelatedPolyhedra';
+import OperationsPanel from './OperationsPanel';
 import PolyhedronList from './PolyhedronList';
 
 const styles = StyleSheet.create({
@@ -55,7 +55,7 @@ export default function Sidebar({ match, configProps, relatedPolyhedraProps }) {
           />
           <Route
             path={`${match.url}/related`}
-            render={() => <RelatedPolyhedra {...relatedPolyhedraProps} />}
+            render={() => <OperationsPanel {...relatedPolyhedraProps} />}
           />
           <Route
             path={`${match.url}/config`}

@@ -258,10 +258,15 @@ export default class Viewer extends Component<ViewerProps, ViewerState> {
   };
 
   setOperation = (operation: OpName) => {
-    this.setState(({ polyhedron, solidName }) => ({
-      operation,
-      applyOptions: applyOptionsFor(solidName, operation),
-    }));
+    this.setState(({ polyhedron, solidName, operation: currentOp }) => {
+      if (operation === currentOp) {
+        return { operation: undefined, applyOptions: {} };
+      }
+      return {
+        operation,
+        applyOptions: applyOptionsFor(solidName, operation),
+      };
+    });
   };
 
   applyCurrentOperation = () => {
