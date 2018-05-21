@@ -18,7 +18,6 @@ const styles = StyleSheet.create({
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    pointerEvents: 'none',
   },
 });
 

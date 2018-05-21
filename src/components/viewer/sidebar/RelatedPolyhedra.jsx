@@ -135,6 +135,7 @@ function AugmentOptions({ options, solid, onClickOption, disabled }) {
 }
 
 const hasMode = [
+  'snub',
   'contract',
   'shorten',
   'cumulate',

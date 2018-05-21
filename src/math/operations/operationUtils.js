@@ -11,6 +11,7 @@ import {
 } from 'math/polyhedra';
 import {
   vec,
+  Vec3D,
   PRECISION,
   getPlane,
   withOrigin,
@@ -98,11 +99,14 @@ export function removeExtraneousVertices(polyhedron: Polyhedron) {
   );
 }
 
-export function getTwist(angle: number) {
-  if (angle > 0) {
-    return 'right';
-  } else if (angle < 0) {
-    return 'left';
+export function getTwistSign(twist: ?Twist) {
+  switch (twist) {
+    case 'left':
+      return 1;
+    case 'right':
+      return -1;
+    default:
+      return 0;
   }
 }
 
@@ -112,12 +116,12 @@ export function getEdgeFacePaths(edge: Edge, twist?: Twist) {
   const [v1, v2] = _.map(edge.vertices, 'index');
   const [f1, f2] = _.map(edge.adjacentFaces(), 'index');
   switch (twist) {
-    case 'right':
+    case 'left':
       return [
         [[f1, v1], [f2, v2], [f1, v2]], // face 1
         [[f1, v1], [f2, v1], [f2, v2]], // face 2
       ];
-    case 'left':
+    case 'right':
       return [
         [[f1, v2], [f1, v1], [f2, v1]], // face 1
         [[f2, v1], [f2, v2], [f1, v2]], // face 2
@@ -129,12 +133,13 @@ export function getEdgeFacePaths(edge: Edge, twist?: Twist) {
 
 export function getTransformedVertices<T: VertexList>(
   vLists: T[],
-  iteratee: T => Transform,
+  iteratee: T => Transform | Vec3D,
 ) {
   const result = [...vLists[0].polyhedron.vertices];
   _.forEach(vLists, vList => {
     _.forEach(vList.vertices, v => {
-      result[v.index] = iteratee(vList)(v.vec);
+      const t = iteratee(vList);
+      result[v.index] = typeof t === 'function' ? t(v.vec) : t;
     });
   });
   return result;

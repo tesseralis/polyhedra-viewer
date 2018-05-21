@@ -3,15 +3,16 @@ import _ from 'lodash';
 import { Polyhedron } from 'math/polyhedra';
 import { withOrigin } from 'math/linAlg';
 import { flatMap, repeat } from 'util.js';
+import type { Twist } from 'types';
 import {
-  getTwist,
+  getTwistSign,
   getSnubAngle,
   getEdgeFacePaths,
-  expansionType,
   isExpandedFace,
   getTransformedVertices,
   getResizedVertices,
 } from './operationUtils';
+import { Operation } from './operationTypes';
 
 // Result functions
 // ================
@@ -89,12 +90,14 @@ function duplicateVertices(polyhedron, twist) {
   );
 }
 
-function doExpansion(polyhedron: Polyhedron, referenceName) {
+function doExpansion(polyhedron, referenceName, twist) {
   const reference = Polyhedron.get(referenceName);
-  const type = expansionType(reference);
   const n = polyhedron.getFace().numSides;
-  const angle = type === 'snub' ? getSnubAngle(reference, n) : 0;
-  const duplicated = duplicateVertices(polyhedron, getTwist(angle));
+  // TODO precalculate this
+  const angle = twist
+    ? getTwistSign(twist) * Math.abs(getSnubAngle(reference, n))
+    : 0;
+  const duplicated = duplicateVertices(polyhedron, twist);
 
   const referenceFace =
     _.find(reference.faces, face => isExpandedFace(reference, face, n)) ||
@@ -119,7 +122,22 @@ function doExpansion(polyhedron: Polyhedron, referenceName) {
   };
 }
 
+export function expand(polyhedron: Polyhedron) {
+  return doExpansion(polyhedron, getExpansionResult(polyhedron));
+}
+
+// TODO test chirality
+export const snub: Operation<{ twist: Twist }> = {
+  apply(polyhedron, { twist }) {
+    return doExpansion(polyhedron, getSnubResult(polyhedron), twist);
+  },
+  getAllApplyArgs(polyhedron) {
+    return [{ twist: 'left' }, { twist: 'right' }];
+  },
+};
+
 export function dual(polyhedron: Polyhedron) {
+  // Scale to create a dual polyhedron with the same midradius
   const scale = (() => {
     const f = polyhedron.getFace().distanceToCenter();
     const e = polyhedron.getEdge().distanceToCenter();
@@ -127,7 +145,7 @@ export function dual(polyhedron: Polyhedron) {
   })();
   const duplicated = duplicateVertices(polyhedron);
   const faces = polyhedron.faces.map(face => face.withPolyhedron(duplicated));
-  const endVertices = getTransformedVertices(faces, f => () =>
+  const endVertices = getTransformedVertices(faces, f =>
     withOrigin(polyhedron.centroid(), v => v.scale(scale))(f.centroid()),
   );
 
@@ -137,13 +155,4 @@ export function dual(polyhedron: Polyhedron) {
       endVertices,
     },
   };
-}
-
-export function expand(polyhedron: Polyhedron) {
-  return doExpansion(polyhedron, getExpansionResult(polyhedron));
-}
-
-export function snub(polyhedron: Polyhedron) {
-  //  TODO figure out how to calculate this without relying on a reference
-  return doExpansion(polyhedron, getSnubResult(polyhedron));
 }

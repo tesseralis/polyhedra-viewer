@@ -62,6 +62,7 @@ const styles = StyleSheet.create({
     left: 0,
     top: 0,
     bottom: 0,
+    pointerEvents: 'none',
   },
 });
 
@@ -212,7 +213,7 @@ export default class Viewer extends Component<ViewerProps, ViewerState> {
               {_.get(operationDescriptions, operation)}
             </div>
           )}
-          {_.includes(['shorten'], operation) && (
+          {_.includes(['shorten', 'snub'], operation) && (
             <div className={css(styles.overlayContainer)}>
               <TwistOptions onClick={this.applyTwistOperation} />
             </div>

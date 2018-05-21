@@ -4,7 +4,11 @@ import { find } from 'util.js';
 import type { Twist } from 'types';
 import { Polyhedron, Peak } from 'math/polyhedra';
 import { isInverse, withOrigin } from 'math/linAlg';
-import { antiprismHeight, getTransformedVertices } from './operationUtils';
+import {
+  getTwistSign,
+  antiprismHeight,
+  getTransformedVertices,
+} from './operationUtils';
 import { Operation } from './operationTypes';
 
 function getOppositePeaks(polyhedron) {
@@ -16,17 +20,6 @@ function getOppositePeaks(polyhedron) {
     if (peak2) return [peak, peak2];
   }
   return undefined;
-}
-
-function getSign(twist) {
-  switch (twist) {
-    case 'left':
-      return -1;
-    case 'right':
-      return 1;
-    default:
-      return 0;
-  }
 }
 
 function doShorten(polyhedron: Polyhedron, options) {
@@ -45,12 +38,12 @@ function doShorten(polyhedron: Polyhedron, options) {
     }
   })();
   const isAntiprism = boundary.adjacentFaces()[0].numSides === 3;
-  const { twist = isAntiprism && 'left' } = options;
+  const { twist = isAntiprism ? 'left' : undefined } = options;
 
   // TODO there is logic here that's duplicated in elongate. Maybe consider combining?
   const n = boundary.numSides;
   const scale = polyhedron.edgeLength() * (twist ? antiprismHeight(n) : 1);
-  const theta = getSign(twist) * Math.PI / n;
+  const theta = -getTwistSign(twist) * Math.PI / n;
 
   const endVertices = getTransformedVertices(setToMap, set =>
     withOrigin(set.normalRay(), v =>

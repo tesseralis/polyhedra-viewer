@@ -5,6 +5,7 @@ import { Polyhedron, Peak } from 'math/polyhedra';
 import { withOrigin } from 'math/linAlg';
 import { mod } from 'util.js';
 import {
+  getTwistSign,
   antiprismHeight,
   getTransformedVertices,
   getEdgeFacePaths,
@@ -41,17 +42,6 @@ function duplicateVertices(polyhedron: Polyhedron, boundary, twist?: Twist) {
   );
 }
 
-function getSign(twist) {
-  switch (twist) {
-    case 'left':
-      return -1;
-    case 'right':
-      return 1;
-    default:
-      return 0;
-  }
-}
-
 // TODO add twist option to elongate
 function doElongate(polyhedron, twist) {
   const peaks = Peak.getAll(polyhedron);
@@ -70,7 +60,7 @@ function doElongate(polyhedron, twist) {
   })();
 
   const height = polyhedron.edgeLength() * (twist ? antiprismHeight(n) : 1);
-  const angle = getSign(twist) * Math.PI / n;
+  const angle = getTwistSign(twist) * Math.PI / n;
 
   const endVertices = getTransformedVertices(transformVertices, set =>
     withOrigin(set.normalRay(), v =>
@@ -92,5 +82,5 @@ export function elongate(polyhedron: Polyhedron) {
 }
 
 export function gyroelongate(polyhedron: Polyhedron) {
-  return doElongate(polyhedron, 'right');
+  return doElongate(polyhedron, 'left');
 }
