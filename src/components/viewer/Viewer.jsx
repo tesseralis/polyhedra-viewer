@@ -171,7 +171,6 @@ export default class Viewer extends Component<ViewerProps, ViewerState> {
       config,
       applyOptions,
     } = this.state;
-    // TODO resizing (decreasing height) for the x3d scene doesn't work well
     return (
       <div className={css(styles.viewer)}>
         <div className={css(styles.sidebar)}>

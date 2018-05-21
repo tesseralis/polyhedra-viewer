@@ -23,8 +23,6 @@ export type OpName =
 
 export interface OperationResult {
   result: Polyhedron;
-  // TODO This is optional because we "fill in" an option result with defaults
-  // but then we have to check for something we're sure to have...
   name: string;
   animationData: ?{
     start: Polyhedron,

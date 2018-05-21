@@ -147,7 +147,6 @@ export default class X3dPolyhedron extends Component<
   };
 
   handleMouseMove = (event: SyntheticX3DMouseEvent) => {
-    // TODO replace this with logs
     this.drag = true;
     const { setApplyArgs } = this.props;
     setApplyArgs(event.hitPnt);

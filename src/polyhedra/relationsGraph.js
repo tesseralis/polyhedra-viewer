@@ -299,7 +299,6 @@ const basePyramidsCupolae = (() => {
       },
     });
 
-    // TODO Populate elongations of bipyramids (which we may not even do?)
     if (!_.isArray(bi)) {
       graph = graphMerge(graph, {
         [bi]: elongations(elongatedBi, gyroelongatedBi),

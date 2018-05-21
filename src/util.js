@@ -65,7 +65,7 @@ export function find<T>(array: T[], predicate: Predicate<T>): T {
   return result;
 }
 
-// Wrap the lodash flatMap with better typign
+// Wrap the lodash flatMap with better typing
 type FlatMap<T, U> = (
   array: T[],
   iteratee: (item: T, index: number) => U[],
