@@ -1,10 +1,10 @@
-// @flow
+// @flow strict
 import React, { Component } from 'react';
 import _ from 'lodash';
 import EventListener from 'react-event-listener';
 
 import { type Point } from 'types';
-import { Polyhedron } from 'math/polyhedra';
+import { SolidData } from 'math/polyhedra';
 
 type SyntheticEventHandler = (e: $Subtype<SyntheticEvent<*>>) => void;
 
@@ -13,12 +13,8 @@ interface SyntheticX3DMouseEvent extends SyntheticEvent<> {
 }
 
 // Join a list of lists with an inner and outer separator.
-export const joinListOfLists = (
-  list: mixed[][],
-  outerSep: string,
-  innerSep: string,
-) => {
-  return list.map(elem => elem.join(innerSep)).join(outerSep);
+const joinListOfLists = (list: *, outerSep: string, innerSep: string) => {
+  return _.map(list, elem => elem.join(innerSep)).join(outerSep);
 };
 
 const Coordinates = ({ points }) => {
@@ -45,7 +41,7 @@ const Edges = ({ edges, vertices }) => {
 interface PolyhedronProps {
   // TODO Use the raw solid data (or vertices) instead
   // (can't do right now because the Page object relies on it)
-  polyhedron: Polyhedron;
+  solidData: SolidData;
   config: *;
   faceColors: *;
   applyOperation(): void;
@@ -70,9 +66,9 @@ export default class X3dPolyhedron extends Component<
   }
 
   render() {
-    const { polyhedron, config } = this.props;
+    const { solidData, config } = this.props;
     const { error } = this.state;
-    const { vertices, faces, edges } = polyhedron.solidData;
+    const { vertices, faces, edges } = solidData;
     const { showFaces, showEdges, showInnerFaces, opacity } = config;
 
     if (error) {

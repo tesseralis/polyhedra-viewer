@@ -7,13 +7,7 @@ import { operations, canAugment } from 'math/operations';
 const debug = require('debug')('applyOperation.test');
 
 // map from polyhedron to excluded operations
-const excludedOperations = {
-  // 'gyroelongated triangular bicupola': ['shorten'],
-  // 'gyroelongated square bicupola': ['shorten'],
-  // 'gyroelongated pentagonal bicupola': ['shorten'],
-  // 'gyroelongated pentagonal cupolarotunda': ['shorten'],
-  // 'gyroelongated pentagonal birotunda': ['shorten'],
-};
+const excludedOperations = {};
 
 function isProperPolyhedron(polyhedron) {
   let prevSideLength: ?number;

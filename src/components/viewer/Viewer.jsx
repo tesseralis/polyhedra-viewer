@@ -162,6 +162,12 @@ export default class Viewer extends Component<ViewerProps, ViewerState> {
     }
   }
 
+  componentWillUnmount() {
+    if (this.transitionId) {
+      cancelAnimationFrame(this.transitionId.current);
+    }
+  }
+
   render() {
     const { solid } = this.props;
     const {
@@ -197,7 +203,7 @@ export default class Viewer extends Component<ViewerProps, ViewerState> {
         <div className={css(styles.scene)}>
           <X3dScene>
             <X3dPolyhedron
-              polyhedron={interpolated || polyhedron}
+              solidData={(interpolated || polyhedron).solidData}
               faceColors={this.getColors()}
               config={config}
               setApplyArgs={this.setApplyArgs}
@@ -402,9 +408,8 @@ export default class Viewer extends Component<ViewerProps, ViewerState> {
     });
   };
 
-  componentWillUnmount() {
-    if (this.transitionId) {
-      cancelAnimationFrame(this.transitionId.current);
-    }
-  }
+  // Testing hack since we can't access the state from integration tests
+  getPolyhedron = () => {
+    return this.state.polyhedron;
+  };
 }

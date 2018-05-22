@@ -29,7 +29,10 @@ export default class AppPage {
   }
 
   getPolyhedron() {
-    return this.wrapper.find('X3dPolyhedron').prop('polyhedron');
+    return this.wrapper
+      .find('Viewer')
+      .instance()
+      .getPolyhedron();
   }
 
   clickFace(face) {
