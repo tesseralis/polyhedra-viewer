@@ -127,8 +127,8 @@ export default function PeriodicTable() {
             </WikiLink>, and the 92{' '}
             <WikiLink href="http://en.wikipedia.org/wiki/Johnson_solid">
               Johnson solids
-            </WikiLink>. When a solid is presented in a "repeated" position
-            (e.g. a Platonic solid in the prism section) it is grayed out.
+            </WikiLink>. Click on a solid to play around with it and to see its
+            relationships with other polyhedra.
           </p>
         </GridArea>
         {periodicTable.map(section => {

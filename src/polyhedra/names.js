@@ -1,4 +1,4 @@
-// @flow
+// @flow strict
 import _ from 'lodash';
 
 import { johnsonSolids } from 'data';
@@ -89,6 +89,5 @@ export const toConwayNotation = (solid: string) => {
     const [prefix] = name.split(' ');
     return 'P' + inversePrismNames[prefix];
   }
-  // return null;
   throw new Error(`Invalid solid name ${solid}`);
 };
