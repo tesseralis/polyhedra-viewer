@@ -5,6 +5,7 @@ import { Peak } from 'math/polyhedra';
 import type { Operation } from './operationTypes';
 import { mapObject } from 'util.js';
 import { getPeakAlignment, getGyrateDirection } from './applyOptionUtils';
+import { getTransformedVertices } from './operationUtils';
 
 const TAU = 2 * Math.PI;
 
@@ -26,7 +27,7 @@ function applyGyrate(polyhedron, { peak }) {
 
   const mockPolyhedron = polyhedron.withChanges(solid =>
     solid.addVertices(boundary.vertices).mapFaces(face => {
-      if (!face.inSet(peak.faces())) {
+      if (face.inSet(peak.faces())) {
         return face;
       }
       return face.vertices.map(v => {
@@ -37,19 +38,12 @@ function applyGyrate(polyhedron, { peak }) {
     }),
   );
 
-  const transform = withOrigin(boundary.centroid(), v =>
-    v.getRotatedAroundAxis(boundary.normal(), theta),
+  const endVertices = getTransformedVertices(
+    [peak],
+    p =>
+      withOrigin(p.normalRay(), v => v.getRotatedAroundAxis(p.normal(), theta)),
+    mockPolyhedron.vertices,
   );
-  // TODO use getMappedVertices?
-  const endVertices = mockPolyhedron.vertices.map((v, vIndex) => {
-    if (
-      _.includes(_.map(peak.innerVertices(), 'index'), v.index) ||
-      v.index >= polyhedron.numVertices()
-    ) {
-      return transform(v.vec);
-    }
-    return v.vec;
-  });
 
   // TODO the animation makes the cupola shrink and expand.
   // Make it not do that.

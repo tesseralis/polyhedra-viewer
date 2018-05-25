@@ -39,8 +39,6 @@ const Edges = ({ edges, vertices }) => {
 };
 
 interface PolyhedronProps {
-  // TODO Use the raw solid data (or vertices) instead
-  // (can't do right now because the Page object relies on it)
   solidData: SolidData;
   config: *;
   faceColors: *;
