@@ -265,7 +265,7 @@ const defaultAugmentees = {
 
 function getAugmenteeNumSides(using: string) {
   const prefix = using[0];
-  const index = parseInt(using.substring(1), 10);
+  const index = _.toNumber(using.substring(1));
   return 'RU'.includes(prefix) ? index * 2 : index;
 }
 

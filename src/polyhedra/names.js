@@ -103,7 +103,7 @@ const fromConwayNotationUnescaped = notation => {
     return archimedeanMapping[notation];
   }
   if (prefix === 'J') {
-    return johnsonSolids[parseInt(number, 10) - 1];
+    return johnsonSolids[_.toNumber(number) - 1];
   }
   if (prefix === 'P') {
     return `${prismNames[number]} prism`;
