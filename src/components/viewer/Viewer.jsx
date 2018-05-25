@@ -83,6 +83,7 @@ function viewerStateFromSolidName(name) {
     solidName: name,
     operation: null,
     applyOptions: {},
+    applyArgs: {},
   };
 }
 
@@ -116,6 +117,7 @@ interface ViewerState {
   // and applyOptions (which are determined by the the panel)
   applyOptions: any;
   applyArgs: any;
+  opApplied: boolean;
   interpolated?: Polyhedron;
   faceColors?: any;
   config: any;
@@ -137,29 +139,25 @@ export default class Viewer extends Component<ViewerProps, ViewerState> {
       solidName: props.solid,
       config: defaultConfig,
       operation: undefined,
+      opApplied: false,
       applyOptions: {},
       applyArgs: {},
     };
   }
 
   static getDerivedStateFromProps(
-    nextProps: ViewerProps,
-    prevState: ViewerState,
+    { solid }: ViewerProps,
+    { opApplied, solidName }: ViewerState,
   ) {
-    const { solid } = nextProps;
-
-    if (solid !== prevState.solidName) {
-      // If not the result of an operation, update our solid based on the name we got
+    // If this wasn't the result of an operation and the solid name prop has changed,
+    // update our state to reflect that
+    if (!opApplied && solid !== solidName) {
       return viewerStateFromSolidName(solid);
     }
-    return prevState;
-  }
-
-  componentDidUpdate(prevProps: ViewerProps) {
-    const { history, solid } = this.props;
-    if (this.state.solidName !== solid && solid === prevProps.solid) {
-      history.push(`/${this.state.solidName}/related`);
-    }
+    // Otherwise reset the opApplied flag
+    return {
+      opApplied: false,
+    };
   }
 
   componentWillUnmount() {
@@ -326,12 +324,20 @@ export default class Viewer extends Component<ViewerProps, ViewerState> {
           interpolated:
             enableAnimation && animationData ? animationData.start : undefined,
           applyArgs: {},
+          opApplied: true,
           ...postOpState,
         };
       },
-      this.startAnimation,
+      () => {
+        this.updateHistory();
+        this.startAnimation();
+      },
     );
   };
+
+  updateHistory() {
+    this.props.history.push(`/${this.state.solidName}/related`);
+  }
 
   startAnimation = () => {
     // start the animation
