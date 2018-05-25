@@ -43,8 +43,55 @@ const archimedeanMapping = {
   bD: 'truncated icosidodecahedron',
   sD: 'snub dodecahedron',
 };
-
 const inverseArchimedeanMapping = _.invert(archimedeanMapping);
+
+const alternateNames = {
+  tetrahedron: ['triangular pyramid', 'digonal antiprism', 'disphenoid'],
+  cube: ['square prism'],
+  octahedron: [
+    'tetratetrahedron', // hehe
+    'triangular antiprism',
+    'triangular bipyramid',
+  ],
+  icosahedron: [
+    'snub tetrahedron',
+    'elongated pentagonal bipyramid',
+    'snub triangular antiprism',
+  ],
+  cuboctahedron: ['rhombitetratetrahedron', 'triangular gyrobicupola'],
+  'truncated octahedron': ['truncated tetratetrahedron'],
+  rhombicuboctahedron: ['elongated square orthobicupola'],
+  icosidodecahedron: ['pentagonal gyrobirotunda'],
+  'triangular prism': ['fastigium', 'digonal cupola'],
+
+  // related to augmented/diminished/gyrate solids
+  'pentagonal antiprism': ['parabidiminished icosahedron'],
+  'gyroelongated pentagonal pyramid': ['diminished icosahedron'],
+  'square pyramid': ['diminished octahedron'],
+
+  'triangular bipyramid': ['augmented tetrahedron'],
+  'elongated square pyramid': ['augmented cube', 'augmented square prism'],
+  'elongated square bipyramid': [
+    'biaugmented cube',
+    'biaugmented square prism',
+  ],
+
+  'elongated square gyrobicupola': [
+    'pseudorhombicuboctahedron',
+    'gyrate rhombicuboctahedron',
+  ],
+  'elongated square cupola': ['diminished rhombicuboctahedron'],
+  'octagonal prism': ['bidiminished rhombicuboctahedron'],
+};
+const inverseAlternateNames = _(alternateNames)
+  .flatMap((alts, canonical) => _.map(alts, alt => [alt, canonical]))
+  .fromPairs()
+  .value();
+
+// TODO figure out how to move this to 'data' so it can be used in construction
+export function getCanonicalName(name: string) {
+  return inverseAlternateNames[name] || name;
+}
 
 const fromConwayNotationUnescaped = notation => {
   const prefix = notation[0];
