@@ -26,6 +26,7 @@ import X3dScene from './X3dScene';
 import X3dPolyhedron from './X3dPolyhedron';
 import { Sidebar } from './sidebar';
 import TwistOptions from './TwistOptions';
+import AugmentOptions from './AugmentOptions';
 import Title from './Title';
 
 const styles = StyleSheet.create({
@@ -186,14 +187,12 @@ export default class Viewer extends Component<ViewerProps, ViewerState> {
             relatedPolyhedraProps={{
               solid,
               operation,
-              applyOptions,
               disabled: !!interpolated,
               ..._.pick(this, [
+                'setOperation',
                 'applyOperation',
                 'recenter',
                 'resize',
-                'setOperation',
-                'setApplyOpt',
               ]),
             }}
           />
@@ -219,6 +218,16 @@ export default class Viewer extends Component<ViewerProps, ViewerState> {
           {_.includes(['shorten', 'snub'], operation) && (
             <div className={css(styles.overlayContainer)}>
               <TwistOptions onClick={this.applyTwistOperation} />
+            </div>
+          )}
+          {_.includes(['augment'], operation) && (
+            <div className={css(styles.overlayContainer)}>
+              <AugmentOptions
+                solid={solid}
+                options={applyOptions}
+                onClickOption={this.setApplyOpt}
+                disabled={!!interpolated}
+              />
             </div>
           )}
         </div>

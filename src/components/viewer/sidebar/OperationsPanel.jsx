@@ -2,7 +2,7 @@ import _ from 'lodash';
 import React from 'react';
 import { css, StyleSheet } from 'aphrodite/no-important';
 
-import { operations, getRelations, getUsingOpts } from 'polyhedra/operations';
+import { operations, getRelations } from 'polyhedra/operations';
 import Tooltip from './Tooltip';
 
 const styles = StyleSheet.create({
@@ -74,66 +74,6 @@ const styles = StyleSheet.create({
   },
 });
 
-const getOptionName = optValue => {
-  switch (optValue) {
-    case 'U2':
-      return 'fastigium';
-    case 'Y4':
-      return 'pyramid';
-    case 'U5':
-      return 'cupola';
-    case 'R5':
-      return 'rotunda';
-    default:
-      return optValue;
-  }
-};
-
-function AugmentOptions({ options, solid, onClickOption, disabled }) {
-  const { gyrate, using } = options;
-
-  const optionArgs = [
-    {
-      name: 'gyrate',
-      values: ['ortho', 'gyro'],
-      value: gyrate,
-      description:
-        'Some solids can be augmented so that opposite faces align (ortho) or not (gyro).',
-    },
-    {
-      name: 'using',
-      values: getUsingOpts(solid),
-      value: using,
-      description: 'Some solids have more than one option to augment a face.',
-    },
-  ];
-
-  return (
-    <div>
-      {optionArgs.map(({ name, values, value, description }) => (
-        <div key={name} className={css(styles.options)}>
-          <Tooltip content={description}>
-            <span>{name}: </span>
-          </Tooltip>
-          {values.map(optValue => (
-            <button
-              key={optValue}
-              onClick={() => onClickOption(name, optValue)}
-              disabled={!value || disabled}
-              className={css(
-                styles.optionButton,
-                optValue === value && styles.isHighlighted,
-              )}
-            >
-              {getOptionName(optValue)}
-            </button>
-          ))}
-        </div>
-      ))}
-    </div>
-  );
-}
-
 const hasMode = [
   'snub',
   'contract',
@@ -164,12 +104,10 @@ export default function OperationsPanel({
   disabled,
   solid,
   operation,
-  applyOptions,
   applyOperation,
   recenter,
   resize,
   setOperation,
-  setApplyOpt,
 }) {
   return (
     <div className={css(styles.opGrid)}>
@@ -200,14 +138,6 @@ export default function OperationsPanel({
                 </button>
               </Tooltip>
             </div>
-            {name === 'augment' && (
-              <AugmentOptions
-                solid={solid}
-                options={applyOptions}
-                onClickOption={setApplyOpt}
-                disabled={disabled}
-              />
-            )}
           </div>
         );
       })}
