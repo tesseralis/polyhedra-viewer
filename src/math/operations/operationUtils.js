@@ -10,14 +10,7 @@ import {
   normalizeVertex,
   VertexList,
 } from 'math/polyhedra';
-import {
-  vec,
-  Vec3D,
-  PRECISION,
-  getPlane,
-  withOrigin,
-  type Transform,
-} from 'math/linAlg';
+import { vec, Vec3D, PRECISION, type Transform } from 'math/linAlg';
 import type { Relation } from './operationTypes';
 
 export const hasMultiple = (relations: ?(Relation[]), property: string) =>
@@ -146,82 +139,6 @@ export function getTransformedVertices<T: VertexList>(
     });
   });
   return result;
-}
-
-export function getResizedVertices(
-  faces: Face[],
-  resizedLength: number,
-  angle: number = 0,
-) {
-  // Update the vertices with the expanded-out version
-  const f0 = faces[0];
-  const scale = resizedLength - f0.distanceToCenter();
-  return getTransformedVertices(faces, f =>
-    withOrigin(f.centroid(), v =>
-      v.getRotatedAroundAxis(f.normal(), angle).add(f.normal().scale(scale)),
-    ),
-  );
-}
-
-type ExpansionType = 'cantellate' | 'snub';
-
-export function expansionType(polyhedron: Polyhedron): ExpansionType {
-  return _.includes([20, 38, 92], polyhedron.numFaces())
-    ? 'snub'
-    : 'cantellate';
-}
-
-const edgeShape = {
-  snub: 3,
-  cantellate: 4,
-};
-
-export function isExpandedFace(
-  polyhedron: Polyhedron,
-  face: Face,
-  nSides?: number,
-) {
-  const type = expansionType(polyhedron);
-  if (typeof nSides === 'number' && face.numSides !== nSides) return false;
-  if (!face.isValid()) return false;
-  return _.every(face.adjacentFaces(), { numSides: edgeShape[type] });
-}
-
-export function getSnubAngle(polyhedron: Polyhedron, numSides: number) {
-  const face0 =
-    _.find(polyhedron.faces, face =>
-      isExpandedFace(polyhedron, face, numSides),
-    ) || polyhedron.getFace();
-
-  const face0AdjacentFaces = face0.vertexAdjacentFaces();
-  const faceCentroid = face0.centroid();
-  const faceNormal = face0.normal();
-  const snubFaces = _.filter(
-    polyhedron.faces,
-    face =>
-      isExpandedFace(polyhedron, face, numSides) &&
-      !face.inSet(face0AdjacentFaces),
-  );
-  const midpoint = face0.edges[0].midpoint();
-  const face1 = _.minBy(snubFaces, face =>
-    midpoint.distanceTo(face.centroid()),
-  );
-  const plane = getPlane([
-    faceCentroid,
-    face1.centroid(),
-    polyhedron.centroid(),
-  ]);
-  const normMidpoint = midpoint.sub(faceCentroid);
-  const projected = plane.getProjectedPoint(midpoint).sub(faceCentroid);
-  const angle = normMidpoint.angleBetween(projected, true);
-  // Return a positive angle if it's a ccw turn, a negative angle otherwise
-  const sign = normMidpoint
-    .cross(projected)
-    .getNormalized()
-    .equalsWithTolerance(faceNormal, PRECISION)
-    ? -1
-    : 1;
-  return angle * sign;
 }
 
 const methodDefaults = {

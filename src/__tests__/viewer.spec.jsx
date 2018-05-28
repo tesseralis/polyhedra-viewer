@@ -133,13 +133,27 @@ describe('viewer', () => {
       .expectTransitionTo('diminished-rhombicosidodecahedron');
   });
 
-  it('can augment and contract an icosahedron', () => {
-    setup('/gyroelongated-pentagonal-pyramid/related');
-    appPage
-      .clickButtonWithText('augment')
-      .clickFaceWithNumSides(5)
-      .expectTransitionTo('icosahedron')
-      .clickButtonWithText('contract')
-      .expectTransitionTo('tetrahedron');
+  describe('contracting an icosahedron', () => {
+    it('can augment and contract an icosahedron', () => {
+      setup('/gyroelongated-pentagonal-pyramid/related');
+      appPage
+        .clickButtonWithText('augment')
+        .clickFaceWithNumSides(5)
+        .expectTransitionTo('icosahedron')
+        .clickButtonWithText('contract')
+        .expectTransitionTo('tetrahedron');
+    });
+
+    it('dodecahedron -> rectify -> cumulate -> contract', () => {
+      setup('/dodecahedron');
+      appPage
+        .clickButtonWithText('rectify')
+        .expectTransitionTo('icosidodecahedron')
+        .clickButtonWithText('cumulate')
+        .clickFaceWithNumSides(5)
+        .expectTransitionTo('icosahedron')
+        .clickButtonWithText('contract')
+        .expectTransitionTo('tetrahedron');
+    });
   });
 });

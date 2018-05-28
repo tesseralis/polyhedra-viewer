@@ -6,12 +6,15 @@ import { flatMap, repeat } from 'util.js';
 import type { Twist } from 'types';
 import {
   getTwistSign,
-  getSnubAngle,
   getEdgeFacePaths,
-  isExpandedFace,
   getTransformedVertices,
-  getResizedVertices,
 } from './operationUtils';
+import {
+  getSnubAngle,
+  getContractFaces,
+  isExpandedFace,
+  getResizedVertices,
+} from './expandContractUtils';
 import { Operation } from './operationTypes';
 
 /**
@@ -57,9 +60,6 @@ function doExpansion(polyhedron, referenceName, twist) {
   const reference = Polyhedron.get(referenceName);
   const n = polyhedron.getFace().numSides;
   // TODO precalculate this
-  const angle = twist
-    ? getTwistSign(twist) * Math.abs(getSnubAngle(reference, n))
-    : 0;
   const duplicated = duplicateVertices(polyhedron, twist);
 
   const referenceFace =
@@ -73,6 +73,10 @@ function doExpansion(polyhedron, referenceName, twist) {
   const expandFaces = _.filter(duplicated.faces, face =>
     isExpandedFace(duplicated, face, n),
   );
+  const refFaces = getContractFaces(reference, n);
+  const angle = twist
+    ? getTwistSign(twist) * Math.abs(getSnubAngle(reference, refFaces))
+    : 0;
 
   // Update the vertices with the expanded-out version
   const endVertices = getResizedVertices(expandFaces, referenceLength, angle);

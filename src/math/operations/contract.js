@@ -1,34 +1,16 @@
 // @flow strict
-import _ from 'lodash';
-import { flatMapUniq } from 'util.js';
 import { Polyhedron } from 'math/polyhedra';
 import {
-  expansionType,
   getSnubAngle,
   isExpandedFace,
   getResizedVertices,
-} from './operationUtils';
+  getFamily,
+  getContractFaces,
+} from './expandContractUtils';
 import { Operation } from './operationTypes';
 
 interface ContractOptions {
   faceType: number;
-}
-
-// Return the symmetry group of the *expanded* polyhedron
-function getFamily(polyhedron) {
-  switch (polyhedron.numFaces()) {
-    case 14: // cuboctahedron
-    case 20: // icosahedron
-      return 'T';
-    case 26: // rhombicuboctahedron
-    case 38: // snub cube
-      return 'O';
-    case 62: // rhombicosidodecahedron
-    case 92: // snub dodecahedron
-      return 'I';
-    default:
-      throw new Error('Did you try to contract an invalid solid?');
-  }
 }
 
 const familyMap = { T: 3, O: 4, I: 5 };
@@ -49,63 +31,6 @@ function getContractLength(polyhedron, faceType) {
   return s / 2 / Math.tan(Math.PI / p) * tanTheta2;
 }
 
-function getFaceDistance(face1, face2) {
-  let dist = 0;
-  let current = [face1];
-  while (!face2.inSet(current)) {
-    dist++;
-    current = flatMapUniq(current, face => face.adjacentFaces(), 'index');
-
-    if (dist > 10) {
-      throw new Error('we went toooooo far');
-    }
-  }
-  return dist;
-}
-
-function getIcosahedronContractFaces(polyhedron) {
-  let result = [];
-  let toTest = polyhedron.faces;
-  while (toTest.length > 0) {
-    const [next, ...rest] = toTest;
-    result.push(next);
-    toTest = _.filter(rest, face => getFaceDistance(face, next) === 3);
-  }
-  return result;
-}
-
-function getCuboctahedronContractFaces(polyhedron) {
-  const toCheck = _.filter(polyhedron.faces, { numSides: 3 });
-  const result = [];
-  const invalid = [];
-  while (toCheck.length > 0) {
-    const next = toCheck.pop();
-    if (_.includes(invalid, next.index)) {
-      continue;
-    }
-    _.forEach(next.vertices, vertex => {
-      _.forEach(vertex.adjacentFaces(), face => {
-        if (face.numSides === 3) {
-          invalid.push(face.index);
-        }
-      });
-    });
-    result.push(next);
-  }
-  return result;
-}
-
-function getContractFaces(polyhedron, faceType) {
-  if (getFamily(polyhedron) === 'T') {
-    return expansionType(polyhedron) === 'snub'
-      ? getIcosahedronContractFaces(polyhedron)
-      : getCuboctahedronContractFaces(polyhedron);
-  }
-  return _.filter(polyhedron.faces, face =>
-    isExpandedFace(polyhedron, face, faceType),
-  );
-}
-
 export function applyContract(
   polyhedron: Polyhedron,
   { faceType = 3 }: ContractOptions,
@@ -115,10 +40,9 @@ export function applyContract(
   // Take all the stuff and push it inwards
   const contractFaces = getContractFaces(polyhedron, faceType);
 
-  const angle =
-    expansionType(polyhedron) === 'snub'
-      ? -getSnubAngle(polyhedron, faceType)
-      : 0;
+  const angle = -getSnubAngle(polyhedron, contractFaces);
+  // expansionType(polyhedron) === 'snub'
+  // 0;
 
   const endVertices = getResizedVertices(contractFaces, resultLength, angle);
   return {
@@ -171,4 +95,3 @@ export const contract: Operation<ContractOptions> = {
     }
   },
 };
-
