@@ -253,7 +253,9 @@ export default class Viewer extends Component<ViewerProps, ViewerState> {
 
     if (operation) {
       if (operations[operation].isHighlighted(polyhedron, applyArgs, face)) {
-        return [1, 1, 0];
+        return toRgb(
+          tinycolor.mix(colors[face.numSides], 'yellow').toHexString(),
+        );
       }
     }
 
@@ -261,9 +263,8 @@ export default class Viewer extends Component<ViewerProps, ViewerState> {
   };
 
   setConfigValue = (key: string, value: any) => {
+    // TODO make different functions
     if (key === null) {
-      console.log('config is', this.state.config);
-      console.log('setting config to ', defaultConfig);
       this.setState({ config: defaultConfig });
     }
     this.setState(({ config }) => ({
