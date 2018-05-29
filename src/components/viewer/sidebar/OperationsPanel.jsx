@@ -4,22 +4,21 @@ import { css, StyleSheet } from 'aphrodite/no-important';
 
 import { operations, getRelations } from 'polyhedra/operations';
 import Tooltip from './Tooltip';
+import Icon from './Icon';
 
 const styles = StyleSheet.create({
   opGrid: {
     padding: '0 10px',
     display: 'grid',
-    gridGap: 10,
+    columnGap: 5,
+    rowGap: 30,
+    // TODO encode the ordering in the actual operation types
     gridTemplateAreas: `
-      "truncate rectify      dual"
-      "cumulate cumulate     dual"
-      "expand   snub         twist"
-      "contract contract     twist"
-      "elongate gyroelongate turn"
-      "shorten  shorten      turn"
-      "augment  augment      gyrate"
-      "diminish diminish     gyrate"
-      "recenter resize       x"
+      "recenter recenter     resize   resize"
+      "truncate rectify      cumulate dual"
+      "expand   snub         contract twist"
+      "elongate gyroelongate shorten  turn"
+      "augment  augment      diminish gyrate"
     `,
   },
 
@@ -27,32 +26,18 @@ const styles = StyleSheet.create({
     padding: '10px 0',
   },
 
-  options: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    height: '100%',
-    minHeight: 40,
-  },
-
-  modeButton: {
-    fontSize: 14,
-    width: '100%',
-    height: '100%',
-    minHeight: 40,
-    maxHeight: 60,
-    padding: '10px 0',
-    border: '1px gray solid',
+  operationButton: {
+    fontSize: 12,
+    width: 75,
+    height: 75,
+    border: '1px LightGray solid',
+    color: 'DimGray',
 
     ':disabled': {
       borderColor: 'LightGray',
       backgroundColor: 'WhiteSmoke',
+      color: 'LightGray',
     },
-  },
-
-  optionButton: {
-    height: 30,
-    width: '100%',
   },
 
   isHighlighted: {
@@ -60,14 +45,14 @@ const styles = StyleSheet.create({
   },
 
   recenterButton: {
-    borderColor: 'Gray',
+    borderColor: 'LightGray',
     marginTop: 10,
     gridArea: 'recenter',
     padding: 10,
   },
 
   resizeButton: {
-    borderColor: 'Gray',
+    borderColor: 'LightGray',
     marginTop: 10,
     gridArea: 'resize',
     padding: 10,
@@ -115,29 +100,28 @@ export default function OperationsPanel({
         const relations = getRelations(solid, name);
         return (
           <div key={name} style={{ gridArea: name }}>
-            <div className={css(styles.options)}>
-              <Tooltip
-                content={description}
-                trigger={!!relations ? ['hover'] : []}
+            <Tooltip
+              content={description}
+              trigger={false && !!relations ? ['hover'] : []}
+            >
+              <button
+                className={css(
+                  styles.operationButton,
+                  operation === name && styles.isHighlighted,
+                )}
+                disabled={!relations || disabled}
+                onClick={() => {
+                  if (hasOptions(name, relations)) {
+                    setOperation(name);
+                  } else {
+                    applyOperation(name);
+                  }
+                }}
               >
-                <button
-                  className={css(
-                    styles.modeButton,
-                    operation === name && styles.isHighlighted,
-                  )}
-                  disabled={!relations || disabled}
-                  onClick={() => {
-                    if (hasOptions(name, relations)) {
-                      setOperation(name);
-                    } else {
-                      applyOperation(name);
-                    }
-                  }}
-                >
-                  {name}
-                </button>
-              </Tooltip>
-            </div>
+                <Icon name="cube-outline" size={48} />
+                {name}
+              </button>
+            </Tooltip>
           </div>
         );
       })}
