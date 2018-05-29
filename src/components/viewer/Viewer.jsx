@@ -2,7 +2,7 @@
 import _ from 'lodash';
 import React, { Component } from 'react';
 import { css, StyleSheet } from 'aphrodite/no-important';
-import { rgb } from 'd3-color';
+import tinycolor from 'tinycolor2';
 import { type Point } from 'types';
 
 import { isValidSolid } from 'data';
@@ -89,7 +89,7 @@ function viewerStateFromSolidName(name) {
 }
 
 function toRgb(hex: string) {
-  const { r, g, b } = rgb(hex);
+  const { r, g, b } = tinycolor(hex).toRgb();
   return [r / 255, g / 255, b / 255];
 }
 const colorIndexForFace = mapObject(polygons, (n, i) => [n, i]);
