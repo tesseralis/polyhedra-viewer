@@ -31,7 +31,7 @@ const filterGroups = (groups, filterText) =>
     })
     .filter(
       ({ groups, polyhedra }) =>
-        (groups && groups.length > 0) || (polyhedra && polyhedra.length > 0)
+        (groups && groups.length > 0) || (polyhedra && polyhedra.length > 0),
     );
 
 const PolyhedronLink = ({ name }) => {
@@ -41,11 +41,15 @@ const PolyhedronLink = ({ name }) => {
       ...hover,
       display: 'block',
       padding: '3px 14px',
+      height: 24,
 
       color: 'DimGrey',
       lineHeight: '18px',
       fontFamily: andaleMono,
       fontSize: 14,
+      overflow: 'hidden',
+      textOverflow: 'ellipsis',
+      whiteSpace: 'nowrap',
     },
 
     isActive: {
