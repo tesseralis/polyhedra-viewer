@@ -262,10 +262,12 @@ export default class Viewer extends Component<ViewerProps, ViewerState> {
 
   setConfigValue = (key: string, value: any) => {
     if (key === null) {
+      console.log('config is', this.state.config);
+      console.log('setting config to ', defaultConfig);
       this.setState({ config: defaultConfig });
     }
     this.setState(({ config }) => ({
-      config: _.set({ ...config }, key, value),
+      config: _.set(_.cloneDeep(config), key, value),
     }));
   };
 
