@@ -10,7 +10,6 @@ import { andaleMono } from 'styles/fonts';
 import { Polyhedron } from 'math/polyhedra';
 import { operations } from 'math/operations';
 import type { OpName } from 'math/operations';
-import polygons from 'constants/polygons';
 import { mapObject } from 'util.js';
 import { fixed, fullScreen } from 'styles/common';
 import { unescapeName } from 'polyhedra/names';
@@ -92,9 +91,6 @@ function toRgb(hex: string) {
   const { r, g, b } = tinycolor(hex).toRgb();
   return [r / 255, g / 255, b / 255];
 }
-const colorIndexForFace = mapObject(polygons, (n, i) => [n, i]);
-const getColorIndex = face => colorIndexForFace[face.numSides];
-const polygonColors = colors => polygons.map(n => toRgb(colors[n]));
 
 function getFaceColors(polyhedron, colors) {
   return _.pickBy(
@@ -244,22 +240,22 @@ export default class Viewer extends Component<ViewerProps, ViewerState> {
   getColorForFace = (face: *) => {
     const { applyArgs, polyhedron, operation, config, faceColors } = this.state;
     const { colors } = config;
-    const defaultColors = polygonColors(colors);
 
     // While doing animation, if we specify that this face has a color, use it
     if (!!faceColors && _.has(faceColors, face.index.toString())) {
       return toRgb(faceColors[face.index]);
     }
 
-    if (operation) {
-      if (operations[operation].isHighlighted(polyhedron, applyArgs, face)) {
-        return toRgb(
-          tinycolor.mix(colors[face.numSides], 'yellow').toHexString(),
-        );
-      }
+    if (
+      operation &&
+      operations[operation].isHighlighted(polyhedron, applyArgs, face)
+    ) {
+      return toRgb(
+        tinycolor.mix(colors[face.numSides], 'yellow').toHexString(),
+      );
     }
 
-    return defaultColors[getColorIndex(face)];
+    return toRgb(colors[face.numSides]);
   };
 
   setConfigValue = (key: string, value: any) => {
