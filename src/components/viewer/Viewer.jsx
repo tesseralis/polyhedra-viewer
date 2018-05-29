@@ -312,7 +312,6 @@ export default class Viewer extends Component<ViewerProps, ViewerState> {
           },
         );
         if (!name) throw new Error('Name not found on new polyhedron');
-        // FIXME gyrate -> twist needs to be unset
         const postOpState = (() => {
           if (_.isEmpty(getRelations(name, operation))) {
             return { operation: undefined, applyOptions: {} };
