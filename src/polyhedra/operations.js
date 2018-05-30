@@ -6,12 +6,12 @@ import { fromConwayNotation, toConwayNotation } from './names';
 import { Polyhedron } from 'math/polyhedra';
 import polyhedraGraph from './relationsGraph';
 import { operations as mathOps } from 'math/operations';
-import type { OpName, OperationResult } from 'math/operations';
+import type { OpName as BaseOpName, OperationResult } from 'math/operations';
 
-type OpNamePlus = OpName | 'twist' | 'turn';
+export type OpName = BaseOpName | 'twist' | 'turn';
 
 interface Operation {
-  name: OpNamePlus;
+  name: OpName;
   symbol: string;
   description: string;
 }

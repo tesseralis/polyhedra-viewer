@@ -4,7 +4,7 @@ import { css, StyleSheet } from 'aphrodite/no-important';
 
 import { operations, getRelations } from 'polyhedra/operations';
 import Tooltip from './Tooltip';
-import Icon from './Icon';
+import OperationIcon from './OperationIcon';
 
 const styles = StyleSheet.create({
   opGrid: {
@@ -34,9 +34,10 @@ const styles = StyleSheet.create({
     color: 'DimGray',
 
     ':disabled': {
-      borderColor: 'LightGray',
-      backgroundColor: 'WhiteSmoke',
-      color: 'LightGray',
+      opacity: 0.3,
+      // borderColor: 'LightGray',
+      // backgroundColor: 'WhiteSmoke',
+      // color: 'LightGray',
     },
   },
 
@@ -118,7 +119,7 @@ export default function OperationsPanel({
                   }
                 }}
               >
-                <Icon name="cube-outline" size={48} />
+                <OperationIcon name={name} />
                 {name}
               </button>
             </Tooltip>
