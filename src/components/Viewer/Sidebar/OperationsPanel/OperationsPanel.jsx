@@ -1,3 +1,4 @@
+// @flow
 import _ from 'lodash';
 import React from 'react';
 import { css, StyleSheet } from 'aphrodite/no-important';
@@ -87,6 +88,16 @@ function hasOptions(operation, relations) {
   }
 }
 
+export interface OperationsPanelProps {
+  disabled: boolean;
+  solid: string;
+  operation: string;
+  applyOperation(op: string): void;
+  setOperation(op: string): void;
+  recenter(): void;
+  resize(): void;
+}
+
 // TODO this could probably use a test to make sure all the buttons are in the right places
 export default function OperationsPanel({
   disabled,
@@ -96,7 +107,7 @@ export default function OperationsPanel({
   recenter,
   resize,
   setOperation,
-}) {
+}: OperationsPanelProps) {
   return (
     <div className={css(styles.opGrid)}>
       {operations.map(({ name, symbol, description }) => {

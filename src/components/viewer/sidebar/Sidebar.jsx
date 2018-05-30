@@ -5,7 +5,7 @@ import { css, StyleSheet } from 'aphrodite/no-important';
 
 import IconLink from './IconLink';
 import ConfigForm from './ConfigForm';
-import OperationsPanel from './OperationsPanel';
+import OperationsPanel, { OperationsPanelProps } from './OperationsPanel';
 import PolyhedronList from './PolyhedronList';
 
 const styles = StyleSheet.create({
@@ -24,7 +24,7 @@ const styles = StyleSheet.create({
 });
 
 interface Props {
-  operationsPanelProps: *;
+  operationsPanelProps: OperationsPanelProps;
 }
 
 export default function Sidebar({ operationsPanelProps }: Props) {
