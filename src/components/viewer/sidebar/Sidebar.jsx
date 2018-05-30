@@ -9,7 +9,7 @@ import PolyhedronList from './PolyhedronList';
 
 const styles = StyleSheet.create({
   sidebar: {
-    width: 350,
+    width: 400,
     height: '100%',
     overflowY: 'scroll',
     backgroundColor: 'WhiteSmoke',

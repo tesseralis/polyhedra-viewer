@@ -28,8 +28,8 @@ const styles = StyleSheet.create({
 
   operationButton: {
     fontSize: 12,
-    width: 75,
-    height: 75,
+    width: 84,
+    height: 84,
     border: '1px LightGray solid',
     color: 'DimGray',
 

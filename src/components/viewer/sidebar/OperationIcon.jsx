@@ -10,8 +10,8 @@ const TAU = 2 * PI;
 const color = 'DimGray';
 const styles = StyleSheet.create({
   operationIcon: {
-    width: 50,
-    height: 50,
+    width: 60,
+    height: 60,
   },
 
   invariant: {
@@ -382,9 +382,9 @@ function drawIcon(name) {
       // TODO simplify the ExpandIcon hierarchy
       return (
         <Fragment>
-          <ExpandIcon styled="added" hollow />
+          <ExpandIcon styled="subtracted" hollow />
           <g transform="rotate(180 100 100)">
-            <ExpandIcon styled="subtracted" hollow />
+            <ExpandIcon styled="added" hollow />
           </g>
         </Fragment>
       );
