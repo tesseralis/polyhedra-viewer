@@ -16,7 +16,8 @@ const styles = StyleSheet.create({
   invariant: {
     fill: 'black',
     stroke: 'black',
-    strokeWidth: 2,
+    strokeWidth: 5,
+    strokeLinejoin: 'round',
   },
 
   subtracted: {
@@ -119,9 +120,14 @@ function DualIcon() {
   );
 }
 
-function BaseExpandIcon({ styled, innerAngle, render = _.noop }) {
+function BaseExpandIcon({
+  styled,
+  hollow = false,
+  innerAngle,
+  render = _.noop,
+}) {
   const [cx, cy] = [100, 100];
-  const r = 75;
+  const r = 80;
   const ap = sqrt(3) * r / 2;
   const r1 = r / sqrt(3);
   const ap1 = r1 / 2;
@@ -136,7 +142,7 @@ function BaseExpandIcon({ styled, innerAngle, render = _.noop }) {
         cy={cy}
       />
       <Polygon
-        className={css(styles.invariant)}
+        className={css(hollow ? styles[styled] : styles.invariant)}
         n={3}
         r={r1}
         a={innerAngle}
@@ -150,6 +156,7 @@ function BaseExpandIcon({ styled, innerAngle, render = _.noop }) {
 
 interface ExpandIconProps {
   styled: string;
+  hollow?: boolean;
   innerStyle?: string;
   render?: *;
 }
@@ -158,11 +165,13 @@ function ExpandIcon({
   styled,
   innerStyle = styled,
   render = _.noop,
+  hollow = false,
 }: ExpandIconProps) {
   return (
     <BaseExpandIcon
       styled={styled}
       innerAngle={-90}
+      hollow={hollow}
       render={({ cx, cy, r, ap, r1, ap1 }) => (
         <Fragment>
           {_.range(3).map(i => (
@@ -181,6 +190,76 @@ function ExpandIcon({
         </Fragment>
       )}
     />
+  );
+}
+
+interface ElongateIconProps {
+  styled: string;
+  render?: *;
+}
+function ElongateIcon({ styled, render }: ElongateIconProps) {
+  // TODO consolidate with expand
+  const [cx, cy] = [100, 100];
+  const r = 80;
+  const ap = sqrt(3) * r / 2;
+  return (
+    <Fragment>
+      <Polygon
+        className={css(styles[styled])}
+        n={6}
+        r={r}
+        a={90}
+        cx={cx}
+        cy={cy}
+      />
+      <PolyLine
+        className={css(styles.invariant)}
+        points={[[cx - ap, cy - r / 2], [cx, cy - r], [cx + ap, cy - r / 2]]}
+      />
+      <PolyLine
+        className={css(styles.invariant)}
+        points={[[cx - ap, cy + r / 2], [cx, cy + r], [cx + ap, cy + r / 2]]}
+      />
+      {render ? (
+        render({ cx, cy, r, ap })
+      ) : (
+        <rect
+          className={css(styles[styled])}
+          x={cx - r / 2}
+          y={cy - r / 2 - 5}
+          width={r}
+          height={r + 10}
+        />
+      )}
+    </Fragment>
+  );
+}
+
+function AugmentIcon({ styled }) {
+  const [cx, cy] = [100, 100];
+  const r = 80;
+  const ap = sqrt(3) * r / 2;
+  return (
+    <Fragment>
+      <Polygon
+        className={css(styles[styled])}
+        n={6}
+        r={r}
+        a={90}
+        cx={cx}
+        cy={cy}
+      />
+      <PolyLine
+        className={css(styles.invariant)}
+        points={[
+          [cx - ap, cy - r / 2],
+          [cx - ap, cy + r / 2],
+          [cx, cy + r],
+          [cx + ap, cy + r / 2],
+          [cx + ap, cy - r / 2],
+        ]}
+      />
+    </Fragment>
   );
 }
 
@@ -208,6 +287,7 @@ function drawIcon(name) {
       return (
         <BaseExpandIcon
           styled="added"
+          hollow={false}
           innerAngle={0}
           render={({ cx, cy, r, ap, r1, ap1 }) =>
             _.range(3).map(i => (
@@ -249,17 +329,66 @@ function drawIcon(name) {
       );
     }
 
-    default:
+    case 'elongate':
+      return <ElongateIcon styled="added" />;
+
+    case 'gyroelongate':
       return (
-        <Polygon
-          className={css(styles.changed)}
-          n={6}
-          r={75}
-          cx={100}
-          cy={100}
-          a={0}
+        <ElongateIcon
+          styled="added"
+          render={({ cx, cy, r, ap }) => (
+            <PolyLine
+              className={css(styles.added)}
+              points={[
+                [cx - ap, cy - r / 2],
+                [cx - r / 2, cy + r / 2],
+                [cx, cy - r / 2],
+                [cx + r / 2, cy + r / 2],
+                [cx + ap, cy - r / 2],
+              ]}
+            />
+          )}
         />
       );
+
+    case 'shorten':
+      return <ElongateIcon styled="subtracted" />;
+
+    case 'turn':
+      return (
+        <ElongateIcon
+          styled="added"
+          render={({ cx, cy, r, ap }) => (
+            <PolyLine
+              className={css(styles.added)}
+              points={[
+                [cx - ap, cy - r / 2],
+                [cx - r / 2, cy + r / 2],
+                [cx - r / 2, cy - r / 2],
+                [cx + r / 2, cy + r / 2],
+                [cx + r / 2, cy - r / 2],
+                [cx + ap, cy + r / 2],
+              ]}
+            />
+          )}
+        />
+      );
+    case 'augment':
+      return <AugmentIcon styled="added" />;
+    case 'diminish':
+      return <AugmentIcon styled="subtracted" />;
+    case 'gyrate':
+      // TODO simplify the ExpandIcon hierarchy
+      return (
+        <Fragment>
+          <ExpandIcon styled="added" hollow />
+          <g transform="rotate(180 100 100)">
+            <ExpandIcon styled="subtracted" hollow />
+          </g>
+        </Fragment>
+      );
+    default:
+      throw new Error(`Unknown operation: ${name}`);
   }
 }
 
