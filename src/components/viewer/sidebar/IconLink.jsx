@@ -1,4 +1,4 @@
-// @flow
+// @flow strict
 import React from 'react';
 import { Route, NavLink } from 'react-router-dom';
 import { css, StyleSheet } from 'aphrodite/no-important';
@@ -29,7 +29,21 @@ const styles = StyleSheet.create({
   },
 });
 
-export default function IconLink({ iconName, title, to, replace, exact }: *) {
+interface Props {
+  iconName: string;
+  title: string;
+  to: string;
+  replace?: boolean;
+  exact?: boolean;
+}
+
+export default function IconLink({
+  iconName,
+  title,
+  to,
+  replace,
+  exact,
+}: Props) {
   return (
     <Route>
       <NavLink

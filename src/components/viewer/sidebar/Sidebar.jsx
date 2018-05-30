@@ -23,7 +23,11 @@ const styles = StyleSheet.create({
   },
 });
 
-export default function Sidebar({ match, configProps, operationsPanelProps }) {
+interface Props {
+  operationsPanelProps: *;
+}
+
+export default function Sidebar({ operationsPanelProps }: Props) {
   return (
     <Route
       render={({ match }) => (

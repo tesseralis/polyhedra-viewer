@@ -1,10 +1,15 @@
+// @flow strict
 export const hover = {
   ':hover': {
     backgroundColor: 'LightGray',
   },
 };
 
-export const transition = (property, duration, ease = '') => {
+export const transition = (
+  property: string,
+  duration: number,
+  ease: string = '',
+) => {
   const value = `${property} ${duration}s ${ease}`.trim();
   return {
     transition: value,
@@ -19,7 +24,7 @@ export const fullScreen = {
   width: '100%',
 };
 
-export const fixed = (vert, horiz) => ({
+export const fixed = (vert: 'top' | 'bottom', horiz: 'left' | 'right') => ({
   position: 'fixed',
   [vert]: 0,
   [horiz]: 0,
