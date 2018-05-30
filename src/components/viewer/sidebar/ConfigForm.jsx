@@ -3,6 +3,7 @@ import React from 'react';
 import { css, StyleSheet } from 'aphrodite/no-important';
 import _ from 'lodash';
 
+import { WithConfig } from 'components/ConfigContext';
 import { configInputs } from 'constants/configOptions';
 import { hover, transition } from 'styles/common';
 import { andaleMono } from 'styles/fonts';
@@ -92,7 +93,7 @@ interface ConfigFormProps {
   setInputValue: (key: string | null, value?: any) => {};
 }
 
-export default ({ width, inputValues, setInputValue }: ConfigFormProps) => {
+export default ({ width }: ConfigFormProps) => {
   const styles = StyleSheet.create({
     configMenu: {
       width,
@@ -104,16 +105,20 @@ export default ({ width, inputValues, setInputValue }: ConfigFormProps) => {
   });
 
   return (
-    <form className={css(styles.configMenu)}>
-      {configInputs.map(({ key, ...input }) => (
-        <LabelledInput
-          key={key}
-          input={input}
-          value={_.get(inputValues, key)}
-          setValue={value => setInputValue(key, value)}
-        />
-      ))}
-      <ResetButton reset={() => setInputValue(null)} />
-    </form>
+    <WithConfig>
+      {({ config, setValue, reset }) => (
+        <form className={css(styles.configMenu)}>
+          {configInputs.map(({ key, ...input }) => (
+            <LabelledInput
+              key={key}
+              input={input}
+              value={_.get(config, key)}
+              setValue={value => setValue(key, value)}
+            />
+          ))}
+          <ResetButton reset={reset} />
+        </form>
+      )}
+    </WithConfig>
   );
 };

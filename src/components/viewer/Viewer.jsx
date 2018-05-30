@@ -18,9 +18,9 @@ import {
   getRelations,
   applyOptionsFor,
 } from 'polyhedra/operations';
-import { defaultConfig } from 'constants/configOptions';
 import transition from 'transition.js';
 
+import { WithConfig } from 'components/ConfigContext';
 import X3dScene from './X3dScene';
 import X3dPolyhedron from './X3dPolyhedron';
 import Sidebar from './Sidebar';
@@ -104,6 +104,7 @@ function getFaceColors(polyhedron, colors) {
 interface ViewerProps {
   solid: string;
   history: any;
+  config: any;
 }
 
 interface ViewerState {
@@ -117,7 +118,6 @@ interface ViewerState {
   opApplied: boolean;
   interpolated?: Polyhedron;
   faceColors?: any;
-  config: any;
   animationData?: any;
 }
 
@@ -126,7 +126,7 @@ interface InterpolatedValues {
   faceColors: any;
 }
 
-export default class Viewer extends Component<ViewerProps, ViewerState> {
+class Viewer extends Component<ViewerProps, ViewerState> {
   transitionId: ?any;
 
   constructor(props: ViewerProps) {
@@ -134,7 +134,6 @@ export default class Viewer extends Component<ViewerProps, ViewerState> {
     this.state = {
       polyhedron: Polyhedron.get(props.solid),
       solidName: props.solid,
-      config: defaultConfig,
       operation: undefined,
       opApplied: false,
       applyOptions: {},
@@ -164,22 +163,12 @@ export default class Viewer extends Component<ViewerProps, ViewerState> {
   }
 
   render() {
-    const { solid } = this.props;
-    const {
-      polyhedron,
-      interpolated,
-      operation,
-      config,
-      applyOptions,
-    } = this.state;
+    const { solid, config } = this.props;
+    const { polyhedron, interpolated, operation, applyOptions } = this.state;
     return (
       <div className={css(styles.viewer)}>
         <div className={css(styles.sidebar)}>
           <Sidebar
-            configProps={{
-              inputValues: config,
-              setInputValue: this.setConfigValue,
-            }}
             relatedPolyhedraProps={{
               solid,
               operation,
@@ -238,7 +227,8 @@ export default class Viewer extends Component<ViewerProps, ViewerState> {
 
   // TODO probably move this and the color utility functions to their own file
   getColorForFace = (face: *) => {
-    const { applyArgs, polyhedron, operation, config, faceColors } = this.state;
+    const { config } = this.props;
+    const { applyArgs, polyhedron, operation, faceColors } = this.state;
     const { colors } = config;
 
     // While doing animation, if we specify that this face has a color, use it
@@ -256,16 +246,6 @@ export default class Viewer extends Component<ViewerProps, ViewerState> {
     }
 
     return toRgb(colors[face.numSides]);
-  };
-
-  setConfigValue = (key: string, value: any) => {
-    // TODO make different functions
-    if (key === null) {
-      this.setState({ config: defaultConfig });
-    }
-    this.setState(({ config }) => ({
-      config: _.set(_.cloneDeep(config), key, value),
-    }));
   };
 
   setOperation = (operation: OpName) => {
@@ -301,7 +281,7 @@ export default class Viewer extends Component<ViewerProps, ViewerState> {
 
   applyOperation = (operation: OpName) => {
     this.setState(
-      ({ polyhedron, solidName, applyOptions, applyArgs, config }) => {
+      ({ polyhedron, solidName, applyOptions, applyArgs }, { config }) => {
         const { result, name, animationData } = applyOperation(
           operation,
           solidName,
@@ -348,7 +328,8 @@ export default class Viewer extends Component<ViewerProps, ViewerState> {
 
   startAnimation = () => {
     // start the animation
-    const { animationData, interpolated, config } = this.state;
+    const { config } = this.props;
+    const { animationData, interpolated } = this.state;
     if (!animationData || !interpolated) return;
 
     const { colors, transitionDuration } = config;
@@ -426,3 +407,9 @@ export default class Viewer extends Component<ViewerProps, ViewerState> {
     return this.state.polyhedron;
   };
 }
+
+export default (props: ViewerProps) => (
+  <WithConfig>
+    {({ config }) => <Viewer {...props} config={config} />}
+  </WithConfig>
+);
