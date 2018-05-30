@@ -169,7 +169,7 @@ class Viewer extends Component<ViewerProps, ViewerState> {
       <div className={css(styles.viewer)}>
         <div className={css(styles.sidebar)}>
           <Sidebar
-            relatedPolyhedraProps={{
+            operationsPanelProps={{
               solid,
               operation,
               disabled: !!interpolated,

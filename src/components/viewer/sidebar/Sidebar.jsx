@@ -1,3 +1,4 @@
+// @flow
 import React from 'react';
 import { Route, Redirect } from 'react-router-dom';
 import { css, StyleSheet } from 'aphrodite/no-important';
@@ -22,7 +23,7 @@ const styles = StyleSheet.create({
   },
 });
 
-export default function Sidebar({ match, configProps, relatedPolyhedraProps }) {
+export default function Sidebar({ match, configProps, operationsPanelProps }) {
   return (
     <Route
       render={({ match }) => (
@@ -55,12 +56,9 @@ export default function Sidebar({ match, configProps, relatedPolyhedraProps }) {
           />
           <Route
             path={`${match.url}/related`}
-            render={() => <OperationsPanel {...relatedPolyhedraProps} />}
+            render={() => <OperationsPanel {...operationsPanelProps} />}
           />
-          <Route
-            path={`${match.url}/config`}
-            render={() => <ConfigForm {...configProps} />}
-          />
+          <Route path={`${match.url}/config`} component={ConfigForm} />
           <Route path={`${match.url}/list`} component={PolyhedronList} />
         </section>
       )}

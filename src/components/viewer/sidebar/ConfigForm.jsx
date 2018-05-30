@@ -87,16 +87,10 @@ const ResetButton = ({ reset }) => {
   );
 };
 
-interface ConfigFormProps {
-  width: number;
-  inputValues: { key: any };
-  setInputValue: (key: string | null, value?: any) => {};
-}
-
-export default ({ width }: ConfigFormProps) => {
+export default () => {
   const styles = StyleSheet.create({
     configMenu: {
-      width,
+      width: '100%',
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'flex-end',
