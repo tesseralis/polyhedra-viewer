@@ -1,8 +1,9 @@
+// @flow
 import React from 'react';
 import { Route, NavLink } from 'react-router-dom';
 import { css, StyleSheet } from 'aphrodite/no-important';
 
-import Icon from './Icon';
+import { Icon } from 'components/common';
 import { resetButton, resetLink } from 'styles/common';
 
 const styles = StyleSheet.create({
@@ -28,7 +29,7 @@ const styles = StyleSheet.create({
   },
 });
 
-export default function IconLink({ iconName, title, to, replace, exact }) {
+export default function IconLink({ iconName, title, to, replace, exact }: *) {
   return (
     <Route>
       <NavLink

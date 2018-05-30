@@ -1,11 +1,10 @@
 // @flow strict
-import Polyhedron from './Polyhedron';
-import Vertex, { VertexList } from './Vertex';
-import Face from './Face';
-import Edge from './Edge';
-import Peak from './Peak';
 
-export { Polyhedron, Vertex, VertexList, Face, Edge, Peak };
+export { default as Polyhedron } from './Polyhedron';
+export { default as Vertex, VertexList } from './Vertex';
+export { default as Face } from './Face';
+export { default as Edge } from './Edge';
+export { default as Peak } from './Peak';
 
 export * from './solidTypes';
 

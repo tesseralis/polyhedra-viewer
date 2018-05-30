@@ -4,7 +4,7 @@ import { css, StyleSheet } from 'aphrodite/no-important';
 import { andaleMono } from 'styles/fonts';
 import { transition } from 'styles/common';
 
-import Icon from './Icon';
+import { Icon } from 'components/common';
 
 const styles = StyleSheet.create({
   searchBar: {

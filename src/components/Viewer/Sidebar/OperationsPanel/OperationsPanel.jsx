@@ -3,7 +3,7 @@ import React from 'react';
 import { css, StyleSheet } from 'aphrodite/no-important';
 
 import { operations, getRelations } from 'polyhedra/operations';
-import Tooltip from './Tooltip';
+import { Tooltip } from 'components/common';
 import OperationIcon from './OperationIcon';
 
 const styles = StyleSheet.create({

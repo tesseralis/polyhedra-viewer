@@ -1,2 +1,1 @@
-import Viewer from './Viewer';
-export { Viewer };
+export { default } from './Viewer';

@@ -23,7 +23,7 @@ import transition from 'transition.js';
 
 import X3dScene from './X3dScene';
 import X3dPolyhedron from './X3dPolyhedron';
-import { Sidebar } from './sidebar';
+import Sidebar from './Sidebar';
 import TwistOptions from './TwistOptions';
 import AugmentOptions from './AugmentOptions';
 import Title from './Title';

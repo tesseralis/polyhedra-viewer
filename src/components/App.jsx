@@ -5,8 +5,8 @@ import { Route } from 'react-router-dom';
 import 'styles/reset.css';
 import 'styles/box-sizing.css';
 
-import { PeriodicTable } from './table';
-import { Viewer } from './viewer';
+import PeriodicTable from './PeriodicTable';
+import Viewer from './Viewer';
 
 export default () => (
   <div>

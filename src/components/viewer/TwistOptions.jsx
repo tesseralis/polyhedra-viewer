@@ -3,7 +3,7 @@ import React from 'react';
 import { css, StyleSheet } from 'aphrodite/no-important';
 
 import { type Twist } from 'types';
-import Icon from './sidebar/Icon';
+import { Icon } from 'components/common';
 
 const styles = StyleSheet.create({
   twistOption: {
