@@ -188,8 +188,9 @@ class Viewer extends Component<ViewerProps, ViewerState> {
               solidData={(interpolated || polyhedron).solidData}
               faceColors={this.getColors()}
               config={config}
-              setApplyArgs={this.setApplyArgs}
-              applyOperation={this.applyCurrentOperation}
+              onHover={this.setApplyArgs}
+              onClick={this.applyCurrentOperation}
+              onMouseOut={this.unsetApplyArgs}
             />
           </X3dScene>
           <div className={css(styles.title)}>
@@ -390,12 +391,13 @@ class Viewer extends Component<ViewerProps, ViewerState> {
     }));
   };
 
-  setApplyArgs = (hitPnt?: Point) => {
+  unsetApplyArgs = () => {
+    this.setState({ applyArgs: {} });
+  };
+
+  setApplyArgs = (hitPnt: Point) => {
     this.setState(({ polyhedron, operation }) => {
-      if (!operation || !hitPnt) {
-        return { applyArgs: {} };
-      }
-      if (!operations[operation].getApplyArgs) return;
+      if (!operation || !operations[operation].getApplyArgs) return;
       return {
         applyArgs: operations[operation].getApplyArgs(polyhedron, hitPnt),
       };

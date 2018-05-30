@@ -30,10 +30,6 @@ export class ConfigProvider extends Component<*, *> {
   }
 
   setValue = (key: string, value: *) => {
-    // TODO make different functions
-    if (key === null) {
-      this.setState({ config: defaultConfig });
-    }
     this.setState(({ config }) => ({
       config: _.set(_.cloneDeep(config), key, value),
     }));

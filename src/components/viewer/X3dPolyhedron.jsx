@@ -42,8 +42,9 @@ interface PolyhedronProps {
   solidData: SolidData;
   config: *;
   faceColors: *;
-  applyOperation(): void;
-  setApplyArgs(hitPnt?: Point): void;
+  onClick(): void;
+  onHover(hitPnt: Point): void;
+  onMouseOut(): void;
 }
 
 interface PolyhedronState {
@@ -136,17 +137,15 @@ export default class X3dPolyhedron extends Component<
 
   handleMouseUp = () => {
     if (this.drag) return;
-    const { applyOperation } = this.props;
-    applyOperation();
+    this.props.onClick();
   };
 
   handleMouseMove = (event: SyntheticX3DMouseEvent) => {
     this.drag = true;
-    const { setApplyArgs } = this.props;
-    setApplyArgs(event.hitPnt);
+    this.props.onHover(event.hitPnt);
   };
 
   handleMouseOut = () => {
-    this.props.setApplyArgs();
+    this.props.onMouseOut();
   };
 }
