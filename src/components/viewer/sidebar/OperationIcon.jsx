@@ -7,6 +7,7 @@ import { css, StyleSheet } from 'aphrodite/no-important';
 const { PI, sqrt, sin, cos } = Math;
 const TAU = 2 * PI;
 
+const color = 'DimGray';
 const styles = StyleSheet.create({
   operationIcon: {
     width: 50,
@@ -14,29 +15,29 @@ const styles = StyleSheet.create({
   },
 
   invariant: {
-    fill: 'black',
-    stroke: 'black',
+    fill: color,
+    stroke: color,
     strokeWidth: 5,
     strokeLinejoin: 'round',
   },
 
   subtracted: {
     fill: 'none',
-    stroke: 'black',
+    stroke: color,
     strokeWidth: 5,
     strokeDasharray: 10,
   },
 
   added: {
     fill: 'none',
-    stroke: 'black',
+    stroke: color,
     strokeWidth: 5,
     strokeLinejoin: 'round',
   },
 
   changed: {
     fill: 'none',
-    stroke: 'black',
+    stroke: color,
     strokeWidth: 5,
   },
 });

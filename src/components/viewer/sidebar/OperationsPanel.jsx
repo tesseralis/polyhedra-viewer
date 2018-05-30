@@ -33,11 +33,13 @@ const styles = StyleSheet.create({
     border: '1px LightGray solid',
     color: 'DimGray',
 
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+
     ':disabled': {
       opacity: 0.3,
-      // borderColor: 'LightGray',
-      // backgroundColor: 'WhiteSmoke',
-      // color: 'LightGray',
     },
   },
 
