@@ -1,4 +1,4 @@
-// @flow
+// @flow strict
 import React from 'react';
 import { css, StyleSheet } from 'aphrodite/no-important';
 import _ from 'lodash';
@@ -87,7 +87,7 @@ const ResetButton = ({ reset }) => {
   );
 };
 
-export default () => {
+function ConfigForm({ config, setValue, reset }) {
   const styles = StyleSheet.create({
     configMenu: {
       width: '100%',
@@ -99,20 +99,24 @@ export default () => {
   });
 
   return (
-    <WithConfig>
-      {({ config, setValue, reset }) => (
-        <form className={css(styles.configMenu)}>
-          {configInputs.map(({ key, ...input }) => (
-            <LabelledInput
-              key={key}
-              input={input}
-              value={_.get(config, key)}
-              setValue={value => setValue(key, value)}
-            />
-          ))}
-          <ResetButton reset={reset} />
-        </form>
-      )}
-    </WithConfig>
+    <form className={css(styles.configMenu)}>
+      {configInputs.map(({ key, ...input }) => (
+        <LabelledInput
+          key={key}
+          input={input}
+          value={_.get(config, key)}
+          setValue={value => setValue(key, value)}
+        />
+      ))}
+      <ResetButton reset={reset} />
+    </form>
   );
-};
+}
+
+export default () => (
+  <WithConfig>
+    {({ config, setValue, reset }) => (
+      <ConfigForm config={config} setValue={setValue} reset={reset} />
+    )}
+  </WithConfig>
+);

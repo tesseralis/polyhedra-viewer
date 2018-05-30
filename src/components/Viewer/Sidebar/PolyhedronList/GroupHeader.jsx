@@ -7,6 +7,10 @@ const styles = StyleSheet.create({
   groupHeader: { fontFamily: hoeflerText, fontSize: 24 },
 });
 
-export default function GroupHeader({ text, ...props }) {
+interface Props {
+  text: string;
+}
+
+export default function GroupHeader({ text, ...props }: Props) {
   return <h2 className={css(styles.groupHeader, props.styles)}>{text}</h2>;
 }

@@ -1,3 +1,4 @@
+// @flow strict
 export const hoeflerText = [
   'Hoefler Text',
   'Baskerville Old Face',
