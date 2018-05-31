@@ -39,7 +39,7 @@ export default [
     columns: ['prism', 'antiprism'],
     data: _.zip(
       ['P3', '!C', 'P5', 'P6', 'P8', 'P10'],
-      ['!O', 'A4', 'A5', 'A6', 'A8', 'A10']
+      ['!O', 'A4', 'A5', 'A6', 'A8', 'A10'],
     ),
   },
 
@@ -95,7 +95,7 @@ export default [
         ['J40', 'J41'],
         ['J42', 'J43'],
       ],
-      ['coplanar', 'J17', '!I', 'concave', 'J44', 'J45', 'J46', 'J47', 'J48']
+      ['coplanar', 'J17', '!I', 'concave', 'J44', 'J45', 'J46', 'J47', 'J48'],
     ),
   },
 
@@ -130,25 +130,24 @@ export default [
     caption: 'Diminished Icosahedra',
     rows: ['icosahedron'],
     columns: [
-      'tridiminished',
-      { name: 'bidiminished', sub: ['para-', 'meta-'] },
       'diminished',
-      'augmented tridiminished',
+      { name: 'bidiminished', sub: ['para-', 'meta-'] },
+      { name: 'tridiminished', sub: ['--', 'augmented'] },
     ],
-    data: [['J63', ['!A5', 'J62'], '!J11', 'J64']],
+    data: [['!J11', ['!A5', 'J62'], ['J63', 'J64']]],
   },
 
   {
     caption: 'Gyrate and Diminished Rhombicosidodecahedra',
     rows: [
-      '',
+      '--',
       'diminished',
       'parabidiminished',
       'metabidiminished',
       'tridiminished',
     ],
     columns: [
-      '',
+      '--',
       { name: 'gyrate', sub: ['para-', 'meta-'] },
       { name: 'bigyrate', sub: ['para-', 'meta-'] },
       'trigyrate',
@@ -165,7 +164,7 @@ export default [
   {
     caption: 'Snub Antiprisms',
     rows: ['snub'],
-    columns: ['disphenoid', 'triangular', 'square antiprism'],
+    columns: ['digonal', 'triangular', 'square'],
     data: [['J84', '!I', 'J85']],
   },
 
