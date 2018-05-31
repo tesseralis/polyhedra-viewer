@@ -64,9 +64,7 @@ export default class AppPage {
   }
 
   expectTransitionTo(expected) {
-    const viewer = this.wrapper.find('Viewer');
     // TODO do a more robust animation test
-    // viewer.instance().finishAnimation();
     this.wrapper.update();
     this.expectPath(`/${expected}/related`);
     expect(this.getPolyhedron().isSame(Polyhedron.get(expected))).toBe(true);

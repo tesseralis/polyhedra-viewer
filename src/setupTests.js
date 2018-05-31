@@ -6,8 +6,3 @@ import { StyleSheetTestUtils } from 'aphrodite';
 
 configure({ adapter: new Adapter() });
 StyleSheetTestUtils.suppressStyleInjection();
-
-// TODO more robust transition mock
-jest.mock('transition', () => {
-  return jest.fn(({ onFinish }) => onFinish());
-});
