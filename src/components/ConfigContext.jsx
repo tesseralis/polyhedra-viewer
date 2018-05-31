@@ -4,14 +4,13 @@ import { defaultConfig } from 'constants/configOptions';
 
 import React, { Component } from 'react';
 
-// TODO where does this go? components/common? A state/reducer folder?
 const ConfigContext = React.createContext({
   config: defaultConfig,
   setValue: _.noop,
   reset: _.noop,
 });
 
-// TODO save config to local state?
+// TODO save config to browser storage
 export class ConfigProvider extends Component<*, *> {
   constructor(props: *) {
     super(props);

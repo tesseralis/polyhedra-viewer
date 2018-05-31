@@ -43,7 +43,6 @@ function duplicateVertices(polyhedron: Polyhedron, boundary, twist?: Twist) {
   );
 }
 
-// TODO add twist option to elongate
 function doElongate(polyhedron, twist) {
   const peaks = Peak.getAll(polyhedron);
   const boundary = peaks[0].boundary();
