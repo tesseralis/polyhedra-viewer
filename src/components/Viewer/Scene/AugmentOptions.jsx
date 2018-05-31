@@ -56,6 +56,7 @@ export default function AugmentOptions({
 }: Props) {
   const { gyrate, using } = options;
 
+  // FIXME make these options always in the right order
   const optionArgs = [
     {
       name: 'gyrate',

@@ -112,10 +112,13 @@ describe('viewer', () => {
     setup('/tridiminished-rhombicosidodecahedron/related');
     appPage
       .clickButtonWithText('augment')
+      .clickButtonWithText('ortho')
       .clickFaceWithNumSides(10)
       .expectTransitionTo('gyrate-bidiminished-rhombicosidodecahedron')
+      .clickButtonWithText('ortho')
       .clickFaceWithNumSides(10)
       .expectTransitionTo('bigyrate-diminished-rhombicosidodecahedron')
+      .clickButtonWithText('ortho')
       .clickFaceWithNumSides(10)
       .expectTransitionTo('trigyrate-rhombicosidodecahedron');
   });

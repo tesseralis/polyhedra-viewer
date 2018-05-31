@@ -127,11 +127,14 @@ const augmenteeSides = {
   R5: 10,
 };
 
+const usingTypeOrder = ['Y', 'U', 'R'];
+
 export function getUsingOpts(solid: string) {
   const augments = getRelations(solid, 'augment');
   const using = _.uniq(_.map(augments, 'using'));
   const grouped = _.groupBy(using, option => augmenteeSides[option]);
-  return _.find(grouped, group => group.length > 1) || [];
+  const opts = _.find(grouped, group => group.length > 1) || [];
+  return _.sortBy(opts, using => usingTypeOrder.indexOf(using[0]));
 }
 
 // Get the polyhedron name as a result of applying the operation to the given polyhedron
@@ -163,13 +166,14 @@ function hasMultipleOptionsForFace(relations) {
   );
 }
 
+// Return the default options for the given solid and operation
 export function applyOptionsFor(solid: string, operation: OpName) {
   if (!solid) return;
   const relations = getRelations(solid, operation);
   const newOpts = {};
   if (operation === 'augment') {
     if (_.filter(relations, 'gyrate').length > 1) {
-      newOpts.gyrate = 'ortho';
+      newOpts.gyrate = 'gyro';
     }
     if (hasMultipleOptionsForFace(relations)) {
       newOpts.using = getUsingOpts(solid)[0];
