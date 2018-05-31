@@ -3,13 +3,14 @@ import React from 'react';
 import { css, StyleSheet } from 'aphrodite/no-important';
 
 import { type Twist } from 'types';
-import { Icon } from 'components/common';
+import { Icon, SrOnly } from 'components/common';
 
 const styles = StyleSheet.create({
   twistOption: {
     border: 'none',
     pointerEvents: 'initial',
     margin: 50,
+    background: 'none',
   },
 
   twistOptions: {
@@ -25,6 +26,7 @@ function TwistOption({ orientation, onClick }) {
   return (
     <button onClick={onClick} className={css(styles.twistOption)}>
       <Icon name={`rotate-${orientation}`} angle={180} size={48} />
+      <SrOnly>{orientation}</SrOnly>
     </button>
   );
 }

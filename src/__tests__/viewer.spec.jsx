@@ -60,10 +60,15 @@ describe('viewer', () => {
       .expectTransitionTo('tetrahedron');
   });
 
-  it('snubs tetrahedron -> icosahedron without options', () => {
+  it('shows options on snub only when chiral options available', () => {
     setup('/tetrahedron/related');
 
-    appPage.clickButtonWithText('snub').expectTransitionTo('icosahedron');
+    appPage
+      .clickButtonWithText('snub')
+      .expectTransitionTo('icosahedron')
+      .clickButtonWithText('snub')
+      .clickButtonWithText('left')
+      .expectTransitionTo('snub-dodecahedron');
   });
 
   it('can transition through a pyramid series', () => {

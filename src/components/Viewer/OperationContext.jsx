@@ -86,12 +86,6 @@ class BaseOperationProvider extends Component<*, *> {
     );
   }
 
-  setStateAsync = async (updater: *) => {
-    return new Promise((resolve, reject) => {
-      this.setState(updater, resolve);
-    });
-  };
-
   isEnabled = (op: OpName) => {
     return !!getRelations(this.props.solid, op);
   };
@@ -101,22 +95,21 @@ class BaseOperationProvider extends Component<*, *> {
       return this.unsetOperation();
     }
 
-    this.setState(
-      {
-        operation: op,
-        options: applyOptionsFor(this.props.solid, op),
-      },
-      () => {
-        if (!hasOptions(op, getRelations(this.props.solid, op))) {
-          this.applyOperation();
-        }
-      },
-    );
+    if (!hasOptions(op, getRelations(this.props.solid, op))) {
+      this.applyOperation(op);
+    } else {
+      this.setOperation(op, this.props.solid);
+    }
   };
 
-  applyOperation = () => {
+  applyOperation = (
+    operation = this.state.operation,
+    options = this.state.options,
+    hitOptions = this.state.hitOptions,
+  ) => {
     const { polyhedron, solid, setSolid, transitionPolyhedron } = this.props;
-    const { operation, options, hitOptions } = this.state;
+    // const { operation, options, hitOptions } = this.state;
+
     if (!operation) throw new Error('no operation defined');
 
     const allOptions = { ...options, ...hitOptions };
@@ -128,23 +121,24 @@ class BaseOperationProvider extends Component<*, *> {
       allOptions,
     );
     if (!name) throw new Error('Name not found on new polyhedron');
-    const postOpState = (() => {
-      if (
-        _.isEmpty(getRelations(name, operation)) ||
-        !hasOptions(operation, getRelations(name, operation)) ||
-        _.isEmpty(allOptions)
-      ) {
-        return { operation: undefined, options: {} };
-      } else {
-        return { options: applyOptionsFor(name, operation) };
-      }
-    })();
+    if (
+      _.isEmpty(getRelations(name, operation)) ||
+      !hasOptions(operation, getRelations(name, operation)) ||
+      _.isEmpty(allOptions)
+    ) {
+      this.unsetOperation();
+    } else {
+      this.setOperation(operation, name);
+    }
 
     setSolid(name);
     transitionPolyhedron(result, animationData);
+  };
 
+  setOperation = (operation: OpName, solid) => {
     this.setState({
-      ...postOpState,
+      operation,
+      options: applyOptionsFor(solid, operation),
       hitOptions: {},
     });
   };
@@ -158,7 +152,7 @@ class BaseOperationProvider extends Component<*, *> {
   };
 
   setOption = (name: string, value: *) => {
-    return this.setStateAsync(({ options }) => ({
+    this.setState(({ options }) => ({
       options: { ...options, [name]: value },
     }));
   };

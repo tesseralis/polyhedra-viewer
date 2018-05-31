@@ -59,7 +59,7 @@ function OperationOverlay(props) {
       {_.includes(['shorten', 'snub', 'gyroelongate'], operation) && (
         <div className={css(styles.overlayContainer)}>
           <TwistOptions
-            onClick={_ => setOption('twist', _).then(applyOperation)}
+            onClick={_ => applyOperation(operation, { twist: _ })}
           />
         </div>
       )}
