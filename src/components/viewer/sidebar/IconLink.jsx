@@ -19,7 +19,7 @@ const styles = StyleSheet.create({
   },
   icon: {
     padding: 10,
-    color: 'Gray',
+    color: 'DimGray',
   },
   title: {
     marginTop: 5,
