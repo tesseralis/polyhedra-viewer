@@ -175,7 +175,11 @@ interface Operation<Options = {}, ApplyArgs = {}> {
 
   getSearchOptions(polyhedron: Polyhedron, options: Options): ?{};
 
-  getApplyArgs(polyhedron: Polyhedron, hitPnt: Point): ApplyArgs;
+  getApplyArgs(
+    polyhedron: Polyhedron,
+    hitPnt: Point,
+    options: Options,
+  ): ApplyArgs;
 
   getAllApplyArgs(polyhedron: Polyhedron): ApplyArgs[];
 
@@ -207,8 +211,8 @@ export function normalizeOperation(op: *): Operation<*, *> {
         },
       };
     },
-    getApplyArgs(polyhedron, hitPnt) {
-      return withDefaults.getApplyArgs(polyhedron, vec(hitPnt));
+    getApplyArgs(polyhedron, hitPnt, options) {
+      return withDefaults.getApplyArgs(polyhedron, vec(hitPnt), options);
     },
   };
 }

@@ -162,11 +162,15 @@ class BaseOperationProvider extends Component<*, *> {
   };
 
   setHitOptions = (hitPnt: Point) => {
-    this.setState(({ operation }, { polyhedron, isTransitioning }) => {
+    this.setState(({ operation, options }, { polyhedron, isTransitioning }) => {
       if (!operation || !operations[operation].getApplyArgs || isTransitioning)
         return;
       return {
-        hitOptions: operations[operation].getApplyArgs(polyhedron, hitPnt),
+        hitOptions: operations[operation].getApplyArgs(
+          polyhedron,
+          hitPnt,
+          options,
+        ),
       };
     });
   };

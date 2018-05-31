@@ -50,6 +50,7 @@ function getPossibleAugmentees(n) {
 // Checks to see if the polyhedron can be augmented at the base while remaining convex
 function canAugmentWith(base, augmentee, offset) {
   const n = base.numSides;
+  if (!augmentee) return false;
   const underside = augmentee.faceWithNumSides(n);
 
   return _.every(base.edges, (edge, i: number) => {
@@ -60,6 +61,16 @@ function canAugmentWith(base, augmentee, offset) {
 
     return baseAngle + augmenteeAngle < Math.PI - PRECISION;
   });
+}
+
+function canAugmentWithType(base, augmentType) {
+  const n = augmentType === 'pyramid' ? base.numSides : base.numSides / 2;
+  for (let offset of [0, 1]) {
+    if (canAugmentWith(base, augmentData[augmentType][n], offset)) {
+      return true;
+    }
+  }
+  return false;
 }
 
 function canAugment(base) {
@@ -73,15 +84,6 @@ function canAugment(base) {
     }
   }
   return false;
-}
-
-function getAugmentGraph(polyhedron) {
-  return polyhedron.faces.map(face => canAugment(face));
-}
-
-function getAugmentFace(polyhedron, graph, point) {
-  const hitFace = polyhedron.hitFace(point);
-  return graph[hitFace.index] ? hitFace : undefined;
 }
 
 // Computes the set equality of two arrays
@@ -184,7 +186,7 @@ function doAugment(
   gyrate,
   mock = false,
 ) {
-  // TODO disallow cases in the viewer where this is needed
+  // TODO fix the test generation code so we don't need this
   const using =
     getAugmenteeNumSides(_using) === base.numSides
       ? _using
@@ -318,11 +320,15 @@ export const augment: Operation<AugmentOptions> = {
     );
   },
 
-  getApplyArgs(polyhedron, hitPnt) {
-    // TODO disallow augmenting a triangular prism when fastigium is selected
-    const augmentInfo = getAugmentGraph(polyhedron);
-    const face = getAugmentFace(polyhedron, augmentInfo, hitPnt);
-    return face ? { face } : {};
+  getApplyArgs(polyhedron, hitPnt, options) {
+    const face = polyhedron.hitFace(hitPnt);
+    if (!options.using) {
+      return canAugment(face) ? { face } : {};
+    }
+    if (!canAugmentWithType(face, augmentTypes[options.using[0]])) {
+      return {};
+    }
+    return { face };
   },
 
   isHighlighted(polyhedron, applyArgs, face) {
