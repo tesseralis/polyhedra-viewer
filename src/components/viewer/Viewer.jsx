@@ -7,10 +7,8 @@ import { fullScreen } from 'styles/common';
 import { OperationProvider } from './OperationContext';
 // TODO how to prevent needing both of these??
 import { PolyhedronProvider, WithPolyhedron } from './PolyhedronContext';
-import X3dScene from './X3dScene';
-import X3dPolyhedron from './X3dPolyhedron';
 import Sidebar from './Sidebar';
-import OptionOverlay from './OptionOverlay';
+import Scene from './Scene';
 
 const styles = StyleSheet.create({
   viewer: {
@@ -63,10 +61,7 @@ class Viewer extends Component<*> {
           <Sidebar />
         </div>
         <div className={css(styles.scene)}>
-          <X3dScene>
-            <X3dPolyhedron />
-          </X3dScene>
-          <OptionOverlay solid={solid} />
+          <Scene solid={solid} />
         </div>
       </div>
     );

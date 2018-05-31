@@ -19,8 +19,8 @@ const styles = StyleSheet.create({
   },
 
   optionButton: {
-    height: 30,
-    width: '100%',
+    width: 64,
+    height: 64,
   },
 
   isHighlighted: {
@@ -76,11 +76,6 @@ export default function AugmentOptions({
     <div className={css(styles.augmentOptions)}>
       {optionArgs.map(({ name, values, value, description }) => (
         <div key={name} className={css(styles.augmentOption)}>
-          {/*
-          <Tooltip content={description}>
-            <span>{name}: </span>
-          </Tooltip>
-          */}
           {values.map(optValue => (
             <button
               key={optValue}

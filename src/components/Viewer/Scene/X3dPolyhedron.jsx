@@ -6,7 +6,7 @@ import EventListener from 'react-event-listener';
 import { type Point } from 'types';
 import { SolidData } from 'math/polyhedra';
 import { WithOperation } from 'components/Viewer/OperationContext';
-import { WithPolyhedron } from './PolyhedronContext';
+import { WithPolyhedron } from 'components/Viewer/PolyhedronContext';
 
 type SyntheticEventHandler = (e: $Subtype<SyntheticEvent<*>>) => void;
 

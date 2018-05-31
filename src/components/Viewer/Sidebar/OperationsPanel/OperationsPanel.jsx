@@ -4,7 +4,6 @@ import React, { Component } from 'react';
 import { css, StyleSheet } from 'aphrodite/no-important';
 
 import { operations } from 'polyhedra/operations';
-import { Tooltip } from 'components/common';
 import { WithOperation } from 'components/Viewer/OperationContext';
 import { WithPolyhedron } from 'components/Viewer/PolyhedronContext';
 import OperationIcon from './OperationIcon';
@@ -99,22 +98,17 @@ class OperationsPanel extends Component<*> {
         {operations.map(({ name, symbol, description }) => {
           return (
             <div key={name} style={{ gridArea: name }}>
-              <Tooltip
-                content={description}
-                trigger={false && isEnabled(name) ? ['hover'] : []}
+              <button
+                className={css(
+                  styles.operationButton,
+                  operation === name && styles.isHighlighted,
+                )}
+                disabled={!isEnabled(name) || isTransitioning}
+                onClick={() => selectOperation(name)}
               >
-                <button
-                  className={css(
-                    styles.operationButton,
-                    operation === name && styles.isHighlighted,
-                  )}
-                  disabled={!isEnabled(name) || isTransitioning}
-                  onClick={() => selectOperation(name)}
-                >
-                  <OperationIcon name={name} />
-                  {name}
-                </button>
-              </Tooltip>
+                <OperationIcon name={name} />
+                {name}
+              </button>
             </div>
           );
         })}
