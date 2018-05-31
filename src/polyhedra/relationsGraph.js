@@ -276,7 +276,7 @@ const basePyramidsCupolae = (() => {
 
   _.forEach(pyramidsCupolae, (row, name) => {
     const {
-      base,
+      '--': base,
       elongated,
       gyroelongated,
       'bi-': bi,
