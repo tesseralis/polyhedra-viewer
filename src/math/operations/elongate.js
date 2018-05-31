@@ -1,6 +1,7 @@
 // @flow strict
 import _ from 'lodash';
 import { type Twist } from 'types';
+import { Operation } from './operationTypes';
 import { Polyhedron, Peak } from 'math/polyhedra';
 import { withOrigin } from 'math/linAlg';
 import { mod } from 'util.js';
@@ -81,6 +82,11 @@ export function elongate(polyhedron: Polyhedron) {
   return doElongate(polyhedron);
 }
 
-export function gyroelongate(polyhedron: Polyhedron) {
-  return doElongate(polyhedron, 'left');
-}
+export const gyroelongate: Operation<{ twist: Twist }> = {
+  apply(polyhedron, { twist = 'left' }) {
+    return doElongate(polyhedron, twist);
+  },
+  getAllApplyArgs(polyhedron) {
+    return [{ twist: 'left' }, { twist: 'right' }];
+  },
+};

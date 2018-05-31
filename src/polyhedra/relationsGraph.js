@@ -234,10 +234,15 @@ const getPyramidCupolaConway = name => {
   return `${pyramidCupolaConway[type]}${nameMapping[sides]}`;
 };
 
-const getElongations = (prism, antiprism) => (pValue, aValue, gyrate) => {
+const getElongations = (prism, antiprism) => (
+  pValue,
+  aValue,
+  gyrate,
+  chiral,
+) => {
   return {
     P: { using: prism, value: pValue },
-    A: { using: antiprism, value: aValue, gyrate },
+    A: { using: antiprism, value: aValue, gyrate, chiral },
   };
 };
 
@@ -307,8 +312,8 @@ const basePyramidsCupolae = (() => {
       const [ortho, gyro] = bi;
       const [elongBiOrtho, elongBiGyro] = elongatedBi;
       graph = graphMerge(graph, {
-        [ortho]: elongations(elongBiOrtho, gyroelongatedBi, 'ortho'),
-        [gyro]: elongations(elongBiGyro, gyroelongatedBi, 'gyro'),
+        [ortho]: elongations(elongBiOrtho, gyroelongatedBi, 'ortho', true),
+        [gyro]: elongations(elongBiGyro, gyroelongatedBi, 'gyro', true),
       });
     }
 

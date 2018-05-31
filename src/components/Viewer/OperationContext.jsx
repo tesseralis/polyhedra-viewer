@@ -32,6 +32,7 @@ const hasMode = [
 function hasOptions(operation, relations) {
   switch (operation) {
     case 'snub':
+    case 'gyroelongate':
       return !!_.find(relations, 'chiral');
     case 'cumulate':
     case 'contract':

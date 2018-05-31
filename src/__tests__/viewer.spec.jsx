@@ -60,6 +60,12 @@ describe('viewer', () => {
       .expectTransitionTo('tetrahedron');
   });
 
+  it('snubs tetrahedron -> icosahedron without options', () => {
+    setup('/tetrahedron/related');
+
+    appPage.clickButtonWithText('snub').expectTransitionTo('icosahedron');
+  });
+
   it('can transition through a pyramid series', () => {
     setup('/square-pyramid/related');
 
