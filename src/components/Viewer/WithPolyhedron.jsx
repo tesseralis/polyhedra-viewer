@@ -79,6 +79,7 @@ class WithPolyhedron extends Component<*, *> {
 
     this.setState({
       isTransitioning: true,
+      polyhedron: animationData.start,
     });
 
     this.transitionId = transition(
