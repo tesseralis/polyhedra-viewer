@@ -321,6 +321,7 @@ export const augment: Operation<AugmentOptions> = {
   },
 
   getApplyArgs(polyhedron, hitPnt, options) {
+    if (!options) return {};
     const face = polyhedron.hitFace(hitPnt);
     if (!options.using) {
       return canAugment(face) ? { face } : {};

@@ -46,7 +46,7 @@ export interface Operation<Options = {}, ApplyArgs = {}> {
   getApplyArgs?: (
     polyhedron: Polyhedron,
     hitPnt: Vec3D,
-    options: Options,
+    options?: Options,
   ) => ApplyArgs;
 
   getAllApplyArgs?: (polyhedron: Polyhedron) => ApplyArgs[];
