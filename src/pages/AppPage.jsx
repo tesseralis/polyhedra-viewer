@@ -29,7 +29,7 @@ export default class AppPage {
   }
 
   getPolyhedron() {
-    return this.wrapper.find('Viewer').prop('polyhedron');
+    return this.wrapper.find('BaseOperationProvider').prop('polyhedron');
   }
 
   clickFace(face) {

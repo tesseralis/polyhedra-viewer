@@ -1,10 +1,12 @@
-// @flow strict
+// @flow
 import React, { Component } from 'react';
 import _ from 'lodash';
 import EventListener from 'react-event-listener';
 
 import { type Point } from 'types';
 import { SolidData } from 'math/polyhedra';
+import { WithOperation } from 'components/Viewer/OperationContext';
+import { WithPolyhedron } from './PolyhedronContext';
 
 type SyntheticEventHandler = (e: $Subtype<SyntheticEvent<*>>) => void;
 
@@ -51,10 +53,7 @@ interface PolyhedronState {
   error?: Error;
 }
 
-export default class X3dPolyhedron extends Component<
-  PolyhedronProps,
-  PolyhedronState,
-> {
+class X3dPolyhedron extends Component<PolyhedronProps, PolyhedronState> {
   shape: *;
   drag: boolean = false;
 
@@ -149,3 +148,29 @@ export default class X3dPolyhedron extends Component<
     this.props.onMouseOut();
   };
 }
+
+export default (props: *) => (
+  <WithPolyhedron>
+    {({ polyhedron, config }) => (
+      <WithOperation>
+        {({
+          hitOptions,
+          setHitOptions,
+          applyOperation,
+          unsetHitOptions,
+          getColors,
+        }) => (
+          <X3dPolyhedron
+            {...props}
+            config={config}
+            onHover={setHitOptions}
+            onClick={() => !_.isEmpty(hitOptions) && applyOperation()}
+            onMouseOut={unsetHitOptions}
+            faceColors={getColors()}
+            solidData={polyhedron.solidData}
+          />
+        )}
+      </WithOperation>
+    )}
+  </WithPolyhedron>
+);

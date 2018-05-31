@@ -16,13 +16,25 @@ function getFaceColors(polyhedron, colors) {
   );
 }
 
-class WithPolyhedron extends Component<*, *> {
+const PolyhedronContext = React.createContext({
+  polyhedron: Polyhedron.get('tetrahedron'),
+  config: {},
+  faceColors: {},
+  isTransitioning: false,
+  setPolyhedron: _.noop,
+  transitionPolyhedron: _.noop,
+  recenter: _.noop,
+  resize: _.noop,
+});
+
+class BasePolyhedronProvider extends Component<*, *> {
   transitionId: *;
 
   constructor(props: *) {
     super(props);
     this.state = {
       polyhedron: Polyhedron.get('tetrahedron'),
+      config: this.props.config,
       faceColors: {},
       isTransitioning: false,
       setPolyhedron: this.setPolyhedron,
@@ -39,7 +51,11 @@ class WithPolyhedron extends Component<*, *> {
   }
 
   render() {
-    return this.props.children(this.state);
+    return (
+      <PolyhedronContext.Provider value={this.state}>
+        {this.props.children}
+      </PolyhedronContext.Provider>
+    );
   }
 
   setPolyhedron = (name: string) => {
@@ -112,8 +128,10 @@ class WithPolyhedron extends Component<*, *> {
   };
 }
 
-export default (props: *) => (
+export const PolyhedronProvider = (props: *) => (
   <WithConfig>
-    {({ config }) => <WithPolyhedron {...props} config={config} />}
+    {({ config }) => <BasePolyhedronProvider {...props} config={config} />}
   </WithConfig>
 );
+
+export const WithPolyhedron = PolyhedronContext.Consumer;

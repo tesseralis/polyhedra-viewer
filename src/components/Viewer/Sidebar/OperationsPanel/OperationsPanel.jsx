@@ -1,10 +1,10 @@
 // @flow
-import _ from 'lodash';
 import React from 'react';
 import { css, StyleSheet } from 'aphrodite/no-important';
 
-import { operations, getRelations } from 'polyhedra/operations';
+import { operations } from 'polyhedra/operations';
 import { Tooltip } from 'components/common';
+import { WithOperation } from 'components/Viewer/OperationContext';
 import OperationIcon from './OperationIcon';
 
 const styles = StyleSheet.create({
@@ -63,74 +63,40 @@ const styles = StyleSheet.create({
   },
 });
 
-const hasMode = [
-  'snub',
-  'contract',
-  'shorten',
-  'cumulate',
-  'augment',
-  'diminish',
-  'gyrate',
-];
-
-// TODO possibly move this as part of the operation definition
-function hasOptions(operation, relations) {
-  switch (operation) {
-    case 'cumulate':
-    case 'contract':
-    case 'shorten':
-      if (relations.length > 1) {
-        return true;
-      }
-      return false;
-    default:
-      return _.includes(hasMode, operation);
-  }
-}
-
 export interface OperationsPanelProps {
   disabled: boolean;
-  solid: string;
   operation: string;
-  applyOperation(op: string): void;
-  setOperation(op: string): void;
+  selectOperation(op: string): void;
+  isEnabled(op: string): void;
   recenter(): void;
   resize(): void;
 }
 
 // TODO this could probably use a test to make sure all the buttons are in the right places
-export default function OperationsPanel({
+function OperationsPanel({
   disabled,
-  solid,
   operation,
-  applyOperation,
   recenter,
   resize,
-  setOperation,
+  selectOperation,
+  isEnabled,
 }: OperationsPanelProps) {
   return (
     <div className={css(styles.opGrid)}>
       {operations.map(({ name, symbol, description }) => {
-        const relations = getRelations(solid, name);
         return (
           <div key={name} style={{ gridArea: name }}>
             <Tooltip
               content={description}
-              trigger={false && !!relations ? ['hover'] : []}
+              trigger={false && isEnabled(name) ? ['hover'] : []}
             >
               <button
                 className={css(
                   styles.operationButton,
                   operation === name && styles.isHighlighted,
                 )}
-                disabled={!relations || disabled}
-                onClick={() => {
-                  if (hasOptions(name, relations)) {
-                    setOperation(name);
-                  } else {
-                    applyOperation(name);
-                  }
-                }}
+                disabled={!isEnabled(name) || disabled}
+                onClick={() => selectOperation(name)}
               >
                 <OperationIcon name={name} />
                 {name}
@@ -156,3 +122,16 @@ export default function OperationsPanel({
     </div>
   );
 }
+
+export default (props: *) => (
+  <WithOperation>
+    {({ operation, selectOperation, isEnabled }) => (
+      <OperationsPanel
+        {...props}
+        operation={operation}
+        selectOperation={selectOperation}
+        isEnabled={isEnabled}
+      />
+    )}
+  </WithOperation>
+);
