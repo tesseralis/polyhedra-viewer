@@ -107,7 +107,7 @@ const snubResults = {
 
 // TODO test chirality
 export const snub: Operation<{ twist: Twist }> = {
-  apply(polyhedron, { twist }) {
+  apply(polyhedron, { twist = 'left' }) {
     return doExpansion(polyhedron, snubResults[polyhedron.symmetry()], twist);
   },
   getAllApplyArgs(polyhedron) {

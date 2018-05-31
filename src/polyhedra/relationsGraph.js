@@ -17,13 +17,13 @@ const archimedean = {
     t: 'tC',
     a: 'aC',
     e: 'eC',
-    s: 'sC',
+    s: { value: 'sC', chiral: true },
   },
   O: {
     t: 'tO',
     a: 'aC',
     e: 'eC',
-    s: 'sC',
+    s: { value: 'sC', chiral: true },
   },
   aC: {
     // TODO (possibly) coxeter snub (semi-snub) and rectify relations
@@ -38,13 +38,13 @@ const archimedean = {
     t: 'tD',
     a: 'aD',
     e: 'eD',
-    s: 'sD',
+    s: { value: 'sD', chiral: true },
   },
   I: {
     t: 'tI',
     a: 'aD',
     e: 'eD',
-    s: 'sD',
+    s: { value: 'sD', chiral: true },
   },
   aD: {
     t: 'bD',

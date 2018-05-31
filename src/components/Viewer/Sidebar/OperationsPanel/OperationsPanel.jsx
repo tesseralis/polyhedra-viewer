@@ -1,6 +1,6 @@
 // @flow
 import _ from 'lodash';
-import React from 'react';
+import React, { Component } from 'react';
 import { css, StyleSheet } from 'aphrodite/no-important';
 
 import { operations } from 'polyhedra/operations';
@@ -47,7 +47,7 @@ const styles = StyleSheet.create({
   },
 
   isHighlighted: {
-    border: '2px red solid',
+    border: '2px DarkSlateGray solid',
   },
 
   recenterButton: {
@@ -65,64 +65,62 @@ const styles = StyleSheet.create({
   },
 });
 
-export interface OperationsPanelProps {
-  isTransitioning: boolean;
-  operation: string;
-  selectOperation(op: string): void;
-  isEnabled(op: string): void;
-  recenter(): void;
-  resize(): void;
-}
-
 // TODO this could probably use a test to make sure all the buttons are in the right places
-function OperationsPanel({
-  isTransitioning,
-  operation,
-  recenter,
-  resize,
-  selectOperation,
-  isEnabled,
-}: OperationsPanelProps) {
-  return (
-    <div className={css(styles.opGrid)}>
-      {operations.map(({ name, symbol, description }) => {
-        return (
-          <div key={name} style={{ gridArea: name }}>
-            <Tooltip
-              content={description}
-              trigger={false && isEnabled(name) ? ['hover'] : []}
-            >
-              <button
-                className={css(
-                  styles.operationButton,
-                  operation === name && styles.isHighlighted,
-                )}
-                disabled={!isEnabled(name) || isTransitioning}
-                onClick={() => selectOperation(name)}
+class OperationsPanel extends Component<*> {
+  componentWillUnmount() {
+    this.props.unsetOperation();
+  }
+
+  render() {
+    const {
+      isTransitioning,
+      operation,
+      recenter,
+      resize,
+      selectOperation,
+      isEnabled,
+    } = this.props;
+    return (
+      <div className={css(styles.opGrid)}>
+        <button
+          disabled={isTransitioning}
+          onClick={recenter}
+          className={css(styles.recenterButton)}
+        >
+          Recenter
+        </button>
+        <button
+          disabled={isTransitioning}
+          onClick={resize}
+          className={css(styles.resizeButton)}
+        >
+          Resize
+        </button>
+        {operations.map(({ name, symbol, description }) => {
+          return (
+            <div key={name} style={{ gridArea: name }}>
+              <Tooltip
+                content={description}
+                trigger={false && isEnabled(name) ? ['hover'] : []}
               >
-                <OperationIcon name={name} />
-                {name}
-              </button>
-            </Tooltip>
-          </div>
-        );
-      })}
-      <button
-        disabled={isTransitioning}
-        onClick={recenter}
-        className={css(styles.recenterButton)}
-      >
-        Recenter
-      </button>
-      <button
-        disabled={isTransitioning}
-        onClick={resize}
-        className={css(styles.resizeButton)}
-      >
-        Resize
-      </button>
-    </div>
-  );
+                <button
+                  className={css(
+                    styles.operationButton,
+                    operation === name && styles.isHighlighted,
+                  )}
+                  disabled={!isEnabled(name) || isTransitioning}
+                  onClick={() => selectOperation(name)}
+                >
+                  <OperationIcon name={name} />
+                  {name}
+                </button>
+              </Tooltip>
+            </div>
+          );
+        })}
+      </div>
+    );
+  }
 }
 
 export default (props: *) => (
@@ -140,6 +138,7 @@ export default (props: *) => (
             {..._.pick(operationProps, [
               'operation',
               'selectOperation',
+              'unsetOperation',
               'isEnabled',
             ])}
           />
