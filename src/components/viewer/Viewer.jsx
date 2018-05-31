@@ -17,7 +17,7 @@ import {
 } from 'polyhedra/operations';
 
 import { WithConfig } from 'components/ConfigContext';
-import { WithPolyhedron } from './PolyhedronContext';
+import WithPolyhedron from './WithPolyhedron';
 import X3dScene from './X3dScene';
 import X3dPolyhedron from './X3dPolyhedron';
 import Sidebar from './Sidebar';
@@ -92,7 +92,7 @@ interface ViewerState {
 }
 
 class Viewer extends Component<*, ViewerState> {
-  constructor(props: ViewerProps) {
+  constructor(props: *) {
     super(props);
     this.state = {
       operation: undefined,
@@ -100,10 +100,7 @@ class Viewer extends Component<*, ViewerState> {
       applyOptions: {},
       applyArgs: {},
     };
-  }
-
-  componentDidMount() {
-    const { solid, setPolyhedron } = this.props;
+    const { solid, setPolyhedron } = props;
     setPolyhedron(solid);
   }
 

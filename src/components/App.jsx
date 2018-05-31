@@ -7,7 +7,6 @@ import 'styles/box-sizing.css';
 
 import PeriodicTable from './PeriodicTable';
 import Viewer from './Viewer';
-import { PolyhedronProvider } from './Viewer/PolyhedronContext';
 
 export default () => (
   <div>
@@ -15,9 +14,7 @@ export default () => (
     <Route
       path="/:solid"
       render={({ match, history }) => (
-        <PolyhedronProvider>
-          <Viewer solid={match.params.solid} history={history} />
-        </PolyhedronProvider>
+        <Viewer solid={match.params.solid} history={history} />
       )}
     />
   </div>

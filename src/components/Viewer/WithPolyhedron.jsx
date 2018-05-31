@@ -6,16 +6,6 @@ import { WithConfig } from 'components/ConfigContext';
 import transition from 'transition';
 import { mapObject } from 'util.js';
 import { Polyhedron } from 'math/polyhedra';
-// TODO where does this go? components/common? A state/reducer folder?
-const PolyhedronContext = React.createContext({
-  polyhedron: undefined,
-  faceColors: {},
-  isTransitioning: false,
-  transitionPolyhedron: _.noop,
-  setPolyhedron: _.noop,
-  recenter: _.noop,
-  resize: _.noop,
-});
 
 function getFaceColors(polyhedron, colors) {
   return _.pickBy(
@@ -26,7 +16,7 @@ function getFaceColors(polyhedron, colors) {
   );
 }
 
-class BasePolyhedronProvider extends Component<*, *> {
+class WithPolyhedron extends Component<*, *> {
   transitionId: *;
 
   constructor(props: *) {
@@ -49,11 +39,7 @@ class BasePolyhedronProvider extends Component<*, *> {
   }
 
   render() {
-    return (
-      <PolyhedronContext.Provider value={this.state}>
-        {this.props.children}
-      </PolyhedronContext.Provider>
-    );
+    return this.props.children(this.state);
   }
 
   setPolyhedron = (name: string) => {
@@ -71,7 +57,7 @@ class BasePolyhedronProvider extends Component<*, *> {
 
   resize = () => {
     this.setState(({ polyhedron }) => ({
-      polyhedron: polyhedron.normalizeToVolume(4.5),
+      polyhedron: polyhedron.normalizeToVolume(5),
     }));
   };
 
@@ -124,10 +110,8 @@ class BasePolyhedronProvider extends Component<*, *> {
   };
 }
 
-export const PolyhedronProvider = (props: *) => (
+export default (props: *) => (
   <WithConfig>
-    {({ config }) => <BasePolyhedronProvider {...props} config={config} />}
+    {({ config }) => <WithPolyhedron {...props} config={config} />}
   </WithConfig>
 );
-
-export const WithPolyhedron = PolyhedronContext.Consumer;
