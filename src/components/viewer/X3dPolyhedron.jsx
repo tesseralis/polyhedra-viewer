@@ -1,5 +1,5 @@
 // @flow
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import _ from 'lodash';
 import EventListener from 'react-event-listener';
 
@@ -73,7 +73,7 @@ class X3dPolyhedron extends Component<PolyhedronProps, PolyhedronState> {
       throw error;
     }
     return (
-      <transform>
+      <Fragment>
         {showFaces && (
           // NOTE: The mouse handlers are duplicated to make it easy to test on enzyme.
           // They don't actually do anything in production
@@ -99,7 +99,7 @@ class X3dPolyhedron extends Component<PolyhedronProps, PolyhedronState> {
           </shape>
         )}
         {showEdges && <Edges edges={edges} vertices={vertices} />}
-      </transform>
+      </Fragment>
     );
   }
 
