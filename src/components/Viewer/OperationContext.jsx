@@ -34,10 +34,7 @@ function hasOptions(operation, relations) {
     case 'cumulate':
     case 'contract':
     case 'shorten':
-      if (relations.length > 1) {
-        return true;
-      }
-      return false;
+      return relations.length > 1;
     default:
       return _.includes(hasMode, operation);
   }
@@ -127,7 +124,7 @@ class BaseOperationProvider extends Component<*, *> {
     const postOpState = (() => {
       if (
         _.isEmpty(getRelations(name, operation)) ||
-        !hasOptions(operation, getRelations(this.props.solid, operation))
+        !hasOptions(operation, getRelations(name, operation))
       ) {
         return { operation: undefined, options: {} };
       } else {

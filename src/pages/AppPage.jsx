@@ -56,6 +56,12 @@ export default class AppPage {
     return this;
   }
 
+  expectOperation(operation) {
+    const actual = this.wrapper.find('BaseOperationProvider').prop('operation');
+    expect(operation).toEqual(actual);
+    return this;
+  }
+
   expectPath(path) {
     const viewer = this.wrapper.find('Viewer');
     const history = viewer.prop('history');

@@ -32,12 +32,20 @@ describe('viewer', () => {
     appPage.clickButtonWithText('diminish').clickFaceWithNumSides(6);
   });
 
-  it('unsets the mode and apply args when going to a different polyhedron', () => {
+  it('unsets the operation and options when going to a different polyhedron', () => {
     setup('/triangular-cupola/related');
     appPage
       .clickButtonWithText('augment')
       .clickButtonWithText('elongate')
       .expectNoButtonWithText('ortho');
+  });
+
+  it('unsets the operation when there are no more options', () => {
+    setup('/tetrahedron/related');
+    appPage
+      .clickButtonWithText('rectify')
+      .expectTransitionTo('octahedron')
+      .expectOperation(undefined);
   });
 
   it('can augment and diminish a tetrahedron', () => {
