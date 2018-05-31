@@ -1,10 +1,12 @@
 // @flow
+import _ from 'lodash';
 import React from 'react';
 import { css, StyleSheet } from 'aphrodite/no-important';
 
 import { operations } from 'polyhedra/operations';
 import { Tooltip } from 'components/common';
 import { WithOperation } from 'components/Viewer/OperationContext';
+import { WithPolyhedron } from 'components/Viewer/PolyhedronContext';
 import OperationIcon from './OperationIcon';
 
 const styles = StyleSheet.create({
@@ -64,7 +66,7 @@ const styles = StyleSheet.create({
 });
 
 export interface OperationsPanelProps {
-  disabled: boolean;
+  isTransitioning: boolean;
   operation: string;
   selectOperation(op: string): void;
   isEnabled(op: string): void;
@@ -74,7 +76,7 @@ export interface OperationsPanelProps {
 
 // TODO this could probably use a test to make sure all the buttons are in the right places
 function OperationsPanel({
-  disabled,
+  isTransitioning,
   operation,
   recenter,
   resize,
@@ -95,7 +97,7 @@ function OperationsPanel({
                   styles.operationButton,
                   operation === name && styles.isHighlighted,
                 )}
-                disabled={!isEnabled(name) || disabled}
+                disabled={!isEnabled(name) || isTransitioning}
                 onClick={() => selectOperation(name)}
               >
                 <OperationIcon name={name} />
@@ -106,14 +108,14 @@ function OperationsPanel({
         );
       })}
       <button
-        disabled={disabled}
+        disabled={isTransitioning}
         onClick={recenter}
         className={css(styles.recenterButton)}
       >
         Recenter
       </button>
       <button
-        disabled={disabled}
+        disabled={isTransitioning}
         onClick={resize}
         className={css(styles.resizeButton)}
       >
@@ -124,14 +126,25 @@ function OperationsPanel({
 }
 
 export default (props: *) => (
-  <WithOperation>
-    {({ operation, selectOperation, isEnabled }) => (
-      <OperationsPanel
-        {...props}
-        operation={operation}
-        selectOperation={selectOperation}
-        isEnabled={isEnabled}
-      />
+  <WithPolyhedron>
+    {polyhedronProps => (
+      <WithOperation>
+        {operationProps => (
+          <OperationsPanel
+            {...props}
+            {..._.pick(polyhedronProps, [
+              'resize',
+              'recenter',
+              'isTransitioning',
+            ])}
+            {..._.pick(operationProps, [
+              'operation',
+              'selectOperation',
+              'isEnabled',
+            ])}
+          />
+        )}
+      </WithOperation>
     )}
-  </WithOperation>
+  </WithPolyhedron>
 );

@@ -5,7 +5,7 @@ import { css, StyleSheet } from 'aphrodite/no-important';
 
 import IconLink from './IconLink';
 import ConfigForm from './ConfigForm';
-import OperationsPanel, { OperationsPanelProps } from './OperationsPanel';
+import OperationsPanel from './OperationsPanel';
 import PolyhedronList from './PolyhedronList';
 
 const styles = StyleSheet.create({
@@ -23,11 +23,7 @@ const styles = StyleSheet.create({
   },
 });
 
-interface Props {
-  operationsPanelProps: OperationsPanelProps;
-}
-
-export default function Sidebar({ operationsPanelProps }: Props) {
+export default function Sidebar() {
   return (
     <Route
       render={({ match }) => (
@@ -58,10 +54,7 @@ export default function Sidebar({ operationsPanelProps }: Props) {
             path={match.url}
             render={() => <Redirect to={`${match.url}/related`} />}
           />
-          <Route
-            path={`${match.url}/related`}
-            render={() => <OperationsPanel {...operationsPanelProps} />}
-          />
+          <Route path={`${match.url}/related`} component={OperationsPanel} />
           <Route path={`${match.url}/config`} component={ConfigForm} />
           <Route path={`${match.url}/list`} component={PolyhedronList} />
         </section>

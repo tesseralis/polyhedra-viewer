@@ -56,7 +56,6 @@ const OperationContext = React.createContext({
   getColors: _.noop,
 });
 
-// TODO save config to local state?
 class BaseOperationProvider extends Component<*, *> {
   constructor(props: *) {
     super(props);
@@ -64,16 +63,19 @@ class BaseOperationProvider extends Component<*, *> {
       operation: undefined,
       options: {},
       hitOptions: {},
-      setOption: this.setOption,
-      selectOperation: this.selectOperation,
-      isEnabled: this.isEnabled,
-      setHitOptions: this.setHitOptions,
-      applyOperation: this.applyOperation,
-      applyTwistOperation: this.applyTwistOperation,
-      unsetHitOptions: this.unsetHitOptions,
-      getColors: this.getColors,
+      // TODO can we not repeat all this?
+      ..._.pick(this, [
+        'setOption',
+        'selectOperation',
+        'isEnabled',
+        'setHitOptions',
+        'applyOperation',
+        'unsetHitOptions',
+        'getColors',
+      ]),
     };
   }
+
   render() {
     return (
       <OperationContext.Provider value={this.state}>
@@ -81,6 +83,12 @@ class BaseOperationProvider extends Component<*, *> {
       </OperationContext.Provider>
     );
   }
+
+  setStateAsync = async (updater: *) => {
+    return new Promise((resolve, reject) => {
+      this.setState(updater, resolve);
+    });
+  };
 
   isEnabled = (op: OpName) => {
     return !!getRelations(this.props.solid, op);
@@ -90,6 +98,7 @@ class BaseOperationProvider extends Component<*, *> {
     if (op === this.state.operation) {
       return this.setState({ operation: undefined });
     }
+
     this.setState(
       {
         operation: op,
@@ -99,18 +108,6 @@ class BaseOperationProvider extends Component<*, *> {
         if (!hasOptions(op, getRelations(this.props.solid, op))) {
           this.applyOperation();
         }
-      },
-    );
-  };
-
-  // FIXME don't have something like this
-  applyTwistOperation = (twist: *) => {
-    this.setState(
-      ({ hitOptions }) => {
-        return { hitOptions: { ...hitOptions, twist } };
-      },
-      () => {
-        this.applyOperation();
       },
     );
   };
@@ -148,7 +145,7 @@ class BaseOperationProvider extends Component<*, *> {
   };
 
   setOption = (name: string, value: *) => {
-    this.setState(({ options }) => ({
+    return this.setStateAsync(({ options }) => ({
       options: { ...options, [name]: value },
     }));
   };
@@ -166,7 +163,7 @@ class BaseOperationProvider extends Component<*, *> {
     });
   };
 
-  // FIXME put this in a better place
+  // TODO put this in a better place
   getColors = () => {
     const { polyhedron } = this.props;
     return polyhedron.faces.map(this.getColorForFace);

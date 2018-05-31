@@ -2,17 +2,15 @@
 import React, { Component } from 'react';
 import { css, StyleSheet } from 'aphrodite/no-important';
 
-import { andaleMono } from 'styles/fonts';
-import { fixed, fullScreen } from 'styles/common';
-import { unescapeName } from 'polyhedra/names';
+import { fullScreen } from 'styles/common';
 
 import { OperationProvider } from './OperationContext';
+// TODO how to prevent needing both of these??
 import { PolyhedronProvider, WithPolyhedron } from './PolyhedronContext';
 import X3dScene from './X3dScene';
 import X3dPolyhedron from './X3dPolyhedron';
 import Sidebar from './Sidebar';
 import OptionOverlay from './OptionOverlay';
-import Title from './Title';
 
 const styles = StyleSheet.create({
   viewer: {
@@ -29,27 +27,6 @@ const styles = StyleSheet.create({
     height: '100%',
     minHeight: '100%',
   },
-  title: {
-    ...fixed('bottom', 'right'),
-    padding: 36,
-    maxWidth: '50%',
-    textAlign: 'right',
-  },
-  description: {
-    ...fixed('top', 'right'),
-    padding: 36,
-    fontSize: 24,
-    fontFamily: andaleMono,
-    textAlign: 'right',
-  },
-  overlayContainer: {
-    position: 'absolute',
-    right: 0,
-    left: 0,
-    top: 0,
-    bottom: 0,
-    pointerEvents: 'none',
-  },
 });
 
 interface ViewerProps {
@@ -57,58 +34,39 @@ interface ViewerProps {
   history: any;
 }
 
-interface ViewerState {
-  opApplied: boolean;
-}
-
-class Viewer extends Component<*, ViewerState> {
+class Viewer extends Component<*> {
   constructor(props: *) {
     super(props);
-    this.state = {
-      operation: undefined,
-      opApplied: false,
-      applyOptions: {},
-      applyArgs: {},
-    };
     const { solid, setPolyhedron } = props;
     setPolyhedron(solid);
   }
 
   componentDidUpdate(prevProps) {
-    const { solid, setPolyhedron } = this.props;
-    const { opApplied } = this.state;
+    const { solid, setPolyhedron, history } = this.props;
 
-    // // If an operation has not been applied and there is a mismatch betweeen the props and context,
-    // // update context
-    if (!opApplied && solid !== prevProps.solid) {
-      // FIXME opApplied doesn't work anymore
+    // If an operation has not been applied and there is a mismatch betweeen the props and context,
+    // update context
+    // TODO is this janky?
+    if (
+      solid !== prevProps.solid &&
+      !history.location.pathname.endsWith('related')
+    ) {
       setPolyhedron(solid);
-    } else if (opApplied) {
-      this.setState({ opApplied: false });
     }
   }
 
   render() {
-    const { solid, isTransitioning, recenter, resize } = this.props;
+    const { solid } = this.props;
     return (
       <div className={css(styles.viewer)}>
         <div className={css(styles.sidebar)}>
-          <Sidebar
-            operationsPanelProps={{
-              recenter,
-              resize,
-              disabled: isTransitioning,
-            }}
-          />
+          <Sidebar />
         </div>
         <div className={css(styles.scene)}>
           <X3dScene>
             <X3dPolyhedron />
           </X3dScene>
-          <div className={css(styles.title)}>
-            <Title name={unescapeName(solid)} />
-          </div>
-          <OptionOverlay solid={solid} disabled={isTransitioning} />
+          <OptionOverlay solid={solid} />
         </div>
       </div>
     );

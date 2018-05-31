@@ -42,7 +42,7 @@ const Edges = ({ edges, vertices }) => {
 
 interface PolyhedronProps {
   solidData: SolidData;
-  config: *;
+  config: Object;
   faceColors: *;
   onClick(): void;
   onHover(hitPnt: Point): void;
@@ -164,7 +164,9 @@ export default (props: *) => (
             {...props}
             config={config}
             onHover={setHitOptions}
-            onClick={() => !_.isEmpty(hitOptions) && applyOperation()}
+            onClick={() => {
+              if (!_.isEmpty(hitOptions)) applyOperation();
+            }}
             onMouseOut={unsetHitOptions}
             faceColors={getColors()}
             solidData={polyhedron.solidData}

@@ -47,14 +47,12 @@ interface Props {
   options: *;
   solid: string;
   onClickOption(option: string, value: string): void;
-  disabled: boolean;
 }
 
 export default function AugmentOptions({
   options,
   solid,
   onClickOption,
-  disabled,
 }: Props) {
   const { gyrate, using } = options;
 
@@ -87,7 +85,7 @@ export default function AugmentOptions({
             <button
               key={optValue}
               onClick={() => onClickOption(name, optValue)}
-              disabled={!value || disabled}
+              disabled={!value}
               className={css(
                 styles.optionButton,
                 optValue === value && styles.isHighlighted,

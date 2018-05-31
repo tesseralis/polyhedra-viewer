@@ -2,6 +2,7 @@
 import _ from 'lodash';
 import React, { Component } from 'react';
 
+import { defaultConfig } from 'constants/configOptions';
 import { WithConfig } from 'components/ConfigContext';
 import transition from 'transition';
 import { mapObject } from 'util.js';
@@ -18,7 +19,7 @@ function getFaceColors(polyhedron, colors) {
 
 const PolyhedronContext = React.createContext({
   polyhedron: Polyhedron.get('tetrahedron'),
-  config: {},
+  config: defaultConfig,
   faceColors: {},
   isTransitioning: false,
   setPolyhedron: _.noop,
@@ -42,6 +43,11 @@ class BasePolyhedronProvider extends Component<*, *> {
       recenter: this.recenter,
       resize: this.resize,
     };
+  }
+
+  // Copy the config for ease of use
+  static getDerivedStateFromProps({ config }) {
+    return { config };
   }
 
   componentWillUnmount() {

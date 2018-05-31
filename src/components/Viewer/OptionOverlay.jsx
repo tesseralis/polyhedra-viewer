@@ -7,6 +7,8 @@ import { fixed } from 'styles/common';
 import { andaleMono } from 'styles/fonts';
 
 import { WithOperation } from 'components/Viewer/OperationContext';
+import { unescapeName } from 'polyhedra/names';
+import Title from './Title';
 import TwistOptions from './TwistOptions';
 import AugmentOptions from './AugmentOptions';
 
@@ -26,6 +28,12 @@ const styles = StyleSheet.create({
     fontFamily: andaleMono,
     textAlign: 'right',
   },
+  title: {
+    ...fixed('bottom', 'right'),
+    padding: 36,
+    maxWidth: '50%',
+    textAlign: 'right',
+  },
   overlayContainer: {
     position: 'absolute',
     right: 0,
@@ -37,16 +45,12 @@ const styles = StyleSheet.create({
 });
 
 function OperationOverlay(props) {
-  const {
-    operation,
-    solid,
-    options,
-    disabled,
-    applyTwistOperation,
-    setOption,
-  } = props;
+  const { operation, solid, options, applyOperation, setOption } = props;
   return (
     <Fragment>
+      <div className={css(styles.title)}>
+        <Title name={unescapeName(solid)} />
+      </div>
       {_.has(operationDescriptions, operation) && (
         <div className={css(styles.description)}>
           {_.get(operationDescriptions, operation)}
@@ -54,7 +58,9 @@ function OperationOverlay(props) {
       )}
       {_.includes(['shorten', 'snub'], operation) && (
         <div className={css(styles.overlayContainer)}>
-          <TwistOptions onClick={applyTwistOperation} />
+          <TwistOptions
+            onClick={_ => setOption('twist', _).then(applyOperation)}
+          />
         </div>
       )}
       {_.includes(['augment'], operation) && (
@@ -63,7 +69,6 @@ function OperationOverlay(props) {
             solid={solid}
             options={options}
             onClickOption={setOption}
-            disabled={disabled}
           />
         </div>
       )}
@@ -78,7 +83,7 @@ export default (props: *) => (
         {..._.pick(operationProps, [
           'operation',
           'options',
-          'applyTwistOperation',
+          'applyOperation',
           'setOption',
         ])}
       />
