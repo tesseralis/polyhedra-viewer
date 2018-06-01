@@ -15,13 +15,11 @@ class SolidColors extends Component<*> {
     return this.props.children(this.getColors());
   }
 
-  // TODO put this in a better place
   getColors = () => {
     const { polyhedron } = this.props;
     return polyhedron.faces.map(this.getColorForFace);
   };
 
-  // TODO probably move this and the color utility functions to their own file
   getColorForFace = (face: *) => {
     const {
       config,

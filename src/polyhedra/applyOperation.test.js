@@ -3,7 +3,7 @@ import { allSolidNames } from 'data';
 import { PRECISION, isPlanar } from 'math/linAlg';
 import { applyOperation, getOperations, getRelations } from './operations';
 import { Polyhedron, Peak } from 'math/polyhedra';
-import { operations, canAugment } from 'math/operations';
+import { operations } from 'math/operations';
 const debug = require('debug')('applyOperation.test');
 
 // map from polyhedron to excluded operations
