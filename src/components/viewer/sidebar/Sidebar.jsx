@@ -12,14 +12,20 @@ const styles = StyleSheet.create({
   sidebar: {
     width: 400,
     height: '100%',
-    overflowY: 'scroll',
-    backgroundColor: 'WhiteSmoke',
-    boxShadow: 'inset -1px -1px 4px LightGray',
+    position: 'relative',
+    boxShadow: '1px 1px 4px LightGray',
   },
   menu: {
     display: 'flex',
+    height: 75,
     justifyContent: 'space-between',
     padding: '0 10px',
+    borderBottom: '1px solid LightGray',
+  },
+  content: {
+    paddingTop: 10,
+    height: 'calc(100% - 75px)',
+    overflowY: 'scroll',
   },
 });
 
@@ -49,14 +55,16 @@ export default function Sidebar() {
               iconName="math-compass"
             />
           </div>
-          <Route
-            exact
-            path={match.url}
-            render={() => <Redirect to={`${match.url}/related`} />}
-          />
-          <Route path={`${match.url}/related`} component={OperationsPanel} />
-          <Route path={`${match.url}/config`} component={ConfigForm} />
-          <Route path={`${match.url}/list`} component={PolyhedronList} />
+          <div className={css(styles.content)}>
+            <Route
+              exact
+              path={match.url}
+              render={() => <Redirect to={`${match.url}/related`} />}
+            />
+            <Route path={`${match.url}/related`} component={OperationsPanel} />
+            <Route path={`${match.url}/config`} component={ConfigForm} />
+            <Route path={`${match.url}/list`} component={PolyhedronList} />
+          </div>
         </section>
       )}
     />

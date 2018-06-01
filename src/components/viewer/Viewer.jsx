@@ -17,6 +17,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   sidebar: {
+    position: 'relative',
     height: '100%',
   },
   scene: {
@@ -80,6 +81,5 @@ export default (props: ViewerProps) => (
         )}
       </WithPolyhedron>
     </OperationProvider>
-    )}
   </PolyhedronProvider>
 );

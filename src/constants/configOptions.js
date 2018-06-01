@@ -45,6 +45,7 @@ export const configInputs = [
     default: true,
   },
   {
+    // TODO <select> would probably be best
     key: 'animationSpeed',
     type: 'range',
     default: 1,

@@ -43,7 +43,7 @@ function doShorten(polyhedron: Polyhedron, options) {
   // TODO there is logic here that's duplicated in elongate. Maybe consider combining?
   const n = boundary.numSides;
   const scale = polyhedron.edgeLength() * (twist ? antiprismHeight(n) : 1);
-  const theta = -getTwistSign(twist) * Math.PI / n;
+  const theta = getTwistSign(twist) * Math.PI / n;
 
   const endVertices = getTransformedVertices(setToMap, set =>
     withOrigin(set.normalRay(), v =>
@@ -100,7 +100,7 @@ export const shorten: Operation<ShortenOptions> = {
     if (!isGyroelongatedBiCupola(polyhedron)) return;
     const { twist } = options;
     const chirality = getChirality(polyhedron);
-    const gyrate = twist !== chirality ? 'ortho' : 'gyro';
+    const gyrate = twist === chirality ? 'ortho' : 'gyro';
     return { gyrate };
   },
 
