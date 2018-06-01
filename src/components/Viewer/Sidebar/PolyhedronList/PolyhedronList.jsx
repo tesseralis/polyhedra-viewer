@@ -139,10 +139,12 @@ export default class PolyhedronList extends Component {
 
   render() {
     const { filterText } = this.state;
+    const filteredGroups =
+      filterText === '' ? groups : filterGroups(groups, filterText);
     return (
       <div>
         <SearchBar text={filterText} onChange={this.handleFilterChange} />
-        {filterGroups(groups, filterText).map(({ name, ...group }) => (
+        {filteredGroups.map(({ name, ...group }) => (
           <PolyhedronGroup key={name} group={group} />
         ))}
       </div>
