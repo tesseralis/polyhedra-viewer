@@ -1,9 +1,11 @@
 // @flow
 import React from 'react';
 import { Route } from 'react-router-dom';
+import 'what-input';
 
 import 'styles/reset.css';
 import 'styles/box-sizing.css';
+import 'styles/a11y.css';
 
 import PeriodicTable from './PeriodicTable';
 import Viewer from './Viewer';
