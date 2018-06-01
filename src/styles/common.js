@@ -1,7 +1,7 @@
 // @flow strict
 export const hover = {
-  ':hover': {
-    backgroundColor: 'LightGray',
+  ':hover:not(:disabled)': {
+    backgroundColor: 'Gainsboro',
   },
 };
 

@@ -5,7 +5,7 @@ import _ from 'lodash';
 
 import { WithConfig } from 'components/ConfigContext';
 import { configInputs } from 'constants/configOptions';
-import { hover, transition } from 'styles/common';
+import { hover } from 'styles/common';
 import { andaleMono } from 'styles/fonts';
 
 const getInputValue = (input, el) => {
@@ -60,23 +60,15 @@ const ResetButton = ({ reset }) => {
   const styles = StyleSheet.create({
     resetButton: {
       ...hover,
-      ...transition('all', 0.25),
 
       width: 120,
       height: 30,
       marginTop: 20,
 
-      background: 'WhiteSmoke',
-      border: '2px LightGray solid',
-      borderRadius: 2,
+      border: '1px LightGray solid',
 
       fontFamily: andaleMono,
       fontSize: 14,
-
-      ':focus': {
-        outline: 'none',
-        borderColor: 'Gray',
-      },
     },
   });
 

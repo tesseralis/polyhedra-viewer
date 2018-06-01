@@ -7,7 +7,9 @@ import { operations } from 'polyhedra/operations';
 import { WithOperation } from 'components/Viewer/OperationContext';
 import { WithPolyhedron } from 'components/Viewer/PolyhedronContext';
 import OperationIcon from './OperationIcon';
+
 import { verdana, andaleMono } from 'styles/fonts';
+import { hover } from 'styles/common';
 
 const styles = StyleSheet.create({
   opGrid: {
@@ -46,6 +48,8 @@ const styles = StyleSheet.create({
     ':disabled': {
       opacity: 0.3,
     },
+
+    ...hover,
   },
 
   isHighlighted: {
@@ -58,6 +62,7 @@ const styles = StyleSheet.create({
     padding: 10,
     fontSize: 14,
     fontFamily: andaleMono,
+    ...hover,
   },
 });
 
