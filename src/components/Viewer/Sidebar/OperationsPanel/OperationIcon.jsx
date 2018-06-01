@@ -1,6 +1,6 @@
 // @flow strict
 import _ from 'lodash';
-import React, { Fragment } from 'react';
+import React, { PureComponent, Fragment } from 'react';
 import { css, StyleSheet } from 'aphrodite/no-important';
 
 import { Polygon, PolyLine } from 'components/svg';
@@ -377,10 +377,14 @@ interface Props {
   name: string;
 }
 
-export default function OperationIcon({ name }: Props) {
-  return (
-    <svg viewBox="0 0 200 200" className={css(styles.operationIcon)}>
-      {drawIcon(name)}
-    </svg>
-  );
+// PureComponent so we don't rerender when name is the same
+export default class OperationIcon extends PureComponent<Props> {
+  render() {
+    const { name } = this.props;
+    return (
+      <svg viewBox="0 0 200 200" className={css(styles.operationIcon)}>
+        {drawIcon(name)}
+      </svg>
+    );
+  }
 }

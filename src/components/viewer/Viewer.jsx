@@ -1,5 +1,5 @@
 // @flow
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import { css, StyleSheet } from 'aphrodite/no-important';
 
 import { fullScreen } from 'styles/common';
@@ -32,7 +32,7 @@ interface ViewerProps {
   history: any;
 }
 
-class Viewer extends Component<*> {
+class Viewer extends PureComponent<*> {
   constructor(props: *) {
     super(props);
     const { solid, setPolyhedron } = props;

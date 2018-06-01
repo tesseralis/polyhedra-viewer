@@ -1,6 +1,6 @@
 // @flow strict
 import _ from 'lodash';
-import React, { Fragment } from 'react';
+import React, { PureComponent, Fragment } from 'react';
 import { css, StyleSheet } from 'aphrodite/no-important';
 
 import { Polygon, PolyLine, PolyShape, polygonPoints } from 'components/svg';
@@ -165,12 +165,14 @@ function drawIcon(name) {
       throw new Error('unknown icon type');
   }
 }
-
-export default function OptionIcon({ name }: Props) {
-  // TODO should the viewBox actually be centered on zero?
-  return (
-    <svg viewBox="0 0 200 200" className={css(styles.icon)}>
-      {drawIcon(name)}
-    </svg>
-  );
+// PureComponent so we don't rerender when name is the same
+export default class OptionIcon extends PureComponent<Props> {
+  render() {
+    const { name } = this.props;
+    return (
+      <svg viewBox="0 0 200 200" className={css(styles.icon)}>
+        {drawIcon(name)}
+      </svg>
+    );
+  }
 }
