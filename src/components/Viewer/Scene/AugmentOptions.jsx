@@ -2,6 +2,7 @@
 import React from 'react';
 import { css, StyleSheet } from 'aphrodite/no-important';
 import { getUsingOpts } from 'polyhedra/operations';
+import OptionIcon from './OptionIcon';
 
 const styles = StyleSheet.create({
   augmentOptions: {
@@ -87,6 +88,7 @@ export default function AugmentOptions({
                 optValue === value && styles.isHighlighted,
               )}
             >
+              <OptionIcon name={getOptionName(optValue)} />
               {getOptionName(optValue)}
             </button>
           ))}
