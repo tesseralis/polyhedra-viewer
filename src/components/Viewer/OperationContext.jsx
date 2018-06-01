@@ -1,7 +1,6 @@
 // @flow
 import _ from 'lodash';
 import React, { Component } from 'react';
-import tinycolor from 'tinycolor2';
 
 import type { Point } from 'types';
 import { operations, type OpName } from 'math/operations';
@@ -12,11 +11,6 @@ import {
 } from 'polyhedra/operations';
 
 import { WithPolyhedron } from './PolyhedronContext';
-
-function toRgb(hex: string) {
-  const { r, g, b } = tinycolor(hex).toRgb();
-  return [r / 255, g / 255, b / 255];
-}
 
 const hasMode = [
   'snub',
@@ -55,7 +49,6 @@ const OperationContext = React.createContext({
   setHitOptions: _.noop,
   unsetHitOptions: _.noop,
   applyOperation: _.noop,
-  getColors: _.noop,
   unsetOperation: _.noop,
 });
 
@@ -75,7 +68,6 @@ class BaseOperationProvider extends Component<*, *> {
         'setHitOptions',
         'applyOperation',
         'unsetHitOptions',
-        'getColors',
       ]),
     };
   }
@@ -175,32 +167,6 @@ class BaseOperationProvider extends Component<*, *> {
       };
     });
   };
-
-  // TODO put this in a better place
-  getColors = () => {
-    const { polyhedron } = this.props;
-    return polyhedron.faces.map(this.getColorForFace);
-  };
-
-  // TODO probably move this and the color utility functions to their own file
-  getColorForFace = (face: *) => {
-    const { config, polyhedron, faceColors } = this.props;
-    const { hitOptions, operation } = this.state;
-    const { colors } = config;
-
-    // While doing animation, if we specify that this face has a color, use it
-    if (!!faceColors && _.has(faceColors, face.index.toString())) {
-      return toRgb(faceColors[face.index]);
-    }
-
-    if (operation && operation.isHighlighted(polyhedron, hitOptions, face)) {
-      return toRgb(
-        tinycolor.mix(colors[face.numSides], 'lightyellow').toHexString(),
-      );
-    }
-
-    return toRgb(colors[face.numSides]);
-  };
 }
 
 export function OperationProvider(props: *) {
@@ -210,10 +176,8 @@ export function OperationProvider(props: *) {
         <BaseOperationProvider
           {...props}
           {..._.pick(polyhedronProps, [
-            'config',
             'polyhedron',
             'isTransitioning',
-            'faceColors',
             'transitionPolyhedron',
           ])}
         />
