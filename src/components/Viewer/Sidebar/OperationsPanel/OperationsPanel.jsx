@@ -95,7 +95,7 @@ class OperationsPanel extends PureComponent<*> {
         >
           Resize
         </button>
-        {operations.map(({ name, symbol, description }) => {
+        {operations.map(({ name }) => {
           return (
             <button
               key={name}
