@@ -46,6 +46,7 @@ function hasOptions(operation, relations) {
 // TODO can we not repeat all this?
 const OperationContext = React.createContext({
   operation: undefined,
+  opName: '',
   options: {},
   hitOptions: {}, // options determined by the polyhedron face
   setOption: _.noop,
@@ -63,6 +64,7 @@ class BaseOperationProvider extends Component<*, *> {
     super(props);
     this.state = {
       operation: undefined,
+      opName: '',
       options: {},
       hitOptions: {},
       ..._.pick(this, [
@@ -90,30 +92,31 @@ class BaseOperationProvider extends Component<*, *> {
     return !!getRelations(this.props.solid, op);
   };
 
-  selectOperation = (op: OpName) => {
-    if (op === this.state.operation) {
+  selectOperation = (opName: OpName) => {
+    if (opName === this.state.opName) {
       return this.unsetOperation();
     }
 
-    if (!hasOptions(op, getRelations(this.props.solid, op))) {
-      this.applyOperation(op);
+    if (!hasOptions(opName, getRelations(this.props.solid, opName))) {
+      this.applyOperation(opName);
     } else {
-      this.setOperation(op, this.props.solid);
+      this.setOperation(opName, this.props.solid);
     }
   };
 
   applyOperation = (
-    operation = this.state.operation,
+    opName = this.state.opName,
     options = this.state.options,
     hitOptions = this.state.hitOptions,
   ) => {
     const { polyhedron, solid, setSolid, transitionPolyhedron } = this.props;
-    // const { operation, options, hitOptions } = this.state;
+    const operation = operations[opName];
 
     if (!operation) throw new Error('no operation defined');
 
     const allOptions = { ...options, ...hitOptions };
 
+    // TODO use the operation name instead
     const { result, name, animationData } = applyOperation(
       operation,
       solid,
@@ -121,30 +124,33 @@ class BaseOperationProvider extends Component<*, *> {
       allOptions,
     );
     if (!name) throw new Error('Name not found on new polyhedron');
+    const newRelations = getRelations(name, opName);
     if (
-      _.isEmpty(getRelations(name, operation)) ||
-      !hasOptions(operation, getRelations(name, operation)) ||
+      _.isEmpty(newRelations) ||
+      !hasOptions(opName, newRelations) ||
       _.isEmpty(allOptions)
     ) {
       this.unsetOperation();
     } else {
-      this.setOperation(operation, name);
+      this.setOperation(opName, name);
     }
 
     setSolid(name);
     transitionPolyhedron(result, animationData);
   };
 
-  setOperation = (operation: OpName, solid) => {
+  setOperation = (opName: OpName, solid) => {
     this.setState({
-      operation,
-      options: applyOptionsFor(solid, operation),
+      opName,
+      operation: operations[opName],
+      options: applyOptionsFor(solid, opName),
       hitOptions: {},
     });
   };
 
   unsetOperation = () => {
     this.setState({
+      opName: '',
       operation: undefined,
       options: {},
       hitOptions: {},
@@ -163,14 +169,9 @@ class BaseOperationProvider extends Component<*, *> {
 
   setHitOptions = (hitPnt: Point) => {
     this.setState(({ operation, options }, { polyhedron, isTransitioning }) => {
-      if (!operation || !operations[operation].getApplyArgs || isTransitioning)
-        return;
+      if (!operation || !operation.getApplyArgs || isTransitioning) return;
       return {
-        hitOptions: operations[operation].getApplyArgs(
-          polyhedron,
-          hitPnt,
-          options,
-        ),
+        hitOptions: operation.getApplyArgs(polyhedron, hitPnt, options),
       };
     });
   };
@@ -192,10 +193,7 @@ class BaseOperationProvider extends Component<*, *> {
       return toRgb(faceColors[face.index]);
     }
 
-    if (
-      operation &&
-      operations[operation].isHighlighted(polyhedron, hitOptions, face)
-    ) {
+    if (operation && operation.isHighlighted(polyhedron, hitOptions, face)) {
       return toRgb(
         tinycolor.mix(colors[face.numSides], 'lightyellow').toHexString(),
       );

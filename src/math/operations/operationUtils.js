@@ -1,6 +1,7 @@
 // @flow strict
 import _ from 'lodash';
 
+import type { OpName } from './operationTypes';
 import type { Point, Twist } from 'types';
 import {
   Polyhedron,
@@ -190,12 +191,13 @@ interface Operation<Options = {}, ApplyArgs = {}> {
   ): boolean;
 }
 
-export function normalizeOperation(op: *): Operation<*, *> {
+export function normalizeOperation(op: *, name: OpName): Operation<*, *> {
   const withDefaults = fillDefaults(
     typeof op === 'function' ? { apply: op } : op,
   );
   return {
     ...withDefaults,
+    name,
     apply(polyhedron, options) {
       const opResult = withDefaults.apply(polyhedron, options);
       if (!opResult.animationData) {

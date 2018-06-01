@@ -66,10 +66,8 @@ expect.extend({
 });
 
 function getOptsToTest(operation, name, polyhedron) {
-  const relations = getRelations(name, operation);
-  return (
-    operations[operation].getAllApplyArgs(polyhedron, relations) || [undefined]
-  );
+  const relations = getRelations(name, operation.name);
+  return operation.getAllApplyArgs(polyhedron, relations) || [undefined];
 }
 
 // TODO reconsider how these tests are organized
@@ -78,9 +76,10 @@ describe('applyOperation', () => {
     it(`correctly applies all possible operations on ${solidName}`, () => {
       const allOperations = getOperations(solidName);
       const excluded = excludedOperations[solidName];
-      const operations = _.difference(allOperations, excluded);
-      operations.forEach(operation => {
+      const opNames = _.difference(allOperations, excluded);
+      opNames.forEach(opName => {
         const polyhedron = Polyhedron.get(solidName);
+        const operation = operations[opName];
         const optsToTest = getOptsToTest(operation, solidName, polyhedron);
         optsToTest.forEach(options => {
           const result = applyOperation(

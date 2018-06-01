@@ -5,7 +5,6 @@ import { find } from 'util.js';
 import { fromConwayNotation, toConwayNotation } from './names';
 import { Polyhedron } from 'math/polyhedra';
 import polyhedraGraph from './relationsGraph';
-import { operations as mathOps } from 'math/operations';
 import type { OpName as BaseOpName, OperationResult } from 'math/operations';
 
 export type OpName = BaseOpName | 'twist' | 'turn';
@@ -183,22 +182,22 @@ export function applyOptionsFor(solid: string, operation: OpName) {
 }
 
 export function applyOperation(
-  operation: OpName,
+  operation: *,
   name: string,
   polyhedron: Polyhedron,
   config: any = {},
 ): OperationResult {
-  const relations = getRelations(name, operation);
-  const op = mathOps[operation];
-  const options = op.getSearchOptions(polyhedron, config, relations);
+  const relations = getRelations(name, operation.name);
+  // const op = mathOps[operation];
+  const options = operation.getSearchOptions(polyhedron, config, relations);
 
-  const next = getNextPolyhedron(name, operation, _.pickBy(options));
-  if (!op) {
+  const next = getNextPolyhedron(name, operation.name, _.pickBy(options));
+  if (!operation.name) {
     return {
       result: Polyhedron.get(next),
       name: next,
       animationData: undefined,
     };
   }
-  return { name: next, ...op.apply(polyhedron, config) };
+  return { name: next, ...operation.apply(polyhedron, config) };
 }

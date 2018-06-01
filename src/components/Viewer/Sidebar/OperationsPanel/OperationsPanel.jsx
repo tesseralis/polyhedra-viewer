@@ -73,7 +73,7 @@ class OperationsPanel extends Component<*> {
   render() {
     const {
       isTransitioning,
-      operation,
+      opName,
       recenter,
       resize,
       selectOperation,
@@ -101,7 +101,7 @@ class OperationsPanel extends Component<*> {
               <button
                 className={css(
                   styles.operationButton,
-                  operation === name && styles.isHighlighted,
+                  opName === name && styles.isHighlighted,
                 )}
                 disabled={!isEnabled(name) || isTransitioning}
                 onClick={() => selectOperation(name)}
@@ -130,7 +130,7 @@ export default (props: *) => (
               'isTransitioning',
             ])}
             {..._.pick(operationProps, [
-              'operation',
+              'opName',
               'selectOperation',
               'unsetOperation',
               'isEnabled',
