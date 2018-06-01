@@ -197,7 +197,7 @@ class BaseOperationProvider extends Component<*, *> {
       operations[operation].isHighlighted(polyhedron, hitOptions, face)
     ) {
       return toRgb(
-        tinycolor.mix(colors[face.numSides], 'yellow').toHexString(),
+        tinycolor.mix(colors[face.numSides], 'lightyellow').toHexString(),
       );
     }
 
