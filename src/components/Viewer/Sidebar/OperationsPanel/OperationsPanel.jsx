@@ -7,20 +7,22 @@ import { operations } from 'polyhedra/operations';
 import { WithOperation } from 'components/Viewer/OperationContext';
 import { WithPolyhedron } from 'components/Viewer/PolyhedronContext';
 import OperationIcon from './OperationIcon';
+import { verdana, andaleMono } from 'styles/fonts';
 
 const styles = StyleSheet.create({
   opGrid: {
-    padding: '0 10px',
+    padding: 10,
     display: 'grid',
+    justifyContent: 'space-around',
     columnGap: 5,
-    rowGap: 30,
+    rowGap: 20,
     // TODO encode the ordering in the actual operation types
     gridTemplateAreas: `
-      "recenter recenter     resize   resize"
       "truncate rectify      cumulate dual"
       "expand   snub         contract twist"
       "elongate gyroelongate shorten  turn"
       "augment  augment      diminish gyrate"
+      "recenter recenter     resize   resize"
     `,
   },
 
@@ -29,6 +31,7 @@ const styles = StyleSheet.create({
   },
 
   operationButton: {
+    fontFamily: verdana,
     fontSize: 12,
     width: 84,
     height: 84,
@@ -49,18 +52,12 @@ const styles = StyleSheet.create({
     border: '2px DarkSlateGray solid',
   },
 
-  recenterButton: {
+  resetButton: {
     borderColor: 'LightGray',
     marginTop: 10,
-    gridArea: 'recenter',
     padding: 10,
-  },
-
-  resizeButton: {
-    borderColor: 'LightGray',
-    marginTop: 10,
-    gridArea: 'resize',
-    padding: 10,
+    fontSize: 14,
+    fontFamily: andaleMono,
   },
 });
 
@@ -81,20 +78,6 @@ class OperationsPanel extends PureComponent<*> {
     } = this.props;
     return (
       <div className={css(styles.opGrid)}>
-        <button
-          disabled={isTransitioning}
-          onClick={recenter}
-          className={css(styles.recenterButton)}
-        >
-          Recenter
-        </button>
-        <button
-          disabled={isTransitioning}
-          onClick={resize}
-          className={css(styles.resizeButton)}
-        >
-          Resize
-        </button>
         {operations.map(({ name }) => {
           return (
             <button
@@ -112,6 +95,22 @@ class OperationsPanel extends PureComponent<*> {
             </button>
           );
         })}
+        <button
+          disabled={isTransitioning}
+          onClick={recenter}
+          style={{ gridArea: 'recenter' }}
+          className={css(styles.resetButton)}
+        >
+          Recenter
+        </button>
+        <button
+          disabled={isTransitioning}
+          onClick={resize}
+          style={{ gridArea: 'resize' }}
+          className={css(styles.resetButton)}
+        >
+          Resize
+        </button>
       </div>
     );
   }

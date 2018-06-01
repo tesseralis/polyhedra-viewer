@@ -3,6 +3,7 @@ import React from 'react';
 import { Route, NavLink } from 'react-router-dom';
 import { css, StyleSheet } from 'aphrodite/no-important';
 
+import { verdana } from 'styles/fonts';
 import { Icon } from 'components/common';
 import { resetButton, resetLink } from 'styles/common';
 
@@ -24,8 +25,7 @@ const styles = StyleSheet.create({
   title: {
     marginTop: 5,
     fontSize: 12,
-    // TODO come up with a better one
-    fontFamily: 'system-ui',
+    fontFamily: verdana,
   },
 });
 

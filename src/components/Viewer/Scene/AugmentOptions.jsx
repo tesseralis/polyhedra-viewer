@@ -5,6 +5,7 @@ import { getUsingOpts } from 'polyhedra/operations';
 
 import { WithOperation } from 'components/Viewer/OperationContext';
 import OptionIcon from './OptionIcon';
+import { verdana } from 'styles/fonts';
 
 const styles = StyleSheet.create({
   augmentOptions: {
@@ -23,9 +24,10 @@ const styles = StyleSheet.create({
   },
 
   optionButton: {
-    width: 64,
-    height: 64,
+    width: 72,
+    height: 72,
     border: '1px LightGray solid',
+    fontFamily: verdana,
   },
 
   isHighlighted: {
