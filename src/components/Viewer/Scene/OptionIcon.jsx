@@ -3,6 +3,8 @@ import _ from 'lodash';
 import React, { Fragment } from 'react';
 import { css, StyleSheet } from 'aphrodite/no-important';
 
+import { Polygon, PolyLine, PolyShape, polygonPoints } from 'components/svg';
+
 const color = 'DimGray';
 const styles = StyleSheet.create({
   icon: {
@@ -24,34 +26,6 @@ const styles = StyleSheet.create({
     strokeLinejoin: 'round',
   },
 });
-
-const { PI, sin, cos } = Math;
-const TAU = 2 * PI;
-
-function joinPoints(points) {
-  return points.map(point => point.join(',')).join(' ');
-}
-
-function PolyShape({ points, ...rest }) {
-  return <polygon {...rest} points={joinPoints(points)} />;
-}
-
-function PolyLine({ points, ...rest }) {
-  return <polyline {...rest} points={joinPoints(points)} />;
-}
-
-// FIXME deduplicate with the other one
-function Polygon({ n = 3, r = 1, cx = 0, cy = 0, a = 0, ...rest }) {
-  const points = _(n)
-    .range()
-    .map(i => [
-      cx + r * cos(TAU * (a / 360 + i / n)),
-      cy + r * sin(TAU * (a / 360 + i / n)),
-    ])
-    .value();
-
-  return <PolyShape {...rest} points={points} />;
-}
 
 interface Props {
   name: 'ortho' | 'gyro' | 'pyramid' | 'fastigium' | 'cupola' | 'rotunda';
@@ -165,19 +139,10 @@ function drawIcon(name) {
       );
     }
     case 'rotunda': {
-      const n1 = 7;
-      const n = 12;
-      const cx = 100;
-      const cy = 150;
-      const r = -90;
-      const a = 0;
-      const points = _(n1)
-        .range()
-        .map(i => [
-          cx + r * cos(TAU * (a / 360 + i / n)),
-          cy + r * sin(TAU * (a / 360 + i / n)),
-        ])
-        .value();
+      const points = _.take(
+        polygonPoints({ n: 12, cx: 100, cy: 150, r: -90 }),
+        7,
+      );
       const [p1, p2, p3, p4, p5, p6] = points;
       const bottomY = p1[1];
       const q1 = [p3[0], p2[1]];
@@ -202,6 +167,7 @@ function drawIcon(name) {
 }
 
 export default function OptionIcon({ name }: Props) {
+  // TODO should the viewBox actually be centered on zero?
   return (
     <svg viewBox="0 0 200 200" className={css(styles.icon)}>
       {drawIcon(name)}

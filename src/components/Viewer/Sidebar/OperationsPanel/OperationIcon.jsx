@@ -3,9 +3,8 @@ import _ from 'lodash';
 import React, { Fragment } from 'react';
 import { css, StyleSheet } from 'aphrodite/no-important';
 
-// import { type OpName } from 'polyhedra/operations';
-const { PI, sqrt, sin, cos } = Math;
-const TAU = 2 * PI;
+import { Polygon, PolyLine } from 'components/svg';
+const { sqrt } = Math;
 
 const color = 'DimGray';
 const styles = StyleSheet.create({
@@ -41,26 +40,6 @@ const styles = StyleSheet.create({
     strokeWidth: 5,
   },
 });
-
-function joinPoints(points) {
-  return points.map(point => point.join(',')).join(' ');
-}
-
-function Polygon({ n = 3, r = 1, cx = 0, cy = 0, a = 0, ...rest }) {
-  const points = _(n)
-    .range()
-    .map(i => [
-      cx + r * cos(TAU * (a / 360 + i / n)),
-      cy + r * sin(TAU * (a / 360 + i / n)),
-    ])
-    .value();
-
-  return <polygon {...rest} points={joinPoints(points)} />;
-}
-
-function PolyLine({ points, ...rest }) {
-  return <polyline {...rest} points={joinPoints(points)} />;
-}
 
 interface TruncateIconProps {
   styled: string;

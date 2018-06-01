@@ -2,6 +2,7 @@
 import React from 'react';
 import { css, StyleSheet } from 'aphrodite/no-important';
 import { getUsingOpts } from 'polyhedra/operations';
+
 import OptionIcon from './OptionIcon';
 
 const styles = StyleSheet.create({
@@ -17,15 +18,17 @@ const styles = StyleSheet.create({
     display: 'flex',
     flexDirection: 'column',
     pointerEvents: 'initial',
+    margin: 20,
   },
 
   optionButton: {
     width: 64,
     height: 64,
+    border: '1px LightGray solid',
   },
 
   isHighlighted: {
-    border: '2px red solid',
+    border: '2px DarkSlateGray solid',
   },
 });
 
@@ -56,8 +59,6 @@ export default function AugmentOptions({
   onClickOption,
 }: Props) {
   const { gyrate, using } = options;
-
-  // FIXME make these options always in the right order
   const optionArgs = [
     {
       name: 'gyrate',
