@@ -97,19 +97,19 @@ class OperationsPanel extends Component<*> {
         </button>
         {operations.map(({ name, symbol, description }) => {
           return (
-            <div key={name} style={{ gridArea: name }}>
-              <button
-                className={css(
-                  styles.operationButton,
-                  opName === name && styles.isHighlighted,
-                )}
-                disabled={!isEnabled(name) || isTransitioning}
-                onClick={() => selectOperation(name)}
-              >
-                <OperationIcon name={name} />
-                {name}
-              </button>
-            </div>
+            <button
+              key={name}
+              className={css(
+                styles.operationButton,
+                opName === name && styles.isHighlighted,
+              )}
+              style={{ gridArea: name }}
+              disabled={!isEnabled(name) || isTransitioning}
+              onClick={() => selectOperation(name)}
+            >
+              <OperationIcon name={name} />
+              {name}
+            </button>
           );
         })}
       </div>

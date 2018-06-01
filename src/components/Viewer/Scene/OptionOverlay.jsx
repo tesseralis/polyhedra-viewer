@@ -29,7 +29,7 @@ const styles = StyleSheet.create({
 });
 
 function OperationOverlay(props) {
-  const { opName, solid, options, applyOperation, setOption } = props;
+  const { opName, solid, applyOperation } = props;
   return (
     <Fragment>
       <div className={css(styles.title)}>
@@ -42,11 +42,7 @@ function OperationOverlay(props) {
       )}
       {_.includes(['augment'], opName) && (
         <div className={css(styles.overlayContainer)}>
-          <AugmentOptions
-            solid={solid}
-            options={options}
-            onClickOption={setOption}
-          />
+          <AugmentOptions solid={solid} />
         </div>
       )}
     </Fragment>
@@ -57,12 +53,7 @@ export default (props: *) => (
     {operationProps => (
       <OperationOverlay
         {...props}
-        {..._.pick(operationProps, [
-          'opName',
-          'options',
-          'applyOperation',
-          'setOption',
-        ])}
+        {..._.pick(operationProps, ['opName', 'applyOperation'])}
       />
     )}
   </WithOperation>

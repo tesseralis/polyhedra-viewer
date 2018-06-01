@@ -3,6 +3,7 @@ import React from 'react';
 import { css, StyleSheet } from 'aphrodite/no-important';
 import { getUsingOpts } from 'polyhedra/operations';
 
+import { WithOperation } from 'components/Viewer/OperationContext';
 import OptionIcon from './OptionIcon';
 
 const styles = StyleSheet.create({
@@ -53,11 +54,7 @@ interface Props {
   onClickOption(option: string, value: string): void;
 }
 
-export default function AugmentOptions({
-  options,
-  solid,
-  onClickOption,
-}: Props) {
+function AugmentOptions({ options, solid, onClickOption }: Props) {
   const { gyrate, using } = options;
   const optionArgs = [
     {
@@ -98,3 +95,11 @@ export default function AugmentOptions({
     </div>
   );
 }
+
+export default (props: *) => (
+  <WithOperation>
+    {({ options, setOption }) => (
+      <AugmentOptions {...props} options={options} onClickOption={setOption} />
+    )}
+  </WithOperation>
+);

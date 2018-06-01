@@ -41,8 +41,8 @@ function hasOptions(operation, relations) {
 const OperationContext = React.createContext({
   operation: undefined,
   opName: '',
-  options: {},
-  hitOptions: {}, // options determined by the polyhedron face
+  options: undefined,
+  hitOptions: undefined, // options determined by the polyhedron face
   setOption: _.noop,
   selectOperation: _.noop,
   isEnabled: _.noop,
@@ -136,7 +136,7 @@ class BaseOperationProvider extends Component<*, *> {
       opName,
       operation: operations[opName],
       options: applyOptionsFor(solid, opName),
-      hitOptions: {},
+      hitOptions: undefined,
     });
   };
 
@@ -144,8 +144,8 @@ class BaseOperationProvider extends Component<*, *> {
     this.setState({
       opName: '',
       operation: undefined,
-      options: {},
-      hitOptions: {},
+      options: undefined,
+      hitOptions: undefined,
     });
   };
 
@@ -156,16 +156,27 @@ class BaseOperationProvider extends Component<*, *> {
   };
 
   unsetHitOptions = () => {
-    this.setState({ hitOptions: {} });
+    this.setState(
+      ({ hitOptions }) => (hitOptions ? { hitOptions: undefined } : undefined),
+    );
   };
 
   setHitOptions = (hitPnt: Point) => {
-    this.setState(({ operation, options }, { polyhedron, isTransitioning }) => {
-      if (!operation || !operation.getApplyArgs || isTransitioning) return;
-      return {
-        hitOptions: operation.getApplyArgs(polyhedron, hitPnt, options),
-      };
-    });
+    this.setState(
+      ({ operation, options, hitOptions }, { polyhedron, isTransitioning }) => {
+        if (!operation || isTransitioning) return;
+        const newHitOptions = operation.getApplyArgs(
+          polyhedron,
+          hitPnt,
+          options,
+        );
+        if (!_.isEqual(hitOptions, newHitOptions)) {
+          return {
+            hitOptions: newHitOptions,
+          };
+        }
+      },
+    );
   };
 }
 
