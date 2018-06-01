@@ -1,6 +1,6 @@
 // @flow
 import React from 'react';
-import { Route } from 'react-router-dom';
+import { Route, Redirect } from 'react-router-dom';
 import 'what-input';
 
 import 'styles/reset.css';
@@ -14,9 +14,18 @@ export default () => (
   <div>
     <Route exact path="/" component={PeriodicTable} />
     <Route
+      exact
       path="/:solid"
+      render={({ match, history }) => <Redirect to={`${match.url}/related`} />}
+    />
+    <Route
+      path="/:solid/:panel"
       render={({ match, history }) => (
-        <Viewer solid={match.params.solid} history={history} />
+        <Viewer
+          solid={match.params.solid}
+          panel={match.params.panel}
+          history={history}
+        />
       )}
     />
   </div>

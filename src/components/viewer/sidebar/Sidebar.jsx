@@ -1,9 +1,8 @@
 // @flow
 import React from 'react';
-import { Route, Redirect } from 'react-router-dom';
 import { css, StyleSheet } from 'aphrodite/no-important';
 
-import IconLink from './IconLink';
+import Menu from '../Menu';
 import ConfigForm from './ConfigForm';
 import OperationsPanel from './OperationsPanel';
 import PolyhedronList from './PolyhedronList';
@@ -13,12 +12,10 @@ const styles = StyleSheet.create({
     width: 400,
     height: '100%',
     position: 'relative',
-    boxShadow: '1px 1px 4px LightGray',
+    boxShadow: 'inset -1px -1px 4px LightGray',
   },
   menu: {
-    display: 'flex',
     height: 75,
-    justifyContent: 'space-between',
     padding: '0 10px',
     borderBottom: '1px solid LightGray',
   },
@@ -29,44 +26,31 @@ const styles = StyleSheet.create({
   },
 });
 
-export default function Sidebar() {
+interface Props {
+  panel: string;
+  solid: string;
+}
+
+function renderPanel(panel) {
+  switch (panel) {
+    case 'related':
+      return <OperationsPanel />;
+    case 'config':
+      return <ConfigForm />;
+    case 'list':
+      return <PolyhedronList />;
+    default:
+      throw new Error('unknown tab');
+  }
+}
+
+export default function Sidebar({ panel, solid }: Props) {
   return (
-    <Route
-      render={({ match }) => (
-        <section className={css(styles.sidebar)}>
-          <div className={css(styles.menu)}>
-            <IconLink to="/" title="Table" iconName="periodic-table" exact />
-            <IconLink
-              replace
-              to={`${match.url}/list`}
-              title="List"
-              iconName="format-list-bulleted"
-            />
-            <IconLink
-              replace
-              to={`${match.url}/config`}
-              title="Options"
-              iconName="settings"
-            />
-            <IconLink
-              replace
-              to={`${match.url}/related`}
-              title="Operations"
-              iconName="math-compass"
-            />
-          </div>
-          <div className={css(styles.content)}>
-            <Route
-              exact
-              path={match.url}
-              render={() => <Redirect to={`${match.url}/related`} />}
-            />
-            <Route path={`${match.url}/related`} component={OperationsPanel} />
-            <Route path={`${match.url}/config`} component={ConfigForm} />
-            <Route path={`${match.url}/list`} component={PolyhedronList} />
-          </div>
-        </section>
-      )}
-    />
+    <section className={css(styles.sidebar)}>
+      <div className={css(styles.menu)}>
+        <Menu solid={solid} />
+      </div>
+      <div className={css(styles.content)}>{renderPanel(panel)}</div>
+    </section>
   );
 }

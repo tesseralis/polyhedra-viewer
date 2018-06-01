@@ -4,11 +4,11 @@ import { Route, NavLink } from 'react-router-dom';
 import { css, StyleSheet } from 'aphrodite/no-important';
 
 import { verdana } from 'styles/fonts';
-import { Icon } from 'components/common';
-import { resetButton, resetLink } from 'styles/common';
+import { Icon, SrOnly } from 'components/common';
+import { resetLink } from 'styles/common';
 
 const styles = StyleSheet.create({
-  button: resetButton,
+  // TODO link hover
   link: {
     ...resetLink,
     display: 'flex',
@@ -31,6 +31,7 @@ const styles = StyleSheet.create({
 
 interface Props {
   iconName: string;
+  iconOnly?: boolean;
   title: string;
   to: string;
   replace?: boolean;
@@ -43,6 +44,7 @@ export default function IconLink({
   to,
   replace,
   exact,
+  iconOnly = false,
 }: Props) {
   return (
     <Route>
@@ -54,7 +56,11 @@ export default function IconLink({
         activeClassName={css(styles.activeLink)}
       >
         <Icon name={iconName} size={36} />
-        <div className={css(styles.title)}>{title || iconName}</div>
+        {iconOnly ? (
+          <SrOnly>{title || iconName}</SrOnly>
+        ) : (
+          <div className={css(styles.title)}>{title || iconName}</div>
+        )}
       </NavLink>
     </Route>
   );

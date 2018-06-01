@@ -55,14 +55,16 @@ class Viewer extends PureComponent<*> {
   }
 
   render() {
-    const { solid } = this.props;
+    const { solid, panel } = this.props;
     return (
       <div className={css(styles.viewer)}>
-        <div className={css(styles.sidebar)}>
-          <Sidebar />
-        </div>
+        {panel !== 'full' && (
+          <div className={css(styles.sidebar)}>
+            <Sidebar panel={panel} solid={solid} />
+          </div>
+        )}
         <div className={css(styles.scene)}>
-          <Scene solid={solid} />
+          <Scene panel={panel} solid={solid} />
         </div>
       </div>
     );

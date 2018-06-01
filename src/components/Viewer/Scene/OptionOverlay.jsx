@@ -7,6 +7,8 @@ import { fixed } from 'styles/common';
 
 import { WithOperation } from 'components/Viewer/OperationContext';
 import { unescapeName } from 'polyhedra/names';
+import IconLink from 'components/Viewer/IconLink';
+import Menu from 'components/Viewer/Menu';
 import Title from './Title';
 import TwistOptions from './TwistOptions';
 import AugmentOptions from './AugmentOptions';
@@ -17,6 +19,11 @@ const styles = StyleSheet.create({
     padding: 36,
     maxWidth: '50%',
     textAlign: 'right',
+  },
+  sidebarToggle: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
   },
   overlayContainer: {
     position: 'absolute',
@@ -29,9 +36,22 @@ const styles = StyleSheet.create({
 });
 
 function OperationOverlay(props) {
-  const { opName, solid, applyOperation } = props;
+  const { opName, solid, panel, applyOperation } = props;
   return (
     <Fragment>
+      <div className={css(styles.sidebarToggle)}>
+        {panel === 'full' ? (
+          <Menu solid={solid} compact />
+        ) : (
+          <IconLink
+            iconName="chevron-left"
+            iconOnly
+            title="hide menu"
+            replace
+            to={`/${solid}/${panel === 'full' ? 'related' : 'full'}`}
+          />
+        )}
+      </div>
       <div className={css(styles.title)}>
         <Title name={unescapeName(solid)} />
       </div>
