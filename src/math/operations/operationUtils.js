@@ -6,7 +6,6 @@ import type { Point, Twist } from 'types';
 import {
   Polyhedron,
   Vertex,
-  Face,
   Edge,
   normalizeVertex,
   VertexList,
@@ -146,7 +145,7 @@ const methodDefaults = {
   getApplyArgs: {},
   getAllApplyArgs: [undefined],
   getSearchOptions: undefined,
-  isHighlighted: false,
+  getSelectState: [],
 };
 
 function fillDefaults(op) {
@@ -170,6 +169,8 @@ export interface OperationResult {
   };
 }
 
+type SelectState = 'selected' | 'selectable' | null;
+
 // TODO consolidate these with the one in operationTypes
 interface Operation<Options = {}, ApplyArgs = {}> {
   apply(polyhedron: Polyhedron, options: Options): OperationResult;
@@ -184,11 +185,10 @@ interface Operation<Options = {}, ApplyArgs = {}> {
 
   getAllApplyArgs(polyhedron: Polyhedron): ApplyArgs[];
 
-  isHighlighed(
+  getSelectState(
     polyhedron: Polyhedron,
-    applyArgs: ApplyArgs,
-    face: Face,
-  ): boolean;
+    options: Options & ApplyArgs,
+  ): SelectState[];
 }
 
 export function normalizeOperation(op: *, name: OpName): Operation<*, *> {

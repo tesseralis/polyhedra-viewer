@@ -86,12 +86,12 @@ export const contract: Operation<ContractOptions> = {
     }
   },
 
-  isHighlighted(polyhedron, applyArgs, face) {
-    if (
-      typeof applyArgs.faceType === 'number' &&
-      isExpandedFace(polyhedron, face, applyArgs.faceType)
-    ) {
-      return true;
-    }
+  getSelectState(polyhedron, { faceType }) {
+    return polyhedron.faces.map(face => {
+      if (faceType && isExpandedFace(polyhedron, face, faceType))
+        return 'selected';
+      if (isExpandedFace(polyhedron, face)) return 'selectable';
+      return null;
+    });
   },
 };

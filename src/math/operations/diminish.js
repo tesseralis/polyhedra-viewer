@@ -1,6 +1,7 @@
 // @flow strict
 import _ from 'lodash';
 
+import { flatMap } from 'util.js';
 import { hasMultiple, removeExtraneousVertices } from './operationUtils';
 import { Peak } from 'math/polyhedra';
 import type { Operation } from './operationTypes';
@@ -56,9 +57,11 @@ export const diminish: Operation<DiminishOptions> = {
     return peak ? { peak } : {};
   },
 
-  isHighlighted(polyhedron, applyArgs, face) {
-    if (_.isObject(applyArgs.peak) && face.inSet(applyArgs.peak.faces())) {
-      return true;
-    }
+  getSelectState(polyhedron, { peak }) {
+    const allPeakFaces = flatMap(Peak.getAll(polyhedron), peak => peak.faces());
+    return _.map(polyhedron.faces, face => {
+      if (_.isObject(peak) && face.inSet(peak.faces())) return 'selected';
+      if (face.inSet(allPeakFaces)) return 'selectable';
+    });
   },
 };

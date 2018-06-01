@@ -332,9 +332,14 @@ export const augment: Operation<AugmentOptions> = {
     return { face };
   },
 
-  isHighlighted(polyhedron, applyArgs, face) {
-    if (!!applyArgs.face && applyArgs.face.equals(face)) {
-      return true;
-    }
+  getSelectState(polyhedron, { face, using }) {
+    return _.map(polyhedron.faces, f => {
+      if (face && f.equals(face)) return 'selected';
+
+      if (!using && canAugment(f)) return 'selectable';
+
+      if (using && canAugmentWithType(f, augmentTypes[using[0]]))
+        return 'selectable';
+    });
   },
 };

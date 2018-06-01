@@ -185,10 +185,9 @@ export function applyOperation(
   operation: *,
   name: string,
   polyhedron: Polyhedron,
-  config: any = {},
+  config: * = {},
 ): OperationResult {
   const relations = getRelations(name, operation.name);
-  // const op = mathOps[operation];
   const options = operation.getSearchOptions(polyhedron, config, relations);
 
   const next = getNextPolyhedron(name, operation.name, _.pickBy(options));

@@ -5,22 +5,20 @@ import React, { Component } from 'react';
 import { defaultConfig } from 'constants/configOptions';
 import { WithConfig } from 'components/ConfigContext';
 import transition from 'transition';
-import { mapObject } from 'util.js';
 import { Polyhedron } from 'math/polyhedra';
 
 function getFaceColors(polyhedron, colors) {
-  return _.pickBy(
-    mapObject(polyhedron.faces, (face, fIndex) => [
-      fIndex,
-      colors[face.numUniqueSides()],
-    ]),
-  );
+  return _.map(polyhedron.faces, face => colors[face.numUniqueSides()]);
+}
+
+function arrayDefaults(first, second) {
+  return _.map(first, (item, i) => (_.isNil(item) ? second[i] : item));
 }
 
 const PolyhedronContext = React.createContext({
   polyhedron: Polyhedron.get('tetrahedron'),
   config: defaultConfig,
-  faceColors: {},
+  faceColors: [],
   isTransitioning: false,
   setPolyhedron: _.noop,
   transitionPolyhedron: _.noop,
@@ -36,7 +34,7 @@ class BasePolyhedronProvider extends Component<*, *> {
     this.state = {
       polyhedron: Polyhedron.get('tetrahedron'),
       config: this.props.config,
-      faceColors: {},
+      faceColors: [],
       isTransitioning: false,
       setPolyhedron: this.setPolyhedron,
       transitionPolyhedron: this.transitionPolyhedron,
@@ -67,7 +65,7 @@ class BasePolyhedronProvider extends Component<*, *> {
   setPolyhedron = (name: string) => {
     this.setState({
       polyhedron: Polyhedron.get(name),
-      faceColors: {},
+      faceColors: [],
     });
   };
 
@@ -98,11 +96,12 @@ class BasePolyhedronProvider extends Component<*, *> {
       animationData.start.withVertices(animationData.endVertices),
       colors,
     );
+    const allColorStart = arrayDefaults(colorStart, colorEnd);
 
     this.setState({
       isTransitioning: true,
       polyhedron: animationData.start,
-      faceColors: { ...colorEnd, ...colorStart },
+      faceColors: allColorStart,
     });
 
     this.transitionId = transition(
@@ -110,16 +109,16 @@ class BasePolyhedronProvider extends Component<*, *> {
         duration: 750 / animationSpeed,
         startValue: {
           vertices: animationData.start.solidData.vertices,
-          faceColors: { ...colorEnd, ...colorStart },
+          faceColors: allColorStart,
         },
         endValue: {
           vertices: animationData.endVertices,
-          faceColors: { ...colorStart, ...colorEnd },
+          faceColors: arrayDefaults(colorEnd, colorStart),
         },
         onFinish: () => {
           this.setState({
             polyhedron: result,
-            faceColors: {},
+            faceColors: [],
             isTransitioning: false,
           });
         },

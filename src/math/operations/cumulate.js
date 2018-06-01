@@ -164,12 +164,10 @@ export const cumulate: Operation<CumulateOptions> = {
     return n <= 5 ? { faceType: n } : {};
   },
 
-  isHighlighted(polyhedron, applyArgs, face) {
-    if (
-      _.isNumber(applyArgs.faceType) &&
-      face.numSides === applyArgs.faceType
-    ) {
-      return true;
-    }
+  getSelectState(polyhedron, { faceType }) {
+    return _.map(polyhedron.faces, face => {
+      if (_.isNumber(faceType) && face.numSides === faceType) return 'selected';
+      return 'selectable';
+    });
   },
 };

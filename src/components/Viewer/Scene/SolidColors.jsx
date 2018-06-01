@@ -12,36 +12,37 @@ function toRgb(hex: string) {
 
 class SolidColors extends Component<*> {
   render() {
-    return this.props.children(this.getColors());
+    return this.props.children(this.getColors().map(toRgb));
   }
 
   getColors = () => {
-    const { polyhedron } = this.props;
-    return polyhedron.faces.map(this.getColorForFace);
-  };
-
-  getColorForFace = (face: *) => {
     const {
-      config,
-      polyhedron,
       faceColors,
-      hitOptions,
+      polyhedron,
       operation,
+      config: { colors },
+      options,
+      hitOptions,
     } = this.props;
-    const { colors } = config;
-
-    // While doing animation, if we specify that this face has a color, use it
-    if (!!faceColors && _.has(faceColors, face.index.toString())) {
-      return toRgb(faceColors[face.index]);
-    }
-
-    if (operation && operation.isHighlighted(polyhedron, hitOptions, face)) {
-      return toRgb(
-        tinycolor.mix(colors[face.numSides], 'lightyellow').toHexString(),
+    if (!_.isEmpty(faceColors)) {
+      return polyhedron.faces.map(
+        (face, i) => faceColors[i] || colors[face.numSides],
       );
     }
-
-    return toRgb(colors[face.numSides]);
+    if (!operation) return polyhedron.faces.map(f => colors[f.numSides]);
+    // TODO I want a better way to do this...
+    const allOptions = { ...options, ...hitOptions };
+    const selectState = operation.getSelectState(polyhedron, allOptions);
+    return polyhedron.faces.map((face, i) => {
+      switch (selectState[i]) {
+        case 'selected':
+          return tinycolor.mix(colors[face.numSides], 'lightyellow');
+        case 'selectable':
+          return tinycolor.mix(colors[face.numSides], 'lightyellow', 20);
+        default:
+          return colors[face.numSides];
+      }
+    });
   };
 }
 
@@ -54,7 +55,7 @@ export default (props: *) => {
             <SolidColors
               {...props}
               {..._.pick(polyhedronProps, 'polyhedron', 'config', 'faceColors')}
-              {..._.pick(operationProps, 'operation', 'hitOptions')}
+              {..._.pick(operationProps, 'operation', 'options', 'hitOptions')}
             />
           )}
         </WithPolyhedron>
