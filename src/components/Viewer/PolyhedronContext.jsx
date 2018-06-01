@@ -85,7 +85,7 @@ class BasePolyhedronProvider extends Component<*, *> {
 
   transitionPolyhedron = (result: Polyhedron, animationData: *) => {
     const { config } = this.props;
-    const { colors, transitionDuration, enableAnimation } = config;
+    const { colors, animationSpeed, enableAnimation } = config;
 
     if (!enableAnimation || !animationData) {
       return this.setState({
@@ -107,7 +107,7 @@ class BasePolyhedronProvider extends Component<*, *> {
 
     this.transitionId = transition(
       {
-        duration: transitionDuration,
+        duration: 750 / animationSpeed,
         startValue: {
           vertices: animationData.start.solidData.vertices,
           faceColors: { ...colorEnd, ...colorStart },

@@ -45,10 +45,12 @@ export const configInputs = [
     default: true,
   },
   {
-    // TODO more UI friendly version of this option
-    key: 'transitionDuration',
-    type: 'number',
-    default: 750,
+    key: 'animationSpeed',
+    type: 'range',
+    default: 1,
+    min: 0.25,
+    max: 2,
+    step: 0.25,
   },
   ...colorOptionsList,
 ].map(input => ({
