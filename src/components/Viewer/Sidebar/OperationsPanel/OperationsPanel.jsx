@@ -16,9 +16,12 @@ const styles = StyleSheet.create({
     padding: 10,
     display: 'grid',
     justifyContent: 'space-around',
+    height: '100%',
     columnGap: 5,
     rowGap: 20,
+    overflowY: 'scroll',
     // TODO encode the ordering in the actual operation types
+    gridTemplateRows: 'repeat(4, 80px) 1fr',
     gridTemplateAreas: `
       "truncate rectify      cumulate dual"
       "expand   snub         contract twist"
@@ -26,10 +29,6 @@ const styles = StyleSheet.create({
       "augment  augment      diminish gyrate"
       "recenter recenter     resize   resize"
     `,
-  },
-
-  operations: {
-    padding: '10px 0',
   },
 
   operationButton: {
@@ -57,7 +56,9 @@ const styles = StyleSheet.create({
   },
 
   resetButton: {
+    alignSelf: 'end',
     borderColor: 'LightGray',
+    height: 40,
     marginTop: 10,
     padding: 10,
     fontSize: 14,
