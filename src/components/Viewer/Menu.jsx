@@ -36,14 +36,14 @@ export default function Menu({ solid, compact = false }: Props) {
       />
       <IconLink
         replace
-        to={`/${solid}/config`}
+        to={`/${solid}/options`}
         title="Options"
         iconName="settings"
         iconOnly={compact}
       />
       <IconLink
         replace
-        to={`/${solid}/related`}
+        to={`/${solid}/operations`}
         title="Operations"
         iconName="math-compass"
         iconOnly={compact}

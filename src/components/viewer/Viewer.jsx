@@ -41,15 +41,12 @@ class Viewer extends PureComponent<*> {
   }
 
   componentDidUpdate(prevProps) {
-    const { solid, setPolyhedron, history } = this.props;
+    const { solid, panel, setPolyhedron } = this.props;
 
     // If an operation has not been applied and there is a mismatch betweeen the props and context,
     // update context
     // TODO is this janky?
-    if (
-      solid !== prevProps.solid &&
-      !history.location.pathname.endsWith('related')
-    ) {
+    if (solid !== prevProps.solid && panel !== 'operations') {
       setPolyhedron(solid);
     }
   }
@@ -75,7 +72,7 @@ export default (props: ViewerProps) => (
   <PolyhedronProvider>
     <OperationProvider
       solid={props.solid}
-      setSolid={name => props.history.push(`/${name}/related`)}
+      setSolid={name => props.history.push(`/${name}/operations`)}
     >
       <WithPolyhedron>
         {({ setPolyhedron }) => (

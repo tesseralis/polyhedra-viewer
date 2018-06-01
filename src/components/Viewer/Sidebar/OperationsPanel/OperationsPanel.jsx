@@ -82,9 +82,15 @@ class OperationsPanel extends PureComponent<*> {
       selectOperation,
       isEnabled,
     } = this.props;
+
     return (
       <div className={css(styles.opGrid)}>
         {operations.map(({ name }) => {
+          console.log(
+            name,
+            'is disabled: ',
+            !isEnabled(name) || isTransitioning,
+          );
           return (
             <button
               key={name}

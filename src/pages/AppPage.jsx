@@ -24,6 +24,7 @@ export default class AppPage {
   }
 
   clickButtonWithText(text) {
+    console.log('finding button ', text);
     this.findButtonWithText(text).simulate('click');
     return this;
   }
@@ -72,7 +73,7 @@ export default class AppPage {
   expectTransitionTo(expected) {
     // TODO do a more robust animation test
     this.wrapper.update();
-    this.expectPath(`/${expected}/related`);
+    this.expectPath(`/${expected}/operations`);
     expect(this.getPolyhedron().isSame(Polyhedron.get(expected))).toBe(true);
     return this;
   }

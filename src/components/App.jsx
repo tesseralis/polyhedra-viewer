@@ -16,7 +16,9 @@ export default () => (
     <Route
       exact
       path="/:solid"
-      render={({ match, history }) => <Redirect to={`${match.url}/related`} />}
+      render={({ match, history }) => (
+        <Redirect to={`${match.url}/operations`} />
+      )}
     />
     <Route
       path="/:solid/:panel"

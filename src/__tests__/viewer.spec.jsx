@@ -20,7 +20,7 @@ describe('viewer', () => {
   });
 
   it('resets the operation when unset', () => {
-    setup('/triangular-cupola/related');
+    setup('/triangular-cupola/operations');
     appPage
       .clickButtonWithText('augment')
       .clickButtonWithText('augment')
@@ -28,12 +28,12 @@ describe('viewer', () => {
   });
 
   it('does not applyOperation on invalid apply args', () => {
-    setup('/augmented-truncated-tetrahedron/related');
+    setup('/augmented-truncated-tetrahedron/operations');
     appPage.clickButtonWithText('diminish').clickFaceWithNumSides(6);
   });
 
   it('unsets the operation and options when going to a different polyhedron', () => {
-    setup('/triangular-cupola/related');
+    setup('/triangular-cupola/operations');
     appPage
       .clickButtonWithText('augment')
       .clickButtonWithText('elongate')
@@ -41,7 +41,7 @@ describe('viewer', () => {
   });
 
   it('unsets the operation when there are no more options', () => {
-    setup('/tetrahedron/related');
+    setup('/tetrahedron/operations');
     appPage
       .clickButtonWithText('rectify')
       .expectTransitionTo('octahedron')
@@ -49,7 +49,7 @@ describe('viewer', () => {
   });
 
   it('can augment and diminish a tetrahedron', () => {
-    setup('/tetrahedron/related');
+    setup('/tetrahedron/operations');
 
     appPage
       .clickButtonWithText('augment')
@@ -61,7 +61,7 @@ describe('viewer', () => {
   });
 
   it('shows options on snub only when chiral options available', () => {
-    setup('/tetrahedron/related');
+    setup('/tetrahedron/operations');
 
     appPage
       .clickButtonWithText('snub')
@@ -72,7 +72,7 @@ describe('viewer', () => {
   });
 
   it('can transition through a pyramid series', () => {
-    setup('/square-pyramid/related');
+    setup('/square-pyramid/operations');
 
     appPage
       .clickButtonWithText('augment')
@@ -87,7 +87,7 @@ describe('viewer', () => {
   });
 
   it('can triaugment a triangular prism', () => {
-    setup('/triangular-prism/related');
+    setup('/triangular-prism/operations');
     appPage
       // test gyrobifastigium
       .clickButtonWithText('augment')
@@ -109,7 +109,7 @@ describe('viewer', () => {
   });
 
   it('can go through a simple rhombicosadodecahedron workflow', () => {
-    setup('/tridiminished-rhombicosidodecahedron/related');
+    setup('/tridiminished-rhombicosidodecahedron/operations');
     appPage
       .clickButtonWithText('augment')
       .clickButtonWithText('ortho')
@@ -124,7 +124,7 @@ describe('viewer', () => {
   });
 
   it('can go through a truncation and rectification workflow', () => {
-    setup('/tetrahedron/related');
+    setup('/tetrahedron/operations');
     appPage
       .clickButtonWithText('truncate')
       .expectTransitionTo('truncated-tetrahedron')
@@ -145,7 +145,7 @@ describe('viewer', () => {
   });
 
   it('can go through an expansion workflow', () => {
-    setup('/dodecahedron/related');
+    setup('/dodecahedron/operations');
     // TODO test contract/snub/twist
     appPage
       .clickButtonWithText('expand')
@@ -157,7 +157,7 @@ describe('viewer', () => {
 
   describe('contracting an icosahedron', () => {
     it('can augment and contract an icosahedron', () => {
-      setup('/gyroelongated-pentagonal-pyramid/related');
+      setup('/gyroelongated-pentagonal-pyramid/operations');
       appPage
         .clickButtonWithText('augment')
         .clickFaceWithNumSides(5)

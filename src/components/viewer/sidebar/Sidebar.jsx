@@ -33,9 +33,9 @@ interface Props {
 
 function renderPanel(panel) {
   switch (panel) {
-    case 'related':
+    case 'operations':
       return <OperationsPanel />;
-    case 'config':
+    case 'options':
       return <ConfigForm />;
     case 'list':
       return <PolyhedronList />;
