@@ -35,7 +35,7 @@ describe('relationsGraph', () => {
       });
     });
 
-    xit('has twist operator on the expansion', () => {
+    it('has twist operator on the expansion', () => {
       const rectified = ['aC', 'eC', 'eD'];
       rectified.forEach(solid => {
         expect(graph).toHaveProperty(`${solid}.p`, expect.anything());
