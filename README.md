@@ -11,10 +11,8 @@ An interactive tool that lets you manipulate virtual models of various polyhedra
 It was built with (among [other things]):
 
 * [React](https://facebook.github.io/react/)
-* [React Motion](https://github.com/chenglou/react-motion)
 * [Aphrodite](https://github.com/Khan/aphrodite)
 * [x3dom](http://www.x3dom.org/)
-* [Font Awesome](http://fontawesome.io/)
 
 Geometric data taken from George W. Hart's [Virtual Polyhedra].
 
