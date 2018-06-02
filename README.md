@@ -18,7 +18,5 @@ It was built with (among [other things]):
 
 Geometric data taken from George W. Hart's [Virtual Polyhedra].
 
-An old version made with d3 can be found at http://tessenate.me/d3-polyhedra-viewer/.
-
 [Virtual Polyhedra]: http://www.georgehart.com/virtual-polyhedra/vp.html
 [other things]: ./package.json
