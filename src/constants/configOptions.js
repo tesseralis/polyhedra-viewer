@@ -47,11 +47,9 @@ export const configInputs = [
   {
     // TODO <select> would probably be best
     key: 'animationSpeed',
-    type: 'range',
+    type: 'select',
+    options: [0.25, 0.5, 0.75, 1, 1.25, 1.5, 2],
     default: 1,
-    min: 0.25,
-    max: 2,
-    step: 0.25,
   },
   ...colorOptionsList,
 ].map(input => ({

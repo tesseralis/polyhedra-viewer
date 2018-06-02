@@ -34,7 +34,18 @@ const getInputProps = (input, value) => {
 const ConfigInput = ({ input, value, setValue }) => {
   const inputProps = getInputProps(input, value);
   const onChange = evt => setValue(getInputValue(input, evt.target));
-  return <input type={input.type} onChange={onChange} {...inputProps} />;
+  switch (input.type) {
+    case 'select':
+      return (
+        <select onChange={onChange} {...inputProps}>
+          {_.map(input.options, option => (
+            <option value={option}>{option}</option>
+          ))}
+        </select>
+      );
+    default:
+      return <input type={input.type} onChange={onChange} {...inputProps} />;
+  }
 };
 
 const LabelledInput = ({ input, value, setValue }) => {
