@@ -6,6 +6,12 @@ import polygons, { polygonNames } from './polygons';
 
 const polygonSchemeIdx = { '3': 4, '4': 0, '5': 1, '6': 2, '8': 6, '10': 3 };
 
+interface ConfigInput {
+  key: string;
+  type: string;
+  default: mixed;
+}
+
 const colorOptionsList = polygons.map(n => {
   return {
     key: `colors[${n}]`,
@@ -15,7 +21,7 @@ const colorOptionsList = polygons.map(n => {
   };
 });
 
-export const configInputs = [
+export const configInputs: ConfigInput[] = [
   {
     key: 'showEdges',
     type: 'checkbox',
@@ -45,7 +51,6 @@ export const configInputs = [
     default: true,
   },
   {
-    // TODO <select> would probably be best
     key: 'animationSpeed',
     type: 'select',
     options: [0.25, 0.5, 0.75, 1, 1.25, 1.5, 2],

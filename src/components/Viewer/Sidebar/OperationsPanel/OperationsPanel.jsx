@@ -13,7 +13,7 @@ import { hover } from 'styles/common';
 
 const styles = StyleSheet.create({
   opGrid: {
-    padding: 10,
+    padding: '20px 10px',
     display: 'grid',
     justifyContent: 'space-around',
     height: '100%',

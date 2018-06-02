@@ -52,7 +52,7 @@ const LabelledInput = ({ input, value, setValue }) => {
   const styles = StyleSheet.create({
     label: {
       width: '100%',
-      margin: '8px 0',
+      marginBottom: 16,
       display: 'flex',
       justifyContent: 'space-between',
       fontFamily: andaleMono,
@@ -97,7 +97,7 @@ function ConfigForm({ config, setValue, reset }) {
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'flex-end',
-      padding: '0 20px',
+      padding: 20,
     },
   });
 

@@ -20,7 +20,6 @@ const styles = StyleSheet.create({
     borderBottom: '1px solid LightGray',
   },
   content: {
-    paddingTop: 10,
     height: 'calc(100% - 75px)',
     overflowY: 'scroll',
   },
