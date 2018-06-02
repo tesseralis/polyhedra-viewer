@@ -320,6 +320,12 @@ const basePyramidsCupolae = (() => {
       graph = graphMerge(graph, {
         [ortho]: elongations(elongBiOrtho, gyroelongatedBi, 'ortho', true),
         [gyro]: elongations(elongBiGyro, gyroelongatedBi, 'gyro', true),
+        [elongBiOrtho]: {
+          u: { value: gyroelongatedBi, gyrate: 'ortho', chiral: true },
+        },
+        [elongBiGyro]: {
+          u: { value: gyroelongatedBi, gyrate: 'gyro', chiral: true },
+        },
       });
     }
 

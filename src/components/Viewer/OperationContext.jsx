@@ -25,6 +25,8 @@ const hasMode = [
 // TODO possibly move this as part of the operation definition
 function hasOptions(operation, relations) {
   switch (operation) {
+    case 'turn':
+      return relations.length > 1 || !!_.find(relations, 'chiral');
     case 'snub':
     case 'gyroelongate':
       return !!_.find(relations, 'chiral');
@@ -126,11 +128,15 @@ class BaseOperationProvider extends Component<*, *> {
     } else {
       // Update the current hit options on gyrate
       // TODO generalize this for more operations
-      const { peak } = hitOptions;
-      const newHitOptions = peak
-        ? { peak: peak.withPolyhedron(result) }
-        : undefined;
-      this.setOperation(opName, name, newHitOptions);
+      if (!hitOptions) {
+        this.setOperation(opName, name);
+      } else {
+        const { peak } = hitOptions;
+        const newHitOptions = peak
+          ? { peak: peak.withPolyhedron(result) }
+          : undefined;
+        this.setOperation(opName, name, newHitOptions);
+      }
     }
 
     setSolid(name);

@@ -91,7 +91,7 @@ function pivot(list, value) {
   return [..._.slice(list, index), ..._.slice(list, 0, index)];
 }
 
-function bisectPrismFaces(polyhedron, boundary) {
+function bisectPrismFaces(polyhedron, boundary, twist) {
   const prismFaces = _.map(boundary.edges, edge => edge.twinFace());
   const newFaces = flatMap(boundary.edges, edge => {
     const twinFace = edge.twinFace();
@@ -99,7 +99,10 @@ function bisectPrismFaces(polyhedron, boundary) {
       _.map(twinFace.vertices, 'index'),
       edge.v2.index,
     );
-    return [[v1, v2, v4], [v2, v3, v4]];
+
+    return twist === 'left'
+      ? [[v1, v2, v4], [v2, v3, v4]]
+      : [[v1, v2, v3], [v1, v3, v4]];
   });
 
   return polyhedron.withChanges(solid =>
@@ -107,7 +110,7 @@ function bisectPrismFaces(polyhedron, boundary) {
   );
 }
 
-function joinAntiprismFaces(polyhedron, boundary) {
+function joinAntiprismFaces(polyhedron, boundary, twist) {
   const antiprismFaces = flatMap(boundary.edges, edge => {
     return [
       edge.twinFace(),
@@ -120,11 +123,18 @@ function joinAntiprismFaces(polyhedron, boundary) {
 
   const newFaces = _.map(boundary.edges, edge => {
     const [v1, v2] = edge.twin().vertices;
-    const [v3, v4] = edge
-      .twin()
-      .prev()
-      .twin()
-      .next().vertices;
+    const [v3, v4] =
+      twist === 'left'
+        ? edge
+            .twin()
+            .prev()
+            .twin()
+            .next().vertices
+        : edge
+            .twin()
+            .next()
+            .twin()
+            .prev().vertices;
 
     return [v1, v2, v3, v4];
   });
@@ -160,12 +170,12 @@ function doTurn(polyhedron: Polyhedron, options) {
     return [[face], face, 1];
   })();
   const isAntiprism = boundary.adjacentFaces()[0].numSides === 3;
-  // const { twist = isAntiprism ? 'left' : undefined } = options;
-  const twist = 'left';
+  const { twist = 'left' } = options;
+  // const twist = 'left';
 
   const duplicated = isAntiprism
-    ? joinAntiprismFaces(polyhedron, boundary)
-    : bisectPrismFaces(polyhedron, boundary);
+    ? joinAntiprismFaces(polyhedron, boundary, twist)
+    : bisectPrismFaces(polyhedron, boundary, twist);
 
   // TODO there is logic here that's duplicated in elongate. Maybe consider combining?
   const n = boundary.numSides;
@@ -191,6 +201,7 @@ function doTurn(polyhedron: Polyhedron, options) {
 
 function isGyroelongatedBiCupola(polyhedron) {
   const peaks = Peak.getAll(polyhedron);
+  if (!peaks[0]) return false;
   const boundary = peaks[0].boundary();
   return (
     peaks.length === 2 &&
@@ -243,18 +254,18 @@ export const shorten: Operation<ShortenOptions> = {
 
 export const turn: Operation<ShortenOptions> = {
   apply: doTurn,
-  // getSearchOptions(polyhedron, options) {
-  //   if (!isGyroelongatedBiCupola(polyhedron)) return;
-  //   const { twist } = options;
-  //   const chirality = getChirality(polyhedron);
-  //   const gyrate = twist === chirality ? 'ortho' : 'gyro';
-  //   return { gyrate };
-  // },
+  getSearchOptions(polyhedron, options) {
+    if (!isGyroelongatedBiCupola(polyhedron)) return;
+    const { twist } = options;
+    const chirality = getChirality(polyhedron);
+    const gyrate = twist === chirality ? 'ortho' : 'gyro';
+    return { gyrate };
+  },
 
-  // getAllApplyArgs(polyhedron) {
-  //   if (isGyroelongatedBiCupola(polyhedron)) {
-  //     return [{ twist: 'left' }, { twist: 'right' }];
-  //   }
-  //   return [{}];
-  // },
+  getAllApplyArgs(polyhedron) {
+    if (isGyroelongatedBiCupola(polyhedron)) {
+      return [{ twist: 'left' }, { twist: 'right' }];
+    }
+    return [{}];
+  },
 };
