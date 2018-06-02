@@ -27,6 +27,8 @@ function hasOptions(operation, relations) {
   switch (operation) {
     case 'turn':
       return relations.length > 1 || !!_.find(relations, 'chiral');
+    case 'twist':
+      return relations[0].value[0] === 's';
     case 'snub':
     case 'gyroelongate':
       return !!_.find(relations, 'chiral');

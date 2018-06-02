@@ -4,6 +4,7 @@ import { truncate, rectify } from './truncate';
 import { cumulate } from './cumulate';
 import { expand, snub, dual } from './expand';
 import { contract } from './contract';
+import { twist } from './twist';
 import { elongate, gyroelongate } from './elongate';
 import { shorten } from './shorten';
 import { turn } from './turn';
@@ -20,6 +21,7 @@ const rawOps = {
     expand,
     snub,
     contract,
+    twist,
     elongate,
     gyroelongate,
     shorten,

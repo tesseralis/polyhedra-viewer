@@ -191,16 +191,13 @@ export default class Polyhedron {
         .size() === 1;
     if (!vertexRegular) return false;
 
-    // Make sure it's face regular as well
-    return _(this.faces)
-      .groupBy('numSides')
-      .every(
-        (nFaces, n) =>
-          _(nFaces)
-            .map(f => f.adjacentFaceCounts())
-            .uniqWith(_.isEqual)
-            .size() === 1,
-      );
+    // Special case for pseudo-rhombicuboctahedron
+    return !_.some(
+      this.faces,
+      face =>
+        face.numSides === 4 &&
+        _.isEqual(face.adjacentFaceCounts(), { '3': 1, '4': 3 }),
+    );
   });
 
   isQuasiRegular() {

@@ -221,10 +221,10 @@ const archimedean = {
   aC: {
     // TODO (possibly) coxeter snub (semi-snub) and rectify relations
     t: 'bC',
-    // p: 'I',
+    p: 'I',
   },
   eC: {
-    // p: 'sC',
+    p: { value: 'sC', chiral: true },
   },
   D: {
     d: 'I',
@@ -243,7 +243,7 @@ const archimedean = {
     t: 'bD',
   },
   eD: {
-    // p: 'sD',
+    p: { value: 'sD', chiral: true },
   },
 };
 

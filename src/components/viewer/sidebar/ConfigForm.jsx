@@ -39,7 +39,9 @@ const ConfigInput = ({ input, value, setValue }) => {
       return (
         <select onChange={onChange} {...inputProps}>
           {_.map(input.options, option => (
-            <option value={option}>{option}</option>
+            <option key={option} value={option}>
+              {option}
+            </option>
           ))}
         </select>
       );

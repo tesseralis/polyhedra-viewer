@@ -15,6 +15,7 @@ function getCoplanarFaces(polyhedron) {
     if (f1.inSet(found)) return;
 
     _.forEach(f1.adjacentFaces(), f2 => {
+      if (!f2) return;
       if (f1.normal().equalsWithTolerance(f2.normal(), PRECISION)) {
         pairs.push([f1, f2]);
         found.push(f1);

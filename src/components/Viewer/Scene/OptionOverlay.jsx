@@ -63,7 +63,10 @@ function OperationOverlay(props) {
       <div className={css(styles.title)}>
         <Title name={unescapeName(solid)} />
       </div>
-      {_.includes(['shorten', 'snub', 'gyroelongate', 'turn'], opName) && (
+      {_.includes(
+        ['shorten', 'snub', 'twist', 'gyroelongate', 'turn'],
+        opName,
+      ) && (
         <TwistOptions onClick={twist => applyOperation(opName, { twist })} />
       )}
       {_.includes(['augment'], opName) && <AugmentOptions solid={solid} />}

@@ -41,7 +41,7 @@ export function getFamily(polyhedron: Polyhedron) {
   }
 }
 
-function expansionType(polyhedron: Polyhedron): ExpansionType {
+export function expansionType(polyhedron: Polyhedron): ExpansionType {
   return _.includes([20, 38, 92], polyhedron.numFaces())
     ? 'snub'
     : 'cantellate';
@@ -109,7 +109,7 @@ function getCuboctahedronContractFaces(polyhedron) {
   return result;
 }
 
-export function getContractFaces(polyhedron: Polyhedron, faceType: number) {
+export function getContractFaces(polyhedron: Polyhedron, faceType?: number) {
   if (getFamily(polyhedron) === 'T') {
     return expansionType(polyhedron) === 'snub'
       ? getIcosahedronContractFaces(polyhedron)

@@ -10,7 +10,6 @@ const debug = require('debug')('applyOperation.test');
 const excludedOperations = {};
 
 function isProperPolyhedron(polyhedron) {
-  let prevSideLength: ?number;
   const expectedSideLength = polyhedron.edgeLength();
   for (let edge of polyhedron.edges) {
     const sideLength: number = edge.length();
@@ -20,7 +19,7 @@ function isProperPolyhedron(polyhedron) {
     }
     if (Math.abs(sideLength - expectedSideLength) > PRECISION) {
       console.log(
-        `edge ${edge} has length ${sideLength} which is different from ${prevSideLength}`,
+        `edge ${edge} has length ${sideLength} which is different from ${expectedSideLength}`,
       );
       return false;
     }
