@@ -36,9 +36,9 @@ class SolidColors extends Component<*> {
     return polyhedron.faces.map((face, i) => {
       switch (selectState[i]) {
         case 'selected':
-          return tinycolor.mix(colors[face.numSides], 'lightyellow');
+          return tinycolor.mix(colors[face.numSides], 'lime');
         case 'selectable':
-          return tinycolor.mix(colors[face.numSides], 'lightyellow', 20);
+          return tinycolor.mix(colors[face.numSides], 'yellow', 25);
         default:
           return colors[face.numSides];
       }
