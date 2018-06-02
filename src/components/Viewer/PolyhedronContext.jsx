@@ -116,7 +116,6 @@ class BasePolyhedronProvider extends Component<*, *> {
           faceColors: arrayDefaults(colorEnd, colorStart),
         },
         onFinish: () => {
-          console.log('calling onFinish');
           this.setState({
             polyhedron: result,
             faceColors: [],

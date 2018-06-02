@@ -1,6 +1,6 @@
 // @flow
 import _ from 'lodash';
-import React, { PureComponent } from 'react';
+import React, { Component } from 'react';
 import { css, StyleSheet } from 'aphrodite/no-important';
 
 import { operations } from 'polyhedra/operations';
@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
 });
 
 // TODO this could probably use a test to make sure all the buttons are in the right places
-class OperationsPanel extends PureComponent<*> {
+class OperationsPanel extends Component<*> {
   componentWillUnmount() {
     this.props.unsetOperation();
   }
@@ -86,11 +86,6 @@ class OperationsPanel extends PureComponent<*> {
     return (
       <div className={css(styles.opGrid)}>
         {operations.map(({ name }) => {
-          console.log(
-            name,
-            'is disabled: ',
-            !isEnabled(name) || isTransitioning,
-          );
           return (
             <button
               key={name}
