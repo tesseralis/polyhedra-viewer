@@ -12,7 +12,6 @@ import {
   getAdjustInformation,
   getScaledPrismVertices,
 } from './prismUtils';
-import { getTwistSign } from './operationUtils';
 
 function pivot(list, value) {
   const index = _.indexOf(list, value);
@@ -73,7 +72,8 @@ function joinAntiprismFaces(polyhedron, boundary, twist) {
 }
 
 function doTurn(polyhedron, { twist = 'left' }) {
-  const { vertexSets, boundary, multiplier } = getAdjustInformation(polyhedron);
+  const adjustInfo = getAdjustInformation(polyhedron);
+  const { boundary } = adjustInfo;
   const isAntiprism = boundary.adjacentFaces()[0].numSides === 3;
 
   const duplicated = isAntiprism
@@ -83,14 +83,8 @@ function doTurn(polyhedron, { twist = 'left' }) {
   const n = boundary.numSides;
   const scale =
     polyhedron.edgeLength() * (antiprismHeight(n) - 1) * (isAntiprism ? -1 : 1);
-  const theta = getTwistSign(twist) * Math.PI / n;
 
-  const endVertices = getScaledPrismVertices(
-    vertexSets,
-    scale,
-    theta,
-    multiplier,
-  );
+  const endVertices = getScaledPrismVertices(adjustInfo, scale, twist);
   return {
     animationData: {
       start: duplicated,

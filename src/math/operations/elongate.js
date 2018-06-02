@@ -4,7 +4,7 @@ import { type Twist } from 'types';
 import { Operation } from './operationTypes';
 import { Polyhedron, Peak } from 'math/polyhedra';
 import { mod } from 'util.js';
-import { getTwistSign, getEdgeFacePaths } from './operationUtils';
+import { getEdgeFacePaths } from './operationUtils';
 import { antiprismHeight, getScaledPrismVertices } from './prismUtils';
 
 function duplicateVertices(polyhedron: Polyhedron, boundary, twist?: Twist) {
@@ -43,7 +43,7 @@ function doElongate(polyhedron, twist) {
   const boundary = peaks[0].boundary();
   const n = boundary.numSides;
   const duplicated = duplicateVertices(polyhedron, boundary, twist);
-  const [transformVertices, multiplier] = (() => {
+  const [vertexSets, multiplier] = (() => {
     const duplicatedPeaks = Peak.getAll(duplicated);
     if (duplicatedPeaks.length === 2) {
       return [duplicatedPeaks, 1 / 2];
@@ -53,16 +53,11 @@ function doElongate(polyhedron, twist) {
       return [[base], 1];
     }
   })();
+  const adjustInfo = { vertexSets, boundary, multiplier };
 
   const height = polyhedron.edgeLength() * (twist ? antiprismHeight(n) : 1);
-  const angle = getTwistSign(twist) * Math.PI / n;
 
-  const endVertices = getScaledPrismVertices(
-    transformVertices,
-    height,
-    angle,
-    multiplier,
-  );
+  const endVertices = getScaledPrismVertices(adjustInfo, height, twist);
   return {
     animationData: {
       start: duplicated,

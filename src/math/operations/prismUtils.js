@@ -1,9 +1,10 @@
 // @flow strict
 import _ from 'lodash';
+import type { Twist } from 'types';
 import { find } from 'util.js';
 import { Polyhedron, Peak } from 'math/polyhedra';
 import { withOrigin, isInverse } from 'math/linAlg';
-import { getTransformedVertices } from './operationUtils';
+import { getTwistSign, getTransformedVertices } from './operationUtils';
 
 // Get antiprism height of a unit antiprism with n sides
 export function antiprismHeight(n: number) {
@@ -111,15 +112,18 @@ export function getAdjustInformation(polyhedron: Polyhedron) {
 }
 
 export function getScaledPrismVertices(
-  vertexSets: *,
-  height: number,
-  angle: number,
-  multiplier: number,
+  adjustInfo: *,
+  scale: number,
+  twist: ?Twist,
 ) {
+  const { vertexSets, boundary, multiplier } = adjustInfo;
+  const n = boundary.numSides;
+  const angle = getTwistSign(twist) * Math.PI / n;
+
   return getTransformedVertices(vertexSets, set =>
     withOrigin(set.normalRay(), v =>
       v
-        .add(set.normal().scale(height * multiplier))
+        .add(set.normal().scale(scale * multiplier))
         .getRotatedAroundAxis(set.normal(), angle * multiplier),
     ),
   );
