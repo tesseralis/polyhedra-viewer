@@ -20,13 +20,6 @@ export const hasMultiple = (relations: ?(Relation[]), property: string) =>
     .compact()
     .value().length > 1;
 
-// TODO maybe this goes in a math/geom file?
-// Get antiprism height of a unit antiprism with n sides
-export function antiprismHeight(n: number) {
-  const sec = 1 / Math.cos(Math.PI / (2 * n));
-  return Math.sqrt(1 - sec * sec / 4);
-}
-
 // Remove vertices (and faces) from the polyhedron when they are all the same
 function deduplicateVertices(polyhedron: Polyhedron) {
   // group vertex indices by same
@@ -48,7 +41,6 @@ function deduplicateVertices(polyhedron: Polyhedron) {
   if (_.isEmpty(oldToNew)) return polyhedron;
 
   // replace vertices that are the same
-  // TODO create a filterFaces method?
   let newFaces = _(polyhedron.faces)
     .map(face => _.uniq(face.vertices.map(v => oldToNew[v.index])))
     .filter(vIndices => vIndices.length >= 3)
@@ -160,8 +152,6 @@ function fillDefaults(op) {
 
 export interface OperationResult {
   result: Polyhedron;
-  // TODO This is optional because we "fill in" an option result with defaults
-  // but then we have to check for something we're sure to have...
   name: string;
   animationData: ?{
     start: Polyhedron,

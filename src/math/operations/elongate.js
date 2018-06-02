@@ -3,14 +3,9 @@ import _ from 'lodash';
 import { type Twist } from 'types';
 import { Operation } from './operationTypes';
 import { Polyhedron, Peak } from 'math/polyhedra';
-import { withOrigin } from 'math/linAlg';
 import { mod } from 'util.js';
-import {
-  getTwistSign,
-  antiprismHeight,
-  getTransformedVertices,
-  getEdgeFacePaths,
-} from './operationUtils';
+import { getTwistSign, getEdgeFacePaths } from './operationUtils';
+import { antiprismHeight, getScaledPrismVertices } from './prismUtils';
 
 function duplicateVertices(polyhedron: Polyhedron, boundary, twist?: Twist) {
   const newVertexMapping = {};
@@ -62,12 +57,11 @@ function doElongate(polyhedron, twist) {
   const height = polyhedron.edgeLength() * (twist ? antiprismHeight(n) : 1);
   const angle = getTwistSign(twist) * Math.PI / n;
 
-  const endVertices = getTransformedVertices(transformVertices, set =>
-    withOrigin(set.normalRay(), v =>
-      v
-        .add(set.normal().scale(height * multiplier))
-        .getRotatedAroundAxis(set.normal(), angle * multiplier),
-    ),
+  const endVertices = getScaledPrismVertices(
+    transformVertices,
+    height,
+    angle,
+    multiplier,
   );
   return {
     animationData: {

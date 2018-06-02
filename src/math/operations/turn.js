@@ -1,0 +1,123 @@
+// @flow strict
+import _ from 'lodash';
+
+import type { Twist } from 'types';
+import { flatMap } from 'util.js';
+
+import { Operation } from './operationTypes';
+import {
+  getChirality,
+  isGyroelongatedBiCupola,
+  antiprismHeight,
+  getAdjustInformation,
+  getScaledPrismVertices,
+} from './prismUtils';
+import { getTwistSign } from './operationUtils';
+
+function pivot(list, value) {
+  const index = _.indexOf(list, value);
+  return [..._.slice(list, index), ..._.slice(list, 0, index)];
+}
+
+function bisectPrismFaces(polyhedron, boundary, twist) {
+  const prismFaces = _.map(boundary.edges, edge => edge.twinFace());
+  const newFaces = flatMap(boundary.edges, edge => {
+    const twinFace = edge.twinFace();
+    const [v1, v2, v3, v4] = pivot(
+      _.map(twinFace.vertices, 'index'),
+      edge.v2.index,
+    );
+
+    return twist === 'left'
+      ? [[v1, v2, v4], [v2, v3, v4]]
+      : [[v1, v2, v3], [v1, v3, v4]];
+  });
+
+  return polyhedron.withChanges(solid =>
+    solid.withoutFaces(prismFaces).addFaces(newFaces),
+  );
+}
+
+function joinAntiprismFaces(polyhedron, boundary, twist) {
+  const antiprismFaces = flatMap(boundary.edges, edge => {
+    return [
+      edge.twinFace(),
+      edge
+        .twin()
+        .prev()
+        .twinFace(),
+    ];
+  });
+
+  const newFaces = _.map(boundary.edges, edge => {
+    const [v1, v2] = edge.twin().vertices;
+    const [v3, v4] =
+      twist === 'left'
+        ? edge
+            .twin()
+            .prev()
+            .twin()
+            .next().vertices
+        : edge
+            .twin()
+            .next()
+            .twin()
+            .prev().vertices;
+
+    return [v1, v2, v3, v4];
+  });
+
+  return polyhedron.withChanges(solid =>
+    solid.withoutFaces(antiprismFaces).addFaces(newFaces),
+  );
+}
+
+function doTurn(polyhedron, { twist = 'left' }) {
+  const { vertexSets, boundary, multiplier } = getAdjustInformation(polyhedron);
+  const isAntiprism = boundary.adjacentFaces()[0].numSides === 3;
+
+  const duplicated = isAntiprism
+    ? polyhedron
+    : bisectPrismFaces(polyhedron, boundary, twist);
+
+  const n = boundary.numSides;
+  const scale =
+    polyhedron.edgeLength() * (antiprismHeight(n) - 1) * (isAntiprism ? -1 : 1);
+  const theta = getTwistSign(twist) * Math.PI / n;
+
+  const endVertices = getScaledPrismVertices(
+    vertexSets,
+    scale,
+    theta,
+    multiplier,
+  );
+  return {
+    animationData: {
+      start: duplicated,
+      endVertices,
+    },
+    result: isAntiprism
+      ? joinAntiprismFaces(polyhedron, boundary, twist).withVertices(
+          endVertices,
+        )
+      : undefined,
+  };
+}
+
+export const turn: Operation<{ twist?: Twist }> = {
+  apply: doTurn,
+  getSearchOptions(polyhedron, options) {
+    if (!isGyroelongatedBiCupola(polyhedron)) return;
+    const { twist } = options;
+    const chirality = getChirality(polyhedron);
+    const gyrate = twist === chirality ? 'ortho' : 'gyro';
+    return { gyrate };
+  },
+
+  getAllApplyArgs(polyhedron) {
+    if (isGyroelongatedBiCupola(polyhedron)) {
+      return [{ twist: 'left' }, { twist: 'right' }];
+    }
+    return [{}];
+  },
+};

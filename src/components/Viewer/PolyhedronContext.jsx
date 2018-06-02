@@ -6,9 +6,39 @@ import { defaultConfig } from 'constants/configOptions';
 import { WithConfig } from 'components/ConfigContext';
 import transition from 'transition';
 import { Polyhedron } from 'math/polyhedra';
+import { PRECISION } from 'math/linAlg';
+
+function getCoplanarFaces(polyhedron) {
+  const found = [];
+  const pairs = [];
+  _.forEach(polyhedron.faces, f1 => {
+    if (f1.inSet(found)) return;
+
+    _.forEach(f1.adjacentFaces(), f2 => {
+      if (f1.normal().equalsWithTolerance(f2.normal(), PRECISION)) {
+        pairs.push([f1, f2]);
+        found.push(f1);
+        found.push(f2);
+        return;
+      }
+    });
+  });
+  return pairs;
+}
 
 function getFaceColors(polyhedron, colors) {
-  return _.map(polyhedron.faces, face => colors[face.numUniqueSides()]);
+  const pairs = getCoplanarFaces(polyhedron);
+  const mapping = {};
+  _.forEach(pairs, ([f1, f2]) => {
+    const numSides = f1.numSides + f2.numSides - 2;
+    mapping[f1.index] = numSides;
+    mapping[f2.index] = numSides;
+  });
+
+  return _.map(
+    polyhedron.faces,
+    face => colors[_.get(mapping, face.index, face.numUniqueSides())],
+  );
 }
 
 function arrayDefaults(first, second) {
