@@ -124,19 +124,25 @@ class BaseOperationProvider extends Component<*, *> {
     ) {
       this.unsetOperation();
     } else {
-      this.setOperation(opName, name);
+      // Update the current hit options on gyrate
+      // TODO generalize this for more operations
+      const { peak } = hitOptions;
+      const newHitOptions = peak
+        ? { peak: peak.withPolyhedron(result) }
+        : undefined;
+      this.setOperation(opName, name, newHitOptions);
     }
 
     setSolid(name);
     transitionPolyhedron(result, animationData);
   };
 
-  setOperation = (opName: OpName, solid) => {
+  setOperation = (opName, solid, hitOptions) => {
     this.setState({
       opName,
       operation: operations[opName],
       options: applyOptionsFor(solid, opName),
-      hitOptions: undefined,
+      hitOptions,
     });
   };
 

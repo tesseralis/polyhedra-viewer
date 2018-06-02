@@ -131,6 +131,10 @@ export default class Peak implements VertexList {
       this.boundary().isPlanar()
     );
   }
+
+  withPolyhedron(other: Polyhedron) {
+    return Peak.find(other, this.topPoint());
+  }
 }
 const Pyramid = withMapper('vertices')(
   class extends Peak {
