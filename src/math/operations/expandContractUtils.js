@@ -89,24 +89,15 @@ function getIcosahedronContractFaces(polyhedron) {
 }
 
 function getCuboctahedronContractFaces(polyhedron) {
-  const toCheck = _.filter(polyhedron.faces, { numSides: 3 });
-  const result = [];
-  const invalid = [];
-  while (toCheck.length > 0) {
-    const next = toCheck.pop();
-    if (_.includes(invalid, next.index)) {
-      continue;
-    }
-    _.forEach(next.vertices, vertex => {
-      _.forEach(vertex.adjacentFaces(), face => {
-        if (face.numSides === 3) {
-          invalid.push(face.index);
-        }
-      });
-    });
-    result.push(next);
-  }
-  return result;
+  const f0 = polyhedron.faceWithNumSides(3);
+  const rest = _.map(f0.edges, e => {
+    return e
+      .twin()
+      .next()
+      .next()
+      .twinFace();
+  });
+  return [f0, ...rest];
 }
 
 export function getContractFaces(polyhedron: Polyhedron, faceType?: number) {
@@ -146,4 +137,3 @@ export function getSnubAngle(polyhedron: Polyhedron, faces: Face[]) {
     : 1;
   return angle * sign;
 }
-

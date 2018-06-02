@@ -155,6 +155,19 @@ describe('viewer', () => {
       .expectTransitionTo('diminished-rhombicosidodecahedron');
   });
 
+  it('can combine twist and turn operations', () => {
+    setup('/elongated-pentagonal-bipyramid/operations');
+    appPage
+      .clickButtonWithText('turn')
+      .expectTransitionTo('icosahedron')
+      .clickButtonWithText('twist')
+      .expectTransitionTo('cuboctahedron')
+      .clickButtonWithText('twist')
+      .expectTransitionTo('icosahedron')
+      .clickButtonWithText('turn')
+      .expectTransitionTo('elongated-pentagonal-bipyramid');
+  });
+
   describe('contracting an icosahedron', () => {
     it('can augment and contract an icosahedron', () => {
       setup('/gyroelongated-pentagonal-pyramid/operations');
