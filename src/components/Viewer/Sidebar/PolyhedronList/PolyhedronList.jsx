@@ -129,6 +129,12 @@ const PolyhedronGroup = ({ group }) => {
   );
 };
 
+const styles = StyleSheet.create({
+  list: {
+    paddingTop: 10,
+  },
+});
+
 export default class PolyhedronList extends Component {
   constructor(props) {
     super(props);
@@ -142,7 +148,7 @@ export default class PolyhedronList extends Component {
     const filteredGroups =
       filterText === '' ? groups : filterGroups(groups, filterText);
     return (
-      <div>
+      <div className={css(styles.list)}>
         <SearchBar text={filterText} onChange={this.handleFilterChange} />
         {filteredGroups.map(({ name, ...group }) => (
           <PolyhedronGroup key={name} group={group} />
