@@ -18,6 +18,7 @@ function pivot(list, value) {
   return [..._.slice(list, index), ..._.slice(list, 0, index)];
 }
 
+// TODO deduplicate with turn
 function bisectEdgeFaces(expandedFaces, twist) {
   let newFaces = [];
   const found = [];
@@ -82,13 +83,13 @@ function joinEdgeFaces(twistFaces, twist) {
   );
 }
 
+// TODO deduplicate with expand/contract
 function doTwist(polyhedron, referenceName, twist = 'left') {
   const reference = Polyhedron.get(referenceName);
   const isSnub = expansionType(polyhedron) === 'snub';
   const f0 = polyhedron.largestFace();
   const n = f0.numSides;
   const twistFaces = getContractFaces(polyhedron, n);
-  // FIXME icosahdron needs proper twist alignment
 
   const referenceFace =
     _.find(reference.faces, face => isExpandedFace(reference, face, n)) ||
