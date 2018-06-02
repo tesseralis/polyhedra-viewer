@@ -5,4 +5,5 @@ import Adapter from './ReactSixteenAdapter';
 import { StyleSheetTestUtils } from 'aphrodite';
 
 configure({ adapter: new Adapter() });
+jest.mock('x3dom.js');
 StyleSheetTestUtils.suppressStyleInjection();
