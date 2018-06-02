@@ -75,7 +75,7 @@ export const operations: Operation[] = [
   {
     name: 'turn',
     symbol: 'u',
-    description: 'Rotate a prism to an antiprism or vice versa',
+    description: 'rotate a prism to an antiprism or vice versa',
   },
   {
     name: 'augment',

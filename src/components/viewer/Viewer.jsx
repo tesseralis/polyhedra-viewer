@@ -60,9 +60,7 @@ class Viewer extends PureComponent<*> {
             <Sidebar panel={panel} solid={solid} />
           </div>
         )}
-        <div className={css(styles.scene)}>
-          <Scene panel={panel} solid={solid} />
-        </div>
+        <Scene panel={panel} solid={solid} />
       </div>
     );
   }

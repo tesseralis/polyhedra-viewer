@@ -148,12 +148,12 @@ export default class PolyhedronList extends Component {
     const filteredGroups =
       filterText === '' ? groups : filterGroups(groups, filterText);
     return (
-      <div className={css(styles.list)}>
+      <section className={css(styles.list)}>
         <SearchBar text={filterText} onChange={this.handleFilterChange} />
         {filteredGroups.map(({ name, ...group }) => (
           <PolyhedronGroup key={name} group={group} />
         ))}
-      </div>
+      </section>
     );
   }
 

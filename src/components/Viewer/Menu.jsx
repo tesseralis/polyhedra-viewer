@@ -19,7 +19,7 @@ interface Props {
 
 export default function Menu({ solid, compact = false }: Props) {
   return (
-    <div className={css(styles.menu)}>
+    <nav className={css(styles.menu)}>
       <IconLink
         to="/"
         title="Table"
@@ -48,6 +48,6 @@ export default function Menu({ solid, compact = false }: Props) {
         iconName="math-compass"
         iconOnly={compact}
       />
-    </div>
+    </nav>
   );
 }

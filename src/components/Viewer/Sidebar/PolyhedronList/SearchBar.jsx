@@ -63,6 +63,7 @@ export default class SearchBar extends Component {
         <input
           type="text"
           placeholder="Search..."
+          aria-label="search"
           value={value}
           onChange={e => onChange(e.target.value)}
           onFocus={() => this.setFocus(true)}

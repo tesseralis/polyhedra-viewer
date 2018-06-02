@@ -84,7 +84,7 @@ class OperationsPanel extends Component<*> {
     } = this.props;
 
     return (
-      <div className={css(styles.opGrid)}>
+      <section className={css(styles.opGrid)}>
         {operations.map(({ name }) => {
           return (
             <button
@@ -118,7 +118,7 @@ class OperationsPanel extends Component<*> {
         >
           Resize
         </button>
-      </div>
+      </section>
     );
   }
 }
