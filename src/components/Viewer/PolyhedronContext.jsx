@@ -12,10 +12,10 @@ function getCoplanarFaces(polyhedron) {
   const found = [];
   const pairs = [];
   _.forEach(polyhedron.faces, f1 => {
-    if (f1.inSet(found)) return;
+    if (f1.inSet(found || !f1.isValid())) return;
 
     _.forEach(f1.adjacentFaces(), f2 => {
-      if (!f2) return;
+      if (!f2 || !f2.isValid()) return;
       if (f1.normal().equalsWithTolerance(f2.normal(), PRECISION)) {
         pairs.push([f1, f2]);
         found.push(f1);
