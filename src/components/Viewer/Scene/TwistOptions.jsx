@@ -4,6 +4,7 @@ import { css, StyleSheet } from 'aphrodite/no-important';
 
 import { type Twist } from 'types';
 import { Icon, SrOnly } from 'components/common';
+import { WithPolyhedron } from 'components/Viewer/PolyhedronContext';
 
 const styles = StyleSheet.create({
   twistOption: {
@@ -22,9 +23,13 @@ const styles = StyleSheet.create({
   },
 });
 
-function TwistOption({ orientation, onClick }) {
+function TwistOption({ orientation, onClick, disabled }) {
   return (
-    <button onClick={onClick} className={css(styles.twistOption)}>
+    <button
+      disabled={disabled}
+      onClick={onClick}
+      className={css(styles.twistOption)}
+    >
       <Icon name={`rotate-${orientation}`} angle={180} size={48} />
       <SrOnly>{orientation}</SrOnly>
     </button>
@@ -33,13 +38,32 @@ function TwistOption({ orientation, onClick }) {
 
 interface Props {
   onClick(twist: Twist): void;
+  disabled: boolean;
 }
 
-export default function TwistOptions({ onClick }: Props) {
+function TwistOptions({ onClick, disabled }: Props) {
   return (
     <div className={css(styles.twistOptions)}>
-      <TwistOption orientation="left" onClick={() => onClick('left')} />
-      <TwistOption orientation="right" onClick={() => onClick('right')} />
+      <TwistOption
+        orientation="left"
+        disabled={disabled}
+        onClick={() => onClick('left')}
+      />
+      <TwistOption
+        orientation="right"
+        disabled={disabled}
+        onClick={() => onClick('right')}
+      />
     </div>
   );
 }
+
+export default (props: *) => {
+  return (
+    <WithPolyhedron>
+      {({ isTransitioning }) => (
+        <TwistOptions {...props} disabled={isTransitioning} />
+      )}
+    </WithPolyhedron>
+  );
+};
