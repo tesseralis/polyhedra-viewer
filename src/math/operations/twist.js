@@ -88,7 +88,7 @@ function doTwist(polyhedron, referenceName, twist = 'left') {
   const f0 = polyhedron.largestFace();
   const n = f0.numSides;
   const twistFaces = getContractFaces(polyhedron, n);
-  const duplicated = isSnub ? polyhedron : bisectEdgeFaces(twistFaces, twist);
+  // FIXME icosahdron needs proper twist alignment
 
   const referenceFace =
     _.find(reference.faces, face => isExpandedFace(reference, face, n)) ||
@@ -102,7 +102,11 @@ function doTwist(polyhedron, referenceName, twist = 'left') {
   const angle = !isSnub
     ? getTwistSign(twist) * Math.abs(getSnubAngle(reference, refFaces))
     : -getSnubAngle(polyhedron, twistFaces);
+  const snubTwist = angle > 0 ? 'left' : 'right';
 
+  const duplicated = isSnub
+    ? polyhedron
+    : bisectEdgeFaces(twistFaces, snubTwist);
   const endVertices = getResizedVertices(twistFaces, referenceLength, angle);
 
   return {
@@ -111,9 +115,7 @@ function doTwist(polyhedron, referenceName, twist = 'left') {
       endVertices,
     },
     result: isSnub
-      ? joinEdgeFaces(twistFaces, angle > 0 ? 'left' : 'right').withVertices(
-          endVertices,
-        )
+      ? joinEdgeFaces(twistFaces, snubTwist).withVertices(endVertices)
       : undefined,
   };
 }
