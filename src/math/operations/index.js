@@ -5,7 +5,7 @@ import { cumulate } from './cumulate';
 import { expand, snub, dual } from './expand';
 import { contract } from './contract';
 import { elongate, gyroelongate } from './elongate';
-import { shorten } from './shorten';
+import { shorten, turn } from './shorten';
 import { augment } from './augment';
 import { diminish } from './diminish';
 import { gyrate } from './gyrate';
@@ -19,11 +19,12 @@ const rawOps = {
     expand,
     snub,
     contract,
-    augment,
     elongate,
     gyroelongate,
-    diminish,
     shorten,
+    turn,
+    augment,
+    diminish,
     gyrate,
 };
 

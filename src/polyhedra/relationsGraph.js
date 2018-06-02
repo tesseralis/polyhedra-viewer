@@ -91,7 +91,7 @@ function graphMergeAll(...objects) {
 }
 
 const getInverseOperation = operation => {
-  if ('dgp'.includes(operation)) return operation;
+  if ('dgpu'.includes(operation)) return operation;
   if (operation === '+') return '-';
   if (operation === '-') return '+';
   if ('ta'.includes(operation)) return 'k';
@@ -262,6 +262,7 @@ const basePyramidsCupolae = (() => {
           { value: elongated, using },
           hasRotunda && { value: rotundaRow.elongated, using: 'R5' },
         ],
+        u: antiprism,
       },
       [antiprism]: {
         '+': [
@@ -295,6 +296,7 @@ const basePyramidsCupolae = (() => {
       },
       [elongated]: {
         '+': augmentations(name, 'elongated bi-'),
+        u: gyroelongated,
       },
       [gyroelongated]: {
         '+': augmentations(name, 'gyroelongated bi-'),

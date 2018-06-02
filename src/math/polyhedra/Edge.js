@@ -46,6 +46,10 @@ export default class Edge implements VertexList {
     return new Edge(this.v2, this.v1);
   }
 
+  twinFace() {
+    return this.twin().face;
+  }
+
   // Get the "undirected" version of this edge, represented by
   // the version where its vertices are ordered by their index
   undirected() {
