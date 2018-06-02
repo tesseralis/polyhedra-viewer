@@ -1,7 +1,7 @@
 //@flow
 
 import _ from 'lodash';
-import React, { Fragment } from 'react';
+import React from 'react';
 import { css, StyleSheet } from 'aphrodite/no-important';
 import { fixed } from 'styles/common';
 
@@ -14,18 +14,7 @@ import TwistOptions from './TwistOptions';
 import AugmentOptions from './AugmentOptions';
 
 const styles = StyleSheet.create({
-  title: {
-    ...fixed('bottom', 'right'),
-    padding: 36,
-    maxWidth: '50%',
-    textAlign: 'right',
-  },
-  sidebarToggle: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-  },
-  overlayContainer: {
+  overlay: {
     position: 'absolute',
     right: 0,
     left: 0,
@@ -33,12 +22,31 @@ const styles = StyleSheet.create({
     bottom: 0,
     pointerEvents: 'none',
   },
+
+  opFocus: {
+    // border: '2px solid DarkSlateGray',
+  },
+
+  title: {
+    pointerEvents: 'initial',
+    padding: 36,
+    maxWidth: '50%',
+    textAlign: 'right',
+    ...fixed('bottom', 'right'),
+  },
+
+  sidebarToggle: {
+    pointerEvents: 'initial',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+  },
 });
 
 function OperationOverlay(props) {
   const { opName, solid, panel, applyOperation } = props;
   return (
-    <Fragment>
+    <div className={css(styles.overlay, opName && styles.opFocus)}>
       <div className={css(styles.sidebarToggle)}>
         {panel === 'full' ? (
           <Menu solid={solid} compact />
@@ -56,16 +64,10 @@ function OperationOverlay(props) {
         <Title name={unescapeName(solid)} />
       </div>
       {_.includes(['shorten', 'snub', 'gyroelongate'], opName) && (
-        <div className={css(styles.overlayContainer)}>
-          <TwistOptions onClick={twist => applyOperation(opName, { twist })} />
-        </div>
+        <TwistOptions onClick={twist => applyOperation(opName, { twist })} />
       )}
-      {_.includes(['augment'], opName) && (
-        <div className={css(styles.overlayContainer)}>
-          <AugmentOptions solid={solid} />
-        </div>
-      )}
-    </Fragment>
+      {_.includes(['augment'], opName) && <AugmentOptions solid={solid} />}
+    </div>
   );
 }
 export default (props: *) => (
