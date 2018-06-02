@@ -3,56 +3,6 @@ import _ from 'lodash';
 import periodicTable from 'constants/periodicTable';
 import { toConwayNotation } from './names';
 import { mapObject } from 'util.js';
-// TODO: adapt this from the table to we don't miss anything
-const archimedean = {
-  T: {
-    d: 'T',
-    t: 'tT',
-    a: 'O',
-    e: 'aC',
-    s: 'I',
-  },
-  C: {
-    d: 'O',
-    t: 'tC',
-    a: 'aC',
-    e: 'eC',
-    s: { value: 'sC', chiral: true },
-  },
-  O: {
-    t: 'tO',
-    a: 'aC',
-    e: 'eC',
-    s: { value: 'sC', chiral: true },
-  },
-  aC: {
-    // TODO (possibly) coxeter snub (semi-snub) and rectify relations
-    t: 'bC',
-    // p: 'I',
-  },
-  eC: {
-    // p: 'sC',
-  },
-  D: {
-    d: 'I',
-    t: 'tD',
-    a: 'aD',
-    e: 'eD',
-    s: { value: 'sD', chiral: true },
-  },
-  I: {
-    t: 'tI',
-    a: 'aD',
-    e: 'eD',
-    s: { value: 'sD', chiral: true },
-  },
-  aD: {
-    t: 'bD',
-  },
-  eD: {
-    // p: 'sD',
-  },
-};
 
 // Make everything an array
 function normalize(graph) {
@@ -246,6 +196,57 @@ const getElongations = (prism, antiprism) => (
   };
 };
 
+// TODO: adapt this from the table to we don't miss anything
+const archimedean = {
+  T: {
+    d: 'T',
+    t: 'tT',
+    a: 'O',
+    e: 'aC',
+    s: 'I',
+  },
+  C: {
+    d: 'O',
+    t: 'tC',
+    a: 'aC',
+    e: 'eC',
+    s: { value: 'sC', chiral: true },
+  },
+  O: {
+    t: 'tO',
+    a: 'aC',
+    e: 'eC',
+    s: { value: 'sC', chiral: true },
+  },
+  aC: {
+    // TODO (possibly) coxeter snub (semi-snub) and rectify relations
+    t: 'bC',
+    // p: 'I',
+  },
+  eC: {
+    // p: 'sC',
+  },
+  D: {
+    d: 'I',
+    t: 'tD',
+    a: 'aD',
+    e: 'eD',
+    s: { value: 'sD', chiral: true },
+  },
+  I: {
+    t: 'tI',
+    a: 'aD',
+    e: 'eD',
+    s: { value: 'sD', chiral: true },
+  },
+  aD: {
+    t: 'bD',
+  },
+  eD: {
+    // p: 'sD',
+  },
+};
+
 const basePyramidsCupolae = (() => {
   let graph = {};
   // relation of prisms and antiprisms
@@ -309,6 +310,9 @@ const basePyramidsCupolae = (() => {
     if (!_.isArray(bi)) {
       graph = graphMerge(graph, {
         [bi]: elongations(elongatedBi, gyroelongatedBi),
+        [elongatedBi]: {
+          u: gyroelongatedBi,
+        },
       });
     } else {
       const [ortho, gyro] = bi;

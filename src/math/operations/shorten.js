@@ -25,10 +25,18 @@ function getOppositePeaks(polyhedron) {
 function getOppositePrismFaces(polyhedron) {
   const face1 = _.maxBy(
     _.filter(polyhedron.faces, face => {
-      return _.uniqBy(face.adjacentFaces(), 'numSides').length === 1;
+      const faceCounts = _.countBy(
+        face.vertexAdjacentFaces().filter(f => !f.equals(face)),
+        'numSides',
+      );
+      return (
+        _.isEqual(faceCounts, { '4': face.numSides }) ||
+        _.isEqual(faceCounts, { '3': 2 * face.numSides })
+      );
     }),
     'numSides',
   );
+  if (!face1) return undefined;
 
   const face2 = _.find(
     polyhedron.faces,
