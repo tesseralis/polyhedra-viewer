@@ -3,7 +3,6 @@ import React from 'react';
 import { css, StyleSheet } from 'aphrodite/no-important';
 import _ from 'lodash';
 
-import connect from 'components/connect';
 import { WithConfig } from 'components/ConfigContext';
 import { configInputs } from 'constants/configOptions';
 import { hover } from 'styles/common';
@@ -93,7 +92,7 @@ const ResetButton = ({ reset }) => {
   );
 };
 
-function ConfigForm({ config, setValue, reset }) {
+export default function ConfigForm() {
   const styles = StyleSheet.create({
     configMenu: {
       width: '100%',
@@ -105,21 +104,20 @@ function ConfigForm({ config, setValue, reset }) {
   });
 
   return (
-    <form className={css(styles.configMenu)}>
-      {configInputs.map(({ key, ...input }) => (
-        <LabelledInput
-          key={key}
-          input={input}
-          value={_.get(config, key)}
-          setValue={value => setValue(key, value)}
-        />
-      ))}
-      <ResetButton reset={reset} />
-    </form>
+    <WithConfig>
+      {({ config, setValue, reset }) => (
+        <form className={css(styles.configMenu)}>
+          {configInputs.map(({ key, ...input }) => (
+            <LabelledInput
+              key={key}
+              input={input}
+              value={_.get(config, key)}
+              setValue={value => setValue(key, value)}
+            />
+          ))}
+          <ResetButton reset={reset} />
+        </form>
+      )}
+    </WithConfig>
   );
 }
-
-export default connect(
-  WithConfig,
-  ['config', 'setValue', 'reset'],
-)(ConfigForm);

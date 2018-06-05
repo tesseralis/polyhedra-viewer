@@ -7,7 +7,6 @@ import { fixed } from 'styles/common';
 
 import connect from 'components/connect';
 import { WithOperation } from 'components/Viewer/OperationContext';
-import ApplyOperation from 'components/Viewer/ApplyOperation';
 import { unescapeName } from 'polyhedra/names';
 import IconLink from 'components/Viewer/IconLink';
 import Menu from 'components/Viewer/Menu';
@@ -45,8 +44,7 @@ const styles = StyleSheet.create({
   },
 });
 
-function OperationOverlay(props) {
-  const { opName, solid, panel, applyOperation } = props;
+function OperationOverlay({ opName, solid, panel }) {
   return (
     <div className={css(styles.overlay, opName && styles.opFocus)}>
       <div className={css(styles.sidebarToggle)}>
@@ -68,21 +66,13 @@ function OperationOverlay(props) {
       {_.includes(
         ['shorten', 'snub', 'twist', 'gyroelongate', 'turn'],
         opName,
-      ) && (
-        <TwistOptions onClick={twist => applyOperation(opName, { twist })} />
-      )}
+      ) && <TwistOptions opName={opName} />}
       {_.includes(['augment'], opName) && <AugmentOptions solid={solid} />}
     </div>
   );
 }
 
-export default _.flow([
-  connect(
-    WithOperation,
-    ['opName'],
-  ),
-  connect(
-    ApplyOperation,
-    ['applyOperation'],
-  ),
-])(OperationOverlay);
+export default connect(
+  WithOperation,
+  ['opName'],
+)(OperationOverlay);

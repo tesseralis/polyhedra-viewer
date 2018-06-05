@@ -1,4 +1,5 @@
-// @flow strict
+// @flow
+import _ from 'lodash';
 import React from 'react';
 import { css, StyleSheet } from 'aphrodite/no-important';
 
@@ -6,6 +7,7 @@ import { type Twist } from 'types';
 import connect from 'components/connect';
 import { Icon, SrOnly } from 'components/common';
 import { WithPolyhedron } from 'components/Viewer/PolyhedronContext';
+import ApplyOperation from 'components/Viewer/ApplyOperation';
 
 const styles = StyleSheet.create({
   twistOption: {
@@ -38,28 +40,35 @@ function TwistOption({ orientation, onClick, disabled }) {
 }
 
 interface Props {
-  onClick(twist: Twist): void;
+  opName: string;
+  onClick(opName: string, twist: Twist): void;
   disabled: boolean;
 }
 
-function TwistOptions({ onClick, disabled }: Props) {
+function TwistOptions({ opName, onClick, disabled }: Props) {
   return (
     <div className={css(styles.twistOptions)}>
       <TwistOption
         orientation="left"
         disabled={disabled}
-        onClick={() => onClick('left')}
+        onClick={() => onClick(opName, 'left')}
       />
       <TwistOption
         orientation="right"
         disabled={disabled}
-        onClick={() => onClick('right')}
+        onClick={() => onClick(opName, 'right')}
       />
     </div>
   );
 }
 
-export default connect(
-  WithPolyhedron,
-  { disabled: 'isTransitioning' },
-)(TwistOptions);
+export default _.flow([
+  connect(
+    WithPolyhedron,
+    { disabled: 'isTransitioning' },
+  ),
+  connect(
+    ApplyOperation,
+    { onClick: 'applyOperation' },
+  ),
+])(TwistOptions);
