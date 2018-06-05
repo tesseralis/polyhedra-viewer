@@ -114,7 +114,6 @@ export function getTransformedVertices<T: VertexList>(
   iteratee: T => Transform | Vec3D,
   vertices?: Vertex[] = vLists[0].polyhedron.vertices,
 ) {
-  // const result = [...vLists[0].polyhedron.vertices];
   const result = [...vertices];
   _.forEach(vLists, vList => {
     _.forEach(vList.vertices, v => {
