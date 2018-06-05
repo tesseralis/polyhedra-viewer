@@ -1,12 +1,13 @@
 // @flow
 import React, { PureComponent } from 'react';
 import { css, StyleSheet } from 'aphrodite/no-important';
+import { type RouterHistory } from 'react-router-dom';
 
 import { fullScreen } from 'styles/common';
 
 import { OperationProvider } from './OperationContext';
-// TODO how to prevent needing both of these??
-import { PolyhedronProvider, WithPolyhedron } from './PolyhedronContext';
+import { PolyhedronProvider } from './PolyhedronContext';
+import SolidSync from './SolidSync';
 import Sidebar from './Sidebar';
 import Scene from './Scene';
 
@@ -30,31 +31,15 @@ const styles = StyleSheet.create({
 
 interface ViewerProps {
   solid: string;
-  history: any;
+  history: RouterHistory;
 }
 
 class Viewer extends PureComponent<*> {
-  constructor(props: *) {
-    super(props);
-    const { solid, setPolyhedron } = props;
-    setPolyhedron(solid);
-  }
-
-  componentDidUpdate(prevProps) {
-    const { solid, panel, setPolyhedron } = this.props;
-
-    // If an operation has not been applied and there is a mismatch betweeen the props and context,
-    // update context
-    // TODO is this janky?
-    if (solid !== prevProps.solid && panel !== 'operations') {
-      setPolyhedron(solid);
-    }
-  }
-
   render() {
     const { solid, panel } = this.props;
     return (
       <div className={css(styles.viewer)}>
+        <SolidSync solid={solid} panel={panel} />
         {panel !== 'full' && (
           <div className={css(styles.sidebar)}>
             <Sidebar panel={panel} solid={solid} />
@@ -72,11 +57,7 @@ export default (props: ViewerProps) => (
       solid={props.solid}
       setSolid={name => props.history.push(`/${name}/operations`)}
     >
-      <WithPolyhedron>
-        {({ setPolyhedron }) => (
-          <Viewer {...props} setPolyhedron={setPolyhedron} />
-        )}
-      </WithPolyhedron>
+      <Viewer {...props} />
     </OperationProvider>
   </PolyhedronProvider>
 );
