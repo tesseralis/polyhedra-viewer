@@ -46,7 +46,7 @@ describe('viewer', () => {
     appPage
       .clickButtonWithText('rectify')
       .expectTransitionTo('octahedron')
-      .expectOperation(undefined);
+      .expectOperation('');
   });
 
   it('can augment and diminish a tetrahedron', () => {

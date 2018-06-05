@@ -23,7 +23,6 @@ class SolidColors extends Component<*> {
       operation,
       config: { colors },
       options,
-      hitOptions,
     } = this.props;
     if (!_.isEmpty(faceColors)) {
       return polyhedron.faces.map(
@@ -32,8 +31,7 @@ class SolidColors extends Component<*> {
     }
     if (!operation) return polyhedron.faces.map(f => colors[f.numSides]);
     // TODO I want a better way to do this...
-    const allOptions = { ...options, ...hitOptions };
-    const selectState = operation.getSelectState(polyhedron, allOptions);
+    const selectState = operation.getSelectState(polyhedron, options);
     return polyhedron.faces.map((face, i) => {
       switch (selectState[i]) {
         case 'selected':
@@ -50,7 +48,7 @@ class SolidColors extends Component<*> {
 export default _.flow([
   connect(
     WithOperation,
-    ['operation', 'options', 'hitOptions'],
+    ['operation', 'options'],
   ),
   connect(
     WithPolyhedron,

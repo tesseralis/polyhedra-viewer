@@ -47,7 +47,7 @@ class ApplyOperation extends Component<*> {
   applyOperation = (
     opName = this.props.opName,
     options = this.props.options,
-    hitOptions = this.props.hitOptions,
+    callback?: *,
   ) => {
     const {
       polyhedron,
@@ -61,39 +61,29 @@ class ApplyOperation extends Component<*> {
 
     if (!operation) throw new Error('no operation defined');
 
-    const allOptions = { ...options, ...hitOptions };
-
-    // TODO use the operation name instead
     const { result, name, animationData } = applyOperation(
       operation,
       solidName,
       polyhedron,
-      allOptions,
+      options,
     );
     if (!name) throw new Error('Name not found on new polyhedron');
     const newRelations = getRelations(name, opName);
     if (
       _.isEmpty(newRelations) ||
       !hasOptions(opName, newRelations) ||
-      _.isEmpty(allOptions)
+      _.isEmpty(options)
     ) {
       unsetOperation();
     } else {
-      // Update the current hit options on gyrate
-      // TODO generalize this for more operations
-      if (!hitOptions) {
-        setOperation(opName, name);
-      } else {
-        const { peak } = hitOptions;
-        const newHitOptions = peak
-          ? { peak: peak.withPolyhedron(result) }
-          : undefined;
-        setOperation(opName, name, newHitOptions);
-      }
+      setOperation(opName, name);
     }
 
     setName(name);
     transitionPolyhedron(result, animationData);
+    if (typeof callback === 'function') {
+      callback(result);
+    }
   };
 
   // TODO this should just go in the panel connect
@@ -114,7 +104,7 @@ class ApplyOperation extends Component<*> {
 export default _.flow([
   connect(
     WithOperation,
-    ['opName', 'options', 'hitOptions', 'setOperation', 'unsetOperation'],
+    ['opName', 'options', 'setOperation', 'unsetOperation'],
   ),
   connect(
     WithPolyhedron,

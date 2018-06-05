@@ -6,10 +6,9 @@ import EventListener from 'react-event-listener';
 import { type Point } from 'types';
 import { SolidData } from 'math/polyhedra';
 import connect from 'components/connect';
-import { WithOperation } from 'components/Viewer/OperationContext';
 import { WithPolyhedron } from 'components/Viewer/PolyhedronContext';
-import ApplyOperation from 'components/Viewer/ApplyOperation';
 import SolidColors from './SolidColors';
+import HitOptions from './HitOptions';
 
 type SyntheticEventHandler = (e: $Subtype<SyntheticEvent<*>>) => void;
 
@@ -152,11 +151,7 @@ class X3dPolyhedron extends Component<PolyhedronProps, PolyhedronState> {
   };
 }
 
-export default _.flowRight([
-  connect(
-    ApplyOperation,
-    ['applyOperation'],
-  ),
+export default _.flow([
   connect(
     WithPolyhedron,
     ({ polyhedron, config }) => ({ solidData: polyhedron.solidData, config }),
@@ -166,14 +161,11 @@ export default _.flowRight([
     { faceColors: 'colors' },
   ),
   connect(
-    WithOperation,
-    ({ applyOperation, hitOptions, setHitOptions, unsetHitOptions }) => ({
-      onHover: setHitOptions,
-      onClick: () => {
-        // only apply operation if we have a hit
-        if (!_.isEmpty(hitOptions)) applyOperation();
-      },
-      onMouseOut: unsetHitOptions,
-    }),
+    HitOptions,
+    {
+      onHover: 'setHitOption',
+      onMouseOut: 'unsetHitOption',
+      onClick: 'applyWithHitOption',
+    },
   ),
 ])(X3dPolyhedron);

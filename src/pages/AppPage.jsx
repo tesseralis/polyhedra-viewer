@@ -32,7 +32,7 @@ export default class AppPage {
   }
 
   getPolyhedron() {
-    return this.wrapper.find('BaseOperationProvider').prop('polyhedron');
+    return this.wrapper.find('HitOptions').prop('polyhedron');
   }
 
   clickFace(face: *) {
@@ -59,8 +59,8 @@ export default class AppPage {
     return this;
   }
 
-  expectOperation(operation: string) {
-    const actual = this.wrapper.find('BaseOperationProvider').prop('operation');
+  expectOperation(operation: ?string) {
+    const actual = this.wrapper.find('OperationsPanel').prop('opName');
     expect(operation).toEqual(actual);
     return this;
   }
