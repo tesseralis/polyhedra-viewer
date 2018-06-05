@@ -5,6 +5,7 @@ import React from 'react';
 import { css, StyleSheet } from 'aphrodite/no-important';
 import { fixed } from 'styles/common';
 
+import connect from 'components/connect';
 import { WithOperation } from 'components/Viewer/OperationContext';
 import { unescapeName } from 'polyhedra/names';
 import IconLink from 'components/Viewer/IconLink';
@@ -73,13 +74,8 @@ function OperationOverlay(props) {
     </div>
   );
 }
-export default (props: *) => (
-  <WithOperation>
-    {operationProps => (
-      <OperationOverlay
-        {...props}
-        {..._.pick(operationProps, ['opName', 'applyOperation'])}
-      />
-    )}
-  </WithOperation>
-);
+
+export default connect(
+  WithOperation,
+  ['opName', 'applyOperation'],
+)(OperationOverlay);

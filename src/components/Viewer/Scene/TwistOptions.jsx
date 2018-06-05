@@ -3,6 +3,7 @@ import React from 'react';
 import { css, StyleSheet } from 'aphrodite/no-important';
 
 import { type Twist } from 'types';
+import connect from 'components/connect';
 import { Icon, SrOnly } from 'components/common';
 import { WithPolyhedron } from 'components/Viewer/PolyhedronContext';
 
@@ -58,12 +59,7 @@ function TwistOptions({ onClick, disabled }: Props) {
   );
 }
 
-export default (props: *) => {
-  return (
-    <WithPolyhedron>
-      {({ isTransitioning }) => (
-        <TwistOptions {...props} disabled={isTransitioning} />
-      )}
-    </WithPolyhedron>
-  );
-};
+export default connect(
+  WithPolyhedron,
+  { disabled: 'isTransitioning' },
+)(TwistOptions);

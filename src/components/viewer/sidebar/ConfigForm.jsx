@@ -3,6 +3,7 @@ import React from 'react';
 import { css, StyleSheet } from 'aphrodite/no-important';
 import _ from 'lodash';
 
+import connect from 'components/connect';
 import { WithConfig } from 'components/ConfigContext';
 import { configInputs } from 'constants/configOptions';
 import { hover } from 'styles/common';
@@ -118,10 +119,7 @@ function ConfigForm({ config, setValue, reset }) {
   );
 }
 
-export default () => (
-  <WithConfig>
-    {({ config, setValue, reset }) => (
-      <ConfigForm config={config} setValue={setValue} reset={reset} />
-    )}
-  </WithConfig>
-);
+export default connect(
+  WithConfig,
+  ['config', 'setValue', 'reset'],
+)(ConfigForm);

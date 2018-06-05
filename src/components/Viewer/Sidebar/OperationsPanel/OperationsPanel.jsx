@@ -4,6 +4,7 @@ import React, { Component } from 'react';
 import { css, StyleSheet } from 'aphrodite/no-important';
 
 import { operations } from 'polyhedra/operations';
+import connect from 'components/connect';
 import { WithOperation } from 'components/Viewer/OperationContext';
 import { WithPolyhedron } from 'components/Viewer/PolyhedronContext';
 import OperationIcon from './OperationIcon';
@@ -123,27 +124,13 @@ class OperationsPanel extends Component<*> {
   }
 }
 
-export default (props: *) => (
-  <WithPolyhedron>
-    {polyhedronProps => (
-      <WithOperation>
-        {operationProps => (
-          <OperationsPanel
-            {...props}
-            {..._.pick(polyhedronProps, [
-              'resize',
-              'recenter',
-              'isTransitioning',
-            ])}
-            {..._.pick(operationProps, [
-              'opName',
-              'selectOperation',
-              'unsetOperation',
-              'isEnabled',
-            ])}
-          />
-        )}
-      </WithOperation>
-    )}
-  </WithPolyhedron>
-);
+export default _.flow([
+  connect(
+    WithPolyhedron,
+    ['resize', 'recenter', 'istransitioning'],
+  ),
+  connect(
+    WithOperation,
+    ['opName', 'selectOperation', 'unsetOperation', 'isEnabled'],
+  ),
+])(OperationsPanel);
