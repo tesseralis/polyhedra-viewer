@@ -111,10 +111,11 @@ function getBaseType(base) {
 }
 
 function getOppositePrismFace(base) {
-  const square = base.adjacentFaces()[0];
-  const squareAdjFaces = square.adjacentFaces();
-  const i = _.findIndex(squareAdjFaces, face => base.equals(face));
-  return getCyclic(squareAdjFaces, i + 2);
+  return base.edges[0]
+    .twin()
+    .next()
+    .next()
+    .twinFace();
 }
 
 function isCupolaRotunda(baseType, augmentType) {

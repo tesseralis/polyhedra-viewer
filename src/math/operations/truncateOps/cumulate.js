@@ -10,16 +10,9 @@ interface CumulateOptions {
 
 // Return the symmetry group of the *rectified* polyhedron
 function getFamily(polyhedron) {
-  switch (polyhedron.numFaces()) {
-    case 8: // octahedron
-      return 'T';
-    case 14: // cuboctahedron
-      return 'O';
-    case 32: // icosidodecahedron
-      return 'I';
-    default:
-      throw new Error('Did you try to cumulate an invalid solid?');
-  }
+  // The octahedron is the rectification of the tetrahedron;
+  // Otherwise rely on polyhedral symmetry
+  return polyhedron.isRegular() ? 'T' : polyhedron.symmetry();
 }
 
 // Adjacent faces of the vertex with a cumulate face first
@@ -56,10 +49,7 @@ function duplicateVertices(polyhedron, facesToCumulate) {
 
 function getCumulateFaces(polyhedron, faceType) {
   // Special octahedron case
-  if (
-    polyhedron.numFaces() === 8 &&
-    _.every(polyhedron.faces, { numSides: 3 })
-  ) {
+  if (polyhedron.isRegular()) {
     const face0 = polyhedron.getFace();
     const adjacentFaces = face0.adjacentFaces();
     return _.filter(face0.vertexAdjacentFaces(), f => !f.inSet(adjacentFaces));

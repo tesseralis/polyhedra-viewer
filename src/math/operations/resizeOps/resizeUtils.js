@@ -25,24 +25,14 @@ type ExpansionType = 'cantellate' | 'snub';
 
 // Return the symmetry group of the *expanded* polyhedron
 export function getFamily(polyhedron: Polyhedron) {
-  switch (polyhedron.numFaces()) {
-    // TODO figure out how to use symmetry to get this result
-    case 14: // cuboctahedron
-    case 20: // icosahedron
-      return 'T';
-    case 26: // rhombicuboctahedron
-    case 38: // snub cube
-      return 'O';
-    case 62: // rhombicosidodecahedron
-    case 92: // snub dodecahedron
-      return 'I';
-    default:
-      throw new Error('Did you try to contract an invalid solid?');
+  if (polyhedron.isRegular() || polyhedron.isQuasiRegular()) {
+    return 'T';
   }
+  return polyhedron.symmetry();
 }
 
 export function expansionType(polyhedron: Polyhedron): ExpansionType {
-  return _.includes([20, 38, 92], polyhedron.numFaces())
+  return polyhedron.getVertex().adjacentFaceCounts()[3] >= 3
     ? 'snub'
     : 'cantellate';
 }

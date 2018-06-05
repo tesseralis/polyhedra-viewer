@@ -1,7 +1,7 @@
 // @flow strict
 import _ from 'lodash';
 
-import { flatMap, repeat, find, mod } from 'util.js';
+import { flatMap, repeat, find } from 'util.js';
 import { withOrigin, PRECISION } from 'math/linAlg';
 import { Polyhedron } from 'math/polyhedra';
 
@@ -52,7 +52,7 @@ function duplicateVertices(polyhedron) {
         return _.flatMap(face.vertices, v => {
           const base = count * v.index;
           const j = mapping[face.index][v.index];
-          return [base + mod(j + 1, count), base + j];
+          return [base + ((j + 1) % count), base + j];
         });
       })
       .addFaces(

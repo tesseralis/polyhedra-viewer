@@ -3,7 +3,6 @@ import _ from 'lodash';
 import { type Twist } from 'types';
 import { Operation } from '../operationTypes';
 import { Polyhedron, Peak } from 'math/polyhedra';
-import { mod } from 'util.js';
 import { getEdgeFacePaths } from '../operationUtils';
 import { antiprismHeight, getScaledPrismVertices } from './prismUtils';
 
@@ -15,7 +14,7 @@ function duplicateVertices(polyhedron: Polyhedron, boundary, twist?: Twist) {
       _.set(
         newVertexMapping,
         [oppositeFace.index, v.index],
-        polyhedron.numVertices() + mod(i + j, boundary.numSides),
+        polyhedron.numVertices() + ((i + j) % boundary.numSides),
       );
     });
   });

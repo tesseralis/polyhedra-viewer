@@ -1,12 +1,9 @@
 // @flow strict
 import _ from 'lodash';
-import type { Predicate, ValueOnlyIteratee, FlatMapIteratee } from 'lodash';
+import type { Predicate, ValueOnlyIteratee } from 'lodash';
 
-/**
- * Variation of the mod function that keeps sign of the dividend
- */
-export function mod(a: number, b: number) {
-  return a >= 0 ? a % b : a % b + b;
+function mod(a: number, b: number) {
+  return a >= 0 ? a % b : (a % b) + b;
 }
 
 /**
@@ -49,7 +46,9 @@ export function flatMapUniq<T, U>(
  */
 export function getSingle<T>(array: T[]): T {
   if (array.length !== 1) {
-    throw new Error(`Expected array to have one element: ${array.toString()}`);
+    throw new Error(
+      `Expected array to have one element: ${JSON.stringify(array)}`,
+    );
   }
   return array[0];
 }
@@ -71,15 +70,3 @@ type FlatMap<T, U> = (
   iteratee: (item: T, index: number) => U[],
 ) => U[];
 export const flatMap: FlatMap<*, *> = _.flatMap;
-
-function f(a: mixed[][], b: mixed[]) {
-  const mapper: FlatMapIteratee<mixed, mixed[]> = (x: mixed[]) =>
-    b.map(y => [...x, y]);
-  return _.flatMap(a, mapper);
-}
-/**
- * Calculate the cartesian product of the given arrays.
- */
-export function cartesian(a: mixed[], ...arrays: mixed[][]): mixed[][] {
-  return _.reduce(arrays, f, a.map(x => [x]));
-}
