@@ -145,7 +145,7 @@ export const cumulate: Operation<CumulateOptions> = {
     }
   },
 
-  getAllApplyArgs(polyhedron) {
+  getAllOptions(polyhedron) {
     if (!polyhedron.isQuasiRegular()) {
       return [{}];
     }
@@ -159,7 +159,7 @@ export const cumulate: Operation<CumulateOptions> = {
     }
   },
 
-  getApplyArgs(polyhedron, hitPoint) {
+  getHitOption(polyhedron, hitPoint) {
     const n = polyhedron.hitFace(hitPoint).numSides;
     return n <= 5 ? { faceType: n } : {};
   },

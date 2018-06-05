@@ -11,7 +11,7 @@ import {
 } from '../operationUtils';
 import {
   getSnubAngle,
-  getContractFaces,
+  getExpandedFaces,
   isExpandedFace,
   getResizedVertices,
 } from './resizeUtils';
@@ -72,7 +72,7 @@ function doExpansion(polyhedron, referenceName, twist) {
   const expandFaces = _.filter(duplicated.faces, face =>
     isExpandedFace(duplicated, face, n),
   );
-  const refFaces = getContractFaces(reference, n);
+  const refFaces = getExpandedFaces(reference, n);
   const angle = twist
     ? getTwistSign(twist) * Math.abs(getSnubAngle(reference, refFaces))
     : 0;
@@ -109,7 +109,7 @@ export const snub: Operation<{ twist: Twist }> = {
   apply(polyhedron, { twist = 'left' }) {
     return doExpansion(polyhedron, snubResults[polyhedron.symmetry()], twist);
   },
-  getAllApplyArgs(polyhedron) {
+  getAllOptions(polyhedron) {
     return [{ twist: 'left' }, { twist: 'right' }];
   },
 };

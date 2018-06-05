@@ -74,7 +74,7 @@ export const gyroelongate: Operation<{ twist: Twist }> = {
   apply(polyhedron, { twist = 'left' }) {
     return doElongate(polyhedron, twist);
   },
-  getAllApplyArgs(polyhedron) {
+  getAllOptions(polyhedron) {
     return [{ twist: 'left' }, { twist: 'right' }];
   },
 };

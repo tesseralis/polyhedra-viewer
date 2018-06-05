@@ -45,7 +45,7 @@ class HitOptions extends Component<*> {
     } = this.props;
     if (!operation || isTransitioning) return;
     const hitOption = getHitOption(opName);
-    const newHitOptions = operation.getApplyArgs(polyhedron, hitPnt, options);
+    const newHitOptions = operation.getHitOption(polyhedron, hitPnt, options);
     if (_.isEmpty(newHitOptions)) {
       return setOption(hitOption, undefined);
     }

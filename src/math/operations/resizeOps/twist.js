@@ -5,7 +5,7 @@ import type { Twist } from 'types';
 import { getTwistSign } from '../operationUtils';
 import {
   getSnubAngle,
-  getContractFaces,
+  getExpandedFaces,
   isExpandedFace,
   getResizedVertices,
   expansionType,
@@ -89,7 +89,7 @@ function doTwist(polyhedron, referenceName, twist = 'left') {
   const isSnub = expansionType(polyhedron) === 'snub';
   const f0 = polyhedron.largestFace();
   const n = f0.numSides;
-  const twistFaces = getContractFaces(polyhedron, n);
+  const twistFaces = getExpandedFaces(polyhedron, n);
 
   const referenceFace =
     _.find(reference.faces, face => isExpandedFace(reference, face, n)) ||
@@ -98,7 +98,7 @@ function doTwist(polyhedron, referenceName, twist = 'left') {
     (referenceFace.distanceToCenter() / reference.edgeLength()) *
     polyhedron.edgeLength();
 
-  const refFaces = getContractFaces(reference, n);
+  const refFaces = getExpandedFaces(reference, n);
   const angle = !isSnub
     ? getTwistSign(twist) * Math.abs(getSnubAngle(reference, refFaces))
     : -getSnubAngle(polyhedron, twistFaces);
@@ -138,7 +138,7 @@ export const twist: Operation<{ twist: Twist }> = {
       expansionType(polyhedron) === 'snub' ? expansionResults : snubResults;
     return doTwist(polyhedron, results[getFamily(polyhedron)], twistOpt);
   },
-  getAllApplyArgs(polyhedron) {
+  getAllOptions(polyhedron) {
     if (expansionType(polyhedron) !== 'snub') {
       return [{ twist: 'left' }, { twist: 'right' }];
     }

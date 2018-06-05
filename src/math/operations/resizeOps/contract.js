@@ -5,7 +5,7 @@ import {
   isExpandedFace,
   getResizedVertices,
   getFamily,
-  getContractFaces,
+  getExpandedFaces,
 } from './resizeUtils';
 import { Operation } from '../operationTypes';
 
@@ -38,7 +38,7 @@ export function applyContract(
   const resultLength = getContractLength(polyhedron, faceType);
 
   // Take all the stuff and push it inwards
-  const contractFaces = getContractFaces(polyhedron, faceType);
+  const contractFaces = getExpandedFaces(polyhedron, faceType);
 
   const angle = -getSnubAngle(polyhedron, contractFaces);
   // expansionType(polyhedron) === 'snub'
@@ -69,13 +69,13 @@ export const contract: Operation<ContractOptions> = {
     }
   },
 
-  getApplyArgs(polyhedron, hitPoint) {
+  getHitOption(polyhedron, hitPoint) {
     const hitFace = polyhedron.hitFace(hitPoint);
     const isValid = isExpandedFace(polyhedron, hitFace);
     return isValid ? { faceType: hitFace.numSides } : {};
   },
 
-  getAllApplyArgs(polyhedron) {
+  getAllOptions(polyhedron) {
     switch (getFamily(polyhedron)) {
       case 'O':
         return [{ faceType: 3 }, { faceType: 4 }];

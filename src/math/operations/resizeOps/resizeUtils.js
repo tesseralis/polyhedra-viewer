@@ -100,7 +100,7 @@ function getCuboctahedronContractFaces(polyhedron) {
   return [f0, ...rest];
 }
 
-export function getContractFaces(polyhedron: Polyhedron, faceType?: number) {
+export function getExpandedFaces(polyhedron: Polyhedron, faceType?: number) {
   if (getFamily(polyhedron) === 'T') {
     return expansionType(polyhedron) === 'snub'
       ? getIcosahedronContractFaces(polyhedron)

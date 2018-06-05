@@ -3,7 +3,7 @@ import _ from 'lodash';
 
 import { Polyhedron, Face, Peak } from 'math/polyhedra';
 import { isInverse, PRECISION } from 'math/linAlg';
-import { getCyclic, getSingle, cartesian } from 'util.js';
+import { getCyclic, getSingle } from 'util.js';
 
 import { Operation } from '../operationTypes';
 import { hasMultiple } from './cutPasteUtils';
@@ -303,7 +303,7 @@ export const augment: Operation<AugmentOptions> = {
     };
   },
 
-  getAllApplyArgs(polyhedron, relations) {
+  getAllOptions(polyhedron, relations) {
     const rawGyrateOpts = _.compact(_.uniq(_.map(relations, 'gyrate')));
     const gyrateOpts = rawGyrateOpts.length === 2 ? rawGyrateOpts : [undefined];
     const rawUsingOpts = _.compact(_.uniq(_.map(relations, 'using')));
@@ -315,12 +315,22 @@ export const augment: Operation<AugmentOptions> = {
       : [undefined];
     const faceOpts = _.map(polyhedron.faces.filter(face => canAugment(face)));
 
-    return cartesian(gyrateOpts, usingOpts, faceOpts).map(
-      ([gyrate, using, face]) => ({ gyrate, using, face }),
-    );
+    const options = [];
+
+    for (let face of faceOpts) {
+      for (let gyrate of gyrateOpts) {
+        for (let using of usingOpts) {
+          if (!using || canAugmentWithType(face, augmentTypes[using[0]])) {
+            options.push({ gyrate, using, face });
+          }
+        }
+      }
+    }
+
+    return options;
   },
 
-  getApplyArgs(polyhedron, hitPnt, options) {
+  getHitOption(polyhedron, hitPnt, options) {
     if (!options) return {};
     const face = polyhedron.hitFace(hitPnt);
     if (!options.using) {

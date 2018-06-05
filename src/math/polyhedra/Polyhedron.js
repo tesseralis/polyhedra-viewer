@@ -148,7 +148,7 @@ export default class Polyhedron {
 
   volume() {
     return _(this.faces)
-      .map(face => face.area() * face.distanceToCenter() / 3)
+      .map(face => (face.area() * face.distanceToCenter()) / 3)
       .sum();
   }
 
@@ -183,7 +183,7 @@ export default class Polyhedron {
   // Property predicates
   // ===================
 
-  isSemiRegular = _.once(() => {
+  isUniform = _.once(() => {
     const vertexRegular =
       _(this.vertices)
         .map(v => v.adjacentFaceCounts())
@@ -201,13 +201,13 @@ export default class Polyhedron {
   });
 
   isQuasiRegular() {
-    if (!this.isSemiRegular()) return false;
+    if (!this.isUniform()) return false;
     const adjFaces = this.getVertex().adjacentFaceCounts();
     return _.every(adjFaces, count => count % 2 === 0);
   }
 
   isRegular() {
-    return this.isSemiRegular() && this.faceTypes().length === 1;
+    return this.isUniform() && this.faceTypes().length === 1;
   }
 
   // TODO reimplement this in terms of face functions
@@ -231,7 +231,7 @@ export default class Polyhedron {
 
   // TODO Handle chirality
   symmetry = _.once(() => {
-    if (!this.isSemiRegular()) {
+    if (!this.isUniform()) {
       throw new Error('Only uniform solids are supported right now');
     }
 

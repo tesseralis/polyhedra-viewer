@@ -126,8 +126,8 @@ export function getTransformedVertices<T: VertexList>(
 }
 
 const methodDefaults = {
-  getApplyArgs: {},
-  getAllApplyArgs: [undefined],
+  getHitOption: {},
+  getAllOptions: [undefined],
   getSearchOptions: undefined,
   getSelectState: [],
 };
@@ -154,26 +154,23 @@ export interface OperationResult {
 type SelectState = 'selected' | 'selectable' | null;
 
 // TODO consolidate these with the one in operationTypes
-interface Operation<Options = {}, ApplyArgs = {}> {
+interface Operation<Options = {}> {
   apply(polyhedron: Polyhedron, options: Options): OperationResult;
 
   getSearchOptions(polyhedron: Polyhedron, options: Options): ?{};
 
-  getApplyArgs(
+  getHitOption(
     polyhedron: Polyhedron,
     hitPnt: Point,
     options: Options,
-  ): ApplyArgs;
+  ): Options;
 
-  getAllApplyArgs(polyhedron: Polyhedron): ApplyArgs[];
+  getAllOptions(polyhedron: Polyhedron): Options[];
 
-  getSelectState(
-    polyhedron: Polyhedron,
-    options: Options & ApplyArgs,
-  ): SelectState[];
+  getSelectState(polyhedron: Polyhedron, options: Options): SelectState[];
 }
 
-export function normalizeOperation(op: *, name: OpName): Operation<*, *> {
+export function normalizeOperation(op: *, name: OpName): Operation<*> {
   const withDefaults = fillDefaults(
     typeof op === 'function' ? { apply: op } : op,
   );
@@ -195,8 +192,8 @@ export function normalizeOperation(op: *, name: OpName): Operation<*, *> {
         },
       };
     },
-    getApplyArgs(polyhedron, hitPnt, options) {
-      return withDefaults.getApplyArgs(polyhedron, vec(hitPnt), options);
+    getHitOption(polyhedron, hitPnt, options) {
+      return withDefaults.getHitOption(polyhedron, vec(hitPnt), options);
     },
   };
 }

@@ -82,11 +82,11 @@ export const gyrate: Operation<GyrateOptions> = {
     return options;
   },
 
-  getAllApplyArgs(polyhedron) {
+  getAllOptions(polyhedron) {
     return Peak.getAll(polyhedron).map(peak => ({ peak }));
   },
 
-  getApplyArgs(polyhedron, hitPnt) {
+  getHitOption(polyhedron, hitPnt) {
     const peak = Peak.find(polyhedron, hitPnt);
     return peak ? { peak } : {};
   },

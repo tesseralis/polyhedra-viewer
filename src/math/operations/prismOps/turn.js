@@ -108,7 +108,7 @@ export const turn: Operation<{ twist?: Twist }> = {
     return { gyrate };
   },
 
-  getAllApplyArgs(polyhedron) {
+  getAllOptions(polyhedron) {
     if (isGyroelongatedBiCupola(polyhedron)) {
       return [{ twist: 'left' }, { twist: 'right' }];
     }

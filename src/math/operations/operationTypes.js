@@ -2,7 +2,7 @@
 
 import { Vec3D } from 'math/linAlg';
 import { Polyhedron } from 'math/polyhedra';
-import type { Face, VertexArg } from 'math/polyhedra';
+import type { VertexArg } from 'math/polyhedra';
 
 export type OpName =
   | 'truncate'
@@ -34,26 +34,27 @@ export type Relation = {};
 
 export type PartialOpResult = $Shape<OperationResult>;
 
+type SelectState = 'selected' | 'selectable';
+
 /**
  * Object that describes the shape of an operation applied on a polyhedron
  * and the related functionality.
  */
-export interface Operation<Options = {}, ApplyArgs = {}> {
+export interface Operation<Options = {}> {
   apply(polyhedron: Polyhedron, options: Options): Polyhedron | PartialOpResult;
 
   getSearchOptions?: (polyhedron: Polyhedron, options: Options) => ?{};
 
-  getApplyArgs?: (
+  getHitOption?: (
     polyhedron: Polyhedron,
     hitPnt: Vec3D,
     options?: Options,
-  ) => ApplyArgs;
+  ) => *;
 
-  getAllApplyArgs?: (polyhedron: Polyhedron) => ApplyArgs[];
+  getAllOptions?: (polyhedron: Polyhedron) => $Shape<Options>[];
 
-  isHighlighed?: (
+  getSelectState?: (
     polyhedron: Polyhedron,
-    applyArgs: ApplyArgs,
-    face: Face,
-  ) => boolean;
+    options: Options,
+  ) => (?SelectState)[];
 }
