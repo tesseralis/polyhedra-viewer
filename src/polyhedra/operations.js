@@ -181,6 +181,30 @@ export function applyOptionsFor(solid: string, operation: OpName) {
   return newOpts;
 }
 
+export function hasOptions(solid: string, operation: OpName) {
+  const relations = getRelations(solid, operation);
+  if (_.isEmpty(relations)) return false;
+  switch (operation) {
+    case 'turn':
+      return relations.length > 1 || !!_.find(relations, 'chiral');
+    case 'twist':
+      return relations[0].value[0] === 's';
+    case 'snub':
+    case 'gyroelongate':
+      return !!_.find(relations, 'chiral');
+    case 'cumulate':
+    case 'contract':
+    case 'shorten':
+      return relations.length > 1;
+    case 'augment':
+    case 'diminish':
+    case 'gyrate':
+      return true;
+    default:
+      return false;
+  }
+}
+
 export function applyOperation(
   operation: *,
   name: string,
