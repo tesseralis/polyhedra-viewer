@@ -45,7 +45,7 @@ const Edges = ({ edges, vertices }) => {
 interface PolyhedronProps {
   solidData: SolidData;
   config: Object;
-  faceColors: *;
+  colors: *;
   onClick(): void;
   onHover(hitPnt: Point): void;
   onMouseOut(): void;
@@ -106,7 +106,7 @@ class X3dPolyhedron extends Component<PolyhedronProps, PolyhedronState> {
   }
 
   getColors = () => {
-    return joinListOfLists(this.props.faceColors, ',', ' ');
+    return joinListOfLists(this.props.colors, ',', ' ');
   };
 
   // Manually adding event listeners swallows errors, so we have to store it in the component itself
@@ -158,7 +158,7 @@ export default _.flow([
   ),
   connect(
     SolidColors,
-    { faceColors: 'colors' },
+    ['colors'],
   ),
   connect(
     HitOptions,
