@@ -4,12 +4,13 @@ import _ from 'lodash';
 
 type PropsMap<T, U> = $Enum<T>[] | { [$Enum<U>]: $Enum<T> } | (T => U);
 
-function mapProps(propsMap, props) {
+function mapProps(propsMap, props, ownProps) {
   if (Array.isArray(propsMap)) {
     return _.pick(props, propsMap);
   }
   if (typeof propsMap === 'function') {
-    return propsMap(props);
+    //  TODO pass in props and ownProps as different operations
+    return propsMap({ ...props, ...ownProps });
   }
   return _.mapValues(propsMap, orig => props[orig]);
 }
@@ -20,7 +21,7 @@ export default (context: *, propsMap: PropsMap<*, *>) => (wrapped: *) => {
   return (props: *) => (
     <Context>
       {contextProps => (
-        <Wrapped {...props} {...mapProps(propsMap, contextProps)} />
+        <Wrapped {...props} {...mapProps(propsMap, contextProps, props)} />
       )}
     </Context>
   );

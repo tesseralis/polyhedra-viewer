@@ -52,11 +52,11 @@ class Viewer extends PureComponent<*> {
 }
 
 export default (props: ViewerProps) => (
-  <PolyhedronProvider>
-    <OperationProvider
-      solid={props.solid}
-      setSolid={name => props.history.push(`/${name}/operations`)}
-    >
+  <PolyhedronProvider
+    name={props.solid}
+    setName={name => props.history.push(`/${name}/operations`)}
+  >
+    <OperationProvider>
       <Viewer {...props} />
     </OperationProvider>
   </PolyhedronProvider>

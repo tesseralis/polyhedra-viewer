@@ -8,6 +8,7 @@ import { SolidData } from 'math/polyhedra';
 import connect from 'components/connect';
 import { WithOperation } from 'components/Viewer/OperationContext';
 import { WithPolyhedron } from 'components/Viewer/PolyhedronContext';
+import ApplyOperation from 'components/Viewer/ApplyOperation';
 import SolidColors from './SolidColors';
 
 type SyntheticEventHandler = (e: $Subtype<SyntheticEvent<*>>) => void;
@@ -151,7 +152,11 @@ class X3dPolyhedron extends Component<PolyhedronProps, PolyhedronState> {
   };
 }
 
-export default _.flow([
+export default _.flowRight([
+  connect(
+    ApplyOperation,
+    ['applyOperation'],
+  ),
   connect(
     WithPolyhedron,
     ({ polyhedron, config }) => ({ solidData: polyhedron.solidData, config }),
@@ -162,9 +167,10 @@ export default _.flow([
   ),
   connect(
     WithOperation,
-    ({ hitOptions, setHitOptions, applyOperation, unsetHitOptions }) => ({
+    ({ applyOperation, hitOptions, setHitOptions, unsetHitOptions }) => ({
       onHover: setHitOptions,
       onClick: () => {
+        // only apply operation if we have a hit
         if (!_.isEmpty(hitOptions)) applyOperation();
       },
       onMouseOut: unsetHitOptions,

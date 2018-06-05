@@ -7,6 +7,7 @@ import { fixed } from 'styles/common';
 
 import connect from 'components/connect';
 import { WithOperation } from 'components/Viewer/OperationContext';
+import ApplyOperation from 'components/Viewer/ApplyOperation';
 import { unescapeName } from 'polyhedra/names';
 import IconLink from 'components/Viewer/IconLink';
 import Menu from 'components/Viewer/Menu';
@@ -75,7 +76,13 @@ function OperationOverlay(props) {
   );
 }
 
-export default connect(
-  WithOperation,
-  ['opName', 'applyOperation'],
-)(OperationOverlay);
+export default _.flow([
+  connect(
+    WithOperation,
+    ['opName'],
+  ),
+  connect(
+    ApplyOperation,
+    ['applyOperation'],
+  ),
+])(OperationOverlay);

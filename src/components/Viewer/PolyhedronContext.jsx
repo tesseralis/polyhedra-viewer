@@ -47,6 +47,8 @@ function arrayDefaults(first, second) {
 }
 
 const PolyhedronContext = React.createContext({
+  solidName: 'tetrahedron',
+  setName: _.noop,
   polyhedron: Polyhedron.get('tetrahedron'),
   config: defaultConfig,
   faceColors: [],
@@ -63,6 +65,8 @@ class BasePolyhedronProvider extends Component<*, *> {
   constructor(props: *) {
     super(props);
     this.state = {
+      solidName: this.props.name,
+      setName: this.props.setName,
       polyhedron: Polyhedron.get('tetrahedron'),
       config: this.props.config,
       faceColors: [],
@@ -75,8 +79,8 @@ class BasePolyhedronProvider extends Component<*, *> {
   }
 
   // Copy the config for ease of use
-  static getDerivedStateFromProps({ config }) {
-    return { config };
+  static getDerivedStateFromProps({ config, name: solidName }) {
+    return { config, solidName };
   }
 
   componentWillUnmount() {

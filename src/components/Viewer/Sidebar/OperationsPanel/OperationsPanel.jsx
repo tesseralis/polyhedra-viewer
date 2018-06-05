@@ -3,8 +3,9 @@ import _ from 'lodash';
 import React, { Component } from 'react';
 import { css, StyleSheet } from 'aphrodite/no-important';
 
-import { operations } from 'polyhedra/operations';
+import { getRelations, operations } from 'polyhedra/operations';
 import connect from 'components/connect';
+import ApplyOperation from 'components/Viewer/ApplyOperation';
 import { WithOperation } from 'components/Viewer/OperationContext';
 import { WithPolyhedron } from 'components/Viewer/PolyhedronContext';
 import OperationIcon from './OperationIcon';
@@ -68,6 +69,10 @@ const styles = StyleSheet.create({
   },
 });
 
+function isEnabled(solid, operation) {
+  return !!getRelations(solid, operation);
+}
+
 // TODO this could probably use a test to make sure all the buttons are in the right places
 class OperationsPanel extends Component<*> {
   componentWillUnmount() {
@@ -77,11 +82,11 @@ class OperationsPanel extends Component<*> {
   render() {
     const {
       isTransitioning,
+      solidName,
       opName,
       recenter,
       resize,
       selectOperation,
-      isEnabled,
     } = this.props;
 
     return (
@@ -95,7 +100,7 @@ class OperationsPanel extends Component<*> {
                 opName === name && styles.isHighlighted,
               )}
               style={{ gridArea: name }}
-              disabled={!isEnabled(name) || isTransitioning}
+              disabled={!isEnabled(solidName, name) || isTransitioning}
               onClick={() => selectOperation(name)}
             >
               <OperationIcon name={name} />
@@ -127,10 +132,14 @@ class OperationsPanel extends Component<*> {
 export default _.flow([
   connect(
     WithPolyhedron,
-    ['resize', 'recenter', 'istransitioning'],
+    ['solidName', 'resize', 'recenter', 'isTransitioning'],
+  ),
+  connect(
+    ApplyOperation,
+    ['selectOperation'],
   ),
   connect(
     WithOperation,
-    ['opName', 'selectOperation', 'unsetOperation', 'isEnabled'],
+    ['opName', 'unsetOperation'],
   ),
 ])(OperationsPanel);
