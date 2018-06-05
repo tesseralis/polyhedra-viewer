@@ -1,3 +1,4 @@
+// @flow
 import React from 'react';
 import { MemoryRouter } from 'react-router-dom';
 import { mount } from 'enzyme';
@@ -153,42 +154,5 @@ describe('viewer', () => {
       .clickButtonWithText('diminish')
       .clickAnyFace()
       .expectTransitionTo('diminished-rhombicosidodecahedron');
-  });
-
-  it('can combine twist and turn operations', () => {
-    setup('/elongated-pentagonal-bipyramid/operations');
-    appPage
-      .clickButtonWithText('turn')
-      .expectTransitionTo('icosahedron')
-      .clickButtonWithText('twist')
-      .expectTransitionTo('cuboctahedron')
-      .clickButtonWithText('twist')
-      .expectTransitionTo('icosahedron')
-      .clickButtonWithText('turn')
-      .expectTransitionTo('elongated-pentagonal-bipyramid');
-  });
-
-  describe('contracting an icosahedron', () => {
-    it('can augment and contract an icosahedron', () => {
-      setup('/gyroelongated-pentagonal-pyramid/operations');
-      appPage
-        .clickButtonWithText('augment')
-        .clickFaceWithNumSides(5)
-        .expectTransitionTo('icosahedron')
-        .clickButtonWithText('contract')
-        .expectTransitionTo('tetrahedron');
-    });
-
-    it('dodecahedron -> rectify -> cumulate -> contract', () => {
-      setup('/dodecahedron');
-      appPage
-        .clickButtonWithText('rectify')
-        .expectTransitionTo('icosidodecahedron')
-        .clickButtonWithText('cumulate')
-        .clickFaceWithNumSides(5)
-        .expectTransitionTo('icosahedron')
-        .clickButtonWithText('contract')
-        .expectTransitionTo('tetrahedron');
-    });
   });
 });

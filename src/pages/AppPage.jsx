@@ -1,3 +1,4 @@
+// @flow
 import _ from 'lodash';
 import React from 'react';
 import { MemoryRouter } from 'react-router-dom';
@@ -8,7 +9,9 @@ import App from 'components/App';
 import { Polyhedron } from 'math/polyhedra';
 
 export default class AppPage {
-  constructor(path = '/') {
+  wrapper: *;
+
+  constructor(path: string = '/') {
     this.wrapper = mount(
       <MemoryRouter initialEntries={[path]}>
         <App />
@@ -17,13 +20,13 @@ export default class AppPage {
   }
 
   // Find a (not disabled) button with the given text
-  findButtonWithText(text) {
+  findButtonWithText(text: string) {
     return this.wrapper
       .find('button')
       .filterWhere(n => n.text() === text && !n.prop('disabled'));
   }
 
-  clickButtonWithText(text) {
+  clickButtonWithText(text: string) {
     this.findButtonWithText(text).simulate('click');
     return this;
   }
@@ -32,7 +35,7 @@ export default class AppPage {
     return this.wrapper.find('BaseOperationProvider').prop('polyhedron');
   }
 
-  clickFace(face) {
+  clickFace(face: *) {
     const hitPnt = face.centroid().toArray();
     const shape = this.wrapper
       .find('shape')
@@ -47,29 +50,29 @@ export default class AppPage {
     return this.clickFace(this.getPolyhedron().getFace());
   }
 
-  clickFaceWithNumSides(n) {
+  clickFaceWithNumSides(n: number) {
     return this.clickFace(this.getPolyhedron().faceWithNumSides(n));
   }
 
-  expectNoButtonWithText(text) {
+  expectNoButtonWithText(text: string) {
     expect(this.findButtonWithText(text)).toHaveLength(0);
     return this;
   }
 
-  expectOperation(operation) {
+  expectOperation(operation: string) {
     const actual = this.wrapper.find('BaseOperationProvider').prop('operation');
     expect(operation).toEqual(actual);
     return this;
   }
 
-  expectPath(path) {
+  expectPath(path: string) {
     const viewer = this.wrapper.find('Viewer');
     const history = viewer.prop('history');
     expect(history.location.pathname).toEqual(path);
     return this;
   }
 
-  expectTransitionTo(expected) {
+  expectTransitionTo(expected: string) {
     // TODO do a more robust animation test
     this.wrapper.update();
     this.expectPath(`/${expected}/operations`);
