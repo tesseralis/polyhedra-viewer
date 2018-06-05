@@ -13,7 +13,7 @@ function toRgb(hex: string) {
 
 class SolidColors extends Component<*> {
   render() {
-    return this.props.children(this.getColors().map(toRgb));
+    return this.props.children({ colors: this.getColors().map(toRgb) });
   }
 
   getColors = () => {

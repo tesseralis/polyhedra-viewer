@@ -5,6 +5,7 @@ import EventListener from 'react-event-listener';
 
 import { type Point } from 'types';
 import { SolidData } from 'math/polyhedra';
+import connect from 'components/connect';
 import { WithOperation } from 'components/Viewer/OperationContext';
 import { WithPolyhedron } from 'components/Viewer/PolyhedronContext';
 import SolidColors from './SolidColors';
@@ -150,28 +151,23 @@ class X3dPolyhedron extends Component<PolyhedronProps, PolyhedronState> {
   };
 }
 
-export default (props: *) => (
-  <WithPolyhedron>
-    {({ polyhedron, config }) => (
-      <WithOperation>
-        {({ hitOptions, setHitOptions, applyOperation, unsetHitOptions }) => (
-          <SolidColors>
-            {colors => (
-              <X3dPolyhedron
-                {...props}
-                config={config}
-                onHover={setHitOptions}
-                onClick={() => {
-                  if (!_.isEmpty(hitOptions)) applyOperation();
-                }}
-                onMouseOut={unsetHitOptions}
-                faceColors={colors}
-                solidData={polyhedron.solidData}
-              />
-            )}
-          </SolidColors>
-        )}
-      </WithOperation>
-    )}
-  </WithPolyhedron>
-);
+export default _.flow([
+  connect(
+    WithPolyhedron,
+    ({ polyhedron, config }) => ({ solidData: polyhedron.solidData, config }),
+  ),
+  connect(
+    SolidColors,
+    { faceColors: 'colors' },
+  ),
+  connect(
+    WithOperation,
+    ({ hitOptions, setHitOptions, applyOperation, unsetHitOptions }) => ({
+      onHover: setHitOptions,
+      onClick: () => {
+        if (!_.isEmpty(hitOptions)) applyOperation();
+      },
+      onMouseOut: unsetHitOptions,
+    }),
+  ),
+])(X3dPolyhedron);
