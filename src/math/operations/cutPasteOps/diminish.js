@@ -2,10 +2,14 @@
 import _ from 'lodash';
 
 import { flatMap } from 'util.js';
-import { hasMultiple, removeExtraneousVertices } from './operationUtils';
+import { removeExtraneousVertices } from '../operationUtils';
 import { Peak } from 'math/polyhedra';
-import type { Operation } from './operationTypes';
-import { getPeakAlignment, getCupolaGyrate } from './applyOptionUtils';
+import type { Operation } from '../operationTypes';
+import {
+  hasMultiple,
+  getPeakAlignment,
+  getCupolaGyrate,
+} from './cutPasteUtils';
 
 function removePeak(polyhedron, peak) {
   return removeExtraneousVertices(

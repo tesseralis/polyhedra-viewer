@@ -1,5 +1,5 @@
 // @flow strict
-import React, { type ComponentType } from 'react';
+import React from 'react';
 import _ from 'lodash';
 
 type PropsMap<T, U> = $Enum<T>[] | { [$Enum<U>]: $Enum<T> } | (T => U);

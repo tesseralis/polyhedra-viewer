@@ -4,7 +4,7 @@ import _ from 'lodash';
 import { flatMapUniq } from 'util.js';
 import { Polyhedron, Face } from 'math/polyhedra';
 import { PRECISION, getPlane, withOrigin } from 'math/linAlg';
-import { getTransformedVertices } from './operationUtils';
+import { getTransformedVertices } from '../operationUtils';
 
 export function getResizedVertices(
   faces: Face[],

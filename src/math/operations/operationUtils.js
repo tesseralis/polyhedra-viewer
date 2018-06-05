@@ -11,14 +11,6 @@ import {
   VertexList,
 } from 'math/polyhedra';
 import { vec, Vec3D, PRECISION, type Transform } from 'math/linAlg';
-import type { Relation } from './operationTypes';
-
-export const hasMultiple = (relations: ?(Relation[]), property: string) =>
-  _(relations)
-    .map(property)
-    .uniq()
-    .compact()
-    .value().length > 1;
 
 // Remove vertices (and faces) from the polyhedron when they are all the same
 function deduplicateVertices(polyhedron: Polyhedron) {

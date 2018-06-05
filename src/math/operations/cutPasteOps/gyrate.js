@@ -4,10 +4,10 @@ import _ from 'lodash';
 import { flatMap } from 'util.js';
 import { withOrigin } from 'math/linAlg';
 import { Peak } from 'math/polyhedra';
-import type { Operation } from './operationTypes';
+import type { Operation } from '../operationTypes';
 import { mapObject } from 'util.js';
-import { getPeakAlignment, getGyrateDirection } from './applyOptionUtils';
-import { getTransformedVertices } from './operationUtils';
+import { getPeakAlignment, getGyrateDirection } from './cutPasteUtils';
+import { getTransformedVertices } from '../operationUtils';
 
 const TAU = 2 * Math.PI;
 

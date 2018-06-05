@@ -1,7 +1,7 @@
 // @flow strict
 import type { Twist } from 'types';
 import { Polyhedron } from 'math/polyhedra';
-import { Operation } from './operationTypes';
+import { Operation } from '../operationTypes';
 import {
   antiprismHeight,
   getChirality,

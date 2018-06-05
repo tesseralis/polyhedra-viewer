@@ -2,7 +2,7 @@
 import _ from 'lodash';
 import { Polyhedron } from 'math/polyhedra';
 import type { Twist } from 'types';
-import { getTwistSign } from './operationUtils';
+import { getTwistSign } from '../operationUtils';
 import {
   getSnubAngle,
   getContractFaces,
@@ -10,8 +10,8 @@ import {
   getResizedVertices,
   expansionType,
   getFamily,
-} from './expandContractUtils';
-import { Operation } from './operationTypes';
+} from './resizeUtils';
+import { Operation } from '../operationTypes';
 
 function pivot(list, value) {
   const index = _.indexOf(list, value);
@@ -95,8 +95,7 @@ function doTwist(polyhedron, referenceName, twist = 'left') {
     _.find(reference.faces, face => isExpandedFace(reference, face, n)) ||
     reference.getFace();
   const referenceLength =
-    referenceFace.distanceToCenter() /
-    reference.edgeLength() *
+    (referenceFace.distanceToCenter() / reference.edgeLength()) *
     polyhedron.edgeLength();
 
   const refFaces = getContractFaces(reference, n);

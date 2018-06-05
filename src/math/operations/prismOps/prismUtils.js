@@ -4,12 +4,12 @@ import type { Twist } from 'types';
 import { find } from 'util.js';
 import { Polyhedron, Peak } from 'math/polyhedra';
 import { withOrigin, isInverse } from 'math/linAlg';
-import { getTwistSign, getTransformedVertices } from './operationUtils';
+import { getTwistSign, getTransformedVertices } from '../operationUtils';
 
 // Get antiprism height of a unit antiprism with n sides
 export function antiprismHeight(n: number) {
   const sec = 1 / Math.cos(Math.PI / (2 * n));
-  return Math.sqrt(1 - sec * sec / 4);
+  return Math.sqrt(1 - (sec * sec) / 4);
 }
 
 // TODO deduplicate with snub polyhedra if possible
@@ -118,7 +118,7 @@ export function getScaledPrismVertices(
 ) {
   const { vertexSets, boundary, multiplier } = adjustInfo;
   const n = boundary.numSides;
-  const angle = getTwistSign(twist) * Math.PI / n;
+  const angle = (getTwistSign(twist) * Math.PI) / n;
 
   return getTransformedVertices(vertexSets, set =>
     withOrigin(set.normalRay(), v =>

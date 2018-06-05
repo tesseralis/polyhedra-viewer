@@ -3,6 +3,14 @@ import _ from 'lodash';
 import { getSingle } from 'util.js';
 import { Peak, Polyhedron } from 'math/polyhedra';
 import { isInverse } from 'math/linAlg';
+import type { Relation } from '../operationTypes';
+
+export const hasMultiple = (relations: ?(Relation[]), property: string) =>
+  _(relations)
+    .map(property)
+    .uniq()
+    .compact()
+    .value().length > 1;
 
 export function getPeakAlignment(polyhedron: Polyhedron, peak: Peak) {
   const isRhombicosidodecahedron = peak.type === 'cupola';

@@ -6,8 +6,8 @@ import {
   getResizedVertices,
   getFamily,
   getContractFaces,
-} from './expandContractUtils';
-import { Operation } from './operationTypes';
+} from './resizeUtils';
+import { Operation } from '../operationTypes';
 
 interface ContractOptions {
   faceType: number;
@@ -28,7 +28,7 @@ function getContractLength(polyhedron, faceType) {
 
   // Calculate the inradius
   // https://en.wikipedia.org/wiki/Platonic_solid#Radii,_area,_and_volume
-  return s / 2 / Math.tan(Math.PI / p) * tanTheta2;
+  return (s / 2 / Math.tan(Math.PI / p)) * tanTheta2;
 }
 
 export function applyContract(

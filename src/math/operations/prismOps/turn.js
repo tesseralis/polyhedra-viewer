@@ -4,7 +4,7 @@ import _ from 'lodash';
 import type { Twist } from 'types';
 import { flatMap } from 'util.js';
 
-import { Operation } from './operationTypes';
+import { Operation } from '../operationTypes';
 import {
   getChirality,
   isGyroelongatedBiCupola,

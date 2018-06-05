@@ -2,7 +2,7 @@
 import _ from 'lodash';
 
 import { Polyhedron } from 'math/polyhedra';
-import type { Operation } from './operationTypes';
+import type { Operation } from '../operationTypes';
 
 interface CumulateOptions {
   faceType?: number;

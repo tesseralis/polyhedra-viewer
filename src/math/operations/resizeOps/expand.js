@@ -8,14 +8,14 @@ import {
   getTwistSign,
   getEdgeFacePaths,
   getTransformedVertices,
-} from './operationUtils';
+} from '../operationUtils';
 import {
   getSnubAngle,
   getContractFaces,
   isExpandedFace,
   getResizedVertices,
-} from './expandContractUtils';
-import { Operation } from './operationTypes';
+} from './resizeUtils';
+import { Operation } from '../operationTypes';
 
 /**
  * Duplicate the vertices, so that each face has its own unique set of vertices,
@@ -66,8 +66,7 @@ function doExpansion(polyhedron, referenceName, twist) {
     _.find(reference.faces, face => isExpandedFace(reference, face, n)) ||
     reference.getFace();
   const referenceLength =
-    referenceFace.distanceToCenter() /
-    reference.edgeLength() *
+    (referenceFace.distanceToCenter() / reference.edgeLength()) *
     polyhedron.edgeLength();
 
   const expandFaces = _.filter(duplicated.faces, face =>
@@ -120,7 +119,7 @@ export function dual(polyhedron: Polyhedron) {
   const scale = (() => {
     const f = polyhedron.getFace().distanceToCenter();
     const e = polyhedron.getEdge().distanceToCenter();
-    return e * e / (f * f);
+    return (e * e) / (f * f);
   })();
   const duplicated = duplicateVertices(polyhedron);
   const faces = polyhedron.faces.map(face => face.withPolyhedron(duplicated));

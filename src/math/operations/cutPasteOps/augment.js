@@ -5,8 +5,8 @@ import { Polyhedron, Face, Peak } from 'math/polyhedra';
 import { isInverse, PRECISION } from 'math/linAlg';
 import { getCyclic, getSingle, cartesian } from 'util.js';
 
-import { hasMultiple } from './operationUtils';
-import { Operation } from './operationTypes';
+import { Operation } from '../operationTypes';
+import { hasMultiple } from './cutPasteUtils';
 
 const augmentees = {
   pyramid: {
