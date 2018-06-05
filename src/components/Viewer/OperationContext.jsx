@@ -4,12 +4,14 @@ import React, { Component } from 'react';
 
 import type { Point } from 'types';
 import { operations, type OpName } from 'math/operations';
+
 import {
   applyOperation,
   getRelations,
   applyOptionsFor,
 } from 'polyhedra/operations';
 
+import connect from 'components/connect';
 import { WithPolyhedron } from './PolyhedronContext';
 
 const hasMode = [
@@ -194,21 +196,9 @@ class BaseOperationProvider extends Component<*, *> {
   };
 }
 
-export function OperationProvider(props: *) {
-  return (
-    <WithPolyhedron>
-      {polyhedronProps => (
-        <BaseOperationProvider
-          {...props}
-          {..._.pick(polyhedronProps, [
-            'polyhedron',
-            'isTransitioning',
-            'transitionPolyhedron',
-          ])}
-        />
-      )}
-    </WithPolyhedron>
-  );
-}
+export const OperationProvider = connect(
+  WithPolyhedron,
+  ['polyhedron', 'isTransitioning', 'transitionPolyhedron'],
+)(BaseOperationProvider);
 
 export const WithOperation = OperationContext.Consumer;
