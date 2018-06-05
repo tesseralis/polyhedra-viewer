@@ -18,7 +18,9 @@ const hasMode = [
 ];
 
 // TODO possibly move this as part of the operation definition
-function hasOptions(operation, relations) {
+function hasOptions(solid, operation) {
+  const relations = getRelations(solid, operation);
+  if (_.isEmpty(relations)) return false;
   switch (operation) {
     case 'turn':
       return relations.length > 1 || !!_.find(relations, 'chiral');
@@ -68,12 +70,7 @@ class ApplyOperation extends Component<*> {
       options,
     );
     if (!name) throw new Error('Name not found on new polyhedron');
-    const newRelations = getRelations(name, opName);
-    if (
-      _.isEmpty(newRelations) ||
-      !hasOptions(opName, newRelations) ||
-      _.isEmpty(options)
-    ) {
+    if (!hasOptions(name, opName) || _.isEmpty(options)) {
       unsetOperation();
     } else {
       setOperation(opName, name);
@@ -93,7 +90,7 @@ class ApplyOperation extends Component<*> {
       return unsetOperation();
     }
 
-    if (!hasOptions(opName, getRelations(solidName, opName))) {
+    if (!hasOptions(solidName, opName)) {
       this.applyOperation(opName);
     } else {
       setOperation(opName, solidName);
