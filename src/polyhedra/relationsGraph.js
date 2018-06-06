@@ -194,8 +194,8 @@ const getElongations = (prism, antiprism) => (
   chiral,
 ) => {
   return {
-    P: { using: prism, value: pValue },
-    A: { using: antiprism, value: aValue, gyrate, chiral },
+    P: { value: pValue },
+    A: { value: aValue, gyrate, chiral },
   };
 };
 
