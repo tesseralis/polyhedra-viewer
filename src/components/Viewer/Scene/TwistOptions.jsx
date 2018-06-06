@@ -3,7 +3,6 @@ import _ from 'lodash';
 import React from 'react';
 import { css, StyleSheet } from 'aphrodite/no-important';
 
-import { type Twist } from 'types';
 import connect from 'components/connect';
 import { Icon, SrOnly } from 'components/common';
 import { WithPolyhedron } from 'components/Viewer/PolyhedronContext';

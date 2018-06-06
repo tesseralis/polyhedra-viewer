@@ -72,6 +72,22 @@ describe('viewer', () => {
       .expectTransitionTo('snub-dodecahedron');
   });
 
+  it('twists things left and right correctly', () => {
+    setup('/gyroelongated-pentagonal-bicupola');
+
+    appPage
+      .clickButtonWithText('shorten')
+      .clickButtonWithText('right')
+      .expectTransitionTo('pentagonal-gyrobicupola');
+
+    setup('/gyroelongated-pentagonal-bicupola');
+
+    appPage
+      .clickButtonWithText('shorten')
+      .clickButtonWithText('left')
+      .expectTransitionTo('pentagonal-orthobicupola');
+  });
+
   it('can transition through a pyramid series', () => {
     setup('/square-pyramid/operations');
 
