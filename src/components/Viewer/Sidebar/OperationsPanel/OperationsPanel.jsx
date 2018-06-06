@@ -3,7 +3,7 @@ import _ from 'lodash';
 import React, { Component } from 'react';
 import { css, StyleSheet } from 'aphrodite/no-important';
 
-import { getRelations, operations } from 'polyhedra/operations';
+import { getOpResults, operations } from 'polyhedra/operations';
 import connect from 'components/connect';
 import ApplyOperation from 'components/Viewer/ApplyOperation';
 import { WithOperation } from 'components/Viewer/OperationContext';
@@ -70,7 +70,7 @@ const styles = StyleSheet.create({
 });
 
 function isEnabled(solid, operation) {
-  return !!getRelations(solid, operation);
+  return !!getOpResults(solid, operation);
 }
 
 // TODO this could probably use a test to make sure all the buttons are in the right places

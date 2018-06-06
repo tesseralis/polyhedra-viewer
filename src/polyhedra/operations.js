@@ -107,7 +107,7 @@ export function getOperations(solid: string) {
   return _.keys(polyhedraGraph[toConwayNotation(solid)]).map(getOpName);
 }
 
-export function getRelations(solid: string, opName: OpName) {
+export function getOpResults(solid: string, opName: OpName) {
   return polyhedraGraph[toConwayNotation(solid)][getOpSymbol(opName)];
 }
 
@@ -129,7 +129,7 @@ const augmenteeSides = {
 const usingTypeOrder = ['Y', 'U', 'R'];
 
 export function getUsingOpts(solid: string) {
-  const augments = getRelations(solid, 'augment');
+  const augments = getOpResults(solid, 'augment');
   const using = _.uniq(_.map(augments, 'using'));
   const grouped = _.groupBy(using, option => augmenteeSides[option]);
   const opts = _.find(grouped, group => group.length > 1) || [];
@@ -138,8 +138,8 @@ export function getUsingOpts(solid: string) {
 
 // Get the polyhedron name as a result of applying the operation to the given polyhedron
 function getNextPolyhedron<O>(solid: string, operation: OpName, filterOpts: O) {
-  const relations = getRelations(solid, operation);
-  const next = _(relations)
+  const results = getOpResults(solid, operation);
+  const next = _(results)
     .filter(!_.isEmpty(filterOpts) ? filterOpts : _.stubTrue)
     .value();
   if (next.length > 1) {
@@ -168,13 +168,13 @@ function hasMultipleOptionsForFace(relations) {
 // Return the default options for the given solid and operation
 export function applyOptionsFor(solid: string, operation: OpName) {
   if (!solid) return;
-  const relations = getRelations(solid, operation);
+  const results = getOpResults(solid, operation);
   const newOpts = {};
   if (operation === 'augment') {
-    if (_.filter(relations, 'gyrate').length > 1) {
+    if (_.filter(results, 'gyrate').length > 1) {
       newOpts.gyrate = 'gyro';
     }
-    if (hasMultipleOptionsForFace(relations)) {
+    if (hasMultipleOptionsForFace(results)) {
       newOpts.using = getUsingOpts(solid)[0];
     }
   }
@@ -182,7 +182,7 @@ export function applyOptionsFor(solid: string, operation: OpName) {
 }
 
 export function hasOptions(solid: string, operation: OpName) {
-  const relations = getRelations(solid, operation);
+  const relations = getOpResults(solid, operation);
   if (_.isEmpty(relations)) return false;
   switch (operation) {
     case 'turn':
@@ -211,8 +211,8 @@ export function applyOperation(
   polyhedron: Polyhedron,
   config: * = {},
 ): OperationResult {
-  const relations = getRelations(name, operation.name);
-  const options = operation.getSearchOptions(polyhedron, config, relations);
+  const results = getOpResults(name, operation.name);
+  const options = operation.getSearchOptions(polyhedron, config, results);
 
   const next = getNextPolyhedron(name, operation.name, _.pickBy(options));
   if (!operation.name) {

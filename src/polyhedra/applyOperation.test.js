@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import { allSolidNames } from 'data';
 import { PRECISION, isPlanar } from 'math/linAlg';
-import { applyOperation, getOperations, getRelations } from './operations';
+import { applyOperation, getOperations, getOpResults } from './operations';
 import { Polyhedron, Peak } from 'math/polyhedra';
 import { operations } from 'math/operations';
 const debug = require('debug')('applyOperation.test');
@@ -65,7 +65,7 @@ expect.extend({
 });
 
 function getOptsToTest(operation, name, polyhedron) {
-  const relations = getRelations(name, operation.name);
+  const relations = getOpResults(name, operation.name);
   return operation.getAllOptions(polyhedron, relations) || [undefined];
 }
 
