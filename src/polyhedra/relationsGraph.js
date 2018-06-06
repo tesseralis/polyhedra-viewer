@@ -1,4 +1,4 @@
-// @flow
+// @flow strict
 import _ from 'lodash';
 import periodicTable from 'constants/periodicTable';
 import { toConwayNotation } from './names';
@@ -84,11 +84,12 @@ function makeBidirectional(graph) {
 
 function getKeyedTable(table) {
   const result = {};
+  if (table.type === 'subheader') return result;
   if (!table.rows) return result;
   table.rows.forEach((row, i) => {
     result[row] = {};
     table.columns.forEach((column, j) => {
-      const colName = _.isObject(column) ? column.name : column;
+      const colName = typeof column === 'object' ? column.name : column;
       result[row][colName] = table.data[i][j];
     });
   });
@@ -97,14 +98,14 @@ function getKeyedTable(table) {
 
 const invalidNames = ['concave', 'coplanar'];
 function convertTableNotation(notation) {
-  if (_.isArray(notation)) return notation.map(convertTableNotation);
+  if (Array.isArray(notation)) return notation.map(convertTableNotation);
   if (notation[0] === '!') return notation.substring(1);
   if (_.includes(invalidNames, notation)) return null;
   return notation;
 }
 
 function convertTable(table) {
-  if (!table.data) return table;
+  if (table.type === 'subheader') return table;
   return {
     ...table,
     data: table.data.map(row => row.map(convertTableNotation)),

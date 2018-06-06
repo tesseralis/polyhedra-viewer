@@ -1,6 +1,25 @@
-import * as _ from 'lodash';
+// @flow strict
+import { zip } from 'utils';
 
-export default [
+type Column = { name: string, sub: string[] } | string;
+type Data = string | string[];
+type DataRow = Data[];
+
+interface SubHeader {
+  caption: string;
+  type: 'subheader';
+}
+
+interface DataTable {
+  caption: string;
+  rows: string[];
+  columns: Column[];
+  data: DataRow[];
+}
+
+type Table = DataTable | SubHeader;
+
+const periodicTable: Table[] = [
   {
     caption: 'Platonic and Archimedean Solids',
     rows: [
@@ -11,6 +30,7 @@ export default [
       'cantellated',
       'snub',
     ],
+    // TODO this causes an extra "empty" row to be read by screenreaders
     columns: [
       { name: '', sub: ['tetrahedron'] },
       { name: '', sub: ['cube', 'octahedron'] },
@@ -37,7 +57,7 @@ export default [
       'decagonal',
     ],
     columns: ['prism', 'antiprism'],
-    data: _.zip(
+    data: zip(
       ['P3', '!C', 'P5', 'P6', 'P8', 'P10'],
       ['!O', 'A4', 'A5', 'A6', 'A8', 'A10'],
     ),
@@ -69,7 +89,7 @@ export default [
       { name: 'elongated bi-', sub: ['ortho-', 'gyro-'] },
       'gyroelongated bi-',
     ],
-    data: _.zip(
+    data: zip(
       ['!T', 'J1', 'J2', '!P3', 'J3', 'J4', 'J5', '', 'J6'],
       ['J7', 'J8', 'J9', 'coplanar', 'J18', 'J19', 'J20', '', 'J21'],
       ['coplanar', 'J10', 'J11', 'concave', 'J22', 'J23', 'J24', '', 'J25'],
@@ -175,3 +195,5 @@ export default [
     data: [['J86', 'J87', 'J88', 'J89', 'J90', 'J91', 'J92']],
   },
 ];
+
+export default periodicTable;

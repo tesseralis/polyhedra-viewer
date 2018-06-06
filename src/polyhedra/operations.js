@@ -1,4 +1,4 @@
-// @flow
+// @flow strict
 import _ from 'lodash';
 
 import { find } from 'utils';
@@ -137,7 +137,7 @@ export function getUsingOpts(solid: string) {
 }
 
 // Get the polyhedron name as a result of applying the operation to the given polyhedron
-function getNextPolyhedron(solid: string, operation: OpName, filterOpts: any) {
+function getNextPolyhedron<O>(solid: string, operation: OpName, filterOpts: O) {
   const relations = getRelations(solid, operation);
   const next = _(relations)
     .filter(!_.isEmpty(filterOpts) ? filterOpts : _.stubTrue)

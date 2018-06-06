@@ -70,3 +70,8 @@ type FlatMap<T, U> = (
   iteratee: (item: T, index: number) => U[],
 ) => U[];
 export const flatMap: FlatMap<*, *> = _.flatMap;
+
+export function zip<T>(...arrays: T[][]): T[][] {
+  // I HATE YOU FLOW LODASH TYPINGS
+  return _.invoke(_, 'zip', ...arrays);
+}
