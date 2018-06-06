@@ -3,6 +3,7 @@ import _ from 'lodash';
 import React, { PureComponent, Fragment } from 'react';
 import { css, StyleSheet } from 'aphrodite/no-important';
 
+import { type OpName } from 'polyhedra/operations';
 import { Polygon, PolyLine } from 'components/svg';
 const { sqrt } = Math;
 
@@ -108,7 +109,7 @@ function BaseExpandIcon({
 }) {
   const [cx, cy] = [100, 100];
   const r = 80;
-  const ap = sqrt(3) * r / 2;
+  const ap = (sqrt(3) * r) / 2;
   const r1 = r / sqrt(3);
   const ap1 = r1 / 2;
   return (
@@ -154,18 +155,20 @@ function ExpandIcon({
       hollow={hollow}
       render={({ cx, cy, r, ap, r1, ap1 }) => (
         <Fragment>
-          {_.range(3).map(i => (
-            <PolyLine
-              key={i}
-              className={css(styles[innerStyle])}
-              transform={`rotate(${i * 120} ${cx} ${cy})`}
-              points={[
-                [cx - r / 2, cy - ap],
-                [cx, cy - r1],
-                [cx + r / 2, cy - ap],
-              ]}
-            />
-          ))}
+          {_
+            .range(3)
+            .map(i => (
+              <PolyLine
+                key={i}
+                className={css(styles[innerStyle])}
+                transform={`rotate(${i * 120} ${cx} ${cy})`}
+                points={[
+                  [cx - r / 2, cy - ap],
+                  [cx, cy - r1],
+                  [cx + r / 2, cy - ap],
+                ]}
+              />
+            ))}
           {render({ cx, cy, r, ap, r1, ap1 })}
         </Fragment>
       )}
@@ -181,7 +184,7 @@ function ElongateIcon({ styled, render }: ElongateIconProps) {
   // TODO consolidate with expand
   const [cx, cy] = [100, 100];
   const r = 80;
-  const ap = sqrt(3) * r / 2;
+  const ap = (sqrt(3) * r) / 2;
   return (
     <Fragment>
       <Polygon
@@ -218,7 +221,7 @@ function ElongateIcon({ styled, render }: ElongateIconProps) {
 function AugmentIcon({ styled }) {
   const [cx, cy] = [100, 100];
   const r = 80;
-  const ap = sqrt(3) * r / 2;
+  const ap = (sqrt(3) * r) / 2;
   return (
     <Fragment>
       <Polygon
@@ -270,19 +273,21 @@ function drawIcon(name) {
           hollow={false}
           innerAngle={0}
           render={({ cx, cy, r, ap, r1, ap1 }) =>
-            _.range(3).map(i => (
-              <PolyLine
-                key={i}
-                className={css(styles.added)}
-                transform={`rotate(${i * 120} ${cx} ${cy})`}
-                points={[
-                  [cx - ap1, cy - r / 2],
-                  [cx - r, cy],
-                  [cx - ap1, cy + r / 2],
-                  [cx - r / 2, cy + ap],
-                ]}
-              />
-            ))
+            _
+              .range(3)
+              .map(i => (
+                <PolyLine
+                  key={i}
+                  className={css(styles.added)}
+                  transform={`rotate(${i * 120} ${cx} ${cy})`}
+                  points={[
+                    [cx - ap1, cy - r / 2],
+                    [cx - r, cy],
+                    [cx - ap1, cy + r / 2],
+                    [cx - r / 2, cy + ap],
+                  ]}
+                />
+              ))
           }
         />
       );
@@ -296,14 +301,16 @@ function drawIcon(name) {
           styled="changed"
           innerStyle="invariant"
           render={({ cx, cy, r, ap, r1, ap1 }) =>
-            _.range(3).map(i => (
-              <PolyLine
-                key={i}
-                className={css(styles.changed)}
-                transform={`rotate(${i * 120} ${cx} ${cy})`}
-                points={[[cx - r / 2, cy + ap1], [cx + r / 2, cy + ap]]}
-              />
-            ))
+            _
+              .range(3)
+              .map(i => (
+                <PolyLine
+                  key={i}
+                  className={css(styles.changed)}
+                  transform={`rotate(${i * 120} ${cx} ${cy})`}
+                  points={[[cx - r / 2, cy + ap1], [cx + r / 2, cy + ap]]}
+                />
+              ))
           }
         />
       );
@@ -373,8 +380,7 @@ function drawIcon(name) {
 }
 
 interface Props {
-  // TODO use OpName
-  name: string;
+  name: OpName;
 }
 
 // PureComponent so we don't rerender when name is the same
