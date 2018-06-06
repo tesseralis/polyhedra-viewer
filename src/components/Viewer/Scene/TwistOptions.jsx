@@ -41,7 +41,7 @@ function TwistOption({ orientation, onClick, disabled }) {
 
 interface Props {
   opName: string;
-  onClick(opName: string, twist: Twist): void;
+  onClick(opName: string, twistOpts: *): void;
   disabled: boolean;
 }
 
@@ -51,12 +51,12 @@ function TwistOptions({ opName, onClick, disabled }: Props) {
       <TwistOption
         orientation="left"
         disabled={disabled}
-        onClick={() => onClick(opName, 'left')}
+        onClick={() => onClick(opName, { twist: 'left' })}
       />
       <TwistOption
         orientation="right"
         disabled={disabled}
-        onClick={() => onClick(opName, 'right')}
+        onClick={() => onClick(opName, { twist: 'right' })}
       />
     </div>
   );
