@@ -1,7 +1,7 @@
 // @flow
 import _ from 'lodash';
 
-import { find } from 'util.js';
+import { find } from 'utils';
 import { fromConwayNotation, toConwayNotation } from './names';
 import { Polyhedron } from 'math/polyhedra';
 import polyhedraGraph from './relationsGraph';

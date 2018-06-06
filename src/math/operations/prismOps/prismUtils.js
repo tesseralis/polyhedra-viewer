@@ -1,7 +1,7 @@
 // @flow strict
 import _ from 'lodash';
 import type { Twist } from 'types';
-import { find } from 'util.js';
+import { find } from 'utils';
 import { Polyhedron, Peak } from 'math/polyhedra';
 import { withOrigin, isInverse } from 'math/linAlg';
 import { getTwistSign, getTransformedVertices } from '../operationUtils';

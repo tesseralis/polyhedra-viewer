@@ -2,7 +2,7 @@
 
 import _ from 'lodash';
 
-import { flatMapUniq } from 'util.js';
+import { flatMapUniq } from 'utils';
 import { Vec3D } from 'math/linAlg';
 import Polyhedron from './Polyhedron';
 import Face from './Face';

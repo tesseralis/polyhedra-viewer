@@ -1,7 +1,7 @@
 // @flow strict
 import _ from 'lodash';
 
-import { find } from 'util.js';
+import { find } from 'utils';
 import { isValidSolid, getSolidData } from 'data';
 import { Vec3D, getCentroid } from 'math/linAlg';
 

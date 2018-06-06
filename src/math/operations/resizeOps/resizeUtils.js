@@ -1,7 +1,7 @@
 // @flow strict
 import _ from 'lodash';
 
-import { flatMapUniq } from 'util.js';
+import { flatMapUniq } from 'utils';
 import { Polyhedron, Face } from 'math/polyhedra';
 import { PRECISION, getPlane, withOrigin } from 'math/linAlg';
 import { getTransformedVertices } from '../operationUtils';

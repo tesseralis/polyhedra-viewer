@@ -1,7 +1,7 @@
 // @flow strict
 import _ from 'lodash';
 
-import { getCyclic, flatMapUniq } from 'util.js';
+import { getCyclic, flatMapUniq } from 'utils';
 import type { VIndex, FIndex } from './solidTypes';
 import Polyhedron from './Polyhedron';
 import VEList from './VEList';

@@ -10,7 +10,7 @@ import {
   getNormal,
   getNormalRay,
 } from 'math/linAlg';
-import { find } from 'util.js';
+import { find } from 'utils';
 import Polyhedron from './Polyhedron';
 import Edge from './Edge';
 import Vertex, { VertexList } from './Vertex';

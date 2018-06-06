@@ -3,7 +3,7 @@ import _ from 'lodash';
 
 import { Polyhedron, Face, Peak } from 'math/polyhedra';
 import { isInverse, PRECISION } from 'math/linAlg';
-import { getCyclic, getSingle } from 'util.js';
+import { getCyclic, getSingle } from 'utils';
 
 import { Operation } from '../operationTypes';
 import { hasMultiple } from './cutPasteUtils';

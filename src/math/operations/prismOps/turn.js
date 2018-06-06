@@ -2,7 +2,7 @@
 import _ from 'lodash';
 
 import type { Twist } from 'types';
-import { flatMap } from 'util.js';
+import { flatMap } from 'utils';
 
 import { Operation } from '../operationTypes';
 import {

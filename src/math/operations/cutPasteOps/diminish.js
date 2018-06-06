@@ -1,7 +1,7 @@
 // @flow strict
 import _ from 'lodash';
 
-import { flatMap } from 'util.js';
+import { flatMap } from 'utils';
 import { removeExtraneousVertices } from '../operationUtils';
 import { Peak } from 'math/polyhedra';
 import type { Operation } from '../operationTypes';

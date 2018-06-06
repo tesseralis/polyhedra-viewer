@@ -1,7 +1,7 @@
 // @flow strict
 import _ from 'lodash';
 
-import { flatMap, repeat, find } from 'util.js';
+import { flatMap, repeat, find } from 'utils';
 import { withOrigin, PRECISION } from 'math/linAlg';
 import { Polyhedron } from 'math/polyhedra';
 

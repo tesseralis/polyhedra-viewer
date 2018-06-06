@@ -1,6 +1,6 @@
 // @flow strict
 import _ from 'lodash';
-import { getSingle } from 'util.js';
+import { getSingle } from 'utils';
 import { Peak, Polyhedron } from 'math/polyhedra';
 import { isInverse } from 'math/linAlg';
 import type { Relation } from '../operationTypes';

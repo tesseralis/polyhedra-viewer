@@ -2,7 +2,7 @@
 import _ from 'lodash';
 import { Polyhedron } from 'math/polyhedra';
 import { withOrigin } from 'math/linAlg';
-import { flatMap, repeat } from 'util.js';
+import { flatMap, repeat } from 'utils';
 import type { Twist } from 'types';
 import {
   getTwistSign,
