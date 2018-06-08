@@ -1,6 +1,6 @@
 // @flow
 import _ from 'lodash';
-import { Component } from 'react';
+import { PureComponent } from 'react';
 import tinycolor from 'tinycolor2';
 import connect from 'components/connect';
 import { WithConfig } from 'components/ConfigContext';
@@ -12,7 +12,7 @@ function toRgb(hex: string) {
   return [r / 255, g / 255, b / 255];
 }
 
-class SolidColors extends Component<*> {
+class SolidColors extends PureComponent<*> {
   render() {
     return this.props.children({ colors: this.getColors().map(toRgb) });
   }

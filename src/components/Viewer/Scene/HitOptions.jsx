@@ -1,6 +1,6 @@
 // @flow strict
 import _ from 'lodash';
-import { Component } from 'react';
+import { PureComponent } from 'react';
 
 import type { Point } from 'types';
 import { type OpName } from 'polyhedra/operations';
@@ -25,7 +25,7 @@ function getHitOption(opName: OpName) {
   }
 }
 
-class HitOptions extends Component<*> {
+class HitOptions extends PureComponent<*> {
   render() {
     return this.props.children({
       setHitOption: this.setHitOption,
