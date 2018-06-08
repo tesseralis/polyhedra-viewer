@@ -1,4 +1,5 @@
 // @flow strict
+
 import React from 'react';
 import { css, StyleSheet } from 'aphrodite/no-important';
 
@@ -7,8 +8,8 @@ import IconLink from './IconLink';
 const styles = StyleSheet.create({
   menu: {
     width: '100%',
-    display: 'flex',
-    justifyContent: 'space-between',
+    display: 'grid',
+    gridTemplateColumns: '1fr 1fr 1fr 1fr',
   },
 });
 

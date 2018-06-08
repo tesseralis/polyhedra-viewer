@@ -9,10 +9,14 @@ import PolyhedronList from './PolyhedronList';
 
 const styles = StyleSheet.create({
   sidebar: {
-    width: 400,
+    //width: 400,
+    width: '100%',
     height: '100%',
     position: 'relative',
     boxShadow: 'inset -1px -1px 4px LightGray',
+
+    // '@media (min-width: 320px) and (max-width: 480px)': {
+    // },
   },
   menu: {
     height: 75,

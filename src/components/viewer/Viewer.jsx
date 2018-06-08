@@ -4,6 +4,7 @@ import { css, StyleSheet } from 'aphrodite/no-important';
 import { type RouterHistory } from 'react-router-dom';
 
 import { fullScreen } from 'styles/common';
+import * as media from 'styles/media';
 
 import { OperationProvider } from './OperationContext';
 import { PolyhedronProvider } from './PolyhedronContext';
@@ -20,12 +21,15 @@ const styles = StyleSheet.create({
   sidebar: {
     position: 'relative',
     height: '100%',
+    minWidth: 400,
+    [media.mobile]: {
+      minWidth: '100%',
+    },
   },
   scene: {
-    position: 'relative',
-    width: '100%',
-    height: '100%',
-    minHeight: '100%',
+    [media.mobile]: {
+      display: 'none',
+    },
   },
 });
 
@@ -45,7 +49,9 @@ class Viewer extends PureComponent<*> {
             <Sidebar panel={panel} solid={solid} />
           </div>
         )}
-        <Scene panel={panel} solid={solid} />
+        <div className={css(styles.scene)}>
+          <Scene panel={panel} solid={solid} />
+        </div>
       </div>
     );
   }
