@@ -1,8 +1,7 @@
 // @flow strict
 import _ from 'lodash';
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 
-import { defaultConfig } from 'constants/configOptions';
 import { WithConfig } from 'components/ConfigContext';
 import transition from 'transition';
 import { Polyhedron } from 'math/polyhedra';
@@ -50,7 +49,6 @@ const PolyhedronContext = React.createContext({
   solidName: 'tetrahedron',
   setName: _.noop,
   polyhedron: Polyhedron.get('tetrahedron'),
-  config: defaultConfig,
   faceColors: [],
   isTransitioning: false,
   setPolyhedron: _.noop,
@@ -59,16 +57,14 @@ const PolyhedronContext = React.createContext({
   resize: _.noop,
 });
 
-class BasePolyhedronProvider extends Component<*, *> {
+class BasePolyhedronProvider extends PureComponent<*, *> {
   transitionId: *;
 
   constructor(props: *) {
     super(props);
     this.state = {
-      solidName: this.props.name,
       setName: this.props.setName,
       polyhedron: Polyhedron.get('tetrahedron'),
-      config: this.props.config,
       faceColors: [],
       isTransitioning: false,
       setPolyhedron: this.setPolyhedron,
@@ -78,11 +74,6 @@ class BasePolyhedronProvider extends Component<*, *> {
     };
   }
 
-  // Copy the config for ease of use
-  static getDerivedStateFromProps({ config, name: solidName }) {
-    return { config, solidName };
-  }
-
   componentWillUnmount() {
     if (this.transitionId) {
       cancelAnimationFrame(this.transitionId.current);
@@ -90,8 +81,9 @@ class BasePolyhedronProvider extends Component<*, *> {
   }
 
   render() {
+    const value = { ...this.state, solidName: this.props.name };
     return (
-      <PolyhedronContext.Provider value={this.state}>
+      <PolyhedronContext.Provider value={value}>
         {this.props.children}
       </PolyhedronContext.Provider>
     );

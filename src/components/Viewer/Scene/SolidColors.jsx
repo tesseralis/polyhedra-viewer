@@ -3,6 +3,7 @@ import _ from 'lodash';
 import { Component } from 'react';
 import tinycolor from 'tinycolor2';
 import connect from 'components/connect';
+import { WithConfig } from 'components/ConfigContext';
 import { WithPolyhedron } from 'components/Viewer/PolyhedronContext';
 import { WithOperation } from 'components/Viewer/OperationContext';
 
@@ -47,11 +48,15 @@ class SolidColors extends Component<*> {
 
 export default _.flow([
   connect(
+    WithConfig,
+    ['config'],
+  ),
+  connect(
     WithOperation,
     ['operation', 'options'],
   ),
   connect(
     WithPolyhedron,
-    ['polyhedron', 'config', 'faceColors'],
+    ['polyhedron', 'faceColors'],
   ),
 ])(SolidColors);

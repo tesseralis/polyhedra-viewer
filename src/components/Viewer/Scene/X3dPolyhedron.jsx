@@ -6,6 +6,7 @@ import EventListener from 'react-event-listener';
 import { type Point } from 'types';
 import { SolidData } from 'math/polyhedra';
 import connect from 'components/connect';
+import { WithConfig } from 'components/ConfigContext';
 import { WithPolyhedron } from 'components/Viewer/PolyhedronContext';
 import SolidColors from './SolidColors';
 import HitOptions from './HitOptions';
@@ -153,8 +154,12 @@ class X3dPolyhedron extends Component<PolyhedronProps, PolyhedronState> {
 
 export default _.flow([
   connect(
+    WithConfig,
+    ['config'],
+  ),
+  connect(
     WithPolyhedron,
-    ({ polyhedron, config }) => ({ solidData: polyhedron.solidData, config }),
+    ({ polyhedron }) => ({ solidData: polyhedron.solidData }),
   ),
   connect(
     SolidColors,
