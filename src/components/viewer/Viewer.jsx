@@ -19,17 +19,29 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   sidebar: {
-    position: 'relative',
-    height: '100%',
-    minWidth: 400,
     [media.mobile]: {
       minWidth: '100%',
     },
   },
+  sidebarFull: {
+    position: 'relative',
+    height: '100%',
+    minWidth: 400,
+  },
+  sidebarCompact: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+  },
+
   scene: {
+    width: 'calc(100% - 400px)',
     [media.mobile]: {
       display: 'none',
     },
+  },
+  full: {
+    width: '100%',
   },
 });
 
@@ -38,19 +50,31 @@ interface ViewerProps {
   history: RouterHistory;
 }
 
+function isMobile() {
+  const width = window.innerWidth > 0 ? window.innerWidth : window.screen.width;
+  return width <= 480;
+}
+
 class Viewer extends PureComponent<*> {
   render() {
     const { solid, panel } = this.props;
+    const full = panel === 'full';
+    const mobile = isMobile();
     return (
       <div className={css(styles.viewer)}>
         <SolidSync solid={solid} panel={panel} />
-        {panel !== 'full' && (
-          <div className={css(styles.sidebar)}>
-            <Sidebar panel={panel} solid={solid} />
+        {!mobile && (
+          <div className={css(styles.scene, full && styles.full)}>
+            <Scene panel={panel} solid={solid} />
           </div>
         )}
-        <div className={css(styles.scene)}>
-          <Scene panel={panel} solid={solid} />
+        <div
+          className={css(
+            styles.sidebar,
+            !mobile && full ? styles.sidebarCompact : styles.sidebarFull,
+          )}
+        >
+          <Sidebar panel={panel} solid={solid} compact={full} />
         </div>
       </div>
     );

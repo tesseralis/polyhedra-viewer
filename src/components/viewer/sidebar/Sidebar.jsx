@@ -1,26 +1,33 @@
 // @flow
-import React from 'react';
+import _ from 'lodash';
+import React, { Fragment } from 'react';
 import { css, StyleSheet } from 'aphrodite/no-important';
+
+import { absolute } from 'styles/common';
 
 import Menu from '../Menu';
 import ConfigForm from './ConfigForm';
 import OperationsPanel from './OperationsPanel';
 import PolyhedronList from './PolyhedronList';
+import Scene from 'components/Viewer/Scene';
 
 const styles = StyleSheet.create({
   sidebar: {
-    //width: 400,
     width: '100%',
     height: '100%',
     position: 'relative',
-    boxShadow: 'inset -1px -1px 4px LightGray',
-
-    // '@media (min-width: 320px) and (max-width: 480px)': {
-    // },
+  },
+  full: {
+    boxShadow: 'inset 1px -1px 4px LightGray',
   },
   menu: {
     height: 75,
     padding: '0 10px',
+  },
+  menuMobile: {
+    borderTop: '1px solid LightGray',
+  },
+  menuFull: {
     borderBottom: '1px solid LightGray',
   },
   content: {
@@ -32,6 +39,7 @@ const styles = StyleSheet.create({
 interface Props {
   panel: string;
   solid: string;
+  compact?: boolean;
 }
 
 function renderPanel(panel) {
@@ -42,18 +50,45 @@ function renderPanel(panel) {
       return <ConfigForm />;
     case 'list':
       return <PolyhedronList />;
+    case 'full':
+      return null;
     default:
       throw new Error('unknown tab');
   }
 }
 
-export default function Sidebar({ panel, solid }: Props) {
+// FIXME generalize and put in util file
+function isMobile() {
+  const width = window.innerWidth > 0 ? window.innerWidth : window.screen.width;
+  return width <= 480;
+}
+
+export default function Sidebar({ compact, panel, solid }: Props) {
+  if (isMobile()) {
+    return (
+      <section className={css(styles.sidebar, !compact && styles.full)}>
+        <div className={css(styles.content)}>
+          <Fragment>
+            {_.includes(['operations', 'full'], panel) && (
+              <Scene panel={panel} solid={solid} />
+            )}
+            {renderPanel(panel)}
+          </Fragment>
+        </div>
+        <div className={css(styles.menu, styles.menuMobile)}>
+          <Menu solid={solid} />
+        </div>
+      </section>
+    );
+  }
   return (
-    <section className={css(styles.sidebar)}>
-      <div className={css(styles.menu)}>
-        <Menu solid={solid} />
+    <section className={css(styles.sidebar, !compact && styles.full)}>
+      <div className={css(styles.menu, !compact && styles.menuFull)}>
+        <Menu solid={solid} compact={!!compact} />
       </div>
-      <div className={css(styles.content)}>{renderPanel(panel)}</div>
+      {!compact && (
+        <div className={css(styles.content)}>{renderPanel(panel)}</div>
+      )}
     </section>
   );
 }

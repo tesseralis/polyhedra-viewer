@@ -22,9 +22,9 @@ export default function Menu({ solid, compact = false }: Props) {
   return (
     <nav className={css(styles.menu)}>
       <IconLink
-        to="/"
-        title="Table"
-        iconName="periodic-table"
+        to={`/${solid}/full`}
+        title="Full Screen"
+        iconName="cube-outline"
         iconOnly={compact}
         exact
       />

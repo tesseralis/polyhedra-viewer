@@ -24,6 +24,12 @@ export const fullScreen = {
   width: '100%',
 };
 
+export const absolute = (vert: 'top' | 'bottom', horiz: 'left' | 'right') => ({
+  position: 'absolute',
+  [vert]: 0,
+  [horiz]: 0,
+});
+
 export const fixed = (vert: 'top' | 'bottom', horiz: 'left' | 'right') => ({
   position: 'fixed',
   [vert]: 0,
