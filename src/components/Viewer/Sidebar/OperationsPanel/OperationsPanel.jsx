@@ -3,6 +3,7 @@ import _ from 'lodash';
 import React, { Component } from 'react';
 import { css, StyleSheet } from 'aphrodite/no-important';
 
+import * as media from 'styles/media';
 import { getOpResults, operations } from 'polyhedra/operations';
 import connect from 'components/connect';
 import ApplyOperation from 'components/Viewer/ApplyOperation';
@@ -23,7 +24,7 @@ const styles = StyleSheet.create({
     rowGap: 20,
     overflowY: 'scroll',
     // TODO encode the ordering in the actual operation types
-    gridTemplateRows: 'repeat(4, 80px) 1fr',
+    gridTemplateRows: 'repeat(4, 80px)',
     gridTemplateAreas: `
       "truncate rectify      cumulate dual"
       "expand   snub         contract twist"
@@ -31,6 +32,13 @@ const styles = StyleSheet.create({
       "augment  augment      diminish gyrate"
       "recenter recenter     resize   resize"
     `,
+    [media.mobile]: {
+      height: 100,
+      gridTemplateRows: 'repeat(16, 80px)',
+      gridTemplateAreas: `
+      "truncate rectify      cumulate dual expand   snub         contract twist elongate gyroelongate shorten  turn augment  augment      diminish gyrate recenter recenter     resize   resize"
+      `,
+    },
   },
 
   operationButton: {

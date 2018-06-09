@@ -20,6 +20,8 @@ const styles = StyleSheet.create({
     position: 'relative',
     display: 'grid',
     gridTemplateRows: `${menuH}px 1fr`,
+    gridTemplateAreas: '"menu" "content"',
+    alignItems: 'end',
 
     [media.mobile]: {
       gridTemplateRows: `${mobTitleH}px 1fr ${menuH}px`,
@@ -54,6 +56,11 @@ const styles = StyleSheet.create({
   content: {
     overflowY: 'scroll',
     position: 'relative',
+  },
+
+  operations: {
+    zIndex: 100,
+    height: 100,
   },
 
   contentFull: {
@@ -108,7 +115,7 @@ export default function Sidebar({ compact, panel, solid }: Props) {
             <div
               className={css(
                 styles.content,
-                panel !== 'full' && styles.contentFull,
+                panel === 'operations' ? styles.operations : styles.contentFull,
               )}
             >
               {panelNode}
