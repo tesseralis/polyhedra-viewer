@@ -3,9 +3,10 @@ import React from 'react';
 import { Route, NavLink } from 'react-router-dom';
 import { css, StyleSheet } from 'aphrodite/no-important';
 
+import { resetLink } from 'styles/common';
+import * as media from 'styles/media';
 import { verdana } from 'styles/fonts';
 import { Icon, SrOnly } from 'components/common';
-import { resetLink } from 'styles/common';
 
 const styles = StyleSheet.create({
   // TODO link hover
@@ -26,6 +27,10 @@ const styles = StyleSheet.create({
     marginTop: 5,
     fontSize: 12,
     fontFamily: verdana,
+
+    [media.mobile]: {
+      fontSize: 9,
+    },
   },
 });
 

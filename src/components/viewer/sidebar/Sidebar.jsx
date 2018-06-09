@@ -12,6 +12,7 @@ import Scene from 'components/Viewer/Scene';
 import MobileTracker from 'components/MobileTracker';
 
 const mobTitleH = 50;
+const menuH = 75;
 const styles = StyleSheet.create({
   sidebar: {
     width: '100%',
@@ -22,7 +23,7 @@ const styles = StyleSheet.create({
     boxShadow: 'inset 1px -1px 4px LightGray',
   },
   menu: {
-    height: 75,
+    height: menuH,
     padding: '0 10px',
 
     [media.mobile]: {
@@ -43,12 +44,25 @@ const styles = StyleSheet.create({
     justifyItems: 'center',
   },
   content: {
-    height: 'calc(100% - 75px)',
+    height: `calc(100% - ${menuH}px)`,
     overflowY: 'scroll',
+    position: 'relative',
 
     [media.mobile]: {
-      height: `calc(100% - 75px - ${mobTitleH}px)`,
+      zIndex: 100,
+      opacity: 0.75,
+      backgroundColor: 'white',
+      height: `calc(100% - ${menuH}px - ${mobTitleH}px)`,
     },
+  },
+
+  scene: {
+    zIndex: 0,
+    position: 'absolute',
+    top: mobTitleH,
+    bottom: menuH,
+    left: 0,
+    right: 0,
   },
 });
 
@@ -83,9 +97,9 @@ export default function Sidebar({ compact, panel, solid }: Props) {
             <IconLink iconOnly iconName="periodic-table" title="Table" to="/" />
             {solid}
           </div>
-          <div className={css(styles.content)}>
+          <div className={css(styles.content)}>{renderPanel(panel)}</div>
+          <div className={css(styles.scene)}>
             <Scene panel={panel} solid={solid} />
-            {renderPanel(panel)}
           </div>
           <div className={css(styles.menu, styles.menuMobile)}>
             <Menu solid={solid} />
