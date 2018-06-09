@@ -4,6 +4,8 @@ import { StyleSheet, css } from 'aphrodite/no-important';
 import x3dom from 'x3dom.js';
 import 'x3dom/x3dom.css';
 
+import X3dPolyhedron from './X3dPolyhedron';
+
 // Disable double-clicking to change rotation point
 if (x3dom.Viewarea) {
   x3dom.Viewarea.prototype.onDoubleClick = () => {};
@@ -32,7 +34,7 @@ export default class X3dScene extends React.Component<Props> {
       <x3d className={css(styles.x3dScene)}>
         <scene>
           <viewpoint position="0,0,5" />
-          {this.props.children}
+          <X3dPolyhedron />
         </scene>
       </x3d>
     );

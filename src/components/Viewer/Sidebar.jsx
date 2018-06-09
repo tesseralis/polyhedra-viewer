@@ -4,7 +4,7 @@ import { css, StyleSheet } from 'aphrodite/no-important';
 
 import * as media from 'styles/media';
 import IconLink from 'components/Viewer/IconLink';
-import Menu from '../Menu';
+import Menu from './Menu';
 import ConfigForm from './ConfigForm';
 import OperationsPanel from './OperationsPanel';
 import PolyhedronList from './PolyhedronList';
