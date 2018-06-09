@@ -5,6 +5,7 @@ import React, { Fragment } from 'react';
 import { css, StyleSheet } from 'aphrodite/no-important';
 
 import { absolute } from 'styles/common';
+import MobileTracker from 'components/MobileTracker';
 import connect from 'components/connect';
 import { WithOperation } from 'components/Viewer/OperationContext';
 import { unescapeName } from 'polyhedra/names';
@@ -41,25 +42,26 @@ const styles = StyleSheet.create({
   },
 });
 
-function isMobile() {
-  const width = window.innerWidth > 0 ? window.innerWidth : window.screen.width;
-  return width <= 480;
-}
-
 function OperationOverlay({ opName, solid }) {
-  const mobile = isMobile();
   return (
     <div className={css(styles.overlay, opName && styles.opFocus)}>
-      {!mobile && (
-        <Fragment>
-          <div className={css(styles.homeLink)}>
-            <IconLink iconName="periodic-table" title="Table" replace to="/" />
-          </div>
-          <div className={css(styles.title)}>
-            <Title name={unescapeName(solid)} />
-          </div>
-        </Fragment>
-      )}
+      <MobileTracker
+        renderDesktop={() => (
+          <Fragment>
+            <div className={css(styles.homeLink)}>
+              <IconLink
+                iconName="periodic-table"
+                title="Table"
+                replace
+                to="/"
+              />
+            </div>
+            <div className={css(styles.title)}>
+              <Title name={unescapeName(solid)} />
+            </div>
+          </Fragment>
+        )}
+      />
       {_.includes(
         ['shorten', 'snub', 'twist', 'gyroelongate', 'turn'],
         opName,
