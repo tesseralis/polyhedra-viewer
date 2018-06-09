@@ -21,9 +21,9 @@ const styles = StyleSheet.create({
     display: 'grid',
     gridTemplateRows: `${menuH}px 1fr`,
     gridTemplateAreas: '"menu" "content"',
-    alignItems: 'end',
 
     [media.mobile]: {
+      alignItems: 'end',
       gridTemplateRows: `${mobTitleH}px 1fr ${menuH}px`,
       gridTemplateAreas: '"title" "content" "menu"',
     },
