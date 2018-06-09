@@ -1,4 +1,4 @@
-// @flow
+// @flow strict
 import React, { Component, Fragment } from 'react';
 import _ from 'lodash';
 import EventListener from 'react-event-listener';
@@ -45,7 +45,7 @@ const Edges = ({ edges, vertices }) => {
 
 interface PolyhedronProps {
   solidData: SolidData;
-  config: Object;
+  config: *;
   colors: *;
   onClick(): void;
   onHover(hitPnt: Point): void;

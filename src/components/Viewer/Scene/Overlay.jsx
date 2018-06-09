@@ -1,18 +1,14 @@
 //@flow
 
-import _ from 'lodash';
 import React, { Fragment } from 'react';
 import { css, StyleSheet } from 'aphrodite/no-important';
 
 import { absolute } from 'styles/common';
 import MobileTracker from 'components/MobileTracker';
-import connect from 'components/connect';
-import { WithOperation } from 'components/Viewer/OperationContext';
 import { unescapeName } from 'polyhedra/names';
 import IconLink from 'components/Viewer/IconLink';
 import Title from './Title';
-import TwistOptions from './TwistOptions';
-import AugmentOptions from './AugmentOptions';
+import Options from './Options';
 
 const styles = StyleSheet.create({
   overlay: {
@@ -22,10 +18,6 @@ const styles = StyleSheet.create({
     top: 0,
     bottom: 0,
     pointerEvents: 'none',
-  },
-
-  opFocus: {
-    // border: '2px solid DarkSlateGray',
   },
 
   title: {
@@ -42,9 +34,13 @@ const styles = StyleSheet.create({
   },
 });
 
-function OperationOverlay({ opName, solid }) {
+interface Props {
+  solid: string;
+}
+
+export default function Overlay({ solid }: Props) {
   return (
-    <div className={css(styles.overlay, opName && styles.opFocus)}>
+    <div className={css(styles.overlay)}>
       <MobileTracker
         renderDesktop={() => (
           <Fragment>
@@ -62,16 +58,7 @@ function OperationOverlay({ opName, solid }) {
           </Fragment>
         )}
       />
-      {_.includes(
-        ['shorten', 'snub', 'twist', 'gyroelongate', 'turn'],
-        opName,
-      ) && <TwistOptions opName={opName} />}
-      {_.includes(['augment'], opName) && <AugmentOptions solid={solid} />}
+      <Options solid={solid} />
     </div>
   );
 }
-
-export default connect(
-  WithOperation,
-  ['opName'],
-)(OperationOverlay);

@@ -8,6 +8,7 @@ import * as media from 'styles/media';
 
 import { OperationProvider } from './OperationContext';
 import { PolyhedronProvider } from './PolyhedronContext';
+import MobileTracker from 'components/MobileTracker';
 import SolidSync from './SolidSync';
 import Sidebar from './Sidebar';
 import Scene from './Scene';
@@ -29,9 +30,11 @@ const styles = StyleSheet.create({
     minWidth: 400,
   },
   sidebarCompact: {
-    position: 'absolute',
-    top: 0,
-    right: 0,
+    [media.desktop]: {
+      position: 'absolute',
+      top: 0,
+      right: 0,
+    },
   },
 
   scene: {
@@ -50,28 +53,24 @@ interface ViewerProps {
   history: RouterHistory;
 }
 
-function isMobile() {
-  const width = window.innerWidth > 0 ? window.innerWidth : window.screen.width;
-  return width <= 480;
-}
-
 class Viewer extends PureComponent<*> {
   render() {
     const { solid, panel } = this.props;
     const full = panel === 'full';
-    const mobile = isMobile();
     return (
       <div className={css(styles.viewer)}>
         <SolidSync solid={solid} panel={panel} />
-        {!mobile && (
-          <div className={css(styles.scene, full && styles.full)}>
-            <Scene panel={panel} solid={solid} />
-          </div>
-        )}
+        <MobileTracker
+          renderDesktop={() => (
+            <div className={css(styles.scene, full && styles.full)}>
+              <Scene panel={panel} solid={solid} />
+            </div>
+          )}
+        />
         <div
           className={css(
             styles.sidebar,
-            !mobile && full ? styles.sidebarCompact : styles.sidebarFull,
+            full ? styles.sidebarCompact : styles.sidebarFull,
           )}
         >
           <Sidebar panel={panel} solid={solid} compact={full} />
