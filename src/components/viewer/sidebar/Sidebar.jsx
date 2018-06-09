@@ -18,11 +18,19 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     position: 'relative',
+    display: 'grid',
+    gridTemplateRows: `${menuH}px 1fr`,
+
+    [media.mobile]: {
+      gridTemplateRows: `${mobTitleH}px 1fr ${menuH}px`,
+      gridTemplateAreas: '"title" "content" "menu"',
+    },
   },
   full: {
     boxShadow: 'inset 1px -1px 4px LightGray',
   },
   menu: {
+    gridArea: 'menu',
     height: menuH,
     padding: '0 10px',
 
@@ -44,13 +52,8 @@ const styles = StyleSheet.create({
     justifyItems: 'center',
   },
   content: {
-    height: `calc(100% - ${menuH}px)`,
     overflowY: 'scroll',
     position: 'relative',
-
-    [media.mobile]: {
-      height: `calc(100% - ${menuH}px - ${mobTitleH}px)`,
-    },
   },
 
   contentFull: {
@@ -91,6 +94,7 @@ function renderPanel(panel) {
 }
 
 export default function Sidebar({ compact, panel, solid }: Props) {
+  const panelNode = renderPanel(panel);
   return (
     <MobileTracker
       renderMobile={() => (
@@ -100,14 +104,16 @@ export default function Sidebar({ compact, panel, solid }: Props) {
             <IconLink iconOnly iconName="periodic-table" title="Table" to="/" />
             {solid}
           </div>
-          <div
-            className={css(
-              styles.content,
-              panel !== 'full' && styles.contentFull,
-            )}
-          >
-            {renderPanel(panel)}
-          </div>
+          {panelNode && (
+            <div
+              className={css(
+                styles.content,
+                panel !== 'full' && styles.contentFull,
+              )}
+            >
+              {panelNode}
+            </div>
+          )}
           <div className={css(styles.scene)}>
             <Scene panel={panel} solid={solid} />
           </div>
