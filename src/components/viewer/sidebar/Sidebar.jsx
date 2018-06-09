@@ -23,7 +23,6 @@ const styles = StyleSheet.create({
     gridTemplateAreas: '"menu" "content"',
 
     [media.mobile]: {
-      alignItems: 'end',
       gridTemplateRows: `${mobTitleH}px 1fr ${menuH}px`,
       gridTemplateAreas: '"title" "content" "menu"',
     },
@@ -54,6 +53,7 @@ const styles = StyleSheet.create({
     justifyItems: 'center',
   },
   content: {
+    gridArea: 'content',
     overflowY: 'scroll',
     position: 'relative',
   },
@@ -61,6 +61,7 @@ const styles = StyleSheet.create({
   operations: {
     zIndex: 100,
     height: 100,
+    alignSelf: 'end',
   },
 
   contentFull: {
@@ -71,11 +72,7 @@ const styles = StyleSheet.create({
 
   scene: {
     zIndex: 0,
-    position: 'absolute',
-    top: mobTitleH,
-    bottom: menuH,
-    left: 0,
-    right: 0,
+    gridArea: 'content',
   },
 });
 
