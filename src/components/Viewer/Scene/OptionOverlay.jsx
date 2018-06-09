@@ -1,7 +1,7 @@
 //@flow
 
 import _ from 'lodash';
-import React from 'react';
+import React, { Fragment } from 'react';
 import { css, StyleSheet } from 'aphrodite/no-important';
 
 import { absolute } from 'styles/common';
@@ -41,15 +41,25 @@ const styles = StyleSheet.create({
   },
 });
 
+function isMobile() {
+  const width = window.innerWidth > 0 ? window.innerWidth : window.screen.width;
+  return width <= 480;
+}
+
 function OperationOverlay({ opName, solid }) {
+  const mobile = isMobile();
   return (
     <div className={css(styles.overlay, opName && styles.opFocus)}>
-      <div className={css(styles.homeLink)}>
-        <IconLink iconName="periodic-table" title="Table" replace to="/" />
-      </div>
-      <div className={css(styles.title)}>
-        <Title name={unescapeName(solid)} />
-      </div>
+      {!mobile && (
+        <Fragment>
+          <div className={css(styles.homeLink)}>
+            <IconLink iconName="periodic-table" title="Table" replace to="/" />
+          </div>
+          <div className={css(styles.title)}>
+            <Title name={unescapeName(solid)} />
+          </div>
+        </Fragment>
+      )}
       {_.includes(
         ['shorten', 'snub', 'twist', 'gyroelongate', 'turn'],
         opName,

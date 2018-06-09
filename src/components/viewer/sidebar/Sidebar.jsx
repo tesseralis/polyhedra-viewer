@@ -1,9 +1,6 @@
 // @flow
-import _ from 'lodash';
-import React, { Fragment } from 'react';
+import React from 'react';
 import { css, StyleSheet } from 'aphrodite/no-important';
-
-import { absolute } from 'styles/common';
 
 import Menu from '../Menu';
 import ConfigForm from './ConfigForm';
@@ -68,12 +65,8 @@ export default function Sidebar({ compact, panel, solid }: Props) {
     return (
       <section className={css(styles.sidebar, !compact && styles.full)}>
         <div className={css(styles.content)}>
-          <Fragment>
-            {_.includes(['operations', 'full'], panel) && (
-              <Scene panel={panel} solid={solid} />
-            )}
-            {renderPanel(panel)}
-          </Fragment>
+          <Scene panel={panel} solid={solid} />
+          {renderPanel(panel)}
         </div>
         <div className={css(styles.menu, styles.menuMobile)}>
           <Menu solid={solid} />
