@@ -2,6 +2,8 @@
 import React from 'react';
 import { css, StyleSheet } from 'aphrodite/no-important';
 
+import * as media from 'styles/media';
+import IconLink from 'components/Viewer/IconLink';
 import Menu from '../Menu';
 import ConfigForm from './ConfigForm';
 import OperationsPanel from './OperationsPanel';
@@ -9,6 +11,7 @@ import PolyhedronList from './PolyhedronList';
 import Scene from 'components/Viewer/Scene';
 import MobileTracker from 'components/MobileTracker';
 
+const mobTitleH = 50;
 const styles = StyleSheet.create({
   sidebar: {
     width: '100%',
@@ -21,16 +24,31 @@ const styles = StyleSheet.create({
   menu: {
     height: 75,
     padding: '0 10px',
-  },
-  menuMobile: {
-    borderTop: '1px solid LightGray',
+
+    [media.mobile]: {
+      borderTop: '1px solid LightGray',
+    },
   },
   menuFull: {
     borderBottom: '1px solid LightGray',
   },
+
+  mobileTitle: {
+    height: mobTitleH,
+    borderBottom: '1px solid LightGray',
+    width: '100%',
+    display: 'grid',
+    gridTemplateColumns: '40px 1fr 40px',
+    alignItems: 'center',
+    justifyItems: 'center',
+  },
   content: {
     height: 'calc(100% - 75px)',
     overflowY: 'scroll',
+
+    [media.mobile]: {
+      height: `calc(100% - 75px - ${mobTitleH}px)`,
+    },
   },
 });
 
@@ -60,6 +78,11 @@ export default function Sidebar({ compact, panel, solid }: Props) {
     <MobileTracker
       renderMobile={() => (
         <section className={css(styles.sidebar, !compact && styles.full)}>
+          {/* FIXME title styling, padding... */}
+          <div className={css(styles.mobileTitle)}>
+            <IconLink iconOnly iconName="periodic-table" title="Table" to="/" />
+            {solid}
+          </div>
           <div className={css(styles.content)}>
             <Scene panel={panel} solid={solid} />
             {renderPanel(panel)}
