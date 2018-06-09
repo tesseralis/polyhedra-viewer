@@ -49,11 +49,14 @@ const styles = StyleSheet.create({
     position: 'relative',
 
     [media.mobile]: {
-      zIndex: 100,
-      opacity: 0.75,
-      backgroundColor: 'white',
       height: `calc(100% - ${menuH}px - ${mobTitleH}px)`,
     },
+  },
+
+  contentFull: {
+    opacity: 0.75,
+    zIndex: 100,
+    backgroundColor: 'white',
   },
 
   scene: {
@@ -97,7 +100,14 @@ export default function Sidebar({ compact, panel, solid }: Props) {
             <IconLink iconOnly iconName="periodic-table" title="Table" to="/" />
             {solid}
           </div>
-          <div className={css(styles.content)}>{renderPanel(panel)}</div>
+          <div
+            className={css(
+              styles.content,
+              panel !== 'full' && styles.contentFull,
+            )}
+          >
+            {renderPanel(panel)}
+          </div>
           <div className={css(styles.scene)}>
             <Scene panel={panel} solid={solid} />
           </div>
