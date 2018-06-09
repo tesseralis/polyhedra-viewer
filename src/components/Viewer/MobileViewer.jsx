@@ -13,14 +13,11 @@ import Scene from 'components/Viewer/Scene';
 const mobTitleH = 50;
 const menuH = 75;
 const styles = StyleSheet.create({
-  sidebar: {
+  viewer: {
     ...fullScreen,
     display: 'grid',
     gridTemplateRows: `${mobTitleH}px 1fr ${menuH}px`,
     gridTemplateAreas: '"title" "content" "menu"',
-  },
-  full: {
-    boxShadow: 'inset 1px -1px 4px LightGray',
   },
   menu: {
     gridArea: 'menu',
@@ -30,7 +27,7 @@ const styles = StyleSheet.create({
     borderTop: '1px solid LightGray',
   },
 
-  mobileTitle: {
+  title: {
     height: mobTitleH,
     borderBottom: '1px solid LightGray',
     width: '100%',
@@ -66,9 +63,9 @@ const styles = StyleSheet.create({
 interface Props {
   panel: string;
   solid: string;
-  compact?: boolean;
 }
 
+// FIXME dedupe with other sidebar
 function renderPanel(panel) {
   switch (panel) {
     case 'operations':
@@ -84,12 +81,12 @@ function renderPanel(panel) {
   }
 }
 
-export default function MobileViewer({ compact, panel, solid }: Props) {
+export default function MobileViewer({ panel, solid }: Props) {
   const panelNode = renderPanel(panel);
   return (
-    <section className={css(styles.sidebar, !compact && styles.full)}>
+    <section className={css(styles.viewer)}>
       {/* FIXME title styling, padding... */}
-      <div className={css(styles.mobileTitle)}>
+      <div className={css(styles.title)}>
         <IconLink iconOnly iconName="periodic-table" title="Table" to="/" />
         {solid}
       </div>
@@ -106,7 +103,7 @@ export default function MobileViewer({ compact, panel, solid }: Props) {
       <div className={css(styles.scene)}>
         <Scene panel={panel} solid={solid} />
       </div>
-      <div className={css(styles.menu, styles.menuMobile)}>
+      <div className={css(styles.menu)}>
         <Menu solid={solid} />
       </div>
     </section>

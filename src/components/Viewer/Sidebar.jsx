@@ -34,12 +34,6 @@ const styles = StyleSheet.create({
     overflowY: 'scroll',
     position: 'relative',
   },
-
-  contentFull: {
-    opacity: 0.75,
-    zIndex: 100,
-    backgroundColor: 'white',
-  },
 });
 
 interface Props {
