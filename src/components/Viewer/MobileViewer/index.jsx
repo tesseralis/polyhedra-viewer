@@ -2,7 +2,7 @@
 import React from 'react';
 import { css, StyleSheet } from 'aphrodite/no-important';
 
-import { fullScreen } from 'styles/common';
+import { scroll } from 'styles/common';
 import {
   IconLink,
   Title,
@@ -18,7 +18,10 @@ const mobTitleH = 60;
 const menuH = 75;
 const styles = StyleSheet.create({
   viewer: {
-    ...fullScreen,
+    // ...fullScreen,
+    position: 'absolute',
+    width: '100vw',
+    height: '100vh',
     display: 'grid',
     gridTemplateRows: `${mobTitleH}px 1fr ${menuH}px`,
     gridTemplateAreas: '"title" "content" "menu"',
@@ -42,8 +45,8 @@ const styles = StyleSheet.create({
     justifyItems: 'center',
   },
   content: {
+    ...scroll('y'),
     gridArea: 'content',
-    overflowY: 'scroll',
     position: 'relative',
     zIndex: 100,
   },

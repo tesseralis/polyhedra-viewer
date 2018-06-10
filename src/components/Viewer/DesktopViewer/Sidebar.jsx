@@ -3,6 +3,7 @@ import React from 'react';
 import { css, StyleSheet } from 'aphrodite/no-important';
 
 import { NavMenu, ConfigForm, PolyhedronList } from '../common';
+import { scroll } from 'styles/common';
 
 import OperationsPanel from './OperationsPanel';
 
@@ -29,8 +30,8 @@ const styles = StyleSheet.create({
   },
 
   content: {
+    ...scroll('y'),
     gridArea: 'content',
-    overflowY: 'scroll',
     position: 'relative',
   },
 });

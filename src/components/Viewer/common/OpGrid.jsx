@@ -14,7 +14,7 @@ import {
 import OperationIcon from './OperationIcon';
 
 import { verdana } from 'styles/fonts';
-import { hover } from 'styles/common';
+import { hover, scroll } from 'styles/common';
 
 const styles = StyleSheet.create({
   opGrid: {
@@ -33,10 +33,10 @@ const styles = StyleSheet.create({
     `,
     },
     [media.mobile]: {
+      ...scroll('x'),
       height: 100,
       display: 'flex',
       width: '100%',
-      overflowX: 'scroll',
     },
   },
 

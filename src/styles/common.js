@@ -47,3 +47,13 @@ export const resetButton = {
 export const resetLink = {
   textDecoration: 'none',
 };
+
+/* Mobile */
+export function scroll(direction?: 'x' | 'y') {
+  const prop = `overflow${(direction || '').toUpperCase()}`;
+  return {
+    [prop]: 'scroll',
+    // use momentum scrolling on mobile browsers
+    '-webkit-overflow-scrolling': 'touch',
+  };
+}
