@@ -61,6 +61,7 @@ class HitOptions extends PureComponent<*> {
     }
   };
 
+  // FIXME there's no "onMouseover" on mobile
   applyWithHitOption = () => {
     const { opName, options, applyOperation, setOption } = this.props;
     const hitOption = getHitOption(opName);

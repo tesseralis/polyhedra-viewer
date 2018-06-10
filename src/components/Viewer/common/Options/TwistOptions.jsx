@@ -3,6 +3,7 @@ import _ from 'lodash';
 import React from 'react';
 import { css, StyleSheet } from 'aphrodite/no-important';
 
+import * as media from 'styles/media';
 import connect from 'components/connect';
 import { Icon, SrOnly } from 'components/common';
 import { ApplyOperation, WithPolyhedron } from '../../context';
@@ -13,6 +14,10 @@ const styles = StyleSheet.create({
     pointerEvents: 'initial',
     margin: 50,
     background: 'none',
+
+    [media.mobile]: {
+      margin: 20,
+    },
   },
 
   twistOptions: {

@@ -17,13 +17,6 @@ import { verdana } from 'styles/fonts';
 import { hover } from 'styles/common';
 
 const styles = StyleSheet.create({
-  opPanel: {
-    height: '100%',
-    padding: '20px 10px',
-    display: 'flex',
-    flexDirection: 'column',
-  },
-
   opGrid: {
     display: 'grid',
     justifyContent: 'space-around',
@@ -37,13 +30,10 @@ const styles = StyleSheet.create({
       "elongate gyroelongate shorten  turn"
       "augment  augment      diminish gyrate"
     `,
-    [media.mobile]: {
-      height: 100,
-      gridTemplateRows: 'repeat(16, 80px)',
-      gridTemplateAreas: `
-      "truncate rectify      cumulate dual expand   snub         contract twist elongate gyroelongate shorten  turn augment  augment      diminish gyrate"
-      `,
-    },
+    // [media.mobile]: {
+    //   height: 100,
+    //   // gridTemplateRows: 'repeat(16, 80px)',
+    // },
   },
 
   operationButton: {

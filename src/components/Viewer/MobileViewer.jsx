@@ -63,6 +63,12 @@ const styles = StyleSheet.create({
     zIndex: 0,
     gridArea: 'content',
   },
+  options: {
+    zIndex: 1,
+    alignSelf: 'start',
+    pointerEvents: 'none',
+    gridArea: 'content',
+  },
 });
 
 interface Props {
@@ -107,8 +113,10 @@ export default function MobileViewer({ panel, solid }: Props) {
       )}
       <main className={css(styles.scene)}>
         <X3dScene />
-        <Options solid={solid} />
       </main>
+      <div className={css(styles.options)}>
+        <Options solid={solid} />
+      </div>
       <div className={css(styles.menu)}>
         <NavMenu solid={solid} />
       </div>
