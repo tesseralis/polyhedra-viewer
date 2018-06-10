@@ -8,7 +8,7 @@ import {
   Title,
   NavMenu,
   ConfigForm,
-  OperationsPanel,
+  OpGrid,
   PolyhedronList,
   X3dScene,
   Options,
@@ -74,7 +74,7 @@ interface Props {
 function renderPanel(panel) {
   switch (panel) {
     case 'operations':
-      return <OperationsPanel />;
+      return <OpGrid />;
     case 'options':
       return <ConfigForm />;
     case 'list':

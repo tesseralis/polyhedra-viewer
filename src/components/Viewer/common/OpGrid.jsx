@@ -6,21 +6,29 @@ import { css, StyleSheet } from 'aphrodite/no-important';
 import * as media from 'styles/media';
 import { getOpResults, operations } from 'polyhedra/operations';
 import connect from 'components/connect';
-import { ApplyOperation, WithOperation, WithPolyhedron } from '../../context';
+import {
+  ApplyOperation,
+  WithOperation,
+  WithPolyhedron,
+} from 'components/Viewer/context';
 import OperationIcon from './OperationIcon';
 
-import { verdana, andaleMono } from 'styles/fonts';
+import { verdana } from 'styles/fonts';
 import { hover } from 'styles/common';
 
 const styles = StyleSheet.create({
-  opGrid: {
+  opPanel: {
+    height: '100%',
     padding: '20px 10px',
+    display: 'flex',
+    flexDirection: 'column',
+  },
+
+  opGrid: {
     display: 'grid',
     justifyContent: 'space-around',
-    height: '100%',
     columnGap: 5,
     rowGap: 20,
-    overflowY: 'scroll',
     // TODO encode the ordering in the actual operation types
     gridTemplateRows: 'repeat(4, 80px)',
     gridTemplateAreas: `
@@ -28,13 +36,12 @@ const styles = StyleSheet.create({
       "expand   snub         contract twist"
       "elongate gyroelongate shorten  turn"
       "augment  augment      diminish gyrate"
-      "recenter recenter     resize   resize"
     `,
     [media.mobile]: {
       height: 100,
       gridTemplateRows: 'repeat(16, 80px)',
       gridTemplateAreas: `
-      "truncate rectify      cumulate dual expand   snub         contract twist elongate gyroelongate shorten  turn augment  augment      diminish gyrate recenter recenter     resize   resize"
+      "truncate rectify      cumulate dual expand   snub         contract twist elongate gyroelongate shorten  turn augment  augment      diminish gyrate"
       `,
     },
   },
@@ -62,17 +69,6 @@ const styles = StyleSheet.create({
   isHighlighted: {
     border: '2px DarkSlateGray solid',
   },
-
-  resetButton: {
-    alignSelf: 'end',
-    borderColor: 'LightGray',
-    height: 40,
-    marginTop: 10,
-    padding: 10,
-    fontSize: 14,
-    fontFamily: andaleMono,
-    ...hover,
-  },
 });
 
 function isEnabled(solid, operation) {
@@ -80,23 +76,16 @@ function isEnabled(solid, operation) {
 }
 
 // TODO this could probably use a test to make sure all the buttons are in the right places
-class OperationsPanel extends Component<*> {
+class OpGrid extends Component<*> {
   componentWillUnmount() {
     this.props.unsetOperation();
   }
 
   render() {
-    const {
-      isTransitioning,
-      solidName,
-      opName,
-      recenter,
-      resize,
-      selectOperation,
-    } = this.props;
+    const { isTransitioning, solidName, opName, selectOperation } = this.props;
 
     return (
-      <section className={css(styles.opGrid)}>
+      <div className={css(styles.opGrid)}>
         {operations.map(({ name }) => {
           return (
             <button
@@ -114,23 +103,7 @@ class OperationsPanel extends Component<*> {
             </button>
           );
         })}
-        <button
-          disabled={isTransitioning}
-          onClick={recenter}
-          style={{ gridArea: 'recenter' }}
-          className={css(styles.resetButton)}
-        >
-          Recenter
-        </button>
-        <button
-          disabled={isTransitioning}
-          onClick={resize}
-          style={{ gridArea: 'resize' }}
-          className={css(styles.resetButton)}
-        >
-          Resize
-        </button>
-      </section>
+      </div>
     );
   }
 }
@@ -138,7 +111,7 @@ class OperationsPanel extends Component<*> {
 export default _.flow([
   connect(
     WithPolyhedron,
-    ['solidName', 'resize', 'recenter', 'isTransitioning'],
+    ['solidName', 'isTransitioning'],
   ),
   connect(
     ApplyOperation,
@@ -148,4 +121,4 @@ export default _.flow([
     WithOperation,
     ['opName', 'unsetOperation'],
   ),
-])(OperationsPanel);
+])(OpGrid);

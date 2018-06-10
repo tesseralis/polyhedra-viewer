@@ -60,7 +60,7 @@ export default class AppPage {
   }
 
   expectOperation(operation: ?string) {
-    const actual = this.wrapper.find('OperationsPanel').prop('opName');
+    const actual = this.wrapper.find('OpGrid').prop('opName');
     expect(operation).toEqual(actual);
     return this;
   }

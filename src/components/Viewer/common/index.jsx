@@ -1,5 +1,6 @@
 // @flow
-export { default as OperationsPanel } from './OperationsPanel';
+export { default as OpGrid } from './OpGrid';
+export { default as ResizeButtons } from './ResizeButtons';
 export { default as Options } from './Options';
 export { default as PolyhedronList } from './PolyhedronList';
 export { default as X3dScene } from './X3dScene';
