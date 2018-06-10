@@ -15,10 +15,8 @@ const styles = StyleSheet.create({
     display: 'flex',
     alignItems: 'center',
     color: 'DimGray',
-    [media.mobilePortrait]: {
-      padding: 10,
-      flexDirection: 'column',
-    },
+    padding: 10,
+    flexDirection: 'column',
     [media.mobileLandscape]: {
       padding: 0,
       flexDirection: 'row',

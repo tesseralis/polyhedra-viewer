@@ -17,7 +17,7 @@ const styles = StyleSheet.create({
   },
 
   title: {
-    ...absolute('bottom', 'right'),
+    ...absolute('bottom', 'left'),
     pointerEvents: 'initial',
     padding: 36,
     textAlign: 'right',
@@ -25,6 +25,7 @@ const styles = StyleSheet.create({
 
   homeLink: {
     pointerEvents: 'initial',
+    paddingLeft: 10,
     ...absolute('top', 'left'),
   },
 
