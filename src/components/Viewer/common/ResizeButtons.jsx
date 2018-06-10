@@ -19,7 +19,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     borderColor: 'LightGray',
     height: 40,
-    marginTop: 10,
     padding: 10,
     fontSize: 14,
     fontFamily: andaleMono,

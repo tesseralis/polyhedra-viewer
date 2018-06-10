@@ -78,10 +78,6 @@ const styles = StyleSheet.create({
     gridArea: 'content',
     position: 'relative',
   },
-  wut: {
-    display: 'block',
-    height: '100%',
-  },
   options: {
     zIndex: 1,
     alignSelf: 'start',
@@ -130,9 +126,7 @@ export default function MobileViewer({ panel, solid }: Props) {
         </div>
       )}
       <main className={css(styles.scene)}>
-        <div className={css(styles.wut)}>
-          <X3dScene />
-        </div>
+        <X3dScene />
       </main>
       <div className={css(styles.menu)}>
         <NavMenu solid={solid} />

@@ -34,7 +34,7 @@ const styles = StyleSheet.create({
     },
     [media.mobile]: {
       ...scroll('x'),
-      height: 100,
+      height: 85,
       display: 'flex',
       width: '100%',
     },

@@ -3,14 +3,17 @@ import React from 'react';
 import { css, StyleSheet } from 'aphrodite/no-important';
 
 import { OpGrid, Options, ResizeButtons } from '../common';
+import * as media from 'styles/media';
 
 const styles = StyleSheet.create({
   opPanel: {
     height: '100%',
-    padding: '0 10px',
     display: 'flex',
     flexDirection: 'column',
     pointerEvents: 'none',
+    [media.mobilePortrait]: {
+      padding: 10,
+    },
   },
 
   resizeButtons: {

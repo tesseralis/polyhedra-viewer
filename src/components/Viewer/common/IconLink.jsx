@@ -36,6 +36,7 @@ const styles = StyleSheet.create({
       fontSize: 9,
     },
     [media.mobileLandscape]: {
+      marginTop: 0,
       paddingLeft: 5,
     },
   },
