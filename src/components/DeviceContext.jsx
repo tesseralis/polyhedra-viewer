@@ -2,15 +2,14 @@
 import _ from 'lodash';
 import React, { Component } from 'react';
 import EventListener from 'react-event-listener';
-
-const desktopWidth = 1024;
+import * as media from 'styles/media';
 
 // TODO maybe this should be "device context"
-const MobileContext = React.createContext({
-  width: desktopWidth,
+const DeviceContext = React.createContext({
+  width: media.desktopMinWidth,
 });
 
-export class MobileProvider extends Component<*, *> {
+export class DeviceProvider extends Component<*, *> {
   constructor(props: *) {
     super(props);
     this.state = {
@@ -20,10 +19,10 @@ export class MobileProvider extends Component<*, *> {
 
   render() {
     return (
-      <MobileContext.Provider value={this.state}>
+      <DeviceContext.Provider value={this.state}>
         <EventListener target="window" onResize={this.handleResize} />
         {this.props.children}
-      </MobileContext.Provider>
+      </DeviceContext.Provider>
     );
   }
 
@@ -36,8 +35,8 @@ export class MobileProvider extends Component<*, *> {
   };
 }
 
-function isMobile(width) {
-  return width <= 480;
+function isDevice(width) {
+  return width <= media.mobileMaxWidth;
 }
 
 interface Props {
@@ -45,13 +44,13 @@ interface Props {
   renderDesktop?: () => React$Node;
 }
 
-export default function MobileTracker({
+export function DeviceTracker({
   renderMobile = _.constant(null),
   renderDesktop = _.constant(null),
 }: Props) {
   return (
-    <MobileContext.Consumer>
-      {({ width }) => (isMobile(width) ? renderMobile() : renderDesktop())}
-    </MobileContext.Consumer>
+    <DeviceContext.Consumer>
+      {({ width }) => (isDevice(width) ? renderMobile() : renderDesktop())}
+    </DeviceContext.Consumer>
   );
 }

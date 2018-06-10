@@ -5,7 +5,7 @@ import { type RouterHistory } from 'react-router-dom';
 import { OperationProvider, PolyhedronProvider } from './context';
 import DesktopViewer from './DesktopViewer';
 import MobileViewer from './MobileViewer';
-import MobileTracker from 'components/MobileTracker';
+import { DeviceTracker } from 'components/DeviceContext';
 import SolidSync from './SolidSync';
 
 interface ViewerProps {
@@ -19,7 +19,7 @@ class Viewer extends PureComponent<*> {
     return (
       <Fragment>
         <SolidSync solid={solid} panel={panel} />
-        <MobileTracker
+        <DeviceTracker
           renderDesktop={() => <DesktopViewer solid={solid} panel={panel} />}
           renderMobile={() => <MobileViewer solid={solid} panel={panel} />}
         />

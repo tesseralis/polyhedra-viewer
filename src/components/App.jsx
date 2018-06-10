@@ -1,5 +1,5 @@
 // @flow
-import React from 'react';
+import React, { Fragment } from 'react';
 import { Route, Redirect } from 'react-router-dom';
 import 'what-input';
 
@@ -11,7 +11,7 @@ import PeriodicTable from './PeriodicTable';
 import Viewer from './Viewer';
 
 export default () => (
-  <div>
+  <Fragment>
     <Route exact path="/" component={PeriodicTable} />
     <Route
       exact
@@ -30,5 +30,5 @@ export default () => (
         />
       )}
     />
-  </div>
+  </Fragment>
 );

@@ -1,18 +1,18 @@
 // @flow
 import React from 'react';
 import { BrowserRouter } from 'react-router-dom';
-import { MobileProvider } from './MobileTracker';
+import { DeviceProvider } from './DeviceContext';
 import { ConfigProvider } from './ConfigContext';
 
 import App from './App';
 
 const Root = () => (
   <BrowserRouter>
-    <MobileProvider>
+    <DeviceProvider>
       <ConfigProvider>
         <App />
       </ConfigProvider>
-    </MobileProvider>
+    </DeviceProvider>
   </BrowserRouter>
 );
 
