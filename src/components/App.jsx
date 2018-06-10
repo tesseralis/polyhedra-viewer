@@ -9,9 +9,6 @@ import 'styles/reset.css';
 import 'styles/box-sizing.css';
 import 'styles/a11y.css';
 
-// import PeriodicTable from './PeriodicTable';
-// import Viewer from './Viewer';
-
 const Loading = () => <div>Loading...</div>;
 
 const PeriodicTable = Loadable({
