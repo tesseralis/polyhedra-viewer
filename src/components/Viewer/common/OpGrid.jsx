@@ -21,8 +21,8 @@ const styles = StyleSheet.create({
     [media.notMobile]: {
       display: 'grid',
       justifyContent: 'space-around',
-      columnGap: 5,
-      rowGap: 20,
+      gridColumnGap: 5,
+      gridRowGap: 20,
       // TODO encode the ordering in the actual operation types
       gridTemplateRows: 'repeat(4, 80px)',
       gridTemplateAreas: `

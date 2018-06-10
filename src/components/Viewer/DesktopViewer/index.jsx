@@ -2,18 +2,18 @@
 import React, { PureComponent } from 'react';
 import { css, StyleSheet } from 'aphrodite/no-important';
 
-import { fullScreen } from 'styles/common';
-
 import Sidebar from './Sidebar';
 import Overlay from './Overlay';
 import { X3dScene } from '../common';
 
 const styles = StyleSheet.create({
   viewer: {
-    ...fullScreen,
     // We have to use flex here because x3dom doesn't work well with grid
     display: 'flex',
+    position: 'fixed',
     width: '100%',
+    height: '100%',
+    overflow: 'hidden',
   },
   sidebarFull: {
     position: 'relative',
