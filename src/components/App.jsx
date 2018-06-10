@@ -9,6 +9,7 @@ import 'styles/reset.css';
 import 'styles/box-sizing.css';
 import 'styles/a11y.css';
 
+// TODO more interesting loading bar
 const Loading = () => <div>Loading...</div>;
 
 const PeriodicTable = Loadable({
