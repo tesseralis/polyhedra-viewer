@@ -7,7 +7,7 @@ import { absolute } from 'styles/common';
 import { unescapeName } from 'polyhedra/names';
 import IconLink from 'components/Viewer/IconLink';
 import Title from './Title';
-import Options from './Options';
+import Options from '../Options';
 
 const styles = StyleSheet.create({
   overlay: {

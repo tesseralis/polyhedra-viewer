@@ -5,7 +5,8 @@ import { css, StyleSheet } from 'aphrodite/no-important';
 import { fullScreen } from 'styles/common';
 
 import Sidebar from './Sidebar';
-import Scene from './Scene';
+import X3dScene from '../X3dScene';
+import Overlay from './Overlay';
 
 const styles = StyleSheet.create({
   viewer: {
@@ -26,6 +27,7 @@ const styles = StyleSheet.create({
   },
 
   scene: {
+    position: 'relative',
     width: 'calc(100% - 400px)',
     height: '100%',
     alignSelf: 'start',
@@ -42,7 +44,8 @@ export default class DesktopViewer extends PureComponent<*> {
     return (
       <div className={css(styles.viewer)}>
         <div className={css(styles.scene, full && styles.full)}>
-          <Scene panel={panel} solid={solid} />
+          <X3dScene />
+          <Overlay solid={solid} panel={panel} />
         </div>
         <div className={css(full ? styles.sidebarCompact : styles.sidebarFull)}>
           <Sidebar panel={panel} solid={solid} compact={full} />

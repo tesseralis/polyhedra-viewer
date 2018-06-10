@@ -22,13 +22,6 @@ export default function Menu({ solid, compact = false }: Props) {
   return (
     <nav className={css(styles.menu)}>
       <IconLink
-        to={`/${solid}/full`}
-        title="Full Screen"
-        iconName="cube-outline"
-        iconOnly={compact}
-        exact
-      />
-      <IconLink
         replace
         to={`/${solid}/list`}
         title="List"
@@ -48,6 +41,13 @@ export default function Menu({ solid, compact = false }: Props) {
         title="Operations"
         iconName="math-compass"
         iconOnly={compact}
+      />
+      <IconLink
+        to={`/${solid}/full`}
+        title="Full Screen"
+        iconName="cube-outline"
+        iconOnly={compact}
+        exact
       />
     </nav>
   );
