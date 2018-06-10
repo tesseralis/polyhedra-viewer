@@ -2,6 +2,7 @@
 import React from 'react';
 import { css, StyleSheet } from 'aphrodite/no-important';
 
+import * as media from 'styles/media';
 import { scroll } from 'styles/common';
 import {
   IconLink,
@@ -14,29 +15,38 @@ import {
 
 import OperationsPanel from './OperationsPanel';
 
-const mobTitleH = 60;
-const menuH = 75;
+function mobile(styles) {
+  return {
+    [media.mobileLandscape]: styles(45, 45),
+    [media.mobilePortrait]: styles(60, 75),
+  };
+}
 const styles = StyleSheet.create({
   viewer: {
-    // ...fullScreen,
-    position: 'absolute',
+    position: 'relative',
     width: '100vw',
     height: '100vh',
     display: 'grid',
-    gridTemplateRows: `${mobTitleH}px 1fr ${menuH}px`,
     gridTemplateAreas: '"title" "content" "menu"',
+    ...mobile((mobTitleH, menuH) => ({
+      gridTemplateRows: `${mobTitleH}px 1fr ${menuH}px`,
+    })),
   },
   menu: {
+    ...mobile((mobTitleH, menuH) => ({
+      height: menuH,
+    })),
     gridArea: 'menu',
-    height: menuH,
     padding: '5px 10px',
 
     borderTop: '1px solid LightGray',
   },
 
   title: {
+    ...mobile((mobTitleH, menuH) => ({
+      height: mobTitleH,
+    })),
     padding: '0 10px',
-    height: mobTitleH,
     borderBottom: '1px solid LightGray',
     width: '100%',
     display: 'grid',
@@ -52,8 +62,6 @@ const styles = StyleSheet.create({
   },
 
   operations: {
-    // height: 100,
-    // alignSelf: 'end',
     pointerEvents: 'none',
   },
 
@@ -63,8 +71,16 @@ const styles = StyleSheet.create({
   },
 
   scene: {
+    ...mobile((mobTitleH, menuH) => ({
+      height: `calc(100vh - ${menuH}px - ${mobTitleH}px)`,
+    })),
     zIndex: 0,
     gridArea: 'content',
+    position: 'relative',
+  },
+  wut: {
+    display: 'block',
+    height: '100%',
   },
   options: {
     zIndex: 1,
@@ -114,7 +130,9 @@ export default function MobileViewer({ panel, solid }: Props) {
         </div>
       )}
       <main className={css(styles.scene)}>
-        <X3dScene />
+        <div className={css(styles.wut)}>
+          <X3dScene />
+        </div>
       </main>
       <div className={css(styles.menu)}>
         <NavMenu solid={solid} />

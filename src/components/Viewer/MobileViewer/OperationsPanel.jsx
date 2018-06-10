@@ -20,7 +20,6 @@ const styles = StyleSheet.create({
   options: {
     marginTop: 10,
     marginBottom: 'auto',
-    pointerEvents: 'initial',
   },
 
   opGrid: {

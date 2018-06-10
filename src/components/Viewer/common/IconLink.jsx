@@ -13,23 +13,30 @@ const styles = StyleSheet.create({
   link: {
     ...resetLink,
     display: 'flex',
-    flexDirection: 'column',
     alignItems: 'center',
+    color: 'DimGray',
+    [media.mobilePortrait]: {
+      padding: 10,
+      flexDirection: 'column',
+    },
+    [media.mobileLandscape]: {
+      padding: 0,
+      flexDirection: 'row',
+    },
   },
   activeLink: {
     color: 'DarkSlateGray',
-  },
-  icon: {
-    padding: 10,
-    color: 'DimGray',
   },
   title: {
     marginTop: 5,
     fontSize: 12,
     fontFamily: verdana,
 
-    [media.mobile]: {
+    [media.mobilePortrait]: {
       fontSize: 9,
+    },
+    [media.mobileLandscape]: {
+      paddingLeft: 5,
     },
   },
 });
@@ -57,7 +64,7 @@ export default function IconLink({
         to={to}
         replace={replace}
         exact={exact}
-        className={css(styles.link, styles.icon)}
+        className={css(styles.link)}
         activeClassName={css(styles.activeLink)}
       >
         <Icon name={iconName} size={36} />

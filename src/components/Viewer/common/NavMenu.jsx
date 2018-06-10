@@ -10,6 +10,7 @@ const styles = StyleSheet.create({
     width: '100%',
     display: 'grid',
     gridTemplateColumns: '1fr 1fr 1fr 1fr',
+    justifyItems: 'center',
   },
 });
 
