@@ -8,7 +8,8 @@ import Menu from './Menu';
 import ConfigForm from './ConfigForm';
 import OperationsPanel from './OperationsPanel';
 import PolyhedronList from './PolyhedronList';
-import Scene from 'components/Viewer/Scene';
+import X3dScene from './X3dScene';
+import Options from './Options';
 
 const mobTitleH = 50;
 const menuH = 75;
@@ -100,9 +101,10 @@ export default function MobileViewer({ panel, solid }: Props) {
           {panelNode}
         </div>
       )}
-      <div className={css(styles.scene)}>
-        <Scene panel={panel} solid={solid} />
-      </div>
+      <main className={css(styles.scene)}>
+        <X3dScene />
+        <Options solid={solid} />
+      </main>
       <div className={css(styles.menu)}>
         <Menu solid={solid} />
       </div>

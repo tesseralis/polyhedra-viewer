@@ -1,10 +1,9 @@
 //@flow
 
-import React, { Fragment } from 'react';
+import React from 'react';
 import { css, StyleSheet } from 'aphrodite/no-important';
 
 import { absolute } from 'styles/common';
-import MobileTracker from 'components/MobileTracker';
 import { unescapeName } from 'polyhedra/names';
 import IconLink from 'components/Viewer/IconLink';
 import Title from './Title';
@@ -41,23 +40,12 @@ interface Props {
 export default function Overlay({ solid }: Props) {
   return (
     <div className={css(styles.overlay)}>
-      <MobileTracker
-        renderDesktop={() => (
-          <Fragment>
-            <div className={css(styles.homeLink)}>
-              <IconLink
-                iconName="periodic-table"
-                title="Table"
-                replace
-                to="/"
-              />
-            </div>
-            <div className={css(styles.title)}>
-              <Title name={unescapeName(solid)} />
-            </div>
-          </Fragment>
-        )}
-      />
+      <div className={css(styles.homeLink)}>
+        <IconLink iconName="periodic-table" title="Table" replace to="/" />
+      </div>
+      <div className={css(styles.title)}>
+        <Title name={unescapeName(solid)} />
+      </div>
       <Options solid={solid} />
     </div>
   );

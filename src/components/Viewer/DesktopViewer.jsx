@@ -10,6 +10,7 @@ import Scene from './Scene';
 const styles = StyleSheet.create({
   viewer: {
     ...fullScreen,
+    // We have to use flex here because x3dom doesn't work well with grid
     display: 'flex',
     width: '100%',
   },
@@ -26,6 +27,8 @@ const styles = StyleSheet.create({
 
   scene: {
     width: 'calc(100% - 400px)',
+    height: '100%',
+    alignSelf: 'start',
   },
   full: {
     width: '100%',
