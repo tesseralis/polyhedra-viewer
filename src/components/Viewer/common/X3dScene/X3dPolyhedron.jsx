@@ -58,7 +58,7 @@ interface PolyhedronState {
 
 class X3dPolyhedron extends Component<PolyhedronProps, PolyhedronState> {
   shape: *;
-  drag: boolean = false;
+  hitPnt: * = undefined;
 
   constructor(props: PolyhedronProps) {
     super(props);
@@ -132,19 +132,18 @@ class X3dPolyhedron extends Component<PolyhedronProps, PolyhedronState> {
     this.addEventListener('mouseout', this.handleMouseOut);
   };
 
-  handleMouseDown = () => {
+  handleMouseDown = (event: SyntheticX3DMouseEvent) => {
     // logic to ensure drags aren't registered as clicks
-    this.drag = false;
+    this.hitPnt = event.hitPnt;
   };
 
   handleMouseUp = (event: SyntheticX3DMouseEvent) => {
-    if (this.drag) return;
+    if (!_.isEqual(this.hitPnt, event.hitPnt)) return;
     this.props.onClick(event.hitPnt);
   };
 
-  // FIXME this still registers drags as clicks
   handleMouseMove = (event: SyntheticX3DMouseEvent) => {
-    this.drag = true;
+    this.hitPnt = event.hitPnt;
     this.props.onHover(event.hitPnt);
   };
 
