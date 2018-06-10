@@ -20,7 +20,6 @@ const styles = StyleSheet.create({
     ...absolute('bottom', 'right'),
     pointerEvents: 'initial',
     padding: 36,
-    maxWidth: '50%',
     textAlign: 'right',
   },
 

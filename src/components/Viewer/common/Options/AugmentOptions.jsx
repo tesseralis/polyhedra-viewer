@@ -28,6 +28,7 @@ const styles = StyleSheet.create({
     width: 72,
     height: 72,
     border: '1px LightGray solid',
+    backgroundColor: 'white',
     fontFamily: verdana,
   },
 

@@ -56,7 +56,7 @@ interface PolyhedronState {
   error?: Error;
 }
 
-class X3dPolyhedron extends Component<PolyhedronProps, PolyhedronState> {
+export class X3dPolyhedron extends Component<PolyhedronProps, PolyhedronState> {
   shape: *;
   hitPnt: * = undefined;
 
@@ -77,6 +77,7 @@ class X3dPolyhedron extends Component<PolyhedronProps, PolyhedronState> {
     }
     return (
       <Fragment>
+        <EventListener target="document" onLoad={_.once(this.handleLoad)} />
         {showFaces && (
           // NOTE: The mouse handlers are duplicated to make it easy to test on enzyme.
           // They don't actually do anything in production
@@ -87,7 +88,6 @@ class X3dPolyhedron extends Component<PolyhedronProps, PolyhedronState> {
             onMouseUp={this.handleMouseUp}
             onMouseOut={this.handleMouseOut}
           >
-            <EventListener target="document" onLoad={_.once(this.handleLoad)} />
             <appearance>
               <material transparency={1 - opacity} />
             </appearance>
