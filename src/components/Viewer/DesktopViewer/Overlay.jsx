@@ -4,9 +4,8 @@ import React from 'react';
 import { css, StyleSheet } from 'aphrodite/no-important';
 
 import { absolute } from 'styles/common';
-import { unescapeName } from 'polyhedra/names';
-import IconLink from 'components/Viewer/IconLink';
-import Title from './Title';
+import IconLink from '../IconLink';
+import Title from '../Title';
 import Options from '../Options';
 
 const styles = StyleSheet.create({
@@ -44,7 +43,7 @@ export default function Overlay({ solid }: Props) {
         <IconLink iconName="periodic-table" title="Table" replace to="/" />
       </div>
       <div className={css(styles.title)}>
-        <Title name={unescapeName(solid)} />
+        <Title name={solid} />
       </div>
       <Options solid={solid} />
     </div>

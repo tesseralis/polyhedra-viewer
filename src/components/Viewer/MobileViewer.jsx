@@ -3,7 +3,8 @@ import React from 'react';
 import { css, StyleSheet } from 'aphrodite/no-important';
 
 import { fullScreen } from 'styles/common';
-import IconLink from 'components/Viewer/IconLink';
+import IconLink from './IconLink';
+import Title from './Title';
 import Menu from './Menu';
 import ConfigForm from './ConfigForm';
 import OperationsPanel from './OperationsPanel';
@@ -11,7 +12,7 @@ import PolyhedronList from './PolyhedronList';
 import X3dScene from './X3dScene';
 import Options from './Options';
 
-const mobTitleH = 50;
+const mobTitleH = 60;
 const menuH = 75;
 const styles = StyleSheet.create({
   viewer: {
@@ -23,12 +24,13 @@ const styles = StyleSheet.create({
   menu: {
     gridArea: 'menu',
     height: menuH,
-    padding: '0 10px',
+    padding: '5px 10px',
 
     borderTop: '1px solid LightGray',
   },
 
   title: {
+    padding: '0 10px',
     height: mobTitleH,
     borderBottom: '1px solid LightGray',
     width: '100%',
@@ -89,7 +91,7 @@ export default function MobileViewer({ panel, solid }: Props) {
       {/* FIXME title styling, padding... */}
       <div className={css(styles.title)}>
         <IconLink iconOnly iconName="periodic-table" title="Table" to="/" />
-        {solid}
+        <Title name={solid} />
       </div>
       {panelNode && (
         <div
