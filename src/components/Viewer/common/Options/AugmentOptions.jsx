@@ -21,7 +21,6 @@ const styles = StyleSheet.create({
     display: 'flex',
     flexDirection: 'column',
     pointerEvents: 'initial',
-    margin: 20,
   },
 
   optionButton: {

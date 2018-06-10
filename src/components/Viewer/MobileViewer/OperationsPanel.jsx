@@ -14,6 +14,11 @@ const styles = StyleSheet.create({
   },
 
   resizeButtons: {
+    pointerEvents: 'initial',
+  },
+
+  options: {
+    marginTop: 10,
     marginBottom: 'auto',
     pointerEvents: 'initial',
   },
@@ -31,6 +36,8 @@ export default function OperationsPanel({ solid }: *) {
     <section className={css(styles.opPanel)}>
       <div className={css(styles.resizeButtons)}>
         <ResizeButtons />
+      </div>
+      <div className={css(styles.options)}>
         <Options solid={solid} />
       </div>
       <div className={css(styles.opGrid)}>

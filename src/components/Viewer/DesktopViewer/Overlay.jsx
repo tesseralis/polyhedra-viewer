@@ -28,6 +28,11 @@ const styles = StyleSheet.create({
     pointerEvents: 'initial',
     ...absolute('top', 'left'),
   },
+
+  options: {
+    margin: '0 50px',
+    height: '100%',
+  },
 });
 
 interface Props {
@@ -43,7 +48,9 @@ export default function Overlay({ solid }: Props) {
       <div className={css(styles.title)}>
         <Title name={solid} />
       </div>
-      <Options solid={solid} />
+      <div className={css(styles.options)}>
+        <Options solid={solid} />
+      </div>
     </div>
   );
 }
