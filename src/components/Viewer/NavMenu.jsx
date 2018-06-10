@@ -18,7 +18,7 @@ interface Props {
   compact?: boolean;
 }
 
-export default function Menu({ solid, compact = false }: Props) {
+export default function NavMenu({ solid, compact = false }: Props) {
   return (
     <nav className={css(styles.menu)}>
       <IconLink

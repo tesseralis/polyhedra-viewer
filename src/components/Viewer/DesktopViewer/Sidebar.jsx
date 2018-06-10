@@ -2,7 +2,7 @@
 import React from 'react';
 import { css, StyleSheet } from 'aphrodite/no-important';
 
-import Menu from '../Menu';
+import NavMenu from '../NavMenu';
 import ConfigForm from '../ConfigForm';
 import OperationsPanel from '../OperationsPanel';
 import PolyhedronList from '../PolyhedronList';
@@ -61,7 +61,7 @@ export default function Sidebar({ compact, panel, solid }: Props) {
   return (
     <section className={css(styles.sidebar, !compact && styles.full)}>
       <div className={css(styles.menu, !compact && styles.menuFull)}>
-        <Menu solid={solid} compact={!!compact} />
+        <NavMenu solid={solid} compact={!!compact} />
       </div>
       {!compact && (
         <div className={css(styles.content)}>{renderPanel(panel)}</div>

@@ -5,7 +5,7 @@ import { css, StyleSheet } from 'aphrodite/no-important';
 import { fullScreen } from 'styles/common';
 import IconLink from './IconLink';
 import Title from './Title';
-import Menu from './Menu';
+import NavMenu from './NavMenu';
 import ConfigForm from './ConfigForm';
 import OperationsPanel from './OperationsPanel';
 import PolyhedronList from './PolyhedronList';
@@ -108,7 +108,7 @@ export default function MobileViewer({ panel, solid }: Props) {
         <Options solid={solid} />
       </main>
       <div className={css(styles.menu)}>
-        <Menu solid={solid} />
+        <NavMenu solid={solid} />
       </div>
     </section>
   );
