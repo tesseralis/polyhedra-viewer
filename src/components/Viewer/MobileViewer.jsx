@@ -3,14 +3,16 @@ import React from 'react';
 import { css, StyleSheet } from 'aphrodite/no-important';
 
 import { fullScreen } from 'styles/common';
-import IconLink from './IconLink';
-import Title from './Title';
-import NavMenu from './NavMenu';
-import ConfigForm from './ConfigForm';
-import OperationsPanel from './OperationsPanel';
-import PolyhedronList from './PolyhedronList';
-import X3dScene from './X3dScene';
-import Options from './Options';
+import {
+  IconLink,
+  Title,
+  NavMenu,
+  ConfigForm,
+  OperationsPanel,
+  PolyhedronList,
+  X3dScene,
+  Options,
+} from './common';
 
 const mobTitleH = 60;
 const menuH = 75;

@@ -4,8 +4,8 @@ import { Component } from 'react';
 import { operations, type OpName } from 'math/operations';
 import { applyOperation, hasOptions } from 'polyhedra/operations';
 import connect from 'components/connect';
-import { WithPolyhedron } from 'components/Viewer/PolyhedronContext';
-import { WithOperation } from 'components/Viewer/OperationContext';
+import { WithPolyhedron } from './PolyhedronContext';
+import { WithOperation } from './OperationContext';
 
 // TODO possibly move this as part of the operation definition
 class ApplyOperation extends Component<*> {

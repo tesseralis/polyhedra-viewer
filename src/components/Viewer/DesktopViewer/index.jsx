@@ -5,8 +5,8 @@ import { css, StyleSheet } from 'aphrodite/no-important';
 import { fullScreen } from 'styles/common';
 
 import Sidebar from './Sidebar';
-import X3dScene from '../X3dScene';
 import Overlay from './Overlay';
+import { X3dScene } from '../common';
 
 const styles = StyleSheet.create({
   viewer: {

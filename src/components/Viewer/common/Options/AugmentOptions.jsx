@@ -3,7 +3,7 @@ import React from 'react';
 import { css, StyleSheet } from 'aphrodite/no-important';
 import { getUsingOpts } from 'polyhedra/operations';
 
-import { WithOperation } from 'components/Viewer/OperationContext';
+import { WithOperation } from 'components/Viewer/context';
 import OptionIcon from './OptionIcon';
 import { verdana } from 'styles/fonts';
 import { hover } from 'styles/common';

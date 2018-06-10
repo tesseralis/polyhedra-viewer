@@ -1,7 +1,7 @@
 // @flow strict
 import { Component } from 'react';
 import connect from 'components/connect';
-import { WithPolyhedron } from './PolyhedronContext';
+import { WithPolyhedron } from './context';
 
 class SolidSync extends Component<*> {
   constructor(props: *) {

@@ -5,8 +5,7 @@ import { css, StyleSheet } from 'aphrodite/no-important';
 
 import connect from 'components/connect';
 import { Icon, SrOnly } from 'components/common';
-import { WithPolyhedron } from 'components/Viewer/PolyhedronContext';
-import ApplyOperation from 'components/Viewer/ApplyOperation';
+import { ApplyOperation, WithPolyhedron } from '../../context';
 
 const styles = StyleSheet.create({
   twistOption: {

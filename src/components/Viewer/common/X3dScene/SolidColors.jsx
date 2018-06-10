@@ -4,8 +4,7 @@ import { PureComponent } from 'react';
 import tinycolor from 'tinycolor2';
 import connect from 'components/connect';
 import { WithConfig } from 'components/ConfigContext';
-import { WithPolyhedron } from 'components/Viewer/PolyhedronContext';
-import { WithOperation } from 'components/Viewer/OperationContext';
+import { WithPolyhedron, WithOperation } from '../../context';
 
 function toRgb(hex: string) {
   const { r, g, b } = tinycolor(hex).toRgb();

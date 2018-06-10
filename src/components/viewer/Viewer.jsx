@@ -2,8 +2,7 @@
 import React, { PureComponent, Fragment } from 'react';
 import { type RouterHistory } from 'react-router-dom';
 
-import { OperationProvider } from './OperationContext';
-import { PolyhedronProvider } from './PolyhedronContext';
+import { OperationProvider, PolyhedronProvider } from './context';
 import DesktopViewer from './DesktopViewer';
 import MobileViewer from './MobileViewer';
 import MobileTracker from 'components/MobileTracker';

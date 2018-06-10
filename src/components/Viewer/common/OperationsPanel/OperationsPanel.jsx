@@ -6,9 +6,7 @@ import { css, StyleSheet } from 'aphrodite/no-important';
 import * as media from 'styles/media';
 import { getOpResults, operations } from 'polyhedra/operations';
 import connect from 'components/connect';
-import ApplyOperation from 'components/Viewer/ApplyOperation';
-import { WithOperation } from 'components/Viewer/OperationContext';
-import { WithPolyhedron } from 'components/Viewer/PolyhedronContext';
+import { ApplyOperation, WithOperation, WithPolyhedron } from '../../context';
 import OperationIcon from './OperationIcon';
 
 import { verdana, andaleMono } from 'styles/fonts';

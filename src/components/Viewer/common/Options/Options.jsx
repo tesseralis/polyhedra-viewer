@@ -2,7 +2,7 @@
 import React, { Fragment } from 'react';
 import _ from 'lodash';
 
-import { WithOperation } from 'components/Viewer/OperationContext';
+import { WithOperation } from 'components/Viewer/context';
 import connect from 'components/connect';
 import TwistOptions from './TwistOptions';
 import AugmentOptions from './AugmentOptions';

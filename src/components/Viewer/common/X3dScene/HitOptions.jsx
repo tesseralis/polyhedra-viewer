@@ -5,9 +5,7 @@ import { PureComponent } from 'react';
 import type { Point } from 'types';
 import { type OpName } from 'polyhedra/operations';
 import connect from 'components/connect';
-import { WithPolyhedron } from 'components/Viewer/PolyhedronContext';
-import { WithOperation } from 'components/Viewer/OperationContext';
-import ApplyOperation from 'components/Viewer/ApplyOperation';
+import { WithPolyhedron, WithOperation, ApplyOperation } from '../../context';
 
 // TODO define this property in the operation
 function getHitOption(opName: OpName) {

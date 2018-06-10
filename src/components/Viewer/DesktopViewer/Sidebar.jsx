@@ -2,10 +2,12 @@
 import React from 'react';
 import { css, StyleSheet } from 'aphrodite/no-important';
 
-import NavMenu from '../NavMenu';
-import ConfigForm from '../ConfigForm';
-import OperationsPanel from '../OperationsPanel';
-import PolyhedronList from '../PolyhedronList';
+import {
+  NavMenu,
+  ConfigForm,
+  OperationsPanel,
+  PolyhedronList,
+} from '../common';
 
 const menuH = 75;
 const styles = StyleSheet.create({

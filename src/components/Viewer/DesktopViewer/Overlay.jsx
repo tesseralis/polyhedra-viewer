@@ -4,9 +4,7 @@ import React from 'react';
 import { css, StyleSheet } from 'aphrodite/no-important';
 
 import { absolute } from 'styles/common';
-import IconLink from '../IconLink';
-import Title from '../Title';
-import Options from '../Options';
+import { IconLink, Title, Options } from '../common';
 
 const styles = StyleSheet.create({
   overlay: {

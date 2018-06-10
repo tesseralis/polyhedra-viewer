@@ -7,7 +7,7 @@ import { type Point } from 'types';
 import { SolidData } from 'math/polyhedra';
 import connect from 'components/connect';
 import { WithConfig } from 'components/ConfigContext';
-import { WithPolyhedron } from 'components/Viewer/PolyhedronContext';
+import { WithPolyhedron } from '../../context';
 import SolidColors from './SolidColors';
 import HitOptions from './HitOptions';
 
