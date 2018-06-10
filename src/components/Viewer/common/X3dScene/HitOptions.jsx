@@ -69,8 +69,9 @@ class HitOptions extends PureComponent<*> {
       options,
       applyOperation,
       setOption,
+      isTransitioning,
     } = this.props;
-    if (!operation) return;
+    if (!operation || isTransitioning) return;
     const hitOption = getHitOption(opName);
     const newHitOptions = operation.getHitOption(polyhedron, hitPnt, options);
     const newValue = newHitOptions[hitOption];

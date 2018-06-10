@@ -53,5 +53,5 @@ class ResizeButtons extends Component<*> {
 
 export default connect(
   WithPolyhedron,
-  ['resize', 'recenter'],
+  { resize: 'resize', recenter: 'recenter', disabled: 'isTransitioning' },
 )(ResizeButtons);

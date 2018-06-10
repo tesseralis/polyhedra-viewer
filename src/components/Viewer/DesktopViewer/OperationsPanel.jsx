@@ -17,7 +17,6 @@ const styles = StyleSheet.create({
   },
 });
 
-// FIXME disable on transition
 export default class OperationsPanel extends Component<*> {
   render() {
     return (

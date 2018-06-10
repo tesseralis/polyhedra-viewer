@@ -79,7 +79,7 @@ interface Props {
   solid: string;
 }
 
-// FIXME dedupe with other sidebar
+// TODO dedupe with other sidebar
 function renderPanel(panel, solid) {
   switch (panel) {
     case 'operations':
@@ -116,9 +116,6 @@ export default function MobileViewer({ panel, solid }: Props) {
       <main className={css(styles.scene)}>
         <X3dScene />
       </main>
-      <div className={css(styles.options)}>
-        {/* FIXME better to put options in the "content" of the op panel */}
-      </div>
       <div className={css(styles.menu)}>
         <NavMenu solid={solid} />
       </div>

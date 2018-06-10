@@ -30,7 +30,6 @@ const styles = StyleSheet.create({
   },
 });
 
-// FIXME disable on transition
 export default function OperationsPanel({ solid }: *) {
   return (
     <section className={css(styles.opPanel)}>
