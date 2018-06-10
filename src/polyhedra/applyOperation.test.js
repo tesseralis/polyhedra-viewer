@@ -122,6 +122,25 @@ describe('applyOperation', () => {
           ['contract', 'tetrahedron'],
         ],
       },
+      {
+        description: 'truncation and rectification',
+        start: 'tetrahedron',
+        operations: [
+          ['truncate', 'truncated-tetrahedron'],
+          ['cumulate', 'tetrahedron'],
+          ['rectify', 'octahedron'],
+          ['rectify', 'cuboctahedron'],
+          ['truncate', 'truncated-cuboctahedron'],
+          ['cumulate', 'cuboctahedron'],
+          { op: 'cumulate', args: { faceType: 3 }, expected: 'cube' },
+          ['truncate', 'truncated-cube'],
+          {
+            op: 'augment',
+            args: { n: 8 },
+            expected: 'augmented-truncated-cube',
+          },
+        ],
+      },
     ];
 
     function getArgs(args, polyhedron) {

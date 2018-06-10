@@ -20,6 +20,7 @@ describe('viewer', () => {
     setup();
   });
 
+  // TODO probably want to do all these basic ops on mobile as well
   it('resets the operation when unset', () => {
     setup('/triangular-cupola/operations');
     appPage
@@ -103,7 +104,7 @@ describe('viewer', () => {
       .clickButtonWithText('augment');
   });
 
-  it('can triaugment a triangular prism', () => {
+  it('can augment triangular prism with pyramid and cupola', () => {
     setup('/triangular-prism/operations');
     appPage
       // test gyrobifastigium
@@ -127,6 +128,7 @@ describe('viewer', () => {
 
   it('can go through a simple rhombicosadodecahedron workflow', () => {
     setup('/tridiminished-rhombicosidodecahedron/operations');
+    // make sure we can augment multiple times without resetting operation
     appPage
       .clickButtonWithText('augment')
       .clickButtonWithText('ortho')
@@ -138,27 +140,6 @@ describe('viewer', () => {
       .clickButtonWithText('ortho')
       .clickFaceWithNumSides(10)
       .expectTransitionTo('trigyrate-rhombicosidodecahedron');
-  });
-
-  it('can go through a truncation and rectification workflow', () => {
-    setup('/tetrahedron/operations');
-    appPage
-      .clickButtonWithText('truncate')
-      .expectTransitionTo('truncated-tetrahedron')
-      .clickButtonWithText('cumulate')
-      .expectTransitionTo('tetrahedron')
-      .clickButtonWithText('rectify')
-      .expectTransitionTo('octahedron')
-      .clickButtonWithText('rectify')
-      .expectTransitionTo('cuboctahedron')
-      .clickButtonWithText('cumulate')
-      .clickFaceWithNumSides(3)
-      .expectTransitionTo('cube')
-      .clickButtonWithText('truncate')
-      .expectTransitionTo('truncated-cube')
-      .clickButtonWithText('augment')
-      .clickFaceWithNumSides(8)
-      .expectTransitionTo('augmented-truncated-cube');
   });
 
   it('can go through an expansion workflow', () => {
