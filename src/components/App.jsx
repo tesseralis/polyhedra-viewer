@@ -1,17 +1,31 @@
 // @flow
-import React, { Fragment } from 'react';
-import { Route, Redirect } from 'react-router-dom';
+import React from 'react';
+import { Route, Redirect, Switch } from 'react-router-dom';
+import Loadable from 'react-loadable';
+
 import 'what-input';
 
 import 'styles/reset.css';
 import 'styles/box-sizing.css';
 import 'styles/a11y.css';
 
-import PeriodicTable from './PeriodicTable';
-import Viewer from './Viewer';
+// import PeriodicTable from './PeriodicTable';
+// import Viewer from './Viewer';
+
+const Loading = () => <div>Loading...</div>;
+
+const PeriodicTable = Loadable({
+  loader: () => import('./PeriodicTable'),
+  loading: Loading,
+});
+
+const Viewer = Loadable({
+  loader: () => import('./Viewer'),
+  loading: Loading,
+});
 
 export default () => (
-  <Fragment>
+  <Switch>
     <Route exact path="/" component={PeriodicTable} />
     <Route
       exact
@@ -30,5 +44,5 @@ export default () => (
         />
       )}
     />
-  </Fragment>
+  </Switch>
 );

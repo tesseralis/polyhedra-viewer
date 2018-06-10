@@ -22,6 +22,7 @@
     "react": "^16.4.0",
     "react-dom": "^16.4.0",
     "react-event-listener": "^0.5.9",
+    "react-loadable": "^5.4.0",
     "react-router-dom": "^4.2.2",
     "tinycolor2": "^1.4.1",
     "toxiclibsjs": "^0.3.3",
