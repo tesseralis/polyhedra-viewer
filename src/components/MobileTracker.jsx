@@ -3,9 +3,11 @@ import _ from 'lodash';
 import React, { Component } from 'react';
 import EventListener from 'react-event-listener';
 
+const desktopWidth = 1024;
+
 // TODO maybe this should be "device context"
 const MobileContext = React.createContext({
-  width: 0,
+  width: desktopWidth,
 });
 
 export class MobileProvider extends Component<*, *> {

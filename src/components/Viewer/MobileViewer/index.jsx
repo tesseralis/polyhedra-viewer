@@ -8,11 +8,11 @@ import {
   Title,
   NavMenu,
   ConfigForm,
-  OpGrid,
   PolyhedronList,
   X3dScene,
-  Options,
-} from './common';
+} from '../common';
+
+import OperationsPanel from './OperationsPanel';
 
 const mobTitleH = 60;
 const menuH = 75;
@@ -45,17 +45,17 @@ const styles = StyleSheet.create({
     gridArea: 'content',
     overflowY: 'scroll',
     position: 'relative',
+    zIndex: 100,
   },
 
   operations: {
-    zIndex: 100,
-    height: 100,
-    alignSelf: 'end',
+    // height: 100,
+    // alignSelf: 'end',
+    pointerEvents: 'none',
   },
 
   contentFull: {
     opacity: 0.75,
-    zIndex: 100,
     backgroundColor: 'white',
   },
 
@@ -77,10 +77,10 @@ interface Props {
 }
 
 // FIXME dedupe with other sidebar
-function renderPanel(panel) {
+function renderPanel(panel, solid) {
   switch (panel) {
     case 'operations':
-      return <OpGrid />;
+      return <OperationsPanel solid={solid} />;
     case 'options':
       return <ConfigForm />;
     case 'list':
@@ -93,10 +93,9 @@ function renderPanel(panel) {
 }
 
 export default function MobileViewer({ panel, solid }: Props) {
-  const panelNode = renderPanel(panel);
+  const panelNode = renderPanel(panel, solid);
   return (
     <section className={css(styles.viewer)}>
-      {/* FIXME title styling, padding... */}
       <div className={css(styles.title)}>
         <IconLink iconOnly iconName="periodic-table" title="Table" to="/" />
         <Title name={solid} />
@@ -115,7 +114,7 @@ export default function MobileViewer({ panel, solid }: Props) {
         <X3dScene />
       </main>
       <div className={css(styles.options)}>
-        <Options solid={solid} />
+        {/* FIXME better to put options in the "content" of the op panel */}
       </div>
       <div className={css(styles.menu)}>
         <NavMenu solid={solid} />

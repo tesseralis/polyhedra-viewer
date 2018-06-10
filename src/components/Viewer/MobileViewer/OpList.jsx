@@ -3,7 +3,6 @@ import _ from 'lodash';
 import React, { Component } from 'react';
 import { css, StyleSheet } from 'aphrodite/no-important';
 
-import * as media from 'styles/media';
 import { getOpResults, operations } from 'polyhedra/operations';
 import connect from 'components/connect';
 import {
@@ -11,32 +10,21 @@ import {
   WithOperation,
   WithPolyhedron,
 } from 'components/Viewer/context';
-import OperationIcon from './OperationIcon';
+import OperationIcon from 'components/Viewer/common/OperationIcon';
 
 import { verdana } from 'styles/fonts';
 import { hover } from 'styles/common';
 
 const styles = StyleSheet.create({
-  opGrid: {
-    display: 'grid',
-    justifyContent: 'space-around',
-    columnGap: 5,
-    rowGap: 20,
-    // TODO encode the ordering in the actual operation types
-    gridTemplateRows: 'repeat(4, 80px)',
-    gridTemplateAreas: `
-      "truncate rectify      cumulate dual"
-      "expand   snub         contract twist"
-      "elongate gyroelongate shorten  turn"
-      "augment  augment      diminish gyrate"
-    `,
-    [media.mobile]: {
-      height: 100,
-      gridTemplateRows: 'repeat(16, 80px)',
-    },
+  opList: {
+    height: 100,
+    display: 'flex',
+    width: '100%',
+    overflowX: 'scroll',
   },
 
   operationButton: {
+    marginRight: 10,
     fontFamily: verdana,
     fontSize: 12,
     width: 84,
@@ -66,7 +54,7 @@ function isEnabled(solid, operation) {
 }
 
 // TODO this could probably use a test to make sure all the buttons are in the right places
-class OpGrid extends Component<*> {
+class OpList extends Component<*> {
   componentWillUnmount() {
     this.props.unsetOperation();
   }
@@ -75,7 +63,7 @@ class OpGrid extends Component<*> {
     const { isTransitioning, solidName, opName, selectOperation } = this.props;
 
     return (
-      <div className={css(styles.opGrid)}>
+      <div className={css(styles.opList)}>
         {operations.map(({ name }) => {
           return (
             <button
@@ -111,4 +99,4 @@ export default _.flow([
     WithOperation,
     ['opName', 'unsetOperation'],
   ),
-])(OpGrid);
+])(OpList);
