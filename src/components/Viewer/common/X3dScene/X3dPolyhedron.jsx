@@ -142,6 +142,7 @@ class X3dPolyhedron extends Component<PolyhedronProps, PolyhedronState> {
     this.props.onClick(event.hitPnt);
   };
 
+  // FIXME this still registers drags as clicks
   handleMouseMove = (event: SyntheticX3DMouseEvent) => {
     this.drag = true;
     this.props.onHover(event.hitPnt);
