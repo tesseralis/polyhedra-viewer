@@ -18,21 +18,25 @@ import { hover } from 'styles/common';
 
 const styles = StyleSheet.create({
   opGrid: {
-    display: 'grid',
-    justifyContent: 'space-around',
-    columnGap: 5,
-    rowGap: 20,
-    // TODO encode the ordering in the actual operation types
-    gridTemplateRows: 'repeat(4, 80px)',
-    gridTemplateAreas: `
+    [media.notMobile]: {
+      display: 'grid',
+      justifyContent: 'space-around',
+      columnGap: 5,
+      rowGap: 20,
+      // TODO encode the ordering in the actual operation types
+      gridTemplateRows: 'repeat(4, 80px)',
+      gridTemplateAreas: `
       "truncate rectify      cumulate dual"
       "expand   snub         contract twist"
       "elongate gyroelongate shorten  turn"
       "augment  augment      diminish gyrate"
     `,
+    },
     [media.mobile]: {
       height: 100,
-      gridTemplateRows: 'repeat(16, 80px)',
+      display: 'flex',
+      width: '100%',
+      overflowX: 'scroll',
     },
   },
 
@@ -54,6 +58,10 @@ const styles = StyleSheet.create({
     },
 
     ...hover,
+
+    [media.mobile]: {
+      margin: '0 8px',
+    },
   },
 
   isHighlighted: {

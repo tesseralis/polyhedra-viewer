@@ -2,8 +2,7 @@
 import React from 'react';
 import { css, StyleSheet } from 'aphrodite/no-important';
 
-import { Options, ResizeButtons } from '../common';
-import OpList from './OpList';
+import { OpGrid, Options, ResizeButtons } from '../common';
 
 const styles = StyleSheet.create({
   opPanel: {
@@ -35,7 +34,7 @@ export default function OperationsPanel({ solid }: *) {
         <Options solid={solid} />
       </div>
       <div className={css(styles.opGrid)}>
-        <OpList />
+        <OpGrid />
       </div>
     </section>
   );
