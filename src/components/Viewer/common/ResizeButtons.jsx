@@ -17,7 +17,7 @@ const styles = StyleSheet.create({
   resetButton: {
     alignSelf: 'end',
     backgroundColor: 'white',
-    borderColor: 'LightGray',
+    border: '1px LightGray solid',
     height: 40,
     padding: 10,
     fontSize: 14,
