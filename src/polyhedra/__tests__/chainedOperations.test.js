@@ -1,0 +1,93 @@
+import { Polyhedron } from 'math/polyhedra';
+import { applyOperation } from '../operations';
+import { operations } from 'math/operations';
+import { setupOperations } from '../operationTestUtils';
+
+setupOperations();
+
+describe('chained tests', () => {
+  const tests = [
+    {
+      description: 'combining twist and turn operations',
+      start: 'elongated-pentagonal-bipyramid',
+      operations: [
+        ['turn', 'icosahedron'],
+        ['twist', 'cuboctahedron'],
+        ['twist', 'icosahedron'],
+        ['turn', 'elongated-pentagonal-bipyramid'],
+      ],
+    },
+    {
+      description: 'augmenting and contracting icosahedron',
+      start: 'gyroelongated-pentagonal-pyramid',
+      operations: [
+        { op: 'augment', args: { n: 5 }, expected: 'icosahedron' },
+        ['contract', 'tetrahedron'],
+      ],
+    },
+    {
+      description: 'dodecahedron -> rectify -> cumulate -> contract',
+      start: 'dodecahedron',
+      operations: [
+        ['rectify', 'icosidodecahedron'],
+        { op: 'cumulate', args: { faceType: 5 }, expected: 'icosahedron' },
+        ['contract', 'tetrahedron'],
+      ],
+    },
+    {
+      description: 'truncation and rectification',
+      start: 'tetrahedron',
+      operations: [
+        ['truncate', 'truncated-tetrahedron'],
+        ['cumulate', 'tetrahedron'],
+        ['rectify', 'octahedron'],
+        ['rectify', 'cuboctahedron'],
+        ['truncate', 'truncated-cuboctahedron'],
+        ['cumulate', 'cuboctahedron'],
+        { op: 'cumulate', args: { faceType: 3 }, expected: 'cube' },
+        ['truncate', 'truncated-cube'],
+        {
+          op: 'augment',
+          args: { n: 8 },
+          expected: 'augmented-truncated-cube',
+        },
+      ],
+    },
+  ];
+
+  function getArgs(args, polyhedron) {
+    if (args.n) {
+      return { face: polyhedron.faceWithNumSides(args.n) };
+    }
+    return args;
+  }
+
+  function getOpInfo(opInfo, polyhedron) {
+    if (Array.isArray(opInfo)) {
+      return { op: operations[opInfo[0]], expected: opInfo[1] };
+    }
+    const { op, args, expected } = opInfo;
+    return {
+      op: operations[op],
+      expected,
+      args: getArgs(args, polyhedron),
+    };
+  }
+
+  tests.forEach(test => {
+    const { start, description, operations } = test;
+    let polyhedron = Polyhedron.get(start);
+    let solidName = start;
+    it(description, () => {
+      operations.forEach(opInfo => {
+        const { op, args, expected } = getOpInfo(opInfo, polyhedron);
+        const result = applyOperation(op, solidName, polyhedron, args);
+        expect(result).toBeValidPolyhedron();
+        expect(result.name).toBe(expected);
+
+        polyhedron = result.result;
+        solidName = result.name;
+      });
+    });
+  });
+});
