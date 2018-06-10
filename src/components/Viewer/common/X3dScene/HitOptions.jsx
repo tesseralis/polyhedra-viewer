@@ -62,14 +62,24 @@ class HitOptions extends PureComponent<*> {
   };
 
   // FIXME there's no "onMouseover" on mobile
-  applyWithHitOption = () => {
-    const { opName, options, applyOperation, setOption } = this.props;
+  applyWithHitOption = (hitPnt: Point) => {
+    const {
+      operation,
+      polyhedron,
+      opName,
+      options,
+      applyOperation,
+      setOption,
+    } = this.props;
+    if (!operation) return;
     const hitOption = getHitOption(opName);
+    const newHitOptions = operation.getHitOption(polyhedron, hitPnt, options);
+    const newValue = newHitOptions[hitOption];
     // only apply operation if we have a hit
-    if (options[hitOption] !== undefined) {
-      applyOperation(opName, options, result => {
+    if (options && newValue) {
+      applyOperation(opName, { ...options, [hitOption]: newValue }, result => {
         if (hitOption === 'peak') {
-          setOption('peak', options[hitOption].withPolyhedron(result));
+          setOption('peak', newValue.withPolyhedron(result));
         }
       });
     }

@@ -42,7 +42,7 @@ export default class AppPage {
       .filterWhere(n => !!n.prop('onMouseMove'));
     shape.simulate('mousemove', { hitPnt });
     shape.simulate('mousedown');
-    shape.simulate('mouseup');
+    shape.simulate('mouseup', { hitPnt });
     return this;
   }
 
