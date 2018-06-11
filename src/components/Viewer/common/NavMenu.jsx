@@ -44,6 +44,7 @@ export default function NavMenu({ solid, compact = false }: Props) {
         iconOnly={compact}
       />
       <IconLink
+        replace
         to={`/${solid}/full`}
         title="Full Screen"
         iconName="cube-outline"
