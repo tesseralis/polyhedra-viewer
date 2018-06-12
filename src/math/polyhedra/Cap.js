@@ -10,7 +10,7 @@ import Vertex, { VertexList } from './Vertex';
 import Edge from './Edge';
 import VEList from './VEList';
 
-type PeakType = 'pyramid' | 'cupola' | 'rotunda' | 'fastigium' | 'prism';
+type CapType = 'pyramid' | 'cupola' | 'rotunda' | 'fastigium' | 'prism';
 type FaceConfiguration = { [string]: number };
 
 // Find the boundary of a connected set of faces
@@ -45,24 +45,24 @@ const withMapper = property => Base =>
       const mapper = _.get(polyhedron, property);
       return (typeof mapper === 'function' ? mapper() : mapper)
         .map(arg => new Base(polyhedron, arg))
-        .filter(peak => peak.isValid());
+        .filter(cap => cap.isValid());
     }
   };
 
-export default class Peak implements VertexList {
+export default class Cap implements VertexList {
   polyhedron: Polyhedron;
   _innerVertices: Vertex[];
-  type: PeakType;
+  type: CapType;
 
   static find(polyhedron: Polyhedron, hitPoint: Vec3D) {
     const hitFace = polyhedron.hitFace(hitPoint);
-    const peaks = Peak.getAll(polyhedron).filter(peak =>
-      hitFace.inSet(peak.faces()),
+    const caps = Cap.getAll(polyhedron).filter(cap =>
+      hitFace.inSet(cap.faces()),
     );
-    if (peaks.length === 0) {
+    if (caps.length === 0) {
       return null;
     }
-    return _.minBy(peaks, peak => peak.topPoint().distanceTo(hitPoint));
+    return _.minBy(caps, cap => cap.topPoint().distanceTo(hitPoint));
   }
 
   static getAll(polyhedron: Polyhedron) {
@@ -79,7 +79,7 @@ export default class Peak implements VertexList {
     return [];
   }
 
-  constructor(polyhedron: Polyhedron, innerVertices: Vertex[], type: PeakType) {
+  constructor(polyhedron: Polyhedron, innerVertices: Vertex[], type: CapType) {
     this.polyhedron = polyhedron;
     this._innerVertices = innerVertices;
     this.type = type;
@@ -133,11 +133,11 @@ export default class Peak implements VertexList {
   }
 
   withPolyhedron(other: Polyhedron) {
-    return Peak.find(other, this.topPoint());
+    return Cap.find(other, this.topPoint());
   }
 }
 const Pyramid = withMapper('vertices')(
-  class extends Peak {
+  class extends Cap {
     vertex: Vertex;
 
     constructor(polyhedron, vertex) {
@@ -154,7 +154,7 @@ const Pyramid = withMapper('vertices')(
 );
 
 const Fastigium = withMapper('edges')(
-  class extends Peak {
+  class extends Cap {
     edge: Edge;
 
     constructor(polyhedron, edge) {
@@ -171,7 +171,7 @@ const Fastigium = withMapper('edges')(
 );
 
 const Cupola = withMapper('faces')(
-  class extends Peak {
+  class extends Cap {
     face: Face;
 
     constructor(polyhedron, face) {
@@ -188,7 +188,7 @@ const Cupola = withMapper('faces')(
 );
 
 const Rotunda = withMapper('faces')(
-  class extends Peak {
+  class extends Cap {
     face: Face;
 
     constructor(polyhedron, face) {

@@ -2,7 +2,7 @@
 import _ from 'lodash';
 import { type Twist } from 'types';
 import { Operation } from '../operationTypes';
-import { Polyhedron, Peak } from 'math/polyhedra';
+import { Polyhedron, Cap } from 'math/polyhedra';
 import { getEdgeFacePaths } from '../operationUtils';
 import { antiprismHeight, getScaledPrismVertices } from './prismUtils';
 
@@ -38,14 +38,14 @@ function duplicateVertices(polyhedron: Polyhedron, boundary, twist?: Twist) {
 }
 
 function doElongate(polyhedron, twist) {
-  const peaks = Peak.getAll(polyhedron);
-  const boundary = peaks[0].boundary();
+  const caps = Cap.getAll(polyhedron);
+  const boundary = caps[0].boundary();
   const n = boundary.numSides;
   const duplicated = duplicateVertices(polyhedron, boundary, twist);
   const [vertexSets, multiplier] = (() => {
-    const duplicatedPeaks = Peak.getAll(duplicated);
-    if (duplicatedPeaks.length === 2) {
-      return [duplicatedPeaks, 1 / 2];
+    const duplicatedCaps = Cap.getAll(duplicated);
+    if (duplicatedCaps.length === 2) {
+      return [duplicatedCaps, 1 / 2];
     } else {
       // Otherwise it's the largest face
       const base = boundary.adjacentFaces()[0].withPolyhedron(duplicated);

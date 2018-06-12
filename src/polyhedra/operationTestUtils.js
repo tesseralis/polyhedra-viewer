@@ -3,7 +3,7 @@ import _ from 'lodash';
 import { allSolidNames } from 'data';
 import { PRECISION, isPlanar } from 'math/linAlg';
 import { applyOperation, getOperations, getOpResults } from './operations';
-import { Polyhedron, Peak } from 'math/polyhedra';
+import { Polyhedron, Cap } from 'math/polyhedra';
 import { operations } from 'math/operations';
 
 function isProperPolyhedron(polyhedron) {

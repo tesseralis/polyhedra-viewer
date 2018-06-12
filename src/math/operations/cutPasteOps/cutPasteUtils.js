@@ -1,7 +1,7 @@
 // @flow strict
 import _ from 'lodash';
 import { getSingle } from 'utils';
-import { Peak, Polyhedron } from 'math/polyhedra';
+import { Cap, Polyhedron } from 'math/polyhedra';
 import { isInverse } from 'math/linAlg';
 import type { Relation } from '../operationTypes';
 
@@ -12,33 +12,33 @@ export const hasMultiple = (relations: ?(Relation[]), property: string) =>
     .compact()
     .value().length > 1;
 
-export function getPeakAlignment(polyhedron: Polyhedron, peak: Peak) {
-  const isRhombicosidodecahedron = peak.type === 'cupola';
-  const orthoPeaks = isRhombicosidodecahedron
+export function getCapAlignment(polyhedron: Polyhedron, cap: Cap) {
+  const isRhombicosidodecahedron = cap.type === 'cupola';
+  const orthoCaps = isRhombicosidodecahedron
     ? _.filter(
-        Peak.getAll(polyhedron),
-        peak => getCupolaGyrate(polyhedron, peak) === 'ortho',
+        Cap.getAll(polyhedron),
+        cap => getCupolaGyrate(polyhedron, cap) === 'ortho',
       )
     : [];
 
   const otherNormal =
-    orthoPeaks.length > 0
-      ? getSingle(orthoPeaks)
+    orthoCaps.length > 0
+      ? getSingle(orthoCaps)
           .boundary()
           .normal()
       : polyhedron.largestFace().normal();
 
-  return isInverse(peak.normal(), otherNormal) ? 'para' : 'meta';
+  return isInverse(cap.normal(), otherNormal) ? 'para' : 'meta';
 }
 
-export function getCupolaGyrate(polyhedron: Polyhedron, peak: Peak) {
-  const isOrtho = _.every(peak.boundary().edges, edge => {
+export function getCupolaGyrate(polyhedron: Polyhedron, cap: Cap) {
+  const isOrtho = _.every(cap.boundary().edges, edge => {
     const [n1, n2] = _.map(edge.adjacentFaces(), 'numSides');
     return (n1 === 4) === (n2 === 4);
   });
   return isOrtho ? 'ortho' : 'gyro';
 }
 
-export function getGyrateDirection(polyhedron: Polyhedron, peak: Peak) {
-  return getCupolaGyrate(polyhedron, peak) === 'ortho' ? 'back' : 'forward';
+export function getGyrateDirection(polyhedron: Polyhedron, cap: Cap) {
+  return getCupolaGyrate(polyhedron, cap) === 'ortho' ? 'back' : 'forward';
 }

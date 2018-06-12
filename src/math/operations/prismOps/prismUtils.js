@@ -2,7 +2,7 @@
 import _ from 'lodash';
 import type { Twist } from 'types';
 import { find } from 'utils';
-import { Polyhedron, Peak } from 'math/polyhedra';
+import { Polyhedron, Cap } from 'math/polyhedra';
 import { withOrigin, isInverse } from 'math/linAlg';
 import { getTwistSign, getTransformedVertices } from '../operationUtils';
 
@@ -14,9 +14,9 @@ export function antiprismHeight(n: number) {
 
 // TODO deduplicate with snub polyhedra if possible
 export function getChirality(polyhedron: Polyhedron) {
-  const [peak1, peak2] = Peak.getAll(polyhedron);
-  const boundary = peak1.boundary();
-  const isCupolaRotunda = peak1.type !== peak2.type;
+  const [cap1, cap2] = Cap.getAll(polyhedron);
+  const boundary = cap1.boundary();
+  const isCupolaRotunda = cap1.type !== cap2.type;
 
   const nonTriangleFace = find(boundary.edges, e => e.face.numSides !== 3);
   const rightFaceAcross = nonTriangleFace
@@ -33,23 +33,21 @@ export function getChirality(polyhedron: Polyhedron) {
 }
 
 export function isGyroelongatedBiCupola(polyhedron: Polyhedron) {
-  const peaks = Peak.getAll(polyhedron);
-  if (!peaks[0]) return false;
-  const boundary = peaks[0].boundary();
+  const caps = Cap.getAll(polyhedron);
+  if (!caps[0]) return false;
+  const boundary = caps[0].boundary();
   return (
-    peaks.length === 2 &&
+    caps.length === 2 &&
     boundary.numSides > 5 &&
     boundary.adjacentFaces()[0].numSides === 3
   );
 }
 
-function getOppositePeaks(polyhedron: Polyhedron) {
-  const peaks = Peak.getAll(polyhedron);
-  for (let peak of peaks) {
-    const peak2 = _.find(peaks, peak2 =>
-      isInverse(peak.normal(), peak2.normal()),
-    );
-    if (peak2) return [peak, peak2];
+function getOppositeCaps(polyhedron: Polyhedron) {
+  const caps = Cap.getAll(polyhedron);
+  for (let cap of caps) {
+    const cap2 = _.find(caps, cap2 => isInverse(cap.normal(), cap2.normal()));
+    if (cap2) return [cap, cap2];
   }
   return undefined;
 }
@@ -89,17 +87,17 @@ export function getAdjustInformation(polyhedron: Polyhedron) {
       multiplier: 1 / 2,
     };
   }
-  const oppositePeaks = getOppositePeaks(polyhedron);
-  if (oppositePeaks) {
-    // This is an elongated bi-peak
+  const oppositeCaps = getOppositeCaps(polyhedron);
+  if (oppositeCaps) {
+    // This is an elongated bi-cap
     return {
-      vertexSets: oppositePeaks,
-      boundary: oppositePeaks[0].boundary(),
+      vertexSets: oppositeCaps,
+      boundary: oppositeCaps[0].boundary(),
       multiplier: 1 / 2,
     };
   }
 
-  // Otherwise it's an elongated single peak
+  // Otherwise it's an elongated single cap
   const faces = polyhedron.faces.filter(face => {
     return _.uniqBy(face.adjacentFaces(), 'numSides').length === 1;
   });

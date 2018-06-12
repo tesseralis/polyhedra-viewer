@@ -14,7 +14,7 @@ function getHitOption(opName: OpName) {
       return 'face';
     case 'diminish':
     case 'gyrate':
-      return 'peak';
+      return 'cap';
     case 'cumulate':
     case 'contract':
       return 'faceType';
@@ -78,8 +78,8 @@ class HitOptions extends PureComponent<*> {
     // only apply operation if we have a hit
     if (options && newValue) {
       applyOperation(opName, { ...options, [hitOption]: newValue }, result => {
-        if (hitOption === 'peak' && options[hitOption]) {
-          setOption('peak', options[hitOption].withPolyhedron(result));
+        if (hitOption === 'cap' && options[hitOption]) {
+          setOption('cap', options[hitOption].withPolyhedron(result));
         }
       });
     }

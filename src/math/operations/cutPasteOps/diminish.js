@@ -3,38 +3,34 @@ import _ from 'lodash';
 
 import { flatMap } from 'utils';
 import { removeExtraneousVertices } from '../operationUtils';
-import { Peak } from 'math/polyhedra';
+import { Cap } from 'math/polyhedra';
 import type { Operation } from '../operationTypes';
-import {
-  hasMultiple,
-  getPeakAlignment,
-  getCupolaGyrate,
-} from './cutPasteUtils';
+import { hasMultiple, getCapAlignment, getCupolaGyrate } from './cutPasteUtils';
 
-function removePeak(polyhedron, peak) {
+function removeCap(polyhedron, cap) {
   return removeExtraneousVertices(
     polyhedron.withChanges(solid =>
-      solid.withoutFaces(peak.faces()).addFaces([peak.boundary().vertices]),
+      solid.withoutFaces(cap.faces()).addFaces([cap.boundary().vertices]),
     ),
   );
 }
 
 interface DiminishOptions {
-  peak: Peak;
+  cap: Cap;
 }
 
 export const diminish: Operation<DiminishOptions> = {
-  apply(polyhedron, { peak }) {
-    return removePeak(polyhedron, peak);
+  apply(polyhedron, { cap }) {
+    return removeCap(polyhedron, cap);
   },
 
   getSearchOptions(polyhedron, config, relations) {
     const options = {};
-    const { peak } = config;
-    if (!peak) {
-      throw new Error('Invalid peak');
+    const { cap } = config;
+    if (!cap) {
+      throw new Error('Invalid cap');
     }
-    const vertices = peak.innerVertices();
+    const vertices = cap.innerVertices();
     // If diminishing a pentagonal cupola/rotunda, check which one it is
     if (vertices.length === 5) {
       options.using = 'U5';
@@ -43,29 +39,29 @@ export const diminish: Operation<DiminishOptions> = {
     }
 
     if (hasMultiple(relations, 'gyrate')) {
-      options.gyrate = getCupolaGyrate(polyhedron, peak);
+      options.gyrate = getCupolaGyrate(polyhedron, cap);
     }
 
     if (options.gyrate !== 'ortho' && hasMultiple(relations, 'align')) {
-      options.align = getPeakAlignment(polyhedron, peak);
+      options.align = getCapAlignment(polyhedron, cap);
     }
     return options;
   },
 
   getAllOptions(polyhedron) {
-    return Peak.getAll(polyhedron).map(peak => ({ peak }));
+    return Cap.getAll(polyhedron).map(cap => ({ cap }));
   },
 
   getHitOption(polyhedron, hitPnt) {
-    const peak = Peak.find(polyhedron, hitPnt);
-    return peak ? { peak } : {};
+    const cap = Cap.find(polyhedron, hitPnt);
+    return cap ? { cap } : {};
   },
 
-  getSelectState(polyhedron, { peak }) {
-    const allPeakFaces = flatMap(Peak.getAll(polyhedron), peak => peak.faces());
+  getSelectState(polyhedron, { cap }) {
+    const allCapFaces = flatMap(Cap.getAll(polyhedron), cap => cap.faces());
     return _.map(polyhedron.faces, face => {
-      if (_.isObject(peak) && face.inSet(peak.faces())) return 'selected';
-      if (face.inSet(allPeakFaces)) return 'selectable';
+      if (_.isObject(cap) && face.inSet(cap.faces())) return 'selected';
+      if (face.inSet(allCapFaces)) return 'selectable';
     });
   },
 };

@@ -3,21 +3,21 @@ import _ from 'lodash';
 
 import { flatMap } from 'utils';
 import { withOrigin } from 'math/linAlg';
-import { Peak } from 'math/polyhedra';
+import { Cap } from 'math/polyhedra';
 import type { Operation } from '../operationTypes';
 import { mapObject } from 'utils';
-import { getPeakAlignment, getGyrateDirection } from './cutPasteUtils';
+import { getCapAlignment, getGyrateDirection } from './cutPasteUtils';
 import { getTransformedVertices } from '../operationUtils';
 
 const TAU = 2 * Math.PI;
 
 interface GyrateOptions {
-  peak: Peak;
+  cap: Cap;
 }
 
-function applyGyrate(polyhedron, { peak }) {
+function applyGyrate(polyhedron, { cap }) {
   // get adjacent faces
-  const boundary = peak.boundary();
+  const boundary = cap.boundary();
 
   // rotate the cupola/rotunda top
   const theta = TAU / boundary.numSides;
@@ -29,7 +29,7 @@ function applyGyrate(polyhedron, { peak }) {
 
   const mockPolyhedron = polyhedron.withChanges(solid =>
     solid.addVertices(boundary.vertices).mapFaces(face => {
-      if (face.inSet(peak.faces())) {
+      if (face.inSet(cap.faces())) {
         return face;
       }
       return face.vertices.map(v => {
@@ -41,7 +41,7 @@ function applyGyrate(polyhedron, { peak }) {
   );
 
   const endVertices = getTransformedVertices(
-    [peak],
+    [cap],
     p =>
       withOrigin(p.normalRay(), v => v.getRotatedAroundAxis(p.normal(), theta)),
     mockPolyhedron.vertices,
@@ -62,13 +62,13 @@ export const gyrate: Operation<GyrateOptions> = {
 
   getSearchOptions(polyhedron, config, relations) {
     const options = {};
-    const { peak } = config;
-    if (!peak) {
-      throw new Error('Invalid peak');
+    const { cap } = config;
+    if (!cap) {
+      throw new Error('Invalid cap');
     }
     // TODO can we not rely on relations?
     if (_.some(relations, 'direction')) {
-      options.direction = getGyrateDirection(polyhedron, peak);
+      options.direction = getGyrateDirection(polyhedron, cap);
       if (
         _.filter(
           relations,
@@ -76,26 +76,26 @@ export const gyrate: Operation<GyrateOptions> = {
             relation.direction === options.direction && !!relation.align,
         ).length > 1
       ) {
-        options.align = getPeakAlignment(polyhedron, peak);
+        options.align = getCapAlignment(polyhedron, cap);
       }
     }
     return options;
   },
 
   getAllOptions(polyhedron) {
-    return Peak.getAll(polyhedron).map(peak => ({ peak }));
+    return Cap.getAll(polyhedron).map(cap => ({ cap }));
   },
 
   getHitOption(polyhedron, hitPnt) {
-    const peak = Peak.find(polyhedron, hitPnt);
-    return peak ? { peak } : {};
+    const cap = Cap.find(polyhedron, hitPnt);
+    return cap ? { cap } : {};
   },
 
-  getSelectState(polyhedron, { peak }) {
-    const allPeakFaces = flatMap(Peak.getAll(polyhedron), peak => peak.faces());
+  getSelectState(polyhedron, { cap }) {
+    const allCapFaces = flatMap(Cap.getAll(polyhedron), cap => cap.faces());
     return _.map(polyhedron.faces, face => {
-      if (_.isObject(peak) && face.inSet(peak.faces())) return 'selected';
-      if (face.inSet(allPeakFaces)) return 'selectable';
+      if (_.isObject(cap) && face.inSet(cap.faces())) return 'selected';
+      if (face.inSet(allCapFaces)) return 'selectable';
     });
   },
 };
