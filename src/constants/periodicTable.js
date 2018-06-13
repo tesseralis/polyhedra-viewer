@@ -21,6 +21,10 @@ type Table = DataTable | SubHeader;
 
 const periodicTable: Table[] = [
   {
+    caption: 'Uniform Polyhedra',
+    type: 'subheader',
+  },
+  {
     caption: 'Platonic and Archimedean Solids',
     rows: [
       'regular',

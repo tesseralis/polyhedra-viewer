@@ -112,7 +112,7 @@ function convertTable(table) {
   };
 }
 
-const [, prisms, , pyramidsCupolae, augmentations] = periodicTable
+const [, , prisms, , pyramidsCupolae, augmentations] = periodicTable
   .map(convertTable)
   .map(getKeyedTable);
 

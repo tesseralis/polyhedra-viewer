@@ -15,27 +15,32 @@ const gridAreaMapping = {
   'Gyrate and Diminished Rhombicosidodecahedra': 'rhombicos',
   'Snub Antiprisms': 'snub',
   'Other Johnson Solids': 'other',
+  'Uniform Polyhedra': 'U',
   'Johnson Solids': 'J',
 };
 
 const styles = StyleSheet.create({
   wrapper: {
     position: 'absolute',
-    minHeight: '100%',
     display: 'flex',
     alignItems: 'center',
-    padding: '0 80px',
+    justifyContent: 'center',
+    width: '100%',
   },
   grid: {
     display: 'grid',
-    gridGap: 25,
+    padding: 50,
+    gridRowGap: 50,
     justifyItems: 'center',
-    alignItems: 'center',
     gridTemplateAreas: `
-      "abs   abs   J pyrCup aug  rhombicos"
-      "plato prism J pyrCup aug  rhombicos"
-      "plato prism J pyrCup aug  snub"
-      "plato prism J pyrCup icos other"
+      "abs    abs"
+      "U      U"
+      "plato  prism"
+      "J      J"
+      "pyrCup pyrCup"
+      "aug    rhombicos"
+      "icos   icos"
+      "snub   other"
     `,
   },
 
@@ -48,24 +53,20 @@ const styles = StyleSheet.create({
   header: {
     marginTop: 20,
     marginBottom: 20,
-    fontSize: 24,
+    fontSize: 36,
     fontWeight: 'bold',
     fontFamily: andaleMono,
   },
 
   description: {
-    fontSize: 12,
+    fontSize: 16,
     fontFamily: hoeflerText,
     color: 'DimGrey',
-    lineHeight: '18px',
   },
 
   subheader: {
-    marginLeft: 50,
     fontFamily: hoeflerText,
-    transform: 'rotate(-90deg)',
-    overflow: 'hidden',
-    whiteSpace: 'nowrap',
+    fontSize: 20,
   },
 
   wikiLink: {

@@ -11,15 +11,15 @@ const styles = StyleSheet.create({
     // margin: 15,
   },
   caption: {
-    fontSize: 14,
+    fontSize: 18,
     fontWeight: hoeflerText,
     marginBottom: 5,
   },
   cell: {
-    maxWidth: 70,
+    // maxWidth: 70,
     verticalAlign: 'middle',
     textAlign: 'center',
-    fontSize: 10,
+    fontSize: 14,
     fontWeight: hoeflerText,
     color: 'DimGrey',
   },
@@ -58,7 +58,7 @@ const ColumnHeaders = ({ columns }) => {
                   {subCol}
                 </th>
               ))
-            )
+            ),
         )}
       </tr>
       {/* Render the main column headers, making sure to span more than one column for those with subcolumns */}

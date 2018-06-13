@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 import { escapeName } from 'polyhedra/names';
 import { hover } from 'styles/common';
 
-const thumbnailSize = 55;
+const thumbnailSize = 80;
 
 const styles = StyleSheet.create({
   link: {
