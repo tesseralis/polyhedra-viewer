@@ -1,4 +1,5 @@
 import React from 'react';
+import Markdown from 'react-markdown';
 import { css, StyleSheet } from 'aphrodite/no-important';
 
 import { hoeflerText, andaleMono } from 'styles/fonts';
@@ -80,6 +81,10 @@ const styles = StyleSheet.create({
   },
 });
 
+const Paragraph = ({ children }) => {
+  return <p className={css(styles.description)}>{children}</p>;
+};
+
 const WikiLink = ({ href, children }) => {
   return (
     <a className={css(styles.wikiLink)} href={href}>
@@ -105,33 +110,34 @@ const PolyhedronTableArea = ({ area, data }) => {
   );
 };
 
+const description = `
+  These tables are a categorization of the convex, regular-faced (CRF)
+  polyhedra. These include the five [Platonic solids][platonic], the 13
+  [Archimedean solids][archimedean], the infinite set of [prisms][prism]
+  and [antiprisms][antiprism], and the 92 [Johnson solids][johnson].
+  Select a solid to play around with it and to see its
+  relationships with other polyhedra.
+
+  [platonic]: http://en.wikipedia.org/wiki/Platonic_solid
+  [archimedean]: http://en.wikipedia.org/wiki/Archimedean_solid
+  [prism]: http://en.wikipedia.org/wiki/Prism_(geometry)
+  [antiprism]: http://en.wikipedia.org/wiki/Antiprism
+  [johnson]: http://en.wikipedia.org/wiki/Johnson_solid
+`;
+
 export default function PeriodicTable() {
   return (
     <main className={css(styles.wrapper)}>
       <div className={css(styles.grid)}>
         <GridArea area="abs" classes={styles.abstract}>
           <h1 className={css(styles.header)}>Periodic Table of Polyhedra</h1>
-          <p className={css(styles.description)}>
-            These tables are a categorization of the convex, regular-faced (CRF)
-            polyhedra. These include the five{' '}
-            <WikiLink href="http://en.wikipedia.org/wiki/Platonic_solid">
-              Platonic solids
-            </WikiLink>, the 13{' '}
-            <WikiLink href="http://en.wikipedia.org/wiki/Archimedean_solid">
-              Archimedean solids
-            </WikiLink>, the infinite set of{' '}
-            <WikiLink href="http://en.wikipedia.org/wiki/Prism_(geometry)">
-              prisms
-            </WikiLink>{' '}
-            and{' '}
-            <WikiLink href="http://en.wikipedia.org/wiki/Antiprism">
-              antiprisms
-            </WikiLink>, and the 92{' '}
-            <WikiLink href="http://en.wikipedia.org/wiki/Johnson_solid">
-              Johnson solids
-            </WikiLink>. Select a solid to play around with it and to see its
-            relationships with other polyhedra.
-          </p>
+          <Markdown
+            source={description}
+            renderers={{
+              paragraph: Paragraph,
+              linkReference: WikiLink,
+            }}
+          />
         </GridArea>
         {periodicTable.map(section => {
           const area = gridAreaMapping[section.caption];
