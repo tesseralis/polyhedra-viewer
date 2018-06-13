@@ -1,6 +1,7 @@
+// @flow strict
 import React from 'react';
 import Markdown from 'react-markdown';
-import { css, StyleSheet } from 'aphrodite/no-important';
+import { css, StyleSheet, type StyleDefinition } from 'aphrodite/no-important';
 
 import { hoeflerText, andaleMono } from 'styles/fonts';
 import periodicTable from 'constants/periodicTable';
@@ -68,7 +69,7 @@ const styles = StyleSheet.create({
 
   subheader: {
     fontFamily: hoeflerText,
-    fontSize: 28,
+    fontSize: 20,
   },
 
   wikiLink: {
@@ -93,7 +94,19 @@ const WikiLink = ({ href, children }) => {
   );
 };
 
-const GridArea = ({ area, children, element = 'div', classes = [] }) => {
+interface GridAreaProps {
+  area: *;
+  children: React$Node;
+  element?: string;
+  classes: StyleDefinition[];
+}
+
+const GridArea = ({
+  area,
+  children,
+  element = 'div',
+  classes = [],
+}: GridAreaProps) => {
   const El = element;
   return (
     <El style={{ gridArea: area }} className={css(classes)}>

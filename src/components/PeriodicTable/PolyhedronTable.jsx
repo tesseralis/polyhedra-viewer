@@ -1,9 +1,12 @@
+// @flow strict
 import React from 'react';
-import * as _ from 'lodash';
+import _ from 'lodash';
 import { css, StyleSheet } from 'aphrodite/no-important';
 
+import { flatMap } from 'utils';
 import { hoeflerText } from 'styles/fonts';
 import { fromConwayNotation } from 'polyhedra/names';
+import { type DataTable } from 'constants/periodicTable';
 import PolyhedronLink from './PolyhedronLink';
 
 const styles = StyleSheet.create({
@@ -24,7 +27,7 @@ const styles = StyleSheet.create({
   },
 });
 
-const Cell = ({ cell, colSpan = 1 }) => {
+const Cell = ({ cell, colSpan = 1 }: { cell: *, colSpan?: * }) => {
   const isFake = cell[0] === '!';
   const polyhedron = fromConwayNotation(isFake ? cell.substring(1) : cell);
 
@@ -36,28 +39,22 @@ const Cell = ({ cell, colSpan = 1 }) => {
   );
 };
 
-// Return whether this column has subcolumns
-// (Right now, we check if it's a string or an object)
-const hasSubColumn = column => !_.isString(column);
-
 const ColumnHeaders = ({ columns }) => {
   return (
     <thead>
       {/* Render the subcolumn headers first, where they exist. */}
       <tr>
         <th />
-        {_.flatMap(
+        {flatMap(
           columns,
           (col, j) =>
-            !hasSubColumn(col) ? (
-              <th key={j} />
-            ) : (
-              col.sub.map(subCol => (
-                <th className={css(styles.cell)} key={`${j}-${subCol}`}>
-                  {subCol}
-                </th>
-              ))
-            ),
+            typeof col === 'string'
+              ? [<th key={j} />]
+              : col.sub.map(subCol => (
+                  <th className={css(styles.cell)} key={`${j}-${subCol}`}>
+                    {subCol}
+                  </th>
+                )),
         )}
       </tr>
       {/* Render the main column headers, making sure to span more than one column for those with subcolumns */}
@@ -67,9 +64,9 @@ const ColumnHeaders = ({ columns }) => {
           <th
             className={css(styles.cell)}
             key={j}
-            colSpan={hasSubColumn(col) ? col.sub.length : 1}
+            colSpan={typeof col !== 'string' ? col.sub.length : 1}
           >
-            {hasSubColumn(col) ? col.name : col}
+            {typeof col !== 'string' ? col.name : col}
           </th>
         ))}
       </tr>
@@ -77,7 +74,14 @@ const ColumnHeaders = ({ columns }) => {
   );
 };
 
-export default function PolyhedronTable({ caption, rows, columns, data }) {
+type Props = DataTable;
+
+export default function PolyhedronTable({
+  caption,
+  rows,
+  columns,
+  data,
+}: Props) {
   return (
     <table className={css(styles.table)}>
       <caption className={css(styles.caption)}>{caption}</caption>
@@ -87,13 +91,13 @@ export default function PolyhedronTable({ caption, rows, columns, data }) {
           <tr key={i}>
             {/* Row header */}
             <th className={css(styles.cell)}>{rows[i]}</th>
-            {_.flatMap(row, (cell, j) => {
+            {flatMap(row, (cell, j) => {
               const col = columns[j];
-              if (!hasSubColumn(col)) {
-                return <Cell key={j} cell={cell} />;
+              if (typeof col === 'string') {
+                return [<Cell key={j} cell={cell} />];
               } else if (!_.isArray(cell)) {
                 // If the cell does *not* have subcells, make it span the length of the subcolumns
-                return <Cell key={j} cell={cell} colSpan={col.sub.length} />;
+                return [<Cell key={j} cell={cell} colSpan={col.sub.length} />];
               } else {
                 // If the cell does have subcells render and return them
                 return cell.map((subcell, k) => (

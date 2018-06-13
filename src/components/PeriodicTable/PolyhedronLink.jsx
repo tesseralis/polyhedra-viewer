@@ -1,4 +1,4 @@
-// no flow (nonstatic require)
+// @flow strict
 import React from 'react';
 import { css, StyleSheet } from 'aphrodite/no-important';
 import { Link } from 'react-router-dom';

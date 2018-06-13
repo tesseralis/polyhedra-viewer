@@ -1,6 +1,6 @@
 // @flow strict
 import _ from 'lodash';
-import periodicTable from 'constants/periodicTable';
+import { prisms, capstones, augmented } from 'constants/periodicTable';
 import { toConwayNotation } from './names';
 import { mapObject } from 'utils';
 
@@ -112,13 +112,14 @@ function convertTable(table) {
   };
 }
 
-const [, , prisms, , capstones, augmentations] = periodicTable
+// const [, , prisms, , capstones, augmentations] = periodicTable
+const [prismMap, capstoneMap, augmentationMap] = [prisms, capstones, augmented]
   .map(convertTable)
   .map(getKeyedTable);
 
 const hasCupolaRotunda = name =>
   name.includes('pentagonal') && !name.includes('pyramid');
-const cupolaRotunda = capstones['cupola-rotunda'];
+const cupolaRotunda = capstoneMap['cupola-rotunda'];
 
 const getOrthoGyroAugment = (value, using) => {
   if (!_.isArray(value)) {
@@ -138,7 +139,7 @@ const getCupolaRotunda = (using, colName) => {
 
 const getAugmentations = using => (rowName, colName) => {
   return _([
-    getOrthoGyroAugment(capstones[rowName][colName], using),
+    getOrthoGyroAugment(capstoneMap[rowName][colName], using),
     hasCupolaRotunda(rowName) && getCupolaRotunda(using, colName),
   ])
     .flatten()
@@ -253,12 +254,12 @@ const archimedean = {
 const baseCapstones = (() => {
   let graph = {};
   // relation of prisms and antiprisms
-  _.forEach(prisms, (row, name) => {
+  _.forEach(prismMap, (row, name) => {
     const { prism, antiprism } = row;
     const hasRotunda = name.startsWith('decagonal');
     const pyramidRow = getPyramidFromPrism(name);
-    const { elongated, gyroelongated } = capstones[pyramidRow];
-    const rotundaRow = capstones['pentagonal rotunda'];
+    const { elongated, gyroelongated } = capstoneMap[pyramidRow];
+    const rotundaRow = capstoneMap['pentagonal rotunda'];
     const using = getPyramidCupolaConway(pyramidRow);
     graph = graphMerge(graph, {
       [prism]: {
@@ -279,7 +280,7 @@ const baseCapstones = (() => {
   // for diminished icosahedra
   graph['A5']['+'][0].align = 'para';
 
-  _.forEach(capstones, (row, name) => {
+  _.forEach(capstoneMap, (row, name) => {
     const {
       '--': base,
       elongated,
@@ -376,7 +377,7 @@ const getBiAugmented = (biaugmented, using) => {
 
 const baseAugmentations = (() => {
   let graph = {};
-  _.forEach(augmentations, (row, name) => {
+  _.forEach(augmentationMap, (row, name) => {
     const base = toConwayNotation(name);
     const { augmented, biaugmented, triaugmented } = row;
     const augmentee = getAugmentee(name);

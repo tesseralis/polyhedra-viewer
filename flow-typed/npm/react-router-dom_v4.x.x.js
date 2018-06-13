@@ -1,21 +1,21 @@
-// flow-typed signature: a2389d94821a287e40b26a1b70836d92
-// flow-typed version: 83f1c5c51e/react-router-dom_v4.x.x/flow_>=v0.63.x
+// flow-typed signature: fe714a602c89b76a1a69c9d10cac64e1
+// flow-typed version: 0e60d78d09/react-router-dom_v4.x.x/flow_>=v0.63.x
 
 declare module "react-router-dom" {
-  declare export class BrowserRouter extends React$Component<{
+  declare export class BrowserRouter extends React$Component<{|
     basename?: string,
     forceRefresh?: boolean,
     getUserConfirmation?: GetUserConfirmation,
     keyLength?: number,
     children?: React$Node
-  }> {}
+  |}> {}
 
-  declare export class HashRouter extends React$Component<{
+  declare export class HashRouter extends React$Component<{|
     basename?: string,
     getUserConfirmation?: GetUserConfirmation,
     hashType?: "slash" | "noslash" | "hashbang",
     children?: React$Node
-  }> {}
+  |}> {}
 
   declare export class Link extends React$Component<{
     className?: string,
@@ -106,48 +106,49 @@ declare module "react-router-dom" {
     url?: string
   };
 
-  declare export class StaticRouter extends React$Component<{
+  declare export class StaticRouter extends React$Component<{|
     basename?: string,
     location?: string | Location,
     context: StaticRouterContext,
     children?: React$Node
-  }> {}
+  |}> {}
 
-  declare export class MemoryRouter extends React$Component<{
+  declare export class MemoryRouter extends React$Component<{|
     initialEntries?: Array<LocationShape | string>,
     initialIndex?: number,
     getUserConfirmation?: GetUserConfirmation,
     keyLength?: number,
     children?: React$Node
-  }> {}
+  |}> {}
 
-  declare export class Router extends React$Component<{
+  declare export class Router extends React$Component<{|
     history: RouterHistory,
     children?: React$Node
-  }> {}
+  |}> {}
 
-  declare export class Prompt extends React$Component<{
+  declare export class Prompt extends React$Component<{|
     message: string | ((location: Location) => string | boolean),
     when?: boolean
-  }> {}
+  |}> {}
 
-  declare export class Redirect extends React$Component<{
+  declare export class Redirect extends React$Component<{|
     to: string | LocationShape,
     push?: boolean
-  }> {}
+  |}> {}
 
-  declare export class Route extends React$Component<{
+  declare export class Route extends React$Component<{|
     component?: React$ComponentType<*>,
     render?: (router: ContextRouter) => React$Node,
     children?: React$ComponentType<ContextRouter> | React$Node,
     path?: string,
     exact?: boolean,
     strict?: boolean
-  }> {}
+  |}> {}
 
-  declare export class Switch extends React$Component<{
-    children?: React$Node
-  }> {}
+  declare export class Switch extends React$Component<{|
+    children?: React$Node,
+    location?: Location
+  |}> {}
 
   declare export function withRouter<P: {}, Component: React$ComponentType<P>>(
     WrappedComponent: Component
