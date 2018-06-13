@@ -5,24 +5,38 @@ import { Link } from 'react-router-dom';
 
 import { escapeName } from 'polyhedra/names';
 import { hover } from 'styles/common';
+import * as media from 'styles/media';
 
 const thumbnailSize = 70;
+
+const mobThumbnailSize = 50;
 
 const styles = StyleSheet.create({
   link: {
     ...hover,
-    width: thumbnailSize,
-    height: thumbnailSize,
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
     overflow: 'hidden',
     borderRadius: 10,
     margin: 'auto', // center inside a table
+    [media.notMobile]: {
+      width: thumbnailSize,
+      height: thumbnailSize,
+    },
+    [media.mobile]: {
+      width: mobThumbnailSize,
+      height: mobThumbnailSize,
+    },
   },
 
   image: {
-    height: thumbnailSize + 10,
+    [media.notMobile]: {
+      height: thumbnailSize + 15,
+    },
+    [media.mobile]: {
+      height: mobThumbnailSize + 15,
+    },
   },
 
   fake: {

@@ -3,6 +3,7 @@ import React from 'react';
 import Markdown from 'react-markdown';
 import { css, StyleSheet, type StyleDefinition } from 'aphrodite/no-important';
 
+import * as media from 'styles/media';
 import { hoeflerText, andaleMono } from 'styles/fonts';
 import periodicTable from 'constants/periodicTable';
 
@@ -54,15 +55,43 @@ const styles = StyleSheet.create({
     gridTemplateAreas: `
       "plato prism"
     `,
+    [media.mobilePortrait]: {
+      gridTemplateAreas: `
+      "plato"
+      "prism"
+    `,
+    },
   },
 
   johnson: {
-    gridTemplateAreas: `
+    [media.desktop]: {
+      gridTemplateAreas: `
       "caps caps"
       "aug  icos"
       "aug  rhombicos"
       "snub other"
     `,
+    },
+    [media.tabletPortrait]: {
+      gridTemplateAreas: `
+      "caps"
+      "aug"
+      "icos"
+      "rhombicos"
+      "snub"
+      "other"
+    `,
+    },
+    [media.mobile]: {
+      gridTemplateAreas: `
+      "caps"
+      "aug"
+      "icos"
+      "rhombicos"
+      "snub"
+      "other"
+    `,
+    },
   },
 
   abstract: {

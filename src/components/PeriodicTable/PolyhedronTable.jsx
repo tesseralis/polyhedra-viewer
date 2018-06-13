@@ -8,6 +8,7 @@ import { hoeflerText } from 'styles/fonts';
 import { fromConwayNotation } from 'polyhedra/names';
 import { type Table } from 'constants/periodicTable';
 import PolyhedronLink from './PolyhedronLink';
+import * as media from 'styles/media';
 
 const styles = StyleSheet.create({
   table: {
@@ -21,9 +22,14 @@ const styles = StyleSheet.create({
   cell: {
     verticalAlign: 'middle',
     textAlign: 'center',
-    fontSize: 14,
     fontWeight: hoeflerText,
     color: 'DimGrey',
+    [media.notMobile]: {
+      fontSize: 12,
+    },
+    [media.mobile]: {
+      fontSize: 10,
+    },
   },
 });
 
