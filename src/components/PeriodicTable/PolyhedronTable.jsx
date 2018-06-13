@@ -13,7 +13,7 @@ const styles = StyleSheet.create({
   caption: {
     fontSize: 18,
     fontWeight: hoeflerText,
-    marginBottom: 5,
+    marginBottom: 10,
   },
   cell: {
     // maxWidth: 70,

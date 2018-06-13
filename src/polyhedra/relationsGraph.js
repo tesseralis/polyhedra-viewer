@@ -112,13 +112,13 @@ function convertTable(table) {
   };
 }
 
-const [, , prisms, , pyramidsCupolae, augmentations] = periodicTable
+const [, , prisms, , capstones, augmentations] = periodicTable
   .map(convertTable)
   .map(getKeyedTable);
 
 const hasCupolaRotunda = name =>
   name.includes('pentagonal') && !name.includes('pyramid');
-const cupolaRotunda = pyramidsCupolae['cupola-rotunda'];
+const cupolaRotunda = capstones['cupola-rotunda'];
 
 const getOrthoGyroAugment = (value, using) => {
   if (!_.isArray(value)) {
@@ -138,7 +138,7 @@ const getCupolaRotunda = (using, colName) => {
 
 const getAugmentations = using => (rowName, colName) => {
   return _([
-    getOrthoGyroAugment(pyramidsCupolae[rowName][colName], using),
+    getOrthoGyroAugment(capstones[rowName][colName], using),
     hasCupolaRotunda(rowName) && getCupolaRotunda(using, colName),
   ])
     .flatten()
@@ -250,15 +250,15 @@ const archimedean = {
   },
 };
 
-const basePyramidsCupolae = (() => {
+const baseCapstones = (() => {
   let graph = {};
   // relation of prisms and antiprisms
   _.forEach(prisms, (row, name) => {
     const { prism, antiprism } = row;
     const hasRotunda = name.startsWith('decagonal');
     const pyramidRow = getPyramidFromPrism(name);
-    const { elongated, gyroelongated } = pyramidsCupolae[pyramidRow];
-    const rotundaRow = pyramidsCupolae['pentagonal rotunda'];
+    const { elongated, gyroelongated } = capstones[pyramidRow];
+    const rotundaRow = capstones['pentagonal rotunda'];
     const using = getPyramidCupolaConway(pyramidRow);
     graph = graphMerge(graph, {
       [prism]: {
@@ -279,7 +279,7 @@ const basePyramidsCupolae = (() => {
   // for diminished icosahedra
   graph['A5']['+'][0].align = 'para';
 
-  _.forEach(pyramidsCupolae, (row, name) => {
+  _.forEach(capstones, (row, name) => {
     const {
       '--': base,
       elongated,
@@ -395,7 +395,7 @@ const baseAugmentations = (() => {
   return graph;
 })();
 
-const diminishedIcosahedraGraph = (() => {
+const diminishedIcosahedra = (() => {
   return {
     J63: {
       '+': [{ using: 'Y3', value: 'J64' }, { using: 'Y5', value: 'J62' }],
@@ -406,7 +406,7 @@ const diminishedIcosahedraGraph = (() => {
   };
 })();
 
-const rhombicosidodecahedraGraph = (() => {
+const rhombicosidodecahedra = (() => {
   const getAugment = relations =>
     relations.map(relation => ({ ...relation, using: 'U5' }));
   const getGyrate = relations =>
@@ -486,7 +486,7 @@ const rhombicosidodecahedraGraph = (() => {
   };
 })();
 
-const othersGraph = (() => {
+const elementary = (() => {
   const empty = mapObject(_.range(87, 93), j => [`J${j}`, {}]);
   return {
     ...empty,
@@ -510,11 +510,11 @@ const othersGraph = (() => {
 
 const normalized = [
   archimedean,
-  basePyramidsCupolae,
+  baseCapstones,
   baseAugmentations,
-  diminishedIcosahedraGraph,
-  rhombicosidodecahedraGraph,
-  othersGraph,
+  diminishedIcosahedra,
+  rhombicosidodecahedra,
+  elementary,
 ]
   .map(normalize)
   .map(compact);

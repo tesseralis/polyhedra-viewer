@@ -163,25 +163,18 @@ const periodicTable: Table[] = [
 
   {
     caption: 'Gyrate and Diminished Rhombicosidodecahedra',
-    rows: [
-      '--',
-      'diminished',
-      'parabidiminished',
-      'metabidiminished',
+    rows: ['--', 'gyrate', 'bigyrate', 'trigyrate'],
+    columns: [
+      { name: '--', sub: ['para-', 'meta-'] },
+      { name: 'diminished', sub: ['para-', 'meta-'] },
+      { name: 'bidiminished', sub: ['para-', 'meta-'] },
       'tridiminished',
     ],
-    columns: [
-      '--',
-      { name: 'gyrate', sub: ['para-', 'meta-'] },
-      { name: 'bigyrate', sub: ['para-', 'meta-'] },
-      'trigyrate',
-    ],
     data: [
-      ['!eD', 'J72', ['J73', 'J74'], 'J75'],
-      ['J76', ['J77', 'J78'], 'J79'],
-      ['J80'],
-      ['J81', 'J82'],
-      ['J83'],
+      ['!eD', 'J76', ['J80', 'J81'], 'J83'],
+      ['J72', ['J77', 'J78'], 'J82'],
+      [['J73', 'J74'], 'J79'],
+      ['J75'],
     ],
   },
 

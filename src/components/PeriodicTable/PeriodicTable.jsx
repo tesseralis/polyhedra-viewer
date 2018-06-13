@@ -9,7 +9,7 @@ import PolyhedronTable from './PolyhedronTable';
 const gridAreaMapping = {
   'Platonic and Archimedean Solids': 'plato',
   'Prisms and Antiprisms': 'prism',
-  'Pyramids, Cupoplæ, and Rotundæ': 'pyrCup',
+  'Pyramids, Cupoplæ, and Rotundæ': 'caps',
   'Augmented Polyhedra': 'aug',
   'Diminished Icosahedra': 'icos',
   'Gyrate and Diminished Rhombicosidodecahedra': 'rhombicos',
@@ -33,14 +33,14 @@ const styles = StyleSheet.create({
     gridRowGap: 50,
     justifyItems: 'center',
     gridTemplateAreas: `
-      "abs    abs"
-      "U      U"
-      "plato  prism"
-      "J      J"
-      "pyrCup pyrCup"
-      "aug    rhombicos"
-      "icos   icos"
-      "snub   other"
+      "abs  abs    abs       abs"
+      "U    U      U         U"
+      "x    plato  prism     prism"
+      "J    J      J         J"
+      "caps caps   caps      caps"
+      "aug  aug    icos      icos"
+      "aug  aug    rhombicos rhombicos"
+      "snub snub   other     other"
     `,
   },
 
@@ -66,7 +66,7 @@ const styles = StyleSheet.create({
 
   subheader: {
     fontFamily: hoeflerText,
-    fontSize: 20,
+    fontSize: 28,
   },
 
   wikiLink: {
