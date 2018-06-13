@@ -5,19 +5,17 @@ type Column = { name: string, sub: string[] } | string;
 type Data = string | string[];
 type DataRow = Data[];
 
-interface SubHeader {
-  caption: string;
-  type: 'subheader';
-}
-
-export interface DataTable {
+export interface Table {
   caption: string;
   rows: string[];
   columns: Column[];
   data: DataRow[];
 }
 
-type Table = DataTable | SubHeader;
+interface TableSection {
+  header: string;
+  tables: Table[];
+}
 
 export const archimedean: Table = {
   caption: 'Platonic and Archimedean Solids',
@@ -182,23 +180,21 @@ export const others: Table = {
   data: [['J86', 'J87', 'J88', 'J89', 'J90', 'J91', 'J92']],
 };
 
-const periodicTable: Table[] = [
+const periodicTable: TableSection[] = [
   {
-    caption: 'Uniform Polyhedra',
-    type: 'subheader',
+    header: 'Uniform Polyhedra',
+    tables: [archimedean, prisms],
   },
-  archimedean,
-  prisms,
   {
-    caption: 'Johnson Solids',
-    type: 'subheader',
+    header: 'Johnson Solids',
+    tables: [
+      capstones,
+      augmented,
+      icosahedra,
+      rhombicosidodecahedra,
+      snubAntiprisms,
+      others,
+    ],
   },
-  capstones,
-  augmented,
-  icosahedra,
-  rhombicosidodecahedra,
-  snubAntiprisms,
-  others,
 ];
-
 export default periodicTable;

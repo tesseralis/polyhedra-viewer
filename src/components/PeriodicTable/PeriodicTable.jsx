@@ -8,6 +8,11 @@ import periodicTable from 'constants/periodicTable';
 
 import PolyhedronTable from './PolyhedronTable';
 
+const sectionMapping = {
+  'Uniform Polyhedra': 'uniform',
+  'Johnson Solids': 'johnson',
+};
+
 const gridAreaMapping = {
   'Platonic and Archimedean Solids': 'plato',
   'Prisms and Antiprisms': 'prism',
@@ -25,24 +30,38 @@ const styles = StyleSheet.create({
   wrapper: {
     position: 'absolute',
     display: 'flex',
+    flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
     width: '100%',
   },
+
+  section: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    marginBottom: 50,
+  },
+
   grid: {
     display: 'grid',
-    padding: 50,
     gridRowGap: 50,
+    gridColumnGap: 30,
     justifyItems: 'center',
+  },
+
+  uniform: {
     gridTemplateAreas: `
-      "abs  abs    abs       abs"
-      "U    U      U         U"
-      "x    plato  prism     prism"
-      "J    J      J         J"
-      "caps caps   caps      caps"
-      "aug  aug    icos      icos"
-      "aug  aug    rhombicos rhombicos"
-      "snub snub   other     other"
+      "plato prism"
+    `,
+  },
+
+  johnson: {
+    gridTemplateAreas: `
+      "caps caps"
+      "aug  icos"
+      "aug  rhombicos"
+      "snub other"
     `,
   },
 
@@ -50,6 +69,8 @@ const styles = StyleSheet.create({
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
+    margin: 50,
+    maxWidth: 800,
   },
 
   header: {
@@ -69,7 +90,8 @@ const styles = StyleSheet.create({
 
   subheader: {
     fontFamily: hoeflerText,
-    fontSize: 20,
+    fontSize: 24,
+    marginBottom: 20,
   },
 
   wikiLink: {
@@ -98,7 +120,7 @@ interface GridAreaProps {
   area: *;
   children: React$Node;
   element?: string;
-  classes: StyleDefinition[];
+  classes?: StyleDefinition[];
 }
 
 const GridArea = ({
@@ -109,7 +131,7 @@ const GridArea = ({
 }: GridAreaProps) => {
   const El = element;
   return (
-    <El style={{ gridArea: area }} className={css(classes)}>
+    <El style={{ gridArea: area }} className={css(...classes)}>
       {children}
     </El>
   );
@@ -120,6 +142,17 @@ const PolyhedronTableArea = ({ area, data }) => {
     <GridArea area={area}>
       <PolyhedronTable {...data} />
     </GridArea>
+  );
+};
+
+const TableGrid = ({ tables, header }) => {
+  return (
+    <div className={css(styles.grid, styles[sectionMapping[header]])}>
+      {tables.map(table => {
+        const area = gridAreaMapping[table.caption];
+        return <PolyhedronTableArea key={area} area={area} data={table} />;
+      })}
+    </div>
   );
 };
 
@@ -141,34 +174,24 @@ const description = `
 export default function PeriodicTable() {
   return (
     <main className={css(styles.wrapper)}>
-      <div className={css(styles.grid)}>
-        <GridArea area="abs" classes={styles.abstract}>
-          <h1 className={css(styles.header)}>Periodic Table of Polyhedra</h1>
-          <Markdown
-            source={description}
-            renderers={{
-              paragraph: Paragraph,
-              linkReference: WikiLink,
-            }}
-          />
-        </GridArea>
-        {periodicTable.map(section => {
-          const area = gridAreaMapping[section.caption];
-          if (section.type === 'subheader') {
-            return (
-              <GridArea
-                key={area}
-                area={area}
-                element="h2"
-                classes={styles.subheader}
-              >
-                {section.caption}
-              </GridArea>
-            );
-          }
-          return <PolyhedronTableArea key={area} area={area} data={section} />;
-        })}
+      <div className={css(styles.abstract)}>
+        <h1 className={css(styles.header)}>Periodic Table of Polyhedra</h1>
+        <Markdown
+          source={description}
+          renderers={{
+            paragraph: Paragraph,
+            linkReference: WikiLink,
+          }}
+        />
       </div>
+      {periodicTable.map(({ header, tables }) => {
+        return (
+          <div className={css(styles.section)}>
+            <h2 className={css(styles.subheader)}>{header}</h2>
+            <TableGrid header={header} tables={tables} />
+          </div>
+        );
+      })}
     </main>
   );
 }

@@ -6,7 +6,7 @@ import { css, StyleSheet } from 'aphrodite/no-important';
 import { flatMap } from 'utils';
 import { hoeflerText } from 'styles/fonts';
 import { fromConwayNotation } from 'polyhedra/names';
-import { type DataTable } from 'constants/periodicTable';
+import { type Table } from 'constants/periodicTable';
 import PolyhedronLink from './PolyhedronLink';
 
 const styles = StyleSheet.create({
@@ -14,7 +14,7 @@ const styles = StyleSheet.create({
     // margin: 15,
   },
   caption: {
-    fontSize: 18,
+    fontSize: 16,
     fontFamily: hoeflerText,
     marginBottom: 15,
   },
@@ -74,7 +74,7 @@ const ColumnHeaders = ({ columns }) => {
   );
 };
 
-type Props = DataTable;
+type Props = Table;
 
 export default function PolyhedronTable({
   caption,

@@ -84,7 +84,6 @@ function makeBidirectional(graph) {
 
 function getKeyedTable(table) {
   const result = {};
-  if (table.type === 'subheader') return result;
   if (!table.rows) return result;
   table.rows.forEach((row, i) => {
     result[row] = {};
@@ -105,7 +104,6 @@ function convertTableNotation(notation) {
 }
 
 function convertTable(table) {
-  if (table.type === 'subheader') return table;
   return {
     ...table,
     data: table.data.map(row => row.map(convertTableNotation)),
