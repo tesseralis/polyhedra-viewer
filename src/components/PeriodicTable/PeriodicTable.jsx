@@ -62,6 +62,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: hoeflerText,
     color: 'DimGrey',
+    lineHeight: 1.5,
   },
 
   subheader: {
@@ -111,7 +112,7 @@ export default function PeriodicTable() {
         <GridArea area="abs" classes={styles.abstract}>
           <h1 className={css(styles.header)}>Periodic Table of Polyhedra</h1>
           <p className={css(styles.description)}>
-            This table is a categorization of the convex, regular-faced (CRF)
+            These tables are a categorization of the convex, regular-faced (CRF)
             polyhedra. These include the five{' '}
             <WikiLink href="http://en.wikipedia.org/wiki/Platonic_solid">
               Platonic solids
@@ -128,7 +129,7 @@ export default function PeriodicTable() {
             </WikiLink>, and the 92{' '}
             <WikiLink href="http://en.wikipedia.org/wiki/Johnson_solid">
               Johnson solids
-            </WikiLink>. Click on a solid to play around with it and to see its
+            </WikiLink>. Select a solid to play around with it and to see its
             relationships with other polyhedra.
           </p>
         </GridArea>

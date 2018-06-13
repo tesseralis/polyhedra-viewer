@@ -12,11 +12,10 @@ const styles = StyleSheet.create({
   },
   caption: {
     fontSize: 18,
-    fontWeight: hoeflerText,
-    marginBottom: 10,
+    fontFamily: hoeflerText,
+    marginBottom: 15,
   },
   cell: {
-    // maxWidth: 70,
     verticalAlign: 'middle',
     textAlign: 'center',
     fontSize: 14,
