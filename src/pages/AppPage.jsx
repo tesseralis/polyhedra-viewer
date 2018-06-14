@@ -5,7 +5,9 @@ import { MemoryRouter } from 'react-router-dom';
 
 import { mount } from 'enzyme';
 
+import * as media from 'styles/media';
 import App from 'components/App';
+import { DeviceProvider } from 'components/DeviceContext';
 import { Polyhedron } from 'math/polyhedra';
 
 export default class AppPage {
@@ -13,10 +15,32 @@ export default class AppPage {
 
   constructor(path: string = '/') {
     this.wrapper = mount(
-      <MemoryRouter initialEntries={[path]}>
-        <App />
-      </MemoryRouter>,
+      <DeviceProvider>
+        <MemoryRouter initialEntries={[path]}>
+          <App />
+        </MemoryRouter>
+      </DeviceProvider>,
     );
+  }
+
+  setDevice(device: 'mobile' | 'desktop') {
+    global.innerWidth =
+      device === 'mobile'
+        ? media.mobilePortraitMaxWidth
+        : media.desktopMinWidth;
+    const resize = this.wrapper.find('EventListener').prop('onResize');
+    resize();
+    this.wrapper.update();
+    return this;
+  }
+
+  findElementWithText(element: string, text: string) {
+    return this.wrapper.find(element).filterWhere(n => n.text().includes(text));
+  }
+
+  expectElementWithText(element: string, text: string) {
+    expect(this.findElementWithText(element, text)).toHaveLength(1);
+    return this;
   }
 
   // Find a (not disabled) button with the given text
@@ -31,6 +55,7 @@ export default class AppPage {
     return this;
   }
 
+  // TODO these should go to a "ViewerPage" subclass
   getPolyhedron() {
     return this.wrapper.find('HitOptions').prop('polyhedron');
   }

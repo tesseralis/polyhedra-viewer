@@ -209,7 +209,7 @@ function PeriodicTable({ data }) {
       </div>
       {data.map(({ header, tables }) => {
         return (
-          <div className={css(styles.section)}>
+          <div key={header} className={css(styles.section)}>
             <h2 className={css(styles.subheader)}>{header}</h2>
             <TableGrid header={header} tables={tables} />
           </div>
