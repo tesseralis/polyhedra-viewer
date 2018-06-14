@@ -1,12 +1,13 @@
 // @flow strict
 import React from 'react';
 import Markdown from 'react-markdown';
-import { css, StyleSheet, type StyleDefinition } from 'aphrodite/no-important';
+import { css, StyleSheet } from 'aphrodite/no-important';
 
 import * as media from 'styles/media';
 import { hoeflerText, andaleMono } from 'styles/fonts';
-import periodicTable from 'constants/periodicTable';
+import periodicTable, { narrowTable } from 'constants/periodicTable';
 
+import { DeviceTracker } from 'components/DeviceContext';
 import PolyhedronTable from './PolyhedronTable';
 
 const sectionMapping = {
@@ -18,23 +19,23 @@ const gridAreaMapping = {
   'Platonic and Archimedean Solids': 'plato',
   'Prisms and Antiprisms': 'prism',
   'Pyramids, Cupoplæ, and Rotundæ': 'caps',
+  'Bipyramids, Cupoplæ, and Rotundæ': 'bi',
   'Augmented Polyhedra': 'aug',
   'Diminished Icosahedra': 'icos',
   'Gyrate and Diminished Rhombicosidodecahedra': 'rhombicos',
+  'Gyrate Rhombicosidodecahedra': 'gyr',
+  'Diminished Rhombicosidodecahedra': 'dim',
   'Snub Antiprisms': 'snub',
   'Other Johnson Solids': 'other',
-  'Uniform Polyhedra': 'U',
-  'Johnson Solids': 'J',
 };
 
 const styles = StyleSheet.create({
-  wrapper: {
-    position: 'absolute',
+  periodicTable: {
+    width: '100%',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    width: '100%',
   },
 
   section: {
@@ -50,6 +51,8 @@ const styles = StyleSheet.create({
     gridColumnGap: 30,
     justifyItems: 'center',
   },
+
+  gridArea: {},
 
   uniform: {
     gridTemplateAreas: `
@@ -82,12 +85,24 @@ const styles = StyleSheet.create({
       "other"
     `,
     },
-    [media.mobile]: {
+    [media.mobileLandscape]: {
       gridTemplateAreas: `
       "caps"
       "aug"
       "icos"
       "rhombicos"
+      "snub"
+      "other"
+    `,
+    },
+    [media.mobilePortrait]: {
+      gridTemplateAreas: `
+      "caps"
+      "bi"
+      "aug"
+      "icos"
+      "gyr"
+      "dim"
       "snub"
       "other"
     `,
@@ -145,32 +160,11 @@ const WikiLink = ({ href, children }) => {
   );
 };
 
-interface GridAreaProps {
-  area: *;
-  children: React$Node;
-  element?: string;
-  classes?: StyleDefinition[];
-}
-
-const GridArea = ({
-  area,
-  children,
-  element = 'div',
-  classes = [],
-}: GridAreaProps) => {
-  const El = element;
+const GridArea = ({ area, data }) => {
   return (
-    <El style={{ gridArea: area }} className={css(...classes)}>
-      {children}
-    </El>
-  );
-};
-
-const PolyhedronTableArea = ({ area, data }) => {
-  return (
-    <GridArea area={area}>
+    <div style={{ gridArea: area }} className={css(styles.gridArea)}>
       <PolyhedronTable {...data} />
-    </GridArea>
+    </div>
   );
 };
 
@@ -179,7 +173,7 @@ const TableGrid = ({ tables, header }) => {
     <div className={css(styles.grid, styles[sectionMapping[header]])}>
       {tables.map(table => {
         const area = gridAreaMapping[table.caption];
-        return <PolyhedronTableArea key={area} area={area} data={table} />;
+        return <GridArea key={area} area={area} data={table} />;
       })}
     </div>
   );
@@ -200,9 +194,9 @@ const description = `
   [johnson]: http://en.wikipedia.org/wiki/Johnson_solid
 `;
 
-export default function PeriodicTable() {
+function PeriodicTable({ data }) {
   return (
-    <main className={css(styles.wrapper)}>
+    <main className={css(styles.periodicTable)}>
       <div className={css(styles.abstract)}>
         <h1 className={css(styles.header)}>Periodic Table of Polyhedra</h1>
         <Markdown
@@ -213,7 +207,7 @@ export default function PeriodicTable() {
           }}
         />
       </div>
-      {periodicTable.map(({ header, tables }) => {
+      {data.map(({ header, tables }) => {
         return (
           <div className={css(styles.section)}>
             <h2 className={css(styles.subheader)}>{header}</h2>
@@ -224,3 +218,16 @@ export default function PeriodicTable() {
     </main>
   );
 }
+
+export default () => {
+  return (
+    <DeviceTracker
+      renderDesktop={() => <PeriodicTable data={periodicTable} />}
+      renderMobile={({ orientation }) => (
+        <PeriodicTable
+          data={orientation === 'portrait' ? narrowTable : periodicTable}
+        />
+      )}
+    />
+  );
+};

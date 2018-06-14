@@ -35,12 +35,20 @@ export class DeviceProvider extends Component<*, *> {
   };
 }
 
-function isDevice(width) {
+function isMobile(width) {
   return width <= media.mobileMaxWidth;
 }
 
+function getOrientation(width) {
+  return width <= media.mobilePortraitMaxWidth ? 'portrait' : 'landscape';
+}
+
+interface RenderMobileArgs {
+  orientation?: 'portrait' | 'landscape';
+}
+
 interface Props {
-  renderMobile?: () => React$Node;
+  renderMobile?: (args?: RenderMobileArgs) => React$Node;
   renderDesktop?: () => React$Node;
 }
 
@@ -50,7 +58,11 @@ export function DeviceTracker({
 }: Props) {
   return (
     <DeviceContext.Consumer>
-      {({ width }) => (isDevice(width) ? renderMobile() : renderDesktop())}
+      {({ width }) =>
+        isMobile(width)
+          ? renderMobile({ orientation: getOrientation(width) })
+          : renderDesktop()
+      }
     </DeviceContext.Consumer>
   );
 }
