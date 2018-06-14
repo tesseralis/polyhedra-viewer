@@ -21,7 +21,7 @@ class Viewer extends PureComponent<*> {
         <SolidSync solid={solid} panel={panel} />
         <DeviceTracker
           renderDesktop={() => <DesktopViewer solid={solid} panel={panel} />}
-          renderMobile={() => <MobileViewer solid={solid} panel={panel} />}
+          renderMobile={$ => <MobileViewer solid={solid} panel={panel} />}
         />
       </Fragment>
     );

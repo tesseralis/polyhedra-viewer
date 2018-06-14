@@ -48,7 +48,7 @@ interface RenderMobileArgs {
 }
 
 interface Props {
-  renderMobile?: (args?: RenderMobileArgs) => React$Node;
+  renderMobile?: (args: RenderMobileArgs) => React$Node;
   renderDesktop?: () => React$Node;
 }
 
