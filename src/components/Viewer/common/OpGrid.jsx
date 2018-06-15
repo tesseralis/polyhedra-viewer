@@ -3,7 +3,8 @@ import _ from 'lodash';
 import React, { Component } from 'react';
 import { css, StyleSheet } from 'aphrodite/no-important';
 
-import { media } from 'styles';
+import { media, fonts } from 'styles';
+import { hover, scroll } from 'styles/common';
 import { getOpResults, operations } from 'polyhedra/operations';
 import connect from 'components/connect';
 import {
@@ -12,9 +13,6 @@ import {
   WithPolyhedron,
 } from 'components/Viewer/context';
 import OperationIcon from './OperationIcon';
-
-import { verdana } from 'styles/fonts';
-import { hover, scroll } from 'styles/common';
 
 const styles = StyleSheet.create({
   opGrid: {
@@ -41,7 +39,7 @@ const styles = StyleSheet.create({
   },
 
   operationButton: {
-    fontFamily: verdana,
+    fontFamily: fonts.verdana,
     fontSize: 12,
     width: 84,
     height: 84,

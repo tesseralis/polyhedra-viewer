@@ -3,8 +3,7 @@ import React from 'react';
 import { css, StyleSheet } from 'aphrodite/no-important';
 
 import { unescapeName } from 'polyhedra/names';
-import * as fonts from 'styles/fonts';
-import { media } from 'styles';
+import { media, fonts } from 'styles';
 
 const Title = ({ name, ...props }) => {
   const styles = StyleSheet.create({

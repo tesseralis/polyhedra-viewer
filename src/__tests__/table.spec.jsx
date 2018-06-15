@@ -5,10 +5,10 @@ import { mount } from 'enzyme';
 import AppPage from 'pages/AppPage';
 
 describe('table', () => {
-  let appPage;
+  let page;
 
   function setup() {
-    appPage = new AppPage('/');
+    page = new AppPage('/');
   }
 
   beforeEach(() => {
@@ -22,7 +22,7 @@ describe('table', () => {
   it('generates a compact view on mobile vertical', () => {
     setup();
     // Ensure that these two big tables are split up in two
-    appPage
+    page
       .setDevice('mobile')
       .expectElementWithText('caption', 'Bipyramids')
       .expectElementWithText('caption', 'Gyrate Rhombicos');

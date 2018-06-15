@@ -3,8 +3,7 @@ import React from 'react';
 import Markdown from 'react-markdown';
 import { css, StyleSheet } from 'aphrodite/no-important';
 
-import { media } from 'styles';
-import { hoeflerText, andaleMono } from 'styles/fonts';
+import { media, fonts } from 'styles';
 import periodicTable, { narrowTable } from 'constants/periodicTable';
 
 import { DeviceTracker } from 'components/DeviceContext';
@@ -122,18 +121,18 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     fontSize: 36,
     fontWeight: 'bold',
-    fontFamily: andaleMono,
+    fontFamily: fonts.andaleMono,
   },
 
   description: {
     fontSize: 16,
-    fontFamily: hoeflerText,
+    fontFamily: fonts.hoeflerText,
     color: 'DimGrey',
     lineHeight: 1.5,
   },
 
   subheader: {
-    fontFamily: hoeflerText,
+    fontFamily: fonts.hoeflerText,
     fontSize: 24,
     marginBottom: 20,
   },

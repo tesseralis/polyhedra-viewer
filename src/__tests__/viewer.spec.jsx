@@ -2,57 +2,65 @@
 import React from 'react';
 import { mount } from 'enzyme';
 
-import AppPage from 'pages/AppPage';
+import ViewerPage from 'pages/ViewerPage';
 
 describe('viewer', () => {
-  let appPage;
+  let page;
 
-  function setup(path = '/tetrahedron') {
-    appPage = new AppPage(path);
+  function setup(solid = 'tetrahedron', panel?: string) {
+    page = new ViewerPage(solid, panel);
   }
 
   beforeEach(() => {
-    setup('/tetrahedron');
+    setup('tetrahedron');
   });
 
   it('works', () => {
     setup();
   });
 
+  it('works on mobile', () => {
+    setup('tetrahedron');
+    page
+      .setDevice('mobile')
+      .clickButtonWithText('truncate')
+      .expectTransitionTo('truncated-tetrahedron');
+  });
+
   // TODO probably want to do all these basic ops on mobile as well
   it('resets the operation when unset', () => {
-    setup('/triangular-cupola/operations');
-    appPage
+    setup('triangular-cupola');
+    page
       .clickButtonWithText('augment')
       .clickButtonWithText('augment')
       .expectNoButtonWithText('ortho');
   });
 
   it('does not applyOperation on invalid apply args', () => {
-    setup('/augmented-truncated-tetrahedron/operations');
-    appPage.clickButtonWithText('diminish').clickFaceWithNumSides(6);
+    setup('augmented-truncated-tetrahedron');
+    page.clickButtonWithText('diminish').clickFaceWithNumSides(6);
   });
 
   it('unsets the operation and options when going to a different polyhedron', () => {
-    setup('/triangular-cupola/operations');
-    appPage
+    setup('triangular-cupola');
+    page
       .clickButtonWithText('augment')
       .clickButtonWithText('elongate')
       .expectNoButtonWithText('ortho');
   });
 
   it('unsets the operation when there are no more options', () => {
-    setup('/tetrahedron/operations');
-    appPage
+    setup('tetrahedron');
+    page
       .clickButtonWithText('rectify')
       .expectTransitionTo('octahedron')
       .expectOperation('');
   });
 
   it('can augment and diminish a tetrahedron', () => {
-    setup('/tetrahedron/operations');
+    setup('tetrahedron');
 
-    appPage
+    page
       .clickButtonWithText('augment')
       .clickAnyFace()
       .expectTransitionTo('triangular-bipyramid')
@@ -62,9 +70,9 @@ describe('viewer', () => {
   });
 
   it('shows options on snub only when chiral options available', () => {
-    setup('/tetrahedron/operations');
+    setup('tetrahedron');
 
-    appPage
+    page
       .clickButtonWithText('snub')
       .expectTransitionTo('icosahedron')
       .clickButtonWithText('snub')
@@ -73,25 +81,25 @@ describe('viewer', () => {
   });
 
   it('twists things left and right correctly', () => {
-    setup('/gyroelongated-pentagonal-bicupola');
+    setup('gyroelongated-pentagonal-bicupola');
 
-    appPage
+    page
       .clickButtonWithText('shorten')
       .clickButtonWithText('right')
       .expectTransitionTo('pentagonal-gyrobicupola');
 
-    setup('/gyroelongated-pentagonal-bicupola');
+    setup('gyroelongated-pentagonal-bicupola');
 
-    appPage
+    page
       .clickButtonWithText('shorten')
       .clickButtonWithText('left')
       .expectTransitionTo('pentagonal-orthobicupola');
   });
 
   it('can transition through a pyramid series', () => {
-    setup('/square-pyramid/operations');
+    setup('square-pyramid');
 
-    appPage
+    page
       .clickButtonWithText('augment')
       .clickFaceWithNumSides(4)
       .expectTransitionTo('octahedron')
@@ -104,8 +112,8 @@ describe('viewer', () => {
   });
 
   it('can augment triangular prism with pyramid and cupola', () => {
-    setup('/triangular-prism/operations');
-    appPage
+    setup('triangular-prism');
+    page
       // test gyrobifastigium
       .clickButtonWithText('augment')
       .clickButtonWithText('fastigium')
@@ -126,9 +134,9 @@ describe('viewer', () => {
   });
 
   it('can go through a simple rhombicosadodecahedron workflow', () => {
-    setup('/tridiminished-rhombicosidodecahedron/operations');
+    setup('tridiminished-rhombicosidodecahedron');
     // make sure we can augment multiple times without resetting operation
-    appPage
+    page
       .clickButtonWithText('augment')
       .clickButtonWithText('ortho')
       .clickFaceWithNumSides(10)
@@ -142,9 +150,9 @@ describe('viewer', () => {
   });
 
   it('can go through an expansion workflow', () => {
-    setup('/dodecahedron/operations');
+    setup('dodecahedron');
     // TODO test contract/snub/twist
-    appPage
+    page
       .clickButtonWithText('expand')
       .expectTransitionTo('rhombicosidodecahedron')
       .clickButtonWithText('diminish')

@@ -4,8 +4,7 @@ import { Route, NavLink } from 'react-router-dom';
 import { css, StyleSheet } from 'aphrodite/no-important';
 
 import { resetLink } from 'styles/common';
-import { media } from 'styles';
-import { verdana } from 'styles/fonts';
+import { media, fonts } from 'styles';
 import { Icon, SrOnly } from 'components/common';
 
 const styles = StyleSheet.create({
@@ -28,7 +27,7 @@ const styles = StyleSheet.create({
   title: {
     marginTop: 5,
     fontSize: 12,
-    fontFamily: verdana,
+    fontFamily: fonts.verdana,
 
     [media.mobilePortrait]: {
       fontSize: 9,
