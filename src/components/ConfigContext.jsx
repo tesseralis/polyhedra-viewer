@@ -10,7 +10,6 @@ const ConfigContext = React.createContext({
   reset: _.noop,
 });
 
-// TODO save config to browser storage
 export class ConfigProvider extends Component<*, *> {
   constructor(props: *) {
     super(props);

@@ -198,7 +198,6 @@ const getElongations = (prism, antiprism) => (
   };
 };
 
-// TODO: adapt this from the table to we don't miss anything
 const archimedean = {
   T: {
     d: 'T',

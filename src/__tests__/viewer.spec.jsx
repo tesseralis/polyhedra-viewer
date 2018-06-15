@@ -151,7 +151,6 @@ describe('viewer', () => {
 
   it('can go through an expansion workflow', () => {
     setup('dodecahedron');
-    // TODO test contract/snub/twist
     page
       .clickButtonWithText('expand')
       .expectTransitionTo('rhombicosidodecahedron')

@@ -6,7 +6,6 @@ export default class ViewerPage extends AppPage {
   constructor(solid: string, panel?: string = 'operations') {
     super(`/${solid}/${panel}`);
   }
-  // TODO these should go to a "ViewerPage" subclass
   getPolyhedron() {
     return this.wrapper.find('HitOptions').prop('polyhedron');
   }
