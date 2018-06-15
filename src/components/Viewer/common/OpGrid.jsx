@@ -3,7 +3,7 @@ import _ from 'lodash';
 import React, { Component } from 'react';
 import { css, StyleSheet } from 'aphrodite/no-important';
 
-import * as media from 'styles/media';
+import { media } from 'styles';
 import { getOpResults, operations } from 'polyhedra/operations';
 import connect from 'components/connect';
 import {

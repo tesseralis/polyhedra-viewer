@@ -3,7 +3,7 @@ import React from 'react';
 import { css, StyleSheet } from 'aphrodite/no-important';
 
 import { OpGrid, Options, ResizeButtons } from '../common';
-import * as media from 'styles/media';
+import { media } from 'styles';
 
 const styles = StyleSheet.create({
   opPanel: {

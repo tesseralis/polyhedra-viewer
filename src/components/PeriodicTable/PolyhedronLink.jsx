@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 
 import { escapeName } from 'polyhedra/names';
 import { hover } from 'styles/common';
-import * as media from 'styles/media';
+import { media } from 'styles';
 
 const thumbnailSize = 70;
 

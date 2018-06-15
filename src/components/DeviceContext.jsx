@@ -2,7 +2,7 @@
 import _ from 'lodash';
 import React, { Component } from 'react';
 import EventListener from 'react-event-listener';
-import * as media from 'styles/media';
+import { media } from 'styles';
 
 // TODO maybe this should be "device context"
 const DeviceContext = React.createContext({

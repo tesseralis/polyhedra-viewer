@@ -3,7 +3,7 @@ import React from 'react';
 import Markdown from 'react-markdown';
 import { css, StyleSheet } from 'aphrodite/no-important';
 
-import * as media from 'styles/media';
+import { media } from 'styles';
 import { hoeflerText, andaleMono } from 'styles/fonts';
 import periodicTable, { narrowTable } from 'constants/periodicTable';
 

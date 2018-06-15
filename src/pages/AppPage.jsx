@@ -5,7 +5,7 @@ import { MemoryRouter } from 'react-router-dom';
 
 import { mount } from 'enzyme';
 
-import * as media from 'styles/media';
+import { media } from 'styles';
 import App from 'components/App';
 import { DeviceProvider } from 'components/DeviceContext';
 import { Polyhedron } from 'math/polyhedra';

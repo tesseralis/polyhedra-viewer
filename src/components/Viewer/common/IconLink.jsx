@@ -4,7 +4,7 @@ import { Route, NavLink } from 'react-router-dom';
 import { css, StyleSheet } from 'aphrodite/no-important';
 
 import { resetLink } from 'styles/common';
-import * as media from 'styles/media';
+import { media } from 'styles';
 import { verdana } from 'styles/fonts';
 import { Icon, SrOnly } from 'components/common';
 

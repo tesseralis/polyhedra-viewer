@@ -4,7 +4,7 @@ import { css, StyleSheet } from 'aphrodite/no-important';
 
 import { unescapeName } from 'polyhedra/names';
 import * as fonts from 'styles/fonts';
-import * as media from 'styles/media';
+import { media } from 'styles';
 
 const Title = ({ name, ...props }) => {
   const styles = StyleSheet.create({

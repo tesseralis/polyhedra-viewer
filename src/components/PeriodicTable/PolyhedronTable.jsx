@@ -8,7 +8,7 @@ import { hoeflerText } from 'styles/fonts';
 import { fromConwayNotation } from 'polyhedra/names';
 import { type Table } from 'constants/periodicTable';
 import PolyhedronLink from './PolyhedronLink';
-import * as media from 'styles/media';
+import { media } from 'styles';
 
 const styles = StyleSheet.create({
   table: {
