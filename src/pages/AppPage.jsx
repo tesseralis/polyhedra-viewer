@@ -22,7 +22,7 @@ export default class AppPage {
     );
   }
 
-  setDevice(device: 'mobile' | 'desktop') {
+  setDevice(device: 'mobile' | 'desktop'): this {
     global.innerWidth =
       device === 'mobile'
         ? media.mobilePortraitMaxWidth
@@ -52,7 +52,7 @@ export default class AppPage {
       .filterWhere(n => n.text() === text && !n.prop('disabled'));
   }
 
-  clickButtonWithText(text: string) {
+  clickButtonWithText(text: string): this {
     this.findButtonWithText(text).simulate('click');
     return this;
   }
