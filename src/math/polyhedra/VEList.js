@@ -89,7 +89,6 @@ export default class VEList implements VertexList {
     return getNormalRay(this.vectors);
   }
 
-  // TODO check if planar?
   isValid() {
     return _.every(this.edges, edge => edge.length() > PRECISION);
   }

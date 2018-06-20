@@ -37,7 +37,6 @@ export const isValidSolid = (escapedSolidName: string) => {
   return allSolidNames.includes(escapedSolidName.replace(/-/g, ' '));
 };
 
-// TODO make name escaping consistent *again*
 export const getSolidData = (solidName: string) => {
   return require(`data/polyhedra/${solidName.replace(/ /g, '-')}.json`);
 };

@@ -27,7 +27,6 @@ describe('viewer', () => {
       .expectTransitionTo('truncated-tetrahedron');
   });
 
-  // TODO probably want to do all these basic ops on mobile as well
   it('resets the operation when unset', () => {
     setup('triangular-cupola');
     page

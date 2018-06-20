@@ -7,7 +7,6 @@ import connect from 'components/connect';
 import { WithPolyhedron } from './PolyhedronContext';
 import { WithOperation } from './OperationContext';
 
-// TODO possibly move this as part of the operation definition
 class ApplyOperation extends Component<*> {
   render() {
     return this.props.children({
@@ -53,7 +52,6 @@ class ApplyOperation extends Component<*> {
     }
   };
 
-  // TODO this should just go in the panel connect
   selectOperation = (opName: OpName) => {
     const { solidName, unsetOperation, setOperation } = this.props;
     if (opName === this.props.opName) {

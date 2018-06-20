@@ -4,7 +4,6 @@ import React, { Component } from 'react';
 import EventListener from 'react-event-listener';
 import { media } from 'styles';
 
-// TODO maybe this should be "device context"
 const DeviceContext = React.createContext({
   width: media.desktopMinWidth,
 });
