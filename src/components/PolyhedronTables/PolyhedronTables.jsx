@@ -4,7 +4,6 @@ import { css, StyleSheet } from 'aphrodite/no-important';
 
 import { media, fonts } from 'styles';
 import polyhedronTables, {
-  narrowTable,
   type TableSection as TableSectionType,
 } from 'constants/polyhedronTables';
 
@@ -136,15 +135,6 @@ const styles = StyleSheet.create({
     fontSize: 20,
     marginBottom: 15,
   },
-
-  wikiLink: {
-    textDecoration: 'none',
-    color: 'MediumBlue',
-
-    ':hover': {
-      textDecoration: 'underline',
-    },
-  },
 });
 
 const GridArea = ({ area, data }) => {
@@ -168,23 +158,35 @@ const TableGrid = ({ tables, header }) => {
 
 interface TableSectionProps {
   data: TableSectionType;
+  narrow?: boolean;
   isSubsection?: boolean;
 }
 
-function TableSection({ data, isSubsection = false }: TableSectionProps) {
-  const { header, tables, subsections } = data;
+function TableSection({
+  data,
+  narrow = false,
+  isSubsection = false,
+}: TableSectionProps) {
+  const { header, tables, narrowTables, subsections } = data;
   const Header = isSubsection ? 'h3' : 'h2';
   const headerStyle = isSubsection
     ? styles.subsectionHeader
     : styles.sectionHeader;
+
   return (
     <div key={header} className={css(styles.section)}>
       <Header className={css(headerStyle)}>{header}</Header>
-      {tables && <TableGrid header={header} tables={tables} />}
+      {tables && (
+        <TableGrid
+          header={header}
+          tables={narrow ? narrowTables || tables : tables}
+        />
+      )}
       {subsections &&
         subsections.map(subsection => (
           <TableSection
             key={subsection.header}
+            narrow={narrow}
             isSubsection
             data={subsection}
           />
@@ -193,7 +195,7 @@ function TableSection({ data, isSubsection = false }: TableSectionProps) {
   );
 }
 
-function PolyhedronTables({ data }) {
+function PolyhedronTables({ data, narrow = false }) {
   return (
     <main className={css(styles.polyhedronTables)}>
       <div className={css(styles.abstract)}>
@@ -201,7 +203,11 @@ function PolyhedronTables({ data }) {
         <Markdown source={text.abstract} />
       </div>
       {data.map(sectionData => (
-        <TableSection key={sectionData.header} data={sectionData} />
+        <TableSection
+          narrow={narrow}
+          key={sectionData.header}
+          data={sectionData}
+        />
       ))}
     </main>
   );
@@ -213,7 +219,8 @@ export default () => {
       renderDesktop={() => <PolyhedronTables data={polyhedronTables} />}
       renderMobile={({ orientation }) => (
         <PolyhedronTables
-          data={orientation === 'portrait' ? narrowTable : polyhedronTables}
+          narrow={orientation === 'portrait'}
+          data={polyhedronTables}
         />
       )}
     />

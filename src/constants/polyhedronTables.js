@@ -15,6 +15,7 @@ export interface Table {
 export interface TableSection {
   header: string;
   tables?: Table[];
+  narrowTables?: Table[];
   subsections?: TableSection[];
 }
 
@@ -272,35 +273,12 @@ const polyhedronTables: TableSection[] = [
       {
         header: 'Capstones',
         tables: [capstones],
+        narrowTables: [capstonesMono, capstonesBi],
       },
       {
         header: 'Augmented, Diminished, and Gyrate Polyhedra',
         tables: [augmented, icosahedra, rhombicosidodecahedra],
-      },
-      {
-        header: 'Elementary Johnson Solids',
-        tables: [snubAntiprisms, others],
-      },
-    ],
-  },
-];
-export default polyhedronTables;
-
-export const narrowTable: TableSection[] = [
-  {
-    header: 'Uniform Polyhedra',
-    tables: [archimedean, prisms],
-  },
-  {
-    header: 'Johnson Solids',
-    subsections: [
-      {
-        header: 'Capstones',
-        tables: [capstonesMono, capstonesBi],
-      },
-      {
-        header: 'Augmented, Diminished, and Gyrate Polyhedra',
-        tables: [
+        narrowTables: [
           augmented,
           icosahedra,
           gyrateRhombicosidodecahedra,
@@ -314,3 +292,4 @@ export const narrowTable: TableSection[] = [
     ],
   },
 ];
+export default polyhedronTables;
