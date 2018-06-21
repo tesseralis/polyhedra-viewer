@@ -40,7 +40,7 @@ const styles = StyleSheet.create({
   },
 
   fake: {
-    opacity: 0.25,
+    opacity: 0.5,
     filter: 'grayscale(50%)',
   },
 });
