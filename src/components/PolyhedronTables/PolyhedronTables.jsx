@@ -13,6 +13,9 @@ import * as text from './text';
 const sectionMapping = {
   'Uniform Polyhedra': 'uniform',
   'Johnson Solids': 'johnson',
+  Capstones: 'capstones',
+  'Augmented, Diminished, and Gyrate Polyhedra': 'augDimGyr',
+  'Elementary Johnson Solids': 'elementary',
 };
 
 const gridAreaMapping = {
@@ -64,46 +67,42 @@ const styles = StyleSheet.create({
     },
   },
 
-  johnson: {
+  capstones: {
+    gridTemplateAreas: `"caps"`,
+    [media.mobilePortrait]: {
+      gridTemplateAreas: `"caps" "bi"`,
+    },
+  },
+
+  augDimGyr: {
+    gridTemplateAreas: `
+      "aug"
+      "icos"
+      "rhombicos"
+    `,
     [media.desktop]: {
       gridTemplateAreas: `
-      "caps caps"
-      "aug  icos"
-      "aug  rhombicos"
-      "snub other"
-    `,
-    },
-    [media.tabletPortrait]: {
-      gridTemplateAreas: `
-      "caps"
-      "aug"
-      "icos"
-      "rhombicos"
-      "snub"
-      "other"
-    `,
-    },
-    [media.mobileLandscape]: {
-      gridTemplateAreas: `
-      "caps"
-      "aug"
-      "icos"
-      "rhombicos"
-      "snub"
-      "other"
-    `,
+        "aug  icos"
+        "aug  rhombicos"
+      `,
     },
     [media.mobilePortrait]: {
       gridTemplateAreas: `
-      "caps"
-      "bi"
-      "aug"
-      "icos"
-      "gyr"
-      "dim"
+        "aug"
+        "icos"
+        "gyr"
+        "dim"
+      `,
+    },
+  },
+
+  elementary: {
+    gridTemplateAreas: `
       "snub"
       "other"
     `,
+    [media.desktop]: {
+      gridTemplateAreas: '"snub other"',
     },
   },
 
@@ -123,10 +122,16 @@ const styles = StyleSheet.create({
     fontFamily: fonts.andaleMono,
   },
 
-  subheader: {
+  sectionHeader: {
     fontFamily: fonts.hoeflerText,
     fontSize: 24,
     marginBottom: 20,
+  },
+
+  subsectionHeader: {
+    fontFamily: fonts.hoeflerText,
+    fontSize: 20,
+    marginBottom: 15,
   },
 
   wikiLink: {
@@ -158,6 +163,28 @@ const TableGrid = ({ tables, header }) => {
   );
 };
 
+function TableSection({ data, isSubsection }) {
+  const { header, tables, subsections } = data;
+  const Header = isSubsection ? 'h3' : 'h2';
+  const headerStyle = isSubsection
+    ? styles.subsectionHeader
+    : styles.sectionHeader;
+  return (
+    <div key={header} className={css(styles.section)}>
+      <Header className={css(headerStyle)}>{header}</Header>
+      {tables && <TableGrid header={header} tables={tables} />}
+      {subsections &&
+        subsections.map(subsection => (
+          <TableSection
+            key={subsection.header}
+            isSubsection
+            data={subsection}
+          />
+        ))}
+    </div>
+  );
+}
+
 function PolyhedronTables({ data }) {
   return (
     <main className={css(styles.polyhedronTables)}>
@@ -165,14 +192,9 @@ function PolyhedronTables({ data }) {
         <h1 className={css(styles.header)}>Convex Polyhedra</h1>
         <Markdown source={text.abstract} />
       </div>
-      {data.map(({ header, tables }) => {
-        return (
-          <div key={header} className={css(styles.section)}>
-            <h2 className={css(styles.subheader)}>{header}</h2>
-            <TableGrid header={header} tables={tables} />
-          </div>
-        );
-      })}
+      {data.map(sectionData => (
+        <TableSection key={sectionData.header} data={sectionData} />
+      ))}
     </main>
   );
 }

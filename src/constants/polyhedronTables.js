@@ -12,10 +12,17 @@ export interface Table {
   data: DataRow[];
 }
 
-interface TableSection {
+interface BaseTableSection {
   header: string;
   tables: Table[];
 }
+
+interface TableGroup {
+  header: string;
+  subsections: BaseTableSection[];
+}
+
+type TableSection = BaseTableSection | TableGroup;
 
 export const archimedean: Table = {
   caption: 'Platonic and Archimedean Solids',
@@ -267,13 +274,19 @@ const polyhedronTables: TableSection[] = [
   },
   {
     header: 'Johnson Solids',
-    tables: [
-      capstones,
-      augmented,
-      icosahedra,
-      rhombicosidodecahedra,
-      snubAntiprisms,
-      others,
+    subsections: [
+      {
+        header: 'Capstones',
+        tables: [capstones],
+      },
+      {
+        header: 'Augmented, Diminished, and Gyrate Polyhedra',
+        tables: [augmented, icosahedra, rhombicosidodecahedra],
+      },
+      {
+        header: 'Elementary Johnson Solids',
+        tables: [snubAntiprisms, others],
+      },
     ],
   },
 ];
@@ -286,15 +299,24 @@ export const narrowTable: TableSection[] = [
   },
   {
     header: 'Johnson Solids',
-    tables: [
-      capstonesMono,
-      capstonesBi,
-      augmented,
-      icosahedra,
-      gyrateRhombicosidodecahedra,
-      diminishedRhombicosidodecahedra,
-      snubAntiprisms,
-      others,
+    subsections: [
+      {
+        header: 'Capstones',
+        tables: [capstonesMono, capstonesBi],
+      },
+      {
+        header: 'Augmented, Diminished, and Gyrate Polyhedra',
+        tables: [
+          augmented,
+          icosahedra,
+          gyrateRhombicosidodecahedra,
+          diminishedRhombicosidodecahedra,
+        ],
+      },
+      {
+        header: 'Elementary Johnson Solids',
+        tables: [snubAntiprisms, others],
+      },
     ],
   },
 ];
