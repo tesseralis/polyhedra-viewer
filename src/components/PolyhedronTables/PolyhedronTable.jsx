@@ -15,7 +15,7 @@ const styles = StyleSheet.create({
     // margin: 15,
   },
   caption: {
-    fontSize: 16,
+    fontSize: 14,
     fontFamily: hoeflerText,
     marginBottom: 15,
   },

@@ -1,5 +1,6 @@
 // @flow strict
 import { zip } from 'utils';
+// import * as text from './text';
 
 type Column = { name: string, sub: string[] } | string;
 type Data = string | string[];
@@ -14,6 +15,7 @@ export interface Table {
 
 export interface TableSection {
   header: string;
+  description?: string;
   tables?: Table[];
   narrowTables?: Table[];
   subsections?: TableSection[];
@@ -269,9 +271,11 @@ const polyhedronTables: TableSection[] = [
   },
   {
     header: 'Johnson Solids',
+    // description: text.johnson,
     subsections: [
       {
         header: 'Capstones',
+        // description: text.capstones,
         tables: [capstones],
         narrowTables: [capstonesMono, capstonesBi],
       },

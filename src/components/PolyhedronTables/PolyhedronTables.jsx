@@ -10,13 +10,13 @@ import polyhedronTables, {
 import { DeviceTracker } from 'components/DeviceContext';
 import Markdown from './Markdown';
 import PolyhedronTable from './PolyhedronTable';
-import * as text from './text';
+import * as text from 'constants/text';
 
 const sectionMapping = {
   'Uniform Polyhedra': 'uniform',
   'Johnson Solids': 'johnson',
   Capstones: 'capstones',
-  'Augmented, Diminished, and Gyrate Polyhedra': 'augDimGyr',
+  'Augmented, Diminished, and Gyrate Polyhedra': 'cutPaste',
   'Elementary Johnson Solids': 'elementary',
 };
 
@@ -76,7 +76,7 @@ const styles = StyleSheet.create({
     },
   },
 
-  augDimGyr: {
+  cutPaste: {
     gridTemplateAreas: `
       "aug"
       "icos"
@@ -99,6 +99,7 @@ const styles = StyleSheet.create({
   },
 
   elementary: {
+    gridColumnGap: 50,
     gridTemplateAreas: `
       "snub"
       "other"
@@ -109,11 +110,20 @@ const styles = StyleSheet.create({
   },
 
   abstract: {
+    maxWidth: 800,
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
     margin: 50,
+  },
+
+  // FIXME dedupe with abstract/markdown
+  description: {
     maxWidth: 800,
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    margin: '0 50px',
   },
 
   header: {
@@ -132,7 +142,7 @@ const styles = StyleSheet.create({
 
   subsectionHeader: {
     fontFamily: fonts.hoeflerText,
-    fontSize: 20,
+    fontSize: 18,
     marginBottom: 15,
   },
 });
@@ -167,7 +177,7 @@ function TableSection({
   narrow = false,
   isSubsection = false,
 }: TableSectionProps) {
-  const { header, tables, narrowTables, subsections } = data;
+  const { header, description, tables, narrowTables, subsections } = data;
   const Header = isSubsection ? 'h3' : 'h2';
   const headerStyle = isSubsection
     ? styles.subsectionHeader
@@ -176,6 +186,11 @@ function TableSection({
   return (
     <div key={header} className={css(styles.section)}>
       <Header className={css(headerStyle)}>{header}</Header>
+      {!!description && (
+        <div className={css(styles.description)}>
+          <Markdown source={description} />
+        </div>
+      )}
       {tables && (
         <TableGrid
           header={header}
@@ -195,7 +210,12 @@ function TableSection({
   );
 }
 
-function PolyhedronTables({ data, narrow = false }) {
+interface Props {
+  data: TableSection[];
+  narrow?: boolean;
+}
+
+function PolyhedronTables({ data, narrow = false }: Props) {
   return (
     <main className={css(styles.polyhedronTables)}>
       <div className={css(styles.abstract)}>

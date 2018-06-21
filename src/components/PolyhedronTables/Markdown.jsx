@@ -11,6 +11,7 @@ const styles = StyleSheet.create({
     fontFamily: fonts.hoeflerText,
     color: 'DimGrey',
     lineHeight: 1.5,
+    marginBottom: 10,
   },
 
   link: {
