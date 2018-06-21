@@ -267,6 +267,7 @@ export const others: Table = {
 const polyhedronTables: TableSection[] = [
   {
     header: 'Uniform Polyhedra',
+    description: text.uniform,
     tables: [archimedean, prisms],
   },
   {

@@ -17,6 +17,11 @@ relationships with other polyhedra.
 [johnson]: http://en.wikipedia.org/wiki/Johnson_solid
 `;
 
+export const uniform = `
+A polyhedron is _uniform_ if its vertices are transitive. These include the regular
+Platonic solids and the semi-regular Archimedean solids, prisms, and antiprisms.
+`;
+
 export const johnson = `
 The 92 Johnson solids, named after Norman Johnson, are the *nonuniform*
 convex regular-faced polyhedra -- polyhedra whose vertices aren't completely symmetrical.

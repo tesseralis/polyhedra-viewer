@@ -185,9 +185,9 @@ function TableSection({
 
   return (
     <div key={header} className={css(styles.section)}>
-      <Header className={css(headerStyle)}>{header}</Header>
-      {!!description && (
+      {description !== 'undefined' && (
         <div className={css(styles.description)}>
+          <Header className={css(headerStyle)}>{header}</Header>
           <Markdown source={description} />
         </div>
       )}
