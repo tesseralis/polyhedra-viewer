@@ -8,6 +8,7 @@ import polyhedronTables, { narrowTable } from 'constants/polyhedronTables';
 
 import { DeviceTracker } from 'components/DeviceContext';
 import PolyhedronTable from './PolyhedronTable';
+import * as text from './text';
 
 const sectionMapping = {
   'Uniform Polyhedra': 'uniform',
@@ -178,28 +179,13 @@ const TableGrid = ({ tables, header }) => {
   );
 };
 
-const description = `
-  These tables are a categorization of the convex, regular-faced (CRF)
-  polyhedra. These include the five [Platonic solids][platonic], the 13
-  [Archimedean solids][archimedean], the infinite set of [prisms][prism]
-  and [antiprisms][antiprism], and the 92 [Johnson solids][johnson].
-  Select a solid to play around with it and to see its
-  relationships with other polyhedra.
-
-  [platonic]: http://en.wikipedia.org/wiki/Platonic_solid
-  [archimedean]: http://en.wikipedia.org/wiki/Archimedean_solid
-  [prism]: http://en.wikipedia.org/wiki/Prism_(geometry)
-  [antiprism]: http://en.wikipedia.org/wiki/Antiprism
-  [johnson]: http://en.wikipedia.org/wiki/Johnson_solid
-`;
-
 function PolyhedronTables({ data }) {
   return (
     <main className={css(styles.polyhedronTables)}>
       <div className={css(styles.abstract)}>
         <h1 className={css(styles.header)}>Convex Polyhedra</h1>
         <Markdown
-          source={description}
+          source={text.abstract}
           renderers={{
             paragraph: Paragraph,
             linkReference: WikiLink,
