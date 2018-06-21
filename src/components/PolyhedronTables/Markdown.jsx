@@ -1,20 +1,26 @@
 // @flow strict
+import _ from 'lodash';
 import React from 'react';
 import Markdown from 'react-markdown';
 import { css, StyleSheet } from 'aphrodite/no-important';
 
-import { fonts } from 'styles';
+import { media, fonts } from 'styles';
 
 const styles = StyleSheet.create({
-  paragraph: {
+  // TODO change a lot of this to be from the surrounding element
+  p: {
     fontSize: 16,
     fontFamily: fonts.hoeflerText,
     color: 'DimGrey',
     lineHeight: 1.5,
     marginBottom: 10,
+
+    [media.mobile]: {
+      fontSize: 14,
+    },
   },
 
-  link: {
+  a: {
     textDecoration: 'none',
     color: 'MediumBlue',
 
@@ -22,19 +28,46 @@ const styles = StyleSheet.create({
       textDecoration: 'underline',
     },
   },
+  ul: {
+    listStyle: 'disc',
+    margin: '0 20px',
+    marginBottom: 10,
+  },
+
+  li: {
+    fontSize: 16,
+    fontFamily: fonts.hoeflerText,
+    color: 'DimGrey',
+    lineHeight: 1.5,
+
+    [media.mobile]: {
+      fontSize: 14,
+    },
+  },
+
+  em: {
+    fontStyle: 'italic',
+  },
+
+  strong: {
+    fontWeight: 'bold',
+  },
 });
 
-// TODO generate from styles instead of creating new component for each
-const Paragraph = props => {
-  return <p {...props} className={css(styles.paragraph)} />;
-};
+function makeRenderer(El) {
+  return props => {
+    const allowedProps = _.pick(props, ['children', 'href']);
+    return <El {...allowedProps} className={css(styles[El])} />;
+  };
+}
 
-const Link = ({ children, href }) => {
-  return (
-    <a className={css(styles.link)} href={href}>
-      {children}
-    </a>
-  );
+const renderers = {
+  paragraph: makeRenderer('p'),
+  linkReference: makeRenderer('a'),
+  list: makeRenderer('ul'),
+  listItem: makeRenderer('li'),
+  emphasis: makeRenderer('em'),
+  strong: makeRenderer('strong'),
 };
 
 interface Props {
@@ -42,13 +75,5 @@ interface Props {
 }
 
 export default ({ source }: Props) => {
-  return (
-    <Markdown
-      source={source}
-      renderers={{
-        paragraph: Paragraph,
-        linkReference: Link,
-      }}
-    />
-  );
+  return <Markdown source={source} renderers={renderers} />;
 };

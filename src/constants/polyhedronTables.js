@@ -1,6 +1,6 @@
 // @flow strict
 import { zip } from 'utils';
-// import * as text from './text';
+import * as text from './text';
 
 type Column = { name: string, sub: string[] } | string;
 type Data = string | string[];
@@ -271,16 +271,17 @@ const polyhedronTables: TableSection[] = [
   },
   {
     header: 'Johnson Solids',
-    // description: text.johnson,
+    description: text.johnson,
     subsections: [
       {
         header: 'Capstones',
-        // description: text.capstones,
+        description: text.capstones,
         tables: [capstones],
         narrowTables: [capstonesMono, capstonesBi],
       },
       {
         header: 'Augmented, Diminished, and Gyrate Polyhedra',
+        description: text.cutPaste,
         tables: [augmented, icosahedra, rhombicosidodecahedra],
         narrowTables: [
           augmented,
@@ -291,6 +292,7 @@ const polyhedronTables: TableSection[] = [
       },
       {
         header: 'Elementary Johnson Solids',
+        description: text.elementary,
         tables: [snubAntiprisms, others],
       },
     ],
