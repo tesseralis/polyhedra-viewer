@@ -1,12 +1,12 @@
 // @flow strict
 import React from 'react';
-import Markdown from 'react-markdown';
 import { css, StyleSheet } from 'aphrodite/no-important';
 
 import { media, fonts } from 'styles';
 import polyhedronTables, { narrowTable } from 'constants/polyhedronTables';
 
 import { DeviceTracker } from 'components/DeviceContext';
+import Markdown from './Markdown';
 import PolyhedronTable from './PolyhedronTable';
 import * as text from './text';
 
@@ -51,8 +51,6 @@ const styles = StyleSheet.create({
     gridColumnGap: 30,
     justifyItems: 'center',
   },
-
-  gridArea: {},
 
   uniform: {
     gridTemplateAreas: `
@@ -125,13 +123,6 @@ const styles = StyleSheet.create({
     fontFamily: fonts.andaleMono,
   },
 
-  description: {
-    fontSize: 16,
-    fontFamily: fonts.hoeflerText,
-    color: 'DimGrey',
-    lineHeight: 1.5,
-  },
-
   subheader: {
     fontFamily: fonts.hoeflerText,
     fontSize: 24,
@@ -148,21 +139,9 @@ const styles = StyleSheet.create({
   },
 });
 
-const Paragraph = ({ children }) => {
-  return <p className={css(styles.description)}>{children}</p>;
-};
-
-const WikiLink = ({ href, children }) => {
-  return (
-    <a className={css(styles.wikiLink)} href={href}>
-      {children}
-    </a>
-  );
-};
-
 const GridArea = ({ area, data }) => {
   return (
-    <div style={{ gridArea: area }} className={css(styles.gridArea)}>
+    <div style={{ gridArea: area }}>
       <PolyhedronTable {...data} />
     </div>
   );
@@ -184,13 +163,7 @@ function PolyhedronTables({ data }) {
     <main className={css(styles.polyhedronTables)}>
       <div className={css(styles.abstract)}>
         <h1 className={css(styles.header)}>Convex Polyhedra</h1>
-        <Markdown
-          source={text.abstract}
-          renderers={{
-            paragraph: Paragraph,
-            linkReference: WikiLink,
-          }}
-        />
+        <Markdown source={text.abstract} />
       </div>
       {data.map(({ header, tables }) => {
         return (
