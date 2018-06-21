@@ -3,7 +3,10 @@ import React from 'react';
 import { css, StyleSheet } from 'aphrodite/no-important';
 
 import { media, fonts } from 'styles';
-import polyhedronTables, { narrowTable } from 'constants/polyhedronTables';
+import polyhedronTables, {
+  narrowTable,
+  type TableSection as TableSectionType,
+} from 'constants/polyhedronTables';
 
 import { DeviceTracker } from 'components/DeviceContext';
 import Markdown from './Markdown';
@@ -163,7 +166,12 @@ const TableGrid = ({ tables, header }) => {
   );
 };
 
-function TableSection({ data, isSubsection }) {
+interface TableSectionProps {
+  data: TableSectionType;
+  isSubsection?: boolean;
+}
+
+function TableSection({ data, isSubsection = false }: TableSectionProps) {
   const { header, tables, subsections } = data;
   const Header = isSubsection ? 'h3' : 'h2';
   const headerStyle = isSubsection

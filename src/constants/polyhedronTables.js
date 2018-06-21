@@ -12,17 +12,11 @@ export interface Table {
   data: DataRow[];
 }
 
-interface BaseTableSection {
+export interface TableSection {
   header: string;
-  tables: Table[];
+  tables?: Table[];
+  subsections?: TableSection[];
 }
-
-interface TableGroup {
-  header: string;
-  subsections: BaseTableSection[];
-}
-
-type TableSection = BaseTableSection | TableGroup;
 
 export const archimedean: Table = {
   caption: 'Platonic and Archimedean Solids',
