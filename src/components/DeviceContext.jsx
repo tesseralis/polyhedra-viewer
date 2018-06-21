@@ -1,6 +1,6 @@
 // @flow strict
 import _ from 'lodash';
-import React, { Component } from 'react';
+import * as React from 'react';
 import EventListener from 'react-event-listener';
 import { media } from 'styles';
 
@@ -8,8 +8,19 @@ const DeviceContext = React.createContext({
   width: media.desktopMinWidth,
 });
 
-export class DeviceProvider extends Component<*, *> {
-  constructor(props: *) {
+interface ProviderProps {
+  children?: React.Node;
+}
+
+interface ProviderState {
+  width: number;
+}
+
+export class DeviceProvider extends React.Component<
+  ProviderProps,
+  ProviderState,
+> {
+  constructor(props: ProviderProps) {
     super(props);
     this.state = {
       width: this.getWidth(),
@@ -29,7 +40,7 @@ export class DeviceProvider extends Component<*, *> {
     this.setState({ width: this.getWidth() });
   };
 
-  getWidth = () => {
+  getWidth = (): number => {
     return window.innerWidth > 0 ? window.innerWidth : window.screen.width;
   };
 }

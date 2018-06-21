@@ -112,7 +112,7 @@ export default function MobileViewer({ panel, solid }: Props) {
   return (
     <section className={css(styles.viewer)}>
       <div className={css(styles.title)}>
-        <IconLink iconOnly iconName="periodic-table" title="Table" to="/" />
+        <IconLink iconOnly iconName="chevron-left" title="Back" to="/" />
         <Title name={solid} />
       </div>
       {panelNode && (

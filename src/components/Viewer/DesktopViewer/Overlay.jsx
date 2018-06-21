@@ -43,7 +43,13 @@ export default function Overlay({ solid }: Props) {
   return (
     <div className={css(styles.overlay)}>
       <div className={css(styles.homeLink)}>
-        <IconLink iconName="periodic-table" title="Table" replace to="/" />
+        <IconLink
+          iconOnly
+          iconName="chevron-left"
+          title="Back"
+          replace
+          to="/"
+        />
       </div>
       <div className={css(styles.title)}>
         <Title name={solid} />
