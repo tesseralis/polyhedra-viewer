@@ -6,7 +6,7 @@ import { css, StyleSheet } from 'aphrodite/no-important';
 import { flatMap } from 'utils';
 import { hoeflerText } from 'styles/fonts';
 import { fromConwayNotation } from 'polyhedra/names';
-import { type Table } from 'constants/periodicTable';
+import { type Table } from 'constants/polyhedronTables';
 import PolyhedronLink from './PolyhedronLink';
 import { media } from 'styles';
 

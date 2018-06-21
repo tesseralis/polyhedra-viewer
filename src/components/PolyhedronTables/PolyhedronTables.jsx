@@ -4,7 +4,7 @@ import Markdown from 'react-markdown';
 import { css, StyleSheet } from 'aphrodite/no-important';
 
 import { media, fonts } from 'styles';
-import periodicTable, { narrowTable } from 'constants/periodicTable';
+import polyhedronTables, { narrowTable } from 'constants/polyhedronTables';
 
 import { DeviceTracker } from 'components/DeviceContext';
 import PolyhedronTable from './PolyhedronTable';
@@ -29,7 +29,7 @@ const gridAreaMapping = {
 };
 
 const styles = StyleSheet.create({
-  periodicTable: {
+  polyhedronTables: {
     width: '100%',
     display: 'flex',
     flexDirection: 'column',
@@ -193,11 +193,11 @@ const description = `
   [johnson]: http://en.wikipedia.org/wiki/Johnson_solid
 `;
 
-function PeriodicTable({ data }) {
+function PolyhedronTables({ data }) {
   return (
-    <main className={css(styles.periodicTable)}>
+    <main className={css(styles.polyhedronTables)}>
       <div className={css(styles.abstract)}>
-        <h1 className={css(styles.header)}>Periodic Table of Polyhedra</h1>
+        <h1 className={css(styles.header)}>Convex Polyhedra</h1>
         <Markdown
           source={description}
           renderers={{
@@ -221,10 +221,10 @@ function PeriodicTable({ data }) {
 export default () => {
   return (
     <DeviceTracker
-      renderDesktop={() => <PeriodicTable data={periodicTable} />}
+      renderDesktop={() => <PolyhedronTables data={polyhedronTables} />}
       renderMobile={({ orientation }) => (
-        <PeriodicTable
-          data={orientation === 'portrait' ? narrowTable : periodicTable}
+        <PolyhedronTables
+          data={orientation === 'portrait' ? narrowTable : polyhedronTables}
         />
       )}
     />

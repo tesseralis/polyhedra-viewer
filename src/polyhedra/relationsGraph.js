@@ -1,6 +1,6 @@
 // @flow strict
 import _ from 'lodash';
-import { prisms, capstones, augmented } from 'constants/periodicTable';
+import { prisms, capstones, augmented } from 'constants/polyhedronTables';
 import { toConwayNotation } from './names';
 import { mapObject } from 'utils';
 
@@ -110,7 +110,7 @@ function convertTable(table) {
   };
 }
 
-// const [, , prisms, , capstones, augmentations] = periodicTable
+// const [, , prisms, , capstones, augmentations] = polyhedronTables
 const [prismMap, capstoneMap, augmentationMap] = [prisms, capstones, augmented]
   .map(convertTable)
   .map(getKeyedTable);

@@ -12,8 +12,8 @@ import 'styles/a11y.css';
 // TODO more interesting loading bar
 const Loading = () => <div>Loading...</div>;
 
-const PeriodicTable = Loadable({
-  loader: () => import('./PeriodicTable'),
+const PolyhedronTables = Loadable({
+  loader: () => import('./PolyhedronTables'),
   loading: Loading,
 });
 
@@ -24,7 +24,7 @@ const Viewer = Loadable({
 
 export default () => (
   <Switch>
-    <Route exact path="/" component={PeriodicTable} />
+    <Route exact path="/" component={PolyhedronTables} />
     <Route
       exact
       path="/:solid"

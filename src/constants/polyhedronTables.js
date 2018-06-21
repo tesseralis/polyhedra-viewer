@@ -260,7 +260,7 @@ export const others: Table = {
   data: [['J86', 'J87', 'J88', 'J89', 'J90', 'J91', 'J92']],
 };
 
-const periodicTable: TableSection[] = [
+const polyhedronTables: TableSection[] = [
   {
     header: 'Uniform Polyhedra',
     tables: [archimedean, prisms],
@@ -277,7 +277,7 @@ const periodicTable: TableSection[] = [
     ],
   },
 ];
-export default periodicTable;
+export default polyhedronTables;
 
 export const narrowTable: TableSection[] = [
   {
