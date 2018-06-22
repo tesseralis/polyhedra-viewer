@@ -2,6 +2,8 @@
 import React from 'react';
 import { css, StyleSheet } from 'aphrodite/no-important';
 
+// FIXME move this somewhere else!
+import { X3dScene } from 'components/Viewer/common';
 import { media, fonts } from 'styles';
 import polyhedronTables, {
   type TableSection as TableSectionType,
@@ -114,7 +116,7 @@ const styles = StyleSheet.create({
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    margin: 50,
+    marginBottom: 50,
   },
 
   // FIXME dedupe with abstract/markdown
@@ -225,6 +227,7 @@ interface Props {
 function PolyhedronTables({ data, narrow = false }: Props) {
   return (
     <main className={css(styles.polyhedronTables)}>
+      <X3dScene smol />
       <div className={css(styles.abstract)}>
         <h1 className={css(styles.header)}>Polyhedra Viewer</h1>
         <p className={css(styles.author)}>by @tesseralis</p>

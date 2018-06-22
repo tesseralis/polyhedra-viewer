@@ -77,5 +77,21 @@ possible if it would make the dihedral angle between two faces more than 180 deg
 export const elementary = `
 The remaining Johnson solids cannot be created by "cut and paste" operations.
 Of those, two of them can be created by snubbing antiprisms (not supported in this
-app). The rest we have no idea and are just kinda random. Isn't that crazy?
+app).
+
+The remaining seven are named based on their components:
+
+* **lune** - two triangles on opposite ends of a square
+* **spheno-** - two adjacent lunes that make a wedge
+* **hebespheno-** - two lunes separated by a third lune
+* **-corona** - a crownlike complex of eight triangles
+* **-megacorona** - a crownlike complex of 12 triangles
+* **-cingulum** - a belt of 12 triangles
+
+While they are not directly composed of other polyhedra, these solids may still be
+related in interesting ways! For example, the bilunabirotunda makes a honeycomb
+with the cube and dodecahedron!
+
+Are there ways to create these solids with an "operation" like with the snub antiprisms?
+The world may never know.
 `;
