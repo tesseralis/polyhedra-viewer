@@ -19,7 +19,8 @@ relationships with other polyhedra.
 
 export const uniform = `
 A polyhedron is _uniform_ if its vertices are transitive. These include the regular
-Platonic solids and the semi-regular Archimedean solids, prisms, and antiprisms.
+Platonic solids, which only have one type of face, and the semi-regular Archimedean solids,
+prisms, and antiprisms, which have more than one type of face.
 `;
 
 export const johnson = `
@@ -69,7 +70,6 @@ possible if it would make the dihedral angle between two faces more than 180 deg
 
 export const elementary = `
 The remaining Johnson solids cannot be created by "cut and paste" operations.
-Of the remaining, two of them can be created by snubbing antiprisms (this is
-not supported in this app yet). The rest are just… there. Somehow.
-And someone proved that's all of them.
+Of those, two of them can be created by snubbing antiprisms (not supported in this
+app). The rest we have no idea and are just kinda random. Isn't that crazy?
 `;
