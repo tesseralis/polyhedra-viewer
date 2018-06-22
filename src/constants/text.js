@@ -2,6 +2,12 @@
 // Markdown for everything.
 
 export const abstract = `
+For centuries, mathematicians and artists have been fascinated by the
+beauty in polyhedra -- three dimensional shapes made of simple polygons.
+But the majority of us have only heard and seen a few of them, like the
+Platonic Solids, or prisms, or pyramids. There are many more polyhedra
+to find, with interesting properties and relationships to each other.
+
 These tables are a categorization of the convex, regular-faced (CRF)
 polyhedra. These include the five [Platonic solids][platonic], the 13
 [Archimedean solids][archimedean], the infinite set of [prisms][prism]

@@ -128,10 +128,17 @@ const styles = StyleSheet.create({
 
   header: {
     marginTop: 20,
-    marginBottom: 20,
+    marginBottom: 15,
     fontSize: 36,
     fontWeight: 'bold',
     fontFamily: fonts.andaleMono,
+  },
+
+  author: {
+    fontSize: 16,
+    fontFamily: fonts.andaleMono,
+    marginBottom: 20,
+    fontColor: 'dimGray',
   },
 
   sectionHeader: {
@@ -219,7 +226,8 @@ function PolyhedronTables({ data, narrow = false }: Props) {
   return (
     <main className={css(styles.polyhedronTables)}>
       <div className={css(styles.abstract)}>
-        <h1 className={css(styles.header)}>Convex Polyhedra</h1>
+        <h1 className={css(styles.header)}>Polyhedra Viewer</h1>
+        <p className={css(styles.author)}>by @tesseralis</p>
         <Markdown source={text.abstract} />
       </div>
       {data.map(sectionData => (
