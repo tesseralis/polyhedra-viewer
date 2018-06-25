@@ -151,7 +151,7 @@ const styles = StyleSheet.create({
 
   subsectionHeader: {
     fontFamily: fonts.hoeflerText,
-    fontSize: 18,
+    fontSize: 20,
     marginBottom: 15,
   },
 });
