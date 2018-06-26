@@ -121,6 +121,11 @@ const styles = StyleSheet.create({
     marginBottom: 50,
   },
 
+  // The subsection will also have marginbottom so don't duplicate
+  hasSubsection: {
+    marginBottom: 0,
+  },
+
   grid: {
     display: 'grid',
     gridRowGap: 50,
@@ -130,7 +135,6 @@ const styles = StyleSheet.create({
 
   description: {
     maxWidth: 800,
-    width: '100%',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
@@ -205,7 +209,10 @@ function TableSection({
     : styles.sectionHeader;
 
   return (
-    <div key={header} className={css(styles.section)}>
+    <div
+      key={header}
+      className={css(styles.section, !!subsections && styles.hasSubsection)}
+    >
       {typeof description !== 'undefined' && (
         <div className={css(styles.description)}>
           <Header className={css(headerStyle)}>{header}</Header>
@@ -262,6 +269,10 @@ function HomePage({ data, narrow = false }: Props) {
           data={sectionData}
         />
       ))}
+      <div className={css(styles.description)}>
+        <h1 className={css(styles.sectionHeader)}>More Polyhedra</h1>
+        <Markdown source={text.more} />
+      </div>
     </main>
   );
 }

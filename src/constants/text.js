@@ -104,3 +104,15 @@ makes a [honeycomb] with the cube and dodecahedron.
 
 [honeycomb]: https://en.wikipedia.org/wiki/Regular_dodecahedron#Space_filling_with_cube_and_bilunabirotunda
 `;
+
+export const more = `
+Wow wasn't that a trip! Again, these are only the _convex_, _regular-faced_ polyhedra.
+There are many more! The [Kepler-Poinsot polyhedra] are like the Platonic solids but non-convex.
+The [Catalan solids] are the duals of the Archimedian solids and have non-regular faces.
+
+And that's only in three dimensions! Try exploring the four dimentional [polychora]
+(if you can wrap your head around it).
+
+[Kepler-Poinsot polyhedra]: https://en.wikipedia.org/wiki/Kepler%E2%80%93Poinsot_polyhedron
+[Catalan solids]: https://en.wikipedia.org/wiki/Catalan_solid
+`;
