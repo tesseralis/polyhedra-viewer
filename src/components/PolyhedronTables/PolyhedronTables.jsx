@@ -35,6 +35,8 @@ const gridAreaMapping = {
   'Other Johnson Solids': 'other',
 };
 
+const videoHeight = 400;
+
 const styles = StyleSheet.create({
   polyhedronTables: {
     width: '100%',
@@ -42,6 +44,13 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+
+  splash: {
+    // make smaller to hide weird video artifacts
+    height: videoHeight - 2,
+    width: 'auto',
+    overflowY: 'hidden',
   },
 
   section: {
@@ -219,14 +228,16 @@ function TableSection({
 }
 
 interface Props {
-  data: TableSection[];
+  data: TableSectionType[];
   narrow?: boolean;
 }
 
 function PolyhedronTables({ data, narrow = false }: Props) {
   return (
     <main className={css(styles.polyhedronTables)}>
-      <video muted autoPlay loop src={splash} height={400} />
+      <div className={css(styles.splash)}>
+        <video muted autoPlay loop src={splash} height={videoHeight} />
+      </div>
       <div className={css(styles.abstract)}>
         <h1 className={css(styles.header)}>Polyhedra Viewer</h1>
         <p className={css(styles.author)}>by @tesseralis</p>
