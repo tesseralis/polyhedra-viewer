@@ -4,11 +4,11 @@
 export const abstract = `
 For centuries, mathematicians and artists have been fascinated by the
 beauty in polyhedra -- three dimensional shapes made of simple polygons.
-But the majority of us have only heard and seen a few of them, like the
-Platonic Solids, or prisms, or pyramids. There are many more polyhedra
-to find, with interesting properties and relationships to each other.
+But most people have only heard and seen a few of them, like the
+Platonic solids, or prisms, or pyramids. There are many more polyhedra
+to discover, with interesting properties and relationships to each other.
 
-These tables are a categorization of the convex, regular-faced (CRF)
+This site is a categorization of the convex, regular-faced (CRF)
 polyhedra. These include the five [Platonic solids][platonic], the 13
 [Archimedean solids][archimedean], the infinite set of [prisms][prism]
 and [antiprisms][antiprism], and the 92 [Johnson solids][johnson].
@@ -27,6 +27,16 @@ export const uniform = `
 A polyhedron is _uniform_ if its vertices are transitive. These include the regular
 Platonic solids, which only have one type of face, and the semi-regular Archimedean solids,
 prisms, and antiprisms, which have more than one type of face.
+
+The Archimedean solids can be constructed from the Platonic solids by a set of operations:
+
+* **truncate** - Cut each vertex off the solid leaving equal sized faces
+* **rectify** - Cut each vertex off the solid at the midpoint
+* **expand** - Pull the faces of the solid out
+* **snub** - Pull the faces of the solid out and twist them
+
+There are infinitely many prisms and antiprisms, one for each type of polygon.
+A select few are included here because of their relationship to the Johnson solids.
 `;
 
 export const johnson = `
@@ -34,8 +44,8 @@ The 92 Johnson solids, named after Norman Johnson, are the *nonuniform*
 convex regular-faced polyhedra -- polyhedra whose vertices aren't completely symmetrical.
 All but a few of them can be created by "cut-and-paste" operations on the uniform polyhedra.
 
-Even though there is no hard restriction, it turns out that you can make all
-the Johnson solids using faces of 3, 4, 5, 6, 8 or 10 sides.
+Even though there is no hard restriction on which polygons can be used,
+all the Johnson solids can be made using faces of 3, 4, 5, 6, 8 or 10 sides.
 `;
 
 export const capstones = `
@@ -45,7 +55,8 @@ The majority of Johnson solids are made of these components:
 * **pyramid** - a set of triangles around a point with a regular polygon base.
    These can be sliced off from the tetrahedron, octahedron, and icosahedron
 * **cupola** - A set of alternating squares and triangles around a top polygon,
-   with a base that has double the amount of sides. These can be "sliced" off the "rhombi-" solids
+   with a base that has double the amount of sides. These can be sliced off the cantellated
+   Archimedean solids.
 * **rotunda** - Alternating sets of triangles and pentagons. Half of an icosidodecahedron.
 
 The following operations are defined:
@@ -53,9 +64,9 @@ The following operations are defined:
 * **gyroelongate** - Extend this solid with an antiprism
 * **bi** - Glue two solids together
 
-Cupolae and rotundae can be oriented two different ways -
-_Ortho-_ means that opposite faces are aligned with each other.
-_Gyro-_ means that they are skew.
+Cupolae and rotundae can be oriented two different ways:
+_ortho-_ means that opposite faces are aligned with each other, while
+_gyro-_ means that they are skew.
 `;
 
 export const cutPaste = `
