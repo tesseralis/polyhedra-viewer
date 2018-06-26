@@ -54,16 +54,16 @@ const styles = StyleSheet.create({
   },
 });
 
-function makeRenderer(El) {
+function makeRenderer(El, ownProps = {}) {
   return props => {
     const allowedProps = _.pick(props, ['children', 'href']);
-    return <El {...allowedProps} className={css(styles[El])} />;
+    return <El {...allowedProps} {...ownProps} className={css(styles[El])} />;
   };
 }
 
 const renderers = {
   paragraph: makeRenderer('p'),
-  linkReference: makeRenderer('a'),
+  linkReference: makeRenderer('a', { target: '_blank' }),
   list: makeRenderer('ul'),
   listItem: makeRenderer('li'),
   emphasis: makeRenderer('em'),

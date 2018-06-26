@@ -4,14 +4,12 @@
 export const abstract = `
 For centuries, mathematicians and artists have been fascinated by the
 beauty in polyhedra -- three dimensional shapes made of simple polygons.
-But most people have only heard and seen a few of them, like the
-Platonic solids, or prisms, or pyramids. There are many more polyhedra
+But most are familiar with only a few of them, like the
+Platonic solids, prisms, or pyramids. There are many more polyhedra
 to discover, with interesting properties and relationships to each other.
 
-This site is a categorization of the convex, regular-faced (CRF)
-polyhedra. These include the five [Platonic solids], the 13
-[Archimedean solids], the infinite set of [prisms]
-and [antiprisms], and the 92 [Johnson solids].
+This interactive encyclopedia cataloges the relationships between
+the convex, regular-faced (CRF) polyhedra.
 The 120 solids presented here are connected to each other by an intricate
 network of operations. Select a solid to manipulate it and to see its
 relationships with other polyhedra.
@@ -101,8 +99,8 @@ The remaining seven are named based on their components:
 * **-cingulum** - a belt of 12 triangles
 
 While they are not directly composed of other polyhedra, these solids may still be
-related in interesting ways! For example, the bilunabirotunda makes a [honeycomb]
-with the cube and dodecahedron.
+have interesting relationships with other solids. For example, the bilunabirotunda
+makes a [honeycomb] with the cube and dodecahedron.
 
 [honeycomb]: https://en.wikipedia.org/wiki/Regular_dodecahedron#Space_filling_with_cube_and_bilunabirotunda
 `;
