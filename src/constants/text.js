@@ -111,8 +111,9 @@ There are many more! The [Kepler-Poinsot polyhedra] are like the Platonic solids
 The [Catalan solids] are the duals of the Archimedian solids and have non-regular faces.
 
 And that's only in three dimensions! Try exploring the four dimentional [polychora]
-(if you can wrap your head around it).
+(if you can wrap your head around it) or even [higher dimensions][5-polytope]!
 
 [Kepler-Poinsot polyhedra]: https://en.wikipedia.org/wiki/Kepler%E2%80%93Poinsot_polyhedron
 [Catalan solids]: https://en.wikipedia.org/wiki/Catalan_solid
+[5-polytope]: https://en.wikipedia.org/wiki/5-polytope
 `;

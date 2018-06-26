@@ -32,7 +32,7 @@ const styles = StyleSheet.create({
     },
   },
   ul: {
-    listStyle: 'disc',
+    listStyle: 'disc inside',
     margin: '0 20px',
     marginBottom: 10,
   },
