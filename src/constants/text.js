@@ -3,7 +3,7 @@
 
 export const abstract = `
 For centuries, mathematicians and artists have been fascinated by the
-beauty in polyhedra -- three dimensional shapes made of simple polygons.
+beauty in polyhedra—three dimensional shapes made of simple polygons.
 But most are familiar with only a few of them, such as the
 Platonic solids, prisms, or pyramids. There are many more polyhedra
 to discover, with interesting properties and relationships to each other.
@@ -39,7 +39,7 @@ A select few are included here because of their relationship to the Johnson soli
 
 export const johnson = `
 The 92 Johnson solids, named after Norman Johnson, are the *nonuniform*
-convex regular-faced polyhedra -- polyhedra whose vertices aren't completely symmetrical.
+convex regular-faced polyhedra—polyhedra whose vertices aren't completely symmetrical.
 All but a few of them can be created by "cut-and-paste" operations on the uniform polyhedra.
 
 Even though there is no hard restriction on which polygons can be used,
@@ -79,7 +79,7 @@ When more than one operation is applied, sometimes there is more than one way in
 the solid can be modified. A solid _para-_ if the modified components
 are opposite each other, and _meta-_ if they are not.
 
-Johnson solids are, by definition, convex -- an operation is not possible if
+Johnson solids are, by definition, convex—an operation is not possible if
 it would make the dihedral angle between two faces more than 180 degrees.
 For example, the pentagonal prism cannot be augmented more than twice because there
 is no place to put another pyramid without making it nonconvex.
