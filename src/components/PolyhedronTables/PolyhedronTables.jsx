@@ -2,8 +2,7 @@
 import React from 'react';
 import { css, StyleSheet } from 'aphrodite/no-important';
 
-// FIXME move this somewhere else!
-import { X3dScene } from 'components/Viewer/common';
+import splash from 'splash.mp4';
 import { media, fonts } from 'styles';
 import polyhedronTables, {
   type TableSection as TableSectionType,
@@ -227,7 +226,7 @@ interface Props {
 function PolyhedronTables({ data, narrow = false }: Props) {
   return (
     <main className={css(styles.polyhedronTables)}>
-      <X3dScene smol />
+      <video muted autoPlay loop src={splash} height={400} />
       <div className={css(styles.abstract)}>
         <h1 className={css(styles.header)}>Polyhedra Viewer</h1>
         <p className={css(styles.author)}>by @tesseralis</p>
