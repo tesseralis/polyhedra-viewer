@@ -7,6 +7,9 @@ import { css, StyleSheet } from 'aphrodite/no-important';
 import { media, fonts } from 'styles';
 
 const styles = StyleSheet.create({
+  div: {
+    marginBottom: 30,
+  },
   // TODO change a lot of this to be from the surrounding element
   p: {
     fontSize: 16,
@@ -62,6 +65,7 @@ function makeRenderer(El, ownProps = {}) {
 }
 
 const renderers = {
+  root: makeRenderer('div'),
   paragraph: makeRenderer('p'),
   linkReference: makeRenderer('a', { target: '_blank' }),
   list: makeRenderer('ul'),
