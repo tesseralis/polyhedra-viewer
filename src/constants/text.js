@@ -4,7 +4,7 @@
 export const abstract = `
 For centuries, mathematicians and artists have been fascinated by the
 beauty in polyhedra -- three dimensional shapes made of simple polygons.
-But most are familiar with only a few of them, like the
+But most are familiar with only a few of them, such as the
 Platonic solids, prisms, or pyramids. There are many more polyhedra
 to discover, with interesting properties and relationships to each other.
 

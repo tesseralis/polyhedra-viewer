@@ -38,7 +38,7 @@ const gridAreaMapping = {
 const videoHeight = 400;
 
 const styles = StyleSheet.create({
-  polyhedronTables: {
+  homePage: {
     width: '100%',
     display: 'flex',
     flexDirection: 'column',
@@ -232,9 +232,9 @@ interface Props {
   narrow?: boolean;
 }
 
-function PolyhedronTables({ data, narrow = false }: Props) {
+function HomePage({ data, narrow = false }: Props) {
   return (
-    <main className={css(styles.polyhedronTables)}>
+    <main className={css(styles.homePage)}>
       <div className={css(styles.splash)}>
         <video muted autoPlay loop src={splash} height={videoHeight} />
       </div>
@@ -257,12 +257,9 @@ function PolyhedronTables({ data, narrow = false }: Props) {
 export default () => {
   return (
     <DeviceTracker
-      renderDesktop={() => <PolyhedronTables data={polyhedronTables} />}
+      renderDesktop={() => <HomePage data={polyhedronTables} />}
       renderMobile={({ orientation }) => (
-        <PolyhedronTables
-          narrow={orientation === 'portrait'}
-          data={polyhedronTables}
-        />
+        <HomePage narrow={orientation === 'portrait'} data={polyhedronTables} />
       )}
     />
   );
