@@ -15,14 +15,9 @@ const styles = StyleSheet.create({
     height: '100%',
     width: '100%',
   },
-
-  smol: {
-    height: 400,
-  },
 });
 
 interface Props {
-  smol?: boolean;
   children: React.Node;
 }
 
@@ -33,9 +28,8 @@ export default class X3dScene extends React.Component<Props> {
   }
 
   render() {
-    const { smol = false } = this.props;
     return (
-      <x3d className={css(styles.x3dScene, !!smol && styles.smol)}>
+      <x3d className={css(styles.x3dScene)}>
         <scene>
           <viewpoint position="0,0,5" />
           {this.props.children}

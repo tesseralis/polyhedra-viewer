@@ -193,7 +193,7 @@ function TableSection({
 
   return (
     <div key={header} className={css(styles.section)}>
-      {description !== 'undefined' && (
+      {typeof description !== 'undefined' && (
         <div className={css(styles.description)}>
           <Header className={css(headerStyle)}>{header}</Header>
           <Markdown source={description} />
