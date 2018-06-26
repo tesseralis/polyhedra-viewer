@@ -37,36 +37,7 @@ const gridAreaMapping = {
 
 const videoHeight = 400;
 
-const styles = StyleSheet.create({
-  homePage: {
-    width: '100%',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-
-  splash: {
-    // make smaller to hide weird video artifacts
-    height: videoHeight - 2,
-    width: 'auto',
-    overflowY: 'hidden',
-  },
-
-  section: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    marginBottom: 50,
-  },
-
-  grid: {
-    display: 'grid',
-    gridRowGap: 50,
-    gridColumnGap: 30,
-    justifyItems: 'center',
-  },
-
+const sectionStyles = StyleSheet.create({
   uniform: {
     gridTemplateAreas: `
       "plato prism"
@@ -118,21 +89,55 @@ const styles = StyleSheet.create({
       gridTemplateAreas: '"snub other"',
     },
   },
+});
 
-  abstract: {
-    maxWidth: 800,
+const styles = StyleSheet.create({
+  homePage: {
+    width: '100%',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
+    justifyContent: 'center',
   },
 
-  // FIXME dedupe with abstract/markdown
+  authorLink: {
+    textDecoration: 'none',
+    ':hover': {
+      textDecoration: 'underline',
+    },
+  },
+
+  splash: {
+    // make smaller to hide weird video artifacts
+    height: videoHeight - 2,
+    width: 'auto',
+    overflowY: 'hidden',
+  },
+
+  section: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    marginBottom: 50,
+  },
+
+  grid: {
+    display: 'grid',
+    gridRowGap: 50,
+    gridColumnGap: 30,
+    justifyItems: 'center',
+  },
+
   description: {
     maxWidth: 800,
+    width: '100%',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
     margin: '0 50px',
+    [media.mobile]: {
+      margin: '0 30px',
+    },
   },
 
   header: {
@@ -173,7 +178,7 @@ const GridArea = ({ area, data }) => {
 
 const TableGrid = ({ tables, header }) => {
   return (
-    <div className={css(styles.grid, styles[sectionMapping[header]])}>
+    <div className={css(styles.grid, sectionStyles[sectionMapping[header]])}>
       {tables.map(table => {
         const area = gridAreaMapping[table.caption];
         return <GridArea key={area} area={area} data={table} />;
@@ -237,9 +242,17 @@ function HomePage({ data, narrow = false }: Props) {
       <div className={css(styles.splash)}>
         <video muted autoPlay loop src={splash} height={videoHeight} />
       </div>
-      <div className={css(styles.abstract)}>
+      <div className={css(styles.description)}>
         <h1 className={css(styles.header)}>Polyhedra Viewer</h1>
-        <p className={css(styles.author)}>by @tesseralis</p>
+        <p className={css(styles.author)}>
+          by{' '}
+          <a
+            className={css(styles.authorLink)}
+            href="https://github.com/tesseralis"
+          >
+            @tesseralis
+          </a>
+        </p>
         <Markdown source={text.abstract} />
       </div>
       {data.map(sectionData => (
