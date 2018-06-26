@@ -9,18 +9,18 @@ Platonic solids, or prisms, or pyramids. There are many more polyhedra
 to discover, with interesting properties and relationships to each other.
 
 This site is a categorization of the convex, regular-faced (CRF)
-polyhedra. These include the five [Platonic solids][platonic], the 13
-[Archimedean solids][archimedean], the infinite set of [prisms][prism]
-and [antiprisms][antiprism], and the 92 [Johnson solids][johnson].
+polyhedra. These include the five [Platonic solids], the 13
+[Archimedean solids], the infinite set of [prisms]
+and [antiprisms], and the 92 [Johnson solids].
 The 120 solids presented here are connected to each other by an intricate
 network of operations. Select a solid to manipulate it and to see its
 relationships with other polyhedra.
 
-[platonic]: http://en.wikipedia.org/wiki/Platonic_solid
-[archimedean]: http://en.wikipedia.org/wiki/Archimedean_solid
-[prism]: http://en.wikipedia.org/wiki/Prism_(geometry)
-[antiprism]: http://en.wikipedia.org/wiki/Antiprism
-[johnson]: http://en.wikipedia.org/wiki/Johnson_solid
+[Platonic solids]: http://en.wikipedia.org/wiki/Platonic_solid
+[Archimedean solids]: http://en.wikipedia.org/wiki/Archimedean_solid
+[prisms]: http://en.wikipedia.org/wiki/Prism_(geometry)
+[antiprisms]: http://en.wikipedia.org/wiki/Antiprism
+[Johnson solids]: http://en.wikipedia.org/wiki/Johnson_solid
 `;
 
 export const uniform = `
@@ -77,18 +77,19 @@ Platonic and Archimedean solids:
 * **diminish** - diminish a pyramid or cupola
 * **gyrate** - rotate a cupola
 
-When two operations are applied, sometimes there is more than one way to do it.
-Like in molecular chemistry, we name a solid _para-_ if the two modified components
+When more than one operation is applied, sometimes there is more than one way in which
+the solid can be modified. A solid _para-_ if the modified components
 are opposite each other, and _meta-_ if they are not.
 
-Remember that Johnson solids must be convex -- which means that an operation is not
-possible if it would make the dihedral angle between two faces more than 180 degrees.
+Johnson solids are, by definition, convex -- an operation is not possible if
+it would make the dihedral angle between two faces more than 180 degrees.
+For example, the pentagonal prism cannot be augmented more than twice because there
+is no place to put another pyramid without making it nonconvex.
 `;
 
 export const elementary = `
 The remaining Johnson solids cannot be created by "cut and paste" operations.
-Of those, two of them can be created by snubbing antiprisms (not supported in this
-app).
+Of those, two of them can be created by applying the semisnub operation to antiprisms.
 
 The remaining seven are named based on their components:
 
@@ -100,9 +101,8 @@ The remaining seven are named based on their components:
 * **-cingulum** - a belt of 12 triangles
 
 While they are not directly composed of other polyhedra, these solids may still be
-related in interesting ways! For example, the bilunabirotunda makes a honeycomb
-with the cube and dodecahedron!
+related in interesting ways! For example, the bilunabirotunda makes a [honeycomb]
+with the cube and dodecahedron.
 
-Are there ways to create these solids with an "operation" like with the snub antiprisms?
-The world may never know.
+[honeycomb]: https://en.wikipedia.org/wiki/Regular_dodecahedron#Space_filling_with_cube_and_bilunabirotunda
 `;
