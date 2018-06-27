@@ -117,3 +117,13 @@ And that's only in three dimensions! Try exploring the four dimentional [polycho
 [Catalan solids]: https://en.wikipedia.org/wiki/Catalan_solid
 [5-polytope]: https://en.wikipedia.org/wiki/5-polytope
 `;
+
+export const footer = `
+Copyright 2018 Nat Alison.
+
+Polyhedron models taken from George W. Hart.
+
+Made with react and x3dom.
+
+<share buttons>
+`;

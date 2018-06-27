@@ -170,6 +170,12 @@ const styles = StyleSheet.create({
     fontSize: 20,
     marginBottom: 15,
   },
+
+  footer: {
+    boxShadow: 'inset 1px 1px 4px LightGray',
+    width: '100%',
+    padding: 50,
+  },
 });
 
 const GridArea = ({ area, data }) => {
@@ -272,6 +278,9 @@ function HomePage({ data, narrow = false }: Props) {
       <div className={css(styles.description)}>
         <h1 className={css(styles.sectionHeader)}>More Polyhedra</h1>
         <Markdown source={text.more} />
+      </div>
+      <div className={css(styles.footer)}>
+        <Markdown source={text.footer} />
       </div>
     </main>
   );
