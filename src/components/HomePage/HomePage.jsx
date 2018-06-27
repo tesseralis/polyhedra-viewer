@@ -90,7 +90,7 @@ function HomePage({ data, narrow = false }: Props) {
   return (
     <main className={css(styles.homePage)}>
       <div className={css(styles.splash)}>
-        <video muted autoPlay loop src={splash} height={videoHeight} />
+        <video muted autoPlay src={splash} height={videoHeight} />
       </div>
       <div className={css(styles.description)}>
         <h1 className={css(styles.header)}>Polyhedra Viewer</h1>
