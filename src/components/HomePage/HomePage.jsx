@@ -54,6 +54,7 @@ const styles = StyleSheet.create({
     fontSize: 36,
     fontWeight: 'bold',
     fontFamily: fonts.andaleMono,
+    textAlign: 'center',
   },
 
   author: {
@@ -63,10 +64,20 @@ const styles = StyleSheet.create({
     fontColor: 'dimGray',
   },
 
+  sectionHeader: {
+    fontFamily: fonts.hoeflerText,
+    fontSize: 24,
+    marginBottom: 20,
+  },
+
   footer: {
     boxShadow: 'inset 1px 1px 4px LightGray',
     width: '100%',
     padding: 50,
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    textAlign: 'center',
   },
 });
 
@@ -102,7 +113,7 @@ function HomePage({ data, narrow = false }: Props) {
         />
       ))}
       <div className={css(styles.description)}>
-        <h1 className={css(styles.sectionHeader)}>More Polyhedra</h1>
+        <h2 className={css(styles.sectionHeader)}>More Polyhedra</h2>
         <Markdown source={text.more} />
       </div>
       <div className={css(styles.footer)}>

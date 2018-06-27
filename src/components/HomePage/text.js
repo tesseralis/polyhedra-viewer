@@ -1,5 +1,4 @@
 // @flow strict
-// Markdown for everything.
 
 export const abstract = `
 For centuries, mathematicians and artists have been fascinated by the
@@ -118,12 +117,15 @@ And that's only in three dimensions! Try exploring the four dimentional [polycho
 [5-polytope]: https://en.wikipedia.org/wiki/5-polytope
 `;
 
+// TODO share buttons
 export const footer = `
-Copyright 2018 Nat Alison.
+© 2018 Nat Alison
 
-Polyhedron models taken from George W. Hart.
+Polyhedron model data taken from [Virtual Polyhedra] by George W. Hart
 
-Made with react and x3dom.
+Made with [React] and [X3DOM]
 
-<share buttons>
+[Virtual Polyhedra]: http://www.georgehart.com/virtual-polyhedra/vp.html
+[React]: https://reactjs.org/
+[X3DOM]: https://www.x3dom.org/
 `;
