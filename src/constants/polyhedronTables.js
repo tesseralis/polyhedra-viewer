@@ -1,6 +1,5 @@
 // @flow strict
 import { zip } from 'utils';
-import * as text from './text';
 
 type Column = { name: string, sub: string[] } | string;
 type Data = string | string[];
@@ -263,40 +262,3 @@ export const others: Table = {
   columns: ['', '', '', '', '', '', ''],
   data: [['J86', 'J87', 'J88', 'J89', 'J90', 'J91', 'J92']],
 };
-
-const polyhedronTables: TableSection[] = [
-  {
-    header: 'Uniform Polyhedra',
-    description: text.uniform,
-    tables: [archimedean, prisms],
-  },
-  {
-    header: 'Johnson Solids',
-    description: text.johnson,
-    subsections: [
-      {
-        header: 'Capstones',
-        description: text.capstones,
-        tables: [capstones],
-        narrowTables: [capstonesMono, capstonesBi],
-      },
-      {
-        header: 'Augmented, Diminished, and Gyrate Polyhedra',
-        description: text.cutPaste,
-        tables: [augmented, icosahedra, rhombicosidodecahedra],
-        narrowTables: [
-          augmented,
-          icosahedra,
-          gyrateRhombicosidodecahedra,
-          diminishedRhombicosidodecahedra,
-        ],
-      },
-      {
-        header: 'Elementary Johnson Solids',
-        description: text.elementary,
-        tables: [snubAntiprisms, others],
-      },
-    ],
-  },
-];
-export default polyhedronTables;

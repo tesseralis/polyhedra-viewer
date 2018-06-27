@@ -4,14 +4,13 @@ import { css, StyleSheet } from 'aphrodite/no-important';
 
 import splash from 'splash.mp4';
 import { media, fonts } from 'styles';
-import polyhedronTables, {
-  type TableSection as TableSectionType,
-} from 'constants/polyhedronTables';
-
+import { type TableSection as TableSectionType } from 'constants/polyhedronTables';
 import { DeviceTracker } from 'components/DeviceContext';
+
 import Markdown from './Markdown';
 import PolyhedronTable from './PolyhedronTable';
-import * as text from 'constants/text';
+import tableSections from './tableSections';
+import * as text from './text';
 
 const sectionMapping = {
   'Uniform Polyhedra': 'uniform',
@@ -289,9 +288,9 @@ function HomePage({ data, narrow = false }: Props) {
 export default () => {
   return (
     <DeviceTracker
-      renderDesktop={() => <HomePage data={polyhedronTables} />}
+      renderDesktop={() => <HomePage data={tableSections} />}
       renderMobile={({ orientation }) => (
-        <HomePage narrow={orientation === 'portrait'} data={polyhedronTables} />
+        <HomePage narrow={orientation === 'portrait'} data={tableSections} />
       )}
     />
   );
