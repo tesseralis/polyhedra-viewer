@@ -40,7 +40,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     width: '100%',
     boxShadow: 'inset 0 -1px 4px LightGray',
-    padding: 20,
+    padding: '20px 50px',
 
     [media.mobile]: {
       flexDirection: 'column-reverse',
@@ -91,7 +91,7 @@ const styles = StyleSheet.create({
   footer: {
     boxShadow: 'inset 1px 1px 4px LightGray',
     width: '100%',
-    padding: 50,
+    padding: '20px 50px',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',

@@ -109,7 +109,7 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     alignItems: 'center',
     padding: '0 50px',
-    marginBottom: 20,
+    marginBottom: 30,
     [media.mobile]: {
       padding: '0 30px',
     },

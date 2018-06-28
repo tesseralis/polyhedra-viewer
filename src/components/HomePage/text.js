@@ -53,8 +53,8 @@ The majority of Johnson solids are made of these components:
    These can be sliced off from the tetrahedron, octahedron, and icosahedron
 * **cupola** - A set of alternating squares and triangles around a top polygon,
    with a base that has double the amount of sides. These can be sliced off the cantellated
-   Archimedean solids.
-* **rotunda** - Alternating sets of triangles and pentagons. Half of an icosidodecahedron.
+   Archimedean solids
+* **rotunda** - Alternating sets of triangles and pentagons. Half of an icosidodecahedron
 
 The following operations are defined:
 * **elongate** - Extend this solid with a prism
