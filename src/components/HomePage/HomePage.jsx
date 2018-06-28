@@ -23,6 +23,30 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
 
+  main: {
+    width: '100%',
+  },
+
+  abstract: {
+    maxWidth: 600,
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+  },
+
+  masthead: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
+    boxShadow: 'inset 0 -1px 4px LightGray',
+    padding: 20,
+
+    [media.mobile]: {
+      flexDirection: 'column-reverse',
+    },
+  },
+
   authorLink: {
     textDecoration: 'none',
     ':hover': {
@@ -30,44 +54,38 @@ const styles = StyleSheet.create({
     },
   },
 
-  splash: {
+  video: {
+    marginRight: 10,
     // make smaller to hide weird video artifacts
     height: videoHeight - 2,
-    width: 'auto',
-    overflowY: 'hidden',
-  },
-
-  description: {
-    maxWidth: 800,
+    width: videoHeight - 2,
+    overflow: 'hidden',
     display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    margin: '0 50px',
-    [media.mobile]: {
-      margin: '0 30px',
-    },
+    justifyContent: 'center',
   },
 
-  header: {
+  title: {
     marginTop: 20,
     marginBottom: 15,
     fontSize: 36,
+    textAlign: 'center',
     fontWeight: 'bold',
     fontFamily: fonts.andaleMono,
-    textAlign: 'center',
+
+    [media.mobile]: {
+      fontSize: 24,
+    },
   },
 
-  author: {
+  subtitle: {
     fontSize: 16,
     fontFamily: fonts.andaleMono,
     marginBottom: 20,
     fontColor: 'dimGray',
   },
 
-  sectionHeader: {
-    fontFamily: fonts.hoeflerText,
-    fontSize: 24,
-    marginBottom: 20,
+  sections: {
+    paddingTop: 50,
   },
 
   footer: {
@@ -88,38 +106,40 @@ interface Props {
 
 function HomePage({ data, narrow = false }: Props) {
   return (
-    <main className={css(styles.homePage)}>
-      <div className={css(styles.splash)}>
-        <video muted autoPlay src={splash} height={videoHeight} />
-      </div>
-      <div className={css(styles.description)}>
-        <h1 className={css(styles.header)}>Polyhedra Viewer</h1>
-        <p className={css(styles.author)}>
-          by{' '}
-          <a
-            className={css(styles.authorLink)}
-            href="https://github.com/tesseralis"
-          >
-            @tesseralis
-          </a>
-        </p>
-        <Markdown source={text.abstract} />
-      </div>
-      {data.map(sectionData => (
-        <TableSection
-          narrow={narrow}
-          key={sectionData.header}
-          data={sectionData}
-        />
-      ))}
-      <div className={css(styles.description)}>
-        <h2 className={css(styles.sectionHeader)}>More Polyhedra</h2>
-        <Markdown source={text.more} />
-      </div>
-      <div className={css(styles.footer)}>
+    <div className={css(styles.homePage)}>
+      <main className={css(styles.main)}>
+        <div className={css(styles.masthead)}>
+          <div className={css(styles.abstract)}>
+            <h1 className={css(styles.title)}>Polyhedra Viewer</h1>
+            <p className={css(styles.subtitle)}>
+              by{' '}
+              <a
+                className={css(styles.authorLink)}
+                href="https://github.com/tesseralis"
+              >
+                @tesseralis
+              </a>
+            </p>
+            <Markdown source={text.abstract} />
+          </div>
+          <div className={css(styles.video)}>
+            <video muted autoPlay src={splash} height={videoHeight} />
+          </div>
+        </div>
+        <div className={css(styles.sections)}>
+          {data.map(sectionData => (
+            <TableSection
+              narrow={narrow}
+              key={sectionData.header}
+              data={sectionData}
+            />
+          ))}
+        </div>
+      </main>
+      <footer className={css(styles.footer)}>
         <Markdown source={text.footer} />
-      </div>
-    </main>
+      </footer>
+    </div>
   );
 }
 

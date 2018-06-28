@@ -103,15 +103,15 @@ const styles = StyleSheet.create({
     justifyItems: 'center',
   },
 
-  // FIXME deduplicate with HomePage description
   description: {
     maxWidth: 800,
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    margin: '0 50px',
+    padding: '0 50px',
+    marginBottom: 20,
     [media.mobile]: {
-      margin: '0 30px',
+      padding: '0 30px',
     },
   },
 

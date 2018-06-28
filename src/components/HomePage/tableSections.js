@@ -52,5 +52,9 @@ const polyhedronTables: TableSection[] = [
       },
     ],
   },
+  {
+    header: 'More Polyhedra',
+    description: text.more,
+  },
 ];
 export default polyhedronTables;
