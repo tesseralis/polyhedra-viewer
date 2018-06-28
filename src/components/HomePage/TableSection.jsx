@@ -88,12 +88,9 @@ const styles = StyleSheet.create({
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    marginBottom: 50,
-  },
-
-  // The subsection will also have marginbottom so don't duplicate
-  hasSubsection: {
-    marginBottom: 0,
+    ':not(:last-child)': {
+      marginBottom: 50,
+    },
   },
 
   grid: {
@@ -165,10 +162,7 @@ export default function TableSection({
     : styles.sectionHeader;
 
   return (
-    <div
-      key={header}
-      className={css(styles.section, !!subsections && styles.hasSubsection)}
-    >
+    <div key={header} className={css(styles.section)}>
       {typeof description !== 'undefined' && (
         <div className={css(styles.description)}>
           <Header className={css(headerStyle)}>{header}</Header>

@@ -85,7 +85,7 @@ const styles = StyleSheet.create({
   },
 
   sections: {
-    paddingTop: 50,
+    padding: '50px 0',
   },
 
   footer: {
