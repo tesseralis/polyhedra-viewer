@@ -6,6 +6,8 @@ import { css, StyleSheet } from 'aphrodite/no-important';
 
 import { media, fonts } from 'styles';
 
+const listIndent = 20;
+
 const styles = StyleSheet.create({
   div: {},
   // TODO change a lot of this to be from the surrounding element
@@ -40,6 +42,8 @@ const styles = StyleSheet.create({
     fontFamily: fonts.hoeflerText,
     color: 'DimGrey',
     lineHeight: 1.5,
+    textIndent: -listIndent,
+    paddingLeft: listIndent,
 
     [media.mobile]: {
       fontSize: 14,
