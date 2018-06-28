@@ -1,6 +1,7 @@
 // @flow strict
 import React from 'react';
 import { css, StyleSheet } from 'aphrodite/no-important';
+import { Link } from 'react-router-dom';
 
 import splash from 'splash.mp4';
 import { media, fonts } from 'styles';
@@ -122,9 +123,9 @@ function HomePage({ data, narrow = false }: Props) {
             </p>
             <Markdown source={text.abstract} />
           </div>
-          <div className={css(styles.video)}>
+          <Link to="/tetrahedron" className={css(styles.video)}>
             <video muted autoPlay src={splash} height={videoHeight} />
-          </div>
+          </Link>
         </div>
         <div className={css(styles.sections)}>
           {data.map(sectionData => (
