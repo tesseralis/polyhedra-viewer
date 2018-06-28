@@ -53,7 +53,7 @@ const polyhedronTables: TableSection[] = [
     ],
   },
   {
-    header: 'More Polyhedra',
+    header: 'And Many More...',
     description: text.more,
   },
 ];

@@ -44,7 +44,7 @@ const styles = StyleSheet.create({
     boxShadow: 'inset 0 -1px 4px LightGray',
     padding: '20px 50px',
 
-    [media.mobile]: {
+    [media.mobilePortrait]: {
       flexDirection: 'column-reverse',
     },
   },
