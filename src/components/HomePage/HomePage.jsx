@@ -103,54 +103,70 @@ const styles = StyleSheet.create({
 
 interface Props {
   data: TableSectionType[];
+  hash?: string;
   narrow?: boolean;
 }
 
-function HomePage({ data, narrow = false }: Props) {
-  return (
-    <div className={css(styles.homePage)}>
-      <main className={css(styles.main)}>
-        <div className={css(styles.masthead)}>
-          <div className={css(styles.abstract)}>
-            <h1 className={css(styles.title)}>Polyhedra Viewer</h1>
-            <p className={css(styles.subtitle)}>
-              by{' '}
-              <a
-                className={css(styles.authorLink)}
-                href="https://github.com/tesseralis"
-              >
-                @tesseralis
-              </a>
-            </p>
-            <Markdown source={text.abstract} />
+class HomePage extends React.Component<Props> {
+  componentDidMount() {
+    const { hash = '' } = this.props;
+    const el = document.getElementById(hash);
+    if (el !== null) {
+      el.scrollIntoView(false);
+    }
+  }
+
+  render() {
+    const { data, narrow = false } = this.props;
+    return (
+      <div className={css(styles.homePage)}>
+        <main className={css(styles.main)}>
+          <div className={css(styles.masthead)}>
+            <div className={css(styles.abstract)}>
+              <h1 className={css(styles.title)}>Polyhedra Viewer</h1>
+              <p className={css(styles.subtitle)}>
+                by{' '}
+                <a
+                  className={css(styles.authorLink)}
+                  href="https://github.com/tesseralis"
+                >
+                  @tesseralis
+                </a>
+              </p>
+              <Markdown source={text.abstract} />
+            </div>
+            <Link to="/tetrahedron" className={css(styles.video)}>
+              <video muted autoPlay src={splash} height={videoHeight} />
+            </Link>
           </div>
-          <Link to="/tetrahedron" className={css(styles.video)}>
-            <video muted autoPlay src={splash} height={videoHeight} />
-          </Link>
-        </div>
-        <div className={css(styles.sections)}>
-          {data.map(sectionData => (
-            <TableSection
-              narrow={narrow}
-              key={sectionData.header}
-              data={sectionData}
-            />
-          ))}
-        </div>
-      </main>
-      <footer className={css(styles.footer)}>
-        <Markdown source={text.footer} />
-      </footer>
-    </div>
-  );
+          <div className={css(styles.sections)}>
+            {data.map(sectionData => (
+              <TableSection
+                narrow={narrow}
+                key={sectionData.header}
+                data={sectionData}
+              />
+            ))}
+          </div>
+        </main>
+        <footer className={css(styles.footer)}>
+          <Markdown source={text.footer} />
+        </footer>
+      </div>
+    );
+  }
 }
 
-export default () => {
+export default (props: *) => {
   return (
     <DeviceTracker
-      renderDesktop={() => <HomePage data={tableSections} />}
+      renderDesktop={() => <HomePage {...props} data={tableSections} />}
       renderMobile={({ orientation }) => (
-        <HomePage narrow={orientation === 'portrait'} data={tableSections} />
+        <HomePage
+          {...props}
+          narrow={orientation === 'portrait'}
+          data={tableSections}
+        />
       )}
     />
   );

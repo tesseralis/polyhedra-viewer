@@ -55,6 +55,7 @@ export default function PolyhedronLink({ name, isFake }: Props) {
   const img = require(`images/${escapedName}.png`);
   return (
     <Link
+      id={!isFake ? escapedName : undefined}
       to={'/' + escapedName}
       className={css(styles.link, isFake && styles.fake)}
       title={name}

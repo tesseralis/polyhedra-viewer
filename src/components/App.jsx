@@ -24,7 +24,11 @@ const Viewer = Loadable({
 
 export default () => (
   <Switch>
-    <Route exact path="/" component={HomePage} />
+    <Route
+      exact
+      path="/"
+      render={({ location }) => <HomePage hash={location.hash.substring(1)} />}
+    />
     <Route
       exact
       path="/:solid"

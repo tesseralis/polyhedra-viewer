@@ -5,7 +5,7 @@ import { css, StyleSheet } from 'aphrodite/no-important';
 import { media } from 'styles';
 import { scroll } from 'styles/common';
 import {
-  IconLink,
+  BackLink,
   Title,
   NavMenu,
   ConfigForm,
@@ -112,7 +112,7 @@ export default function MobileViewer({ panel, solid }: Props) {
   return (
     <section className={css(styles.viewer)}>
       <div className={css(styles.title)}>
-        <IconLink iconOnly iconName="chevron-left" title="Back" to="/" />
+        <BackLink solid={solid} />
         <Title name={solid} />
       </div>
       {panelNode && (

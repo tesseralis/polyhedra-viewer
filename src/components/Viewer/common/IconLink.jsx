@@ -43,7 +43,7 @@ interface Props {
   iconName: string;
   iconOnly?: boolean;
   title: string;
-  to: string;
+  to: *; // should be string | LocationShape but gets weird
   replace?: boolean;
   exact?: boolean;
 }

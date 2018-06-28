@@ -4,7 +4,7 @@ import React from 'react';
 import { css, StyleSheet } from 'aphrodite/no-important';
 
 import { absolute } from 'styles/common';
-import { IconLink, Title, Options } from '../common';
+import { BackLink, Title, Options } from '../common';
 
 const styles = StyleSheet.create({
   overlay: {
@@ -43,13 +43,7 @@ export default function Overlay({ solid }: Props) {
   return (
     <div className={css(styles.overlay)}>
       <div className={css(styles.homeLink)}>
-        <IconLink
-          iconOnly
-          iconName="chevron-left"
-          title="Back"
-          replace
-          to="/"
-        />
+        <BackLink solid={solid} />
       </div>
       <div className={css(styles.title)}>
         <Title name={solid} />
