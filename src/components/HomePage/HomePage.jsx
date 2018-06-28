@@ -40,6 +40,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     width: '100%',
+    // TODO these box shadow stylings are kinda weird
     boxShadow: 'inset 0 -1px 4px LightGray',
     padding: '20px 50px',
 
@@ -90,7 +91,7 @@ const styles = StyleSheet.create({
   },
 
   footer: {
-    boxShadow: 'inset 1px 1px 4px LightGray',
+    boxShadow: '1px -1px 4px LightGray',
     width: '100%',
     padding: '20px 50px',
     display: 'flex',
