@@ -58,11 +58,11 @@ export const capstones = `
 The majority of Johnson solids are made of these "capstone" components:
 
 * **pyramid** - a set of triangles around a point with a regular polygon base.
-   These can be sliced off from the tetrahedron, octahedron, and icosahedron
+   These can be sliced off from the tetrahedron, octahedron, and icosahedron.
 * **cupola** - A set of alternating squares and triangles around a top polygon,
    with a base that has double the amount of sides. These can be sliced off the cantellated
-   Archimedean solids
-* **rotunda** - Alternating sets of triangles and pentagons. Half of an icosidodecahedron
+   Archimedean solids.
+* **rotunda** - Alternating sets of triangles and pentagons. Half of an icosidodecahedron.
 
 The following operations are defined:
 * **elongate** - Extend the solid with a prism
@@ -88,8 +88,8 @@ are opposite each other, and _meta-_ if they are not.
 `;
 
 export const elementary = `
-The remaining Johnson solids cannot be created by "cut and paste" operations.
-Of those, two of them can be created by applying the semisnub operation to antiprisms.
+The remaining Johnson solids cannot be created by gluing together other polyhedra.
+Of those, two of them can be created by applying the snub operation to antiprisms.
 
 The remaining seven are named based on their components:
 
@@ -117,13 +117,28 @@ Beyond three dimensions, one can explore four dimensional shapes like the [tesse
 [Catalan solids]: https://en.wikipedia.org/wiki/Catalan_solid
 [tesseract]: https://en.wikipedia.org/wiki/Tesseract
 [grand antiprism]: https://en.wikipedia.org/wiki/Grand_antiprism
+
+If you would like to learn more about polyhedra and other geometric figures,
+check out these links:
+
+* [Virtual Polyhedra] by George W. Hart - an extensive encyclopedia of polyhedra and the major
+  inspiration for this site
+* [Visual Polyhedra] by David I. McCooey - More polyhedral models with extensive geometric data
+* [4D Toys] - An interactive catalogue of 4D shapes
+
+[Virtual Polyhedra]: http://www.georgehart.com/virtual-polyhedra/vp.html
+[Visual Polyhedra]: http://dmccooey.com/polyhedra/
+[4D Toys]: http://4dtoys.com/
 `;
 
 // TODO share buttons
 export const footer = `
-© 2018 Nat Alison
+Copyright © 2018 Nat Alison
 
-Polyhedron model data taken from [Virtual Polyhedra] by George W. Hart
+Inspiration and geometric data taken from [Virtual Polyhedra] by George W. Hart
+
+Thank you to the countless friends and unsuspecting strangers who helped test this site
+and provided their feedback
 
 Made with [React] and [X3DOM]
 
