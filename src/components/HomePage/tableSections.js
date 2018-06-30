@@ -29,7 +29,7 @@ const polyhedronTables: TableSection[] = [
     description: text.johnson,
     subsections: [
       {
-        header: 'Capstones',
+        header: 'Pyramids, Cupoplæ, and Rotundæ',
         description: text.capstones,
         tables: [capstones],
         narrowTables: [capstonesMono, capstonesBi],

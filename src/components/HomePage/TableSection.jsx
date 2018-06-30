@@ -10,7 +10,7 @@ import PolyhedronTable from './PolyhedronTable';
 const sectionMapping = {
   'Uniform Polyhedra': 'uniform',
   'Johnson Solids': 'johnson',
-  Capstones: 'capstones',
+  'Pyramids, Cupoplæ, and Rotundæ': 'capstones',
   'Augmented, Diminished, and Gyrate Polyhedra': 'cutPaste',
   'Elementary Johnson Solids': 'elementary',
 };

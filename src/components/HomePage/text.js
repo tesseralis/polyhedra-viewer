@@ -1,19 +1,17 @@
 // @flow strict
 
 export const abstract = `
-For centuries, mathematicians and artists have been fascinated by the
-beauty in polyhedra—three dimensional shapes made of simple polygons.
-But most are familiar with only a few of them, such as the
-Platonic solids, prisms, or pyramids. There are many more polyhedra
+For centuries, mathematicians and artists have been fascinated by the beauty in polyhedra.
+While most are familiar with only a few of them, such as the
+Platonic solids, prisms, or pyramids, there are many more polyhedra
 to discover, with interesting properties and relationships to each other.
 
 This application visualizes the relationships between the convex, regular-faced polyhedra.
-_Convex_ means that no two faces have an inner angle between them of more than 180 degrees.
-_Regular-faced_ means that all the polyhedron's faces are regular polygons—polygons
-whose every side and angle is equal.
+_Convex_ means that no two faces have an inner angle between them of more than 180 degrees,
+while _regular-faced_ means that all the polyhedron's faces are regular polygons.
 
-The 120 solids presented here are connected to each other by a
-network of operations. Select a solid below to manipulate it and to see its
+The 120 solids presented here can be transformed into each other by a network of operations,
+as shown in the animation. Select a solid below to manipulate it and to explore its
 relationships with other polyhedra.
 
 [Platonic solids]: http://en.wikipedia.org/wiki/Platonic_solid
@@ -39,15 +37,16 @@ The 13 Archimedean solids can be constructed from the Platonic solids by a set o
 * **expand** - Pull the faces of the solid out
 * **snub** - Pull the faces of the solid out and twist them
 
-In contrast, there are infinitely many prisms and antiprisms, one for each type of polygon.
+In contrast to the Archimedean solids, there are infinitely many prisms and antiprisms,
+one for each type of polygon.
 A small number are included here because of their relationship to the Johnson solids.
 `;
 
 export const johnson = `
-The 92 Johnson solids, named after Norman Johnson, are the *nonuniform*
+The 92 Johnson solids, named after Norman Johnson, are the *non-uniform*
 convex regular-faced polyhedra—solids whose vertices aren't transitive.
 Almost all of them can be created by gluing together pieces of uniform polyhedra
-so that the angle between them is less than 180 degrees.
+so that the dihedral angle between their faces remains less than 180 degrees.
 
 Even though there is no hard restriction on which polygons can be used,
 all the Johnson solids can be made using faces of 3, 4, 5, 6, 8 or 10 sides.
@@ -55,7 +54,7 @@ all the Johnson solids can be made using faces of 3, 4, 5, 6, 8 or 10 sides.
 
 export const capstones = `
 
-The majority of Johnson solids are made of these "capstone" components:
+The majority of Johnson solids are made of these components:
 
 * **pyramid** - a set of triangles around a point with a regular polygon base.
    These can be sliced off from the tetrahedron, octahedron, and icosahedron.
