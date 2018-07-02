@@ -7,8 +7,11 @@ import { escapeName } from 'polyhedra/names';
 import { allSolidNames } from 'data';
 import { WithPolyhedron } from '../context';
 
+/**
+ * Utility class to download image thumbnails. Do NOT use in production
+ */
 class ImageDownloader extends React.Component<*> {
-  downloadImages = () => {
+  downloadImages = async () => {
     const zip = new JSZip();
     const canvas = document.getElementsByTagName('canvas');
     const ratio = canvas[0].width / canvas[0].height;
@@ -16,24 +19,18 @@ class ImageDownloader extends React.Component<*> {
     canvas[0].width = ratio * 200;
 
     const images = zip.folder('images');
-    const tasks = allSolidNames.map(solid => () =>
-      this.addImage(canvas, images, solid),
-    );
 
-    let result = Promise.resolve();
-    tasks.forEach(task => {
-      result = result.then(() => task());
-    });
-    result.then(() => {
-      zip.generateAsync({ type: 'blob' }).then(content => {
-        FileSaver.saveAs(content, 'images.zip');
-      });
+    for (let solid of allSolidNames) {
+      await this.addImage(canvas, images, solid);
+    }
+    zip.generateAsync({ type: 'blob' }).then(content => {
+      FileSaver.saveAs(content, 'images.zip');
     });
   };
 
-  addImage = (canvas, folder, solid) => {
+  addImage = async (canvas, folder, solid) => {
     const { setPolyhedron } = this.props;
-    return new Promise(resolve => {
+    return await new Promise(resolve => {
       setPolyhedron(solid, () => {
         canvas[0].toBlob(v => {
           folder.file(`${escapeName(solid)}.png`, v, { base64: true });

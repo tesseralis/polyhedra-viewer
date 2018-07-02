@@ -4,7 +4,7 @@ import { css, StyleSheet } from 'aphrodite/no-important';
 
 import Sidebar from './Sidebar';
 import Overlay from './Overlay';
-import { X3dScene, ImageDownloader } from '../common';
+import { X3dScene } from '../common';
 
 const styles = StyleSheet.create({
   viewer: {
@@ -48,7 +48,6 @@ export default class DesktopViewer extends PureComponent<*> {
           <Overlay solid={solid} panel={panel} />
         </div>
         <div className={css(full ? styles.sidebarCompact : styles.sidebarFull)}>
-          <ImageDownloader solid={solid} />
           <Sidebar panel={panel} solid={solid} compact={full} />
         </div>
       </div>
