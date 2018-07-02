@@ -9,3 +9,4 @@ export { default as IconLink } from './IconLink';
 export { default as BackLink } from './BackLink';
 export { default as NavMenu } from './NavMenu';
 export { default as Title } from './Title';
+export { default as ImageDownloader } from './ImageDownloader';

@@ -89,11 +89,14 @@ class BasePolyhedronProvider extends PureComponent<*, *> {
     );
   }
 
-  setPolyhedron = (name: string) => {
-    this.setState({
-      polyhedron: Polyhedron.get(name),
-      faceColors: [],
-    });
+  setPolyhedron = (name: string, callback?: () => void) => {
+    this.setState(
+      {
+        polyhedron: Polyhedron.get(name),
+        faceColors: [],
+      },
+      callback,
+    );
   };
 
   recenter = () => {
