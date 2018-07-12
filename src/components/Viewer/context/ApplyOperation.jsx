@@ -45,7 +45,6 @@ class ApplyOperation extends Component<*> {
       setOperation(opName, name);
     }
 
-    // FIXME unclear that this order is necessary
     transitionPolyhedron(result, animationData);
     setName(name);
     if (typeof callback === 'function') {
