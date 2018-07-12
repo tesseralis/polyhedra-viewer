@@ -51,6 +51,7 @@ const PolyhedronContext = React.createContext({
   polyhedron: Polyhedron.get('tetrahedron'),
   faceColors: [],
   isTransitioning: false,
+  flag: false,
   setPolyhedron: _.noop,
   transitionPolyhedron: _.noop,
   recenter: _.noop,
@@ -67,6 +68,7 @@ class BasePolyhedronProvider extends PureComponent<*, *> {
       polyhedron: Polyhedron.get('tetrahedron'),
       faceColors: [],
       isTransitioning: false,
+      flag: false,
       setPolyhedron: this.setPolyhedron,
       transitionPolyhedron: this.transitionPolyhedron,
       recenter: this.recenter,
@@ -90,13 +92,15 @@ class BasePolyhedronProvider extends PureComponent<*, *> {
   }
 
   setPolyhedron = (name: string, callback?: () => void) => {
-    this.setState(
-      {
+    this.setState(({ flag }) => {
+      if (flag) {
+        return { flag: false };
+      }
+      return {
         polyhedron: Polyhedron.get(name),
         faceColors: [],
-      },
-      callback,
-    );
+      };
+    }, callback);
   };
 
   recenter = () => {
@@ -117,6 +121,7 @@ class BasePolyhedronProvider extends PureComponent<*, *> {
 
     if (!enableAnimation || !animationData) {
       return this.setState({
+        flag: true,
         polyhedron: result,
       });
     }
@@ -130,6 +135,8 @@ class BasePolyhedronProvider extends PureComponent<*, *> {
 
     this.setState({
       isTransitioning: true,
+      // FIXME unclear name; confusing with "isTransitioning"
+      flag: true,
       polyhedron: animationData.start,
       faceColors: allColorStart,
     });

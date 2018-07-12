@@ -11,11 +11,11 @@ class SolidSync extends Component<*> {
   }
 
   componentDidUpdate(prevProps) {
-    const { solid, panel, setPolyhedron } = this.props;
+    const { solid, setPolyhedron } = this.props;
 
     // If an operation has not been applied and there is a mismatch betweeen the props and context,
     // update context
-    if (solid !== prevProps.solid && panel !== 'operations') {
+    if (solid !== prevProps.solid) {
       setPolyhedron(solid);
     }
   }
