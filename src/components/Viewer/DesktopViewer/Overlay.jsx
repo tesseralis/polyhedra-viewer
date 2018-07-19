@@ -4,7 +4,7 @@ import React from 'react';
 import { css, StyleSheet } from 'aphrodite/no-important';
 
 import { absolute } from 'styles/common';
-import { BackLink, Title, Options } from '../common';
+import { BackLink, Title, Options, Prompt } from '../common';
 
 const styles = StyleSheet.create({
   overlay: {
@@ -33,6 +33,14 @@ const styles = StyleSheet.create({
     margin: '0 50px',
     height: '100%',
   },
+
+  prompt: {
+    marginTop: 20,
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    left: 0,
+  },
 });
 
 interface Props {
@@ -47,6 +55,9 @@ export default function Overlay({ solid }: Props) {
       </div>
       <div className={css(styles.title)}>
         <Title name={solid} />
+      </div>
+      <div className={css(styles.prompt)}>
+        <Prompt />
       </div>
       <div className={css(styles.options)}>
         <Options solid={solid} />

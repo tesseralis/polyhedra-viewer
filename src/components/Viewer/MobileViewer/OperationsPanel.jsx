@@ -2,7 +2,7 @@
 import React from 'react';
 import { css, StyleSheet } from 'aphrodite/no-important';
 
-import { OpGrid, Options, ResizeButtons } from '../common';
+import { OpGrid, Prompt, Options, ResizeButtons } from '../common';
 import { media } from 'styles';
 
 const styles = StyleSheet.create({
@@ -18,6 +18,11 @@ const styles = StyleSheet.create({
 
   resizeButtons: {
     pointerEvents: 'initial',
+  },
+
+  prompt: {
+    marginTop: 10,
+    marginBottom: 'auto',
   },
 
   options: {
@@ -36,6 +41,9 @@ export default function OperationsPanel({ solid }: *) {
     <section className={css(styles.opPanel)}>
       <div className={css(styles.resizeButtons)}>
         <ResizeButtons />
+      </div>
+      <div className={css(styles.prompt)}>
+        <Prompt />
       </div>
       <div className={css(styles.options)}>
         <Options solid={solid} />
