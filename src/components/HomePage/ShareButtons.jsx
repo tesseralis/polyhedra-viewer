@@ -12,15 +12,17 @@ const styles = StyleSheet.create({
   },
   text: {
     fontFamily: fonts.andaleMono,
+    fontWeight: 'bold',
     marginRight: 5,
   },
   link: {
-    margin: '0 5px',
+    margin: '0 10px',
     color: 'DimGrey',
   },
 });
 
 const url = 'http://polyhedra.tessera.li';
+const title = 'Polyhedra Viewer';
 
 // FIXME more information in descriptions
 const links = [
@@ -39,6 +41,10 @@ const links = [
   {
     url: `https://reddit.com/submit?url=${url}&title=Polyhedra Viewer`,
     icon: 'reddit',
+  },
+  {
+    url: `https://plus.google.com/share?url=${url}&text=${title}`,
+    icon: 'google-plus',
   },
 ];
 

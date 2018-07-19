@@ -30,7 +30,7 @@ const styles = StyleSheet.create({
   },
 
   shareLinks: {
-    margin: '20px 0',
+    marginBottom: 20,
   },
 
   footer: {
@@ -76,10 +76,10 @@ class HomePage extends React.Component<Props> {
           </div>
         </main>
         <footer className={css(styles.footer)}>
-          <Markdown source={text.footer} />
           <div className={css(styles.shareLinks)}>
             <ShareButtons />
           </div>
+          <Markdown source={text.footer} />
         </footer>
       </div>
     );
