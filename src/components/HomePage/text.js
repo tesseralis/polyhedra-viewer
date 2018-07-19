@@ -138,12 +138,12 @@ check out these links:
 export const footer = `
 Copyright © 2018 Nat Alison
 
-Inspiration and geometric data taken from [Virtual Polyhedra] by George W. Hart
+Inspiration and geometric data taken from [Virtual Polyhedra] by George W. Hart.
 
 Thank you to the countless friends and unsuspecting strangers who helped test this site
-and provided their feedback
+and provided their feedback.
 
-Made with [React] and [X3DOM]
+Made with [React] and [X3DOM].
 
 [Virtual Polyhedra]: http://www.georgehart.com/virtual-polyhedra/vp.html
 [React]: https://reactjs.org/
