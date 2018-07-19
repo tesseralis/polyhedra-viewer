@@ -3,23 +3,25 @@ import React from 'react';
 import { Route, Redirect, Switch } from 'react-router-dom';
 import Loadable from 'react-loadable';
 
+// TODO I don't think this is the best place to put these imports
 import 'what-input';
 
 import 'styles/reset.css';
 import 'styles/box-sizing.css';
 import 'styles/a11y.css';
 
-// TODO more interesting loading bar
-const Loading = () => <div>Loading...</div>;
+import Loading from './Loading';
 
 const HomePage = Loadable({
   loader: () => import('./HomePage'),
   loading: Loading,
+  delay: 350,
 });
 
 const Viewer = Loadable({
   loader: () => import('./Viewer'),
   loading: Loading,
+  delay: 350,
 });
 
 export default () => (
