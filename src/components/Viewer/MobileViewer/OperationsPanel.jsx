@@ -21,13 +21,12 @@ const styles = StyleSheet.create({
   },
 
   options: {
-    marginTop: 10,
-    marginBottom: 'auto',
+    marginTop: 'auto',
+    marginBottom: 10,
   },
 
   opGrid: {
     width: '100%',
-    marginTop: 'auto',
     pointerEvents: 'initial',
   },
 });
