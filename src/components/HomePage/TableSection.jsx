@@ -4,7 +4,7 @@ import { css, StyleSheet } from 'aphrodite/no-important';
 
 import { media, fonts } from 'styles';
 import { type TableSection as TableSectionType } from 'constants/polyhedronTables';
-import Markdown from './Markdown';
+import Description from './Description';
 import PolyhedronTable from './PolyhedronTable';
 
 const sectionMapping = {
@@ -155,7 +155,14 @@ export default function TableSection({
   narrow = false,
   isSubsection = false,
 }: Props) {
-  const { header, description, tables, narrowTables, subsections } = data;
+  const {
+    header,
+    description,
+    sticky,
+    tables,
+    narrowTables,
+    subsections,
+  } = data;
   const Header = isSubsection ? 'h3' : 'h2';
   const headerStyle = isSubsection
     ? styles.subsectionHeader
@@ -166,7 +173,7 @@ export default function TableSection({
       {typeof description !== 'undefined' && (
         <div className={css(styles.description)}>
           <Header className={css(headerStyle)}>{header}</Header>
-          <Markdown source={description} />
+          <Description collapsed={!sticky} content={description} />
         </div>
       )}
       {tables && (

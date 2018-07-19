@@ -15,6 +15,7 @@ export interface Table {
 export interface TableSection {
   header: string;
   description?: string;
+  sticky?: boolean;
   tables?: Table[];
   narrowTables?: Table[];
   subsections?: TableSection[];

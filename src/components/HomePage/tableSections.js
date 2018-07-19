@@ -54,6 +54,7 @@ const polyhedronTables: TableSection[] = [
   },
   {
     header: 'And Many More...',
+    sticky: true,
     description: text.more,
   },
 ];
