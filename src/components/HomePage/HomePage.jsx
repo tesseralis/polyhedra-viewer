@@ -10,7 +10,7 @@ import TableSection from './TableSection';
 import tableSections from './tableSections';
 import * as text from './text';
 import Masthead from './Masthead';
-import ShareButtons from './ShareButtons';
+import ShareLinks from './ShareLinks';
 
 const styles = StyleSheet.create({
   homePage: {
@@ -77,7 +77,7 @@ class HomePage extends React.Component<Props> {
         </main>
         <footer className={css(styles.footer)}>
           <div className={css(styles.shareLinks)}>
-            <ShareButtons />
+            <ShareLinks />
           </div>
           <Markdown source={text.footer} />
         </footer>

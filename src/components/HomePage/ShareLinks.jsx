@@ -23,23 +23,24 @@ const styles = StyleSheet.create({
 
 const url = 'http://polyhedra.tessera.li';
 const title = 'Polyhedra Viewer';
+const author = 'tesseralis';
+const caption = 'Jinkies! Check out this cool polyhedral geometry app!';
 
-// FIXME more information in descriptions
 const links = [
   {
     url: `https://www.facebook.com/sharer.php?u=${url}`,
     icon: 'facebook-box',
   },
   {
-    url: `https://www.tumblr.com/widgets/share/tool?canonicalUrl=${url}&title=Polyhedra Viewer&caption=Polyhedra Viewer`,
+    url: `https://www.tumblr.com/widgets/share/tool?canonicalUrl=${url}&title=${title}&caption=${caption}`,
     icon: 'tumblr',
   },
   {
-    url: `https://twitter.com/intent/tweet?url=${url}&text=Polyhedra Viewer&via=tesseralis`,
+    url: `https://twitter.com/intent/tweet?url=${url}&text=${caption}&via=${author}`,
     icon: 'twitter',
   },
   {
-    url: `https://reddit.com/submit?url=${url}&title=Polyhedra Viewer`,
+    url: `https://reddit.com/submit?url=${url}&title=${title}`,
     icon: 'reddit',
   },
   {
@@ -48,7 +49,7 @@ const links = [
   },
 ];
 
-export default function ShareButtons() {
+export default function ShareLinks() {
   return (
     <div className={css(styles.share)}>
       <span className={css(styles.text)}>Share:</span>

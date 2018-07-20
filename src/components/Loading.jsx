@@ -28,7 +28,7 @@ const styles = StyleSheet.create({
 export default function Loading() {
   return (
     <div className={css(styles.loading)}>
-      <Icon size={36} name="cube-outline" spin />
+      <Icon size={36} name="hexagon-outline" spin />
       <div className={css(styles.text)}>Loading...</div>
     </div>
   );
