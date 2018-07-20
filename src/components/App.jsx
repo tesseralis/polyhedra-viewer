@@ -15,13 +15,11 @@ import Loading from './Loading';
 const HomePage = Loadable({
   loader: () => import('./HomePage'),
   loading: Loading,
-  delay: 350,
 });
 
 const Viewer = Loadable({
   loader: () => import('./Viewer'),
   loading: Loading,
-  delay: 350,
 });
 
 export default () => (

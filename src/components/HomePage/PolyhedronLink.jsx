@@ -1,8 +1,9 @@
 // @flow strict
-import React from 'react';
+import React, { Component } from 'react';
 import { css, StyleSheet } from 'aphrodite/no-important';
 import { Link } from 'react-router-dom';
 
+import { Icon } from 'components/common';
 import { escapeName } from 'polyhedra/names';
 import { hover } from 'styles/common';
 import { media } from 'styles';
@@ -14,6 +15,7 @@ const mobThumbnailSize = 50;
 const styles = StyleSheet.create({
   link: {
     ...hover,
+    color: 'black',
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
@@ -50,17 +52,57 @@ interface Props {
   isFake: boolean;
 }
 
-export default function PolyhedronLink({ name, isFake }: Props) {
-  const escapedName = escapeName(name);
-  const img = require(`images/${escapedName}.png`);
-  return (
-    <Link
-      id={!isFake ? escapedName : undefined}
-      to={'/' + escapedName}
-      className={css(styles.link, isFake && styles.fake)}
-      title={name}
-    >
-      <img className={css(styles.image)} src={img} alt={name} />
-    </Link>
-  );
+interface State {
+  loaded: boolean;
+  error: boolean;
+}
+
+export default class PolyhedronLink extends Component<Props, State> {
+  constructor(props: Props) {
+    super(props);
+    this.state = {
+      loaded: false,
+      error: false,
+    };
+  }
+
+  componentDidMount() {
+    const img = new Image();
+    img.onload = () => {
+      this.setState({ loaded: true });
+    };
+    img.onerror = () => {
+      this.setState({ error: true });
+    };
+    img.src = this.imgSrc();
+  }
+
+  render() {
+    const { name, isFake } = this.props;
+    const { loaded, error } = this.state;
+    const escapedName = escapeName(name);
+    // TODO image error state
+    return (
+      <Link
+        id={!isFake ? escapedName : undefined}
+        to={'/' + escapedName}
+        className={css(styles.link, isFake && styles.fake)}
+        title={name}
+      >
+        {loaded ? (
+          <img className={css(styles.image)} src={this.imgSrc()} alt={name} />
+        ) : error ? (
+          <Icon name="alert-circle-outline" size={48} />
+        ) : (
+          <Icon name="hexagon-outline" size={48} />
+        )}
+      </Link>
+    );
+  }
+
+  imgSrc = () => {
+    const { name } = this.props;
+    const escapedName = escapeName(name);
+    return require(`images/${escapedName}.png`);
+  };
 }
