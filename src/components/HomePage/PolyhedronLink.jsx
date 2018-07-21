@@ -57,11 +57,14 @@ interface State {
   error: boolean;
 }
 
+// TODO can we do this not relying on global state?
+const loadedMap = {};
+
 export default class PolyhedronLink extends Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = {
-      loaded: false,
+      loaded: !!loadedMap[props.name],
       error: false,
     };
   }
@@ -70,6 +73,9 @@ export default class PolyhedronLink extends Component<Props, State> {
     const img = new Image();
     img.onload = () => {
       this.setState({ loaded: true });
+      // Make sure that we don't show the loading screen if we've already loaded this image
+      // (e.g. if we go back to the home page from another page)
+      loadedMap[this.props.name] = true;
     };
     img.onerror = () => {
       this.setState({ error: true });
@@ -81,7 +87,6 @@ export default class PolyhedronLink extends Component<Props, State> {
     const { name, isFake } = this.props;
     const { loaded, error } = this.state;
     const escapedName = escapeName(name);
-    // TODO image error state
     return (
       <Link
         id={!isFake ? escapedName : undefined}
@@ -89,7 +94,7 @@ export default class PolyhedronLink extends Component<Props, State> {
         className={css(styles.link, isFake && styles.fake)}
         title={name}
       >
-        {loaded || true ? ( // TODO don't show loading when intra-app
+        {loaded ? ( // TODO don't show loading when intra-app
           <img className={css(styles.image)} src={this.imgSrc()} alt={name} />
         ) : error ? (
           <Icon name="alert-circle-outline" size={48} />
