@@ -42,10 +42,6 @@ const styles = StyleSheet.create({
     lineHeight: 1.5,
     textIndent: -listIndent,
     paddingLeft: listIndent,
-
-    [media.mobile]: {
-      fontSize: 14,
-    },
   },
 
   em: {
