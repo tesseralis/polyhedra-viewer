@@ -20,12 +20,11 @@ const styles = StyleSheet.create({
     ':before': {
       content: "''",
       width: '100%',
+      height: '75%',
       position: 'absolute',
       left: 0,
       bottom: 0,
-      padding: '30px 0',
-      background: 'linear-gradient(transparent 150px, white)',
-      backgroundImage: 'linear-gradient(to bottom, transparent, white)',
+      backgroundImage: 'linear-gradient(to bottom, rgba(255,255,255,0), white)',
 
       transition: 'opacity .3s',
       opacity: 0,
