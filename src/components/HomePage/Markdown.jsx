@@ -19,10 +19,6 @@ const styles = StyleSheet.create({
     ':not(:last-child)': {
       marginBottom: 10,
     },
-
-    [media.mobile]: {
-      fontSize: 14,
-    },
   },
 
   a: {
