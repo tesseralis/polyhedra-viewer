@@ -15,8 +15,9 @@ class ImageDownloader extends React.Component<*> {
     const zip = new JSZip();
     const canvas = document.getElementsByTagName('canvas');
     const ratio = canvas[0].width / canvas[0].height;
-    canvas[0].height = 200;
-    canvas[0].width = ratio * 200;
+    const height = 150;
+    canvas[0].height = height;
+    canvas[0].width = ratio * height;
 
     const images = zip.folder('images');
 
@@ -32,10 +33,12 @@ class ImageDownloader extends React.Component<*> {
     const { setPolyhedron } = this.props;
     return await new Promise(resolve => {
       setPolyhedron(solid, () => {
-        canvas[0].toBlob(v => {
-          folder.file(`${escapeName(solid)}.png`, v, { base64: true });
-          resolve();
-        });
+        setTimeout(() => {
+          canvas[0].toBlob(v => {
+            folder.file(`${escapeName(solid)}.png`, v, { base64: true });
+            resolve();
+          });
+        }, 100);
       });
     });
   };
