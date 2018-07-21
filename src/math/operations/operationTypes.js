@@ -7,7 +7,7 @@ import type { VertexArg } from 'math/polyhedra';
 export type OpName =
   | 'truncate'
   | 'rectify'
-  | 'cumulate'
+  | 'sharpen'
   | 'dual'
   | 'expand'
   | 'snub'

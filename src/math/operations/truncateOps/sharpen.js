@@ -4,7 +4,7 @@ import _ from 'lodash';
 import { Polyhedron } from 'math/polyhedra';
 import type { Operation } from '../operationTypes';
 
-interface CumulateOptions {
+interface sharpenOptions {
   faceType?: number;
 }
 
@@ -15,17 +15,17 @@ function getFamily(polyhedron) {
   return polyhedron.isRegular() ? 'T' : polyhedron.symmetry();
 }
 
-// Adjacent faces of the vertex with a cumulate face first
-function getShiftedAdjacentFaces(vertex, facesToCumulate) {
+// Adjacent faces of the vertex with a sharpen face first
+function getShiftedAdjacentFaces(vertex, facesTosharpen) {
   const adjFaces = vertex.adjacentFaces();
   const [first, ...last] = adjFaces;
-  if (first.inSet(facesToCumulate)) {
+  if (first.inSet(facesTosharpen)) {
     return adjFaces;
   }
   return [...last, first];
 }
 
-function duplicateVertices(polyhedron, facesToCumulate) {
+function duplicateVertices(polyhedron, facesTosharpen) {
   const offset = polyhedron.numVertices();
   const mapping = {};
   _.forEach(polyhedron.vertices, vertex => {
@@ -33,7 +33,7 @@ function duplicateVertices(polyhedron, facesToCumulate) {
     const v2 = v + offset;
     const values = [v, [v2, v], v2, [v, v2]];
 
-    const faces = getShiftedAdjacentFaces(vertex, facesToCumulate);
+    const faces = getShiftedAdjacentFaces(vertex, facesTosharpen);
     _.forEach(faces, (f, i) => {
       _.set(mapping, [f.index, v], values[i]);
     });
@@ -47,7 +47,7 @@ function duplicateVertices(polyhedron, facesToCumulate) {
   );
 }
 
-function getCumulateFaces(polyhedron, faceType) {
+function getsharpenFaces(polyhedron, faceType) {
   // Special octahedron case
   if (polyhedron.isRegular()) {
     const face0 = polyhedron.getFace();
@@ -58,45 +58,45 @@ function getCumulateFaces(polyhedron, faceType) {
   return _.filter(polyhedron.faces, { numSides: faceType });
 }
 
-function calculateCumulateDist(polyhedron, face, edge) {
+function calculatesharpenDist(polyhedron, face, edge) {
   const apothem = face.apothem();
   const theta = Math.PI - edge.dihedralAngle();
   return apothem * Math.tan(theta);
 }
 
-function getCumulateDist(polyhedron, face) {
+function getsharpenDist(polyhedron, face) {
   if (!polyhedron.isRegular() && !polyhedron.isQuasiRegular()) {
     return _.meanBy(face.edges, edge =>
-      calculateCumulateDist(polyhedron, face, edge),
+      calculatesharpenDist(polyhedron, face, edge),
     );
   }
-  return calculateCumulateDist(polyhedron, face, face.edges[0]);
+  return calculatesharpenDist(polyhedron, face, face.edges[0]);
 }
 
 function getVertexToAdd(polyhedron, face) {
-  const dist = getCumulateDist(polyhedron, face);
+  const dist = getsharpenDist(polyhedron, face);
   return face.normalRay().getPointAtDistance(dist);
 }
 
-function applyCumulate(
+function applysharpen(
   polyhedron: Polyhedron,
-  { faceType = polyhedron.smallestFace().numSides }: CumulateOptions = {},
+  { faceType = polyhedron.smallestFace().numSides }: sharpenOptions = {},
 ) {
   // face indices with the right number of sides
-  let cumulateFaces = getCumulateFaces(polyhedron, faceType);
+  let sharpenFaces = getsharpenFaces(polyhedron, faceType);
 
   let mock;
   if (polyhedron.isQuasiRegular()) {
-    mock = duplicateVertices(polyhedron, cumulateFaces);
-    cumulateFaces = cumulateFaces.map(face => face.withPolyhedron(mock));
+    mock = duplicateVertices(polyhedron, sharpenFaces);
+    sharpenFaces = sharpenFaces.map(face => face.withPolyhedron(mock));
   } else {
     mock = polyhedron;
   }
 
-  const verticesToAdd = cumulateFaces.map(face => getVertexToAdd(mock, face));
+  const verticesToAdd = sharpenFaces.map(face => getVertexToAdd(mock, face));
 
   const oldToNew = {};
-  cumulateFaces.forEach((face, i) => {
+  sharpenFaces.forEach((face, i) => {
     face.vertices.forEach(v => {
       oldToNew[v.index] = i;
     });
@@ -117,8 +117,8 @@ function applyCumulate(
   };
 }
 
-export const cumulate: Operation<CumulateOptions> = {
-  apply: applyCumulate,
+export const sharpen: Operation<sharpenOptions> = {
+  apply: applysharpen,
 
   getSearchOptions(polyhedron, config) {
     const { faceType } = config;

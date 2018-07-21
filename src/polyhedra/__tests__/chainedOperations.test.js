@@ -26,11 +26,11 @@ describe('chained tests', () => {
       ],
     },
     {
-      description: 'dodecahedron -> rectify -> cumulate -> contract',
+      description: 'dodecahedron -> rectify -> sharpen -> contract',
       start: 'dodecahedron',
       operations: [
         ['rectify', 'icosidodecahedron'],
-        { op: 'cumulate', args: { faceType: 5 }, expected: 'icosahedron' },
+        { op: 'sharpen', args: { faceType: 5 }, expected: 'icosahedron' },
         ['contract', 'tetrahedron'],
       ],
     },
@@ -39,12 +39,12 @@ describe('chained tests', () => {
       start: 'tetrahedron',
       operations: [
         ['truncate', 'truncated-tetrahedron'],
-        ['cumulate', 'tetrahedron'],
+        ['sharpen', 'tetrahedron'],
         ['rectify', 'octahedron'],
         ['rectify', 'cuboctahedron'],
         ['truncate', 'truncated-cuboctahedron'],
-        ['cumulate', 'cuboctahedron'],
-        { op: 'cumulate', args: { faceType: 3 }, expected: 'cube' },
+        ['sharpen', 'cuboctahedron'],
+        { op: 'sharpen', args: { faceType: 3 }, expected: 'cube' },
         ['truncate', 'truncated-cube'],
         {
           op: 'augment',

@@ -1,6 +1,6 @@
 // @flow strict
 import _ from 'lodash';
-import { truncate, rectify, cumulate } from './truncateOps';
+import { truncate, rectify, sharpen } from './truncateOps';
 import { dual, expand, snub, contract, twist } from './resizeOps';
 import { elongate, gyroelongate, shorten, turn } from './prismOps';
 import { augment, diminish, gyrate } from './cutPasteOps';
@@ -10,7 +10,7 @@ const rawOps = {
   dual,
   truncate,
   rectify,
-  cumulate,
+  sharpen,
   expand,
   snub,
   contract,

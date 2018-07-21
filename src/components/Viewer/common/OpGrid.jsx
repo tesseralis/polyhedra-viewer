@@ -24,7 +24,7 @@ const styles = StyleSheet.create({
       // TODO encode the ordering in the actual operation types
       gridTemplateRows: 'repeat(4, 80px)',
       gridTemplateAreas: `
-      "truncate rectify      cumulate dual"
+      "truncate rectify      sharpen dual"
       "expand   snub         contract twist"
       "elongate gyroelongate shorten  turn"
       "augment  augment      diminish gyrate"

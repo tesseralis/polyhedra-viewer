@@ -15,7 +15,7 @@ function getHitOption(opName: OpName) {
     case 'diminish':
     case 'gyrate':
       return 'cap';
-    case 'cumulate':
+    case 'sharpen':
     case 'contract':
       return 'faceType';
     default:

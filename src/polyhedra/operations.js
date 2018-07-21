@@ -27,7 +27,7 @@ export const operations: Operation[] = [
     description: 'Cut (truncate) each vertex at the midpoint of each edge.',
   },
   {
-    name: 'cumulate',
+    name: 'sharpen',
     symbol: 'k',
     description: 'Opposite of truncation. Append a pyramid at certain faces.',
   },
@@ -192,7 +192,7 @@ export function hasOptions(solid: string, operation: OpName) {
     case 'snub':
     case 'gyroelongate':
       return !!_.find(relations, 'chiral');
-    case 'cumulate':
+    case 'sharpen':
     case 'contract':
     case 'shorten':
       return relations.length > 1;

@@ -25,7 +25,7 @@ function getMessage(opName) {
     case 'diminish':
     case 'gyrate':
       return 'Select a component';
-    case 'cumulate':
+    case 'sharpen':
     case 'contract':
       return 'Select a type of face';
     default:

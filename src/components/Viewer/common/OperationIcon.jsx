@@ -259,7 +259,7 @@ function drawIcon(name) {
           innerAngle={90}
         />
       );
-    case 'cumulate':
+    case 'sharpen':
       return <TruncateIcon styled="added" />;
     case 'dual':
       return <DualIcon />;
