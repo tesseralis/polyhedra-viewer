@@ -4,7 +4,7 @@ import React from 'react';
 import Markdown from 'react-markdown';
 import { css, StyleSheet } from 'aphrodite/no-important';
 
-import { media, fonts } from 'styles';
+import { fonts } from 'styles';
 
 const listIndent = 20;
 
