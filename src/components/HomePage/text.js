@@ -127,6 +127,7 @@ check out these links:
 * [Johnson Solids] by Allison Chen - Diagrams categorizing the Johnson solids based on their operations
 * [4D Toys] - An interactive catalogue of 4D shapes
 
+
 [Virtual Polyhedra]: http://www.georgehart.com/virtual-polyhedra/vp.html
 [Visual Polyhedra]: http://dmccooey.com/polyhedra/
 [Polyhedra]: http://polyhedra.stacyspeyer.net/
@@ -138,6 +139,8 @@ check out these links:
 export const footer = `
 Copyright © 2018 Nat Alison
 
+If you enjoyed this and would like to see more, please consider buying me a [Ko-fi].
+
 Inspiration and geometric data taken from [Virtual Polyhedra] by George W. Hart.
 
 Thank you to the countless friends and unsuspecting strangers who helped test this site
@@ -145,6 +148,7 @@ and provided their feedback.
 
 Made with [React] and [X3DOM].
 
+[Ko-fi]: https://ko-fi.com/tesseralis/
 [Virtual Polyhedra]: http://www.georgehart.com/virtual-polyhedra/vp.html
 [React]: https://reactjs.org/
 [X3DOM]: https://www.x3dom.org/
