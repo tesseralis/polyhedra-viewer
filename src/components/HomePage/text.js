@@ -7,9 +7,6 @@ Platonic solids, prisms, or pyramids, there are many more polyhedra
 to discover, with interesting properties and relationships to each other.
 
 This application visualizes the relationships between the convex, regular-faced polyhedra.
-_Convex_ means that no two faces have an inner angle between them of more than 180 degrees,
-while _regular-faced_ means that all the polyhedron's faces are regular polygons.
-
 The 120 solids presented here can be transformed into each other by a network of operations.
 Select a solid below to manipulate it and to explore its relationships with other polyhedra.
 

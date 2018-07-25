@@ -9,7 +9,7 @@ import splash from 'splash.mp4';
 import { media, fonts } from 'styles';
 import * as text from './text';
 
-const videoHeight = 400;
+const videoHeight = 300;
 
 const styles = StyleSheet.create({
   masthead: {
