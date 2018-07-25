@@ -2,6 +2,8 @@
 import React from 'react';
 import _ from 'lodash';
 
+import { unescapeName, getType } from 'polyhedra/names';
+
 import connect from 'components/connect';
 import { WithPolyhedron } from 'components/Viewer/context';
 
@@ -20,7 +22,8 @@ function displayFaces(polyhedron) {
 }
 
 const info: InfoRow[] = [
-  { title: 'Name', property: (p, name) => name },
+  { title: 'Name', property: ($, name) => _.capitalize(unescapeName(name)) },
+  { title: 'Type', property: ($, name) => getType(name) },
   { title: 'Vertices', property: p => p.numVertices() },
   { title: 'Edges', property: p => p.numEdges() },
   { title: 'Faces', property: displayFaces },
