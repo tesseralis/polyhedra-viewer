@@ -22,6 +22,9 @@ relationships with other polyhedra.
 `;
 
 export const uniform = `
+The uniform polyhedra are the Platonic solids, the Archimedean solids, and the prisms
+and antiprisms.
+
 A polyhedron is _uniform_ if it is vertex transitive. That is, if you rotate any vertex
 to any other vertex in the solid so that the faces match up, all the other vertices and
 faces will match up as well.
@@ -45,16 +48,18 @@ A small number are included here because of their relationship to the Johnson so
 export const johnson = `
 The 92 Johnson solids, named after Norman Johnson, are the *non-uniform*
 convex regular-faced polyhedra—solids whose vertices aren't transitive.
-Almost all of them can be created by gluing together pieces of uniform polyhedra
-so that the dihedral angle between their faces remains less than 180 degrees.
 
+Almost all of the Johnson solids can be created by gluing together pieces of uniform
+polyhedra so that the dihedral angle between their faces remains less than 180 degrees.
 Even though there is no hard restriction on which polygons can be used,
 all the Johnson solids can be made using faces of 3, 4, 5, 6, 8 or 10 sides.
 `;
 
 export const capstones = `
+The majority of Johnson solids are created from combining _pyramids_, _cupolæ_, and _rotundæ_
+with prisms and antiprisms.
 
-The majority of Johnson solids are made of these components:
+These components are defined as such:
 
 * **pyramid** - a set of triangles around a point with a regular polygon base.
    These can be sliced off from the tetrahedron, octahedron, and icosahedron.
@@ -64,6 +69,7 @@ The majority of Johnson solids are made of these components:
 * **rotunda** - Alternating sets of triangles and pentagons. Half of an icosidodecahedron.
 
 The following operations are defined:
+
 * **elongate** - Extend the solid with a prism
 * **gyroelongate** - Extend the solid with an antiprism
 * **bi** - Glue two pieces of the same type together
@@ -74,8 +80,10 @@ _gyro-_ means that they are unaligned.
 `;
 
 export const cutPaste = `
-The next group of Johnson solids are defined by the following operations on
-Platonic and Archimedean solids:
+The next group of Johnson solids are defined by _augmenting_, _diminishing_, and _gyrating_
+uniform polyhedra.
+
+These operations are defined:
 
 * **augment** - add a pyramid or cupola
 * **diminish** - diminish a pyramid or cupola
@@ -88,8 +96,8 @@ are opposite each other, and _meta-_ if they are not.
 
 export const elementary = `
 The remaining Johnson solids cannot be created by gluing together other polyhedra.
-Of those, two of them can be created by applying the snub operation to antiprisms.
 
+Of those, two of them can be created by applying the snub operation to antiprisms.
 The remaining seven are named based on their components:
 
 * **lune** - two triangles on opposite ends of a square

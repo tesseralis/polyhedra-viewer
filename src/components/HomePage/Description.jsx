@@ -4,7 +4,7 @@ import React, { Component } from 'react';
 import { css, StyleSheet } from 'aphrodite/no-important';
 
 import { fonts } from 'styles';
-import { Icon } from 'components/common';
+import { Icon, SrOnly } from 'components/common';
 import Markdown from './Markdown';
 
 // https://css-tricks.com/text-fade-read-more/
@@ -12,39 +12,19 @@ const styles = StyleSheet.create({
   description: {
     position: 'relative',
   },
+
   content: {
-    transition: 'max-height 2s',
-    maxHeight: 1000,
+    transition: 'height 2s',
     overflowY: 'hidden',
-
-    ':before': {
-      content: "''",
-      width: '100%',
-      height: '75%',
-      position: 'absolute',
-      left: 0,
-      bottom: 0,
-      backgroundImage: 'linear-gradient(to bottom, rgba(255,255,255,0), white)',
-
-      transition: 'opacity .3s',
-      opacity: 0,
-    },
   },
 
   collapsed: {
     position: 'relative',
-    maxHeight: 100,
-
-    ':before': {
-      opacity: 1,
-    },
   },
 
   toggle: {
     width: '100%',
     textAlign: 'center',
-    position: 'absolute',
-    bottom: 0,
 
     fontSize: 14,
     border: 'none',
@@ -60,6 +40,7 @@ const styles = StyleSheet.create({
 interface Props {
   content: string;
   collapsed: boolean;
+  title: string; // used for a11y
 }
 
 interface State {
@@ -75,17 +56,21 @@ export default class Description extends Component<Props, State> {
   }
 
   render() {
-    const { content } = this.props;
+    const { title, content } = this.props;
     const { collapsed } = this.state;
+
+    const brief = content.split('\n\n')[0];
+
     return (
       <div className={css(styles.description)}>
         <div className={css(styles.content, collapsed && styles.collapsed)}>
-          <Markdown source={content} />
+          <Markdown source={collapsed ? brief : content} />
         </div>
         {collapsed && (
           <button className={css(styles.toggle)} onClick={this.toggle}>
             <Icon name="menu-down" />
-            {'More...'}
+            {'More'}
+            <SrOnly>{`about ${title}`}</SrOnly>
           </button>
         )}
       </div>

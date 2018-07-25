@@ -173,7 +173,11 @@ export default function TableSection({
       {typeof description !== 'undefined' && (
         <div className={css(styles.description)}>
           <Header className={css(headerStyle)}>{header}</Header>
-          <Description collapsed={!sticky} content={description} />
+          <Description
+            title={header}
+            collapsed={!sticky}
+            content={description}
+          />
         </div>
       )}
       {tables && (
