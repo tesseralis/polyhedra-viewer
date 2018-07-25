@@ -60,11 +60,12 @@ class HomePage extends React.Component<Props> {
   }
 
   render() {
-    const { data, narrow = false } = this.props;
+    const { data, hash, narrow = false } = this.props;
     return (
       <div className={css(styles.homePage)}>
         <main className={css(styles.main)}>
-          <Masthead />
+          {/* only play video if we're at the top of the page */}
+          <Masthead autoPlay={!hash} />
           <div className={css(styles.sections)}>
             {data.map(sectionData => (
               <TableSection
