@@ -2,7 +2,7 @@
 import React from 'react';
 import _ from 'lodash';
 
-import { unescapeName, getType } from 'polyhedra/names';
+import { unescapeName, getType, toConwayNotation } from 'polyhedra/names';
 
 import connect from 'components/connect';
 import { WithPolyhedron } from 'components/Viewer/context';
@@ -24,6 +24,8 @@ function displayFaces(polyhedron) {
 const info: InfoRow[] = [
   { title: 'Name', property: ($, name) => _.capitalize(unescapeName(name)) },
   { title: 'Type', property: ($, name) => getType(name) },
+  { title: 'Conway Symbol', property: ($, name) => toConwayNotation(name) },
+
   { title: 'Vertices', property: p => p.numVertices() },
   { title: 'Edges', property: p => p.numEdges() },
   { title: 'Faces', property: displayFaces },
@@ -36,7 +38,7 @@ function InfoPanel({ solidName, polyhedron }) {
         {info.map(({ title, property }) => {
           return (
             <tr key={title}>
-              <td>{title}:</td>
+              <th>{title}:</th>
               <td>{property(polyhedron, solidName)}</td>
             </tr>
           );
