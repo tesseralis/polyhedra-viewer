@@ -10,9 +10,8 @@ This application visualizes the relationships between the convex, regular-faced 
 _Convex_ means that no two faces have an inner angle between them of more than 180 degrees,
 while _regular-faced_ means that all the polyhedron's faces are regular polygons.
 
-The 120 solids presented here can be transformed into each other by a network of operations,
-as shown in the animation. Select a solid below to manipulate it and to explore its
-relationships with other polyhedra.
+The 120 solids presented here can be transformed into each other by a network of operations.
+Select a solid below to manipulate it and to explore its relationships with other polyhedra.
 
 [Platonic solids]: http://en.wikipedia.org/wiki/Platonic_solid
 [Archimedean solids]: http://en.wikipedia.org/wiki/Archimedean_solid
