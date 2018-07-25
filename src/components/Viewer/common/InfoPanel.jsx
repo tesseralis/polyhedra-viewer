@@ -2,7 +2,12 @@
 import React from 'react';
 import _ from 'lodash';
 
-import { unescapeName, getType, toConwayNotation } from 'polyhedra/names';
+import {
+  unescapeName,
+  getType,
+  toConwayNotation,
+  getAlternateNames,
+} from 'polyhedra/names';
 
 import connect from 'components/connect';
 import { WithPolyhedron } from 'components/Viewer/context';
@@ -29,6 +34,11 @@ const info: InfoRow[] = [
   { title: 'Vertices', property: p => p.numVertices() },
   { title: 'Edges', property: p => p.numEdges() },
   { title: 'Faces', property: displayFaces },
+
+  {
+    title: 'Alternate Names',
+    property: ($, name) => getAlternateNames(name).join(', ') || 'None',
+  },
 ];
 
 function InfoPanel({ solidName, polyhedron }) {

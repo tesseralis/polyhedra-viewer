@@ -51,7 +51,7 @@ const alternateNames = {
   octahedron: [
     'tetratetrahedron', // hehe
     'triangular antiprism',
-    'triangular bipyramid',
+    'square bipyramid',
   ],
   icosahedron: [
     'snub tetrahedron',
@@ -91,6 +91,10 @@ const inverseAlternateNames = _(alternateNames)
 // TODO figure out how to move this to 'data' so it can be used in construction
 export function getCanonicalName(name: string) {
   return inverseAlternateNames[name] || name;
+}
+
+export function getAlternateNames(name: string) {
+  return alternateNames[unescapeName(name)] || [];
 }
 
 const fromConwayNotationUnescaped = notation => {
