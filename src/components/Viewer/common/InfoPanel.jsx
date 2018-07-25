@@ -29,12 +29,12 @@ function displayFaces(polyhedron) {
 const info: InfoRow[] = [
   { title: 'Name', property: ($, name) => _.capitalize(unescapeName(name)) },
   { title: 'Type', property: ($, name) => getType(name) },
-  { title: 'Conway Symbol', property: ($, name) => toConwayNotation(name) },
 
   { title: 'Vertices', property: p => p.numVertices() },
   { title: 'Edges', property: p => p.numEdges() },
   { title: 'Faces', property: displayFaces },
 
+  { title: 'Conway Symbol', property: ($, name) => toConwayNotation(name) },
   {
     title: 'Alternate Names',
     property: ($, name) => getAlternateNames(name).join(', ') || 'None',
