@@ -15,13 +15,14 @@ const mobThumbnailSize = 50;
 const styles = StyleSheet.create({
   link: {
     ...hover,
+    border: '1px LightGray solid',
     color: 'black',
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
     overflow: 'hidden',
-    borderRadius: 10,
     margin: 'auto', // center inside a table
+    borderRadius: 10,
     [media.notMobile]: {
       width: thumbnailSize,
       height: thumbnailSize,

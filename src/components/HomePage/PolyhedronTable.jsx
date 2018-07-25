@@ -13,6 +13,8 @@ import { media } from 'styles';
 const styles = StyleSheet.create({
   table: {
     // margin: 15,
+    borderSpacing: 10,
+    borderCollapse: 'separate',
   },
   caption: {
     fontSize: 16,
