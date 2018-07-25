@@ -15,6 +15,7 @@ import {
   diminishedRhombicosidodecahedra,
   snubAntiprisms,
   others,
+  othersTwoRows,
   type TableSection,
 } from 'constants/polyhedronTables';
 
@@ -49,6 +50,7 @@ const polyhedronTables: TableSection[] = [
         header: 'Elementary Johnson Solids',
         description: text.elementary,
         tables: [snubAntiprisms, others],
+        narrowTables: [snubAntiprisms, othersTwoRows],
       },
     ],
   },

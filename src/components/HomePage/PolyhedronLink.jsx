@@ -8,20 +8,21 @@ import { escapeName } from 'polyhedra/names';
 import { hover } from 'styles/common';
 import { media } from 'styles';
 
-const thumbnailSize = 70;
+const thumbnailSize = 65;
 
 const mobThumbnailSize = 50;
 
 const styles = StyleSheet.create({
   link: {
     ...hover,
+    border: '1px LightGray solid',
     color: 'black',
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
     overflow: 'hidden',
-    borderRadius: 10,
     margin: 'auto', // center inside a table
+    borderRadius: 10,
     [media.notMobile]: {
       width: thumbnailSize,
       height: thumbnailSize,
