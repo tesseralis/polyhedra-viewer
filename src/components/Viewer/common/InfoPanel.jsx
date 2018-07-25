@@ -1,17 +1,45 @@
 // @flow strict
 import React from 'react';
+import _ from 'lodash';
 
 import connect from 'components/connect';
 import { WithPolyhedron } from 'components/Viewer/context';
 
+interface InfoRow {
+  title: string;
+  property(polyhedron: *, name: string): string;
+}
+
+function displayFaces(polyhedron) {
+  const faceCounts = polyhedron.numFacesBySides();
+  // TODO order by type of face
+  const faceCountDisplay = _
+    .map(faceCounts, (count, type: string) => `${count}{${type}}`)
+    .join(' + ');
+  return `${polyhedron.numFaces()} = ${faceCountDisplay}`;
+}
+
+const info: InfoRow[] = [
+  { title: 'Name', property: (p, name) => name },
+  { title: 'Vertices', property: p => p.numVertices() },
+  { title: 'Edges', property: p => p.numEdges() },
+  { title: 'Faces', property: displayFaces },
+];
+
 function InfoPanel({ solidName, polyhedron }) {
   return (
-    <div>
-      <p>Name: {solidName}</p>
-      <p>Vertices: {polyhedron.numVertices()}</p>
-      <p>Edges: {polyhedron.numEdges()}</p>
-      <p>Faces: {polyhedron.numFaces()}</p> {/* TODO faces by sides */}
-    </div>
+    <table>
+      <tbody>
+        {info.map(({ title, property }) => {
+          return (
+            <tr key={title}>
+              <td>{title}:</td>
+              <td>{property(polyhedron, solidName)}</td>
+            </tr>
+          );
+        })}
+      </tbody>
+    </table>
   );
 }
 
