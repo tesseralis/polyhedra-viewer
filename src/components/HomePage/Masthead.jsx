@@ -71,11 +71,7 @@ const styles = StyleSheet.create({
   },
 });
 
-interface Props {
-  autoPlay: boolean;
-}
-
-export default function Masthead({ autoPlay = false }: Props) {
+export default function Masthead() {
   return (
     <div className={css(styles.masthead)}>
       <div className={css(styles.abstract)}>
@@ -90,13 +86,7 @@ export default function Masthead({ autoPlay = false }: Props) {
       </div>
       <Link to="/tetrahedron" className={css(styles.video)}>
         <SrOnly>View tetrahedron</SrOnly>
-        <video
-          muted
-          autoPlay={autoPlay}
-          playsinline
-          src={splash}
-          height={videoHeight}
-        />
+        <video muted autoPlay playsInline src={splash} height={videoHeight} />
       </Link>
     </div>
   );
