@@ -8,7 +8,7 @@ import { escapeName } from 'polyhedra/names';
 import { hover } from 'styles/common';
 import { media } from 'styles';
 
-const thumbnailSize = 70;
+const thumbnailSize = 65;
 
 const mobThumbnailSize = 50;
 

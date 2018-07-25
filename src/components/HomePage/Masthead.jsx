@@ -78,7 +78,12 @@ export default function Masthead() {
         <h1 className={css(styles.title)}>Polyhedra Viewer</h1>
         <p className={css(styles.subtitle)}>
           by{' '}
-          <a className={css(styles.authorLink)} href="https://www.tessera.li">
+          <a
+            className={css(styles.authorLink)}
+            target="_blank"
+            rel="noopener noreferrer"
+            href="https://www.tessera.li"
+          >
             @tesseralis
           </a>
         </p>
