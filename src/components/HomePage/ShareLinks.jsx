@@ -65,6 +65,7 @@ export default function ShareLinks() {
             href={url}
             key={icon}
             target="_blank"
+            rel="noopener"
             onClick={() =>
               // https://stackoverflow.com/questions/34507160/how-can-i-handle-an-event-to-open-a-window-in-react-js
               window.open(

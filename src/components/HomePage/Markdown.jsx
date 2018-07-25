@@ -63,7 +63,7 @@ function makeRenderer(El, ownProps = {}) {
 const renderers = {
   root: makeRenderer('div'),
   paragraph: makeRenderer('p'),
-  linkReference: makeRenderer('a', { target: '_blank' }),
+  linkReference: makeRenderer('a', { target: '_blank', rel: 'noopener' }),
   list: makeRenderer('ul'),
   listItem: makeRenderer('li'),
   emphasis: makeRenderer('em'),
