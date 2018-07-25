@@ -2,7 +2,7 @@
 import React from 'react';
 import { css, StyleSheet } from 'aphrodite/no-important';
 
-import { Icon } from 'components/common';
+import { Icon, SrOnly } from 'components/common';
 import { fonts } from 'styles';
 
 const styles = StyleSheet.create({
@@ -30,22 +30,27 @@ const links = [
   {
     url: `https://www.facebook.com/sharer.php?u=${url}`,
     icon: 'facebook-box',
+    name: 'Facebook',
   },
   {
     url: `https://www.tumblr.com/widgets/share/tool?canonicalUrl=${url}&title=${title}&caption=${caption}`,
     icon: 'tumblr',
+    name: 'Tumblr',
   },
   {
     url: `https://twitter.com/intent/tweet?url=${url}&text=${caption}&via=${author}`,
     icon: 'twitter',
+    name: 'Twitter',
   },
   {
     url: `https://reddit.com/submit?url=${url}&title=${title}`,
     icon: 'reddit',
+    name: 'Reddit',
   },
   {
     url: `https://plus.google.com/share?url=${url}&text=${title}`,
     icon: 'google-plus',
+    name: 'Google Plus',
   },
 ];
 
@@ -53,7 +58,7 @@ export default function ShareLinks() {
   return (
     <div className={css(styles.share)}>
       <span className={css(styles.text)}>Share:</span>
-      {links.map(({ url, icon }) => {
+      {links.map(({ url, icon, name }) => {
         return (
           <a
             className={css(styles.link)}
@@ -70,6 +75,7 @@ export default function ShareLinks() {
             }
           >
             <Icon size={36} name={icon} />
+            <SrOnly>{`Share on ${name}`}</SrOnly>
           </a>
         );
       })}
