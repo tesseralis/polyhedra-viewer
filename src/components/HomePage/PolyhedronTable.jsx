@@ -31,16 +31,22 @@ const styles = StyleSheet.create({
       fontSize: 10,
     },
   },
+  label: {
+    marginTop: 5,
+  },
 });
 
 const Cell = ({ cell, colSpan = 1 }: { cell: *, colSpan?: * }) => {
   const isFake = cell[0] === '!';
   const polyhedron = fromConwayNotation(isFake ? cell.substring(1) : cell);
 
+  const symbol = isFake ? `(${cell.substring(1)})` : cell;
+
   // Render a link for each cell, or a grayed-out link when indicated by an "!"
   return (
     <td className={css(styles.cell)} colSpan={colSpan}>
       {polyhedron ? <PolyhedronLink isFake={isFake} name={polyhedron} /> : cell}
+      <div className={css(styles.label)}>{polyhedron && symbol}</div>
     </td>
   );
 };
