@@ -142,7 +142,6 @@ check out these links:
 [4D Toys]: http://4dtoys.com/
 `;
 
-// TODO share buttons
 export const footer = `
 Copyright © 2018 Nat Alison
 

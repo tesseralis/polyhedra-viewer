@@ -94,7 +94,7 @@ export default class PolyhedronLink extends Component<Props, State> {
         className={css(styles.link, isFake && styles.fake)}
         title={name}
       >
-        {loaded ? ( // TODO don't show loading when intra-app
+        {loaded ? (
           <img className={css(styles.image)} src={this.imgSrc()} alt={name} />
         ) : error ? (
           <Icon name="alert-circle-outline" size={48} />
