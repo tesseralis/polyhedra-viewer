@@ -2,7 +2,6 @@
 import * as React from 'react';
 import { StyleSheet, css } from 'aphrodite/no-important';
 import x3dom from 'x3dom.js';
-import 'x3dom/x3dom.css';
 
 // Disable double-clicking to change rotation point
 if (x3dom.Viewarea) {
