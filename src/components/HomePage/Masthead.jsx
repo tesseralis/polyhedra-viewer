@@ -82,7 +82,7 @@ export default function Masthead({ autoPlay = false }: Props) {
         <h1 className={css(styles.title)}>Polyhedra Viewer</h1>
         <p className={css(styles.subtitle)}>
           by{' '}
-          <a className={css(styles.authorLink)} href="http://www.tessera.li">
+          <a className={css(styles.authorLink)} href="https://www.tessera.li">
             @tesseralis
           </a>
         </p>
