@@ -11,3 +11,4 @@ export { default as NavMenu } from './NavMenu';
 export { default as Title } from './Title';
 export { default as ImageDownloader } from './ImageDownloader';
 export { default as Prompt } from './Prompt';
+export { default as InfoPanel } from './InfoPanel';

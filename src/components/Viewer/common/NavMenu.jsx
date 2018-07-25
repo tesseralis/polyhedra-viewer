@@ -9,7 +9,7 @@ const styles = StyleSheet.create({
   menu: {
     width: '100%',
     display: 'grid',
-    gridTemplateColumns: '1fr 1fr 1fr 1fr',
+    gridTemplateColumns: '1fr 1fr 1fr 1fr 1fr',
     justifyItems: 'center',
   },
 });
@@ -27,6 +27,13 @@ export default function NavMenu({ solid, compact = false }: Props) {
         to={`/${solid}/list`}
         title="List"
         iconName="format-list-bulleted"
+        iconOnly={compact}
+      />
+      <IconLink
+        replace
+        to={`/${solid}/info`}
+        title="Info"
+        iconName="information-outline"
         iconOnly={compact}
       />
       <IconLink

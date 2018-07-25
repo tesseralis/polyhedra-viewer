@@ -2,7 +2,7 @@
 import React from 'react';
 import { css, StyleSheet } from 'aphrodite/no-important';
 
-import { NavMenu, ConfigForm, PolyhedronList } from '../common';
+import { InfoPanel, NavMenu, ConfigForm, PolyhedronList } from '../common';
 import { scroll } from 'styles/common';
 
 import OperationsPanel from './OperationsPanel';
@@ -44,6 +44,8 @@ interface Props {
 
 function renderPanel(panel) {
   switch (panel) {
+    case 'info':
+      return <InfoPanel />;
     case 'operations':
       return <OperationsPanel />;
     case 'options':
