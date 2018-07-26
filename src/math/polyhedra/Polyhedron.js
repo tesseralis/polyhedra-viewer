@@ -142,13 +142,17 @@ export default class Polyhedron {
 
   surfaceArea() {
     return _(this.faces)
-      .map(face => face.area())
+      .map(face => console.log(face.area()) || face.area())
       .sum();
   }
 
   volume() {
     return _(this.faces)
-      .map(face => (face.area() * face.distanceToCenter()) / 3)
+      .map(
+        face =>
+          console.log(face.area()) ||
+          (face.area() * face.distanceToCenter()) / 3,
+      )
       .sum();
   }
 

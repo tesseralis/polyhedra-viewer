@@ -67,7 +67,7 @@ export default class VEList implements VertexList {
 
   /** Get the area of a *regular* polygon */
   area() {
-    return this.numSides * this.sideLength() * this.apothem();
+    return (this.numSides * this.sideLength() * this.apothem()) / 2;
   }
 
   /** Return the centroid of the face given by the face index */

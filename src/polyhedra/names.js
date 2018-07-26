@@ -146,13 +146,13 @@ export const toConwayNotation = (solid: string) => {
 export function getType(solid: string) {
   const name = unescapeName(solid);
   if (inversePlatonicMapping[name]) {
-    return 'Platonic Solid';
+    return 'Platonic solid';
   }
   if (inverseArchimedeanMapping[name]) {
-    return 'Archimedean Solid';
+    return 'Archimedean solid';
   }
   if (_.includes(johnsonSolids, name)) {
-    return 'Johnson Solid';
+    return 'Johnson solid';
   }
   if (name.includes('antiprism')) {
     return 'Antiprism';
