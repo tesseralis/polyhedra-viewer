@@ -128,6 +128,12 @@ export default class Polyhedron {
       .value();
   }
 
+  vertexConfiguration() {
+    return _.countBy(this.vertices.map(v => v.configuration()), config =>
+      config.join('.'),
+    );
+  }
+
   // Geometric properties
   // ====================
 
@@ -142,17 +148,13 @@ export default class Polyhedron {
 
   surfaceArea() {
     return _(this.faces)
-      .map(face => console.log(face.area()) || face.area())
+      .map(face => face.area())
       .sum();
   }
 
   volume() {
     return _(this.faces)
-      .map(
-        face =>
-          console.log(face.area()) ||
-          (face.area() * face.distanceToCenter()) / 3,
-      )
+      .map(face => (face.area() * face.distanceToCenter()) / 3)
       .sum();
   }
 

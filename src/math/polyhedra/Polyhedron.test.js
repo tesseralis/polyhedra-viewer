@@ -12,6 +12,24 @@ describe('Polyhedron', () => {
     });
   });
 
+  describe('vertexConfiguration', () => {
+    it('gets all the correct vertex configurations', () => {
+      expect(Polyhedron.get('icosidodecahedron').vertexConfiguration()).toEqual(
+        {
+          '3.5.3.5': 30,
+        },
+      );
+      expect(
+        Polyhedron.get('triangular-hebesphenorotunda').vertexConfiguration(),
+      ).toEqual({
+        '3.3.3.5': 3,
+        '3.4.3.5': 6,
+        '3.5.3.5': 3,
+        '3.3.4.6': 6,
+      });
+    });
+  });
+
   describe('isUniform', () => {
     it('counts prisms and antiprisms', () => {
       expect(Polyhedron.get('decagonal-prism').isUniform()).toBe(true);

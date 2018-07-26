@@ -6,6 +6,20 @@ import type { VIndex } from './solidTypes';
 import Polyhedron from './Polyhedron';
 import Edge from './Edge';
 
+function getCycles(array) {
+  return _.map(array, (val, i) => _.drop(array, i).concat(_.take(array, i)));
+}
+
+function arrayMin(a1, a2) {
+  if (a1.length === 0) return a1;
+  if (a2.length === 0) return a2;
+  const [h1, ...t1] = a1;
+  const [h2, ...t2] = a2;
+  if (h1 < h2) return a1;
+  if (h2 < h1) return a2;
+  return [h1, ...arrayMin(t1, t2)];
+}
+
 export default class Vertex {
   polyhedron: Polyhedron;
   index: VIndex;
@@ -49,6 +63,14 @@ export default class Vertex {
 
   adjacentFaces() {
     return _.map(this.adjacentEdges(), 'face');
+  }
+
+  configuration() {
+    const config = _.map(this.adjacentFaces(), 'numSides');
+    const allConfigs = getCycles(config).concat(
+      getCycles(_.reverse([...config])),
+    );
+    return _.reduce(allConfigs, arrayMin);
   }
 
   /** Return adjacent faces counted by number of sides */

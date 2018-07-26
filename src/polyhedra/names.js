@@ -61,8 +61,10 @@ const alternateNames = {
   cuboctahedron: ['rhombitetratetrahedron', 'triangular gyrobicupola'],
   'truncated octahedron': ['truncated tetratetrahedron'],
   rhombicuboctahedron: ['elongated square orthobicupola'],
+  'snub cube': ['snub cuboctahedron'],
   icosidodecahedron: ['pentagonal gyrobirotunda'],
   'triangular prism': ['fastigium', 'digonal cupola'],
+  'snub dodecahedron': ['snub icosidodecahedron'],
 
   // related to augmented/diminished/gyrate solids
   'pentagonal antiprism': ['parabidiminished icosahedron'],

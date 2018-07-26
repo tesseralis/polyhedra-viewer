@@ -3,6 +3,7 @@ import React from 'react';
 import { css, StyleSheet } from 'aphrodite/no-important';
 import _ from 'lodash';
 
+import { fonts } from 'styles';
 import {
   unescapeName,
   getType,
@@ -19,6 +20,11 @@ const styles = StyleSheet.create({
     margin: 10,
     borderSpacing: 8,
     borderCollapse: 'separate',
+  },
+
+  cell: {
+    fontFamily: fonts.verdana,
+    fontSize: 16,
   },
 });
 
@@ -43,23 +49,34 @@ const info: InfoRow[] = [
   { title: 'Vertices', property: p => p.numVertices() },
   { title: 'Edges', property: p => p.numEdges() },
   { title: 'Faces', property: displayFaces },
+  {
+    title: 'Vertex configuration',
+    property: p => {
+      const vConfig = p.vertexConfiguration();
+      const configKeys = _.keys(vConfig);
+      if (configKeys.length === 1) return configKeys[0];
+      // TODO possibly square notation but that's hard
+      return _
+        .map(vConfig, (count, type: string) => `${count}(${type})`)
+        .join(' + '); // TODO list instead
+    },
+  },
 
   {
     title: 'Volume',
     property: p => `${_.round(p.volume() / Math.pow(p.edgeLength(), 3), 3)}`,
   },
   {
-    title: 'Surface Area',
+    title: 'Surface area',
     property: p =>
       `${_.round(p.surfaceArea() / Math.pow(p.edgeLength(), 2), 3)}`,
   },
 
-  { title: 'Vertex Configuration', property: () => '' },
   { title: 'Symmetry', property: () => '' },
 
-  { title: 'Conway Symbol', property: ($, name) => toConwayNotation(name) },
+  { title: 'Conway symbol', property: ($, name) => toConwayNotation(name) },
   {
-    title: 'Alternate Names',
+    title: 'Also known as',
     property: ($, name) => getAlternateNames(name).join(', ') || 'None',
   },
 ];
@@ -71,8 +88,10 @@ function InfoPanel({ solidName, polyhedron }) {
         {info.map(({ title, property }) => {
           return (
             <tr key={title}>
-              <th>{title}</th>
-              <td>{property(polyhedron, solidName)}</td>
+              <th className={css(styles.cell)}>{title}</th>
+              <td className={css(styles.cell)}>
+                {property(polyhedron, solidName)}
+              </td>
             </tr>
           );
         })}
