@@ -255,11 +255,11 @@ export default class Polyhedron {
       }
     }
 
-    if (faceCounts[4] > 3) {
-      return `P${faceCounts[4]}`;
+    if (faceCounts[4] >= 3) {
+      return `D_${faceCounts[4]}h`;
     }
-    if (faceCounts[3] > 6) {
-      return `A${faceCounts[3] / 2}`;
+    if (faceCounts[3] >= 6) {
+      return `D_${faceCounts[3] / 2}d`;
     }
   });
 }

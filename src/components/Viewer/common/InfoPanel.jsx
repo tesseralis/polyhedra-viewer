@@ -36,22 +36,23 @@ interface DatumDisplayProps {
 
 interface InfoRow {
   title: string;
-  property(polyhedron: *, name: string): string;
+  // property: (props: DatumDisplayProps) => string;
+  property: *;
 }
 
-function displayFaces(polyhedron) {
+function displayFaces({ polyhedron }) {
   const faceCounts = polyhedron.numFacesBySides();
   // TODO order by type of face
-  const faceCountDisplay = _
+  return _
     .map(faceCounts, (count, type: string) => `${count}{${type}}`)
     .join(' + ');
-  return `${polyhedron.numFaces()} = ${faceCountDisplay}`;
 }
 
-function displaySymmetry(polyhedron, name) {
+// FIXME still doesn't work well... (e.g. decagonal antiprism)
+function displaySymmetry({ polyhedron, name }) {
   if (polyhedron.isUniform()) {
     const symmetry = polyhedron.symmetry();
-    if (name.includes('snub')) {
+    if (name.includes('snub') || name.includes('prism')) {
       return symmetry;
     }
     return `${symmetry}_h`;
@@ -61,41 +62,52 @@ function displaySymmetry(polyhedron, name) {
 }
 
 const info: InfoRow[] = [
-  { title: 'Name', property: ($, name) => _.capitalize(unescapeName(name)) },
-  { title: 'Type', property: ($, name) => getType(name) },
+  { title: 'Name', property: ({ name }) => _.capitalize(unescapeName(name)) },
+  { title: 'Type', property: ({ name }) => getType(name) },
 
-  { title: 'Vertices', property: p => p.numVertices() },
-  { title: 'Edges', property: p => p.numEdges() },
-  { title: 'Faces', property: displayFaces },
+  { title: 'Vertices', property: ({ polyhedron }) => polyhedron.numVertices() },
+  { title: 'Edges', property: ({ polyhedron }) => polyhedron.numEdges() },
+  { title: 'Faces', property: ({ polyhedron }) => polyhedron.numFaces() },
   {
     title: 'Vertex configuration',
-    property: p => {
-      const vConfig = p.vertexConfiguration();
+    property: ({ polyhedron }) => {
+      const vConfig = polyhedron.vertexConfiguration();
       const configKeys = _.keys(vConfig);
       if (configKeys.length === 1) return configKeys[0];
       // TODO possibly square notation but that's hard
-      return _
-        .map(vConfig, (count, type: string) => `${count}(${type})`)
-        .join(' + '); // TODO list instead
+      return (
+        <ul>
+          {_.map(vConfig, (count, type: string) => (
+            <li>
+              {count}({type})
+            </li>
+          ))}
+        </ul>
+      );
     },
+  },
+  {
+    title: 'Faces by type',
+    property: displayFaces,
   },
 
   {
     title: 'Volume',
-    property: p => `${_.round(p.volume() / Math.pow(p.edgeLength(), 3), 3)}`,
+    property: ({ polyhedron: p }) =>
+      `${_.round(p.volume() / Math.pow(p.edgeLength(), 3), 3)}`,
   },
   {
     title: 'Surface area',
-    property: p =>
+    property: ({ polyhedron: p }) =>
       `${_.round(p.surfaceArea() / Math.pow(p.edgeLength(), 2), 3)}`,
   },
 
   { title: 'Symmetry', property: displaySymmetry },
 
-  { title: 'Conway symbol', property: ($, name) => toConwayNotation(name) },
+  { title: 'Conway symbol', property: ({ name }) => toConwayNotation(name) },
   {
     title: 'Also known as',
-    property: ($, name) => getAlternateNames(name).join(', ') || 'None',
+    property: ({ name }) => getAlternateNames(name).join(', ') || 'None',
   },
 ];
 
@@ -103,12 +115,12 @@ function InfoPanel({ solidName, polyhedron }) {
   return (
     <table className={css(styles.table)}>
       <tbody>
-        {info.map(({ title, property }) => {
+        {info.map(({ title, property: Property }) => {
           return (
             <tr key={title}>
               <th className={css(styles.cell)}>{title}</th>
               <td className={css(styles.cell)}>
-                {property(polyhedron, solidName)}
+                <Property name={solidName} polyhedron={polyhedron} />
               </td>
             </tr>
           );
