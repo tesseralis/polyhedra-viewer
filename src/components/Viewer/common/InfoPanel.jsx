@@ -21,11 +21,45 @@ const styles = StyleSheet.create({
     margin: 10,
     borderSpacing: 8,
     borderCollapse: 'separate',
+    padding: 10,
+    fontFamily: fonts.hoeflerText,
   },
 
-  cell: {
-    fontFamily: fonts.verdana,
+  solidName: {
+    fontSize: 22,
+    marginBottom: 10,
+  },
+
+  solidType: {
+    fontSize: 18,
+    color: 'DimGrey',
+    marginBottom: 20,
+  },
+
+  dataList: {
+    display: 'grid',
+    gridTemplateAreas: `
+      "verts verts edges edges faces faces"
+      "vconf vconf vconf ftype ftype ftype"
+      "vol   vol   vol   sa    sa    sa"
+      "sym   sym   sym   sym   sym   sym"
+      "alt   alt   alt   alt   alt   alt"
+    `,
+    gridRowGap: 10,
+  },
+
+  property: {
+    marginBottom: 10,
+  },
+
+  propName: {
     fontSize: 16,
+    marginBottom: 5,
+  },
+
+  propValue: {
+    fontFamily: fonts.verdana,
+    color: 'DimGrey',
   },
 });
 
@@ -36,7 +70,7 @@ interface DatumDisplayProps {
 
 interface InfoRow {
   title: string;
-  // property: (props: DatumDisplayProps) => string;
+  area: string;
   property: *;
 }
 
@@ -62,14 +96,24 @@ function displaySymmetry({ polyhedron, name }) {
 }
 
 const info: InfoRow[] = [
-  { title: 'Name', property: ({ name }) => _.capitalize(unescapeName(name)) },
-  { title: 'Type', property: ({ name }) => getType(name) },
-
-  { title: 'Vertices', property: ({ polyhedron }) => polyhedron.numVertices() },
-  { title: 'Edges', property: ({ polyhedron }) => polyhedron.numEdges() },
-  { title: 'Faces', property: ({ polyhedron }) => polyhedron.numFaces() },
+  {
+    title: 'Vertices',
+    area: 'verts',
+    property: ({ polyhedron }) => polyhedron.numVertices(),
+  },
+  {
+    title: 'Edges',
+    area: 'edges',
+    property: ({ polyhedron }) => polyhedron.numEdges(),
+  },
+  {
+    title: 'Faces',
+    area: 'faces',
+    property: ({ polyhedron }) => polyhedron.numFaces(),
+  },
   {
     title: 'Vertex configuration',
+    area: 'vconf',
     property: ({ polyhedron }) => {
       const vConfig = polyhedron.vertexConfiguration();
       const configKeys = _.keys(vConfig);
@@ -88,45 +132,52 @@ const info: InfoRow[] = [
   },
   {
     title: 'Faces by type',
+    area: 'ftype',
     property: displayFaces,
   },
 
   {
     title: 'Volume',
+    area: 'vol',
     property: ({ polyhedron: p }) =>
       `${_.round(p.volume() / Math.pow(p.edgeLength(), 3), 3)}`,
   },
   {
     title: 'Surface area',
+    area: 'sa',
     property: ({ polyhedron: p }) =>
       `${_.round(p.surfaceArea() / Math.pow(p.edgeLength(), 2), 3)}`,
   },
 
-  { title: 'Symmetry', property: displaySymmetry },
+  { title: 'Symmetry', area: 'sym', property: displaySymmetry },
 
-  { title: 'Conway symbol', property: ({ name }) => toConwayNotation(name) },
   {
     title: 'Also known as',
+    area: 'alt',
     property: ({ name }) => getAlternateNames(name).join(', ') || 'None',
   },
 ];
 
 function InfoPanel({ solidName, polyhedron }) {
   return (
-    <table className={css(styles.table)}>
-      <tbody>
-        {info.map(({ title, property: Property }) => {
+    <div className={css(styles.table)}>
+      <h2 className={css(styles.solidName)}>
+        {toConwayNotation(solidName)} · {_.capitalize(unescapeName(solidName))}
+      </h2>
+      <div className={css(styles.solidType)}>{getType(solidName)}</div>
+      <dl className={css(styles.dataList)}>
+        {info.map(({ title, area, property: Property }) => {
           return (
-            <tr key={title}>
-              <th className={css(styles.cell)}>{title}</th>
-              <td className={css(styles.cell)}>
+            <div className={css(styles.property)} style={{ gridArea: area }}>
+              <dd className={css(styles.propName)}>{title}</dd>
+              <dt className={css(styles.propValue)}>
                 <Property name={solidName} polyhedron={polyhedron} />
-              </td>
-            </tr>
+              </dt>
+            </div>
           );
         })}
-      </tbody>
-    </table>
+      </dl>
+    </div>
   );
 }
 
