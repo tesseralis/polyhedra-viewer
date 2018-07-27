@@ -158,6 +158,12 @@ export default class Polyhedron {
       .sum();
   }
 
+  sphericity() {
+    const v = this.volume();
+    const a = this.surfaceArea();
+    return (Math.pow(Math.PI, 1 / 3) * Math.pow(6 * v, 2 / 3)) / a;
+  }
+
   /** Get the face that is closest to the given point. */
   hitFace(point: Vec3D) {
     return _.minBy(this.faces, face => face.plane().getDistanceToPoint(point));

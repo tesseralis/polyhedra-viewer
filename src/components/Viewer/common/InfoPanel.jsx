@@ -4,6 +4,7 @@ import { css, StyleSheet } from 'aphrodite/no-important';
 import _ from 'lodash';
 
 import { getJohnsonSymmetry } from 'data';
+import { polygonNames } from 'constants/polygons';
 import { fonts } from 'styles';
 import {
   unescapeName,
@@ -41,7 +42,7 @@ const styles = StyleSheet.create({
     gridTemplateAreas: `
       "verts verts edges edges faces faces"
       "vconf vconf vconf ftype ftype ftype"
-      "vol   vol   vol   sa    sa    sa"
+      "vol   vol   sa    sa    spher spher"
       "sym   sym   sym   sym   sym   sym"
       "alt   alt   alt   alt   alt   alt"
     `,
@@ -58,7 +59,7 @@ const styles = StyleSheet.create({
   },
 
   propValue: {
-    fontFamily: fonts.verdana,
+    fontFamily: fonts.andaleMono,
     color: 'DimGrey',
   },
 });
@@ -77,9 +78,16 @@ interface InfoRow {
 function displayFaces({ polyhedron }) {
   const faceCounts = polyhedron.numFacesBySides();
   // TODO order by type of face
-  return _
-    .map(faceCounts, (count, type: string) => `${count}{${type}}`)
-    .join(' + ');
+  return (
+    <ul>
+      {_.map(faceCounts, (count, type: string) => (
+        <li>
+          {count} {polygonNames[type]}
+          {count !== 1 ? 's' : ''}
+        </li>
+      ))}
+    </ul>
+  );
 }
 
 // FIXME still doesn't work well... (e.g. decagonal antiprism)
@@ -148,13 +156,22 @@ const info: InfoRow[] = [
     property: ({ polyhedron: p }) =>
       `${_.round(p.surfaceArea() / Math.pow(p.edgeLength(), 2), 3)}`,
   },
+  {
+    title: 'Sphericity',
+    area: 'spher',
+    property: ({ polyhedron: p }) => `${_.round(p.sphericity(), 3)}`,
+  },
 
   { title: 'Symmetry', area: 'sym', property: displaySymmetry },
 
   {
     title: 'Also known as',
     area: 'alt',
-    property: ({ name }) => getAlternateNames(name).join(', ') || 'None',
+    property: ({ name }) => {
+      const alts = getAlternateNames(name);
+      if (alts.length === 0) return '--';
+      return <ul>{alts.map(alt => <li key={alt}>{alt}</li>)}</ul>;
+    },
   },
 ];
 
@@ -162,7 +179,7 @@ function InfoPanel({ solidName, polyhedron }) {
   return (
     <div className={css(styles.table)}>
       <h2 className={css(styles.solidName)}>
-        {toConwayNotation(solidName)} · {_.capitalize(unescapeName(solidName))}
+        {_.capitalize(unescapeName(solidName))}, {toConwayNotation(solidName)}
       </h2>
       <div className={css(styles.solidType)}>{getType(solidName)}</div>
       <dl className={css(styles.dataList)}>
