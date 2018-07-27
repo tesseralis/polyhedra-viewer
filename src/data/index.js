@@ -1,6 +1,7 @@
 // @flow strict
 import _ from 'lodash';
 import johnsonSubgroups from './johnsonSubgroups';
+import johnsonSymmetries from './johnsonSymmetries';
 import groupData from './groups';
 
 const getPolyhedra = groupName => require(`./groups/${groupName}.json`);
@@ -40,3 +41,7 @@ export const isValidSolid = (escapedSolidName: string) => {
 export const getSolidData = (solidName: string) => {
   return require(`data/polyhedra/${solidName.replace(/ /g, '-')}.json`);
 };
+
+export function getJohnsonSymmetry(name: string) {
+  return johnsonSymmetries[johnsonSolids.indexOf(name)];
+}

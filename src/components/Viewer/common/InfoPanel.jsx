@@ -1,8 +1,9 @@
 // @flow strict
-import React from 'react';
+import * as React from 'react';
 import { css, StyleSheet } from 'aphrodite/no-important';
 import _ from 'lodash';
 
+import { getJohnsonSymmetry } from 'data';
 import { fonts } from 'styles';
 import {
   unescapeName,
@@ -28,6 +29,11 @@ const styles = StyleSheet.create({
   },
 });
 
+interface DatumDisplayProps {
+  polyhedron: *;
+  name: string;
+}
+
 interface InfoRow {
   title: string;
   property(polyhedron: *, name: string): string;
@@ -40,6 +46,18 @@ function displayFaces(polyhedron) {
     .map(faceCounts, (count, type: string) => `${count}{${type}}`)
     .join(' + ');
   return `${polyhedron.numFaces()} = ${faceCountDisplay}`;
+}
+
+function displaySymmetry(polyhedron, name) {
+  if (polyhedron.isUniform()) {
+    const symmetry = polyhedron.symmetry();
+    if (name.includes('snub')) {
+      return symmetry;
+    }
+    return `${symmetry}_h`;
+  }
+  const { group, sub } = getJohnsonSymmetry(unescapeName(name));
+  return `${group}_${sub}`;
 }
 
 const info: InfoRow[] = [
@@ -72,7 +90,7 @@ const info: InfoRow[] = [
       `${_.round(p.surfaceArea() / Math.pow(p.edgeLength(), 2), 3)}`,
   },
 
-  { title: 'Symmetry', property: () => '' },
+  { title: 'Symmetry', property: displaySymmetry },
 
   { title: 'Conway symbol', property: ($, name) => toConwayNotation(name) },
   {
