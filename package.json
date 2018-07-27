@@ -24,6 +24,7 @@
     "react": "^16.4.0",
     "react-dom": "^16.4.0",
     "react-event-listener": "^0.5.9",
+    "react-ga": "^2.5.3",
     "react-loadable": "^5.4.0",
     "react-markdown": "^3.3.2",
     "react-router-dom": "^4.2.2",
