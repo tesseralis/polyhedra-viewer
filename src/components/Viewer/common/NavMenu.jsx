@@ -1,5 +1,6 @@
 // @flow strict
 
+import _ from 'lodash';
 import React from 'react';
 import { css, StyleSheet } from 'aphrodite/no-important';
 
@@ -17,9 +18,14 @@ const styles = StyleSheet.create({
 interface Props {
   solid: string;
   compact?: boolean;
+  onClick?: () => void;
 }
 
-export default function NavMenu({ solid, compact = false }: Props) {
+export default function NavMenu({
+  solid,
+  compact = false,
+  onClick = _.noop,
+}: Props) {
   return (
     <nav className={css(styles.menu)}>
       <IconLink
@@ -28,6 +34,7 @@ export default function NavMenu({ solid, compact = false }: Props) {
         title="List"
         iconName="format-list-bulleted"
         iconOnly={compact}
+        onClick={onClick}
       />
       <IconLink
         replace
@@ -35,6 +42,7 @@ export default function NavMenu({ solid, compact = false }: Props) {
         title="Options"
         iconName="settings"
         iconOnly={compact}
+        onClick={onClick}
       />
       <IconLink
         replace
@@ -42,6 +50,7 @@ export default function NavMenu({ solid, compact = false }: Props) {
         title="Operations"
         iconName="math-compass"
         iconOnly={compact}
+        onClick={onClick}
       />
       <IconLink
         replace
@@ -49,6 +58,7 @@ export default function NavMenu({ solid, compact = false }: Props) {
         title="Full Screen"
         iconName="cube-outline"
         iconOnly={compact}
+        onClick={onClick}
         exact
       />
     </nav>
