@@ -23,12 +23,12 @@ const styles = StyleSheet.create({
     borderSpacing: 8,
     borderCollapse: 'separate',
     padding: 10,
-    // fontFamily: fonts.times,
+    fontFamily: fonts.times,
   },
 
   solidName: {
     fontSize: 22,
-    marginBottom: 10,
+    marginBottom: 5,
   },
 
   solidType: {
@@ -46,7 +46,7 @@ const styles = StyleSheet.create({
       "sym   sym   sym   sym   order order"
       "alt   alt   alt   alt   alt   alt"
     `,
-    gridRowGap: 10,
+    gridRowGap: 15,
   },
 
   property: {
@@ -54,7 +54,7 @@ const styles = StyleSheet.create({
   },
 
   propName: {
-    fontSize: 16,
+    fontSize: 18,
     marginBottom: 5,
   },
 

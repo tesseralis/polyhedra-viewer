@@ -24,10 +24,10 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: 'DimGrey',
     [media.notMobile]: {
-      fontSize: 12,
+      fontSize: 14,
     },
     [media.mobile]: {
-      fontSize: 10,
+      fontSize: 12,
     },
   },
   label: {
