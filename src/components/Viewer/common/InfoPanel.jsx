@@ -43,7 +43,7 @@ const styles = StyleSheet.create({
       "verts verts edges edges faces faces"
       "vconf vconf vconf ftype ftype ftype"
       "vol   vol   sa    sa    spher spher"
-      "sym   sym   sym   sym   sym   sym"
+      "sym   sym   sym   sym   order order"
       "alt   alt   alt   alt   alt   alt"
     `,
     gridRowGap: 10,
@@ -70,7 +70,7 @@ interface DatumDisplayProps {
 }
 
 interface InfoRow {
-  title: string;
+  name: string;
   area: string;
   property: *;
 }
@@ -97,30 +97,30 @@ function displaySymmetry({ polyhedron, name }) {
     if (name.includes('snub') || name.includes('prism')) {
       return symmetry;
     }
-    return `${symmetry}_h`;
+    return `Polyhedral, ${symmetry}_h`;
   }
   const { group, sub } = getJohnsonSymmetry(unescapeName(name));
-  return `${group}_${sub}`;
+  return `n-gonal polyhedral, ${group}_${sub}`;
 }
 
 const info: InfoRow[] = [
   {
-    title: 'Vertices',
+    name: 'Vertices',
     area: 'verts',
     property: ({ polyhedron }) => polyhedron.numVertices(),
   },
   {
-    title: 'Edges',
+    name: 'Edges',
     area: 'edges',
     property: ({ polyhedron }) => polyhedron.numEdges(),
   },
   {
-    title: 'Faces',
+    name: 'Faces',
     area: 'faces',
     property: ({ polyhedron }) => polyhedron.numFaces(),
   },
   {
-    title: 'Vertex configuration',
+    name: 'Vertex configuration',
     area: 'vconf',
     property: ({ polyhedron }) => {
       const vConfig = polyhedron.vertexConfiguration();
@@ -139,33 +139,34 @@ const info: InfoRow[] = [
     },
   },
   {
-    title: 'Faces by type',
+    name: 'Faces by type',
     area: 'ftype',
     property: displayFaces,
   },
 
   {
-    title: 'Volume',
+    name: 'Volume',
     area: 'vol',
     property: ({ polyhedron: p }) =>
       `${_.round(p.volume() / Math.pow(p.edgeLength(), 3), 3)}`,
   },
   {
-    title: 'Surface area',
+    name: 'Surface area',
     area: 'sa',
     property: ({ polyhedron: p }) =>
       `${_.round(p.surfaceArea() / Math.pow(p.edgeLength(), 2), 3)}`,
   },
   {
-    title: 'Sphericity',
+    name: 'Sphericity',
     area: 'spher',
     property: ({ polyhedron: p }) => `${_.round(p.sphericity(), 3)}`,
   },
 
-  { title: 'Symmetry', area: 'sym', property: displaySymmetry },
+  { name: 'Symmetry', area: 'sym', property: displaySymmetry },
+  { name: 'Order', area: 'order', property: ({}) => '-1' },
 
   {
-    title: 'Also known as',
+    name: 'Also known as',
     area: 'alt',
     property: ({ name }) => {
       const alts = getAlternateNames(name);
@@ -183,10 +184,10 @@ function InfoPanel({ solidName, polyhedron }) {
       </h2>
       <div className={css(styles.solidType)}>{getType(solidName)}</div>
       <dl className={css(styles.dataList)}>
-        {info.map(({ title, area, property: Property }) => {
+        {info.map(({ name, area, property: Property }) => {
           return (
             <div className={css(styles.property)} style={{ gridArea: area }}>
-              <dd className={css(styles.propName)}>{title}</dd>
+              <dd className={css(styles.propName)}>{name}</dd>
               <dt className={css(styles.propValue)}>
                 <Property name={solidName} polyhedron={polyhedron} />
               </dt>
