@@ -1,9 +1,8 @@
 // @flow strict
-import * as React from 'react';
+import React, { Fragment } from 'react';
 import { css, StyleSheet } from 'aphrodite/no-important';
 import _ from 'lodash';
 
-import { getJohnsonSymmetry } from 'data';
 import { polygonNames } from 'constants/polygons';
 import { fonts } from 'styles';
 import {
@@ -12,18 +11,19 @@ import {
   toConwayNotation,
   getAlternateNames,
 } from 'polyhedra/names';
+import { getSymmetry, getSymmetryName, getOrder } from 'polyhedra/symmetry';
 
 import connect from 'components/connect';
 import { WithPolyhedron } from 'components/Viewer/context';
 
 const styles = StyleSheet.create({
-  table: {
+  infoPanel: {
     width: 400, // FIXME don't hardcode
     margin: 10,
     borderSpacing: 8,
     borderCollapse: 'separate',
     padding: 10,
-    // fontFamily: fonts.hoeflerText,
+    // fontFamily: fonts.times,
   },
 
   solidName: {
@@ -83,15 +83,10 @@ function Sup({ children }) {
   return <sup className={css(styles.sup)}>{children}</sup>;
 }
 
-interface DatumDisplayProps {
-  polyhedron: *;
-  name: string;
-}
-
 interface InfoRow {
   name: string;
   area: string;
-  property: *;
+  render: *;
 }
 
 function groupedVertexConfig(config) {
@@ -111,7 +106,7 @@ function groupedVertexConfig(config) {
   return result;
 }
 
-function displayVertexConfig(config) {
+function getShortVertexConfig(config) {
   const grouped = groupedVertexConfig(config);
   const children = _.map(grouped, (typeCount, i) => {
     const { type, count } = typeCount;
@@ -119,20 +114,37 @@ function displayVertexConfig(config) {
       count === 1 ? (
         type
       ) : (
-        <React.Fragment>
+        <Fragment>
           {type}
           <Sup>{count}</Sup>
-        </React.Fragment>
+        </Fragment>
       );
     if (i === 0) return val;
-    return <React.Fragment>.{val}</React.Fragment>;
+    return <Fragment>.{val}</Fragment>;
   });
-  return <span>{children}</span>;
+  return <Fragment>{children}</Fragment>;
 }
 
-function displayFaces({ polyhedron }) {
+function displayVertexConfig({ polyhedron }) {
+  const vConfig = polyhedron.vertexConfiguration();
+  const configKeys = _.keys(vConfig);
+  // When there's only one type, just get it on its own
+  if (configKeys.length === 1) return configKeys[0];
+  // TODO possibly square notation but that's hard
+  return (
+    <ul>
+      {_.map(vConfig, (count, type: string) => (
+        <li>
+          {count}({getShortVertexConfig(type)})
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+function displayFaceTypes({ polyhedron }) {
   const faceCounts = polyhedron.numFacesBySides();
-  // TODO order by type of face
+  // FIXME order by type of face
   return (
     <ul>
       {_.map(faceCounts, (count, type: string) => (
@@ -145,218 +157,78 @@ function displayFaces({ polyhedron }) {
   );
 }
 
-const adjectiveMap = {
-  digonal: 2,
-  triangular: 3,
-  square: 4,
-  pentagonal: 5,
-  hexagonal: 6,
-  octagonal: 8,
-  decagonal: 10,
-};
-
-const reverseAdjectiveMap = _.invert(adjectiveMap);
-
-function getSymmetry(name) {
-  const type = getType(name);
-  if (type === 'Platonic solid' || type === 'Archimedean solid') {
-    const group = (() => {
-      if (name.includes('tetra')) {
-        return 'T';
-      }
-      if (name.includes('cub') || name.includes('oct')) {
-        return 'O';
-      }
-      if (name.includes('icosi') || name.includes('dodec')) {
-        return 'I';
-      }
-    })();
-    const chiral = name.includes('snub');
-    return { group, sub: chiral ? '' : 'h' };
-  }
-  if (type === 'Prism') {
-    const n = adjectiveMap[_.lowerCase(name.split('-')[0])];
-    return { group: 'D', sub: `${n}h` };
-  }
-  if (type === 'Antiprism') {
-    const n = adjectiveMap[_.lowerCase(name.split('-')[0])];
-    return { group: 'D', sub: `${n}d` };
-  }
-  return getJohnsonSymmetry(unescapeName(name));
-}
-
-function getSymmetryName({ group = '', sub }) {
-  if ('TOI'.includes(group)) {
-    const chiralString = sub !== 'h' ? 'chiral ' : '';
-    const base = (() => {
-      switch (group) {
-        case 'T':
-          return 'tetrahedral';
-        case 'O':
-          return 'octahedral';
-        case 'I':
-          return 'icosahedral';
-        default:
-          return '';
-      }
-    })();
-    return chiralString + base;
-  }
-  if (group === 'C') {
-    if (sub === 's') {
-      return 'bilateral';
-    }
-    if (sub === '2v') {
-      return 'biradial';
-    }
-    const n = parseInt(_.trimEnd(sub, 'v'), 10);
-    return reverseAdjectiveMap[n] + ' pyramidal';
-  }
-  if (group === 'D') {
-    const last = sub.substr(sub.length - 1);
-    if (last === 'h') {
-      const n = parseInt(_.trimEnd(sub, 'h'), 10);
-      return reverseAdjectiveMap[n] + ' prismatic';
-    }
-    if (last === 'd') {
-      const n = parseInt(_.trimEnd(sub, 'd'), 10);
-      return reverseAdjectiveMap[n] + ' antiprismatic';
-    }
-
-    const n = parseInt(sub, 10);
-    return reverseAdjectiveMap[n] + ' dihedral';
-  }
-  throw new Error('invalid group');
-}
-
 function displaySymmetry({ polyhedron, name }) {
   const symmetry = getSymmetry(name);
   const symName = getSymmetryName(symmetry);
   const { group = '', sub } = symmetry;
   return (
-    <React.Fragment>
+    <Fragment>
       {_.capitalize(symName)}, {group}
       {sub ? <Sub>{sub}</Sub> : undefined}
-    </React.Fragment>
+    </Fragment>
   );
-}
-
-function getOrder(name) {
-  const { group = '', sub } = getSymmetry(name);
-  if ('TOI'.includes(group)) {
-    const mult = sub === 'h' ? 2 : 1;
-    const base = (() => {
-      switch (group) {
-        case 'T':
-          return 12;
-        case 'O':
-          return 24;
-        case 'I':
-          return 60;
-        default:
-          return 0;
-      }
-    })();
-    return base * mult;
-  }
-  if (group === 'C') {
-    if (sub === 's') {
-      return 2;
-    }
-    const n = parseInt(_.trimEnd(sub, 'v'), 10);
-    return 2 * n;
-  }
-  if (group === 'D') {
-    const last = sub.substr(sub.length - 1);
-    if (last === 'h') {
-      const n = parseInt(_.trimEnd(sub, 'h'), 10);
-      return 4 * n;
-    }
-    if (last === 'd') {
-      const n = parseInt(_.trimEnd(sub, 'd'), 10);
-      return 4 * n;
-    }
-
-    const n = parseInt(sub, 10);
-    return 2 * n;
-  }
-  throw new Error('invalid group');
 }
 
 const info: InfoRow[] = [
   {
     name: 'Vertices',
     area: 'verts',
-    property: ({ polyhedron }) => polyhedron.numVertices(),
+    render: ({ polyhedron }) => polyhedron.numVertices(),
   },
   {
     name: 'Edges',
     area: 'edges',
-    property: ({ polyhedron }) => polyhedron.numEdges(),
+    render: ({ polyhedron }) => polyhedron.numEdges(),
   },
   {
     name: 'Faces',
     area: 'faces',
-    property: ({ polyhedron }) => polyhedron.numFaces(),
+    render: ({ polyhedron }) => polyhedron.numFaces(),
   },
   {
     name: 'Vertex configuration',
     area: 'vconf',
-    property: ({ polyhedron }) => {
-      const vConfig = polyhedron.vertexConfiguration();
-      const configKeys = _.keys(vConfig);
-      if (configKeys.length === 1) return configKeys[0];
-      // TODO possibly square notation but that's hard
-      return (
-        <ul>
-          {_.map(vConfig, (count, type: string) => (
-            <li>
-              {count}({displayVertexConfig(type)})
-            </li>
-          ))}
-        </ul>
-      );
-    },
+    render: displayVertexConfig,
   },
   {
     name: 'Faces by type',
     area: 'ftype',
-    property: displayFaces,
+    render: displayFaceTypes,
   },
 
   {
     name: 'Volume',
     area: 'vol',
-    property: ({ polyhedron: p }) => (
-      <span>
+    render: ({ polyhedron: p }) => (
+      <Fragment>
         ≈{_.round(p.volume() / Math.pow(p.edgeLength(), 3), 3)}s<Sup>3</Sup>
-      </span>
+      </Fragment>
     ),
   },
   {
     name: 'Surface area',
     area: 'sa',
-    property: ({ polyhedron: p }) => (
-      <span>
+    render: ({ polyhedron: p }) => (
+      <Fragment>
         ≈{_.round(p.surfaceArea() / Math.pow(p.edgeLength(), 2), 3)}s<Sup>
           2
         </Sup>
-      </span>
+      </Fragment>
     ),
   },
   {
     name: 'Sphericity',
     area: 'spher',
-    property: ({ polyhedron: p }) => `≈${_.round(p.sphericity(), 3)}`,
+    render: ({ polyhedron: p }) => `≈${_.round(p.sphericity(), 3)}`,
   },
 
-  { name: 'Symmetry', area: 'sym', property: displaySymmetry },
-  { name: 'Order', area: 'order', property: ({ name }) => getOrder(name) },
+  { name: 'Symmetry', area: 'sym', render: displaySymmetry },
+  { name: 'Order', area: 'order', render: ({ name }) => getOrder(name) },
 
   {
     name: 'Also known as',
     area: 'alt',
-    property: ({ name }) => {
+    render: ({ name }) => {
       const alts = getAlternateNames(name);
       if (alts.length === 0) return '--';
       return <ul>{alts.map(alt => <li key={alt}>{alt}</li>)}</ul>;
@@ -366,18 +238,18 @@ const info: InfoRow[] = [
 
 function InfoPanel({ solidName, polyhedron }) {
   return (
-    <div className={css(styles.table)}>
+    <div className={css(styles.infoPanel)}>
       <h2 className={css(styles.solidName)}>
         {_.capitalize(unescapeName(solidName))}, {toConwayNotation(solidName)}
       </h2>
       <div className={css(styles.solidType)}>{getType(solidName)}</div>
       <dl className={css(styles.dataList)}>
-        {info.map(({ name, area, property: Property }) => {
+        {info.map(({ name, area, render: Renderer }) => {
           return (
             <div className={css(styles.property)} style={{ gridArea: area }}>
               <dd className={css(styles.propName)}>{name}</dd>
               <dt className={css(styles.propValue)}>
-                <Property name={solidName} polyhedron={polyhedron} />
+                <Renderer name={solidName} polyhedron={polyhedron} />
               </dt>
             </div>
           );

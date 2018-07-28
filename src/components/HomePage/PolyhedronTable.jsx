@@ -16,10 +16,10 @@ const styles = StyleSheet.create({
   },
   caption: {
     fontSize: 16,
-    fontFamily: fonts.hoeflerText,
+    fontFamily: fonts.times,
   },
   cell: {
-    // TODO currently these cells use Times b/c the font isn't propagated
+    fontFamily: fonts.times,
     verticalAlign: 'middle',
     textAlign: 'center',
     color: 'DimGrey',

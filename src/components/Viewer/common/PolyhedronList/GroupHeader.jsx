@@ -1,10 +1,10 @@
 // @flow strict
 import React from 'react';
 import { StyleSheet, css } from 'aphrodite/no-important';
-import { hoeflerText } from 'styles/fonts';
+import { times } from 'styles/fonts';
 
 const styles = StyleSheet.create({
-  groupHeader: { fontFamily: hoeflerText, fontSize: 24 },
+  groupHeader: { fontFamily: times, fontSize: 24 },
 });
 
 interface Props {

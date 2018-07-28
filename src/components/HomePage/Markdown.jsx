@@ -13,7 +13,7 @@ const styles = StyleSheet.create({
   // TODO change a lot of this to be from the surrounding element
   p: {
     fontSize: 16,
-    fontFamily: fonts.hoeflerText,
+    fontFamily: fonts.times,
     color: 'DimGrey',
     lineHeight: 1.5,
     ':not(:last-child)': {
@@ -37,7 +37,7 @@ const styles = StyleSheet.create({
 
   li: {
     fontSize: 16,
-    fontFamily: fonts.hoeflerText,
+    fontFamily: fonts.times,
     color: 'DimGrey',
     lineHeight: 1.5,
     textIndent: -listIndent,

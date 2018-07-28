@@ -113,13 +113,13 @@ const styles = StyleSheet.create({
   },
 
   sectionHeader: {
-    fontFamily: fonts.hoeflerText,
+    fontFamily: fonts.times,
     fontSize: 24,
     marginBottom: 20,
   },
 
   subsectionHeader: {
-    fontFamily: fonts.hoeflerText,
+    fontFamily: fonts.times,
     fontSize: 20,
     marginBottom: 15,
   },

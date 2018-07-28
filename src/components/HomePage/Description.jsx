@@ -29,7 +29,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     border: 'none',
     color: 'blue',
-    fontFamily: fonts.hoeflerText,
+    fontFamily: fonts.times,
 
     ':hover': {
       textDecoration: 'underline',

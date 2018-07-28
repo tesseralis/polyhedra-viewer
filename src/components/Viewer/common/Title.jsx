@@ -13,7 +13,7 @@ const Title = ({ name, ...props }) => {
       fontWeight: 'bold',
 
       [media.mobile]: {
-        fontFamily: fonts.hoeflerText,
+        fontFamily: fonts.times,
         fontWeight: 'initial',
         fontSize: 18,
         textAlign: 'center',

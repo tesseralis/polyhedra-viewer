@@ -1,11 +1,5 @@
 // @flow strict
-export const hoeflerText = [
-  'Hoefler Text',
-  'Baskerville Old Face',
-  'Garamond',
-  'Times New Roman',
-  'serif',
-];
+export const times = ['Times New Roman', 'Times', 'serif'];
 
 export const andaleMono = ['Andale Mono', 'AndaleMono', 'monospace'];
 
