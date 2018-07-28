@@ -187,8 +187,7 @@ function getSymmetry(name) {
 
 function getSymmetryName({ group = '', sub }) {
   if ('TOI'.includes(group)) {
-    const chiral = sub !== 'h';
-    const chiralString = sub !== 'h' ? ' chiral' : '';
+    const chiralString = sub !== 'h' ? 'chiral ' : '';
     const base = (() => {
       switch (group) {
         case 'T':
@@ -201,7 +200,7 @@ function getSymmetryName({ group = '', sub }) {
           return '';
       }
     })();
-    return base + chiralString;
+    return chiralString + base;
   }
   if (group === 'C') {
     if (sub === 's') {
@@ -240,6 +239,48 @@ function displaySymmetry({ polyhedron, name }) {
       {sub ? <Sub>{sub}</Sub> : undefined}
     </React.Fragment>
   );
+}
+
+function getOrder(name) {
+  const { group = '', sub } = getSymmetry(name);
+  if ('TOI'.includes(group)) {
+    const mult = sub === 'h' ? 2 : 1;
+    const base = (() => {
+      switch (group) {
+        case 'T':
+          return 12;
+        case 'O':
+          return 24;
+        case 'I':
+          return 60;
+        default:
+          return 0;
+      }
+    })();
+    return base * mult;
+  }
+  if (group === 'C') {
+    if (sub === 's') {
+      return 2;
+    }
+    const n = parseInt(_.trimEnd(sub, 'v'), 10);
+    return 2 * n;
+  }
+  if (group === 'D') {
+    const last = sub.substr(sub.length - 1);
+    if (last === 'h') {
+      const n = parseInt(_.trimEnd(sub, 'h'), 10);
+      return 4 * n;
+    }
+    if (last === 'd') {
+      const n = parseInt(_.trimEnd(sub, 'd'), 10);
+      return 4 * n;
+    }
+
+    const n = parseInt(sub, 10);
+    return 2 * n;
+  }
+  throw new Error('invalid group');
 }
 
 const info: InfoRow[] = [
@@ -310,7 +351,7 @@ const info: InfoRow[] = [
   },
 
   { name: 'Symmetry', area: 'sym', property: displaySymmetry },
-  { name: 'Order', area: 'order', property: $ => '-1' },
+  { name: 'Order', area: 'order', property: ({ name }) => getOrder(name) },
 
   {
     name: 'Also known as',
