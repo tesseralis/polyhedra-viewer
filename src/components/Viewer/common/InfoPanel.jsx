@@ -145,17 +145,101 @@ function displayFaces({ polyhedron }) {
   );
 }
 
-// FIXME still doesn't work well... (e.g. decagonal antiprism)
-function displaySymmetry({ polyhedron, name }) {
-  if (polyhedron.isUniform()) {
-    const symmetry = polyhedron.symmetry();
-    if (name.includes('snub') || name.includes('prism')) {
-      return symmetry;
-    }
-    return `Polyhedral, ${symmetry}_h`;
+const adjectiveMap = {
+  digonal: 2,
+  triangular: 3,
+  square: 4,
+  pentagonal: 5,
+  hexagonal: 6,
+  octagonal: 8,
+  decagonal: 10,
+};
+
+const reverseAdjectiveMap = _.invert(adjectiveMap);
+
+function getSymmetry(name) {
+  const type = getType(name);
+  if (type === 'Platonic solid' || type === 'Archimedean solid') {
+    const group = (() => {
+      if (name.includes('tetra')) {
+        return 'T';
+      }
+      if (name.includes('cub') || name.includes('oct')) {
+        return 'O';
+      }
+      if (name.includes('icosi') || name.includes('dodec')) {
+        return 'I';
+      }
+    })();
+    const chiral = name.includes('snub');
+    return { group, sub: chiral ? '' : 'h' };
   }
-  const { group, sub } = getJohnsonSymmetry(unescapeName(name));
-  return `n-gonal polyhedral, ${group}_${sub}`;
+  if (type === 'Prism') {
+    const n = adjectiveMap[_.lowerCase(name.split('-')[0])];
+    return { group: 'D', sub: `${n}h` };
+  }
+  if (type === 'Antiprism') {
+    const n = adjectiveMap[_.lowerCase(name.split('-')[0])];
+    return { group: 'D', sub: `${n}d` };
+  }
+  return getJohnsonSymmetry(unescapeName(name));
+}
+
+function getSymmetryName({ group = '', sub }) {
+  if ('TOI'.includes(group)) {
+    const chiral = sub !== 'h';
+    const chiralString = sub !== 'h' ? ' chiral' : '';
+    const base = (() => {
+      switch (group) {
+        case 'T':
+          return 'tetrahedral';
+        case 'O':
+          return 'octahedral';
+        case 'I':
+          return 'icosahedral';
+        default:
+          return '';
+      }
+    })();
+    return base + chiralString;
+  }
+  if (group === 'C') {
+    if (sub === 's') {
+      return 'bilateral';
+    }
+    if (sub === '2v') {
+      return 'biradial';
+    }
+    const n = parseInt(_.trimEnd(sub, 'v'), 10);
+    return reverseAdjectiveMap[n] + ' pyramidal';
+  }
+  if (group === 'D') {
+    const last = sub.substr(sub.length - 1);
+    if (last === 'h') {
+      const n = parseInt(_.trimEnd(sub, 'h'), 10);
+      return reverseAdjectiveMap[n] + ' prismatic';
+    }
+    if (last === 'd') {
+      const n = parseInt(_.trimEnd(sub, 'd'), 10);
+      return reverseAdjectiveMap[n] + ' antiprismatic';
+    }
+
+    const n = parseInt(sub, 10);
+    return reverseAdjectiveMap[n] + ' dihedral';
+  }
+  throw new Error('invalid group');
+}
+
+function displaySymmetry({ polyhedron, name }) {
+  const symmetry = getSymmetry(name);
+  const symName = getSymmetryName(symmetry);
+  const { group = '', sub } = symmetry;
+  return (
+    <React.Fragment>
+      {_.capitalize(symName)}, {group}
+      {sub ? <Sub>{sub}</Sub> : undefined}
+    </React.Fragment>
+  );
 }
 
 const info: InfoRow[] = [
