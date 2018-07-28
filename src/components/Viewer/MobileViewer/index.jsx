@@ -141,7 +141,7 @@ export default class MobileViewer extends React.Component<Props> {
           </div>
         )}
         <main className={css(styles.scene)}>
-          <X3dScene />
+          <X3dScene label={solid} />
         </main>
         <div className={css(styles.menu)}>
           <NavMenu solid={solid} onClick={this.focusOnHeader} />
