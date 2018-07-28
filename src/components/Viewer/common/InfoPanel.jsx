@@ -23,7 +23,7 @@ const styles = StyleSheet.create({
     borderSpacing: 8,
     borderCollapse: 'separate',
     padding: 10,
-    fontFamily: fonts.hoeflerText,
+    // fontFamily: fonts.hoeflerText,
   },
 
   solidName: {
@@ -167,7 +167,7 @@ const info: InfoRow[] = [
     area: 'vol',
     property: ({ polyhedron: p }) => (
       <span>
-        {_.round(p.volume() / Math.pow(p.edgeLength(), 3), 3)}s<Sup>3</Sup>
+        ≈{_.round(p.volume() / Math.pow(p.edgeLength(), 3), 3)}s<Sup>3</Sup>
       </span>
     ),
   },
@@ -176,14 +176,16 @@ const info: InfoRow[] = [
     area: 'sa',
     property: ({ polyhedron: p }) => (
       <span>
-        {_.round(p.surfaceArea() / Math.pow(p.edgeLength(), 2), 3)}s<Sup>2</Sup>
+        ≈{_.round(p.surfaceArea() / Math.pow(p.edgeLength(), 2), 3)}s<Sup>
+          2
+        </Sup>
       </span>
     ),
   },
   {
     name: 'Sphericity',
     area: 'spher',
-    property: ({ polyhedron: p }) => `${_.round(p.sphericity(), 3)}`,
+    property: ({ polyhedron: p }) => `≈${_.round(p.sphericity(), 3)}`,
   },
 
   { name: 'Symmetry', area: 'sym', property: displaySymmetry },
