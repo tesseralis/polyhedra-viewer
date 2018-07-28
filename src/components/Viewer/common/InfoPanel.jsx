@@ -74,6 +74,7 @@ const styles = StyleSheet.create({
   },
 });
 
+// FIXME use unicode or mathml instead
 function Sub({ children }) {
   return <sub className={css(styles.sub)}>{children}</sub>;
 }
@@ -91,6 +92,42 @@ interface InfoRow {
   name: string;
   area: string;
   property: *;
+}
+
+function groupedVertexConfig(config) {
+  const array = config.split('.');
+  const result = [];
+  let current = { type: -1, count: 0 };
+  _.each(array, type => {
+    if (type === current.type) {
+      current.count++;
+    } else {
+      if (current.count) result.push(current);
+      current = { type, count: 1 };
+    }
+  });
+  if (current.count) result.push(current);
+
+  return result;
+}
+
+function displayVertexConfig(config) {
+  const grouped = groupedVertexConfig(config);
+  const children = _.map(grouped, (typeCount, i) => {
+    const { type, count } = typeCount;
+    const val =
+      count === 1 ? (
+        type
+      ) : (
+        <React.Fragment>
+          {type}
+          <Sup>{count}</Sup>
+        </React.Fragment>
+      );
+    if (i === 0) return val;
+    return <React.Fragment>.{val}</React.Fragment>;
+  });
+  return <span>{children}</span>;
 }
 
 function displayFaces({ polyhedron }) {
@@ -149,7 +186,7 @@ const info: InfoRow[] = [
         <ul>
           {_.map(vConfig, (count, type: string) => (
             <li>
-              {count}({type})
+              {count}({displayVertexConfig(type)})
             </li>
           ))}
         </ul>
