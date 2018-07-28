@@ -44,8 +44,8 @@ export default class DesktopViewer extends PureComponent<*> {
     return (
       <div className={css(styles.viewer)}>
         <div className={css(styles.scene, full && styles.full)}>
-          <X3dScene />
           <Overlay solid={solid} panel={panel} />
+          <X3dScene label={solid} />
         </div>
         <div className={css(full ? styles.sidebarCompact : styles.sidebarFull)}>
           <Sidebar panel={panel} solid={solid} compact={full} />
