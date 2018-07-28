@@ -46,6 +46,7 @@ interface Props {
   to: *; // should be string | LocationShape but gets weird
   replace?: boolean;
   exact?: boolean;
+  onClick?: () => void;
 }
 
 export default function IconLink({
@@ -54,6 +55,7 @@ export default function IconLink({
   to,
   replace,
   exact,
+  onClick,
   iconOnly = false,
 }: Props) {
   return (
@@ -64,6 +66,7 @@ export default function IconLink({
         exact={exact}
         className={css(styles.link)}
         activeClassName={css(styles.activeLink)}
+        onClick={onClick}
       >
         <Icon name={iconName} size={36} />
         {iconOnly ? (

@@ -4,11 +4,10 @@ import _ from 'lodash';
 import { css, StyleSheet } from 'aphrodite/no-important';
 
 import { flatMap } from 'utils';
-import { hoeflerText } from 'styles/fonts';
 import { fromConwayNotation } from 'polyhedra/names';
 import { type Table } from 'constants/polyhedronTables';
 import PolyhedronLink from './PolyhedronLink';
-import { media } from 'styles';
+import { media, fonts } from 'styles';
 
 const styles = StyleSheet.create({
   table: {
@@ -17,12 +16,12 @@ const styles = StyleSheet.create({
   },
   caption: {
     fontSize: 16,
-    fontFamily: hoeflerText,
+    fontFamily: fonts.hoeflerText,
   },
   cell: {
+    // TODO currently these cells use Times b/c the font isn't propagated
     verticalAlign: 'middle',
     textAlign: 'center',
-    fontWeight: hoeflerText,
     color: 'DimGrey',
     [media.notMobile]: {
       fontSize: 12,

@@ -1,7 +1,8 @@
 // @flow
-import React from 'react';
+import React, { Component } from 'react';
 import { css, StyleSheet } from 'aphrodite/no-important';
 
+import { SrOnly } from 'components/common';
 import { InfoPanel, NavMenu, ConfigForm, PolyhedronList } from '../common';
 import { scroll } from 'styles/common';
 
@@ -59,15 +60,43 @@ function renderPanel(panel) {
   }
 }
 
-export default function Sidebar({ compact, panel, solid }: Props) {
-  return (
-    <section className={css(styles.sidebar, !compact && styles.full)}>
-      <div className={css(styles.menu, !compact && styles.menuFull)}>
-        <NavMenu solid={solid} compact={!!compact} />
-      </div>
-      {!compact && (
-        <div className={css(styles.content)}>{renderPanel(panel)}</div>
-      )}
-    </section>
-  );
+export default class Sidebar extends Component<Props> {
+  header: *;
+
+  constructor(props: Props) {
+    super(props);
+    this.header = React.createRef();
+  }
+
+  render() {
+    const { compact, panel, solid } = this.props;
+    return (
+      <section className={css(styles.sidebar, !compact && styles.full)}>
+        <div className={css(styles.menu, !compact && styles.menuFull)}>
+          <NavMenu
+            solid={solid}
+            compact={!!compact}
+            onClick={this.focusOnHeader}
+          />
+        </div>
+        {!compact && (
+          <div className={css(styles.content)}>
+            <SrOnly>
+              <h2 tabIndex={0} ref={this.header}>
+                {panel}
+              </h2>
+            </SrOnly>
+            {renderPanel(panel)}
+          </div>
+        )}
+      </section>
+    );
+  }
+
+  // TODO dedupe with mobile
+  focusOnHeader = () => {
+    if (this.header.current) {
+      this.header.current.focus();
+    }
+  };
 }

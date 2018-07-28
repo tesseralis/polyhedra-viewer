@@ -4,6 +4,7 @@ import { css, StyleSheet } from 'aphrodite/no-important';
 
 import { media } from 'styles';
 import { scroll } from 'styles/common';
+import { SrOnly } from 'components/common';
 import {
   BackLink,
   Title,
@@ -107,30 +108,52 @@ function renderPanel(panel, solid) {
   }
 }
 
-export default function MobileViewer({ panel, solid }: Props) {
-  const panelNode = renderPanel(panel, solid);
-  return (
-    <section className={css(styles.viewer)}>
-      <div className={css(styles.title)}>
-        <BackLink solid={solid} />
-        <Title name={solid} />
-      </div>
-      {panelNode && (
-        <div
-          className={css(
-            styles.content,
-            panel === 'operations' ? styles.operations : styles.contentFull,
-          )}
-        >
-          {panelNode}
+export default class MobileViewer extends React.Component<Props> {
+  header: *;
+
+  constructor(props: Props) {
+    super(props);
+    this.header = React.createRef();
+  }
+
+  render() {
+    const { panel, solid } = this.props;
+    const panelNode = renderPanel(panel, solid);
+    return (
+      <section className={css(styles.viewer)}>
+        <div className={css(styles.title)}>
+          <BackLink solid={solid} />
+          <Title name={solid} />
         </div>
-      )}
-      <main className={css(styles.scene)}>
-        <X3dScene />
-      </main>
-      <div className={css(styles.menu)}>
-        <NavMenu solid={solid} />
-      </div>
-    </section>
-  );
+        {panelNode && (
+          <div
+            className={css(
+              styles.content,
+              panel === 'operations' ? styles.operations : styles.contentFull,
+            )}
+          >
+            <SrOnly>
+              <h2 tabIndex={0} ref={this.header}>
+                {panel}
+              </h2>
+            </SrOnly>
+            {panelNode}
+          </div>
+        )}
+        <main className={css(styles.scene)}>
+          <X3dScene />
+        </main>
+        <div className={css(styles.menu)}>
+          <NavMenu solid={solid} onClick={this.focusOnHeader} />
+        </div>
+      </section>
+    );
+  }
+
+  // TODO dedupe with desktop
+  focusOnHeader = () => {
+    if (this.header.current) {
+      this.header.current.focus();
+    }
+  };
 }
