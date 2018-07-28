@@ -62,7 +62,25 @@ const styles = StyleSheet.create({
     fontFamily: fonts.andaleMono,
     color: 'DimGrey',
   },
+
+  sub: {
+    verticalAlign: 'sub',
+    fontSize: 'smaller',
+  },
+
+  sup: {
+    verticalAlign: 'super',
+    fontSize: 'smaller',
+  },
 });
+
+function Sub({ children }) {
+  return <sub className={css(styles.sub)}>{children}</sub>;
+}
+
+function Sup({ children }) {
+  return <sup className={css(styles.sup)}>{children}</sup>;
+}
 
 interface DatumDisplayProps {
   polyhedron: *;
@@ -147,14 +165,20 @@ const info: InfoRow[] = [
   {
     name: 'Volume',
     area: 'vol',
-    property: ({ polyhedron: p }) =>
-      `${_.round(p.volume() / Math.pow(p.edgeLength(), 3), 3)}`,
+    property: ({ polyhedron: p }) => (
+      <span>
+        {_.round(p.volume() / Math.pow(p.edgeLength(), 3), 3)}s<Sup>3</Sup>
+      </span>
+    ),
   },
   {
     name: 'Surface area',
     area: 'sa',
-    property: ({ polyhedron: p }) =>
-      `${_.round(p.surfaceArea() / Math.pow(p.edgeLength(), 2), 3)}`,
+    property: ({ polyhedron: p }) => (
+      <span>
+        {_.round(p.surfaceArea() / Math.pow(p.edgeLength(), 2), 3)}s<Sup>2</Sup>
+      </span>
+    ),
   },
   {
     name: 'Sphericity',
@@ -163,7 +187,7 @@ const info: InfoRow[] = [
   },
 
   { name: 'Symmetry', area: 'sym', property: displaySymmetry },
-  { name: 'Order', area: 'order', property: ({}) => '-1' },
+  { name: 'Order', area: 'order', property: $ => '-1' },
 
   {
     name: 'Also known as',
