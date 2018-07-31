@@ -68,19 +68,38 @@ const styles = StyleSheet.create({
     fontSize: 'smaller',
   },
 
+  // Superscript is implemented using Unicode superscripts
+  // so we just need to adjust the style so it looks nice
   sup: {
-    verticalAlign: 'super',
-    fontSize: 'smaller',
+    fontSize: 20,
   },
 });
 
-// FIXME use unicode or mathml instead
 function Sub({ children }) {
   return <sub className={css(styles.sub)}>{children}</sub>;
 }
 
-function Sup({ children }) {
-  return <sup className={css(styles.sup)}>{children}</sup>;
+function Sup({ children }: { children: number }) {
+  if (children < 0 || children > 5) {
+    throw new Error('Number not supported');
+  }
+  const value = (() => {
+    switch (children) {
+      case 1:
+        return <Fragment>&#x00B9;</Fragment>;
+      case 2:
+        return <Fragment>&#x00B2;</Fragment>;
+      case 3:
+        return <Fragment>&#x00B3;</Fragment>;
+      case 4:
+        return <Fragment>&#x2074;</Fragment>;
+      case 5:
+        return <Fragment>&#x2075;</Fragment>;
+      default:
+        return children;
+    }
+  })();
+  return <sup className={css(styles.sup)}>{value}</sup>;
 }
 
 interface InfoRow {
@@ -201,7 +220,7 @@ const info: InfoRow[] = [
     area: 'vol',
     render: ({ polyhedron: p }) => (
       <Fragment>
-        ≈{_.round(p.volume() / Math.pow(p.edgeLength(), 3), 3)}s<Sup>3</Sup>
+        ≈{_.round(p.volume() / Math.pow(p.edgeLength(), 3), 3)}s<Sup>{3}</Sup>
       </Fragment>
     ),
   },
@@ -211,7 +230,7 @@ const info: InfoRow[] = [
     render: ({ polyhedron: p }) => (
       <Fragment>
         ≈{_.round(p.surfaceArea() / Math.pow(p.edgeLength(), 2), 3)}s<Sup>
-          2
+          {2}
         </Sup>
       </Fragment>
     ),
