@@ -56,7 +56,7 @@ export function getSymmetry(name: string): Symmetry {
 
 export function getSymmetryName({ group, sub }: Symmetry) {
   if ('TOI'.includes(group)) {
-    const chiralString = sub !== 'h' ? 'chiral ' : '';
+    const prefix = sub === 'h' ? 'full' : 'chiral';
     const base = (() => {
       switch (group) {
         case 'T':
@@ -69,7 +69,7 @@ export function getSymmetryName({ group, sub }: Symmetry) {
           return '';
       }
     })();
-    return chiralString + base;
+    return `${prefix} ${base}`;
   }
   if (group === 'C') {
     if (sub === 's') {
