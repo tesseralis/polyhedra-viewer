@@ -15,6 +15,7 @@ import { getSymmetry, getSymmetryName, getOrder } from 'polyhedra/symmetry';
 
 import connect from 'components/connect';
 import { WithPolyhedron } from 'components/Viewer/context';
+import DataDownloader from './DataDownloader';
 
 const styles = StyleSheet.create({
   infoPanel: {
@@ -271,6 +272,7 @@ function InfoPanel({ solidName, polyhedron }) {
           );
         })}
       </dl>
+      <DataDownloader solid={polyhedron.solidData} name={solidName} />
     </div>
   );
 }
