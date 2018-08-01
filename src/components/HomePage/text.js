@@ -151,11 +151,11 @@ and provided their feedback.
 
 Made with [React] and [X3DOM].
 
-See the [source] on Github.
+[Source] on Github.
 
 [Ko-fi]: https://ko-fi.com/tesseralis/
 [Virtual Polyhedra]: http://www.georgehart.com/virtual-polyhedra/vp.html
 [React]: https://reactjs.org/
 [X3DOM]: https://www.x3dom.org/
-[source]: https://www.github.com/tesseralis/polyhedra-viewer
+[Source]: https://www.github.com/tesseralis/polyhedra-viewer
 `;
