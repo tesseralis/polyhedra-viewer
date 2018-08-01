@@ -18,7 +18,6 @@ import { WithPolyhedron } from 'components/Viewer/context';
 
 const styles = StyleSheet.create({
   infoPanel: {
-    width: 400, // FIXME don't hardcode
     margin: 10,
     borderSpacing: 8,
     borderCollapse: 'separate',

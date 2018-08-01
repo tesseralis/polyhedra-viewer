@@ -19,6 +19,7 @@ const styles = StyleSheet.create({
     position: 'relative',
     height: '100%',
     minWidth: 400,
+    maxWidth: 400,
   },
   sidebarCompact: {
     position: 'absolute',

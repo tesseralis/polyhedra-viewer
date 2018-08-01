@@ -68,8 +68,7 @@ const styles = StyleSheet.create({
   },
 
   contentFull: {
-    opacity: 0.75,
-    backgroundColor: 'white',
+    backgroundColor: 'rgba(255, 255, 255, 0.75)',
   },
 
   scene: {
