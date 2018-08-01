@@ -62,7 +62,7 @@ export default function NavMenu({
       <IconLink
         replace
         to={`/${solid}/full`}
-        title="Full Screen"
+        title="Fullscreen"
         iconName="cube-outline"
         iconOnly={compact}
         onClick={onClick}

@@ -12,6 +12,7 @@ import {
   ConfigForm,
   PolyhedronList,
   X3dScene,
+  InfoPanel,
 } from '../common';
 
 import OperationsPanel from './OperationsPanel';
@@ -95,6 +96,8 @@ interface Props {
 // TODO dedupe with other sidebar
 function renderPanel(panel, solid) {
   switch (panel) {
+    case 'info':
+      return <InfoPanel />;
     case 'operations':
       return <OperationsPanel solid={solid} />;
     case 'options':

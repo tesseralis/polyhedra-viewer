@@ -259,7 +259,7 @@ function InfoPanel({ solidName, polyhedron }) {
       <h2 className={css(styles.solidName)}>
         {_.capitalize(unescapeName(solidName))}, {toConwayNotation(solidName)}
       </h2>
-      <div className={css(styles.solidType)}>{getType(solidName)}</div>
+      <p className={css(styles.solidType)}>{getType(solidName)}</p>
       <dl className={css(styles.dataList)}>
         {info.map(({ name, area, render: Renderer }) => {
           return (
