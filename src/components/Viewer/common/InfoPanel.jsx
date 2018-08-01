@@ -220,7 +220,7 @@ const info: InfoRow[] = [
     area: 'vol',
     render: ({ polyhedron: p }) => (
       <Fragment>
-        ≈{_.round(p.volume() / Math.pow(p.edgeLength(), 3), 3)}s<Sup>{3}</Sup>
+        ≈{_.round(p.normalizedVolume(), 3)}s<Sup>{3}</Sup>
       </Fragment>
     ),
   },
@@ -229,9 +229,7 @@ const info: InfoRow[] = [
     area: 'sa',
     render: ({ polyhedron: p }) => (
       <Fragment>
-        ≈{_.round(p.surfaceArea() / Math.pow(p.edgeLength(), 2), 3)}s<Sup>
-          {2}
-        </Sup>
+        ≈{_.round(p.normalizedSurfaceArea(), 3)}s<Sup>{2}</Sup>
       </Fragment>
     ),
   },

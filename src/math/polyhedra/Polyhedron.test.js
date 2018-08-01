@@ -30,6 +30,20 @@ describe('Polyhedron', () => {
     });
   });
 
+  describe('volume, surface area, sphericity', () => {
+    const cube = Polyhedron.get('cube');
+    it('correctly calculates volume', () => {
+      expect(cube.normalizedVolume()).toBeCloseTo(1, 3);
+    });
+
+    it('correctly calculates surface area', () => {
+      expect(cube.normalizedSurfaceArea()).toBeCloseTo(6, 3);
+    });
+    it('correctly calculates surface area', () => {
+      expect(cube.sphericity()).toBeCloseTo(0.806, 3);
+    });
+  });
+
   describe('isUniform', () => {
     it('counts prisms and antiprisms', () => {
       expect(Polyhedron.get('decagonal-prism').isUniform()).toBe(true);

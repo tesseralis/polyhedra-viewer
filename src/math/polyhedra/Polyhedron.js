@@ -152,10 +152,18 @@ export default class Polyhedron {
       .sum();
   }
 
+  normalizedSurfaceArea() {
+    return this.surfaceArea() / Math.pow(this.edgeLength(), 2);
+  }
+
   volume() {
     return _(this.faces)
       .map(face => (face.area() * face.distanceToCenter()) / 3)
       .sum();
+  }
+
+  normalizedVolume() {
+    return this.volume() / Math.pow(this.edgeLength(), 3);
   }
 
   sphericity() {
