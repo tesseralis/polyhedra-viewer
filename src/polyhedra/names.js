@@ -1,7 +1,8 @@
 // @flow strict
 import _ from 'lodash';
 
-import { johnsonSolids } from 'data';
+import { johnsonSolids, allSolidNames } from 'data';
+import { choose } from 'utils';
 
 export const escapeName = (name: string) => name.replace(/ /g, '-');
 
@@ -97,6 +98,10 @@ export function getCanonicalName(name: string) {
 
 export function getAlternateNames(name: string) {
   return alternateNames[unescapeName(name)] || [];
+}
+
+export function randomSolidName(): string {
+  return escapeName(choose(allSolidNames));
 }
 
 const fromConwayNotationUnescaped = notation => {

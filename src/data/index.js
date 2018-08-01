@@ -32,7 +32,7 @@ export const groups = groupData.map(group => ({
   ...getNestedPolyhedra(group.name),
 }));
 
-export const allSolidNames = _.flatMap(flatGroups, 'polyhedra');
+export const allSolidNames: string[] = _.flatMap(flatGroups, 'polyhedra');
 
 export const isValidSolid = (escapedSolidName: string) => {
   return allSolidNames.includes(escapedSolidName.replace(/-/g, ' '));

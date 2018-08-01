@@ -10,6 +10,7 @@ import 'styles/reset.css';
 import 'styles/box-sizing.css';
 import 'styles/a11y.css';
 
+import { randomSolidName } from 'polyhedra/names';
 import Loading from './Loading';
 
 const HomePage = Loadable({
@@ -28,6 +29,11 @@ export default () => (
       exact
       path="/"
       render={({ location }) => <HomePage hash={location.hash.substring(1)} />}
+    />
+    <Route
+      exact
+      path="/random"
+      render={() => <Redirect to={randomSolidName()} />}
     />
     <Route
       exact

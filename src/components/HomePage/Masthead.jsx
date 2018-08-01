@@ -89,7 +89,7 @@ export default function Masthead() {
         </p>
         <Markdown source={text.abstract} />
       </div>
-      <Link to="/tetrahedron" className={css(styles.video)}>
+      <Link to="/random" className={css(styles.video)}>
         <SrOnly>View tetrahedron</SrOnly>
         <video muted autoPlay playsInline src={splash} height={videoHeight} />
       </Link>

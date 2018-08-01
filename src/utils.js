@@ -64,6 +64,11 @@ export function find<T>(array: T[], predicate: Predicate<T>): T {
   return result;
 }
 
+export function choose<T>(choices: T[]): T {
+  const index = Math.floor(Math.random() * choices.length);
+  return choices[index];
+}
+
 // Wrap the lodash flatMap with better typing
 type FlatMap<T, U> = (
   array: T[],
