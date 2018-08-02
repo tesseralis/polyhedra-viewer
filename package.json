@@ -38,6 +38,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject",
-    "flow": "flow"
+    "flow": "flow",
+    "deploy": "react-scripts build && netlifyctl deploy"
   }
 }
