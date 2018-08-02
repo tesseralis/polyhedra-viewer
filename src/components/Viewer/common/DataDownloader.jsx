@@ -12,15 +12,18 @@ const styles = StyleSheet.create({
   header: {
     fontFamily: fonts.times,
     fontSize: 18,
-    marginBottom: 20,
+    marginBottom: 10,
   },
   downloadLink: {
+    display: 'inline-flex',
+    padding: 10,
+    justifyContent: 'center',
+    width: 100,
+
     textDecoration: 'none',
     border: '1px solid LightGrey',
-    padding: 10,
     color: 'black',
     fontFamily: fonts.andaleMono,
-    width: 75,
     ...hover,
 
     ':not(:first-child)': {
@@ -67,7 +70,7 @@ export default function DataDownloader({ solid, name }: Props) {
   const combinedData = { ...solid, name };
   return (
     <div>
-      <h2 className={css(styles.header)}>Download solid data</h2>
+      <h2 className={css(styles.header)}>Download model</h2>
       <div>
         {fileFormats.map(({ ext, serializer }) => {
           const filename = `${name}.${ext}`;

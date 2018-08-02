@@ -19,11 +19,13 @@ import DataDownloader from './DataDownloader';
 
 const styles = StyleSheet.create({
   infoPanel: {
-    margin: 10,
+    height: '100%',
     borderSpacing: 8,
     borderCollapse: 'separate',
-    padding: 10,
+    padding: 20,
     fontFamily: fonts.times,
+    display: 'flex',
+    flexDirection: 'column',
   },
 
   solidName: {
@@ -72,6 +74,10 @@ const styles = StyleSheet.create({
   // so we just need to adjust the style so it looks nice
   sup: {
     fontSize: 20,
+  },
+
+  downloader: {
+    marginTop: 'auto',
   },
 });
 
@@ -272,7 +278,9 @@ function InfoPanel({ solidName, polyhedron }) {
           );
         })}
       </dl>
-      <DataDownloader solid={polyhedron.solidData} name={solidName} />
+      <div className={css(styles.downloader)}>
+        <DataDownloader solid={polyhedron.solidData} name={solidName} />
+      </div>
     </div>
   );
 }
