@@ -1,18 +1,37 @@
 // @flow strict
 
 import React from 'react';
-import FileSaver from 'file-saver';
+import { css, StyleSheet } from 'aphrodite/no-important';
+
+import { Icon, SrOnly } from 'components/common';
+import { fonts } from 'styles';
+
+import { hover } from 'styles/common';
+
+const styles = StyleSheet.create({
+  header: {
+    fontFamily: fonts.times,
+    fontSize: 18,
+    marginBottom: 20,
+  },
+  downloadLink: {
+    textDecoration: 'none',
+    border: '1px solid LightGrey',
+    padding: 10,
+    color: 'black',
+    fontFamily: fonts.andaleMono,
+    width: 75,
+    ...hover,
+
+    ':not(:first-child)': {
+      marginLeft: 10,
+    },
+  },
+});
 
 interface Props {
   solid: *;
   name: string;
-}
-
-function download(filename, content) {
-  const file = new File([content], filename, {
-    type: 'text/plain;charset=utf-8',
-  });
-  FileSaver.saveAs(file, filename, true);
 }
 
 function formatDecimal(number) {
@@ -33,21 +52,41 @@ function toObj({ vertices, faces }) {
   return vObj.concat(fObj).join('\n');
 }
 
+const fileFormats = [
+  {
+    ext: 'json',
+    serializer: JSON.stringify,
+  },
+  {
+    ext: 'obj',
+    serializer: toObj,
+  },
+];
+
 export default function DataDownloader({ solid, name }: Props) {
+  const combinedData = { ...solid, name };
   return (
-    <p>
-      Download solid data:{' '}
-      <button
-        onClick={() => {
-          const combinedData = { ...solid, name };
-          download(`${name}.json`, JSON.stringify(combinedData));
-        }}
-      >
-        JSON
-      </button>
-      <button onClick={() => download(`${name}.obj`, toObj(solid))}>
-        .obj
-      </button>
-    </p>
+    <div>
+      <h2 className={css(styles.header)}>Download solid data</h2>
+      <div>
+        {fileFormats.map(({ ext, serializer }) => {
+          const filename = `${name}.${ext}`;
+          const blob = new Blob([serializer(combinedData)], {
+            type: 'text/plain;charset=utf-8',
+          });
+          const url = window.URL.createObjectURL(blob);
+          return (
+            <a
+              download={filename}
+              href={url}
+              className={css(styles.downloadLink)}
+            >
+              <SrOnly>Download as</SrOnly>
+              .{ext} <Icon name="download" />
+            </a>
+          );
+        })}
+      </div>
+    </div>
   );
 }

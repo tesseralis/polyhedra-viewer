@@ -163,7 +163,7 @@ function displayVertexConfig({ polyhedron }) {
 
 function displayFaceTypes({ polyhedron }) {
   const faceCounts = polyhedron.numFacesBySides();
-  // FIXME order by type of face
+  // TODO order by type of face
   return (
     <ul>
       {_.map(faceCounts, (count, type: string) => (
