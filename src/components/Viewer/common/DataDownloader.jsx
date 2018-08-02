@@ -9,10 +9,10 @@ interface Props {
 }
 
 function download(filename, content) {
-  const blob = new Blob([content], {
+  const file = new File([content], filename, {
     type: 'text/plain;charset=utf-8',
   });
-  FileSaver.saveAs(blob, filename);
+  FileSaver.saveAs(file, filename, true);
 }
 
 function formatDecimal(number) {
