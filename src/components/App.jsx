@@ -15,6 +15,8 @@ import {
   randomSolidName,
   isConwaySymbol,
   fromConwayNotation,
+  isAlternateName,
+  getCanonicalName,
 } from 'polyhedra/names';
 import Loading from './Loading';
 
@@ -49,7 +51,12 @@ export default () => (
           const newPath = history.location.pathname.replace(solid, fullName);
           return <Redirect to={newPath} />;
         }
-        // TODO support alternate names
+        if (isAlternateName(solid)) {
+          const fullName = escapeName(getCanonicalName(solid));
+          const newPath = history.location.pathname.replace(solid, fullName);
+          console.log('alternate', fullName, newPath);
+          return <Redirect to={newPath} />;
+        }
         // TODO error page when it's an invalid name
         return <Viewer solid={solid} url={match.url} history={history} />;
       }}
