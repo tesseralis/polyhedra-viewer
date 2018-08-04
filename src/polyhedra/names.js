@@ -3,6 +3,7 @@ import _ from 'lodash';
 
 import { johnsonSolids, allSolidNames } from 'data';
 import { choose } from 'utils';
+import polygons from 'constants/polygons';
 
 export const escapeName = (name: string) => name.replace(/ /g, '-');
 
@@ -102,6 +103,21 @@ export function getAlternateNames(name: string) {
 
 export function randomSolidName(): string {
   return escapeName(choose(allSolidNames));
+}
+
+export function isConwaySymbol(symbol: string) {
+  if (_.has(platonicMapping, symbol) || _.has(archimedeanMapping, symbol)) {
+    return true;
+  }
+  const prefix = symbol[0];
+  const number = parseInt(symbol.substring(1), 10);
+  if (prefix === 'J' && number >= 0 && number <= 92) {
+    return true;
+  }
+  if (_.includes(['P', 'A'], prefix) && _.includes(polygons, number)) {
+    return true;
+  }
+  return false;
 }
 
 const fromConwayNotationUnescaped = notation => {

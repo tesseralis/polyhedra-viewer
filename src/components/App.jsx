@@ -10,7 +10,12 @@ import 'styles/reset.css';
 import 'styles/box-sizing.css';
 import 'styles/a11y.css';
 
-import { randomSolidName } from 'polyhedra/names';
+import {
+  escapeName,
+  randomSolidName,
+  isConwaySymbol,
+  fromConwayNotation,
+} from 'polyhedra/names';
 import Loading from './Loading';
 
 const HomePage = Loadable({
@@ -37,9 +42,17 @@ export default () => (
     />
     <Route
       path="/:solid"
-      render={({ match, history }) => (
-        <Viewer solid={match.params.solid} url={match.url} history={history} />
-      )}
+      render={({ match, history }) => {
+        const solid = match.params.solid || '';
+        if (isConwaySymbol(solid)) {
+          const fullName = escapeName(fromConwayNotation(solid));
+          const newPath = history.location.pathname.replace(solid, fullName);
+          return <Redirect to={newPath} />;
+        }
+        // TODO support alternate names
+        // TODO error page when it's an invalid name
+        return <Viewer solid={solid} url={match.url} history={history} />;
+      }}
     />
   </Switch>
 );
