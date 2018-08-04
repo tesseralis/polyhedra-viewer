@@ -4,6 +4,7 @@ import { css, StyleSheet } from 'aphrodite/no-important';
 
 import { type TableSection as TableSectionType } from 'constants/polyhedronTables';
 import { DeviceTracker } from 'components/DeviceContext';
+import { PageTitle } from 'components/common';
 
 import Markdown from './Markdown';
 import TableSection from './TableSection';
@@ -63,6 +64,7 @@ class HomePage extends React.Component<Props> {
     const { data, narrow = false } = this.props;
     return (
       <div className={css(styles.homePage)}>
+        <PageTitle title="Polyhedra Viewer" />
         <main className={css(styles.main)}>
           {/* only play video if we're at the top of the page */}
           <Masthead />
