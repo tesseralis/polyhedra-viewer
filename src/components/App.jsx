@@ -36,20 +36,9 @@ export default () => (
       render={() => <Redirect to={randomSolidName()} />}
     />
     <Route
-      exact
       path="/:solid"
       render={({ match, history }) => (
-        <Redirect to={`${match.url}/operations`} />
-      )}
-    />
-    <Route
-      path="/:solid/:panel"
-      render={({ match, history }) => (
-        <Viewer
-          solid={match.params.solid}
-          panel={match.params.panel}
-          history={history}
-        />
+        <Viewer solid={match.params.solid} url={match.url} history={history} />
       )}
     />
   </Switch>

@@ -1,7 +1,7 @@
 // @flow
 import _ from 'lodash';
 import React, { PureComponent, Fragment } from 'react';
-import { type RouterHistory } from 'react-router-dom';
+import { Route, Redirect, type RouterHistory } from 'react-router-dom';
 
 import { PageTitle } from 'components/common';
 import { OperationProvider, PolyhedronProvider } from './context';
@@ -11,12 +11,12 @@ import { DeviceTracker } from 'components/DeviceContext';
 import SolidSync from './SolidSync';
 import { unescapeName } from 'polyhedra/names';
 
-interface ViewerProps {
+interface InnerProps {
   solid: string;
-  history: RouterHistory;
+  panel: string;
 }
 
-class Viewer extends PureComponent<*> {
+class InnerViewer extends PureComponent<InnerProps> {
   render() {
     const { solid, panel } = this.props;
     const pageTitle = `${_.capitalize(unescapeName(solid))} - Polyhedra Viewer`;
@@ -33,13 +33,31 @@ class Viewer extends PureComponent<*> {
   }
 }
 
-export default (props: ViewerProps) => (
-  <PolyhedronProvider
-    name={props.solid}
-    setName={name => props.history.push(`/${name}/operations`)}
-  >
-    <OperationProvider>
-      <Viewer {...props} />
-    </OperationProvider>
-  </PolyhedronProvider>
-);
+interface Props {
+  solid: string;
+  url: string;
+  history: RouterHistory;
+}
+
+export default function Viewer({ solid, history, url }: Props) {
+  return (
+    <PolyhedronProvider
+      name={solid}
+      setName={name => history.push(`/${name}/operations`)}
+    >
+      <OperationProvider>
+        <Route
+          exact
+          path={url}
+          render={() => <Redirect to={`${url}/operations`} />}
+        />
+        <Route
+          path={`${url}/:panel`}
+          render={({ match, history }) => (
+            <InnerViewer solid={solid} panel={match.params.panel || ''} />
+          )}
+        />
+      </OperationProvider>
+    </PolyhedronProvider>
+  );
+}
