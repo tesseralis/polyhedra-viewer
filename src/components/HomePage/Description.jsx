@@ -10,7 +10,9 @@ import Markdown from './Markdown';
 // https://css-tricks.com/text-fade-read-more/
 const styles = StyleSheet.create({
   description: {
-    position: 'relative',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
   },
 
   content: {
@@ -23,12 +25,14 @@ const styles = StyleSheet.create({
   },
 
   toggle: {
-    width: '100%',
     textAlign: 'center',
 
+    backgroundColor: 'transparent',
+    margin: 'auto 0',
     fontSize: 14,
     border: 'none',
     color: 'blue',
+    cursor: 'pointer',
     fontFamily: fonts.times,
 
     ':hover': {
