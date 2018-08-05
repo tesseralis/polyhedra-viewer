@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 
 import { SrOnly } from 'components/common';
 import Markdown from './Markdown';
-import splash from 'splash.mp4';
+import video from 'images/transitions.mp4';
 import { media, fonts } from 'styles';
 import * as text from './text';
 
@@ -91,7 +91,7 @@ export default function Masthead() {
       </div>
       <Link to="/random" className={css(styles.video)}>
         <SrOnly>View tetrahedron</SrOnly>
-        <video muted autoPlay playsInline src={splash} height={videoHeight} />
+        <video muted autoPlay playsInline src={video} height={videoHeight} />
       </Link>
     </div>
   );

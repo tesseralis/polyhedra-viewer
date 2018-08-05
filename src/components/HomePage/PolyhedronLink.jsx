@@ -109,6 +109,6 @@ export default class PolyhedronLink extends Component<Props, State> {
   imgSrc = () => {
     const { name } = this.props;
     const escapedName = escapeName(name);
-    return require(`images/${escapedName}.png`);
+    return require(`images/thumbnails/${escapedName}.png`);
   };
 }

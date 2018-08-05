@@ -1,10 +1,9 @@
 import React from 'react';
 import { css, StyleSheet } from 'aphrodite/no-important';
-// TODO reorganize images folder
-import image from 'sad-scutoid.png';
 import { Link } from 'react-router-dom';
 
 import { fonts, media } from 'styles';
+import image from 'images/sad-scutoid.png';
 
 const styles = StyleSheet.create({
   errorPage: {
