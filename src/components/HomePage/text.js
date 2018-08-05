@@ -21,9 +21,9 @@ export const uniform = `
 The uniform polyhedra are the Platonic solids, the Archimedean solids, and the prisms
 and antiprisms.
 
-A polyhedron is _uniform_ if it is vertex transitive. That is, if you rotate any vertex
-to any other vertex in the solid so that the faces match up, all the other vertices and
-faces will match up as well.
+A polyhedron is _uniform_ if all its faces are regular polygons and it is _vertex transitive_.
+That is, if you rotate any vertex to any other vertex, there is a way to make all the faces
+and vertices match up so that it looks like the original polyhedron.
 
 The 5 Platonic solids are _regular_ polyhedra, meaning they only have one type of face.
 The Archimedean solids, prisms, and antiprisms are _semi-regular_, which means they can
