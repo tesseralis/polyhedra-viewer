@@ -10,6 +10,7 @@ import 'styles/reset.css';
 import 'styles/box-sizing.css';
 import 'styles/a11y.css';
 
+import { isValidSolid } from 'data';
 import {
   escapeName,
   randomSolidName,
@@ -18,6 +19,8 @@ import {
   isAlternateName,
   getCanonicalName,
 } from 'polyhedra/names';
+
+import ErrorPage from './ErrorPage';
 import Loading from './Loading';
 
 const HomePage = Loadable({
@@ -58,7 +61,10 @@ export default () => (
           return <Redirect to={newPath} />;
         }
         // TODO error page when it's an invalid name
-        return <Viewer solid={solid} url={match.url} history={history} />;
+        if (isValidSolid(solid)) {
+          return <Viewer solid={solid} url={match.url} history={history} />;
+        }
+        return <ErrorPage />;
       }}
     />
   </Switch>
