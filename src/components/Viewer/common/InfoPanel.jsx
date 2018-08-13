@@ -159,7 +159,7 @@ function displayVertexConfig({ polyhedron }) {
   return (
     <ul>
       {_.map(vConfig, (count, type: string) => (
-        <li>
+        <li key={type}>
           {count}({getShortVertexConfig(type)})
         </li>
       ))}
@@ -173,7 +173,7 @@ function displayFaceTypes({ polyhedron }) {
   return (
     <ul>
       {_.map(faceCounts, (count, type: string) => (
-        <li>
+        <li key={type}>
           {count} {polygonNames[type]}
           {count !== 1 ? 's' : ''}
         </li>
@@ -275,7 +275,11 @@ function InfoPanel({ solidName, polyhedron }) {
       <dl className={styles('dataList')}>
         {info.map(({ name, area, render: Renderer }) => {
           return (
-            <div className={styles('property')} style={{ gridArea: area }}>
+            <div
+              key={name}
+              className={styles('property')}
+              style={{ gridArea: area }}
+            >
               <dd className={styles('propName')}>{name}</dd>
               <dt className={styles('propValue')}>
                 <Renderer name={solidName} polyhedron={polyhedron} />

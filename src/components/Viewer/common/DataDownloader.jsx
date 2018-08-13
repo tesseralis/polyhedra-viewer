@@ -80,6 +80,7 @@ export default function DataDownloader({ solid, name }: Props) {
           const url = window.URL.createObjectURL(blob);
           return (
             <a
+              key={ext}
               download={filename}
               href={url}
               className={styles('downloadLink')}
