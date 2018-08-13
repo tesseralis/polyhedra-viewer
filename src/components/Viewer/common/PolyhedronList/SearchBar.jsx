@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
-import { css, StyleSheet } from 'aphrodite/no-important';
+import { makeStyles } from 'styles';
 
 import { andaleMono } from 'styles/fonts';
 import { transition } from 'styles/common';
 
 import { Icon } from 'components/common';
 
-const styles = StyleSheet.create({
+const styles = makeStyles({
   searchBar: {
     display: 'flex',
     justifyContent: 'left',
@@ -59,7 +59,7 @@ export default class SearchBar extends Component {
     const { value, onChange } = this.props;
     const { isFocused } = this.state;
     return (
-      <label className={css(styles.searchBar)}>
+      <label className={styles('searchBar')}>
         <input
           type="text"
           placeholder="Search..."
@@ -68,9 +68,9 @@ export default class SearchBar extends Component {
           onChange={e => onChange(e.target.value)}
           onFocus={() => this.setFocus(true)}
           onBlur={() => this.setFocus(false)}
-          className={css(styles.input)}
+          className={styles('input')}
         />
-        <span className={css(styles.icon, isFocused && styles.iconFocus)}>
+        <span className={styles('icon', isFocused && 'iconFocus')}>
           <Icon name="search" />
         </span>
       </label>

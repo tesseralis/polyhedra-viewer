@@ -1,12 +1,12 @@
 // @flow strict
 import _ from 'lodash';
 import React, { PureComponent, Fragment } from 'react';
-import { css, StyleSheet } from 'aphrodite/no-important';
+import { makeStyles } from 'styles';
 
 import { Polygon, PolyLine, PolyShape, polygonPoints } from 'components/svg';
 
 const color = 'DimGray';
-const styles = StyleSheet.create({
+const styles = makeStyles({
   icon: {
     width: 40,
     height: 40,
@@ -37,7 +37,7 @@ function drawIcon(name) {
       return (
         <Fragment>
           <Polygon
-            className={css(styles.outer)}
+            className={styles('outer')}
             n={5}
             cx={100}
             cy={100}
@@ -45,7 +45,7 @@ function drawIcon(name) {
             r={100}
           />
           <Polygon
-            className={css(styles.inner)}
+            className={styles('inner')}
             n={5}
             cx={100}
             cy={100}
@@ -58,7 +58,7 @@ function drawIcon(name) {
       return (
         <Fragment>
           <Polygon
-            className={css(styles.outer)}
+            className={styles('outer')}
             n={5}
             cx={100}
             cy={100}
@@ -66,7 +66,7 @@ function drawIcon(name) {
             r={100}
           />
           <Polygon
-            className={css(styles.inner)}
+            className={styles('inner')}
             n={5}
             cx={100}
             cy={100}
@@ -79,11 +79,11 @@ function drawIcon(name) {
       return (
         <Fragment>
           <PolyShape
-            className={css(styles.outer)}
+            className={styles('outer')}
             points={[[100, 50], [10, 170], [190, 170]]}
           />
           <PolyLine
-            className={css(styles.inner)}
+            className={styles('inner')}
             points={[[140, 170], [100, 50], [60, 170]]}
           />
         </Fragment>
@@ -96,11 +96,11 @@ function drawIcon(name) {
       return (
         <Fragment>
           <PolyShape
-            className={css(styles.outer)}
+            className={styles('outer')}
             points={[[150, topY], [50, topY], [10, bottomY], [190, bottomY]]}
           />
           <PolyLine
-            className={css(styles.inner)}
+            className={styles('inner')}
             points={[[150, topY], [120, bottomY]]}
           />
         </Fragment>
@@ -118,7 +118,7 @@ function drawIcon(name) {
       return (
         <Fragment>
           <PolyShape
-            className={css(styles.outer)}
+            className={styles('outer')}
             points={[
               [topRightX, topY],
               [topLeftX, topY],
@@ -127,7 +127,7 @@ function drawIcon(name) {
             ]}
           />
           <PolyLine
-            className={css(styles.inner)}
+            className={styles('inner')}
             points={[
               [topLeftX, topY],
               [topLeftX, bottomY],
@@ -149,13 +149,13 @@ function drawIcon(name) {
       const q2 = [p5[0], p6[1]];
       return (
         <Fragment>
-          <PolyShape className={css(styles.outer)} points={points} />
+          <PolyShape className={styles('outer')} points={points} />
           <PolyShape
-            className={css(styles.inner)}
+            className={styles('inner')}
             points={[[70, bottomY], q1, p4, q2, [130, bottomY]]}
           />
           <PolyLine
-            className={css(styles.inner)}
+            className={styles('inner')}
             points={[p3, q1, [40, bottomY], [160, bottomY], q2, p5]}
           />
         </Fragment>
@@ -170,7 +170,7 @@ export default class OptionIcon extends PureComponent<Props> {
   render() {
     const { name } = this.props;
     return (
-      <svg viewBox="0 0 200 200" className={css(styles.icon)}>
+      <svg viewBox="0 0 200 200" className={styles('icon')}>
         {drawIcon(name)}
       </svg>
     );

@@ -1,7 +1,7 @@
 // @flow strict
 import React from 'react';
-import { css, StyleSheet } from 'aphrodite/no-important';
 
+import { makeStyles } from 'styles';
 import { type TableSection as TableSectionType } from 'constants/polyhedronTables';
 import { DeviceTracker } from 'components/DeviceContext';
 import { PageTitle } from 'components/common';
@@ -13,7 +13,7 @@ import * as text from './text';
 import Masthead from './Masthead';
 import ShareLinks from './ShareLinks';
 
-const styles = StyleSheet.create({
+const styles = makeStyles({
   homePage: {
     width: '100%',
     display: 'flex',
@@ -63,12 +63,12 @@ class HomePage extends React.Component<Props> {
   render() {
     const { data, narrow = false } = this.props;
     return (
-      <div className={css(styles.homePage)}>
+      <div className={styles('homePage')}>
         <PageTitle title="Polyhedra Viewer" />
-        <main className={css(styles.main)}>
+        <main className={styles('main')}>
           {/* only play video if we're at the top of the page */}
           <Masthead />
-          <div className={css(styles.sections)}>
+          <div className={styles('sections')}>
             {data.map(sectionData => (
               <TableSection
                 narrow={narrow}
@@ -78,8 +78,8 @@ class HomePage extends React.Component<Props> {
             ))}
           </div>
         </main>
-        <footer className={css(styles.footer)}>
-          <div className={css(styles.shareLinks)}>
+        <footer className={styles('footer')}>
+          <div className={styles('shareLinks')}>
             <ShareLinks />
           </div>
           <Markdown source={text.footer} />

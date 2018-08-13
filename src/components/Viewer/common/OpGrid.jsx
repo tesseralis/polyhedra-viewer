@@ -1,7 +1,7 @@
 // @flow strict
 import _ from 'lodash';
 import React, { Component } from 'react';
-import { css, StyleSheet } from 'aphrodite/no-important';
+import { makeStyles } from 'styles';
 
 import { media, fonts } from 'styles';
 import { hover, scroll } from 'styles/common';
@@ -14,7 +14,7 @@ import {
 } from 'components/Viewer/context';
 import OperationIcon from './OperationIcon';
 
-const styles = StyleSheet.create({
+const styles = makeStyles({
   opGrid: {
     [media.notMobile]: {
       display: 'grid',
@@ -82,14 +82,14 @@ class OpGrid extends Component<*> {
     const { isTransitioning, solidName, opName, selectOperation } = this.props;
 
     return (
-      <div className={css(styles.opGrid)}>
+      <div className={styles('opGrid')}>
         {operations.map(({ name }) => {
           return (
             <button
               key={name}
-              className={css(
-                styles.operationButton,
-                opName === name && styles.isHighlighted,
+              className={styles(
+                'operationButton',
+                opName === name && 'isHighlighted',
               )}
               style={{ gridArea: name }}
               disabled={!isEnabled(solidName, name) || isTransitioning}

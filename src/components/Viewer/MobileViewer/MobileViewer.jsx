@@ -1,8 +1,7 @@
 // @flow
 import React from 'react';
-import { css, StyleSheet } from 'aphrodite/no-important';
 
-import { media } from 'styles';
+import { makeStyles, media } from 'styles';
 import { scroll } from 'styles/common';
 import { SrOnly } from 'components/common';
 import {
@@ -23,7 +22,7 @@ function mobile(styles) {
     [media.mobilePortrait]: styles(60, 75),
   };
 }
-const styles = StyleSheet.create({
+const styles = makeStyles({
   viewer: {
     position: 'relative',
     width: '100vw',
@@ -122,16 +121,16 @@ export default class MobileViewer extends React.Component<Props> {
     const { panel, solid } = this.props;
     const panelNode = renderPanel(panel, solid);
     return (
-      <section className={css(styles.viewer)}>
-        <div className={css(styles.title)}>
+      <section className={styles('viewer')}>
+        <div className={styles('title')}>
           <BackLink solid={solid} />
           <Title name={solid} />
         </div>
         {panelNode && (
           <div
-            className={css(
-              styles.content,
-              panel === 'operations' ? styles.operations : styles.contentFull,
+            className={styles(
+              'content',
+              panel === 'operations' ? 'operations' : 'contentFull',
             )}
           >
             <SrOnly>
@@ -142,10 +141,10 @@ export default class MobileViewer extends React.Component<Props> {
             {panelNode}
           </div>
         )}
-        <main className={css(styles.scene)}>
+        <main className={styles('scene')}>
           <X3dScene label={solid} />
         </main>
-        <div className={css(styles.menu)}>
+        <div className={styles('menu')}>
           <NavMenu solid={solid} onClick={this.focusOnHeader} />
         </div>
       </section>

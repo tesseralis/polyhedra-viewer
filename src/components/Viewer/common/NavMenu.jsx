@@ -2,11 +2,11 @@
 
 import _ from 'lodash';
 import React from 'react';
-import { css, StyleSheet } from 'aphrodite/no-important';
+import { makeStyles } from 'styles';
 
 import IconLink from './IconLink';
 
-const styles = StyleSheet.create({
+const styles = makeStyles({
   menu: {
     width: '100%',
     display: 'grid',
@@ -27,7 +27,7 @@ export default function NavMenu({
   onClick = _.noop,
 }: Props) {
   return (
-    <nav className={css(styles.menu)}>
+    <nav className={styles('menu')}>
       <IconLink
         replace
         to={`/${solid}/list`}

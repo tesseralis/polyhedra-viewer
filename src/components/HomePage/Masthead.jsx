@@ -1,17 +1,16 @@
 // @flow strict
 import React from 'react';
-import { css, StyleSheet } from 'aphrodite/no-important';
 import { Link } from 'react-router-dom';
 
 import { SrOnly } from 'components/common';
 import Markdown from './Markdown';
 import video from 'images/transitions.mp4';
-import { media, fonts } from 'styles';
+import { makeStyles, media, fonts } from 'styles';
 import * as text from './text';
 
 const videoHeight = 300;
 
-const styles = StyleSheet.create({
+const styles = makeStyles({
   masthead: {
     display: 'flex',
     alignItems: 'center',
@@ -73,13 +72,13 @@ const styles = StyleSheet.create({
 
 export default function Masthead() {
   return (
-    <div className={css(styles.masthead)}>
-      <div className={css(styles.abstract)}>
-        <h1 className={css(styles.title)}>Polyhedra Viewer</h1>
-        <p className={css(styles.subtitle)}>
+    <div className={styles('masthead')}>
+      <div className={styles('abstract')}>
+        <h1 className={styles('title')}>Polyhedra Viewer</h1>
+        <p className={styles('subtitle')}>
           by{' '}
           <a
-            className={css(styles.authorLink)}
+            className={styles('authorLink')}
             target="_blank"
             rel="noopener noreferrer"
             href="https://www.tessera.li"
@@ -89,7 +88,7 @@ export default function Masthead() {
         </p>
         <Markdown source={text.abstract} />
       </div>
-      <Link to="/random" className={css(styles.video)}>
+      <Link to="/random" className={styles('video')}>
         <SrOnly>View tetrahedron</SrOnly>
         <video muted autoPlay playsInline src={video} height={videoHeight} />
       </Link>

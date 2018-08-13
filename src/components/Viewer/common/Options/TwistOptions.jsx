@@ -1,13 +1,13 @@
 // @flow strict
 import _ from 'lodash';
 import React from 'react';
-import { css, StyleSheet } from 'aphrodite/no-important';
+import { makeStyles } from 'styles';
 
 import connect from 'components/connect';
 import { Icon, SrOnly } from 'components/common';
 import { ApplyOperation, WithPolyhedron } from '../../context';
 
-const styles = StyleSheet.create({
+const styles = makeStyles({
   twistOption: {
     border: 'none',
     pointerEvents: 'initial',
@@ -28,7 +28,7 @@ function TwistOption({ orientation, onClick, disabled }) {
     <button
       disabled={disabled}
       onClick={onClick}
-      className={css(styles.twistOption)}
+      className={styles('twistOption')}
     >
       <Icon name={`rotate-${orientation}`} angle={180} size={48} />
       <SrOnly>{orientation}</SrOnly>
@@ -44,7 +44,7 @@ interface Props {
 
 function TwistOptions({ opName, onClick, disabled }: Props) {
   return (
-    <div className={css(styles.twistOptions)}>
+    <div className={styles('twistOptions')}>
       <TwistOption
         orientation="left"
         disabled={disabled}

@@ -1,15 +1,16 @@
 // @flow
 import * as React from 'react';
-import { StyleSheet, css } from 'aphrodite/no-important';
 import x3dom from 'x3dom.js';
 import 'x3dom/x3dom.css';
+
+import { makeStyles } from 'styles';
 
 // Disable double-clicking to change rotation point
 if (x3dom.Viewarea) {
   x3dom.Viewarea.prototype.onDoubleClick = () => {};
 }
 
-const styles = StyleSheet.create({
+const styles = makeStyles({
   x3dScene: {
     border: 'none',
     height: '100%',
@@ -46,7 +47,7 @@ export default class X3dScene extends React.Component<Props> {
 
   render() {
     return (
-      <x3d className={css(styles.x3dScene)} ref={this.x3d}>
+      <x3d className={styles('x3dScene')} ref={this.x3d}>
         <scene>
           <viewpoint position="0,0,5" />
           {this.props.children}

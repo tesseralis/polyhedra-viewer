@@ -1,10 +1,10 @@
 // @flow
 import React, { Component } from 'react';
-import { css, StyleSheet } from 'aphrodite/no-important';
+import { makeStyles } from 'styles';
 
 import { ResizeButtons, OpGrid } from '../common';
 
-const styles = StyleSheet.create({
+const styles = makeStyles({
   opPanel: {
     height: '100%',
     padding: '20px 10px',
@@ -20,9 +20,9 @@ const styles = StyleSheet.create({
 export default class OperationsPanel extends Component<*> {
   render() {
     return (
-      <section className={css(styles.opPanel)}>
+      <section className={styles('opPanel')}>
         <OpGrid />
-        <div className={css(styles.resizeButtons)}>
+        <div className={styles('resizeButtons')}>
           <ResizeButtons />
         </div>
       </section>

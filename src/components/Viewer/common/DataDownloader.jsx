@@ -1,14 +1,14 @@
 // @flow strict
 
 import React from 'react';
-import { css, StyleSheet } from 'aphrodite/no-important';
+import { makeStyles } from 'styles';
 
 import { Icon, SrOnly } from 'components/common';
 import { fonts } from 'styles';
 
 import { hover } from 'styles/common';
 
-const styles = StyleSheet.create({
+const styles = makeStyles({
   header: {
     fontFamily: fonts.times,
     fontSize: 18,
@@ -70,7 +70,7 @@ export default function DataDownloader({ solid, name }: Props) {
   const combinedData = { ...solid, name };
   return (
     <div>
-      <h2 className={css(styles.header)}>Download model</h2>
+      <h2 className={styles('header')}>Download model</h2>
       <div>
         {fileFormats.map(({ ext, serializer }) => {
           const filename = `${name}.${ext}`;
@@ -82,10 +82,9 @@ export default function DataDownloader({ solid, name }: Props) {
             <a
               download={filename}
               href={url}
-              className={css(styles.downloadLink)}
+              className={styles('downloadLink')}
             >
-              <SrOnly>Download as</SrOnly>
-              .{ext} <Icon name="download" />
+              <SrOnly>Download as</SrOnly>.{ext} <Icon name="download" />
             </a>
           );
         })}

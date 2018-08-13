@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import { css, StyleSheet } from 'aphrodite/no-important';
+import { makeStyles } from 'styles';
 
 import { SrOnly } from 'components/common';
 import { InfoPanel, NavMenu, ConfigForm, PolyhedronList } from '../common';
@@ -9,7 +9,7 @@ import { scroll } from 'styles/common';
 import OperationsPanel from './OperationsPanel';
 
 const menuH = 75;
-const styles = StyleSheet.create({
+const styles = makeStyles({
   sidebar: {
     width: '100%',
     height: '100%',
@@ -71,8 +71,8 @@ export default class Sidebar extends Component<Props> {
   render() {
     const { compact, panel, solid } = this.props;
     return (
-      <section className={css(styles.sidebar, !compact && styles.full)}>
-        <div className={css(styles.menu, !compact && styles.menuFull)}>
+      <section className={styles('sidebar', !compact && 'full')}>
+        <div className={styles('menu', !compact && 'menuFull')}>
           <NavMenu
             solid={solid}
             compact={!!compact}
@@ -80,7 +80,7 @@ export default class Sidebar extends Component<Props> {
           />
         </div>
         {!compact && (
-          <div className={css(styles.content)}>
+          <div className={styles('content')}>
             <SrOnly>
               <h2 tabIndex={0} ref={this.header}>
                 {panel}

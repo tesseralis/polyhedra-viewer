@@ -1,6 +1,6 @@
 // @flow strict
 import React, { Fragment } from 'react';
-import { css, StyleSheet } from 'aphrodite/no-important';
+import { makeStyles } from 'styles';
 import _ from 'lodash';
 
 import { polygonNames } from 'constants/polygons';
@@ -17,7 +17,7 @@ import connect from 'components/connect';
 import { WithPolyhedron } from 'components/Viewer/context';
 import DataDownloader from './DataDownloader';
 
-const styles = StyleSheet.create({
+const styles = makeStyles({
   infoPanel: {
     height: '100%',
     borderSpacing: 8,
@@ -82,7 +82,7 @@ const styles = StyleSheet.create({
 });
 
 function Sub({ children }) {
-  return <sub className={css(styles.sub)}>{children}</sub>;
+  return <sub className={styles('sub')}>{children}</sub>;
 }
 
 function Sup({ children }: { children: number }) {
@@ -105,7 +105,7 @@ function Sup({ children }: { children: number }) {
         return children;
     }
   })();
-  return <sup className={css(styles.sup)}>{value}</sup>;
+  return <sup className={styles('sup')}>{value}</sup>;
 }
 
 interface InfoRow {
@@ -254,31 +254,37 @@ const info: InfoRow[] = [
     render: ({ name }) => {
       const alts = getAlternateNames(name);
       if (alts.length === 0) return '--';
-      return <ul>{alts.map(alt => <li key={alt}>{alt}</li>)}</ul>;
+      return (
+        <ul>
+          {alts.map(alt => (
+            <li key={alt}>{alt}</li>
+          ))}
+        </ul>
+      );
     },
   },
 ];
 
 function InfoPanel({ solidName, polyhedron }) {
   return (
-    <div className={css(styles.infoPanel)}>
-      <h2 className={css(styles.solidName)}>
+    <div className={styles('infoPanel')}>
+      <h2 className={styles('solidName')}>
         {_.capitalize(unescapeName(solidName))}, {toConwayNotation(solidName)}
       </h2>
-      <p className={css(styles.solidType)}>{getType(solidName)}</p>
-      <dl className={css(styles.dataList)}>
+      <p className={styles('solidType')}>{getType(solidName)}</p>
+      <dl className={styles('dataList')}>
         {info.map(({ name, area, render: Renderer }) => {
           return (
-            <div className={css(styles.property)} style={{ gridArea: area }}>
-              <dd className={css(styles.propName)}>{name}</dd>
-              <dt className={css(styles.propValue)}>
+            <div className={styles('property')} style={{ gridArea: area }}>
+              <dd className={styles('propName')}>{name}</dd>
+              <dt className={styles('propValue')}>
                 <Renderer name={solidName} polyhedron={polyhedron} />
               </dt>
             </div>
           );
         })}
       </dl>
-      <div className={css(styles.downloader)}>
+      <div className={styles('downloader')}>
         <DataDownloader solid={polyhedron.solidData} name={solidName} />
       </div>
     </div>

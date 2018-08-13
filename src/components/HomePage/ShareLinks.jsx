@@ -1,11 +1,11 @@
 // @flow strict
 import React from 'react';
-import { css, StyleSheet } from 'aphrodite/no-important';
+import { makeStyles } from 'styles';
 
 import { Icon, SrOnly } from 'components/common';
 import { fonts } from 'styles';
 
-const styles = StyleSheet.create({
+const styles = makeStyles({
   share: {
     display: 'flex',
     alignItems: 'center',
@@ -56,12 +56,12 @@ const links = [
 
 export default function ShareLinks() {
   return (
-    <div className={css(styles.share)}>
-      <span className={css(styles.text)}>Share:</span>
+    <div className={styles('share')}>
+      <span className={styles('text')}>Share:</span>
       {links.map(({ url, icon, name }) => {
         return (
           <a
-            className={css(styles.link)}
+            className={styles('link')}
             href={url}
             key={icon}
             target="_blank"

@@ -1,14 +1,14 @@
 // @flow strict
 import _ from 'lodash';
 import React, { PureComponent, Fragment } from 'react';
-import { css, StyleSheet } from 'aphrodite/no-important';
+import { makeStyles } from 'styles';
 
 import { type OpName } from 'polyhedra/operations';
 import { Polygon, PolyLine } from 'components/svg';
 const { sqrt } = Math;
 
 const color = 'DimGray';
-const styles = StyleSheet.create({
+const styles = makeStyles({
   operationIcon: {
     width: 60,
     height: 60,
@@ -59,15 +59,9 @@ function TruncateIcon({
   const r = 100;
   return (
     <Fragment>
+      <Polygon className={styles(styled)} n={3} r={r} a={-90} {...center} />
       <Polygon
-        className={css(styles[styled])}
-        n={3}
-        r={r}
-        a={-90}
-        {...center}
-      />
-      <Polygon
-        className={css(styles.invariant)}
+        className={styles('invariant')}
         n={innerSides}
         r={r * innerScale}
         a={innerAngle}
@@ -83,15 +77,15 @@ function DualIcon() {
   return (
     <Fragment>
       <Polygon
-        className={css(styles.subtracted)}
+        className={styles('subtracted')}
         n={3}
         r={r}
         a={-90}
         {...center}
       />
-      <Polygon className={css(styles.added)} n={3} r={r} a={90} {...center} />
+      <Polygon className={styles('added')} n={3} r={r} a={90} {...center} />
       <Polygon
-        className={css(styles.invariant)}
+        className={styles('invariant')}
         n={6}
         r={r / sqrt(3)}
         a={0}
@@ -114,16 +108,9 @@ function BaseExpandIcon({
   const ap1 = r1 / 2;
   return (
     <Fragment>
+      <Polygon className={styles(styled)} n={6} r={r} a={0} cx={cx} cy={cy} />
       <Polygon
-        className={css(styles[styled])}
-        n={6}
-        r={r}
-        a={0}
-        cx={cx}
-        cy={cy}
-      />
-      <Polygon
-        className={css(hollow ? styles[styled] : styles.invariant)}
+        className={styles(hollow ? styled : 'invariant')}
         n={3}
         r={r1}
         a={innerAngle}
@@ -155,20 +142,18 @@ function ExpandIcon({
       hollow={hollow}
       render={({ cx, cy, r, ap, r1, ap1 }) => (
         <Fragment>
-          {_
-            .range(3)
-            .map(i => (
-              <PolyLine
-                key={i}
-                className={css(styles[innerStyle])}
-                transform={`rotate(${i * 120} ${cx} ${cy})`}
-                points={[
-                  [cx - r / 2, cy - ap],
-                  [cx, cy - r1],
-                  [cx + r / 2, cy - ap],
-                ]}
-              />
-            ))}
+          {_.range(3).map(i => (
+            <PolyLine
+              key={i}
+              className={styles(innerStyle)}
+              transform={`rotate(${i * 120} ${cx} ${cy})`}
+              points={[
+                [cx - r / 2, cy - ap],
+                [cx, cy - r1],
+                [cx + r / 2, cy - ap],
+              ]}
+            />
+          ))}
           {render({ cx, cy, r, ap, r1, ap1 })}
         </Fragment>
       )}
@@ -187,27 +172,20 @@ function ElongateIcon({ styled, render }: ElongateIconProps) {
   const ap = (sqrt(3) * r) / 2;
   return (
     <Fragment>
-      <Polygon
-        className={css(styles[styled])}
-        n={6}
-        r={r}
-        a={90}
-        cx={cx}
-        cy={cy}
-      />
+      <Polygon className={styles(styled)} n={6} r={r} a={90} cx={cx} cy={cy} />
       <PolyLine
-        className={css(styles.invariant)}
+        className={styles('invariant')}
         points={[[cx - ap, cy - r / 2], [cx, cy - r], [cx + ap, cy - r / 2]]}
       />
       <PolyLine
-        className={css(styles.invariant)}
+        className={styles('invariant')}
         points={[[cx - ap, cy + r / 2], [cx, cy + r], [cx + ap, cy + r / 2]]}
       />
       {render ? (
         render({ cx, cy, r, ap })
       ) : (
         <rect
-          className={css(styles[styled])}
+          className={styles(styled)}
           x={cx - r / 2}
           y={cy - r / 2 - 5}
           width={r}
@@ -224,16 +202,9 @@ function AugmentIcon({ styled }) {
   const ap = (sqrt(3) * r) / 2;
   return (
     <Fragment>
-      <Polygon
-        className={css(styles[styled])}
-        n={6}
-        r={r}
-        a={90}
-        cx={cx}
-        cy={cy}
-      />
+      <Polygon className={styles(styled)} n={6} r={r} a={90} cx={cx} cy={cy} />
       <PolyLine
-        className={css(styles.invariant)}
+        className={styles('invariant')}
         points={[
           [cx - ap, cy - r / 2],
           [cx - ap, cy + r / 2],
@@ -273,21 +244,19 @@ function drawIcon(name) {
           hollow={false}
           innerAngle={0}
           render={({ cx, cy, r, ap, r1, ap1 }) =>
-            _
-              .range(3)
-              .map(i => (
-                <PolyLine
-                  key={i}
-                  className={css(styles.added)}
-                  transform={`rotate(${i * 120} ${cx} ${cy})`}
-                  points={[
-                    [cx - ap1, cy - r / 2],
-                    [cx - r, cy],
-                    [cx - ap1, cy + r / 2],
-                    [cx - r / 2, cy + ap],
-                  ]}
-                />
-              ))
+            _.range(3).map(i => (
+              <PolyLine
+                key={i}
+                className={styles('added')}
+                transform={`rotate(${i * 120} ${cx} ${cy})`}
+                points={[
+                  [cx - ap1, cy - r / 2],
+                  [cx - r, cy],
+                  [cx - ap1, cy + r / 2],
+                  [cx - r / 2, cy + ap],
+                ]}
+              />
+            ))
           }
         />
       );
@@ -301,16 +270,14 @@ function drawIcon(name) {
           styled="changed"
           innerStyle="invariant"
           render={({ cx, cy, r, ap, r1, ap1 }) =>
-            _
-              .range(3)
-              .map(i => (
-                <PolyLine
-                  key={i}
-                  className={css(styles.changed)}
-                  transform={`rotate(${i * 120} ${cx} ${cy})`}
-                  points={[[cx - r / 2, cy + ap1], [cx + r / 2, cy + ap]]}
-                />
-              ))
+            _.range(3).map(i => (
+              <PolyLine
+                key={i}
+                className={styles('changed')}
+                transform={`rotate(${i * 120} ${cx} ${cy})`}
+                points={[[cx - r / 2, cy + ap1], [cx + r / 2, cy + ap]]}
+              />
+            ))
           }
         />
       );
@@ -325,7 +292,7 @@ function drawIcon(name) {
           styled="added"
           render={({ cx, cy, r, ap }) => (
             <PolyLine
-              className={css(styles.added)}
+              className={styles('added')}
               points={[
                 [cx - ap, cy - r / 2],
                 [cx - r / 2, cy + r / 2],
@@ -347,7 +314,7 @@ function drawIcon(name) {
           styled="added"
           render={({ cx, cy, r, ap }) => (
             <PolyLine
-              className={css(styles.added)}
+              className={styles('added')}
               points={[
                 [cx - ap, cy - r / 2],
                 [cx - r / 2, cy + r / 2],
@@ -388,7 +355,7 @@ export default class OperationIcon extends PureComponent<Props> {
   render() {
     const { name } = this.props;
     return (
-      <svg viewBox="0 0 200 200" className={css(styles.operationIcon)}>
+      <svg viewBox="0 0 200 200" className={styles('operationIcon')}>
         {drawIcon(name)}
       </svg>
     );

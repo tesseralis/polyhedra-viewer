@@ -1,16 +1,20 @@
 // @flow strict
 import React from 'react';
-import { StyleSheet, css } from 'aphrodite/no-important';
-import { times } from 'styles/fonts';
 
-const styles = StyleSheet.create({
-  groupHeader: { fontFamily: times, fontSize: 24 },
+import { makeStyles, fonts } from 'styles';
+
+const styles = makeStyles({
+  groupHeader: {
+    fontFamily: fonts.times,
+    fontSize: 24,
+    margin: '5px 12px',
+  },
 });
 
 interface Props {
   text: string;
 }
 
-export default function GroupHeader({ text, ...props }: Props) {
-  return <h2 className={css(styles.groupHeader, props.styles)}>{text}</h2>;
+export default function GroupHeader({ text }: Props) {
+  return <h2 className={styles('groupHeader')}>{text}</h2>;
 }

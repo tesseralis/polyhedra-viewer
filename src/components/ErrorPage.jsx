@@ -1,13 +1,12 @@
 // @flow strict
 import React from 'react';
-import { css, StyleSheet } from 'aphrodite/no-important';
 import { Link } from 'react-router-dom';
 
-import { fonts, media } from 'styles';
+import { makeStyles, fonts, media } from 'styles';
 import image from 'images/sad-scutoid.png';
 import { PageTitle } from 'components/common';
 
-const styles = StyleSheet.create({
+const styles = makeStyles({
   errorPage: {
     position: 'absolute',
     top: 0,
@@ -50,13 +49,13 @@ const styles = StyleSheet.create({
 
 export default function ErrorPage() {
   return (
-    <section className={css(styles.errorPage)}>
+    <section className={styles('errorPage')}>
       <PageTitle title="Error - Polyhedra Viewer" />
-      <img className={css(styles.image)} src={image} alt="" />
-      <h1 className={css(styles.title)}>
+      <img className={styles('image')} src={image} alt="" />
+      <h1 className={styles('title')}>
         Uh oh! We don't know about that polyhedron!
       </h1>
-      <Link className={css(styles.link)} to="/">
+      <Link className={styles('link')} to="/">
         Go back
       </Link>
     </section>

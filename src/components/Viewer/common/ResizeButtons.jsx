@@ -1,6 +1,6 @@
 // @flow strict
 import React, { Component } from 'react';
-import { css, StyleSheet } from 'aphrodite/no-important';
+import { makeStyles } from 'styles';
 
 import connect from 'components/connect';
 import { WithPolyhedron } from 'components/Viewer/context';
@@ -8,7 +8,7 @@ import { WithPolyhedron } from 'components/Viewer/context';
 import { andaleMono } from 'styles/fonts';
 import { hover } from 'styles/common';
 
-const styles = StyleSheet.create({
+const styles = makeStyles({
   buttons: {
     display: 'grid',
     gridTemplateColumns: '1fr 1fr',
@@ -31,18 +31,18 @@ class ResizeButtons extends Component<*> {
     const { disabled, recenter, resize } = this.props;
 
     return (
-      <div className={css(styles.buttons)}>
+      <div className={styles('buttons')}>
         <button
           disabled={disabled}
           onClick={recenter}
-          className={css(styles.resetButton)}
+          className={styles('resetButton')}
         >
           Recenter
         </button>
         <button
           disabled={disabled}
           onClick={resize}
-          className={css(styles.resetButton)}
+          className={styles('resetButton')}
         >
           Resize
         </button>

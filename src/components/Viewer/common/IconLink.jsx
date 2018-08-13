@@ -1,13 +1,13 @@
 // @flow strict
 import React from 'react';
 import { Route, NavLink } from 'react-router-dom';
-import { css, StyleSheet } from 'aphrodite/no-important';
+import { makeStyles } from 'styles';
 
 import { resetLink } from 'styles/common';
 import { media, fonts } from 'styles';
 import { Icon, SrOnly } from 'components/common';
 
-const styles = StyleSheet.create({
+const styles = makeStyles({
   // TODO link hover
   link: {
     ...resetLink,
@@ -64,15 +64,15 @@ export default function IconLink({
         to={to}
         replace={replace}
         exact={exact}
-        className={css(styles.link)}
-        activeClassName={css(styles.activeLink)}
+        className={styles('link')}
+        activeClassName={styles('activeLink')}
         onClick={onClick}
       >
         <Icon name={iconName} size={36} />
         {iconOnly ? (
           <SrOnly>{title || iconName}</SrOnly>
         ) : (
-          <div className={css(styles.title)}>{title || iconName}</div>
+          <div className={styles('title')}>{title || iconName}</div>
         )}
       </NavLink>
     </Route>

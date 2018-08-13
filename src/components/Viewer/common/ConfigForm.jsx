@@ -1,6 +1,6 @@
 // @flow strict
 import React from 'react';
-import { css, StyleSheet } from 'aphrodite/no-important';
+import { makeStyles } from 'styles';
 import _ from 'lodash';
 
 import { WithConfig } from 'components/ConfigContext';
@@ -51,7 +51,7 @@ const ConfigInput = ({ input, value, setValue }) => {
 };
 
 const LabelledInput = ({ input, value, setValue }) => {
-  const styles = StyleSheet.create({
+  const styles = makeStyles({
     label: {
       width: '100%',
       marginBottom: 16,
@@ -62,7 +62,7 @@ const LabelledInput = ({ input, value, setValue }) => {
   });
 
   return (
-    <label className={css(styles.label)}>
+    <label className={styles('label')}>
       {input.display}
       <ConfigInput input={input} value={value} setValue={setValue} />
     </label>
@@ -70,7 +70,7 @@ const LabelledInput = ({ input, value, setValue }) => {
 };
 
 const ResetButton = ({ reset }) => {
-  const styles = StyleSheet.create({
+  const styles = makeStyles({
     resetButton: {
       ...hover,
 
@@ -86,14 +86,14 @@ const ResetButton = ({ reset }) => {
   });
 
   return (
-    <button type="button" onClick={reset} className={css(styles.resetButton)}>
+    <button type="button" onClick={reset} className={styles('resetButton')}>
       Reset
     </button>
   );
 };
 
 export default function ConfigForm() {
-  const styles = StyleSheet.create({
+  const styles = makeStyles({
     configMenu: {
       width: '100%',
       display: 'flex',
@@ -106,7 +106,7 @@ export default function ConfigForm() {
   return (
     <WithConfig>
       {({ config, setValue, reset }) => (
-        <form className={css(styles.configMenu)}>
+        <form className={styles('configMenu')}>
           {configInputs.map(({ key, ...input }) => (
             <LabelledInput
               key={key}

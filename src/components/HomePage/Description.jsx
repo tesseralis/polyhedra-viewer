@@ -1,14 +1,13 @@
 // @flow strict
 
 import React, { Component } from 'react';
-import { css, StyleSheet } from 'aphrodite/no-important';
 
-import { fonts } from 'styles';
+import { makeStyles, fonts } from 'styles';
 import { Icon, SrOnly } from 'components/common';
 import Markdown from './Markdown';
 
 // https://css-tricks.com/text-fade-read-more/
-const styles = StyleSheet.create({
+const styles = makeStyles({
   description: {
     display: 'flex',
     flexDirection: 'column',
@@ -66,12 +65,12 @@ export default class Description extends Component<Props, State> {
     const brief = content.split('\n\n')[0];
 
     return (
-      <div className={css(styles.description)}>
-        <div className={css(styles.content, collapsed && styles.collapsed)}>
+      <div className={styles('description')}>
+        <div className={styles('content', collapsed && 'collapsed')}>
           <Markdown source={collapsed ? brief : content} />
         </div>
         {collapsed && (
-          <button className={css(styles.toggle)} onClick={this.toggle}>
+          <button className={styles('toggle')} onClick={this.toggle}>
             <Icon name="menu-down" />
             {'More'}
             <SrOnly>{`about ${title}`}</SrOnly>

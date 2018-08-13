@@ -1,6 +1,6 @@
 // @flow strict
 import React from 'react';
-import { css, StyleSheet } from 'aphrodite/no-important';
+import { makeStyles } from 'styles';
 import { getUsingOpts } from 'polyhedra/operations';
 
 import { WithOperation } from 'components/Viewer/context';
@@ -8,7 +8,7 @@ import OptionIcon from './OptionIcon';
 import { verdana } from 'styles/fonts';
 import { hover } from 'styles/common';
 
-const styles = StyleSheet.create({
+const styles = makeStyles({
   augmentOptions: {
     display: 'flex',
     width: '100%',
@@ -77,17 +77,17 @@ function AugmentOptions({ options, solid, onClickOption }: Props) {
   ];
 
   return (
-    <div className={css(styles.augmentOptions)}>
+    <div className={styles('augmentOptions')}>
       {optionArgs.map(({ name, values, value, description }) => (
-        <div key={name} className={css(styles.augmentOption)}>
+        <div key={name} className={styles('augmentOption')}>
           {values.map(optValue => (
             <button
               key={optValue}
               onClick={() => onClickOption(name, optValue)}
               disabled={!value}
-              className={css(
-                styles.optionButton,
-                optValue === value && styles.isHighlighted,
+              className={styles(
+                'optionButton',
+                optValue === value && 'isHighlighted',
               )}
             >
               <OptionIcon name={getOptionName(optValue)} />

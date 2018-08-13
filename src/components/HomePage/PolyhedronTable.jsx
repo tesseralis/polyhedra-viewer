@@ -1,15 +1,14 @@
 // @flow strict
 import React from 'react';
 import _ from 'lodash';
-import { css, StyleSheet } from 'aphrodite/no-important';
 
 import { flatMap } from 'utils';
 import { fromConwayNotation } from 'polyhedra/names';
 import { type Table } from 'constants/polyhedronTables';
 import PolyhedronLink from './PolyhedronLink';
-import { media, fonts } from 'styles';
+import { makeStyles, media, fonts } from 'styles';
 
-const styles = StyleSheet.create({
+const styles = makeStyles({
   table: {
     borderSpacing: 8,
     borderCollapse: 'separate',
@@ -43,9 +42,9 @@ const Cell = ({ cell, colSpan = 1 }: { cell: *, colSpan?: * }) => {
 
   // Render a link for each cell, or a grayed-out link when indicated by an "!"
   return (
-    <td className={css(styles.cell)} colSpan={colSpan}>
+    <td className={styles('cell')} colSpan={colSpan}>
       {polyhedron ? <PolyhedronLink isFake={isFake} name={polyhedron} /> : cell}
-      <div className={css(styles.label)}>{polyhedron && symbol}</div>
+      <div className={styles('label')}>{polyhedron && symbol}</div>
     </td>
   );
 };
@@ -62,7 +61,7 @@ const ColumnHeaders = ({ columns }) => {
             typeof col === 'string'
               ? [<th key={j} />]
               : col.sub.map(subCol => (
-                  <th className={css(styles.cell)} key={`${j}-${subCol}`}>
+                  <th className={styles('cell')} key={`${j}-${subCol}`}>
                     {subCol}
                   </th>
                 )),
@@ -73,7 +72,7 @@ const ColumnHeaders = ({ columns }) => {
         <th />
         {columns.map((col, j) => (
           <th
-            className={css(styles.cell)}
+            className={styles('cell')}
             key={j}
             colSpan={typeof col !== 'string' ? col.sub.length : 1}
           >
@@ -94,14 +93,14 @@ export default function PolyhedronTable({
   data,
 }: Props) {
   return (
-    <table className={css(styles.table)}>
-      <caption className={css(styles.caption)}>{caption}</caption>
+    <table className={styles('table')}>
+      <caption className={styles('caption')}>{caption}</caption>
       <ColumnHeaders columns={columns} />
       <tbody>
         {data.map((row, i) => (
           <tr key={i}>
             {/* Row header */}
-            <th className={css(styles.cell)}>{rows[i]}</th>
+            <th className={styles('cell')}>{rows[i]}</th>
             {flatMap(row, (cell, j) => {
               const col = columns[j];
               if (typeof col === 'string') {

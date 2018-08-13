@@ -1,18 +1,17 @@
 // @flow strict
 import React, { Component } from 'react';
-import { css, StyleSheet } from 'aphrodite/no-important';
 import { Link } from 'react-router-dom';
 
 import { Icon } from 'components/common';
 import { escapeName } from 'polyhedra/names';
 import { hover } from 'styles/common';
-import { media } from 'styles';
+import { makeStyles, media } from 'styles';
 
 const thumbnailSize = 65;
 
 const mobThumbnailSize = 50;
 
-const styles = StyleSheet.create({
+const styles = makeStyles({
   link: {
     ...hover,
     border: '1px LightGray solid',
@@ -92,11 +91,11 @@ export default class PolyhedronLink extends Component<Props, State> {
       <Link
         id={!isFake ? escapedName : undefined}
         to={'/' + escapedName}
-        className={css(styles.link, isFake && styles.fake)}
+        className={styles('link', isFake && 'fake')}
         title={name}
       >
         {loaded ? (
-          <img className={css(styles.image)} src={this.imgSrc()} alt={name} />
+          <img className={styles('image')} src={this.imgSrc()} alt={name} />
         ) : error ? (
           <Icon name="alert-circle-outline" size={48} />
         ) : (

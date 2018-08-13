@@ -1,6 +1,6 @@
 // @flow strict
 import React from 'react';
-import { css, StyleSheet } from 'aphrodite/no-important';
+import { makeStyles } from 'styles';
 
 import { media, fonts } from 'styles';
 import { type TableSection as TableSectionType } from 'constants/polyhedronTables';
@@ -29,7 +29,8 @@ const gridAreaMapping = {
   'Other Johnson Solids': 'other',
 };
 
-const sectionStyles = StyleSheet.create({
+const styles = makeStyles({
+  // Section styles
   uniform: {
     gridTemplateAreas: `
       "plato prism"
@@ -81,9 +82,8 @@ const sectionStyles = StyleSheet.create({
       gridTemplateAreas: '"snub other"',
     },
   },
-});
 
-const styles = StyleSheet.create({
+  // Other styles
   section: {
     display: 'flex',
     flexDirection: 'column',
@@ -135,7 +135,7 @@ const GridArea = ({ area, data }) => {
 
 const TableGrid = ({ tables, header }) => {
   return (
-    <div className={css(styles.grid, sectionStyles[sectionMapping[header]])}>
+    <div className={styles('grid', sectionMapping[header])}>
       {tables.map(table => {
         const area = gridAreaMapping[table.caption];
         return <GridArea key={area} area={area} data={table} />;
@@ -164,15 +164,13 @@ export default function TableSection({
     subsections,
   } = data;
   const Header = isSubsection ? 'h3' : 'h2';
-  const headerStyle = isSubsection
-    ? styles.subsectionHeader
-    : styles.sectionHeader;
+  const headerStyle = isSubsection ? 'subsectionHeader' : 'sectionHeader';
 
   return (
-    <div key={header} className={css(styles.section)}>
+    <div key={header} className={styles('section')}>
       {typeof description !== 'undefined' && (
-        <div className={css(styles.description)}>
-          <Header className={css(headerStyle)}>{header}</Header>
+        <div className={styles('description')}>
+          <Header className={styles(headerStyle)}>{header}</Header>
           <Description
             title={header}
             collapsed={!sticky}

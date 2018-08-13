@@ -1,11 +1,11 @@
 import React from 'react';
 
-import { css, StyleSheet } from 'aphrodite/no-important';
+import { makeStyles } from 'styles';
 import { fonts } from 'styles';
 
 import { Icon } from 'components/common';
 
-const styles = StyleSheet.create({
+const styles = makeStyles({
   loading: {
     position: 'absolute',
     left: 0,
@@ -27,9 +27,9 @@ const styles = StyleSheet.create({
 
 export default function Loading() {
   return (
-    <div className={css(styles.loading)}>
+    <div className={styles('loading')}>
       <Icon size={36} name="hexagon-outline" spin />
-      <div className={css(styles.text)}>Loading...</div>
+      <div className={styles('text')}>Loading...</div>
     </div>
   );
 }

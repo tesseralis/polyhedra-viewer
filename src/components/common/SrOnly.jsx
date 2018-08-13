@@ -1,8 +1,8 @@
 // @flow strict
 import React from 'react';
-import { StyleSheet, css } from 'aphrodite/no-important';
+import { makeStyles } from 'styles';
 
-const styles = StyleSheet.create({
+const styles = makeStyles({
   // https://a11yproject.com/posts/how-to-hide-content/
   srOnly: {
     position: 'absolute !important',
@@ -14,5 +14,5 @@ const styles = StyleSheet.create({
 });
 
 export default function SrOnly({ children }: *) {
-  return <span className={css(styles.srOnly)}>{children}</span>;
+  return <span className={styles('srOnly')}>{children}</span>;
 }

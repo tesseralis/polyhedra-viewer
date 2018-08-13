@@ -1,12 +1,12 @@
 //@flow
 
 import React from 'react';
-import { css, StyleSheet } from 'aphrodite/no-important';
+import { makeStyles } from 'styles';
 
 import { absolute } from 'styles/common';
 import { BackLink, Title, Options, Prompt } from '../common';
 
-const styles = StyleSheet.create({
+const styles = makeStyles({
   overlay: {
     position: 'absolute',
     right: 0,
@@ -49,17 +49,17 @@ interface Props {
 
 export default function Overlay({ solid }: Props) {
   return (
-    <div className={css(styles.overlay)}>
-      <div className={css(styles.homeLink)}>
+    <div className={styles('overlay')}>
+      <div className={styles('homeLink')}>
         <BackLink solid={solid} />
       </div>
-      <div className={css(styles.title)}>
+      <div className={styles('title')}>
         <Title name={solid} />
       </div>
-      <div className={css(styles.prompt)}>
+      <div className={styles('prompt')}>
         <Prompt />
       </div>
-      <div className={css(styles.options)}>
+      <div className={styles('options')}>
         <Options solid={solid} />
       </div>
     </div>

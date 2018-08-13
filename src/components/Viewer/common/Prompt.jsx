@@ -1,12 +1,12 @@
 // @flow strict
 import React from 'react';
-import { css, StyleSheet } from 'aphrodite/no-important';
+import { makeStyles } from 'styles';
 
 import { media, fonts } from 'styles';
 import { WithOperation } from 'components/Viewer/context';
 import connect from 'components/connect';
 
-const styles = StyleSheet.create({
+const styles = makeStyles({
   prompt: {
     fontSize: 24,
     fontFamily: fonts.andaleMono,
@@ -35,7 +35,7 @@ function getMessage(opName) {
 
 function Prompt({ opName }) {
   const message = getMessage(opName);
-  return message && <div className={css(styles.prompt)}>{message}</div>;
+  return message && <div className={styles('prompt')}>{message}</div>;
 }
 
 export default connect(

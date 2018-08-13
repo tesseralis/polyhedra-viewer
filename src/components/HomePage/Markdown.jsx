@@ -2,13 +2,12 @@
 import _ from 'lodash';
 import React from 'react';
 import Markdown from 'react-markdown';
-import { css, StyleSheet } from 'aphrodite/no-important';
 
-import { fonts } from 'styles';
+import { makeStyles, fonts } from 'styles';
 
 const listIndent = 20;
 
-const styles = StyleSheet.create({
+const styles = makeStyles({
   div: {},
   // TODO change a lot of this to be from the surrounding element
   p: {
@@ -56,7 +55,7 @@ const styles = StyleSheet.create({
 function makeRenderer(El, ownProps = {}) {
   return props => {
     const allowedProps = _.pick(props, ['children', 'href']);
-    return <El {...allowedProps} {...ownProps} className={css(styles[El])} />;
+    return <El {...allowedProps} {...ownProps} className={styles(El)} />;
   };
 }
 

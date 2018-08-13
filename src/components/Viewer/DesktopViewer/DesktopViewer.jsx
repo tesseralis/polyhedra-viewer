@@ -1,12 +1,12 @@
 // @flow
 import React, { PureComponent } from 'react';
-import { css, StyleSheet } from 'aphrodite/no-important';
+import { makeStyles } from 'styles';
 
 import Sidebar from './Sidebar';
 import Overlay from './Overlay';
 import { X3dScene } from '../common';
 
-const styles = StyleSheet.create({
+const styles = makeStyles({
   viewer: {
     // We have to use flex here because x3dom doesn't work well with grid
     display: 'flex',
@@ -43,12 +43,12 @@ export default class DesktopViewer extends PureComponent<*> {
     const { solid, panel } = this.props;
     const full = panel === 'full';
     return (
-      <div className={css(styles.viewer)}>
-        <div className={css(styles.scene, full && styles.full)}>
+      <div className={styles('viewer')}>
+        <div className={styles('scene', full && 'full')}>
           <X3dScene label={solid} />
           <Overlay solid={solid} panel={panel} />
         </div>
-        <div className={css(full ? styles.sidebarCompact : styles.sidebarFull)}>
+        <div className={styles(full ? 'sidebarCompact' : 'sidebarFull')}>
           <Sidebar panel={panel} solid={solid} compact={full} />
         </div>
       </div>
