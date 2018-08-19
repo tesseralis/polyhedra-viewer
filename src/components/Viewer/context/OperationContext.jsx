@@ -2,26 +2,29 @@
 import _ from 'lodash';
 import React, { Component } from 'react';
 
+import { mapObject } from 'utils';
 import { operations } from 'math/operations';
 import { applyOptionsFor, type OpName } from 'polyhedra/operations';
 
-const OperationContext = React.createContext({
+const defaultState = {
   operation: undefined,
   opName: '',
-  options: undefined,
-  setOption: _.noop,
-  setOperation: _.noop,
-  unsetOperation: _.noop,
+  options: {},
+};
+
+const actions = ['setOption', 'unsetOperation', 'setOperation'];
+
+const OperationContext = React.createContext({
+  ...defaultState,
+  ...mapObject(actions, a => [a, _.noop]),
 });
 
 export class OperationProvider extends Component<*, *> {
   constructor(props: *) {
     super(props);
     this.state = {
-      operation: undefined,
-      opName: '',
-      options: {},
-      ..._.pick(this, ['setOption', 'unsetOperation', 'setOperation']),
+      ...defaultState,
+      ..._.pick(this, actions),
     };
   }
 

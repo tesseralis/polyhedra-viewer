@@ -6,6 +6,7 @@ import { WithConfig } from 'components/ConfigContext';
 import transition from 'transition';
 import { Polyhedron } from 'math/polyhedra';
 import { PRECISION } from 'math/linAlg';
+import { mapObject } from 'utils';
 
 function getCoplanarFaces(polyhedron) {
   const found = [];
@@ -45,17 +46,19 @@ function arrayDefaults(first, second) {
   return _.map(first, (item, i) => (_.isNil(item) ? second[i] : item));
 }
 
-const PolyhedronContext = React.createContext({
-  solidName: 'tetrahedron',
-  setName: _.noop,
+const defaultState = {
   polyhedron: Polyhedron.get('tetrahedron'),
   faceColors: [],
   transitionApplied: false,
   isTransitioning: false,
-  setPolyhedron: _.noop,
-  transitionPolyhedron: _.noop,
-  recenter: _.noop,
-  resize: _.noop,
+};
+
+const actions = ['setPolyhedron', 'transitionPolyhedron', 'recenter', 'resize'];
+
+const PolyhedronContext = React.createContext({
+  ...defaultState,
+  ...mapObject(actions, action => [action, _.noop]),
+  solidName: 'tetrahedron',
 });
 
 class BasePolyhedronProvider extends PureComponent<*, *> {
@@ -64,15 +67,9 @@ class BasePolyhedronProvider extends PureComponent<*, *> {
   constructor(props: *) {
     super(props);
     this.state = {
+      ...defaultState,
+      ..._.pick(this, actions),
       setName: this.props.setName,
-      polyhedron: Polyhedron.get('tetrahedron'),
-      faceColors: [],
-      isTransitioning: false,
-      transitionApplied: false,
-      setPolyhedron: this.setPolyhedron,
-      transitionPolyhedron: this.transitionPolyhedron,
-      recenter: this.recenter,
-      resize: this.resize,
     };
   }
 
