@@ -8,7 +8,6 @@ import { media, fonts } from 'styles';
 import { Icon, SrOnly } from 'components/common';
 
 const styles = makeStyles({
-  // TODO link hover
   link: {
     ...resetLink,
     display: 'flex',

@@ -3,13 +3,6 @@ import React from 'react';
 import { Route, Redirect, Switch } from 'react-router-dom';
 import Loadable from 'react-loadable';
 
-// TODO I don't think this is the best place to put these imports
-import 'what-input';
-
-import 'styles/reset.css';
-import 'styles/box-sizing.css';
-import 'styles/a11y.css';
-
 import { isValidSolid } from 'data';
 import {
   escapeName,
@@ -60,7 +53,6 @@ export default () => (
           console.log('alternate', fullName, newPath);
           return <Redirect to={newPath} />;
         }
-        // TODO error page when it's an invalid name
         if (isValidSolid(solid)) {
           return <Viewer solid={solid} url={match.url} history={history} />;
         }

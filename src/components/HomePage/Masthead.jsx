@@ -16,7 +16,6 @@ const styles = makeStyles({
     alignItems: 'center',
     justifyContent: 'center',
     width: '100%',
-    // TODO these box shadow stylings are kinda weird
     boxShadow: 'inset 0 -1px 4px LightGray',
     padding: '20px 50px',
 

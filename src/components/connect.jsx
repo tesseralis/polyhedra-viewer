@@ -9,7 +9,6 @@ function mapProps(propsMap, props, ownProps) {
     return _.pick(props, propsMap);
   }
   if (typeof propsMap === 'function') {
-    //  TODO pass in props and ownProps as different operations
     return propsMap({ ...props, ...ownProps });
   }
   return _.mapValues(propsMap, orig => props[orig]);

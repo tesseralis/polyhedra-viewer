@@ -155,7 +155,6 @@ function displayVertexConfig({ polyhedron }) {
   const configKeys = _.keys(vConfig);
   // When there's only one type, just get it on its own
   if (configKeys.length === 1) return configKeys[0];
-  // TODO possibly square notation but that's hard
   return (
     <ul>
       {_.map(vConfig, (count, type: string) => (

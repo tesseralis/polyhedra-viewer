@@ -1,6 +1,7 @@
 // @flow
 import React from 'react';
 import { BrowserRouter } from 'react-router-dom';
+
 import { DeviceProvider } from './DeviceContext';
 import { ConfigProvider } from './ConfigContext';
 import PageTracker from './PageTracker';

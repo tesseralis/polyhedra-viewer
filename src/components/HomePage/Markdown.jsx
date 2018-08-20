@@ -9,7 +9,7 @@ const listIndent = 20;
 
 const styles = makeStyles({
   div: {},
-  // TODO change a lot of this to be from the surrounding element
+
   p: {
     fontSize: 16,
     fontFamily: fonts.times,
