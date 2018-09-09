@@ -2,7 +2,7 @@
 import _ from 'lodash';
 
 import { Polyhedron, Face, Cap } from 'math/polyhedra';
-import { isInverse, PRECISION } from 'math/linAlg';
+import { isInverse, getBasisRotation, PRECISION } from 'math/linAlg';
 import { getCyclic, getSingle } from 'utils';
 
 import { Operation } from '../operationTypes';

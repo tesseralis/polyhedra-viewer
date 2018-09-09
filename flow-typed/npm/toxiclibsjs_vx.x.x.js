@@ -261,6 +261,11 @@ declare module 'toxiclibsjs/geom' {
     constructor(): Triangle3D;
     constructor(a: Vec3D, b: Vec3D, c: Vec3D): Triangle3D;
   }
+
+  declare export class Quaternion {
+    // FIXME fill this out
+    constructor(w: number, x: number, y: number, z: number): Quaternion;
+  }
 }
 
 declare module 'toxiclibsjs/geom/AABB' {
