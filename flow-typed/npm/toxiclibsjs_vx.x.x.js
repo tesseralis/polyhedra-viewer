@@ -226,9 +226,9 @@ declare module 'toxiclibsjs/geom' {
     toArray(): [number, number, number];
     toCartesian(): Vec3D;
     toSpherical(): Vec3D;
-    x(): number;
-    y(): number;
-    z(): number;
+    x: number;
+    y: number;
+    z: number;
   }
 
   declare export class Plane extends Vec3D {

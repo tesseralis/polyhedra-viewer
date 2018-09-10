@@ -7,6 +7,7 @@ import { getCyclic, getSingle } from 'utils';
 
 import { Operation } from '../operationTypes';
 import { hasMultiple } from './cutPasteUtils';
+import { withOrigin } from '../../linAlg';
 
 const augmentees = {
   pyramid: {
@@ -194,36 +195,20 @@ function doAugment(
       : defaultAugmentees[base.numSides];
   const augmentType = augmentTypes[using[0]];
 
-  const baseV0 = base.vertices[0].vec;
-  const baseCenter = base.centroid();
-  const baseNormal = base.normal();
-
   let augmentee = getAugmentee(using);
   const underside = augmentee.faceWithNumSides(base.numSides);
   augmentee = mock ? flatten(augmentee, underside) : augmentee;
 
-  // rotate and translate so that the face is next to our face
+  // Determine the orientations of the underside and the base
   const undersideNormal = underside.normal();
+  const undersideRadius = underside.vertices[0].vec
+    .sub(underside.centroid())
+    .getNormalized();
+  const undersideRotation = getBasisRotation(
+    undersideRadius,
+    undersideNormal.getInverted(),
+  );
 
-  const alignBasesNormal = (() => {
-    const cross = undersideNormal.cross(baseNormal).getNormalized();
-    // If they're the same (e.g. augmenting something with itself), use a random vertex on the base
-    if (cross.magnitude() < PRECISION) {
-      return baseV0.sub(baseCenter).getNormalized();
-    }
-    return cross;
-  })();
-  // The `|| 0` is because this sometimes returns NaN if the angle is 0
-  const alignBasesAngle = baseNormal.angleBetween(undersideNormal, true) || 0;
-
-  const alignedAugmenteeVertices = augmentee.vertices.map(v => {
-    return v.vec
-      .sub(underside.centroid())
-      .scale(base.sideLength() / augmentee.edgeLength())
-      .getRotatedAroundAxis(alignBasesNormal, alignBasesAngle - Math.PI);
-  });
-
-  const translatedV0 = baseV0.sub(baseCenter);
   const baseIsAligned = isAligned(
     polyhedron,
     base,
@@ -232,19 +217,31 @@ function doAugment(
     augmentType,
   );
   const offset = baseIsAligned ? 0 : 1;
-  const alignedV0 = alignedAugmenteeVertices[underside.vertices[offset].index];
-  // align the first vertex of the base face to the first vertex of the underside face
-  const alignVerticesAngle = translatedV0.angleBetween(alignedV0, true) || 0;
-  const transformedAugmenteeVertices = alignedAugmenteeVertices.map(v => {
-    return v
-      .getRotatedAroundAxis(
-        alignedV0.cross(translatedV0).getNormalized(),
-        alignVerticesAngle,
-      )
-      .add(baseCenter);
+  const baseRadius = base.vertices[offset].vec
+    .sub(base.centroid())
+    .getNormalized();
+  const baseRotation = getBasisRotation(baseRadius, base.normal());
+
+  // https://math.stackexchange.com/questions/624348/finding-rotation-axis-and-angle-to-align-two-oriented-vectors
+  // Determine the transformation that rotates the underside orientation to the base orientation
+  // TODO we probably want this as some sort of generic method
+  const transform = withOrigin(base.centroid(), u =>
+    baseRotation.multiply(undersideRotation.getTransposed()).applyTo(u),
+  );
+
+  // Scale and position the augmentee so that it lines up with the base
+  const alignedVertices = augmentee.vertices.map(v => {
+    return v.vec
+      .sub(underside.centroid())
+      .scale(base.sideLength() / augmentee.edgeLength())
+      .add(base.centroid());
   });
+
+  // Rotate the vertices so that they align with the base
+  const rotatedVertices = alignedVertices.map(v => transform(v));
+
   const newAugmentee = augmentee.withChanges(solid =>
-    solid.withVertices(transformedAugmenteeVertices).withoutFaces([underside]),
+    solid.withVertices(rotatedVertices).withoutFaces([underside]),
   );
   return polyhedron.withChanges(solid =>
     solid.withoutFaces([base]).addPolyhedron(newAugmentee),

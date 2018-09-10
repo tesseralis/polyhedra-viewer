@@ -1,7 +1,7 @@
 // @flow strict
 import _ from 'lodash';
 import type { Point } from 'types';
-import { Vec3D, Ray3D, Triangle3D, Plane, Quaternion } from 'toxiclibsjs/geom';
+import { Vec3D, Ray3D, Triangle3D, Plane, Matrix4x4 } from 'toxiclibsjs/geom';
 
 // Re-export Vec3D so its easier to switch
 export { Vec3D };
@@ -57,14 +57,16 @@ export function withOrigin(o: Vec3D, t: Transform): Transform {
 }
 
 /**
- * Return the rotation quaternion based on the orthonormal bases v1, v2, and v1 x v2
+ * Return the rotation quaternion based on the orthonormal bases v1, v2, and (v1 x v2)
  */
 export function getBasisRotation(v1: Vec3D, v2: Vec3D) {
-  // https://en.wikipedia.org/wiki/Rotation_formalisms_in_three_dimensions#Rotation_matrix_%E2%86%94_quaternion
+  // https://math.stackexchange.com/questions/624348/finding-rotation-axis-and-angle-to-align-two-oriented-vectors
   const v3 = v1.cross(v2);
-  const qr = 0.5 * Math.sqrt(1 + v1.x() + v2.y() + v3.z());
-  const qi = (v3.y() - v2.z()) / (4 * qr);
-  const qj = (v1.z() - v3.x()) / (4 * qr);
-  const qk = (v2.x() - v1.y()) / (4 * qr);
-  return new Quaternion(qr, qi, qj, qk);
+  // prettier-ignore
+  return new Matrix4x4(
+    v1.x, v2.x, v3.x, 0,
+    v1.y, v2.y, v3.y, 0,
+    v1.z, v2.z, v3.z, 0,
+    0,    0,    0,    1,
+  )
 }
