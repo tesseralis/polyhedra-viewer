@@ -2,7 +2,7 @@
 import _ from 'lodash';
 
 import { Polyhedron, Face, Cap } from 'math/polyhedra';
-import { isInverse, getBasisRotation, PRECISION } from 'math/linAlg';
+import { isInverse, getOrthonormalTransform, PRECISION } from 'math/linAlg';
 import { getCyclic, getSingle } from 'utils';
 
 import { Operation } from '../operationTypes';
@@ -200,14 +200,9 @@ function doAugment(
   augmentee = mock ? flatten(augmentee, underside) : augmentee;
 
   // Determine the orientations of the underside and the base
-  const undersideNormal = underside.normal();
   const undersideRadius = underside.vertices[0].vec
     .sub(underside.centroid())
     .getNormalized();
-  const undersideRotation = getBasisRotation(
-    undersideRadius,
-    undersideNormal.getInverted(),
-  );
 
   const baseIsAligned = isAligned(
     polyhedron,
@@ -220,13 +215,18 @@ function doAugment(
   const baseRadius = base.vertices[offset].vec
     .sub(base.centroid())
     .getNormalized();
-  const baseRotation = getBasisRotation(baseRadius, base.normal());
 
   // https://math.stackexchange.com/questions/624348/finding-rotation-axis-and-angle-to-align-two-oriented-vectors
   // Determine the transformation that rotates the underside orientation to the base orientation
   // TODO we probably want this as some sort of generic method
+  const transformMatrix = getOrthonormalTransform(
+    undersideRadius,
+    underside.normal().getInverted(),
+    baseRadius,
+    base.normal(),
+  );
   const transform = withOrigin(base.centroid(), u =>
-    baseRotation.multiply(undersideRotation.getTransposed()).applyTo(u),
+    transformMatrix.applyTo(u),
   );
 
   // Scale and position the augmentee so that it lines up with the base

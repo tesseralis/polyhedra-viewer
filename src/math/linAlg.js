@@ -57,9 +57,9 @@ export function withOrigin(o: Vec3D, t: Transform): Transform {
 }
 
 /**
- * Return the rotation quaternion based on the orthonormal bases v1, v2, and (v1 x v2)
+ * Return the rotation matrix based on the orthonormal bases v1, v2, and (v1 x v2)
  */
-export function getBasisRotation(v1: Vec3D, v2: Vec3D) {
+export function getOrientation(v1: Vec3D, v2: Vec3D) {
   // https://math.stackexchange.com/questions/624348/finding-rotation-axis-and-angle-to-align-two-oriented-vectors
   const v3 = v1.cross(v2);
   // prettier-ignore
@@ -69,4 +69,19 @@ export function getBasisRotation(v1: Vec3D, v2: Vec3D) {
     v1.z, v2.z, v3.z, 0,
     0,    0,    0,    1,
   )
+}
+
+/**
+ * Return the rotation matrix that transforms the basis (u1, u2, u1 x u2) to (v1, v2, v1 x v2)
+ */
+export function getOrthonormalTransform(
+  u1: Vec3D,
+  u2: Vec3D,
+  v1: Vec3D,
+  v2: Vec3D,
+) {
+  // https://math.stackexchange.com/questions/624348/finding-rotation-axis-and-angle-to-align-two-oriented-vectors
+  const uOrientation = getOrientation(u1, u2);
+  const vOrientation = getOrientation(v1, v2);
+  return vOrientation.multiply(uOrientation.getTransposed());
 }
