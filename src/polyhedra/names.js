@@ -47,7 +47,7 @@ const archimedeanMapping = {
 };
 const inverseArchimedeanMapping = _.invert(archimedeanMapping);
 
-const alternateNames = {
+export const alternateNames = {
   tetrahedron: ['triangular pyramid', 'digonal antiprism', 'disphenoid'],
   cube: ['square prism'],
   octahedron: [
@@ -57,7 +57,7 @@ const alternateNames = {
   ],
   icosahedron: [
     'snub tetrahedron',
-    'elongated pentagonal bipyramid',
+    'gyroelongated pentagonal bipyramid',
     'snub triangular antiprism',
   ],
   cuboctahedron: ['rhombitetratetrahedron', 'triangular gyrobicupola'],
