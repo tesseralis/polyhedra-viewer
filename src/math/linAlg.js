@@ -68,7 +68,7 @@ export function getOrientation(v1: Vec3D, v2: Vec3D) {
     v1.y, v2.y, v3.y, 0,
     v1.z, v2.z, v3.z, 0,
     0,    0,    0,    1,
-  )
+  );
 }
 
 /**
