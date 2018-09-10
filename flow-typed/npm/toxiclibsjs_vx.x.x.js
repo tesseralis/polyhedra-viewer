@@ -262,9 +262,35 @@ declare module 'toxiclibsjs/geom' {
     constructor(a: Vec3D, b: Vec3D, c: Vec3D): Triangle3D;
   }
 
-  declare export class Quaternion {
-    // FIXME fill this out
-    constructor(w: number, x: number, y: number, z: number): Quaternion;
+  declare export class Matrix4x4 {
+    constructor(): Matrix4x4;
+    constructor(array: number[]): Matrix4x4;
+    // prettier-ignore
+    constructor(
+      v11: number, v12: number, v13: number, v14: number,
+      v21: number, v22: number, v23: number, v24: number,
+      v31: number, v32: number, v33: number, v34: number,
+      v41: number, v42: number, v43: number, v44: number,
+    ): Matrix4x4;
+    constructor(m: Matrix4x4): Matrix4x4;
+    add(rhs: Matrix4x4): Matrix4x4;
+    applyTo(v: Vec3D): Vec3D;
+    copy(): Matrix4x4;
+    getInverted(): Matrix4x4;
+    getRotatedAroundAxis(axis: Vec3D, theta: number): Matrix4x4;
+    getRotatedX(theta: number): Matrix4x4;
+    getRotatedY(theta: number): Matrix4x4;
+    getRotatedZ(theta: number): Matrix4x4;
+    getTransposed(): Matrix4x4;
+    identity(): Matrix4x4;
+    multiply(factor: double): Matrix4x4;
+    multiply(mat: Matrix4x4): Matrix4x4;
+    scale(theta: number): Matrix4x4;
+    scale(scaleX: number, scaleY: number, scaleZ: number): Matrix4x4;
+    scale(scale: Vec3D): Matrix4x4;
+    toString(): string;
+    translate(dx: number, dy: number, dz: number): Matrix4x4;
+    translate(trans: Vec3D): Matrix4x4;
   }
 }
 
