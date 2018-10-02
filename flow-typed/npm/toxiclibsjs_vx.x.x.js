@@ -283,7 +283,7 @@ declare module 'toxiclibsjs/geom' {
     getRotatedZ(theta: number): Matrix4x4;
     getTransposed(): Matrix4x4;
     identity(): Matrix4x4;
-    multiply(factor: double): Matrix4x4;
+    multiply(factor: number): Matrix4x4;
     multiply(mat: Matrix4x4): Matrix4x4;
     scale(theta: number): Matrix4x4;
     scale(scaleX: number, scaleY: number, scaleZ: number): Matrix4x4;
