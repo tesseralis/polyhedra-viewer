@@ -9,7 +9,7 @@
     "file-loader": "^0.10.1",
     "flow-bin": "^0.70.0",
     "json-loader": "^0.5.7",
-    "react-scripts": "^1.1.4"
+    "react-scripts": "^2.0.2"
   },
   "dependencies": {
     "aphrodite": "^1.2.5",
