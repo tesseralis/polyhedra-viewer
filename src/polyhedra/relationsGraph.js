@@ -8,11 +8,9 @@ import { mapObject } from 'utils';
 function normalize(graph) {
   return _.mapValues(graph, ops =>
     _.mapValues(ops, relations => {
-      return _
-        .castArray(relations)
-        .map(
-          relation => (_.isObject(relation) ? relation : { value: relation }),
-        );
+      return _.castArray(relations).map(
+        relation => (_.isObject(relation) ? relation : { value: relation }),
+      );
     }),
   );
 }

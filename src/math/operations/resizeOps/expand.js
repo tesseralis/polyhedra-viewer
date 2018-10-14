@@ -59,9 +59,9 @@ function duplicateVertices(polyhedron, twist) {
 function doExpansion(polyhedron, referenceName, twist) {
   const reference = Polyhedron.get(referenceName);
   const n = polyhedron.getFace().numSides;
-  // TODO precalculate this
   const duplicated = duplicateVertices(polyhedron, twist);
 
+  // TODO precalculate this
   const referenceFace =
     _.find(reference.faces, face => isExpandedFace(reference, face, n)) ||
     reference.getFace();

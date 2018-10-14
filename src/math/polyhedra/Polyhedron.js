@@ -230,7 +230,6 @@ export default class Polyhedron {
     return this.isUniform() && this.faceTypes().length === 1;
   }
 
-  // TODO reimplement this in terms of face functions
   faceAdjacencyList() {
     const faceAdjacencyCounts = _.map(this.faces, face => ({
       n: face.numSides,

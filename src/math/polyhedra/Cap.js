@@ -111,7 +111,6 @@ export default class Cap implements VertexList {
     return getBoundary(this.faces());
   });
 
-  // TODO can we dedupe or generate these properties automatically?
   normal() {
     return this.boundary().normal();
   }

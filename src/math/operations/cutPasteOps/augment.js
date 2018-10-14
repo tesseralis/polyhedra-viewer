@@ -164,40 +164,22 @@ function isAligned(polyhedron, base, underside, gyrate, augmentType) {
   return isOrtho === (gyrate === 'ortho');
 }
 
-// Flatten a polyhedron at the given face
-function flatten(polyhedron, face) {
-  const plane = face.plane();
-  return polyhedron.withVertices(
-    polyhedron.vertices.map(v => plane.getProjectedPoint(v.vec)),
-  );
-}
-
-function getAugmentee(using) {
-  const prefix = using[0];
-  const index = using.substring(1);
-
-  const augmentType = augmentTypes[prefix];
+function getAugmentee(augmentType, numSides) {
+  const index = _.includes(['cupola', 'rotunda'], augmentType)
+    ? numSides / 2
+    : numSides;
   return augmentData[augmentType][index];
 }
 
-// Augment the following
-function doAugment(
-  polyhedron,
-  base,
-  _using = defaultAugmentees[base.numSides],
-  gyrate,
-  mock = false,
-) {
-  // TODO fix the test generation code so we don't need this
-  const using =
-    getAugmenteeNumSides(_using) === base.numSides
-      ? _using
-      : defaultAugmentees[base.numSides];
-  const augmentType = augmentTypes[using[0]];
+function isFastigium(augmentType, numSides) {
+  return augmentType === 'cupola' && numSides === 4;
+}
 
-  let augmentee = getAugmentee(using);
+// Augment the following
+function doAugment(polyhedron, base, augmentType, gyrate) {
+  const numSides = base.numSides;
+  const augmentee = getAugmentee(augmentType, numSides);
   const underside = augmentee.faceWithNumSides(base.numSides);
-  augmentee = mock ? flatten(augmentee, underside) : augmentee;
 
   // Determine the orientations of the underside and the base
   const undersideRadius = underside.vertices[0].vec
@@ -208,7 +190,7 @@ function doAugment(
     polyhedron,
     base,
     underside,
-    using === 'U2' ? 'gyro' : gyrate,
+    isFastigium(augmentType, numSides) ? 'gyro' : gyrate,
     augmentType,
   );
   const offset = baseIsAligned ? 0 : 1;
@@ -254,14 +236,14 @@ interface AugmentOptions {
   using: string;
 }
 
-const defaultAugmentees = {
-  '3': 'Y3',
-  '4': 'Y4',
-  '5': 'Y5',
-  '6': 'U3',
-  '8': 'U4',
-  '10': 'U5',
-};
+function defaultAugmentType(numSides) {
+  return numSides <= 5 ? 'pyramid' : 'cupola';
+}
+
+function defaultAugmentee(numSides: number) {
+  const type = defaultAugmentType(numSides);
+  return type === 'pyramid' ? 'Y' + numSides : 'U' + numSides / 2;
+}
 
 function getAugmenteeNumSides(using: string) {
   const prefix = using[0];
@@ -272,12 +254,15 @@ function getAugmenteeNumSides(using: string) {
 export function getUsingOpt(using: ?string, numSides: number) {
   return typeof using === 'string' && getAugmenteeNumSides(using) === numSides
     ? using
-    : defaultAugmentees[numSides];
+    : defaultAugmentee(numSides);
 }
 
 export const augment: Operation<AugmentOptions> = {
   apply(polyhedron, { face, gyrate, using } = {}) {
-    return doAugment(polyhedron, face, using, gyrate);
+    const augmentType = using
+      ? augmentTypes[using[0]]
+      : defaultAugmentType(face.numSides);
+    return doAugment(polyhedron, face, augmentType, gyrate);
   },
 
   getSearchOptions(polyhedron, config, relations) {
