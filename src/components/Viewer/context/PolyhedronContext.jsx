@@ -141,7 +141,7 @@ class BasePolyhedronProvider extends PureComponent<*, *> {
 
     this.transitionId = transition(
       {
-        duration: 750 / animationSpeed,
+        duration: 1000 / animationSpeed,
         startValue: {
           vertices: animationData.start.solidData.vertices,
           faceColors: allColorStart,
