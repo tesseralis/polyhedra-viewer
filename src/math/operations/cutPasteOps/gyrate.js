@@ -86,6 +86,7 @@ export const gyrate: Operation<GyrateOptions> = {
     return Cap.getAll(polyhedron).map(cap => ({ cap }));
   },
 
+  hitOption: 'cap',
   getHitOption(polyhedron, hitPnt) {
     const cap = Cap.find(polyhedron, hitPnt);
     return cap ? { cap } : {};

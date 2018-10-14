@@ -328,6 +328,7 @@ export const augment: Operation<AugmentOptions> = {
     return options;
   },
 
+  hitOption: 'face',
   getHitOption(polyhedron, hitPnt, options) {
     if (!options) return {};
     const face = polyhedron.hitFace(hitPnt);

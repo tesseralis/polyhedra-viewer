@@ -149,6 +149,7 @@ export const sharpen: Operation<sharpenOptions> = {
     }
   },
 
+  hitOption: 'faceType',
   getHitOption(polyhedron, hitPoint) {
     const n = polyhedron.hitFace(hitPoint).numSides;
     return n <= 5 ? { faceType: n } : {};

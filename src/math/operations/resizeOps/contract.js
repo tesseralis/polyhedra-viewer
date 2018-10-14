@@ -67,6 +67,7 @@ export const contract: Operation<ContractOptions> = {
     }
   },
 
+  hitOption: 'faceType',
   getHitOption(polyhedron, hitPoint) {
     const hitFace = polyhedron.hitFace(hitPoint);
     const isValid = isExpandedFace(polyhedron, hitFace);

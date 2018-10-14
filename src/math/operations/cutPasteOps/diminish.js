@@ -52,6 +52,7 @@ export const diminish: Operation<DiminishOptions> = {
     return Cap.getAll(polyhedron).map(cap => ({ cap }));
   },
 
+  hitOption: 'cap',
   getHitOption(polyhedron, hitPnt) {
     const cap = Cap.find(polyhedron, hitPnt);
     return cap ? { cap } : {};

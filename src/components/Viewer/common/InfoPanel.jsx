@@ -168,7 +168,7 @@ function displayVertexConfig({ polyhedron }) {
 
 function displayFaceTypes({ polyhedron }) {
   const faceCounts = polyhedron.numFacesBySides();
-  // TODO order by type of face
+  // TODO verify order by type of face
   return (
     <ul>
       {_.map(faceCounts, (count, type: string) => (

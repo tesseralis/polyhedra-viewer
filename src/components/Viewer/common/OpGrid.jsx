@@ -72,7 +72,6 @@ function isEnabled(solid, operation) {
   return !!getOpResults(solid, operation);
 }
 
-// TODO this could probably use a test to make sure all the buttons are in the right places
 class OpGrid extends Component<*> {
   render() {
     const { isTransitioning, solidName, opName, selectOperation } = this.props;

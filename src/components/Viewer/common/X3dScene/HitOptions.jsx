@@ -3,25 +3,8 @@ import _ from 'lodash';
 import { PureComponent } from 'react';
 
 import type { Point } from 'types';
-import { type OpName } from 'polyhedra/operations';
 import connect from 'components/connect';
 import { WithPolyhedron, WithOperation, ApplyOperation } from '../../context';
-
-// TODO define this property in the operation
-function getHitOption(opName: OpName) {
-  switch (opName) {
-    case 'augment':
-      return 'face';
-    case 'diminish':
-    case 'gyrate':
-      return 'cap';
-    case 'sharpen':
-    case 'contract':
-      return 'faceType';
-    default:
-      return '';
-  }
-}
 
 class HitOptions extends PureComponent<*> {
   render() {
@@ -35,15 +18,14 @@ class HitOptions extends PureComponent<*> {
   setHitOption = (hitPnt: Point) => {
     const {
       operation,
-      opName,
       options,
       setOption,
       polyhedron,
       isTransitioning,
     } = this.props;
     if (!operation || isTransitioning) return;
-    const hitOption = getHitOption(opName);
-    const newHitOptions = operation.getHitOption(polyhedron, hitPnt, options);
+    const { hitOption, getHitOption } = operation;
+    const newHitOptions = getHitOption(polyhedron, hitPnt, options);
     if (_.isEmpty(newHitOptions)) {
       return setOption(hitOption, undefined);
     }
@@ -54,8 +36,9 @@ class HitOptions extends PureComponent<*> {
   };
 
   unsetHitOption = () => {
-    const { opName, options, setOption } = this.props;
-    const hitOption = getHitOption(opName);
+    const { operation, options, setOption } = this.props;
+    if (!operation) return;
+    const { hitOption } = operation;
     if (_.get(options, hitOption) !== undefined) {
       setOption(hitOption, undefined);
     }
@@ -72,8 +55,8 @@ class HitOptions extends PureComponent<*> {
       isTransitioning,
     } = this.props;
     if (!operation || isTransitioning) return;
-    const hitOption = getHitOption(opName);
-    const newHitOptions = operation.getHitOption(polyhedron, hitPnt, options);
+    const { hitOption, getHitOption } = operation;
+    const newHitOptions = getHitOption(polyhedron, hitPnt, options);
     const newValue = newHitOptions[hitOption];
     // only apply operation if we have a hit
     if (options && newValue) {
