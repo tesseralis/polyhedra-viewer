@@ -117,7 +117,7 @@ export function getSnubAngle(polyhedron: Polyhedron, faces: Face[]) {
 
   const normMidpoint = midpoint.sub(faceCentroid);
   const projected = plane.getProjectedPoint(midpoint).sub(faceCentroid);
-  const angle = normMidpoint.angleBetween(projected, true);
+  const angle = normMidpoint.angleBetween(projected, true) || 0;
   // Return a positive angle if it's a ccw turn, a negative angle otherwise
   const sign = normMidpoint
     .cross(projected)

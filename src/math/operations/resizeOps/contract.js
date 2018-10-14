@@ -41,8 +41,6 @@ export function applyContract(
   const contractFaces = getExpandedFaces(polyhedron, faceType);
 
   const angle = -getSnubAngle(polyhedron, contractFaces);
-  // expansionType(polyhedron) === 'snub'
-  // 0;
 
   const endVertices = getResizedVertices(contractFaces, resultLength, angle);
   return {

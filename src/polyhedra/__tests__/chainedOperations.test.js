@@ -26,6 +26,16 @@ describe('chained tests', () => {
       ],
     },
     {
+      description: 'rhombicuboctahedron expansion/contraction',
+      start: 'cube',
+      operations: [
+        ['expand', 'rhombicuboctahedron'],
+        { op: 'contract', args: { faceType: 4 }, expected: 'cube' },
+        ['expand', 'rhombicuboctahedron'],
+        { op: 'contract', args: { faceType: 3 }, expected: 'octahedron' },
+      ],
+    },
+    {
       description: 'dodecahedron -> rectify -> sharpen -> contract',
       start: 'dodecahedron',
       operations: [
