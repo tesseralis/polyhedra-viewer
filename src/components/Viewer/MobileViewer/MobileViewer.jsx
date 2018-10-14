@@ -4,15 +4,7 @@ import React from 'react';
 import { makeStyles, media } from 'styles';
 import { scroll } from 'styles/common';
 import { SrOnly } from 'components/common';
-import {
-  BackLink,
-  Title,
-  NavMenu,
-  ConfigForm,
-  PolyhedronList,
-  X3dScene,
-  InfoPanel,
-} from '../common';
+import { BackLink, Title, NavMenu, X3dScene, Panels } from '../common';
 
 import OperationsPanel from './OperationsPanel';
 
@@ -91,24 +83,6 @@ interface Props {
   solid: string;
 }
 
-// TODO dedupe with other sidebar
-function renderPanel(panel, solid) {
-  switch (panel) {
-    case 'info':
-      return <InfoPanel />;
-    case 'operations':
-      return <OperationsPanel solid={solid} />;
-    case 'options':
-      return <ConfigForm />;
-    case 'list':
-      return <PolyhedronList />;
-    case 'full':
-      return null;
-    default:
-      throw new Error('unknown tab');
-  }
-}
-
 export default class MobileViewer extends React.Component<Props> {
   header: *;
 
@@ -119,7 +93,12 @@ export default class MobileViewer extends React.Component<Props> {
 
   render() {
     const { panel, solid } = this.props;
-    const panelNode = renderPanel(panel, solid);
+    const panelNode = (
+      <Panels
+        panel={panel}
+        operationsPanel={() => <OperationsPanel solid={solid} />}
+      />
+    );
     return (
       <section className={styles('viewer')}>
         <div className={styles('title')}>

@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import { makeStyles } from 'styles';
 
 import { SrOnly } from 'components/common';
-import { InfoPanel, NavMenu, ConfigForm, PolyhedronList } from '../common';
+import { NavMenu, Panels } from '../common';
 import { scroll } from 'styles/common';
 
 import OperationsPanel from './OperationsPanel';
@@ -43,23 +43,6 @@ interface Props {
   compact?: boolean;
 }
 
-function renderPanel(panel) {
-  switch (panel) {
-    case 'info':
-      return <InfoPanel />;
-    case 'operations':
-      return <OperationsPanel />;
-    case 'options':
-      return <ConfigForm />;
-    case 'list':
-      return <PolyhedronList />;
-    case 'full':
-      return null;
-    default:
-      throw new Error('unknown tab');
-  }
-}
-
 export default class Sidebar extends Component<Props> {
   header: *;
 
@@ -86,7 +69,7 @@ export default class Sidebar extends Component<Props> {
                 {panel}
               </h2>
             </SrOnly>
-            {renderPanel(panel)}
+            <Panels panel={panel} operationsPanel={OperationsPanel} />
           </div>
         )}
       </section>
