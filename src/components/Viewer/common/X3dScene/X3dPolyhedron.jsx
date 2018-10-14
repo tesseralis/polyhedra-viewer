@@ -23,12 +23,7 @@ const joinListOfLists = (list: *, outerSep: string, innerSep: string) => {
 };
 
 const Coordinates = ({ points }) => {
-  // We pad the number of points in case we move from a solid with more vertices
-  // to one with less, so that x3dom does accidentally map an index to a non-existing point
-  const buffer = _.times(100, _.constant([0, 0, 0]));
-  const bufferedPoints = points.concat(buffer);
-
-  return <coordinate point={joinListOfLists(bufferedPoints, ', ', ' ')} />;
+  return <coordinate point={joinListOfLists(points, ', ', ' ')} />;
 };
 
 /* Edges */
