@@ -47,9 +47,9 @@ export default class X3dScene extends React.Component<Props> {
 
   render() {
     return (
-      <x3d className={styles('x3dScene')} ref={this.x3d}>
-        <scene>
-          <viewpoint position="0,0,5" />
+      <x3d is="x3d" class={styles('x3dScene')} ref={this.x3d}>
+        <scene is="x3d">
+          <viewpoint is="x3d" position="0,0,5" />
           {this.props.children}
         </scene>
       </x3d>

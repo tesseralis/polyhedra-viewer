@@ -23,15 +23,15 @@ const joinListOfLists = (list: *, outerSep: string, innerSep: string) => {
 };
 
 const Coordinates = ({ points }) => {
-  return <coordinate point={joinListOfLists(points, ', ', ' ')} />;
+  return <coordinate is="x3d" point={joinListOfLists(points, ', ', ' ')} />;
 };
 
 /* Edges */
 
 const Edges = ({ edges, vertices }) => {
   return (
-    <shape>
-      <indexedlineset coordindex={joinListOfLists(edges, ' -1 ', ' ')}>
+    <shape is="x3d">
+      <indexedlineset is="x3d" coordindex={joinListOfLists(edges, ' -1 ', ' ')}>
         <Coordinates points={vertices} />
       </indexedlineset>
     </shape>
@@ -77,22 +77,24 @@ export class X3dPolyhedron extends Component<PolyhedronProps, PolyhedronState> {
           // NOTE: The mouse handlers are duplicated to make it easy to test on enzyme.
           // They don't actually do anything in production
           <shape
+            is="x3d"
             ref={this.shape}
             onMouseDown={this.handleMouseDown}
             onMouseMove={this.handleMouseMove}
             onMouseUp={this.handleMouseUp}
             onMouseOut={this.handleMouseOut}
           >
-            <appearance>
-              <material transparency={1 - opacity} />
+            <appearance is="x3d">
+              <material is="x3d" transparency={1 - opacity} />
             </appearance>
             <indexedfaceset
+              is="x3d"
               solid={(!showInnerFaces).toString()}
               colorpervertex="false"
               coordindex={joinListOfLists(faces, ' -1 ', ' ')}
             >
               <Coordinates points={vertices} />
-              <color color={this.getColors()} />
+              <color is="x3d" color={this.getColors()} />
             </indexedfaceset>
           </shape>
         )}
