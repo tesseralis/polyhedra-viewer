@@ -48,7 +48,7 @@ function arrayDefaults(first, second) {
 
 const defaultState = {
   polyhedron: Polyhedron.get('tetrahedron'),
-  faceColors: [],
+  faceColors: null,
 };
 
 const actions = ['setPolyhedron', 'transitionPolyhedron', 'recenter', 'resize'];
@@ -75,9 +75,7 @@ class BasePolyhedronProvider extends PureComponent<*, *> {
   componentDidUpdate(prevProps) {
     const { name, disabled } = this.props;
     if (disabled && !prevProps.disabled) {
-      this.setState({
-        faceColors: [],
-      });
+      this.setState({ faceColors: null });
     }
 
     if (disabled && name !== prevProps.name) {
@@ -94,7 +92,12 @@ class BasePolyhedronProvider extends PureComponent<*, *> {
   }
 
   render() {
-    const value = { ...this.state, solidName: this.props.name };
+    const value = {
+      ...this.state,
+      solidName: this.props.name,
+      // TODO more secure way to calc this other than faceColors
+      isTransitioning: !!this.state.faceColors,
+    };
     return (
       <PolyhedronContext.Provider value={value}>
         {this.props.children}
@@ -120,7 +123,6 @@ class BasePolyhedronProvider extends PureComponent<*, *> {
 
     if (!enableAnimation || !animationData) {
       return this.setState({
-        // transitionApplied: true,
         polyhedron: result,
       });
     }
@@ -151,7 +153,7 @@ class BasePolyhedronProvider extends PureComponent<*, *> {
         onFinish: () => {
           this.setState({
             polyhedron: result,
-            faceColors: [],
+            faceColors: null,
           });
         },
       },
