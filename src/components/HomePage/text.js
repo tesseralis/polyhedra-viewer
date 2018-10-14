@@ -127,6 +127,7 @@ check out these links:
 * [Virtual Polyhedra] by George W. Hart - an extensive encyclopedia of polyhedra and the major
   inspiration for this site
 * [Visual Polyhedra] by David I. McCooey - More polyhedral models with extensive geometric data
+* [polyHédronisme] by Anselm Levskaya - Build complex polyhedra using Conway operations
 * [Polyhedra] by Stacy Speyer - Paper models of polyhedra and other artistic imaginings
 * [Johnson Solids] by Allison Chen - Diagrams categorizing the Johnson solids based on their operations
 * [4D Toys] - An interactive catalogue of 4D shapes
@@ -134,6 +135,7 @@ check out these links:
 
 [Virtual Polyhedra]: http://www.georgehart.com/virtual-polyhedra/vp.html
 [Visual Polyhedra]: http://dmccooey.com/polyhedra/
+[polyHédronisme]: http://levskaya.github.io/polyhedronisme/
 [Polyhedra]: http://polyhedra.stacyspeyer.net/
 [Johnson Solids]: http://portfolios.risd.edu/gallery/Johnson-Solids/8807383
 [4D Toys]: http://4dtoys.com/
