@@ -49,8 +49,6 @@ function arrayDefaults(first, second) {
 const defaultState = {
   polyhedron: Polyhedron.get('tetrahedron'),
   faceColors: [],
-  transitionApplied: false,
-  isTransitioning: false,
 };
 
 const actions = ['setPolyhedron', 'transitionPolyhedron', 'recenter', 'resize'];
@@ -69,8 +67,24 @@ class BasePolyhedronProvider extends PureComponent<*, *> {
     this.state = {
       ...defaultState,
       ..._.pick(this, actions),
-      setName: this.props.setName,
+      polyhedron: Polyhedron.get(props.name),
+      setName: props.setName,
     };
+  }
+
+  componentDidUpdate(prevProps) {
+    const { name, disabled } = this.props;
+    if (disabled && !prevProps.disabled) {
+      this.setState({
+        faceColors: [],
+      });
+    }
+
+    if (disabled && name !== prevProps.name) {
+      this.setState({
+        polyhedron: Polyhedron.get(name),
+      });
+    }
   }
 
   componentWillUnmount() {
@@ -87,18 +101,6 @@ class BasePolyhedronProvider extends PureComponent<*, *> {
       </PolyhedronContext.Provider>
     );
   }
-
-  setPolyhedron = (name: string, callback?: () => void) => {
-    this.setState(({ transitionApplied }) => {
-      if (transitionApplied) {
-        return { transitionApplied: false };
-      }
-      return {
-        polyhedron: Polyhedron.get(name),
-        faceColors: [],
-      };
-    }, callback);
-  };
 
   recenter = () => {
     this.setState(({ polyhedron }) => ({
@@ -118,7 +120,7 @@ class BasePolyhedronProvider extends PureComponent<*, *> {
 
     if (!enableAnimation || !animationData) {
       return this.setState({
-        transitionApplied: true,
+        // transitionApplied: true,
         polyhedron: result,
       });
     }
@@ -131,8 +133,6 @@ class BasePolyhedronProvider extends PureComponent<*, *> {
     const allColorStart = arrayDefaults(colorStart, colorEnd);
 
     this.setState({
-      transitionApplied: true,
-      isTransitioning: true,
       polyhedron: animationData.start,
       faceColors: allColorStart,
     });
@@ -152,7 +152,6 @@ class BasePolyhedronProvider extends PureComponent<*, *> {
           this.setState({
             polyhedron: result,
             faceColors: [],
-            isTransitioning: false,
           });
         },
       },

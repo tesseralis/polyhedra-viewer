@@ -32,7 +32,7 @@ export default class ViewerPage extends AppPage {
 
   expectOperation(operation: ?string) {
     const actual = this.wrapper.find('OpGrid').prop('opName');
-    expect(operation).toEqual(actual);
+    expect(actual).toEqual(operation);
     return this;
   }
 

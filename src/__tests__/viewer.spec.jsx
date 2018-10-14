@@ -50,15 +50,21 @@ describe('viewer', () => {
 
   it('unsets the operation when there are no more options', () => {
     setup('tetrahedron');
+    page.clickButtonWithText('rectify').expectTransitionTo('octahedron');
+  });
+
+  it('unsets the operation when clicking a different tab', () => {
+    setup('tetrahedron/operations');
     page
-      .clickButtonWithText('rectify')
-      .expectTransitionTo('octahedron')
-      .expectOperation('');
+      .clickButtonWithText('augment')
+      .clickLinkWithText('Options')
+      .expectNoElementWithText('p', 'Select a face')
+      .clickLinkWithText('Operations')
+      .expectNoElementWithText('p', 'Select a face');
   });
 
   it('can augment and diminish a tetrahedron', () => {
     setup('tetrahedron');
-
     page
       .clickButtonWithText('augment')
       .clickAnyFace()

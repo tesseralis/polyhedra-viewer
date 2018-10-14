@@ -45,6 +45,11 @@ export default class AppPage {
     return this;
   }
 
+  expectNoElementWithText(element: string, text: string) {
+    expect(this.findElementWithText(element, text)).toHaveLength(0);
+    return this;
+  }
+
   // Find a (not disabled) button with the given text
   findButtonWithText(text: string) {
     return this.wrapper
@@ -59,6 +64,15 @@ export default class AppPage {
 
   expectNoButtonWithText(text: string) {
     expect(this.findButtonWithText(text)).toHaveLength(0);
+    return this;
+  }
+
+  findLinkWithText(text: string) {
+    return this.wrapper.find('a').filterWhere(n => n.text() === text);
+  }
+
+  clickLinkWithText(text: string): this {
+    this.findLinkWithText(text).simulate('click', { button: 0 });
     return this;
   }
 }

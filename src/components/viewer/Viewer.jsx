@@ -8,7 +8,6 @@ import { OperationProvider, PolyhedronProvider } from './context';
 import DesktopViewer from './DesktopViewer';
 import MobileViewer from './MobileViewer';
 import { DeviceTracker } from 'components/DeviceContext';
-import SolidSync from './SolidSync';
 import { unescapeName } from 'polyhedra/names';
 
 interface InnerProps {
@@ -23,7 +22,7 @@ class InnerViewer extends PureComponent<InnerProps> {
     return (
       <Fragment>
         <PageTitle title={pageTitle} />
-        <SolidSync solid={solid} panel={panel} />
+        {/* <SolidSync solid={solid} panel={panel} /> */}
         <DeviceTracker
           renderDesktop={() => <DesktopViewer solid={solid} panel={panel} />}
           renderMobile={$ => <MobileViewer solid={solid} panel={panel} />}
@@ -41,23 +40,29 @@ interface Props {
 
 export default function Viewer({ solid, history, url }: Props) {
   return (
-    <PolyhedronProvider
-      name={solid}
-      setName={name => history.push(`/${name}/operations`)}
-    >
-      <OperationProvider>
-        <Route
-          exact
-          path={url}
-          render={() => <Redirect to={`${url}/operations`} />}
-        />
-        <Route
-          path={`${url}/:panel`}
-          render={({ match, history }) => (
-            <InnerViewer solid={solid} panel={match.params.panel || ''} />
-          )}
-        />
-      </OperationProvider>
-    </PolyhedronProvider>
+    <Fragment>
+      <Route
+        exact
+        path={url}
+        render={() => <Redirect to={`${url}/operations`} />}
+      />
+      <Route
+        path={`${url}/:panel`}
+        render={({ match, history }) => {
+          const { panel = '' } = match.params;
+          return (
+            <PolyhedronProvider
+              name={solid}
+              setName={name => history.push(`/${name}/operations`)}
+              disabled={panel !== 'operations'}
+            >
+              <OperationProvider disabled={panel !== 'operations'}>
+                <InnerViewer solid={solid} panel={panel || ''} />
+              </OperationProvider>
+            </PolyhedronProvider>
+          );
+        }}
+      />
+    </Fragment>
   );
 }

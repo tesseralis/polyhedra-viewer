@@ -28,6 +28,13 @@ export class OperationProvider extends Component<*, *> {
     };
   }
 
+  componentDidUpdate(prevProps: *) {
+    const { disabled } = this.props;
+    if (disabled && !prevProps.disabled) {
+      this.unsetOperation();
+    }
+  }
+
   render() {
     return (
       <OperationContext.Provider value={this.state}>
