@@ -50,4 +50,11 @@ export default class ViewerPage extends AppPage {
     expect(this.getPolyhedron().isSame(Polyhedron.get(expected))).toBe(true);
     return this;
   }
+
+  goBack() {
+    const viewer = this.wrapper.find('Viewer');
+    const history = viewer.prop('history');
+    history.goBack();
+    return this;
+  }
 }

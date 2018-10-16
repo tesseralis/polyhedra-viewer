@@ -50,7 +50,6 @@ export default () => (
         if (isAlternateName(solid)) {
           const fullName = escapeName(getCanonicalName(solid));
           const newPath = history.location.pathname.replace(solid, fullName);
-          console.log(solid, 'is alternate', fullName, newPath);
           return <Redirect to={newPath} />;
         }
         if (isValidSolid(solid)) {

@@ -163,4 +163,19 @@ describe('viewer', () => {
       .clickAnyFace()
       .expectTransitionTo('diminished-rhombicosidodecahedron');
   });
+
+  it('can go backwards in the url', () => {
+    setup('tetrahedron');
+    page
+      .clickButtonWithText('truncate')
+      .expectTransitionTo('truncated-tetrahedron')
+      .goBack()
+      .expectTransitionTo('tetrahedron');
+
+    expect(page.getPolyhedron().numFaces()).toEqual(4);
+
+    page
+      .clickButtonWithText('truncate')
+      .expectTransitionTo('truncated-tetrahedron');
+  });
 });
