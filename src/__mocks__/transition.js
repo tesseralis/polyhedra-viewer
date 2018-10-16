@@ -1,5 +1,11 @@
 // @flow strict
+import { interpolate } from 'd3-interpolate';
 
-// TODO more robust transition mock
-const transition = ({ onFinish }: *) => onFinish();
+const transition = ({ startValue, endValue, onFinish }: *, onUpdate: *) => {
+  const interp = interpolate(startValue, endValue);
+  onUpdate(interp(0));
+  onUpdate(interp(0.5));
+  onUpdate(interp(1));
+  onFinish();
+};
 module.exports = transition;
