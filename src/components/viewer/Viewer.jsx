@@ -22,7 +22,6 @@ class InnerViewer extends PureComponent<InnerProps> {
     return (
       <Fragment>
         <PageTitle title={pageTitle} />
-        {/* <SolidSync solid={solid} panel={panel} /> */}
         <DeviceTracker
           renderDesktop={() => <DesktopViewer solid={solid} panel={panel} />}
           renderMobile={$ => <MobileViewer solid={solid} panel={panel} />}
