@@ -1,7 +1,7 @@
 // @flow strict
 import _ from 'lodash';
 import { Polyhedron } from 'math/polyhedra';
-import { withOrigin } from 'math/linAlg';
+import { withOrigin } from 'math/geom';
 import { flatMap, repeat } from 'utils';
 import type { Twist } from 'types';
 import {

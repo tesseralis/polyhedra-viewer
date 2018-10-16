@@ -3,7 +3,7 @@ import _ from 'lodash';
 
 import { flatMapUniq } from 'utils';
 import { Polyhedron, Face } from 'math/polyhedra';
-import { PRECISION, getPlane, withOrigin } from 'math/linAlg';
+import { PRECISION, getPlane, withOrigin } from 'math/geom';
 import { getTransformedVertices } from '../operationUtils';
 
 export function getResizedVertices(

@@ -3,7 +3,7 @@ import _ from 'lodash';
 
 import { find } from 'utils';
 import { isValidSolid, getSolidData } from 'data';
-import { Vec3D, getCentroid } from 'math/linAlg';
+import { Vec3D, getCentroid } from 'math/geom';
 
 import type { SolidData } from './solidTypes';
 import Face from './Face';

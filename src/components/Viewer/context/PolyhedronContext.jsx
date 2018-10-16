@@ -5,7 +5,7 @@ import React, { PureComponent } from 'react';
 import { WithConfig } from 'components/ConfigContext';
 import transition from 'transition';
 import { Polyhedron } from 'math/polyhedra';
-import { PRECISION } from 'math/linAlg';
+import { PRECISION } from 'math/geom';
 import { mapObject } from 'utils';
 
 function getCoplanarFaces(polyhedron) {

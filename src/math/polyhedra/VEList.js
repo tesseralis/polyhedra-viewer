@@ -1,6 +1,6 @@
 // @flow strict
 import _ from 'lodash';
-import { Vec3D } from 'math/linAlg';
+import { Vec3D } from 'math/geom';
 
 import {
   PRECISION,
@@ -9,7 +9,7 @@ import {
   getCentroid,
   getNormal,
   getNormalRay,
-} from 'math/linAlg';
+} from 'math/geom';
 import { find } from 'utils';
 import Polyhedron from './Polyhedron';
 import Edge from './Edge';

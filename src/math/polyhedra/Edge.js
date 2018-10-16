@@ -1,5 +1,5 @@
 // @flow strict
-import { getMidpoint } from 'math/linAlg';
+import { getMidpoint } from 'math/geom';
 import Polyhedron from './Polyhedron';
 import Vertex, { VertexList } from './Vertex';
 

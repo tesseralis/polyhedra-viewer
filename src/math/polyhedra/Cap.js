@@ -3,7 +3,7 @@
 import _ from 'lodash';
 
 import { flatMapUniq } from 'utils';
-import { Vec3D } from 'math/linAlg';
+import { Vec3D } from 'math/geom';
 import Polyhedron from './Polyhedron';
 import Face from './Face';
 import Vertex, { VertexList } from './Vertex';

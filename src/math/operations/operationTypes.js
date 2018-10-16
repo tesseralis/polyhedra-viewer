@@ -1,6 +1,6 @@
 // @flow strict
 
-import { Vec3D } from 'math/linAlg';
+import { Vec3D } from 'math/geom';
 import { Polyhedron } from 'math/polyhedra';
 import type { VertexArg } from 'math/polyhedra';
 

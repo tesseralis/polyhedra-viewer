@@ -1,7 +1,7 @@
 // @flow strict
 import _ from 'lodash';
 import { allSolidNames } from 'data';
-import { PRECISION, isPlanar } from 'math/linAlg';
+import { PRECISION, isPlanar } from 'math/geom';
 import { applyOperation, getOperations, getOpResults } from './operations';
 import { Polyhedron, Cap } from 'math/polyhedra';
 import { operations } from 'math/operations';

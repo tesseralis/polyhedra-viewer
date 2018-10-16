@@ -2,12 +2,12 @@
 import _ from 'lodash';
 
 import { Polyhedron, Face, Cap } from 'math/polyhedra';
-import { isInverse, getOrthonormalTransform, PRECISION } from 'math/linAlg';
+import { isInverse, getOrthonormalTransform, PRECISION } from 'math/geom';
 import { getCyclic, getSingle } from 'utils';
 
 import { Operation } from '../operationTypes';
 import { hasMultiple } from './cutPasteUtils';
-import { withOrigin } from '../../linAlg';
+import { withOrigin } from '../../geom';
 
 const augmentees = {
   pyramid: {

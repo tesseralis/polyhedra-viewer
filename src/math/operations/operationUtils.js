@@ -10,7 +10,7 @@ import {
   normalizeVertex,
   VertexList,
 } from 'math/polyhedra';
-import { vec, Vec3D, PRECISION, type Transform } from 'math/linAlg';
+import { vec, Vec3D, PRECISION, type Transform } from 'math/geom';
 
 // Remove vertices (and faces) from the polyhedron when they are all the same
 function deduplicateVertices(polyhedron: Polyhedron) {

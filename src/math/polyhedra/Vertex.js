@@ -1,7 +1,7 @@
 // @flow strict
 import _ from 'lodash';
 import type { Point } from 'types';
-import { vec, Vec3D } from 'math/linAlg';
+import { vec, Vec3D } from 'math/geom';
 import type { VIndex } from './solidTypes';
 import Polyhedron from './Polyhedron';
 import Edge from './Edge';

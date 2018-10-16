@@ -2,7 +2,7 @@
 import _ from 'lodash';
 
 import { flatMap, repeat, find } from 'utils';
-import { withOrigin, PRECISION } from 'math/linAlg';
+import { withOrigin, PRECISION } from 'math/geom';
 import { Polyhedron } from 'math/polyhedra';
 
 function getFamily(polyhedron) {

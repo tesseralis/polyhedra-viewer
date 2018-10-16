@@ -3,7 +3,7 @@ import _ from 'lodash';
 import type { Twist } from 'types';
 import { find } from 'utils';
 import { Polyhedron, Cap } from 'math/polyhedra';
-import { withOrigin, isInverse } from 'math/linAlg';
+import { withOrigin, isInverse } from 'math/geom';
 import { getTwistSign, getTransformedVertices } from '../operationUtils';
 
 // Get antiprism height of a unit antiprism with n sides
