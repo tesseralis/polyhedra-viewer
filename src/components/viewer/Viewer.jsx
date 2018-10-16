@@ -54,7 +54,7 @@ export default function Viewer({ solid, history, url }: Props) {
             <PolyhedronProvider
               name={solid}
               setName={name => history.push(`/${name}/operations`)}
-              disabled={panel !== 'operations'}
+              disabled={panel !== 'operations' || history.action === 'POP'}
             >
               <OperationProvider disabled={panel !== 'operations'}>
                 <InnerViewer solid={solid} panel={panel || ''} />
