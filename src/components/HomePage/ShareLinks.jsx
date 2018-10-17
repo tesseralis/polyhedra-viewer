@@ -47,11 +47,6 @@ const links = [
     icon: 'reddit',
     name: 'Reddit',
   },
-  {
-    url: `https://plus.google.com/share?url=${url}&text=${title}`,
-    icon: 'google-plus',
-    name: 'Google Plus',
-  },
 ];
 
 export default function ShareLinks() {
