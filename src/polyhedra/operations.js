@@ -4,7 +4,7 @@ import _ from 'lodash';
 import { find } from 'utils';
 import { fromConwayNotation, toConwayNotation } from './names';
 import { Polyhedron } from 'math/polyhedra';
-import polyhedraGraph from './relationsGraph';
+import polyhedraGraph from './operationGraph';
 import type { OpName, OperationResult } from 'math/operations';
 
 export type { OpName } from 'math/operations';

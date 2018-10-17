@@ -1,10 +1,10 @@
 import _ from 'lodash';
-import graph from './relationsGraph';
+import graph from './operationGraph';
 import { allSolidNames } from 'data';
 import { toConwayNotation } from './names';
 
 // Tests on the relations graph, mostly focusing on edge cases
-describe('relationsGraph', () => {
+describe('operationGraph', () => {
   it('has an entry for every polyhedron', () => {
     _.forEach(allSolidNames, name => {
       const symbol = toConwayNotation(name);
