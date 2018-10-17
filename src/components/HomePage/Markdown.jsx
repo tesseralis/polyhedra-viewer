@@ -8,8 +8,6 @@ import { makeStyles, fonts } from 'styles';
 const listIndent = 20;
 
 const styles = makeStyles({
-  div: {},
-
   p: {
     fontSize: 16,
     fontFamily: fonts.times,
@@ -60,7 +58,6 @@ function makeRenderer(El, ownProps = {}) {
 }
 
 const renderers = {
-  root: makeRenderer('div'),
   paragraph: makeRenderer('p'),
   linkReference: makeRenderer('a', { target: '_blank', rel: 'noopener' }),
   list: makeRenderer('ul'),
