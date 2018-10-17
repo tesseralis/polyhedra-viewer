@@ -7,7 +7,7 @@
     "enzyme-adapter-react-16": "^1.6.0",
     "exports-loader": "^0.6.4",
     "file-loader": "^0.10.1",
-    "flow-bin": "^0.70.0",
+    "flow-bin": "^0.83.0",
     "json-loader": "^0.5.7",
     "react-scripts": "^1.1.4"
   },
