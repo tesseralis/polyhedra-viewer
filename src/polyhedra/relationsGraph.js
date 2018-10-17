@@ -108,7 +108,6 @@ function convertTable(table) {
   };
 }
 
-// const [, , prisms, , capstones, augmentations] = polyhedronTables
 const [prismMap, capstoneMap, augmentationMap] = [prisms, capstones, augmented]
   .map(convertTable)
   .map(getKeyedTable);
