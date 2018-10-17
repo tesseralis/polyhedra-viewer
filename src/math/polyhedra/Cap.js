@@ -39,15 +39,14 @@ function getBoundary(faces: Face[]) {
   return new VEList(_.map(result, 'v1'), result);
 }
 
-const withMapper = property => Base =>
-  class extends Base {
-    static getAll(polyhedron: Polyhedron) {
-      const mapper = _.get(polyhedron, property);
-      return (typeof mapper === 'function' ? mapper() : mapper)
-        .map(arg => new Base(polyhedron, arg))
-        .filter(cap => cap.isValid());
-    }
+function createMapper(property, Base) {
+  return (polyhedron: Polyhedron) => {
+    const mapper = _.get(polyhedron, property);
+    return (typeof mapper === 'function' ? mapper() : mapper)
+      .map(arg => new Base(polyhedron, arg))
+      .filter(cap => cap.isValid());
   };
+}
 
 export default class Cap implements VertexList {
   polyhedron: Polyhedron;
@@ -139,49 +138,46 @@ export default class Cap implements VertexList {
     return Cap.find(other, this.topPoint);
   }
 }
-const Pyramid = withMapper('vertices')(
-  class extends Cap {
-    constructor(polyhedron, vertex) {
-      super(polyhedron, [vertex], 'pyramid', vertex.vec, {
-        '3': vertex.adjacentEdges().length,
-      });
-    }
-  },
-);
 
-const Fastigium = withMapper('edges')(
-  class extends Cap {
-    constructor(polyhedron, edge) {
-      const config = { '3': 1, '4': 2 };
-      super(polyhedron, edge.vertices, 'fastigium', edge.midpoint(), config);
-    }
-  },
-);
+class Pyramid extends Cap {
+  constructor(polyhedron, vertex) {
+    super(polyhedron, [vertex], 'pyramid', vertex.vec, {
+      '3': vertex.adjacentEdges().length,
+    });
+  }
+  static getAll = createMapper('vertices', Pyramid);
+}
 
-const Cupola = withMapper('faces')(
-  class extends Cap {
-    constructor(polyhedron, face) {
-      super(
-        polyhedron,
-        face.vertices,
-        'cupola',
-        face.centroid(),
-        _.countBy([3, 4, 4, face.numSides]),
-      );
-    }
-  },
-);
+class Fastigium extends Cap {
+  constructor(polyhedron, edge) {
+    const config = { '3': 1, '4': 2 };
+    super(polyhedron, edge.vertices, 'fastigium', edge.midpoint(), config);
+  }
+  static getAll = createMapper('edges', Fastigium);
+}
 
-const Rotunda = withMapper('faces')(
-  class extends Cap {
-    constructor(polyhedron, face) {
-      super(
-        polyhedron,
-        flatMapUniq(face.vertices, v => v.adjacentVertices(), 'index'),
-        'rotunda',
-        face.centroid(),
-        { '5': 2, '3': 2 },
-      );
-    }
-  },
-);
+class Cupola extends Cap {
+  constructor(polyhedron, face) {
+    super(
+      polyhedron,
+      face.vertices,
+      'cupola',
+      face.centroid(),
+      _.countBy([3, 4, 4, face.numSides]),
+    );
+  }
+  static getAll = createMapper('faces', Cupola);
+}
+
+class Rotunda extends Cap {
+  constructor(polyhedron, face) {
+    super(
+      polyhedron,
+      flatMapUniq(face.vertices, v => v.adjacentVertices(), 'index'),
+      'rotunda',
+      face.centroid(),
+      { '5': 2, '3': 2 },
+    );
+  }
+  static getAll = createMapper('faces', Rotunda);
+}
