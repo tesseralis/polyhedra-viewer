@@ -11,11 +11,12 @@ import { WithPolyhedron } from '../../context';
 import SolidColors from './SolidColors';
 import HitOptions from './HitOptions';
 
-type SyntheticEventHandler = (e: $Subtype<SyntheticEvent<*>>) => void;
-
-interface SyntheticX3DMouseEvent extends SyntheticEvent<> {
+interface X3DEvent {
   hitPnt: Point;
 }
+
+// TODO this is hella sketchy; figure out this typing
+type X3DEventHandler = (e: X3DEvent) => void;
 
 // Join a list of lists with an inner and outer separator.
 const joinListOfLists = (list: *, outerSep: string, innerSep: string) => {
@@ -108,7 +109,7 @@ export class X3dPolyhedron extends Component<PolyhedronProps, PolyhedronState> {
   };
 
   // Manually adding event listeners swallows errors, so we have to store it in the component itself
-  wrapError = (fn: SyntheticEventHandler) => (event: SyntheticEvent<*>) => {
+  wrapError = (fn: X3DEventHandler) => (event: X3DEvent) => {
     try {
       fn(event);
     } catch (error) {
@@ -116,7 +117,7 @@ export class X3dPolyhedron extends Component<PolyhedronProps, PolyhedronState> {
     }
   };
 
-  addEventListener(type: string, fn: SyntheticEventHandler) {
+  addEventListener(type: string, fn: X3DEventHandler) {
     if (this.shape.current !== null) {
       this.shape.current.addEventListener(type, this.wrapError(fn));
     }
@@ -129,17 +130,17 @@ export class X3dPolyhedron extends Component<PolyhedronProps, PolyhedronState> {
     this.addEventListener('mouseout', this.handleMouseOut);
   };
 
-  handleMouseDown = (event: SyntheticX3DMouseEvent) => {
+  handleMouseDown = (event: X3DEvent) => {
     // logic to ensure drags aren't registered as clicks
     this.hitPnt = event.hitPnt;
   };
 
-  handleMouseUp = (event: SyntheticX3DMouseEvent) => {
+  handleMouseUp = (event: X3DEvent) => {
     if (!_.isEqual(this.hitPnt, event.hitPnt)) return;
     this.props.onClick(event.hitPnt);
   };
 
-  handleMouseMove = (event: SyntheticX3DMouseEvent) => {
+  handleMouseMove = (event: X3DEvent) => {
     this.hitPnt = event.hitPnt;
     this.props.onHover(event.hitPnt);
   };
