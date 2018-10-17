@@ -1,7 +1,6 @@
 // @flow strict
 import _ from 'lodash';
 
-import { find } from 'utils';
 import { fromConwayNotation, toConwayNotation } from './names';
 import { Polyhedron } from 'math/polyhedra';
 import polyhedraGraph from './operationGraph';
@@ -11,104 +10,80 @@ export type { OpName } from 'math/operations';
 
 interface Operation {
   name: OpName;
-  symbol: string;
   description: string;
 }
 
 export const operations: Operation[] = [
   {
     name: 'truncate',
-    symbol: 't',
     description: 'Cut and create a new face at each vertex.',
   },
   {
     name: 'rectify',
-    symbol: 'a',
     description: 'Cut (truncate) each vertex at the midpoint of each edge.',
   },
   {
     name: 'sharpen',
-    symbol: 'k',
     description: 'Opposite of truncation. Append a pyramid at certain faces.',
   },
   {
     name: 'dual',
-    symbol: 'd',
     description: 'Replace each face with a vertex.',
   },
   {
     name: 'expand',
-    symbol: 'e',
     description: 'Pull out faces, creating new square faces.',
   },
   {
     name: 'snub',
-    symbol: 's',
     description: 'Pull out and twist faces, creating new triangular faces.',
   },
   {
     name: 'contract',
-    symbol: 'c',
     description: 'Opposite of expand/snub. Shrink faces in, removing faces.',
   },
   {
     name: 'twist',
-    symbol: 'p',
     description:
       'Replace each square face with two triangular faces, or vice versa.',
   },
   {
     name: 'elongate',
-    symbol: 'P',
     description: 'Extend with a prism.',
   },
   {
     name: 'gyroelongate',
-    symbol: 'A',
     description: 'Extend with an antiprism.',
   },
   {
     name: 'shorten',
-    symbol: 'h',
     description: 'Remove a prism or antiprism',
   },
   {
     name: 'turn',
-    symbol: 'u',
     description: 'rotate a prism to an antiprism or vice versa',
   },
   {
     name: 'augment',
-    symbol: '+',
     description: 'Append a pyramid, cupola, or rotunda.',
   },
   {
     name: 'diminish',
-    symbol: '-',
     description: 'Remove a pyramid, cupola, or rotunda.',
   },
   {
     name: 'gyrate',
-    symbol: 'g',
     description: 'Rotate a cupola or rotunda.',
   },
 ];
 
-function getOpSymbol(name: OpName) {
-  return find(operations, { name }).symbol;
-}
-
-function getOpName(symbol: string) {
-  return find(operations, { symbol }).name;
-}
-
 // Get the operations that can be applied to the given solid
 export function getOperations(solid: string) {
-  return _.keys(polyhedraGraph[toConwayNotation(solid)]).map(getOpName);
+  return _.keys(polyhedraGraph[toConwayNotation(solid)]);
 }
 
 export function getOpResults(solid: string, opName: OpName) {
-  return polyhedraGraph[toConwayNotation(solid)][getOpSymbol(opName)];
+  return polyhedraGraph[toConwayNotation(solid)][opName];
 }
 
 const defaultAugmentees = {

@@ -41,13 +41,28 @@ function graphMergeAll(...objects) {
 }
 
 const getInverseOperation = operation => {
-  if ('dgpu'.includes(operation)) return operation;
-  if (operation === '+') return '-';
-  if (operation === '-') return '+';
-  if ('ta'.includes(operation)) return 'k';
-  if ('es'.includes(operation)) return 'c';
-  if ('PA'.includes(operation)) return 'h';
-  throw new Error(`Invalid operation: ${operation}`);
+  switch (operation) {
+    case 'dual':
+    case 'gyrate':
+    case 'twist':
+    case 'turn':
+      return operation;
+    case 'augment':
+      return 'diminish';
+    case 'diminish':
+      return 'augment';
+    case 'truncate':
+    case 'rectify':
+      return 'sharpen';
+    case 'expand':
+    case 'snub':
+      return 'contract';
+    case 'elongate':
+    case 'gyroelongate':
+      return 'shorten';
+    default:
+      throw new Error(`Invalid operation: ${operation}`);
+  }
 };
 
 function makeBidirectional(graph) {
@@ -70,7 +85,7 @@ function makeBidirectional(graph) {
           continue;
         }
         const newValue = { ...sink, value: source };
-        if (operation === 'g' && sink.direction) {
+        if (operation === 'gyrate' && sink.direction) {
           newValue.direction = 'back';
         }
         result[sinkValue][reverseOp].push(newValue);
@@ -190,58 +205,58 @@ const getElongations = (prism, antiprism) => (
   chiral,
 ) => {
   return {
-    P: { value: pValue },
-    A: { value: aValue, gyrate, chiral },
+    elongate: { value: pValue },
+    gyroelongate: { value: aValue, gyrate, chiral },
   };
 };
 
 const archimedean = {
   T: {
-    d: 'T',
-    t: 'tT',
-    a: 'O',
-    e: 'aC',
-    s: 'I',
+    dual: 'T',
+    truncate: 'tT',
+    rectify: 'O',
+    expand: 'aC',
+    snub: 'I',
   },
   C: {
-    d: 'O',
-    t: 'tC',
-    a: 'aC',
-    e: 'eC',
-    s: { value: 'sC', chiral: true },
+    dual: 'O',
+    truncate: 'tC',
+    rectify: 'aC',
+    expand: 'eC',
+    snub: { value: 'sC', chiral: true },
   },
   O: {
-    t: 'tO',
-    a: 'aC',
-    e: 'eC',
-    s: { value: 'sC', chiral: true },
+    truncate: 'tO',
+    rectify: 'aC',
+    expand: 'eC',
+    snub: { value: 'sC', chiral: true },
   },
   aC: {
     // TODO (possibly) coxeter snub (semi-snub) and rectify relations
-    t: 'bC',
-    p: 'I',
+    truncate: 'bC',
+    twist: 'I',
   },
   eC: {
-    p: { value: 'sC', chiral: true },
+    twist: { value: 'sC', chiral: true },
   },
   D: {
-    d: 'I',
-    t: 'tD',
-    a: 'aD',
-    e: 'eD',
-    s: { value: 'sD', chiral: true },
+    dual: 'I',
+    truncate: 'tD',
+    rectify: 'aD',
+    expand: 'eD',
+    snub: { value: 'sD', chiral: true },
   },
   I: {
-    t: 'tI',
-    a: 'aD',
-    e: 'eD',
-    s: { value: 'sD', chiral: true },
+    truncate: 'tI',
+    rectify: 'aD',
+    expand: 'eD',
+    snub: { value: 'sD', chiral: true },
   },
   aD: {
-    t: 'bD',
+    truncate: 'bD',
   },
   eD: {
-    p: { value: 'sD', chiral: true },
+    twist: { value: 'sD', chiral: true },
   },
 };
 
@@ -257,14 +272,14 @@ const baseCapstones = (() => {
     const using = getPyramidCupolaConway(pyramidRow);
     graph = graphMerge(graph, {
       [prism]: {
-        '+': [
+        augment: [
           { value: elongated, using },
           hasRotunda && { value: rotundaRow.elongated, using: 'R5' },
         ],
-        u: antiprism,
+        turn: antiprism,
       },
       [antiprism]: {
-        '+': [
+        augment: [
           { value: gyroelongated, using },
           hasRotunda && { value: rotundaRow.gyroelongated, using: 'R5' },
         ],
@@ -272,7 +287,7 @@ const baseCapstones = (() => {
     });
   });
   // for diminished icosahedra
-  graph['A5']['+'][0].align = 'para';
+  graph['A5']['augment'][0].align = 'para';
 
   _.forEach(capstoneMap, (row, name) => {
     const {
@@ -291,17 +306,17 @@ const baseCapstones = (() => {
     graph = graphMerge(graph, {
       [base]: {
         ...elongations(elongated, gyroelongated),
-        '+': augmentations(name, 'bi-'),
+        augment: augmentations(name, 'bi-'),
       },
       [elongated]: {
-        '+': augmentations(name, 'elongated bi-'),
-        u: gyroelongated,
+        augment: augmentations(name, 'elongated bi-'),
+        turn: gyroelongated,
       },
       [gyroelongated]: {
-        '+': augmentations(name, 'gyroelongated bi-'),
+        augment: augmentations(name, 'gyroelongated bi-'),
       },
       [gyroelongatedBi]: {
-        g: _.isArray(bi) ? { value: gyroelongatedBi } : null,
+        gyrate: _.isArray(bi) ? { value: gyroelongatedBi } : null,
       },
     });
 
@@ -309,7 +324,7 @@ const baseCapstones = (() => {
       graph = graphMerge(graph, {
         [bi]: elongations(elongatedBi, gyroelongatedBi),
         [elongatedBi]: {
-          u: gyroelongatedBi,
+          turn: gyroelongatedBi,
         },
       });
     } else {
@@ -319,10 +334,10 @@ const baseCapstones = (() => {
         [ortho]: elongations(elongBiOrtho, gyroelongatedBi, 'ortho', true),
         [gyro]: elongations(elongBiGyro, gyroelongatedBi, 'gyro', true),
         [elongBiOrtho]: {
-          u: { value: gyroelongatedBi, gyrate: 'ortho', chiral: true },
+          turn: { value: gyroelongatedBi, gyrate: 'ortho', chiral: true },
         },
         [elongBiGyro]: {
-          u: { value: gyroelongatedBi, gyrate: 'gyro', chiral: true },
+          turn: { value: gyroelongatedBi, gyrate: 'gyro', chiral: true },
         },
       });
     }
@@ -333,7 +348,7 @@ const baseCapstones = (() => {
         const [ortho, gyro] = cell;
         graph = graphMerge(graph, {
           [ortho]: {
-            g: gyro,
+            gyrate: gyro,
           },
         });
       }
@@ -377,13 +392,13 @@ const baseAugmentations = (() => {
     const augmentee = getAugmentee(name);
     graph = graphMerge(graph, {
       [base]: {
-        '+': { using: augmentee, value: augmented },
+        augment: { using: augmentee, value: augmented },
       },
       [augmented]: {
-        '+': getBiAugmented(biaugmented, augmentee),
+        augment: getBiAugmented(biaugmented, augmentee),
       },
       [_.isArray(biaugmented) ? biaugmented[1] : biaugmented]: {
-        '+': { using: augmentee, value: triaugmented },
+        augment: { using: augmentee, value: triaugmented },
       },
     });
   });
@@ -393,10 +408,10 @@ const baseAugmentations = (() => {
 const diminishedIcosahedra = (() => {
   return {
     J63: {
-      '+': [{ using: 'Y3', value: 'J64' }, { using: 'Y5', value: 'J62' }],
+      augment: [{ using: 'Y3', value: 'J64' }, { using: 'Y5', value: 'J62' }],
     },
     J62: {
-      '+': { using: 'Y5', align: 'meta', value: 'J11' },
+      augment: { using: 'Y5', align: 'meta', value: 'J11' },
     },
   };
 })();
@@ -409,57 +424,57 @@ const rhombicosidodecahedra = (() => {
   return {
     // tridiminished
     J83: {
-      '+': getAugment([
+      augment: getAugment([
         { value: 'J81', gyrate: 'gyro' },
         { value: 'J82', gyrate: 'ortho' },
       ]),
     },
     // bidiminished
     J81: {
-      '+': getAugment([
+      augment: getAugment([
         { value: 'J76', gyrate: 'gyro', align: 'meta' },
         { value: 'J78', gyrate: 'ortho' },
       ]),
-      g: getGyrate([{ value: 'J82' }]),
+      gyrate: getGyrate([{ value: 'J82' }]),
     },
     J82: {
-      '+': getAugment([
+      augment: getAugment([
         { value: 'J78', gyrate: 'gyro' },
         { value: 'J79', gyrate: 'ortho' },
       ]),
     },
     J80: {
-      '+': getAugment([
+      augment: getAugment([
         { value: 'J76', gyrate: 'gyro', align: 'para' },
         { value: 'J77', gyrate: 'ortho' },
       ]),
     },
     // diminished
     J76: {
-      '+': getAugment([
+      augment: getAugment([
         { value: 'eD', gyrate: 'gyro' },
         { value: 'J72', gyrate: 'ortho' },
       ]),
-      g: getGyrate([
+      gyrate: getGyrate([
         { value: 'J77', align: 'para' },
         { value: 'J78', align: 'meta' },
       ]),
     },
     J77: {
-      '+': getAugment([
+      augment: getAugment([
         { value: 'J72', gyrate: 'gyro', align: 'para' },
         { value: 'J73', gyrate: 'ortho' },
       ]),
     },
     J78: {
-      '+': getAugment([
+      augment: getAugment([
         { value: 'J72', gyrate: 'gyro', align: 'meta' },
         { value: 'J74', gyrate: 'ortho' },
       ]),
-      g: getGyrate([{ value: 'J79' }]),
+      gyrate: getGyrate([{ value: 'J79' }]),
     },
     J79: {
-      '+': getAugment([
+      augment: getAugment([
         { value: 'J74', gyrate: 'gyro' },
         { value: 'J75', gyrate: 'ortho' },
       ]),
@@ -467,16 +482,16 @@ const rhombicosidodecahedra = (() => {
 
     // gyrate
     eD: {
-      g: getGyrate([{ value: 'J72' }]),
+      gyrate: getGyrate([{ value: 'J72' }]),
     },
     J72: {
-      g: getGyrate([
+      gyrate: getGyrate([
         { value: 'J73', align: 'para' },
         { value: 'J74', align: 'meta' },
       ]),
     },
     J74: {
-      g: getGyrate([{ value: 'J75' }]),
+      gyrate: getGyrate([{ value: 'J75' }]),
     },
   };
 })();
@@ -488,17 +503,17 @@ const elementary = (() => {
     // TODO semisnub to create snub antiprisms
     // snub antiprisms
     // T: {
-    //   s: 'J84',
+    //   snub: 'J84',
     // },
     // A4: {
-    //   s: 'J85',
+    //   snub: 'J85',
     // },
     J84: {},
     J85: {},
 
     // other johnson solids
     J86: {
-      '+': { using: 'Y4', value: 'J87' },
+      augment: { using: 'Y4', value: 'J87' },
     },
   };
 })();

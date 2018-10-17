@@ -16,7 +16,7 @@ describe('operationGraph', () => {
   describe('archimedean', () => {
     it('has all archimedean operations to the platonic solids', () => {
       const platonic = ['T', 'C', 'O', 'D', 'I'];
-      const ops = ['d', 't', 'a', 'e', 's'];
+      const ops = ['dual', 'truncate', 'rectify', 'expand', 'snub'];
       platonic.forEach(solid => {
         ops.forEach(op => {
           expect(graph).toHaveProperty(`${solid}.${op}`, expect.anything());
@@ -25,20 +25,20 @@ describe('operationGraph', () => {
     });
 
     it("doesn't allow augmenting the octahedron", () => {
-      expect(graph.O).not.toHaveProperty('+');
+      expect(graph.O).not.toHaveProperty('augment');
     });
 
     it('has truncate operation on the rectification', () => {
       const rectified = ['O', 'aC', 'aD'];
       rectified.forEach(solid => {
-        expect(graph).toHaveProperty(`${solid}.t`, expect.anything());
+        expect(graph).toHaveProperty(`${solid}.truncate`, expect.anything());
       });
     });
 
     it('has twist operator on the expansion', () => {
       const rectified = ['aC', 'eC', 'eD'];
       rectified.forEach(solid => {
-        expect(graph).toHaveProperty(`${solid}.p`, expect.anything());
+        expect(graph).toHaveProperty(`${solid}.twist`, expect.anything());
       });
     });
   });
@@ -46,13 +46,13 @@ describe('operationGraph', () => {
   describe('pyramids and cupolae', () => {
     it('allows rotunda for decagonal anti/prism', () => {
       expect(graph.P10).toHaveProperty(
-        '+',
+        'augment',
         expect.arrayContaining([
           expect.objectContaining({ using: 'R5', value: 'J21' }),
         ]),
       );
       expect(graph.A10).toHaveProperty(
-        '+',
+        'augment',
         expect.arrayContaining([
           expect.objectContaining({ using: 'R5', value: 'J25' }),
         ]),
