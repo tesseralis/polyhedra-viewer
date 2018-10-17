@@ -53,6 +53,7 @@ export default class Cap implements VertexList {
   polyhedron: Polyhedron;
   _innerVertices: Vertex[];
   type: CapType;
+  topPoint: Vec3D;
 
   static find(polyhedron: Polyhedron, hitPoint: Vec3D) {
     const hitFace = polyhedron.hitFace(hitPoint);
@@ -62,7 +63,7 @@ export default class Cap implements VertexList {
     if (caps.length === 0) {
       return null;
     }
-    return _.minBy(caps, cap => cap.topPoint().distanceTo(hitPoint));
+    return _.minBy(caps, cap => cap.topPoint.distanceTo(hitPoint));
   }
 
   static getAll(polyhedron: Polyhedron) {
@@ -79,10 +80,16 @@ export default class Cap implements VertexList {
     return [];
   }
 
-  constructor(polyhedron: Polyhedron, innerVertices: Vertex[], type: CapType) {
+  constructor(
+    polyhedron: Polyhedron,
+    innerVertices: Vertex[],
+    type: CapType,
+    topPoint: Vec3D,
+  ) {
     this.polyhedron = polyhedron;
     this._innerVertices = innerVertices;
     this.type = type;
+    this.topPoint = topPoint;
   }
 
   innerVertices() {
@@ -96,10 +103,6 @@ export default class Cap implements VertexList {
   allVertices = _.once(() => {
     return _.concat(this.innerVertices(), this.boundary().vertices);
   });
-
-  topPoint(): Vec3D {
-    return new Vec3D();
-  }
 
   faceConfiguration: () => FaceConfiguration;
 
@@ -132,77 +135,50 @@ export default class Cap implements VertexList {
   }
 
   withPolyhedron(other: Polyhedron) {
-    return Cap.find(other, this.topPoint());
+    return Cap.find(other, this.topPoint);
   }
 }
 const Pyramid = withMapper('vertices')(
   class extends Cap {
-    vertex: Vertex;
-
     constructor(polyhedron, vertex) {
-      super(polyhedron, [vertex], 'pyramid');
-      this.vertex = vertex;
+      super(polyhedron, [vertex], 'pyramid', vertex.vec);
     }
 
     faceConfiguration = () => ({ '3': this.faces().length });
-
-    topPoint() {
-      return this.vertex.vec;
-    }
   },
 );
 
 const Fastigium = withMapper('edges')(
   class extends Cap {
-    edge: Edge;
-
     constructor(polyhedron, edge) {
-      super(polyhedron, edge.vertices, 'fastigium');
-      this.edge = edge;
+      super(polyhedron, edge.vertices, 'fastigium', edge.midpoint());
     }
 
     faceConfiguration = () => ({ '3': 1, '4': 2 });
-
-    topPoint() {
-      return this.edge.midpoint();
-    }
   },
 );
 
 const Cupola = withMapper('faces')(
   class extends Cap {
-    face: Face;
-
     constructor(polyhedron, face) {
-      super(polyhedron, face.vertices, 'cupola');
-      this.face = face;
+      super(polyhedron, face.vertices, 'cupola', face.centroid());
     }
 
     faceConfiguration = () => _.countBy([3, 4, 4, this.innerVertices().length]);
-
-    topPoint() {
-      return this.face.centroid();
-    }
   },
 );
 
 const Rotunda = withMapper('faces')(
   class extends Cap {
-    face: Face;
-
     constructor(polyhedron, face) {
       super(
         polyhedron,
         flatMapUniq(face.vertices, v => v.adjacentVertices(), 'index'),
         'rotunda',
+        face.centroid(),
       );
-      this.face = face;
     }
 
     faceConfiguration = () => ({ '5': 2, '3': 2 });
-
-    topPoint() {
-      return this.face.centroid();
-    }
   },
 );
