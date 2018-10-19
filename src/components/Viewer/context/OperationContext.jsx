@@ -3,7 +3,7 @@ import _ from 'lodash';
 import React, { Component } from 'react';
 
 import { mapObject } from 'utils';
-import { operations, applyOptionsFor, type OpName } from 'polyhedra/operations';
+import { operations, type OpName } from 'math/operations';
 
 const defaultState = {
   opName: '',
@@ -48,7 +48,8 @@ export class OperationProvider extends Component<*, *> {
   setOperation = (opName: OpName, solid: string) => {
     this.setState({
       opName,
-      options: applyOptionsFor(solid, opName),
+      // TODO should we just store the operation instead?
+      options: operations[opName].applyOptionsFor(solid),
     });
   };
 

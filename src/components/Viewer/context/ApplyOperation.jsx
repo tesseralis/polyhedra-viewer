@@ -1,8 +1,8 @@
 // @flow strict
 import _ from 'lodash';
 import { Component } from 'react';
-import { operations, type OpName } from 'math/operations';
-import { applyOperation, hasOptions } from 'polyhedra/operations';
+import { type OpName } from 'math/operations';
+import { operations } from 'math/operations';
 import connect from 'components/connect';
 import { WithPolyhedron } from './PolyhedronContext';
 import { WithOperation } from './OperationContext';
@@ -32,14 +32,13 @@ class ApplyOperation extends Component<*> {
 
     if (!operation) throw new Error('no operation defined');
 
-    const { result, name, animationData } = applyOperation(
-      operation,
+    const { result, name, animationData } = operation.apply(
       solidName,
       polyhedron,
       options,
     );
     if (!name) throw new Error('Name not found on new polyhedron');
-    if (!hasOptions(name, opName) || _.isEmpty(options)) {
+    if (!operation.hasOptions(name) || _.isEmpty(options)) {
       unsetOperation();
     } else {
       setOperation(opName, name);
@@ -54,11 +53,12 @@ class ApplyOperation extends Component<*> {
 
   selectOperation = (opName: OpName) => {
     const { solidName, unsetOperation, setOperation } = this.props;
+    const operation = operations[opName];
     if (opName === this.props.opName) {
       return unsetOperation();
     }
 
-    if (!hasOptions(solidName, opName)) {
+    if (!operation.hasOptions(solidName)) {
       this.applyOperation(opName);
     } else {
       setOperation(opName, solidName);

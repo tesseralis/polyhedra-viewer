@@ -1,7 +1,9 @@
 // @flow strict
 import _ from 'lodash';
 
+import { fromConwayNotation, toConwayNotation } from 'polyhedra/names';
 import type { OpName } from './operationTypes';
+import operationGraph from './operationGraph';
 import type { Point, Twist } from 'types';
 import {
   Polyhedron,
@@ -11,6 +13,10 @@ import {
   VertexList,
 } from 'math/polyhedra';
 import { vec, Vec3D, PRECISION, type Transform } from 'math/geom';
+
+export function getOperations(solid: string) {
+  return _.keys(operationGraph[toConwayNotation(solid)]);
+}
 
 // Remove vertices (and faces) from the polyhedron when they are all the same
 function deduplicateVertices(polyhedron: Polyhedron) {
@@ -129,6 +135,7 @@ const methodDefaults = {
   getAllOptions: [undefined],
   getSearchOptions: undefined,
   getSelectState: [],
+  applyOptionsFor: {},
 };
 
 function fillDefaults(op) {
@@ -169,6 +176,33 @@ interface Operation<Options = {}> {
   getSelectState(polyhedron: Polyhedron, options: Options): SelectState[];
 }
 
+export function getOpResults(solid: string, opName: string) {
+  return operationGraph[toConwayNotation(solid)][opName];
+}
+
+// Get the polyhedron name as a result of applying the operation to the given polyhedron
+function getNextPolyhedron<O>(solid: string, operation: OpName, filterOpts: O) {
+  const results = getOpResults(solid, operation);
+  const next = _(results)
+    .filter(!_.isEmpty(filterOpts) ? filterOpts : _.stubTrue)
+    .value();
+  if (next.length > 1) {
+    throw new Error(
+      `Multiple possibilities found for operation ${operation} on ${solid} with options ${JSON.stringify(
+        filterOpts,
+      )}: ${JSON.stringify(next)}`,
+    );
+  } else if (next.length === 0) {
+    throw new Error(
+      `No possibilities found for operation ${operation} on ${solid} with options ${JSON.stringify(
+        filterOpts,
+      )}. Are you sure you didn't put in too many?`,
+    );
+  }
+
+  return fromConwayNotation(next[0].value);
+}
+
 export function normalizeOperation(op: *, name: OpName): Operation<*> {
   const withDefaults = fillDefaults(
     typeof op === 'function' ? { apply: op } : op,
@@ -176,14 +210,25 @@ export function normalizeOperation(op: *, name: OpName): Operation<*> {
   return {
     ...withDefaults,
     name,
-    apply(polyhedron, options) {
+    apply(solidName, polyhedron, options = {}) {
+      const relations = getOpResults(solidName, name);
+      const searchOptions = withDefaults.getSearchOptions(
+        polyhedron,
+        options,
+        relations,
+      );
+
+      const next = getNextPolyhedron(solidName, name, _.pickBy(searchOptions));
+
       const opResult = withDefaults.apply(polyhedron, options);
       if (!opResult.animationData) {
-        return { result: deduplicateVertices(opResult) };
+        return { name: next, result: deduplicateVertices(opResult) };
       }
       const { result, animationData } = opResult;
       const { start, endVertices } = animationData;
+
       return {
+        name: next,
         result: result || deduplicateVertices(start.withVertices(endVertices)),
         animationData: {
           start,
@@ -193,6 +238,33 @@ export function normalizeOperation(op: *, name: OpName): Operation<*> {
     },
     getHitOption(polyhedron, hitPnt, options) {
       return withDefaults.getHitOption(polyhedron, vec(hitPnt), options);
+    },
+    resultsFor(solid) {
+      return getOpResults(solid, name);
+    },
+    hasOptions(solid) {
+      const relations = getOpResults(solid, name);
+      if (_.isEmpty(relations)) return false;
+      // TODO should this be split up among operations
+      switch (name) {
+        case 'turn':
+          return relations.length > 1 || !!_.find(relations, 'chiral');
+        case 'twist':
+          return relations[0].value[0] === 's';
+        case 'snub':
+        case 'gyroelongate':
+          return !!_.find(relations, 'chiral');
+        case 'sharpen':
+        case 'contract':
+        case 'shorten':
+          return relations.length > 1;
+        case 'augment':
+        case 'diminish':
+        case 'gyrate':
+          return true;
+        default:
+          return false;
+      }
     },
   };
 }

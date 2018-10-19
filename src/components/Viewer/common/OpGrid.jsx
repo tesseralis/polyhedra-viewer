@@ -1,11 +1,12 @@
 // @flow strict
 import _ from 'lodash';
 import React from 'react';
-import { makeStyles } from 'styles';
 
+import { flatMap } from 'utils';
+import { makeStyles } from 'styles';
 import { media, fonts } from 'styles';
 import { hover, scroll } from 'styles/common';
-import { operations, opList } from 'polyhedra/operations';
+import { operations } from 'math/operations';
 import connect from 'components/connect';
 import {
   ApplyOperation,
@@ -14,6 +15,15 @@ import {
 } from 'components/Viewer/context';
 import OperationIcon from './OperationIcon';
 
+const opLayout = [
+  ['truncate', 'rectify', 'sharpen', 'dual'],
+  ['expand', 'snub', 'contract', 'twist'],
+  ['elongate', 'gyroelongate', 'shorten', 'turn'],
+  ['augment', 'augment', 'diminish', 'gyrate'],
+];
+
+const opList = flatMap(opLayout, line => _.uniq(line));
+
 const styles = makeStyles({
   opGrid: {
     [media.notMobile]: {
@@ -21,14 +31,8 @@ const styles = makeStyles({
       justifyContent: 'space-around',
       gridColumnGap: 5,
       gridRowGap: 20,
-      // TODO encode the ordering in the actual operation types
       gridTemplateRows: 'repeat(4, 80px)',
-      gridTemplateAreas: `
-      "truncate rectify      sharpen dual"
-      "expand   snub         contract twist"
-      "elongate gyroelongate shorten  turn"
-      "augment  augment      diminish gyrate"
-    `,
+      gridTemplateAreas: opLayout.map(line => `"${line.join(' ')}"`).join('\n'),
     },
     [media.mobile]: {
       ...scroll('x'),
@@ -84,7 +88,7 @@ function OpButton({ name, highlighted, ...btnProps }) {
 function OpGrid({ isTransitioning, solidName, opName, selectOperation }) {
   return (
     <div className={styles('opGrid')}>
-      {opList.map(({ name }) => (
+      {opList.map(name => (
         <OpButton
           key={name}
           name={name}

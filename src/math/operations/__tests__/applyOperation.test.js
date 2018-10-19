@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import { allSolidNames } from 'data';
-import { operations, applyOperation, getOperations } from '../operations';
+import { getOperations } from '../operationUtils';
+import { operations } from '..';
 import { Polyhedron } from 'math/polyhedra';
 import { setupOperations } from '../operationTestUtils';
 
@@ -25,12 +26,7 @@ describe('applyOperation', () => {
         const operation = operations[opName];
         const optsToTest = getOptsToTest(operation, solidName, polyhedron);
         optsToTest.forEach(options => {
-          const result = applyOperation(
-            operation,
-            solidName,
-            polyhedron,
-            options,
-          );
+          const result = operation.apply(solidName, polyhedron, options);
           expect(result).toBeValidPolyhedron();
         });
       });

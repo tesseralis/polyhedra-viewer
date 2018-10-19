@@ -1,7 +1,6 @@
 // @flow strict
 import React from 'react';
 import { makeStyles } from 'styles';
-import { getUsingOpts } from 'polyhedra/operations';
 
 import { WithOperation } from 'components/Viewer/context';
 import OptionIcon from './OptionIcon';
@@ -53,12 +52,13 @@ const getOptionName = optValue => {
 };
 
 interface Props {
+  operation: *;
   options: *;
   solid: string;
   onClickOption(option: string, value: string): void;
 }
 
-function AugmentOptions({ options, solid, onClickOption }: Props) {
+function AugmentOptions({ operation, options, solid, onClickOption }: Props) {
   const { gyrate, using } = options;
   const optionArgs = [
     {
@@ -70,7 +70,7 @@ function AugmentOptions({ options, solid, onClickOption }: Props) {
     },
     {
       name: 'using',
-      values: getUsingOpts(solid),
+      values: operation.getUsingOpts(solid),
       value: using,
       description: 'Some solids have more than one option to augment a face.',
     },
@@ -102,8 +102,13 @@ function AugmentOptions({ options, solid, onClickOption }: Props) {
 
 export default (props: *) => (
   <WithOperation>
-    {({ options, setOption }) => (
-      <AugmentOptions {...props} options={options} onClickOption={setOption} />
+    {({ operation, options, setOption }) => (
+      <AugmentOptions
+        {...props}
+        operation={operation}
+        options={options}
+        onClickOption={setOption}
+      />
     )}
   </WithOperation>
 );

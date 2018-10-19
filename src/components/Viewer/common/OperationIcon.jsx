@@ -3,7 +3,7 @@ import _ from 'lodash';
 import React, { PureComponent, Fragment } from 'react';
 import { makeStyles } from 'styles';
 
-import { type OpName } from 'polyhedra/operations';
+import { type OpName } from 'math/operations';
 import { Polygon, PolyLine } from 'components/svg';
 const { sqrt } = Math;
 

@@ -6,6 +6,7 @@ import { isInverse, getOrthonormalTransform, PRECISION } from 'math/geom';
 import { getCyclic, getSingle } from 'utils';
 
 import { Operation } from '../operationTypes';
+import { getOpResults } from '../operationUtils';
 import { hasMultiple } from './cutPasteUtils';
 import { withOrigin } from '../../geom';
 
@@ -37,6 +38,8 @@ const augmentTypes = {
   U: 'cupola',
   R: 'rotunda',
 };
+
+const usingTypeOrder = ['Y', 'U', 'R'];
 
 function getAugmentAlignment(polyhedron, face) {
   const boundary = getSingle(Cap.getAll(polyhedron)).boundary();
@@ -240,10 +243,20 @@ function defaultAugmentType(numSides) {
   return numSides <= 5 ? 'pyramid' : 'cupola';
 }
 
-function defaultAugmentee(numSides: number) {
-  const type = defaultAugmentType(numSides);
-  return type === 'pyramid' ? 'Y' + numSides : 'U' + numSides / 2;
-}
+const defaultAugmentees = {
+  '3': 'Y3',
+  '4': 'Y4',
+  '5': 'Y5',
+  '6': 'U3',
+  '8': 'U4',
+  '10': 'U5',
+};
+
+const augmenteeSides = {
+  ..._.invert(defaultAugmentees),
+  U2: 4,
+  R5: 10,
+};
 
 function getAugmenteeNumSides(using: string) {
   const prefix = using[0];
@@ -254,8 +267,22 @@ function getAugmenteeNumSides(using: string) {
 export function getUsingOpt(using: ?string, numSides: number) {
   return typeof using === 'string' && getAugmenteeNumSides(using) === numSides
     ? using
-    : defaultAugmentee(numSides);
+    : defaultAugmentees[numSides];
 }
+
+function hasMultipleOptionsForFace(relations) {
+  return _.some(relations, relation =>
+    _.includes(['U2', 'R5'], relation.using),
+  );
+}
+
+const getUsingOpts = solid => {
+  const augments = getOpResults(solid, 'augment');
+  const using = _.uniq(_.map(augments, 'using'));
+  const grouped = _.groupBy(using, option => augmenteeSides[option]);
+  const opts = _.find(grouped, group => group.length > 1) || [];
+  return _.sortBy(opts, using => usingTypeOrder.indexOf(using[0]));
+};
 
 export const augment: Operation<AugmentOptions> = {
   apply(polyhedron, { face, gyrate, using } = {}) {
@@ -335,5 +362,20 @@ export const augment: Operation<AugmentOptions> = {
       if (using && canAugmentWithType(f, augmentTypes[using[0]]))
         return 'selectable';
     });
+  },
+
+  getUsingOpts,
+
+  applyOptionsFor(solid) {
+    if (!solid) return;
+    const results = getOpResults(solid, 'augment');
+    const newOpts = {};
+    if (_.filter(results, 'gyrate').length > 1) {
+      newOpts.gyrate = 'gyro';
+    }
+    if (hasMultipleOptionsForFace(results)) {
+      newOpts.using = getUsingOpts(solid)[0];
+    }
+    return newOpts;
   },
 };
