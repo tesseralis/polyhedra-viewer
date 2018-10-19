@@ -10,8 +10,12 @@ import {
   getType,
   toConwayNotation,
   getAlternateNames,
-} from 'polyhedra/names';
-import { getSymmetry, getSymmetryName, getOrder } from 'polyhedra/symmetry';
+} from 'math/polyhedra/names';
+import {
+  getSymmetry,
+  getSymmetryName,
+  getOrder,
+} from 'math/polyhedra/symmetry';
 
 import connect from 'components/connect';
 import { WithPolyhedron } from 'components/Viewer/context';

@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 
 import { Icon } from 'components/common';
-import { escapeName } from 'polyhedra/names';
+import { escapeName } from 'math/polyhedra/names';
 import { hover } from 'styles/common';
 import { makeStyles, media } from 'styles';
 

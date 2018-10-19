@@ -1,7 +1,7 @@
 // @flow strict
 import _ from 'lodash';
 
-import { fromConwayNotation, toConwayNotation } from 'polyhedra/names';
+import { fromConwayNotation, toConwayNotation } from 'math/polyhedra/names';
 import type { OpName } from './operationTypes';
 import operationGraph from './operationGraph';
 import type { Point, Twist } from 'types';
@@ -203,6 +203,22 @@ function getNextPolyhedron<O>(solid: string, operation: OpName, filterOpts: O) {
   return fromConwayNotation(next[0].value);
 }
 
+function normalizeOpResult(opResult) {
+  if (!opResult.animationData) {
+    return { result: deduplicateVertices(opResult) };
+  }
+  const { result, animationData } = opResult;
+  const { start, endVertices } = animationData;
+
+  return {
+    result: result || deduplicateVertices(start.withVertices(endVertices)),
+    animationData: {
+      start,
+      endVertices: endVertices.map(normalizeVertex),
+    },
+  };
+}
+
 export function normalizeOperation(op: *, name: OpName): Operation<*> {
   const withDefaults = fillDefaults(
     typeof op === 'function' ? { apply: op } : op,
@@ -211,29 +227,20 @@ export function normalizeOperation(op: *, name: OpName): Operation<*> {
     ...withDefaults,
     name,
     apply(solidName, polyhedron, options = {}) {
+      // get the next polyhedron name
       const relations = getOpResults(solidName, name);
       const searchOptions = withDefaults.getSearchOptions(
         polyhedron,
         options,
         relations,
       );
-
       const next = getNextPolyhedron(solidName, name, _.pickBy(searchOptions));
 
+      // Get the actual operation result
       const opResult = withDefaults.apply(polyhedron, options);
-      if (!opResult.animationData) {
-        return { name: next, result: deduplicateVertices(opResult) };
-      }
-      const { result, animationData } = opResult;
-      const { start, endVertices } = animationData;
-
       return {
+        ...normalizeOpResult(opResult),
         name: next,
-        result: result || deduplicateVertices(start.withVertices(endVertices)),
-        animationData: {
-          start,
-          endVertices: endVertices.map(normalizeVertex),
-        },
       };
     },
     getHitOption(polyhedron, hitPnt, options) {
@@ -245,7 +252,7 @@ export function normalizeOperation(op: *, name: OpName): Operation<*> {
     hasOptions(solid) {
       const relations = getOpResults(solid, name);
       if (_.isEmpty(relations)) return false;
-      // TODO should this be split up among operations
+      // TODO should this be split up among operations?
       switch (name) {
         case 'turn':
           return relations.length > 1 || !!_.find(relations, 'chiral');

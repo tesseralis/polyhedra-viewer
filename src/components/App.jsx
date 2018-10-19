@@ -11,7 +11,7 @@ import {
   fromConwayNotation,
   isAlternateName,
   getCanonicalName,
-} from 'polyhedra/names';
+} from 'math/polyhedra/names';
 
 import ErrorPage from './ErrorPage';
 import Loading from './Loading';

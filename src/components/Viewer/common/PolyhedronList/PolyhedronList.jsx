@@ -4,7 +4,7 @@ import { NavLink, Route } from 'react-router-dom';
 import { makeStyles } from 'styles';
 
 import { groups } from 'data';
-import { escapeName } from 'polyhedra/names';
+import { escapeName } from 'math/polyhedra/names';
 import { andaleMono } from 'styles/fonts';
 import { resetLink, hover } from 'styles/common';
 

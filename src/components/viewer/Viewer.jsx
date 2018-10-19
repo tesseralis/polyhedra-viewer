@@ -8,7 +8,7 @@ import { OperationProvider, PolyhedronProvider } from './context';
 import DesktopViewer from './DesktopViewer';
 import MobileViewer from './MobileViewer';
 import { DeviceTracker } from 'components/DeviceContext';
-import { unescapeName } from 'polyhedra/names';
+import { unescapeName } from 'math/polyhedra/names';
 
 interface InnerProps {
   solid: string;

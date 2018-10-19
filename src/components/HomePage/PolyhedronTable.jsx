@@ -3,7 +3,7 @@ import React from 'react';
 import _ from 'lodash';
 
 import { flatMap } from 'utils';
-import { fromConwayNotation } from 'polyhedra/names';
+import { fromConwayNotation } from 'math/polyhedra/names';
 import { type Table } from 'constants/polyhedronTables';
 import PolyhedronLink from './PolyhedronLink';
 import { makeStyles, media, fonts } from 'styles';

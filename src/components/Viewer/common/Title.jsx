@@ -2,7 +2,7 @@ import _ from 'lodash';
 import React from 'react';
 import { makeStyles } from 'styles';
 
-import { unescapeName } from 'polyhedra/names';
+import { unescapeName } from 'math/polyhedra/names';
 import { media, fonts } from 'styles';
 
 const styles = makeStyles({

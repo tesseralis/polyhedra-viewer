@@ -3,7 +3,7 @@ import * as React from 'react';
 import JSZip from 'jszip';
 import FileSaver from 'file-saver';
 
-import { escapeName } from 'polyhedra/names';
+import { escapeName } from 'math/polyhedra/names';
 import { allSolidNames } from 'data';
 import { WithPolyhedron } from '../context';
 
