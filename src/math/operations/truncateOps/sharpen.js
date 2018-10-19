@@ -73,7 +73,7 @@ function getVertexToAdd(polyhedron, face) {
 
 function applysharpen(
   polyhedron: Polyhedron,
-  { faceType = polyhedron.smallestFace().numSides }: sharpenOptions = {},
+  { faceType = polyhedron.smallestFace().numSides }: SharpenOptions = {},
 ) {
   // face indices with the right number of sides
   let sharpenFaces = getsharpenFaces(polyhedron, faceType);
