@@ -1,8 +1,7 @@
 import _ from 'lodash';
 import { allSolidNames } from 'data';
-import { applyOperation, getOperations, getOpResults } from '../operations';
+import { operations, applyOperation, getOperations } from '../operations';
 import { Polyhedron } from 'math/polyhedra';
-import { operations } from 'math/operations';
 import { setupOperations } from '../operationTestUtils';
 
 setupOperations();
@@ -10,7 +9,7 @@ setupOperations();
 const excludedOperations = {};
 
 function getOptsToTest(operation, name, polyhedron) {
-  const relations = getOpResults(name, operation.name);
+  const relations = operation.resultsFor(name);
   return operation.getAllOptions(polyhedron, relations) || [undefined];
 }
 

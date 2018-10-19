@@ -1,11 +1,11 @@
 // @flow strict
 import _ from 'lodash';
-import React, { Component } from 'react';
+import React from 'react';
 import { makeStyles } from 'styles';
 
 import { media, fonts } from 'styles';
 import { hover, scroll } from 'styles/common';
-import { getOpResults, operations } from 'polyhedra/operations';
+import { operations, opList } from 'polyhedra/operations';
 import connect from 'components/connect';
 import {
   ApplyOperation,
@@ -68,36 +68,33 @@ const styles = makeStyles({
   },
 });
 
-function isEnabled(solid, operation) {
-  return !!getOpResults(solid, operation);
+function OpButton({ name, highlighted, ...btnProps }) {
+  return (
+    <button
+      {...btnProps}
+      className={styles('operationButton', highlighted && 'isHighlighted')}
+      style={{ gridArea: name }}
+    >
+      <OperationIcon name={name} />
+      {name}
+    </button>
+  );
 }
 
-class OpGrid extends Component<*> {
-  render() {
-    const { isTransitioning, solidName, opName, selectOperation } = this.props;
-
-    return (
-      <div className={styles('opGrid')}>
-        {operations.map(({ name }) => {
-          return (
-            <button
-              key={name}
-              className={styles(
-                'operationButton',
-                opName === name && 'isHighlighted',
-              )}
-              style={{ gridArea: name }}
-              disabled={!isEnabled(solidName, name) || isTransitioning}
-              onClick={() => selectOperation(name)}
-            >
-              <OperationIcon name={name} />
-              {name}
-            </button>
-          );
-        })}
-      </div>
-    );
-  }
+function OpGrid({ isTransitioning, solidName, opName, selectOperation }) {
+  return (
+    <div className={styles('opGrid')}>
+      {opList.map(({ name }) => (
+        <OpButton
+          key={name}
+          name={name}
+          highlighted={opName === name}
+          onClick={() => selectOperation(name)}
+          disabled={!operations[name].resultsFor(solidName) || isTransitioning}
+        />
+      ))}
+    </div>
+  );
 }
 
 export default _.flow([

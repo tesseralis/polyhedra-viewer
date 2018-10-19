@@ -5,6 +5,7 @@ import { fromConwayNotation, toConwayNotation } from './names';
 import { Polyhedron } from 'math/polyhedra';
 import polyhedraGraph from './operationGraph';
 import type { OpName, OperationResult } from 'math/operations';
+import { operations as baseOperations } from 'math/operations';
 
 export type { OpName } from 'math/operations';
 
@@ -13,7 +14,7 @@ interface Operation {
   description: string;
 }
 
-export const operations: Operation[] = [
+export const opList: Operation[] = [
   {
     name: 'truncate',
     description: 'Cut and create a new face at each vertex.',
@@ -199,3 +200,12 @@ export function applyOperation(
   }
   return { name: next, ...operation.apply(polyhedron, config) };
 }
+
+export const operations = _.mapValues(baseOperations, (props, opName) => {
+  return {
+    ...props,
+    resultsFor(solid) {
+      return polyhedraGraph[toConwayNotation(solid)][opName];
+    },
+  };
+});

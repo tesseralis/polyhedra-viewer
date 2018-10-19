@@ -3,11 +3,9 @@ import _ from 'lodash';
 import React, { Component } from 'react';
 
 import { mapObject } from 'utils';
-import { operations } from 'math/operations';
-import { applyOptionsFor, type OpName } from 'polyhedra/operations';
+import { operations, applyOptionsFor, type OpName } from 'polyhedra/operations';
 
 const defaultState = {
-  operation: undefined,
   opName: '',
   options: {},
 };
@@ -36,8 +34,12 @@ export class OperationProvider extends Component<*, *> {
   }
 
   render() {
+    const value = {
+      ...this.state,
+      operation: operations[this.state.opName],
+    };
     return (
-      <OperationContext.Provider value={this.state}>
+      <OperationContext.Provider value={value}>
         {this.props.children}
       </OperationContext.Provider>
     );
@@ -46,7 +48,6 @@ export class OperationProvider extends Component<*, *> {
   setOperation = (opName: OpName, solid: string) => {
     this.setState({
       opName,
-      operation: operations[opName],
       options: applyOptionsFor(solid, opName),
     });
   };
@@ -54,7 +55,6 @@ export class OperationProvider extends Component<*, *> {
   unsetOperation = () => {
     this.setState({
       opName: '',
-      operation: undefined,
       options: undefined,
     });
   };
