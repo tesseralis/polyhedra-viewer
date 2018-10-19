@@ -71,7 +71,7 @@ function getVertexToAdd(polyhedron, face) {
   return face.normalRay().getPointAtDistance(dist);
 }
 
-function applysharpen(
+function applySharpen(
   polyhedron: Polyhedron,
   { faceType = polyhedron.smallestFace().numSides }: SharpenOptions = {},
 ) {
@@ -111,7 +111,7 @@ function applysharpen(
 }
 
 export const sharpen: Operation<SharpenOptions> = {
-  apply: applysharpen,
+  apply: applySharpen,
 
   getSearchOptions(polyhedron, config) {
     const { faceType } = config;
