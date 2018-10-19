@@ -85,7 +85,7 @@ function OpButton({ name, highlighted, ...btnProps }) {
   );
 }
 
-function OpGrid({ isTransitioning, solidName, opName, selectOperation }) {
+function OpGrid({ isTransitioning, polyhedron, opName, selectOperation }) {
   return (
     <div className={styles('opGrid')}>
       {opList.map(name => (
@@ -94,7 +94,7 @@ function OpGrid({ isTransitioning, solidName, opName, selectOperation }) {
           name={name}
           highlighted={opName === name}
           onClick={() => selectOperation(name)}
-          disabled={!operations[name].resultsFor(solidName) || isTransitioning}
+          disabled={!operations[name].resultsFor(polyhedron) || isTransitioning}
         />
       ))}
     </div>
@@ -104,7 +104,7 @@ function OpGrid({ isTransitioning, solidName, opName, selectOperation }) {
 export default _.flow([
   connect(
     WithPolyhedron,
-    ['solidName', 'isTransitioning'],
+    ['polyhedron', 'isTransitioning'],
   ),
   connect(
     ApplyOperation,

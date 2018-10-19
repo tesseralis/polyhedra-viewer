@@ -7,14 +7,14 @@ import connect from 'components/connect';
 import TwistOptions from './TwistOptions';
 import AugmentOptions from './AugmentOptions';
 
-function Options({ opName, solid }) {
+function Options({ opName }) {
   return (
     <Fragment>
       {_.includes(
         ['shorten', 'snub', 'twist', 'gyroelongate', 'turn'],
         opName,
       ) && <TwistOptions opName={opName} />}
-      {_.includes(['augment'], opName) && <AugmentOptions solid={solid} />}
+      {_.includes(['augment'], opName) && <AugmentOptions />}
     </Fragment>
   );
 }

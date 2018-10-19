@@ -10,7 +10,7 @@ setupOperations();
 const excludedOperations = {};
 
 function getOptsToTest(operation, name, polyhedron) {
-  const relations = operation.resultsFor(name);
+  const relations = operation.resultsFor(polyhedron);
   return operation.getAllOptions(polyhedron, relations) || [undefined];
 }
 
@@ -26,7 +26,7 @@ describe('applyOperation', () => {
         const operation = operations[opName];
         const optsToTest = getOptsToTest(operation, solidName, polyhedron);
         optsToTest.forEach(options => {
-          const result = operation.apply(solidName, polyhedron, options);
+          const result = operation.apply(polyhedron, options);
           expect(result).toBeValidPolyhedron();
         });
       });

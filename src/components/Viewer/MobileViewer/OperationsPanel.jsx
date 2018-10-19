@@ -36,7 +36,7 @@ const styles = makeStyles({
   },
 });
 
-export default function OperationsPanel({ solid }: *) {
+export default function OperationsPanel() {
   return (
     <section className={styles('opPanel')}>
       <div className={styles('resizeButtons')}>
@@ -46,7 +46,7 @@ export default function OperationsPanel({ solid }: *) {
         <Prompt />
       </div>
       <div className={styles('options')}>
-        <Options solid={solid} />
+        <Options />
       </div>
       <div className={styles('opGrid')}>
         <OpGrid />

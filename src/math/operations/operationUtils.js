@@ -176,12 +176,12 @@ interface Operation<Options = {}> {
   getSelectState(polyhedron: Polyhedron, options: Options): SelectState[];
 }
 
-export function getOpResults(solid: string, opName: string) {
-  return operationGraph[toConwayNotation(solid)][opName];
+export function getOpResults(solid: Polyhedron, opName: string) {
+  return operationGraph[toConwayNotation(solid.name)][opName];
 }
 
 // Get the polyhedron name as a result of applying the operation to the given polyhedron
-function getNextPolyhedron<O>(solid: string, operation: OpName, filterOpts: O) {
+function getNextPolyhedron<O>(solid, operation: OpName, filterOpts: O) {
   const results = getOpResults(solid, operation);
   const next = _(results)
     .filter(!_.isEmpty(filterOpts) ? filterOpts : _.stubTrue)
@@ -226,18 +226,18 @@ export function normalizeOperation(op: *, name: OpName): Operation<*> {
   return {
     ...withDefaults,
     name,
-    apply(solidName, polyhedron, options = {}) {
+    apply(polyhedron, options = {}) {
       // get the next polyhedron name
-      const relations = getOpResults(solidName, name);
+      const relations = getOpResults(polyhedron, name);
       const searchOptions = withDefaults.getSearchOptions(
         polyhedron,
         options,
         relations,
       );
-      const next = getNextPolyhedron(solidName, name, _.pickBy(searchOptions));
+      const next = getNextPolyhedron(polyhedron, name, _.pickBy(searchOptions));
 
       // Get the actual operation result
-      const opResult = withDefaults.apply(polyhedron, options);
+      const opResult = withDefaults.apply(polyhedron.withName(next), options);
       return {
         ...normalizeOpResult(opResult),
         name: next,
@@ -246,11 +246,11 @@ export function normalizeOperation(op: *, name: OpName): Operation<*> {
     getHitOption(polyhedron, hitPnt, options) {
       return withDefaults.getHitOption(polyhedron, vec(hitPnt), options);
     },
-    resultsFor(solid) {
-      return getOpResults(solid, name);
+    resultsFor(polyhedron) {
+      return getOpResults(polyhedron, name);
     },
-    hasOptions(solid) {
-      const relations = getOpResults(solid, name);
+    hasOptions(polyhedron) {
+      const relations = getOpResults(polyhedron, name);
       if (_.isEmpty(relations)) return false;
       // TODO should this be split up among operations?
       switch (name) {

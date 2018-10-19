@@ -1,8 +1,10 @@
 // @flow strict
+import _ from 'lodash';
 import React from 'react';
 import { makeStyles } from 'styles';
 
-import { WithOperation } from 'components/Viewer/context';
+import connect from 'components/connect';
+import { WithPolyhedron, WithOperation } from 'components/Viewer/context';
 import OptionIcon from './OptionIcon';
 import { verdana } from 'styles/fonts';
 import { hover } from 'styles/common';
@@ -54,11 +56,11 @@ const getOptionName = optValue => {
 interface Props {
   operation: *;
   options: *;
-  solid: string;
-  onClickOption(option: string, value: string): void;
+  polyhedron: *;
+  setOption(option: string, value: string): void;
 }
 
-function AugmentOptions({ operation, options, solid, onClickOption }: Props) {
+function AugmentOptions({ operation, options, polyhedron, setOption }: Props) {
   const { gyrate, using } = options;
   const optionArgs = [
     {
@@ -70,7 +72,7 @@ function AugmentOptions({ operation, options, solid, onClickOption }: Props) {
     },
     {
       name: 'using',
-      values: operation.getUsingOpts(solid),
+      values: operation.getUsingOpts(polyhedron),
       value: using,
       description: 'Some solids have more than one option to augment a face.',
     },
@@ -83,7 +85,7 @@ function AugmentOptions({ operation, options, solid, onClickOption }: Props) {
           {values.map(optValue => (
             <button
               key={optValue}
-              onClick={() => onClickOption(name, optValue)}
+              onClick={() => setOption(name, optValue)}
               disabled={!value}
               className={styles(
                 'optionButton',
@@ -100,15 +102,13 @@ function AugmentOptions({ operation, options, solid, onClickOption }: Props) {
   );
 }
 
-export default (props: *) => (
-  <WithOperation>
-    {({ operation, options, setOption }) => (
-      <AugmentOptions
-        {...props}
-        operation={operation}
-        options={options}
-        onClickOption={setOption}
-      />
-    )}
-  </WithOperation>
-);
+export default _.flow([
+  connect(
+    WithPolyhedron,
+    ['polyhedron'],
+  ),
+  connect(
+    WithOperation,
+    ['operation', 'options', 'setOption'],
+  ),
+])(AugmentOptions);

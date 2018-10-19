@@ -90,7 +90,7 @@ describe('chained tests', () => {
     it(description, () => {
       operations.forEach(opInfo => {
         const { op, args, expected } = getOpInfo(opInfo, polyhedron);
-        const result = op.apply(solidName, polyhedron, args);
+        const result = op.apply(polyhedron, args);
         expect(result).toBeValidPolyhedron();
         expect(result.name).toBe(expected);
 

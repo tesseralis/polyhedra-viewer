@@ -22,7 +22,6 @@ class ApplyOperation extends Component<*> {
   ) => {
     const {
       polyhedron,
-      solidName,
       setName,
       transitionPolyhedron,
       setOperation,
@@ -32,36 +31,31 @@ class ApplyOperation extends Component<*> {
 
     if (!operation) throw new Error('no operation defined');
 
-    const { result, name, animationData } = operation.apply(
-      solidName,
-      polyhedron,
-      options,
-    );
-    if (!name) throw new Error('Name not found on new polyhedron');
-    if (!operation.hasOptions(name) || _.isEmpty(options)) {
+    const { result, animationData } = operation.apply(polyhedron, options);
+    if (!operation.hasOptions(polyhedron) || _.isEmpty(options)) {
       unsetOperation();
     } else {
-      setOperation(opName, name);
+      setOperation(opName, result);
     }
 
     transitionPolyhedron(result, animationData);
-    setName(name);
+    setName(result.name);
     if (typeof callback === 'function') {
       callback(result);
     }
   };
 
   selectOperation = (opName: OpName) => {
-    const { solidName, unsetOperation, setOperation } = this.props;
+    const { polyhedron, unsetOperation, setOperation } = this.props;
     const operation = operations[opName];
     if (opName === this.props.opName) {
       return unsetOperation();
     }
 
-    if (!operation.hasOptions(solidName)) {
+    if (!operation.hasOptions(polyhedron)) {
       this.applyOperation(opName);
     } else {
-      setOperation(opName, solidName);
+      setOperation(opName, polyhedron);
     }
   };
 }
@@ -73,6 +67,6 @@ export default _.flow([
   ),
   connect(
     WithPolyhedron,
-    ['solidName', 'setName', 'polyhedron', 'transitionPolyhedron'],
+    ['setName', 'polyhedron', 'transitionPolyhedron'],
   ),
 ])(ApplyOperation);

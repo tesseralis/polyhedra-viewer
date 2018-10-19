@@ -4,6 +4,7 @@ import React, { Component } from 'react';
 
 import { mapObject } from 'utils';
 import { operations, type OpName } from 'math/operations';
+import { Polyhedron } from 'math/polyhedra';
 
 const defaultState = {
   opName: '',
@@ -45,7 +46,7 @@ export class OperationProvider extends Component<*, *> {
     );
   }
 
-  setOperation = (opName: OpName, solid: string) => {
+  setOperation = (opName: OpName, solid: Polyhedron) => {
     this.setState({
       opName,
       // TODO should we just store the operation instead?

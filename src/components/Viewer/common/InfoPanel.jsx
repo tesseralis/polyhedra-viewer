@@ -268,7 +268,8 @@ const info: InfoRow[] = [
   },
 ];
 
-function InfoPanel({ solidName, polyhedron }) {
+function InfoPanel({ polyhedron }) {
+  const solidName = polyhedron.name;
   return (
     <div className={styles('infoPanel')}>
       <h2 className={styles('solidName')}>
@@ -300,5 +301,5 @@ function InfoPanel({ solidName, polyhedron }) {
 
 export default connect(
   WithPolyhedron,
-  ['solidName', 'polyhedron'],
+  ['polyhedron'],
 )(InfoPanel);

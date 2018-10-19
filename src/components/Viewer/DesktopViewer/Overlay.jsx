@@ -60,7 +60,7 @@ export default function Overlay({ solid }: Props) {
         <Prompt />
       </div>
       <div className={styles('options')}>
-        <Options solid={solid} />
+        <Options />
       </div>
     </div>
   );

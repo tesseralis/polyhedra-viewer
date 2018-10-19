@@ -94,10 +94,7 @@ export default class MobileViewer extends React.Component<Props> {
   render() {
     const { panel, solid } = this.props;
     const panelNode = (
-      <Panels
-        panel={panel}
-        operationsPanel={() => <OperationsPanel solid={solid} />}
-      />
+      <Panels panel={panel} operationsPanel={OperationsPanel} />
     );
     return (
       <section className={styles('viewer')}>

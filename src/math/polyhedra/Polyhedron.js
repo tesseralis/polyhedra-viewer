@@ -21,6 +21,7 @@ function calculateEdges(faces: Face[]) {
 
 export default class Polyhedron {
   _solidData: SolidData;
+  name: string;
   faces: Face[];
   vertices: Vertex[];
   _edges: Edge[];
@@ -38,6 +39,7 @@ export default class Polyhedron {
       (vertex, vIndex) => new Vertex(this, vIndex),
     );
     this.faces = solidData.faces.map((face, fIndex) => new Face(this, fIndex));
+    this.name = solidData.name || '';
   }
 
   get edges() {
@@ -182,6 +184,10 @@ export default class Polyhedron {
 
   withChanges(changes: Builder => Builder) {
     return changes(new Builder(this)).build();
+  }
+
+  withName(name: string) {
+    return new Polyhedron({ ...this.solidData, name });
   }
 
   // return a new polyhedron with the given vertices
