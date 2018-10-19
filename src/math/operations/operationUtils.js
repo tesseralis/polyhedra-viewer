@@ -6,6 +6,7 @@ import operationGraph from './operationGraph';
 import type { Twist } from 'types';
 import { Polyhedron, Vertex, Edge, VertexList } from 'math/polyhedra';
 import { Vec3D, type Transform } from 'math/geom';
+
 export function getOpResults(solid: Polyhedron, opName: string) {
   return operationGraph[toConwayNotation(solid.name)][opName];
 }
