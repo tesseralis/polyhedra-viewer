@@ -6,7 +6,8 @@ import { withOrigin } from 'math/geom';
 import { Cap } from 'math/polyhedra';
 import { mapObject } from 'utils';
 import { getCapAlignment, getGyrateDirection } from './cutPasteUtils';
-import { getTransformedVertices, makeOperation } from '../operationUtils';
+import { getTransformedVertices } from '../operationUtils';
+import makeOperation from '../makeOperation';
 
 const TAU = 2 * Math.PI;
 

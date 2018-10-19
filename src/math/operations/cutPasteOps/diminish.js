@@ -2,7 +2,8 @@
 import _ from 'lodash';
 
 import { flatMap } from 'utils';
-import { removeExtraneousVertices, makeOperation } from '../operationUtils';
+import { removeExtraneousVertices } from '../operationUtils';
+import makeOperation from '../makeOperation';
 import { Cap } from 'math/polyhedra';
 import { hasMultiple, getCapAlignment, getCupolaGyrate } from './cutPasteUtils';
 

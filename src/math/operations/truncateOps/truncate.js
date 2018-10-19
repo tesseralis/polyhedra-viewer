@@ -4,7 +4,7 @@ import _ from 'lodash';
 import { flatMap, repeat, find } from 'utils';
 import { withOrigin, PRECISION } from 'math/geom';
 import { Polyhedron } from 'math/polyhedra';
-import { makeOperation } from '../operationUtils';
+import makeOperation from '../makeOperation';
 
 // Side ratios gotten when calling our "sharpen" operation on a bevelled polyhedron
 // I couldn't actually figure out the math for this so I reverse engineered it.

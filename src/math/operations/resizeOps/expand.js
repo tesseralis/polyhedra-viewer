@@ -7,8 +7,8 @@ import {
   getTwistSign,
   getEdgeFacePaths,
   getTransformedVertices,
-  makeOperation,
 } from '../operationUtils';
+import makeOperation from '../makeOperation';
 import {
   getSnubAngle,
   getExpandedFaces,

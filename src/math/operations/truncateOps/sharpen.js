@@ -2,7 +2,7 @@
 import _ from 'lodash';
 
 import { Polyhedron } from 'math/polyhedra';
-import { makeOperation } from '../operationUtils';
+import makeOperation from '../makeOperation';
 
 interface SharpenOptions {
   faceType?: number;

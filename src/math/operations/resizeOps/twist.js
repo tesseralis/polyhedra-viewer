@@ -9,7 +9,7 @@ import {
   getResizedVertices,
   expansionType,
 } from './resizeUtils';
-import { makeOperation } from '../operationUtils';
+import makeOperation from '../makeOperation';
 
 function pivot(list, value) {
   const index = _.indexOf(list, value);

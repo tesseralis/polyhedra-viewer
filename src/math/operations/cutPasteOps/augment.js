@@ -5,7 +5,8 @@ import { Polyhedron, Cap } from 'math/polyhedra';
 import { isInverse, getOrthonormalTransform, PRECISION } from 'math/geom';
 import { getCyclic, getSingle } from 'utils';
 
-import { getOpResults, makeOperation } from '../operationUtils';
+import { getOpResults } from '../operationUtils';
+import makeOperation from '../makeOperation';
 import { hasMultiple } from './cutPasteUtils';
 import { withOrigin } from '../../geom';
 

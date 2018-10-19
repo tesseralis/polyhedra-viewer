@@ -7,7 +7,7 @@ import {
   getAdjustInformation,
   getScaledPrismVertices,
 } from './prismUtils';
-import { makeOperation } from '../operationUtils';
+import makeOperation from '../makeOperation';
 
 function doShorten(polyhedron: Polyhedron, options) {
   const adjustInfo = getAdjustInformation(polyhedron);

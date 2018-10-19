@@ -7,7 +7,7 @@ import {
   getResizedVertices,
   getExpandedFaces,
 } from './resizeUtils';
-import { makeOperation } from '../operationUtils';
+import makeOperation from '../makeOperation';
 
 interface ContractOptions {
   faceType: number;

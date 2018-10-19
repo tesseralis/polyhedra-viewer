@@ -1,7 +1,8 @@
 // @flow strict
 import _ from 'lodash';
 import { Cap } from 'math/polyhedra';
-import { makeOperation, getEdgeFacePaths } from '../operationUtils';
+import { getEdgeFacePaths } from '../operationUtils';
+import makeOperation from '../makeOperation';
 import { antiprismHeight, getScaledPrismVertices } from './prismUtils';
 
 function duplicateVertices(polyhedron, boundary, twist) {

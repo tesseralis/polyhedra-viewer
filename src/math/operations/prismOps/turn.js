@@ -3,7 +3,7 @@ import _ from 'lodash';
 
 import { flatMap } from 'utils';
 
-import { makeOperation } from '../operationUtils';
+import makeOperation from '../makeOperation';
 import {
   getChirality,
   isGyroelongatedBiCupola,
