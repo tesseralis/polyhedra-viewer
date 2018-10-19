@@ -7,7 +7,7 @@ import {
   getResizedVertices,
   getExpandedFaces,
 } from './resizeUtils';
-import { Operation } from '../operationTypes';
+import { makeOperation } from '../operationUtils';
 
 interface ContractOptions {
   faceType: number;
@@ -60,7 +60,7 @@ export function applyContract(
 }
 
 // NOTE: We are using the same operation for contracting both expanded and snub solids.
-export const contract: Operation<ContractOptions> = {
+export const contract = makeOperation('contract', {
   apply: applyContract,
 
   getSearchOptions(polyhedron, config) {
@@ -101,4 +101,4 @@ export const contract: Operation<ContractOptions> = {
       return null;
     });
   },
-};
+});

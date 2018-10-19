@@ -3,7 +3,8 @@ import _ from 'lodash';
 import { getSingle } from 'utils';
 import { Cap, Polyhedron } from 'math/polyhedra';
 import { isInverse } from 'math/geom';
-import type { Relation } from '../operationTypes';
+
+type Relation = {};
 
 export const hasMultiple = (relations: ?(Relation[]), property: string) =>
   _(relations)

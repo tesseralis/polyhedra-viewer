@@ -1,12 +1,11 @@
 // @flow strict
 import _ from 'lodash';
 
-import { Polyhedron, Face, Cap } from 'math/polyhedra';
+import { Polyhedron, Cap } from 'math/polyhedra';
 import { isInverse, getOrthonormalTransform, PRECISION } from 'math/geom';
 import { getCyclic, getSingle } from 'utils';
 
-import { Operation } from '../operationTypes';
-import { getOpResults } from '../operationUtils';
+import { getOpResults, makeOperation } from '../operationUtils';
 import { hasMultiple } from './cutPasteUtils';
 import { withOrigin } from '../../geom';
 
@@ -233,12 +232,6 @@ function doAugment(polyhedron, base, augmentType, gyrate) {
   );
 }
 
-interface AugmentOptions {
-  face: Face;
-  gyrate: 'ortho' | 'gyro';
-  using: string;
-}
-
 function defaultAugmentType(numSides) {
   return numSides <= 5 ? 'pyramid' : 'cupola';
 }
@@ -284,7 +277,7 @@ const getUsingOpts = solid => {
   return _.sortBy(opts, using => usingTypeOrder.indexOf(using[0]));
 };
 
-export const augment: Operation<AugmentOptions> = {
+export const augment = makeOperation('augment', {
   apply(polyhedron, { face, gyrate, using } = {}) {
     const augmentType = using
       ? augmentTypes[using[0]]
@@ -378,4 +371,4 @@ export const augment: Operation<AugmentOptions> = {
     }
     return newOpts;
   },
-};
+});

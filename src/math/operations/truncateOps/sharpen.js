@@ -2,7 +2,7 @@
 import _ from 'lodash';
 
 import { Polyhedron } from 'math/polyhedra';
-import type { Operation } from '../operationTypes';
+import { makeOperation } from '../operationUtils';
 
 interface SharpenOptions {
   faceType?: number;
@@ -110,7 +110,7 @@ function applySharpen(
   };
 }
 
-export const sharpen: Operation<SharpenOptions> = {
+export const sharpen = makeOperation('sharpen', {
   apply: applySharpen,
 
   getSearchOptions(polyhedron, config) {
@@ -148,4 +148,4 @@ export const sharpen: Operation<SharpenOptions> = {
       return 'selectable';
     });
   },
-};
+});

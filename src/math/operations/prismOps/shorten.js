@@ -1,7 +1,5 @@
 // @flow strict
-import type { Twist } from 'types';
 import { Polyhedron } from 'math/polyhedra';
-import { Operation } from '../operationTypes';
 import {
   antiprismHeight,
   getChirality,
@@ -9,6 +7,7 @@ import {
   getAdjustInformation,
   getScaledPrismVertices,
 } from './prismUtils';
+import { makeOperation } from '../operationUtils';
 
 function doShorten(polyhedron: Polyhedron, options) {
   const adjustInfo = getAdjustInformation(polyhedron);
@@ -29,11 +28,7 @@ function doShorten(polyhedron: Polyhedron, options) {
   };
 }
 
-interface ShortenOptions {
-  twist?: Twist;
-}
-
-export const shorten: Operation<ShortenOptions> = {
+export const shorten = makeOperation('shorten', {
   apply: doShorten,
   getSearchOptions(polyhedron, options) {
     if (!isGyroelongatedBiCupola(polyhedron)) return;
@@ -49,4 +44,4 @@ export const shorten: Operation<ShortenOptions> = {
     }
     return [{}];
   },
-};
+});

@@ -2,7 +2,6 @@
 import _ from 'lodash';
 
 import { fromConwayNotation, toConwayNotation } from 'math/polyhedra/names';
-import type { OpName } from './operationTypes';
 import operationGraph from './operationGraph';
 import type { Point, Twist } from 'types';
 import {
@@ -174,6 +173,10 @@ interface Operation<Options = {}> {
   getAllOptions(polyhedron: Polyhedron): Options[];
 
   getSelectState(polyhedron: Polyhedron, options: Options): SelectState[];
+
+  hasOptions(polyhedron: Polyhedron): boolean;
+
+  applyOptionsFor(polyhedron: Polyhedron): Options;
 }
 
 export function getOpResults(solid: Polyhedron, opName: string) {
@@ -181,7 +184,7 @@ export function getOpResults(solid: Polyhedron, opName: string) {
 }
 
 // Get the polyhedron name as a result of applying the operation to the given polyhedron
-function getNextPolyhedron<O>(solid, operation: OpName, filterOpts: O) {
+function getNextPolyhedron<O>(solid, operation: string, filterOpts: O) {
   const results = getOpResults(solid, operation);
   const next = _(results)
     .filter(!_.isEmpty(filterOpts) ? filterOpts : _.stubTrue)
@@ -222,7 +225,7 @@ function normalizeOpResult(opResult, newName) {
   };
 }
 
-export function normalizeOperation(op: *, name: OpName): Operation<*> {
+export function makeOperation(name: string, op: *): Operation<*> {
   const withDefaults = fillDefaults(
     typeof op === 'function' ? { apply: op } : op,
   );

@@ -1,12 +1,10 @@
 // @flow strict
 import _ from 'lodash';
-import { type Twist } from 'types';
-import { Operation } from '../operationTypes';
-import { Polyhedron, Cap } from 'math/polyhedra';
-import { getEdgeFacePaths } from '../operationUtils';
+import { Cap } from 'math/polyhedra';
+import { makeOperation, getEdgeFacePaths } from '../operationUtils';
 import { antiprismHeight, getScaledPrismVertices } from './prismUtils';
 
-function duplicateVertices(polyhedron: Polyhedron, boundary, twist?: Twist) {
+function duplicateVertices(polyhedron, boundary, twist) {
   const newVertexMapping = {};
   _.forEach(boundary.edges, (edge, i) => {
     const oppositeFace = edge.twin().face;
@@ -65,15 +63,15 @@ function doElongate(polyhedron, twist) {
   };
 }
 
-export function elongate(polyhedron: Polyhedron) {
+export const elongate = makeOperation('elongate', polyhedron => {
   return doElongate(polyhedron);
-}
+});
 
-export const gyroelongate: Operation<{ twist: Twist }> = {
+export const gyroelongate = makeOperation('gyroelongate', {
   apply(polyhedron, { twist = 'left' }) {
     return doElongate(polyhedron, twist);
   },
   getAllOptions(polyhedron) {
     return [{ twist: 'left' }, { twist: 'right' }];
   },
-};
+});

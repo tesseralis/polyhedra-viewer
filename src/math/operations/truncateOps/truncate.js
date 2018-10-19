@@ -4,6 +4,7 @@ import _ from 'lodash';
 import { flatMap, repeat, find } from 'utils';
 import { withOrigin, PRECISION } from 'math/geom';
 import { Polyhedron } from 'math/polyhedra';
+import { makeOperation } from '../operationUtils';
 
 // Side ratios gotten when calling our "sharpen" operation on a bevelled polyhedron
 // I couldn't actually figure out the math for this so I reverse engineered it.
@@ -108,10 +109,13 @@ function doTruncate(polyhedron, rectify = false, result) {
   };
 }
 
-export function truncate(polyhedron: Polyhedron, options: *, result: string) {
-  return doTruncate(polyhedron, false, result);
-}
+export const truncate = makeOperation(
+  'truncate',
+  (polyhedron, options, result) => {
+    return doTruncate(polyhedron, false, result);
+  },
+);
 
-export function rectify(polyhedron: Polyhedron) {
+export const rectify = makeOperation('rectify', polyhedron => {
   return doTruncate(polyhedron, true);
-}
+});

@@ -3,11 +3,11 @@ import _ from 'lodash';
 import { Polyhedron } from 'math/polyhedra';
 import { withOrigin } from 'math/geom';
 import { flatMap, repeat } from 'utils';
-import type { Twist } from 'types';
 import {
   getTwistSign,
   getEdgeFacePaths,
   getTransformedVertices,
+  makeOperation,
 } from '../operationUtils';
 import {
   getSnubAngle,
@@ -15,7 +15,6 @@ import {
   isExpandedFace,
   getResizedVertices,
 } from './resizeUtils';
-import { Operation } from '../operationTypes';
 
 /**
  * Duplicate the vertices, so that each face has its own unique set of vertices,
@@ -88,21 +87,23 @@ function doExpansion(polyhedron, referenceName, twist) {
   };
 }
 
-export function expand(polyhedron: Polyhedron, options: *, result: string) {
-  return doExpansion(polyhedron, result);
-}
+export const expand = makeOperation(
+  'expand',
+  (polyhedron: Polyhedron, options: *, result: string) => {
+    return doExpansion(polyhedron, result);
+  },
+);
 
-// TODO test chirality
-export const snub: Operation<{ twist: Twist }> = {
+export const snub = makeOperation('snub', {
   apply(polyhedron, { twist = 'left' }, result: string) {
     return doExpansion(polyhedron, result, twist);
   },
   getAllOptions(polyhedron) {
     return [{ twist: 'left' }, { twist: 'right' }];
   },
-};
+});
 
-export function dual(polyhedron: Polyhedron) {
+export const dual = makeOperation('dual', (polyhedron: Polyhedron) => {
   // Scale to create a dual polyhedron with the same midradius
   const scale = (() => {
     const f = polyhedron.getFace().distanceToCenter();
@@ -121,4 +122,4 @@ export function dual(polyhedron: Polyhedron) {
       endVertices,
     },
   };
-}
+});

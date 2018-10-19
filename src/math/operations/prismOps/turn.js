@@ -1,10 +1,9 @@
 // @flow strict
 import _ from 'lodash';
 
-import type { Twist } from 'types';
 import { flatMap } from 'utils';
 
-import { Operation } from '../operationTypes';
+import { makeOperation } from '../operationUtils';
 import {
   getChirality,
   isGyroelongatedBiCupola,
@@ -98,7 +97,7 @@ function doTurn(polyhedron, { twist = 'left' }) {
   };
 }
 
-export const turn: Operation<{ twist?: Twist }> = {
+export const turn = makeOperation('turn', {
   apply: doTurn,
   getSearchOptions(polyhedron, options) {
     if (!isGyroelongatedBiCupola(polyhedron)) return;
@@ -114,4 +113,4 @@ export const turn: Operation<{ twist?: Twist }> = {
     }
     return [{}];
   },
-};
+});

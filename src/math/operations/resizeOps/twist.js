@@ -1,7 +1,6 @@
 // @flow strict
 import _ from 'lodash';
 import { Polyhedron } from 'math/polyhedra';
-import type { Twist } from 'types';
 import { getTwistSign } from '../operationUtils';
 import {
   getSnubAngle,
@@ -10,7 +9,7 @@ import {
   getResizedVertices,
   expansionType,
 } from './resizeUtils';
-import { Operation } from '../operationTypes';
+import { makeOperation } from '../operationUtils';
 
 function pivot(list, value) {
   const index = _.indexOf(list, value);
@@ -119,7 +118,7 @@ function doTwist(polyhedron, referenceName, twist = 'left') {
   };
 }
 
-export const twist: Operation<{ twist: Twist }> = {
+export const twist = makeOperation('twist', {
   apply(polyhedron, { twist: twistOpt }, result) {
     return doTwist(polyhedron, result, twistOpt);
   },
@@ -129,4 +128,4 @@ export const twist: Operation<{ twist: Twist }> = {
     }
     return [{}];
   },
-};
+});

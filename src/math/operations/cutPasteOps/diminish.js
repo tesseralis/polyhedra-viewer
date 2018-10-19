@@ -2,9 +2,8 @@
 import _ from 'lodash';
 
 import { flatMap } from 'utils';
-import { removeExtraneousVertices } from '../operationUtils';
+import { removeExtraneousVertices, makeOperation } from '../operationUtils';
 import { Cap } from 'math/polyhedra';
-import type { Operation } from '../operationTypes';
 import { hasMultiple, getCapAlignment, getCupolaGyrate } from './cutPasteUtils';
 
 function removeCap(polyhedron, cap) {
@@ -15,11 +14,7 @@ function removeCap(polyhedron, cap) {
   );
 }
 
-interface DiminishOptions {
-  cap: Cap;
-}
-
-export const diminish: Operation<DiminishOptions> = {
+export const diminish = makeOperation('diminish', {
   apply(polyhedron, { cap }) {
     return removeCap(polyhedron, cap);
   },
@@ -65,4 +60,4 @@ export const diminish: Operation<DiminishOptions> = {
       if (face.inSet(allCapFaces)) return 'selectable';
     });
   },
-};
+});

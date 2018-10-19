@@ -4,16 +4,11 @@ import _ from 'lodash';
 import { flatMap } from 'utils';
 import { withOrigin } from 'math/geom';
 import { Cap } from 'math/polyhedra';
-import type { Operation } from '../operationTypes';
 import { mapObject } from 'utils';
 import { getCapAlignment, getGyrateDirection } from './cutPasteUtils';
-import { getTransformedVertices } from '../operationUtils';
+import { getTransformedVertices, makeOperation } from '../operationUtils';
 
 const TAU = 2 * Math.PI;
-
-interface GyrateOptions {
-  cap: Cap;
-}
 
 function applyGyrate(polyhedron, { cap }) {
   // get adjacent faces
@@ -57,7 +52,7 @@ function applyGyrate(polyhedron, { cap }) {
   };
 }
 
-export const gyrate: Operation<GyrateOptions> = {
+export const gyrate = makeOperation('gyrate', {
   apply: applyGyrate,
 
   getSearchOptions(polyhedron, config, relations) {
@@ -99,4 +94,4 @@ export const gyrate: Operation<GyrateOptions> = {
       if (face.inSet(allCapFaces)) return 'selectable';
     });
   },
-};
+});
