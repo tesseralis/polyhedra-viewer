@@ -92,7 +92,6 @@ const inverseAlternateNames = _(alternateNames)
   .fromPairs()
   .value();
 
-// TODO figure out how to move this to 'data' so it can be used in construction
 export function getCanonicalName(name: string) {
   return inverseAlternateNames[unescapeName(name)] || name;
 }
@@ -146,7 +145,7 @@ export const fromConwayNotation = (notation: string) => {
 };
 
 export const toConwayNotation = (solid: string) => {
-  const name = unescapeName(solid);
+  const name = solid;
   if (inversePlatonicMapping[name]) {
     return inversePlatonicMapping[name];
   }
