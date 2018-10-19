@@ -5,17 +5,6 @@ import _ from 'lodash';
 
 import { polygonNames } from 'constants/polygons';
 import { fonts } from 'styles';
-import {
-  unescapeName,
-  getType,
-  toConwayNotation,
-  getAlternateNames,
-} from 'math/polyhedra/names';
-import {
-  getSymmetry,
-  getSymmetryName,
-  getOrder,
-} from 'math/polyhedra/symmetry';
 
 import connect from 'components/connect';
 import { WithPolyhedron } from 'components/Viewer/context';
@@ -185,9 +174,9 @@ function displayFaceTypes({ polyhedron }) {
   );
 }
 
-function displaySymmetry({ polyhedron, name }) {
-  const symmetry = getSymmetry(name);
-  const symName = getSymmetryName(symmetry);
+function displaySymmetry({ polyhedron }) {
+  const symmetry = polyhedron.symmetry();
+  const symName = polyhedron.symmetryName();
   const { group = '', sub } = symmetry;
   return (
     <Fragment>
@@ -249,13 +238,13 @@ const info: InfoRow[] = [
   },
 
   { name: 'Symmetry', area: 'sym', render: displaySymmetry },
-  { name: 'Order', area: 'order', render: ({ name }) => getOrder(name) },
+  { name: 'Order', area: 'order', render: ({ polyhedron: p }) => p.order() },
 
   {
     name: 'Also known as',
     area: 'alt',
-    render: ({ name }) => {
-      const alts = getAlternateNames(name);
+    render: ({ polyhedron }) => {
+      const alts = polyhedron.alternateNames();
       if (alts.length === 0) return '--';
       return (
         <ul>
@@ -269,13 +258,12 @@ const info: InfoRow[] = [
 ];
 
 function InfoPanel({ polyhedron }) {
-  const solidName = polyhedron.name;
   return (
     <div className={styles('infoPanel')}>
       <h2 className={styles('solidName')}>
-        {_.capitalize(unescapeName(solidName))}, {toConwayNotation(solidName)}
+        {_.capitalize(polyhedron.name)}, {polyhedron.symbol()}
       </h2>
-      <p className={styles('solidType')}>{getType(solidName)}</p>
+      <p className={styles('solidType')}>{polyhedron.type()}</p>
       <dl className={styles('dataList')}>
         {info.map(({ name, area, render: Renderer }) => {
           return (
@@ -286,14 +274,14 @@ function InfoPanel({ polyhedron }) {
             >
               <dd className={styles('propName')}>{name}</dd>
               <dt className={styles('propValue')}>
-                <Renderer name={solidName} polyhedron={polyhedron} />
+                <Renderer polyhedron={polyhedron} />
               </dt>
             </div>
           );
         })}
       </dl>
       <div className={styles('downloader')}>
-        <DataDownloader solid={polyhedron.solidData} name={solidName} />
+        <DataDownloader solid={polyhedron.solidData} />
       </div>
     </div>
   );

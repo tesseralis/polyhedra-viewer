@@ -28,7 +28,7 @@ export function getFamily(polyhedron: Polyhedron) {
   if (polyhedron.isRegular() || polyhedron.isQuasiRegular()) {
     return 'T';
   }
-  return polyhedron.symmetry();
+  return polyhedron.symmetry().group;
 }
 
 export function expansionType(polyhedron: Polyhedron): ExpansionType {

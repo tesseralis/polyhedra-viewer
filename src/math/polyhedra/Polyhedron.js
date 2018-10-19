@@ -5,6 +5,8 @@ import { find } from 'utils';
 import { isValidSolid, getSolidData } from 'data';
 import { Vec3D, getCentroid } from 'math/geom';
 
+import * as meta from './names';
+import * as symmetry from './symmetry';
 import type { SolidData } from './solidTypes';
 import Face from './Face';
 import Vertex from './Vertex';
@@ -206,25 +208,33 @@ export default class Polyhedron {
     return this.withVertices(this.vertices.map(v => v.vec.scale(scale)));
   }
 
+  // Meta Properties
+  // ===============
+  //
+  // The following properties rely on the name of the polyhedron.
+
+  type = () => meta.getType(this.name);
+
+  alternateNames = () => meta.getAlternateNames(this.name);
+
+  // Get the Conway symbol
+  symbol = () => meta.toConwayNotation(this.name);
+
+  symmetry = _.once(() => symmetry.getSymmetry(this.name));
+
+  symmetryName = _.once(() => symmetry.getSymmetryName(this.symmetry()));
+
+  order = () => symmetry.getOrder(this.name);
+
   // Property predicates
   // ===================
 
-  isUniform = _.once(() => {
-    const vertexRegular =
-      _(this.vertices)
-        .map(v => v.adjacentFaceCounts())
-        .uniqWith(_.isEqual)
-        .size() === 1;
-    if (!vertexRegular) return false;
-
-    // Special case for pseudo-rhombicuboctahedron
-    return !_.some(
-      this.faces,
-      face =>
-        face.numSides === 4 &&
-        _.isEqual(face.adjacentFaceCounts(), { '3': 1, '4': 3 }),
+  isUniform() {
+    return _.includes(
+      ['Platonic solid', 'Archimedean solid', 'Prism', 'Antiprism'],
+      this.type(),
     );
-  });
+  }
 
   isQuasiRegular() {
     if (!this.isUniform()) return false;
@@ -233,7 +243,7 @@ export default class Polyhedron {
   }
 
   isRegular() {
-    return this.isUniform() && this.faceTypes().length === 1;
+    return this.type() === 'Platonic solid';
   }
 
   faceAdjacencyList() {
@@ -250,35 +260,4 @@ export default class Polyhedron {
   isSame(other: Polyhedron) {
     return _.isEqual(this.faceAdjacencyList(), other.faceAdjacencyList());
   }
-
-  // Symmetry
-  // ========
-
-  // TODO Handle chirality
-  symmetry = _.once(() => {
-    if (!this.isUniform()) {
-      throw new Error('Only uniform solids are supported right now');
-    }
-
-    const symmetryCounts = {
-      T: { '3': 4, '6': 4 },
-      O: { '3': 8, '4': 6, '6': 8, '8': 6 },
-      I: { '3': 20, '5': 12, '6': 20, '10': 12 },
-    };
-
-    const faceCounts = this.numFacesBySides();
-
-    for (let [symmetry, counts] of _.entries(symmetryCounts)) {
-      if (_.some(faceCounts, (n, face: number) => n === counts[face])) {
-        return symmetry;
-      }
-    }
-
-    if (faceCounts[4] >= 3) {
-      return `D_${faceCounts[4]}h`;
-    }
-    if (faceCounts[3] >= 6) {
-      return `D_${faceCounts[3] / 2}d`;
-    }
-  });
 }

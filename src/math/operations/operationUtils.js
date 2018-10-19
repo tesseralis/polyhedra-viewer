@@ -203,15 +203,18 @@ function getNextPolyhedron<O>(solid, operation: OpName, filterOpts: O) {
   return fromConwayNotation(next[0].value);
 }
 
-function normalizeOpResult(opResult) {
+function normalizeOpResult(opResult, newName) {
   if (!opResult.animationData) {
-    return { result: deduplicateVertices(opResult) };
+    return { result: deduplicateVertices(opResult).withName(newName) };
   }
   const { result, animationData } = opResult;
   const { start, endVertices } = animationData;
 
+  const normedResult =
+    result || deduplicateVertices(start.withVertices(endVertices));
+
   return {
-    result: result || deduplicateVertices(start.withVertices(endVertices)),
+    result: normedResult.withName(newName),
     animationData: {
       start,
       endVertices: endVertices.map(normalizeVertex),
@@ -237,8 +240,8 @@ export function normalizeOperation(op: *, name: OpName): Operation<*> {
       const next = getNextPolyhedron(polyhedron, name, _.pickBy(searchOptions));
 
       // Get the actual operation result
-      const opResult = withDefaults.apply(polyhedron.withName(next), options);
-      return normalizeOpResult(opResult);
+      const opResult = withDefaults.apply(polyhedron, options);
+      return normalizeOpResult(opResult, next);
     },
     getHitOption(polyhedron, hitPnt, options) {
       return withDefaults.getHitOption(polyhedron, vec(hitPnt), options);

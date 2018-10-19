@@ -34,7 +34,6 @@ const styles = makeStyles({
 
 interface Props {
   solid: *;
-  name: string;
 }
 
 function formatDecimal(number) {
@@ -66,15 +65,14 @@ const fileFormats = [
   },
 ];
 
-export default function DataDownloader({ solid, name }: Props) {
-  const combinedData = { ...solid, name };
+export default function DataDownloader({ solid }: Props) {
   return (
     <div>
       <h2 className={styles('header')}>Download model</h2>
       <div>
         {fileFormats.map(({ ext, serializer }) => {
-          const filename = `${name}.${ext}`;
-          const blob = new Blob([serializer(combinedData)], {
+          const filename = `${solid.name}.${ext}`;
+          const blob = new Blob([serializer(solid)], {
             type: 'text/plain;charset=utf-8',
           });
           const url = window.URL.createObjectURL(blob);

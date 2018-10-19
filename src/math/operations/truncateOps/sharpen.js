@@ -12,7 +12,7 @@ interface sharpenOptions {
 function getFamily(polyhedron) {
   // The octahedron is the rectification of the tetrahedron;
   // Otherwise rely on polyhedral symmetry
-  return polyhedron.isRegular() ? 'T' : polyhedron.symmetry();
+  return polyhedron.isRegular() ? 'T' : polyhedron.symmetry().group;
 }
 
 // Adjacent faces of the vertex with a sharpen face first

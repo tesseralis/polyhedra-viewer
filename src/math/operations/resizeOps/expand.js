@@ -95,7 +95,7 @@ const expansionResults = {
 };
 
 export function expand(polyhedron: Polyhedron) {
-  return doExpansion(polyhedron, expansionResults[polyhedron.symmetry()]);
+  return doExpansion(polyhedron, expansionResults[polyhedron.symmetry().group]);
 }
 
 const snubResults = {
@@ -107,7 +107,11 @@ const snubResults = {
 // TODO test chirality
 export const snub: Operation<{ twist: Twist }> = {
   apply(polyhedron, { twist = 'left' }) {
-    return doExpansion(polyhedron, snubResults[polyhedron.symmetry()], twist);
+    return doExpansion(
+      polyhedron,
+      snubResults[polyhedron.symmetry().group],
+      twist,
+    );
   },
   getAllOptions(polyhedron) {
     return [{ twist: 'left' }, { twist: 'right' }];
