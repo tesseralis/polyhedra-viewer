@@ -238,10 +238,7 @@ export function normalizeOperation(op: *, name: OpName): Operation<*> {
 
       // Get the actual operation result
       const opResult = withDefaults.apply(polyhedron.withName(next), options);
-      return {
-        ...normalizeOpResult(opResult),
-        name: next,
-      };
+      return normalizeOpResult(opResult);
     },
     getHitOption(polyhedron, hitPnt, options) {
       return withDefaults.getHitOption(polyhedron, vec(hitPnt), options);

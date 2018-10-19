@@ -56,7 +56,6 @@ const actions = ['setPolyhedron', 'transitionPolyhedron', 'recenter', 'resize'];
 const PolyhedronContext = React.createContext({
   ...defaultState,
   ...mapObject(actions, action => [action, _.noop]),
-  solidName: 'tetrahedron',
 });
 
 class BasePolyhedronProvider extends PureComponent<*, *> {
@@ -94,7 +93,6 @@ class BasePolyhedronProvider extends PureComponent<*, *> {
   render() {
     const value = {
       ...this.state,
-      solidName: this.props.name,
       // TODO more secure way to calc this other than faceColors
       isTransitioning: !!this.state.faceColors,
     };

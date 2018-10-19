@@ -44,18 +44,18 @@ function isProperPolyhedron(polyhedron) {
 export function setupOperations() {
   expect.extend({
     toBeValidPolyhedron(received) {
-      const { result, name } = received;
+      const { result } = received;
       const isProper = isProperPolyhedron(result);
-      const matchesName = result.isSame(Polyhedron.get(name));
+      const matchesName = result.isSame(Polyhedron.get(result.name));
       return {
         message: () => {
           if (!isProper)
             return `expected ${
               this.isNot ? 'an improper' : 'a proper'
             } CRF polyhedron`;
-          return `expected polyhedron to ${
-            this.isNot ? 'not be' : 'be'
-          } a ${name}`;
+          return `expected polyhedron to ${this.isNot ? 'not be' : 'be'} a ${
+            result.name
+          }`;
         },
         pass: isProper && matchesName,
       };

@@ -1,6 +1,7 @@
 // @flow strict
 import _ from 'lodash';
 import { Component } from 'react';
+
 import { type OpName } from 'math/operations';
 import { operations } from 'math/operations';
 import connect from 'components/connect';

@@ -92,9 +92,9 @@ describe('chained tests', () => {
         const { op, args, expected } = getOpInfo(opInfo, polyhedron);
         const result = op.apply(polyhedron, args);
         expect(result).toBeValidPolyhedron();
-        expect(result.name).toBe(expected);
 
         polyhedron = result.result;
+        expect(polyhedron.name).toBe(expected);
         solidName = result.name;
       });
     });
