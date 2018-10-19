@@ -1,16 +1,24 @@
 // @flow strict
+import _ from 'lodash';
 import { Polyhedron } from 'math/polyhedra';
 import {
   getSnubAngle,
   isExpandedFace,
   getResizedVertices,
-  getFamily,
   getExpandedFaces,
 } from './resizeUtils';
 import { Operation } from '../operationTypes';
 
 interface ContractOptions {
   faceType: number;
+}
+
+// Return the symmetry group of an *expanded* polyhedron
+function getFamily(polyhedron: Polyhedron) {
+  if (_.includes(['cuboctahedron', 'icosahedron'], polyhedron.name)) {
+    return 'T';
+  }
+  return polyhedron.symmetry().group;
 }
 
 const familyMap = { T: 3, O: 4, I: 5 };

@@ -4,15 +4,8 @@ import _ from 'lodash';
 import { Polyhedron } from 'math/polyhedra';
 import type { Operation } from '../operationTypes';
 
-interface sharpenOptions {
+interface SharpenOptions {
   faceType?: number;
-}
-
-// Return the symmetry group of the *rectified* polyhedron
-function getFamily(polyhedron) {
-  // The octahedron is the rectification of the tetrahedron;
-  // Otherwise rely on polyhedral symmetry
-  return polyhedron.isRegular() ? 'T' : polyhedron.symmetry().group;
 }
 
 // Adjacent faces of the vertex with a sharpen face first
@@ -117,18 +110,15 @@ function applysharpen(
   };
 }
 
-export const sharpen: Operation<sharpenOptions> = {
+export const sharpen: Operation<SharpenOptions> = {
   apply: applysharpen,
 
   getSearchOptions(polyhedron, config) {
     const { faceType } = config;
-    if (!polyhedron.isQuasiRegular()) {
-      return {};
-    }
-    switch (getFamily(polyhedron)) {
-      case 'O':
+    switch (polyhedron.name) {
+      case 'cuboctahedron':
         return { value: faceType === 3 ? 'C' : 'O' };
-      case 'I':
+      case 'icosidodecahedron':
         return { value: faceType === 3 ? 'D' : 'I' };
       default:
         return {};
@@ -136,13 +126,10 @@ export const sharpen: Operation<sharpenOptions> = {
   },
 
   getAllOptions(polyhedron) {
-    if (!polyhedron.isQuasiRegular()) {
-      return [{}];
-    }
-    switch (getFamily(polyhedron)) {
-      case 'O':
+    switch (polyhedron.name) {
+      case 'cuboctahedron':
         return [{ faceType: 3 }, { faceType: 4 }];
-      case 'I':
+      case 'icosidodecahedron':
         return [{ faceType: 3 }, { faceType: 5 }];
       default:
         return [{}];

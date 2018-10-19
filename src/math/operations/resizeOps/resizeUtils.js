@@ -23,14 +23,6 @@ export function getResizedVertices(
 
 type ExpansionType = 'cantellate' | 'snub';
 
-// Return the symmetry group of the *expanded* polyhedron
-export function getFamily(polyhedron: Polyhedron) {
-  if (polyhedron.isRegular() || polyhedron.isQuasiRegular()) {
-    return 'T';
-  }
-  return polyhedron.symmetry().group;
-}
-
 export function expansionType(polyhedron: Polyhedron): ExpansionType {
   return polyhedron.getVertex().adjacentFaceCounts()[3] >= 3
     ? 'snub'
@@ -91,14 +83,16 @@ function getCuboctahedronContractFaces(polyhedron) {
 }
 
 export function getExpandedFaces(polyhedron: Polyhedron, faceType?: number) {
-  if (getFamily(polyhedron) === 'T') {
-    return expansionType(polyhedron) === 'snub'
-      ? getIcosahedronContractFaces(polyhedron)
-      : getCuboctahedronContractFaces(polyhedron);
+  switch (polyhedron.name) {
+    case 'cuboctahedron':
+      return getCuboctahedronContractFaces(polyhedron);
+    case 'icosahedron':
+      return getIcosahedronContractFaces(polyhedron);
+    default:
+      return _.filter(polyhedron.faces, face =>
+        isExpandedFace(polyhedron, face, faceType),
+      );
   }
-  return _.filter(polyhedron.faces, face =>
-    isExpandedFace(polyhedron, face, faceType),
-  );
 }
 
 export function getSnubAngle(polyhedron: Polyhedron, faces: Face[]) {
