@@ -217,7 +217,6 @@ export default class Polyhedron {
 
   alternateNames = () => meta.getAlternateNames(this.name);
 
-  // Get the Conway symbol
   symbol = () => meta.toConwayNotation(this.name);
 
   symmetry = _.once(() => symmetry.getSymmetry(this.name));
@@ -225,9 +224,6 @@ export default class Polyhedron {
   symmetryName = _.once(() => symmetry.getSymmetryName(this.symmetry()));
 
   order = () => symmetry.getOrder(this.name);
-
-  // Property predicates
-  // ===================
 
   isUniform() {
     return _.includes(
@@ -237,9 +233,10 @@ export default class Polyhedron {
   }
 
   isQuasiRegular() {
-    if (!this.isUniform()) return false;
-    const adjFaces = this.getVertex().adjacentFaceCounts();
-    return _.every(adjFaces, count => count % 2 === 0);
+    return _.includes(
+      ['octahedron', 'cuboctahedron', 'icosidodecahedron'],
+      this.name,
+    );
   }
 
   isRegular() {

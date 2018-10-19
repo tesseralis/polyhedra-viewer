@@ -8,7 +8,7 @@ import { OperationProvider, PolyhedronProvider } from './context';
 import DesktopViewer from './DesktopViewer';
 import MobileViewer from './MobileViewer';
 import { DeviceTracker } from 'components/DeviceContext';
-import { unescapeName } from 'math/polyhedra/names';
+import { escapeName, unescapeName } from 'math/polyhedra/names';
 
 interface InnerProps {
   solid: string;
@@ -52,7 +52,7 @@ export default function Viewer({ solid, history, url }: Props) {
           return (
             <PolyhedronProvider
               name={solid}
-              setName={name => history.push(`/${name}/operations`)}
+              setName={name => history.push(`/${escapeName(name)}/operations`)}
               disabled={panel !== 'operations' || history.action === 'POP'}
             >
               <OperationProvider disabled={panel !== 'operations'}>

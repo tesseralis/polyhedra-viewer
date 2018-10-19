@@ -88,30 +88,14 @@ function doExpansion(polyhedron, referenceName, twist) {
   };
 }
 
-const expansionResults = {
-  T: 'cuboctahedron',
-  O: 'rhombicuboctahedron',
-  I: 'rhombicosidodecahedron',
-};
-
-export function expand(polyhedron: Polyhedron) {
-  return doExpansion(polyhedron, expansionResults[polyhedron.symmetry().group]);
+export function expand(polyhedron: Polyhedron, options: *, result: string) {
+  return doExpansion(polyhedron, result);
 }
-
-const snubResults = {
-  T: 'icosahedron',
-  O: 'snub cube',
-  I: 'snub dodecahedron',
-};
 
 // TODO test chirality
 export const snub: Operation<{ twist: Twist }> = {
-  apply(polyhedron, { twist = 'left' }) {
-    return doExpansion(
-      polyhedron,
-      snubResults[polyhedron.symmetry().group],
-      twist,
-    );
+  apply(polyhedron, { twist = 'left' }, result: string) {
+    return doExpansion(polyhedron, result, twist);
   },
   getAllOptions(polyhedron) {
     return [{ twist: 'left' }, { twist: 'right' }];

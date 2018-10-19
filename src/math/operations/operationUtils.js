@@ -240,7 +240,7 @@ export function normalizeOperation(op: *, name: OpName): Operation<*> {
       const next = getNextPolyhedron(polyhedron, name, _.pickBy(searchOptions));
 
       // Get the actual operation result
-      const opResult = withDefaults.apply(polyhedron, options);
+      const opResult = withDefaults.apply(polyhedron, options, next);
       return normalizeOpResult(opResult, next);
     },
     getHitOption(polyhedron, hitPnt, options) {

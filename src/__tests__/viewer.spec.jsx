@@ -49,8 +49,12 @@ describe('viewer', () => {
   });
 
   it('unsets the operation when there are no more options', () => {
-    setup('tetrahedron');
-    page.clickButtonWithText('rectify').expectTransitionTo('octahedron');
+    setup('cuboctahedron');
+    page
+      .clickButtonWithText('sharpen')
+      .clickFaceWithNumSides(4)
+      .expectTransitionTo('octahedron')
+      .expectOperation('');
   });
 
   it('unsets the operation when clicking a different tab', () => {

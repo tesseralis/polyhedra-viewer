@@ -8,17 +8,17 @@ describe('chained tests', () => {
   const tests = [
     {
       description: 'combining twist and turn operations',
-      start: 'elongated-pentagonal-bipyramid',
+      start: 'elongated pentagonal bipyramid',
       operations: [
         ['turn', 'icosahedron'],
         ['twist', 'cuboctahedron'],
         ['twist', 'icosahedron'],
-        ['turn', 'elongated-pentagonal-bipyramid'],
+        ['turn', 'elongated pentagonal bipyramid'],
       ],
     },
     {
       description: 'augmenting and contracting icosahedron',
-      start: 'gyroelongated-pentagonal-pyramid',
+      start: 'gyroelongated pentagonal pyramid',
       operations: [
         { op: 'augment', args: { n: 5 }, expected: 'icosahedron' },
         ['contract', 'tetrahedron'],
@@ -47,18 +47,18 @@ describe('chained tests', () => {
       description: 'truncation and rectification',
       start: 'tetrahedron',
       operations: [
-        ['truncate', 'truncated-tetrahedron'],
+        ['truncate', 'truncated tetrahedron'],
         ['sharpen', 'tetrahedron'],
         ['rectify', 'octahedron'],
         ['rectify', 'cuboctahedron'],
-        ['truncate', 'truncated-cuboctahedron'],
+        ['truncate', 'truncated cuboctahedron'],
         ['sharpen', 'cuboctahedron'],
         { op: 'sharpen', args: { faceType: 3 }, expected: 'cube' },
-        ['truncate', 'truncated-cube'],
+        ['truncate', 'truncated cube'],
         {
           op: 'augment',
           args: { n: 8 },
-          expected: 'augmented-truncated-cube',
+          expected: 'augmented truncated cube',
         },
       ],
     },

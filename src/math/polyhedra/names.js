@@ -124,7 +124,7 @@ export function isConwaySymbol(symbol: string) {
   return false;
 }
 
-const fromConwayNotationUnescaped = notation => {
+export const fromConwayNotation = (notation: string) => {
   const prefix = notation[0];
   const number = notation.substring(1);
   if (platonicMapping[notation]) {
@@ -144,9 +144,6 @@ const fromConwayNotationUnescaped = notation => {
   }
   return '';
 };
-
-export const fromConwayNotation = (notation: string) =>
-  escapeName(fromConwayNotationUnescaped(notation));
 
 export const toConwayNotation = (solid: string) => {
   const name = unescapeName(solid);

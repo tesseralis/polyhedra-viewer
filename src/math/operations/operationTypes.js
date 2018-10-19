@@ -41,7 +41,11 @@ type SelectState = 'selected' | 'selectable';
  * and the related functionality.
  */
 export interface Operation<Options = {}> {
-  apply(polyhedron: Polyhedron, options: Options): Polyhedron | PartialOpResult;
+  apply(
+    polyhedron: Polyhedron,
+    options: Options,
+    result: string,
+  ): Polyhedron | PartialOpResult;
 
   getSearchOptions?: (polyhedron: Polyhedron, options: Options) => ?{};
 

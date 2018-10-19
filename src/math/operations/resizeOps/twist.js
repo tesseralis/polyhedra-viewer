@@ -9,7 +9,6 @@ import {
   isExpandedFace,
   getResizedVertices,
   expansionType,
-  getFamily,
 } from './resizeUtils';
 import { Operation } from '../operationTypes';
 
@@ -120,23 +119,9 @@ function doTwist(polyhedron, referenceName, twist = 'left') {
   };
 }
 
-const expansionResults = {
-  T: 'cuboctahedron',
-  O: 'rhombicuboctahedron',
-  I: 'rhombicosidodecahedron',
-};
-
-const snubResults = {
-  T: 'icosahedron',
-  O: 'snub cube',
-  I: 'snub dodecahedron',
-};
-
 export const twist: Operation<{ twist: Twist }> = {
-  apply(polyhedron, { twist: twistOpt }) {
-    const results =
-      expansionType(polyhedron) === 'snub' ? expansionResults : snubResults;
-    return doTwist(polyhedron, results[getFamily(polyhedron)], twistOpt);
+  apply(polyhedron, { twist: twistOpt }, result) {
+    return doTwist(polyhedron, result, twistOpt);
   },
   getAllOptions(polyhedron) {
     if (expansionType(polyhedron) !== 'snub') {

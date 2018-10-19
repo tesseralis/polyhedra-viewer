@@ -33,7 +33,7 @@ class ApplyOperation extends Component<*> {
     if (!operation) throw new Error('no operation defined');
 
     const { result, animationData } = operation.apply(polyhedron, options);
-    if (!operation.hasOptions(polyhedron) || _.isEmpty(options)) {
+    if (!operation.hasOptions(result) || _.isEmpty(options)) {
       unsetOperation();
     } else {
       setOperation(opName, result);

@@ -5,31 +5,13 @@ import { flatMap, repeat, find } from 'utils';
 import { withOrigin, PRECISION } from 'math/geom';
 import { Polyhedron } from 'math/polyhedra';
 
-function getFamily(polyhedron) {
-  const faceTypes = polyhedron.faceTypes();
-  if (_.includes(faceTypes, 5)) return 'I';
-  if (_.includes(faceTypes, 4)) return 'O';
-  return 'T';
-}
-
-function getReference(type) {
-  switch (type) {
-    case 'O':
-      return 'truncated cuboctahedron';
-    case 'I':
-      return 'truncated icosidodecahedron';
-    default:
-      throw new Error('Unidentified polyhedron');
-  }
-}
-
 // Side ratios gotten when calling our "sharpen" operation on a bevelled polyhedron
 // I couldn't actually figure out the math for this so I reverse engineered it.
-function getRectifiedMultiplier(type) {
-  switch (type) {
-    case 'O':
+function getRectifiedMultiplier(result) {
+  switch (result) {
+    case 'truncated cuboctahedron':
       return 0.37966751081253297;
-    case 'I':
+    case 'truncated icosidodecahedron':
       return 0.4059223426569837;
     default:
       throw new Error('Unidentified polyhedron');
@@ -71,22 +53,21 @@ function getTruncateLength(polyhedron) {
   return 2 * face.apothem() * Math.tan(newTheta);
 }
 
-function getTruncateTransform(polyhedron, duplicated) {
+function getTruncateTransform(polyhedron, duplicated, result = '') {
   if (polyhedron.isRegular()) {
     return (vector, vertex) => vector;
   }
 
   // If we're doing a bevel, we need to do some fidgeting to make sure the created
   // faces are all regular
-  const family = getFamily(polyhedron);
   const truncateLength = getTruncateLength(polyhedron);
   const oldSideLength = polyhedron.edgeLength();
 
-  const multiplier = getRectifiedMultiplier(family);
+  const multiplier = getRectifiedMultiplier(result);
   const newSideLength = oldSideLength * multiplier;
   const faceResizeScale = newSideLength / truncateLength;
 
-  const reference = Polyhedron.get(getReference(family));
+  const reference = Polyhedron.get(result);
   const normalizedResizeAmount =
     reference.faceWithNumSides(6).distanceToCenter() / reference.edgeLength() -
     polyhedron.smallestFace().distanceToCenter() / newSideLength;
@@ -105,12 +86,12 @@ function getTruncateTransform(polyhedron, duplicated) {
   };
 }
 
-function doTruncate(polyhedron, rectify = false) {
+function doTruncate(polyhedron, rectify = false, result) {
   const truncateLength = getTruncateLength(polyhedron);
   const oldSideLength = polyhedron.edgeLength();
   const truncateScale = (oldSideLength - truncateLength) / 2 / oldSideLength;
   const duplicated = duplicateVertices(polyhedron);
-  const transform = getTruncateTransform(polyhedron, duplicated);
+  const transform = getTruncateTransform(polyhedron, duplicated, result);
 
   const truncatedVertices = duplicated.vertices.map(vertex => {
     const adjacentVertices = vertex.adjacentVertices();
@@ -127,8 +108,8 @@ function doTruncate(polyhedron, rectify = false) {
   };
 }
 
-export function truncate(polyhedron: Polyhedron) {
-  return doTruncate(polyhedron);
+export function truncate(polyhedron: Polyhedron, options: *, result: string) {
+  return doTruncate(polyhedron, false, result);
 }
 
 export function rectify(polyhedron: Polyhedron) {
