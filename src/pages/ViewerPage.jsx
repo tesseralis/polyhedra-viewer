@@ -44,7 +44,6 @@ export default class ViewerPage extends AppPage {
   }
 
   expectTransitionTo(expected: string) {
-    // TODO do a more robust animation test
     this.wrapper.update();
     this.expectPath(`/${expected}/operations`);
     expect(this.getPolyhedron().isSame(Polyhedron.get(expected))).toBe(true);

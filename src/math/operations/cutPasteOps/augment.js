@@ -308,8 +308,11 @@ export const augment = makeOperation('augment', {
   },
 
   getAllOptions(polyhedron, relations) {
+    // TODO which polyhedra have gyrate ops?
     const rawGyrateOpts = _.compact(_.uniq(_.map(relations, 'gyrate')));
     const gyrateOpts = rawGyrateOpts.length === 2 ? rawGyrateOpts : [undefined];
+
+    // TODO which polyhedra have using opts?
     const rawUsingOpts = _.compact(_.uniq(_.map(relations, 'using')));
     // Only do using opts if we can do more than one of each type
     const usingOpts = _(rawUsingOpts)

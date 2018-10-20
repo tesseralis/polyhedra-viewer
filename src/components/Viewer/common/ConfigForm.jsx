@@ -4,7 +4,7 @@ import { makeStyles } from 'styles';
 import _ from 'lodash';
 
 import { WithConfig } from 'components/ConfigContext';
-import { configInputs } from 'constants/configOptions';
+import { configInputs } from 'components/configOptions';
 import { hover } from 'styles/common';
 import { andaleMono } from 'styles/fonts';
 

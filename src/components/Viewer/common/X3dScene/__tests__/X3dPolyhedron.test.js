@@ -3,7 +3,7 @@ import React from 'react';
 import { X3dPolyhedron } from '../X3dPolyhedron';
 
 import { shallow } from 'enzyme';
-import { defaultConfig } from 'constants/configOptions';
+import { defaultConfig } from 'components/configOptions';
 import { Polyhedron } from 'math/polyhedra';
 
 let wrapper;

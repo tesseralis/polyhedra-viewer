@@ -1,6 +1,6 @@
 // @flow strict
 import _ from 'lodash';
-import { defaultConfig } from 'constants/configOptions';
+import { defaultConfig } from './configOptions';
 
 import React, { Component } from 'react';
 

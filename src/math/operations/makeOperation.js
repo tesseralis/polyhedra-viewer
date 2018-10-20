@@ -1,6 +1,7 @@
 // @flow strict
 import _ from 'lodash';
 
+import { getSingle } from 'utils';
 import { fromConwayNotation } from 'math/polyhedra/names';
 import { vec, PRECISION } from 'math/geom';
 import { Polyhedron, normalizeVertex } from 'math/polyhedra';
@@ -41,21 +42,7 @@ function getNextPolyhedron<O>(solid, operation: string, filterOpts: O) {
   const next = _(results)
     .filter(!_.isEmpty(filterOpts) ? filterOpts : _.stubTrue)
     .value();
-  if (next.length > 1) {
-    throw new Error(
-      `Multiple possibilities found for operation ${operation} on ${solid} with options ${JSON.stringify(
-        filterOpts,
-      )}: ${JSON.stringify(next)}`,
-    );
-  } else if (next.length === 0) {
-    throw new Error(
-      `No possibilities found for operation ${operation} on ${solid} with options ${JSON.stringify(
-        filterOpts,
-      )}. Are you sure you didn't put in too many?`,
-    );
-  }
-
-  return fromConwayNotation(next[0].value);
+  return fromConwayNotation(getSingle(next).value);
 }
 
 function normalizeOpResult(opResult, newName) {
@@ -153,8 +140,8 @@ export default function makeOperation(name: string, op: *): Operation<*> {
     getHitOption(polyhedron, hitPnt, options) {
       return withDefaults.getHitOption(polyhedron, vec(hitPnt), options);
     },
-    resultsFor(polyhedron) {
-      return getOpResults(polyhedron, name);
+    canApplyTo(polyhedron) {
+      return !!getOpResults(polyhedron, name);
     },
     hasOptions(polyhedron) {
       const relations = getOpResults(polyhedron, name);

@@ -3,22 +3,13 @@ import _ from 'lodash';
 
 import { johnsonSolids, allSolidNames } from 'data';
 import { choose } from 'utils';
-import polygons from 'constants/polygons';
+import polygons, { polygonPrefixes } from '../polygons';
 
 export const escapeName = (name: string) => name.replace(/ /g, '-');
 
 export const unescapeName = (name: string) => name.replace(/-/g, ' ');
 
-const prismNames = {
-  '3': 'triangular',
-  '4': 'square',
-  '5': 'pentagonal',
-  '6': 'hexagonal',
-  '8': 'octagonal',
-  '10': 'decagonal',
-};
-
-const inversePrismNames = _.invert(prismNames);
+const inversePrismNames = _.invert(polygonPrefixes);
 
 const platonicMapping = {
   T: 'tetrahedron',
@@ -136,10 +127,10 @@ export const fromConwayNotation = (notation: string) => {
     return johnsonSolids[_.toNumber(number) - 1];
   }
   if (prefix === 'P') {
-    return `${prismNames[number]} prism`;
+    return `${polygonPrefixes[number]} prism`;
   }
   if (prefix === 'A') {
-    return `${prismNames[number]} antiprism`;
+    return `${polygonPrefixes[number]} antiprism`;
   }
   return '';
 };

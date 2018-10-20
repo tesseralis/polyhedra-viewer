@@ -62,7 +62,6 @@ export const gyrate = makeOperation('gyrate', {
     if (!cap) {
       throw new Error('Invalid cap');
     }
-    // TODO can we not rely on relations?
     if (_.some(relations, 'direction')) {
       options.direction = getGyrateDirection(polyhedron, cap);
       if (

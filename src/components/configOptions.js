@@ -2,7 +2,7 @@
 import _ from 'lodash';
 import { schemeSet1 } from 'd3-scale-chromatic';
 
-import polygons, { polygonNames } from './polygons';
+import polygons, { polygonNames } from 'math/polygons';
 
 const polygonSchemeIdx = { '3': 4, '4': 0, '5': 1, '6': 2, '8': 6, '10': 3 };
 

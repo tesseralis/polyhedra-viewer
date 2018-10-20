@@ -10,3 +10,12 @@ export const polygonNames = {
   '8': 'octagon',
   '10': 'decagon',
 };
+
+export const polygonPrefixes = {
+  '3': 'triangular',
+  '4': 'square',
+  '5': 'pentagonal',
+  '6': 'hexagonal',
+  '8': 'octagonal',
+  '10': 'decagonal',
+};

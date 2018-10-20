@@ -3,7 +3,7 @@ import React, { Fragment } from 'react';
 import { makeStyles } from 'styles';
 import _ from 'lodash';
 
-import { polygonNames } from 'constants/polygons';
+import { polygonNames } from 'math/polygons';
 import { fonts } from 'styles';
 
 import connect from 'components/connect';

@@ -94,7 +94,7 @@ function OpGrid({ isTransitioning, polyhedron, opName, selectOperation }) {
           name={name}
           highlighted={opName === name}
           onClick={() => selectOperation(name)}
-          disabled={!operations[name].resultsFor(polyhedron) || isTransitioning}
+          disabled={!operations[name].canApplyTo(polyhedron) || isTransitioning}
         />
       ))}
     </div>
