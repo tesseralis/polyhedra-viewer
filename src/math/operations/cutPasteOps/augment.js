@@ -2,6 +2,7 @@
 import _ from 'lodash';
 
 import { Polyhedron, Cap } from 'math/polyhedra';
+import { inRow, inColumn, inSection } from 'math/polyhedra/tableUtils';
 import { isInverse, getOrthonormalTransform, PRECISION } from 'math/geom';
 import { getCyclic, getSingle } from 'utils';
 
@@ -307,19 +308,37 @@ export const augment = makeOperation('augment', {
     };
   },
 
-  getAllOptions(polyhedron, relations) {
-    // TODO which polyhedra have gyrate ops?
-    const rawGyrateOpts = _.compact(_.uniq(_.map(relations, 'gyrate')));
-    const gyrateOpts = rawGyrateOpts.length === 2 ? rawGyrateOpts : [undefined];
+  getAllOptions(polyhedron) {
+    const hasGyrateOpts = (() => {
+      if (inSection(polyhedron.name, 'rhombicosidodecahedra')) {
+        return true;
+      }
+      const cupolaRows = [
+        'triangular cupola',
+        'square cupola',
+        'pentagonal cupola',
+        'pentagonal rotunda',
+      ];
+      if (inColumn(polyhedron.name, 'capstones', 'gyroelongated')) {
+        return false;
+      }
+      if (_.some(cupolaRows, row => inRow(polyhedron.name, 'capstones', row))) {
+        return true;
+      }
+      return false;
+    })();
+    const gyrateOpts = hasGyrateOpts ? ['ortho', 'gyro'] : [undefined];
 
-    // TODO which polyhedra have using opts?
-    const rawUsingOpts = _.compact(_.uniq(_.map(relations, 'using')));
-    // Only do using opts if we can do more than one of each type
-    const usingOpts = _(rawUsingOpts)
-      .countBy(using => getAugmenteeNumSides(using))
-      .some(count => count > 1)
-      ? rawUsingOpts
-      : [undefined];
+    const usingOpts = (() => {
+      if (polyhedron.name === 'triangular prism') {
+        return ['U2', 'Y4'];
+      }
+      const rows = ['pentagonal cupola', 'pentagonal rotunda'];
+      if (_.some(rows, row => inRow(polyhedron.name, 'capstones', row))) {
+        return ['U5', 'R5'];
+      }
+      return [undefined];
+    })();
     const faceOpts = _.map(polyhedron.faces.filter(face => canAugment(face)));
 
     const options = [];

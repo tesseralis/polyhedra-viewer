@@ -21,7 +21,7 @@ interface OperationResult {
 
 const methodDefaults = {
   getHitOption: {},
-  getAllOptions: [undefined],
+  getAllOptions: [null],
   getSearchOptions: undefined,
   getSelectState: [],
   applyOptionsFor: {},

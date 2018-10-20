@@ -9,11 +9,6 @@ setupOperations();
 // map from polyhedron to excluded operations
 const excludedOperations = {};
 
-function getOptsToTest(operation, polyhedron) {
-  const relations = getOpResults(polyhedron, operation.name);
-  return operation.getAllOptions(polyhedron, relations) || [undefined];
-}
-
 // TODO reconsider how these tests are organized
 describe('applyOperation', () => {
   allSolidNames.forEach(solidName => {
@@ -24,7 +19,7 @@ describe('applyOperation', () => {
       opNames.forEach(opName => {
         const polyhedron = Polyhedron.get(solidName);
         const operation = operations[opName];
-        const optsToTest = getOptsToTest(operation, polyhedron);
+        const optsToTest = operation.getAllOptions(polyhedron);
         optsToTest.forEach(options => {
           const result = operation.apply(polyhedron, options);
           expect(result).toBeValidPolyhedron();
