@@ -3,7 +3,7 @@ import graph from './operationGraph';
 import { allSolidNames } from 'data';
 import { toConwayNotation } from 'math/polyhedra/names';
 
-// Tests on the relations graph, mostly focusing on edge cases
+// Tests on the operation graph, mostly focusing on edge cases
 describe('operationGraph', () => {
   it('has an entry for every polyhedron', () => {
     _.forEach(allSolidNames, name => {

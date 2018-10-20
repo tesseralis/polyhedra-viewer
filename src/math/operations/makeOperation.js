@@ -131,11 +131,11 @@ export default function makeOperation(name: string, op: *): Operation<*> {
     name,
     apply(polyhedron, options = {}) {
       // get the next polyhedron name
-      const relations = getOpResults(polyhedron, name);
+      const results = getOpResults(polyhedron, name);
       const searchOptions = withDefaults.getSearchOptions(
         polyhedron,
         options,
-        relations,
+        results,
       );
       const next = getNextPolyhedron(polyhedron, name, _.pickBy(searchOptions));
 
