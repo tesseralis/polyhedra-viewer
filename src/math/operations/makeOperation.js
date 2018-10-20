@@ -1,11 +1,13 @@
 // @flow strict
 import _ from 'lodash';
 
+import { toConwayNotation } from 'math/polyhedra/names';
+import operationGraph from './operationGraph';
 import { getSingle } from 'utils';
 import { fromConwayNotation } from 'math/polyhedra/names';
 import { vec, PRECISION } from 'math/geom';
 import { Polyhedron, normalizeVertex } from 'math/polyhedra';
-import { removeExtraneousVertices, getOpResults } from './operationUtils';
+import { removeExtraneousVertices } from './operationUtils';
 import type { Point } from 'types';
 
 type SelectState = 'selected' | 'selectable' | null;
@@ -26,6 +28,10 @@ const methodDefaults = {
   getSelectState: [],
   applyOptionsFor: {},
 };
+
+export function getOpResults(solid: Polyhedron, opName: string) {
+  return operationGraph[toConwayNotation(solid.name)][opName];
+}
 
 function fillDefaults(op) {
   return {

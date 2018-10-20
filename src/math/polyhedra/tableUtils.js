@@ -3,6 +3,8 @@ import _ from 'lodash';
 import * as sections from './tables';
 import { toConwayNotation } from './names';
 
+// TODO do some thinking and make a smarter table data structure,
+// and come up with a better API for this stuff
 function hasDeep(collection, value) {
   if (collection instanceof Array) {
     return _.some(collection, item => hasDeep(item, value));

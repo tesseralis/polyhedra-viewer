@@ -2,7 +2,6 @@
 import _ from 'lodash';
 import { allSolidNames } from 'data';
 import { PRECISION, isPlanar } from 'math/geom';
-import { getOperations } from './operationUtils';
 import { Polyhedron, Cap } from 'math/polyhedra';
 import { operations } from 'math/operations';
 

@@ -1,20 +1,9 @@
 // @flow strict
 import _ from 'lodash';
 
-import { toConwayNotation } from 'math/polyhedra/names';
-import operationGraph from './operationGraph';
 import type { Twist } from 'types';
 import { Polyhedron, Vertex, Edge, VertexList } from 'math/polyhedra';
 import { Vec3D, type Transform } from 'math/geom';
-
-export function getOpResults(solid: Polyhedron, opName: string) {
-  return operationGraph[toConwayNotation(solid.name)][opName];
-}
-
-export function getOperations(solid: string) {
-  return _.keys(operationGraph[toConwayNotation(solid)]);
-}
-
 /**
  * Remove vertices in the polyhedron that aren't connected to any faces,
  * and remap the faces to the smaller indices

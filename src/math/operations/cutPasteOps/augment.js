@@ -6,7 +6,6 @@ import { inRow, inColumn, inSection } from 'math/polyhedra/tableUtils';
 import { isInverse, getOrthonormalTransform, PRECISION } from 'math/geom';
 import { getCyclic, getSingle } from 'utils';
 
-import { getOpResults } from '../operationUtils';
 import makeOperation from '../makeOperation';
 import { hasMultiple } from './cutPasteUtils';
 import { withOrigin } from '../../geom';
@@ -39,8 +38,6 @@ const augmentTypes = {
   U: 'cupola',
   R: 'rotunda',
 };
-
-const usingTypeOrder = ['Y', 'U', 'R'];
 
 function getAugmentAlignment(polyhedron, face) {
   const boundary = getSingle(Cap.getAll(polyhedron)).boundary();
@@ -247,12 +244,6 @@ const defaultAugmentees = {
   '10': 'U5',
 };
 
-const augmenteeSides = {
-  ..._.invert(defaultAugmentees),
-  U2: 4,
-  R5: 10,
-};
-
 function getAugmenteeNumSides(using: string) {
   const prefix = using[0];
   const index = _.toNumber(using.substring(1));
@@ -265,18 +256,34 @@ export function getUsingOpt(using: ?string, numSides: number) {
     : defaultAugmentees[numSides];
 }
 
-function hasMultipleOptionsForFace(relations) {
-  return _.some(relations, relation =>
-    _.includes(['U2', 'R5'], relation.using),
-  );
-}
+const getUsingOpts = polyhedron => {
+  if (polyhedron.name === 'triangular prism') {
+    return ['Y4', 'U2'];
+  }
+  const rows = ['pentagonal cupola', 'pentagonal rotunda'];
+  if (_.some(rows, row => inRow(polyhedron.name, 'capstones', row))) {
+    return ['U5', 'R5'];
+  }
+  return null;
+};
 
-const getUsingOpts = solid => {
-  const augments = getOpResults(solid, 'augment');
-  const using = _.uniq(_.map(augments, 'using'));
-  const grouped = _.groupBy(using, option => augmenteeSides[option]);
-  const opts = _.find(grouped, group => group.length > 1) || [];
-  return _.sortBy(opts, using => usingTypeOrder.indexOf(using[0]));
+const hasGyrateOpts = polyhedron => {
+  if (inSection(polyhedron.name, 'rhombicosidodecahedra')) {
+    return true;
+  }
+  const cupolaRows = [
+    'triangular cupola',
+    'square cupola',
+    'pentagonal cupola',
+    'pentagonal rotunda',
+  ];
+  if (inColumn(polyhedron.name, 'capstones', 'gyroelongated')) {
+    return false;
+  }
+  if (_.some(cupolaRows, row => inRow(polyhedron.name, 'capstones', row))) {
+    return true;
+  }
+  return false;
 };
 
 export const augment = makeOperation('augment', {
@@ -309,36 +316,11 @@ export const augment = makeOperation('augment', {
   },
 
   getAllOptions(polyhedron) {
-    const hasGyrateOpts = (() => {
-      if (inSection(polyhedron.name, 'rhombicosidodecahedra')) {
-        return true;
-      }
-      const cupolaRows = [
-        'triangular cupola',
-        'square cupola',
-        'pentagonal cupola',
-        'pentagonal rotunda',
-      ];
-      if (inColumn(polyhedron.name, 'capstones', 'gyroelongated')) {
-        return false;
-      }
-      if (_.some(cupolaRows, row => inRow(polyhedron.name, 'capstones', row))) {
-        return true;
-      }
-      return false;
-    })();
-    const gyrateOpts = hasGyrateOpts ? ['ortho', 'gyro'] : [undefined];
+    const gyrateOpts = hasGyrateOpts(polyhedron)
+      ? ['ortho', 'gyro']
+      : [undefined];
 
-    const usingOpts = (() => {
-      if (polyhedron.name === 'triangular prism') {
-        return ['U2', 'Y4'];
-      }
-      const rows = ['pentagonal cupola', 'pentagonal rotunda'];
-      if (_.some(rows, row => inRow(polyhedron.name, 'capstones', row))) {
-        return ['U5', 'R5'];
-      }
-      return [undefined];
-    })();
+    const usingOpts = getUsingOpts(polyhedron) || [null];
     const faceOpts = _.map(polyhedron.faces.filter(face => canAugment(face)));
 
     const options = [];
@@ -384,14 +366,10 @@ export const augment = makeOperation('augment', {
 
   applyOptionsFor(solid) {
     if (!solid) return;
-    const results = getOpResults(solid, 'augment');
-    const newOpts = {};
-    if (_.filter(results, 'gyrate').length > 1) {
-      newOpts.gyrate = 'gyro';
-    }
-    if (hasMultipleOptionsForFace(results)) {
-      newOpts.using = getUsingOpts(solid)[0];
-    }
-    return newOpts;
+    const usingOpts = getUsingOpts(solid) || [];
+    return _.pickBy({
+      gyrate: hasGyrateOpts(solid) && 'gyro',
+      using: usingOpts.length > 1 && usingOpts[0],
+    });
   },
 });
