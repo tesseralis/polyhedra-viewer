@@ -3,6 +3,7 @@ import _ from 'lodash';
 import type { Twist } from 'types';
 import { find } from 'utils';
 import { Polyhedron, Cap } from 'math/polyhedra';
+import { inRow, inColumn } from 'math/polyhedra/tableUtils';
 import { withOrigin, isInverse } from 'math/geom';
 import { getTwistSign, getTransformedVertices } from '../operationUtils';
 
@@ -33,14 +34,11 @@ export function getChirality(polyhedron: Polyhedron) {
 }
 
 export function isGyroelongatedBiCupola(polyhedron: Polyhedron) {
-  const caps = Cap.getAll(polyhedron);
-  if (!caps[0]) return false;
-  const boundary = caps[0].boundary();
-  return (
-    caps.length === 2 &&
-    boundary.numSides > 5 &&
-    boundary.adjacentFaces()[0].numSides === 3
-  );
+  const pyrRows = ['square pyramid', 'pentagonal pyramid'];
+  if (_.some(pyrRows, row => inRow(polyhedron.name, 'capstones', row))) {
+    return false;
+  }
+  return inColumn(polyhedron.name, 'capstones', 'gyroelongated bi-');
 }
 
 function getOppositeCaps(polyhedron: Polyhedron) {
