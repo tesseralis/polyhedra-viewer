@@ -4,7 +4,7 @@ import _ from 'lodash';
 
 import { flatMap } from 'utils';
 import { fromConwayNotation } from 'math/polyhedra/names';
-import { type Table } from 'constants/polyhedronTables';
+import { type Table } from 'math/polyhedra/tables';
 import PolyhedronLink from './PolyhedronLink';
 import { makeStyles, media, fonts } from 'styles';
 

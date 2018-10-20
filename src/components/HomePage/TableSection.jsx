@@ -3,7 +3,7 @@ import React from 'react';
 import { makeStyles } from 'styles';
 
 import { media, fonts } from 'styles';
-import { type TableSection as TableSectionType } from 'constants/polyhedronTables';
+import { type TableSection as TableSectionType } from 'math/polyhedra/tables';
 import Description from './Description';
 import PolyhedronTable from './PolyhedronTable';
 

@@ -1,6 +1,6 @@
 // @flow strict
 import _ from 'lodash';
-import { prisms, capstones, augmented } from 'constants/polyhedronTables';
+import { prisms, capstones, augmented } from 'math/polyhedra/tables';
 import { toConwayNotation } from '../polyhedra/names';
 import { mapObject } from 'utils';
 

@@ -17,7 +17,7 @@ import {
   others,
   othersTwoRows,
   type TableSection,
-} from 'constants/polyhedronTables';
+} from 'math/polyhedra/tables';
 
 const polyhedronTables: TableSection[] = [
   {

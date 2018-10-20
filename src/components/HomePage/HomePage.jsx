@@ -2,7 +2,7 @@
 import React from 'react';
 
 import { makeStyles } from 'styles';
-import { type TableSection as TableSectionType } from 'constants/polyhedronTables';
+import { type TableSection as TableSectionType } from 'math/polyhedra/tables';
 import { DeviceTracker } from 'components/DeviceContext';
 import { PageTitle } from 'components/common';
 
