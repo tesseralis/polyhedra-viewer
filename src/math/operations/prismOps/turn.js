@@ -99,7 +99,7 @@ function doTurn(polyhedron, { twist = 'left' }) {
 
 export const turn = makeOperation('turn', {
   apply: doTurn,
-  getSearchOptions(polyhedron, options) {
+  resultsFilter(polyhedron, options) {
     if (!isGyroelongatedBiCupola(polyhedron)) return;
     const { twist } = options;
     const chirality = getChirality(polyhedron);
@@ -107,7 +107,7 @@ export const turn = makeOperation('turn', {
     return { gyrate };
   },
 
-  getAllOptions(polyhedron) {
+  allOptionCombos(polyhedron) {
     if (isGyroelongatedBiCupola(polyhedron)) {
       return [{ twist: 'left' }, { twist: 'right' }];
     }

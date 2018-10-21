@@ -63,7 +63,7 @@ export function applyContract(
 export const contract = makeOperation('contract', {
   apply: applyContract,
 
-  getSearchOptions(polyhedron, config) {
+  resultsFilter(polyhedron, config) {
     const { faceType } = config;
     switch (getFamily(polyhedron)) {
       case 'O':
@@ -82,7 +82,7 @@ export const contract = makeOperation('contract', {
     return isValid ? { faceType: hitFace.numSides } : {};
   },
 
-  getAllOptions(polyhedron) {
+  allOptionCombos(polyhedron) {
     switch (getFamily(polyhedron)) {
       case 'O':
         return [{ faceType: 3 }, { faceType: 4 }];
@@ -93,7 +93,7 @@ export const contract = makeOperation('contract', {
     }
   },
 
-  getSelectState(polyhedron, { faceType }) {
+  faceSelectionStates(polyhedron, { faceType }) {
     return polyhedron.faces.map(face => {
       if (faceType && isExpandedFace(polyhedron, face, faceType))
         return 'selected';

@@ -16,7 +16,7 @@ describe('applyOperation', () => {
       _.forEach(polyhedra, polyhedron => {
         if (operation.canApplyTo(polyhedron)) {
           it(polyhedron.name, () => {
-            const optsToTest = operation.getAllOptions(polyhedron);
+            const optsToTest = operation.allOptionCombos(polyhedron);
             optsToTest.forEach(options => {
               const result = operation.apply(polyhedron, options);
               expect(result).toBeValidPolyhedron();

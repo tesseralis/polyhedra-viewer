@@ -294,7 +294,7 @@ export const augment = makeOperation('augment', {
     return doAugment(polyhedron, face, augmentType, gyrate);
   },
 
-  getSearchOptions(polyhedron, config, relations) {
+  resultsFilter(polyhedron, config, relations) {
     const { face } = config;
 
     if (!face) {
@@ -315,7 +315,7 @@ export const augment = makeOperation('augment', {
     };
   },
 
-  getAllOptions(polyhedron) {
+  allOptionCombos(polyhedron) {
     const gyrateOpts = hasGyrateOpts(polyhedron)
       ? ['ortho', 'gyro']
       : [undefined];
@@ -351,7 +351,7 @@ export const augment = makeOperation('augment', {
     return { face };
   },
 
-  getSelectState(polyhedron, { face, using }) {
+  faceSelectionStates(polyhedron, { face, using }) {
     return _.map(polyhedron.faces, f => {
       if (face && f.equals(face)) return 'selected';
 
@@ -362,10 +362,18 @@ export const augment = makeOperation('augment', {
     });
   },
 
-  // FIXME don't make this part of the main API
-  getUsingOpts,
+  allOptions(polyhedron, optionName) {
+    switch (optionName) {
+      case 'gyrate':
+        return hasGyrateOpts(polyhedron) ? ['ortho', 'gyro'] : [];
+      case 'using':
+        return getUsingOpts(polyhedron) || [];
+      default:
+        return [];
+    }
+  },
 
-  applyOptionsFor(solid) {
+  defaultOptions(solid) {
     if (!solid) return;
     const usingOpts = getUsingOpts(solid) || [];
     return _.pickBy({

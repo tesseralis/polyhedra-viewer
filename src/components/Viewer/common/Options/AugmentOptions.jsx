@@ -72,7 +72,7 @@ function AugmentOptions({ operation, options, polyhedron, setOption }: Props) {
     },
     {
       name: 'using',
-      values: operation.getUsingOpts(polyhedron) || [],
+      values: operation.allOptions(polyhedron, 'using') || [],
       value: using,
       description: 'Some solids have more than one option to augment a face.',
     },

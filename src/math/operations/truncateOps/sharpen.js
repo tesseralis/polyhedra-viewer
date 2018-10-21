@@ -113,7 +113,7 @@ function applySharpen(
 export const sharpen = makeOperation('sharpen', {
   apply: applySharpen,
 
-  getSearchOptions(polyhedron, config) {
+  resultsFilter(polyhedron, config) {
     const { faceType } = config;
     switch (polyhedron.name) {
       case 'cuboctahedron':
@@ -125,7 +125,7 @@ export const sharpen = makeOperation('sharpen', {
     }
   },
 
-  getAllOptions(polyhedron) {
+  allOptionCombos(polyhedron) {
     switch (polyhedron.name) {
       case 'cuboctahedron':
         return [{ faceType: 3 }, { faceType: 4 }];
@@ -142,7 +142,7 @@ export const sharpen = makeOperation('sharpen', {
     return n <= 5 ? { faceType: n } : {};
   },
 
-  getSelectState(polyhedron, { faceType }) {
+  faceSelectionStates(polyhedron, { faceType }) {
     return _.map(polyhedron.faces, face => {
       if (_.isNumber(faceType) && face.numSides === faceType) return 'selected';
       return 'selectable';

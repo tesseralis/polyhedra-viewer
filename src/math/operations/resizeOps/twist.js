@@ -122,7 +122,7 @@ export const twist = makeOperation('twist', {
   apply(polyhedron, { twist: twistOpt }, result) {
     return doTwist(polyhedron, result, twistOpt);
   },
-  getAllOptions(polyhedron) {
+  allOptionCombos(polyhedron) {
     if (expansionType(polyhedron) !== 'snub') {
       return [{ twist: 'left' }, { twist: 'right' }];
     }

@@ -31,7 +31,7 @@ class SolidColors extends PureComponent<*> {
     }
     if (!operation) return polyhedron.faces.map(f => colors[f.numSides]);
     // TODO I want a better way to do this...
-    const selectState = operation.getSelectState(polyhedron, options);
+    const selectState = operation.faceSelectionStates(polyhedron, options);
     return polyhedron.faces.map((face, i) => {
       switch (selectState[i]) {
         case 'selected':

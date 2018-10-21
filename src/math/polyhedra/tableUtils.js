@@ -3,13 +3,14 @@ import _ from 'lodash';
 import * as sections from './tables';
 import { toConwayNotation } from './names';
 
-// FIXME do some thinking and make a smarter table data structure,
-// and come up with a better API for this stuff
+// TODO do some thinking and make a smarter table data structure,
+// and come up with a better API for this stuff.
 //
 // useful operations:
 //
 // * Rows along a section like "cupola" or "pyramid"
 // * Multiple rows
+
 function hasDeep(collection, value) {
   if (collection instanceof Array) {
     return _.some(collection, item => hasDeep(item, value));

@@ -109,13 +109,14 @@ function doTruncate(polyhedron, rectify = false, result) {
   };
 }
 
-export const truncate = makeOperation(
-  'truncate',
-  (polyhedron, options, result) => {
+export const truncate = makeOperation('truncate', {
+  apply(polyhedron, options, result) {
     return doTruncate(polyhedron, false, result);
   },
-);
+});
 
-export const rectify = makeOperation('rectify', polyhedron => {
-  return doTruncate(polyhedron, true);
+export const rectify = makeOperation('rectify', {
+  apply(polyhedron) {
+    return doTruncate(polyhedron, true);
+  },
 });

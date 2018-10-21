@@ -23,10 +23,10 @@ interface OperationResult {
 
 const methodDefaults = {
   getHitOption: {},
-  getAllOptions: [null],
-  getSearchOptions: undefined,
-  getSelectState: [],
-  applyOptionsFor: {},
+  allOptionCombos: [null],
+  resultsFilter: undefined,
+  faceSelectionStates: [],
+  defaultOptions: {},
 };
 
 export function getOpResults(solid: Polyhedron, opName: string) {
@@ -105,8 +105,9 @@ export function deduplicateVertices(polyhedron: Polyhedron) {
 interface Operation<Options = {}> {
   apply(polyhedron: Polyhedron, options: Options): OperationResult;
 
-  // FIXME this shouldn't be in the public interface
-  getSearchOptions(polyhedron: Polyhedron, options: Options): ?{};
+  // this is only defined in the stuff we pull into this,
+  // but Flow is terrible
+  resultsFilter(polyhedron: Polyhedron, options: Options): ?{};
 
   getHitOption(
     polyhedron: Polyhedron,
@@ -115,16 +116,21 @@ interface Operation<Options = {}> {
   ): Options;
 
   /**
+   * @return all the options for the given option name.
+   */
+  allOptions(polyhedron: Polyhedron, optionName: string): mixed[];
+
+  /**
    * Test utility.
    * @return all possible option permutations for applying this operation to the given polyhedron.
    */
-  getAllOptions(polyhedron: Polyhedron): Options[];
+  allOptionCombos(polyhedron: Polyhedron): Options[];
 
   /**
    * Given an application of an operation to a given polyhedron with the given options,
    * @return an array mapping face indices to selection states (selectable, selected, or none).
    */
-  getSelectState(polyhedron: Polyhedron, options: Options): SelectState[];
+  faceSelectionStates(polyhedron: Polyhedron, options: Options): SelectState[];
 
   /**
    * @return whether this operation has results for the given polyhedron.
@@ -135,7 +141,7 @@ interface Operation<Options = {}> {
    * Return the default selected apply options when an operation is
    * selected on a polyhedron.
    */
-  applyOptionsFor(polyhedron: Polyhedron): Options;
+  defaultOptions(polyhedron: Polyhedron): Options;
 }
 
 export default function makeOperation(name: string, op: *): Operation<*> {
@@ -148,7 +154,7 @@ export default function makeOperation(name: string, op: *): Operation<*> {
     apply(polyhedron, options = {}) {
       // get the next polyhedron name
       const results = getOpResults(polyhedron, name);
-      const searchOptions = withDefaults.getSearchOptions(
+      const searchOptions = withDefaults.resultsFilter(
         polyhedron,
         options,
         results,

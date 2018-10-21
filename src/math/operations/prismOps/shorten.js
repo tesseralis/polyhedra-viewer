@@ -30,7 +30,7 @@ function doShorten(polyhedron: Polyhedron, options) {
 
 export const shorten = makeOperation('shorten', {
   apply: doShorten,
-  getSearchOptions(polyhedron, options) {
+  resultsFilter(polyhedron, options) {
     if (!isGyroelongatedBiCupola(polyhedron)) return;
     const { twist } = options;
     const chirality = getChirality(polyhedron);
@@ -38,7 +38,7 @@ export const shorten = makeOperation('shorten', {
     return { gyrate };
   },
 
-  getAllOptions(polyhedron) {
+  allOptionCombos(polyhedron) {
     if (isGyroelongatedBiCupola(polyhedron)) {
       return [{ twist: 'left' }, { twist: 'right' }];
     }

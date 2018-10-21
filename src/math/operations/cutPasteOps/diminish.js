@@ -20,7 +20,7 @@ export const diminish = makeOperation('diminish', {
     return removeCap(polyhedron, cap);
   },
 
-  getSearchOptions(polyhedron, config, relations) {
+  resultsFilter(polyhedron, config, relations) {
     const options = {};
     const { cap } = config;
     if (!cap) {
@@ -44,7 +44,7 @@ export const diminish = makeOperation('diminish', {
     return options;
   },
 
-  getAllOptions(polyhedron) {
+  allOptionCombos(polyhedron) {
     return Cap.getAll(polyhedron).map(cap => ({ cap }));
   },
 
@@ -54,7 +54,7 @@ export const diminish = makeOperation('diminish', {
     return cap ? { cap } : {};
   },
 
-  getSelectState(polyhedron, { cap }) {
+  faceSelectionStates(polyhedron, { cap }) {
     const allCapFaces = flatMap(Cap.getAll(polyhedron), cap => cap.faces());
     return _.map(polyhedron.faces, face => {
       if (_.isObject(cap) && face.inSet(cap.faces())) return 'selected';

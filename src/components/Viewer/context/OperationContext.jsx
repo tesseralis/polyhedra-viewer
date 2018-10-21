@@ -50,7 +50,7 @@ export class OperationProvider extends Component<*, *> {
     this.setState({
       opName,
       // TODO should we just store the operation instead?
-      options: operations[opName].applyOptionsFor(solid),
+      options: operations[opName].defaultOptions(solid),
     });
   };
 
