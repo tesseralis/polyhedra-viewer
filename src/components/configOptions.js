@@ -1,10 +1,17 @@
 // @flow strict
 import _ from 'lodash';
-import { schemeSet1 } from 'd3-scale-chromatic';
-
 import polygons, { polygonNames } from 'math/polygons';
 
-const polygonSchemeIdx = { '3': 4, '4': 0, '5': 1, '6': 2, '8': 6, '10': 3 };
+// Colors from d3-scale-chromatic:
+// https://github.com/d3/d3-scale-chromatic#schemeCategory10
+const defaultColors = {
+  '3': '#ff7f00',
+  '4': '#e41a1c',
+  '5': '#377eb8',
+  '6': '#4daf4a',
+  '8': '#a65628',
+  '10': '#984ea3',
+};
 
 interface ConfigInput {
   key: string;
@@ -17,7 +24,7 @@ const colorOptionsList = polygons.map(n => {
     key: `colors[${n}]`,
     display: `${_.startCase(polygonNames[n])} Color`,
     type: 'color',
-    default: schemeSet1[polygonSchemeIdx[n]],
+    default: defaultColors[n],
   };
 });
 
