@@ -362,6 +362,7 @@ export const augment = makeOperation('augment', {
     });
   },
 
+  // FIXME don't make this part of the main API
   getUsingOpts,
 
   applyOptionsFor(solid) {

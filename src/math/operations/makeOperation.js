@@ -105,6 +105,7 @@ export function deduplicateVertices(polyhedron: Polyhedron) {
 interface Operation<Options = {}> {
   apply(polyhedron: Polyhedron, options: Options): OperationResult;
 
+  // FIXME this shouldn't be in the public interface
   getSearchOptions(polyhedron: Polyhedron, options: Options): ?{};
 
   getHitOption(
@@ -113,12 +114,27 @@ interface Operation<Options = {}> {
     options: Options,
   ): Options;
 
+  /**
+   * Test utility.
+   * @return all possible option permutations for applying this operation to the given polyhedron.
+   */
   getAllOptions(polyhedron: Polyhedron): Options[];
 
+  /**
+   * Given an application of an operation to a given polyhedron with the given options,
+   * @return an array mapping face indices to selection states (selectable, selected, or none).
+   */
   getSelectState(polyhedron: Polyhedron, options: Options): SelectState[];
 
+  /**
+   * @return whether this operation has results for the given polyhedron.
+   */
   hasOptions(polyhedron: Polyhedron): boolean;
 
+  /**
+   * Return the default selected apply options when an operation is
+   * selected on a polyhedron.
+   */
   applyOptionsFor(polyhedron: Polyhedron): Options;
 }
 
