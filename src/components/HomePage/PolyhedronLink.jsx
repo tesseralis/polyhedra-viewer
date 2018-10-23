@@ -1,15 +1,21 @@
 // @flow strict
-import React, { Component } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 
-import { Icon } from 'components/common';
 import { escapeName } from 'math/polyhedra/names';
 import { hover } from 'styles/common';
 import { makeStyles, media } from 'styles';
 
-const thumbnailSize = 65;
+import 'styles/polyhedronIcons.css';
 
+const baseThumbnailSize = 150;
+
+const thumbnailSize = 65;
 const mobThumbnailSize = 50;
+
+function scale(ratio) {
+  return `scale(${ratio}, ${ratio})`;
+}
 
 const styles = makeStyles({
   link: {
@@ -32,12 +38,19 @@ const styles = makeStyles({
     },
   },
 
-  image: {
+  imageWrapper: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
     [media.notMobile]: {
-      height: thumbnailSize + 15,
+      // The spriting/scaling process makes everything a little off center
+      // so we have to adjust
+      paddingLeft: 3,
+      transform: scale((thumbnailSize + 15) / baseThumbnailSize),
     },
     [media.mobile]: {
-      height: mobThumbnailSize + 15,
+      paddingLeft: 4,
+      transform: scale((mobThumbnailSize + 15) / baseThumbnailSize),
     },
   },
 
@@ -52,62 +65,18 @@ interface Props {
   isFake: boolean;
 }
 
-interface State {
-  loaded: boolean;
-  error: boolean;
-}
-
-// TODO can we do this not relying on global state?
-const loadedMap = {};
-
-export default class PolyhedronLink extends Component<Props, State> {
-  constructor(props: Props) {
-    super(props);
-    this.state = {
-      loaded: !!loadedMap[props.name],
-      error: false,
-    };
-  }
-
-  componentDidMount() {
-    const img = new Image();
-    img.onload = () => {
-      this.setState({ loaded: true });
-      // Make sure that we don't show the loading screen if we've already loaded this image
-      // (e.g. if we go back to the home page from another page)
-      loadedMap[this.props.name] = true;
-    };
-    img.onerror = () => {
-      this.setState({ error: true });
-    };
-    img.src = this.imgSrc();
-  }
-
-  render() {
-    const { name, isFake } = this.props;
-    const { loaded, error } = this.state;
-    const escapedName = escapeName(name);
-    return (
-      <Link
-        id={!isFake ? escapedName : undefined}
-        to={'/' + escapedName}
-        className={styles('link', isFake && 'fake')}
-        title={name}
-      >
-        {loaded ? (
-          <img className={styles('image')} src={this.imgSrc()} alt={name} />
-        ) : error ? (
-          <Icon name="alert-circle-outline" size={48} />
-        ) : (
-          <Icon name="hexagon-outline" size={48} />
-        )}
-      </Link>
-    );
-  }
-
-  imgSrc = () => {
-    const { name } = this.props;
-    const escapedName = escapeName(name);
-    return require(`images/thumbnails/${escapedName}.png`);
-  };
+export default function PolyhedronLink({ name, isFake }: Props) {
+  const escapedName = escapeName(name);
+  return (
+    <Link
+      id={!isFake ? escapedName : undefined}
+      to={'/' + escapedName}
+      className={styles('link', isFake && 'fake')}
+      title={name}
+    >
+      <div className={styles('imageWrapper')}>
+        <img className={`icon-${escapedName}`} alt={name} />;
+      </div>
+    </Link>
+  );
 }
