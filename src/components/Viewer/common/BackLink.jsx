@@ -1,5 +1,6 @@
 // @flow strict
 import React from 'react';
+import { mdiChevronLeft } from '@mdi/js';
 
 import IconLink from './IconLink';
 
@@ -9,7 +10,7 @@ export default function BackLink({ solid }: Props) {
   return (
     <IconLink
       iconOnly
-      iconName="chevron-left"
+      iconName={mdiChevronLeft}
       title="Back"
       to={{
         pathname: '/',

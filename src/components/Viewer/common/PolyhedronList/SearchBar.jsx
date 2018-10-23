@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
-import { makeStyles } from 'styles';
+import Icon from '@mdi/react';
+import { mdiMagnify } from '@mdi/js';
 
+import { makeStyles } from 'styles';
 import { andaleMono } from 'styles/fonts';
 import { transition } from 'styles/common';
-
-import { Icon } from 'components/common';
 
 const styles = makeStyles({
   searchBar: {
@@ -71,7 +71,7 @@ export default class SearchBar extends Component {
           className={styles('input')}
         />
         <span className={styles('icon', isFocused && 'iconFocus')}>
-          <Icon name="search" />
+          <Icon path={mdiMagnify} />
         </span>
       </label>
     );

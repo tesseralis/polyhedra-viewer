@@ -12,6 +12,8 @@
     "react-scripts": "^2.0.5"
   },
   "dependencies": {
+    "@mdi/js": "^3.0.39",
+    "@mdi/react": "^1.1.0",
     "aphrodite": "^2.2.3",
     "d3-ease": "^1.0.3",
     "d3-interpolate": "^1.2.0",

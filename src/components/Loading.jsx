@@ -3,7 +3,8 @@ import React from 'react';
 import { makeStyles } from 'styles';
 import { fonts } from 'styles';
 
-import { Icon } from 'components/common';
+import Icon from '@mdi/react';
+import { mdiHexagonOutline } from '@mdi/js';
 
 const styles = makeStyles({
   loading: {
@@ -28,7 +29,7 @@ const styles = makeStyles({
 export default function Loading() {
   return (
     <div className={styles('loading')}>
-      <Icon size={36} name="hexagon-outline" spin />
+      <Icon size="36px" path={mdiHexagonOutline} spin />
       <div className={styles('text')}>Loading...</div>
     </div>
   );

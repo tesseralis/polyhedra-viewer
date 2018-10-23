@@ -1,12 +1,14 @@
 // @flow strict
 
 import React from 'react';
-import { makeStyles } from 'styles';
+import Icon from '@mdi/react';
 
-import { Icon, SrOnly } from 'components/common';
+import { makeStyles } from 'styles';
+import { SrOnly } from 'components/common';
 import { fonts } from 'styles';
 
 import { hover } from 'styles/common';
+import { mdiDownload } from '@mdi/js';
 
 const styles = makeStyles({
   header: {
@@ -83,7 +85,7 @@ export default function DataDownloader({ solid }: Props) {
               href={url}
               className={styles('downloadLink')}
             >
-              <SrOnly>Download as</SrOnly>.{ext} <Icon name="download" />
+              <SrOnly>Download as</SrOnly>.{ext} <Icon path={mdiDownload} />
             </a>
           );
         })}

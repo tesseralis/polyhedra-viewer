@@ -2,8 +2,15 @@
 
 import _ from 'lodash';
 import React from 'react';
-import { makeStyles } from 'styles';
+import {
+  mdiFormatListBulleted,
+  mdiInformationOutline,
+  mdiSettings,
+  mdiMathCompass,
+  mdiCubeOutline,
+} from '@mdi/js';
 
+import { makeStyles } from 'styles';
 import IconLink from './IconLink';
 
 const styles = makeStyles({
@@ -32,7 +39,7 @@ export default function NavMenu({
         replace
         to={`/${solid}/list`}
         title="List"
-        iconName="format-list-bulleted"
+        iconName={mdiFormatListBulleted}
         iconOnly={compact}
         onClick={onClick}
       />
@@ -40,14 +47,14 @@ export default function NavMenu({
         replace
         to={`/${solid}/info`}
         title="Info"
-        iconName="information-outline"
+        iconName={mdiInformationOutline}
         iconOnly={compact}
       />
       <IconLink
         replace
         to={`/${solid}/options`}
         title="Options"
-        iconName="settings"
+        iconName={mdiSettings}
         iconOnly={compact}
         onClick={onClick}
       />
@@ -55,7 +62,7 @@ export default function NavMenu({
         replace
         to={`/${solid}/operations`}
         title="Operations"
-        iconName="math-compass"
+        iconName={mdiMathCompass}
         iconOnly={compact}
         onClick={onClick}
       />
@@ -63,7 +70,7 @@ export default function NavMenu({
         replace
         to={`/${solid}/full`}
         title="Fullscreen"
-        iconName="cube-outline"
+        iconName={mdiCubeOutline}
         iconOnly={compact}
         onClick={onClick}
         exact

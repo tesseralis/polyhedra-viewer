@@ -1,9 +1,10 @@
 // @flow strict
 import React from 'react';
-import { makeStyles } from 'styles';
+import Icon from '@mdi/react';
+import { mdiFacebookBox, mdiTumblrBox, mdiTwitter, mdiReddit } from '@mdi/js';
 
-import { Icon, SrOnly } from 'components/common';
-import { fonts } from 'styles';
+import { fonts, makeStyles } from 'styles';
+import { SrOnly } from 'components/common';
 
 const styles = makeStyles({
   share: {
@@ -17,7 +18,6 @@ const styles = makeStyles({
   },
   link: {
     margin: '0 10px',
-    color: 'DimGrey',
   },
 });
 
@@ -29,22 +29,22 @@ const caption = 'Jinkies! Check out this cool polyhedral geometry app!';
 const links = [
   {
     url: `https://www.facebook.com/sharer.php?u=${url}`,
-    icon: 'facebook-box',
+    icon: mdiFacebookBox,
     name: 'Facebook',
   },
   {
     url: `https://www.tumblr.com/widgets/share/tool?canonicalUrl=${url}&title=${title}&caption=${caption}`,
-    icon: 'tumblr',
+    icon: mdiTumblrBox,
     name: 'Tumblr',
   },
   {
     url: `https://twitter.com/intent/tweet?url=${url}&text=${caption}&via=${author}`,
-    icon: 'twitter',
+    icon: mdiTwitter,
     name: 'Twitter',
   },
   {
     url: `https://reddit.com/submit?url=${url}&title=${title}`,
-    icon: 'reddit',
+    icon: mdiReddit,
     name: 'Reddit',
   },
 ];
@@ -70,7 +70,7 @@ export default function ShareLinks() {
               )
             }
           >
-            <Icon size={36} name={icon} />
+            <Icon size="36px" path={icon} color="DimGrey" />
             <SrOnly>{`Share on ${name}`}</SrOnly>
           </a>
         );

@@ -2,10 +2,12 @@
 import _ from 'lodash';
 import React from 'react';
 import { makeStyles } from 'styles';
+import Icon from '@mdi/react';
 
 import connect from 'components/connect';
-import { Icon, SrOnly } from 'components/common';
+import { SrOnly } from 'components/common';
 import { ApplyOperation, WithPolyhedron } from '../../context';
+import { mdiRotateLeft, mdiRotateRight } from '@mdi/js';
 
 const styles = makeStyles({
   twistOption: {
@@ -30,7 +32,11 @@ function TwistOption({ orientation, onClick, disabled }) {
       onClick={onClick}
       className={styles('twistOption')}
     >
-      <Icon name={`rotate-${orientation}`} angle={180} size={48} />
+      <Icon
+        name={orientation === 'left' ? mdiRotateLeft : mdiRotateRight}
+        rotate={180}
+        size="48px"
+      />
       <SrOnly>{orientation}</SrOnly>
     </button>
   );

@@ -2,10 +2,11 @@
 import React from 'react';
 import { Route, NavLink } from 'react-router-dom';
 import { makeStyles } from 'styles';
+import Icon from '@mdi/react';
 
 import { resetLink } from 'styles/common';
 import { media, fonts } from 'styles';
-import { Icon, SrOnly } from 'components/common';
+import { SrOnly } from 'components/common';
 
 const styles = makeStyles({
   link: {
@@ -67,11 +68,11 @@ export default function IconLink({
         activeClassName={styles('activeLink')}
         onClick={onClick}
       >
-        <Icon name={iconName} size={36} />
+        <Icon path={iconName} size="36px" color="DimGray" />
         {iconOnly ? (
-          <SrOnly>{title || iconName}</SrOnly>
+          <SrOnly>{title}</SrOnly>
         ) : (
-          <div className={styles('title')}>{title || iconName}</div>
+          <div className={styles('title')}>{title}</div>
         )}
       </NavLink>
     </Route>

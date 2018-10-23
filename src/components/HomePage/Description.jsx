@@ -1,9 +1,11 @@
 // @flow strict
 
 import React, { Component } from 'react';
+import Icon from '@mdi/react';
+import { mdiMenuDown } from '@mdi/js';
 
 import { makeStyles, fonts } from 'styles';
-import { Icon, SrOnly } from 'components/common';
+import { SrOnly } from 'components/common';
 import Markdown from './Markdown';
 
 // https://css-tricks.com/text-fade-read-more/
@@ -71,7 +73,7 @@ export default class Description extends Component<Props, State> {
         </div>
         {collapsed && (
           <button className={styles('toggle')} onClick={this.toggle}>
-            <Icon name="menu-down" />
+            <Icon path={mdiMenuDown} />
             {'More'}
             <SrOnly>{`about ${title}`}</SrOnly>
           </button>
