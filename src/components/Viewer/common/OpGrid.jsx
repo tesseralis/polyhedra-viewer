@@ -86,6 +86,7 @@ function OpButton({ name, highlighted, ...btnProps }) {
 }
 
 function OpGrid({ isTransitioning, polyhedron, opName, selectOperation }) {
+  // TODO can we not pull in the entire polyhedron?
   return (
     <div className={styles('opGrid')}>
       {opList.map(name => (

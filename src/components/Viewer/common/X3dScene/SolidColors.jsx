@@ -13,6 +13,7 @@ function toRgb(hex: string) {
 
 class SolidColors extends PureComponent<*> {
   render() {
+    // TODO this is a pretty expensive calculation (probably)
     return this.props.children({ colors: this.getColors().map(toRgb) });
   }
 
