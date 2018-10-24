@@ -14,6 +14,7 @@ const styles = makeStyles({
     display: 'flex',
     alignItems: 'center',
     color: 'DimGray',
+    fill: 'DimGray',
     padding: 10,
     flexDirection: 'column',
     [media.mobileLandscape]: {
@@ -23,6 +24,7 @@ const styles = makeStyles({
   },
   activeLink: {
     color: 'DarkSlateGray',
+    fill: 'DarkSlateGray',
   },
   title: {
     marginTop: 5,
@@ -68,7 +70,7 @@ export default function IconLink({
         activeClassName={styles('activeLink')}
         onClick={onClick}
       >
-        <Icon path={iconName} size="36px" color="DimGray" />
+        <Icon path={iconName} size="36px" />
         {iconOnly ? (
           <SrOnly>{title}</SrOnly>
         ) : (

@@ -35,16 +35,16 @@ const styles = makeStyles({
   },
 
   icon: {
-    ...transition('color', 0.35),
+    // TODO This is kinda jank but I'm too lazy to fix it for a not useful feature
+    ...transition('fill', 0.35),
     position: 'absolute',
-    top: 10,
-    left: 10,
-    padding: 10,
-    color: 'LightGray',
+    paddingLeft: 8,
+    paddingTop: 2,
+    fill: 'LightGray',
   },
 
   iconFocus: {
-    color: 'Gray',
+    fill: 'Gray',
   },
 });
 
@@ -71,7 +71,7 @@ export default class SearchBar extends Component {
           className={styles('input')}
         />
         <span className={styles('icon', isFocused && 'iconFocus')}>
-          <Icon path={mdiMagnify} />
+          <Icon path={mdiMagnify} size="20px" />
         </span>
       </label>
     );

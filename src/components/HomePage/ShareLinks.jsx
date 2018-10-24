@@ -18,6 +18,7 @@ const styles = makeStyles({
   },
   link: {
     margin: '0 10px',
+    fill: 'DimGrey',
   },
 });
 
@@ -70,7 +71,7 @@ export default function ShareLinks() {
               )
             }
           >
-            <Icon size="36px" path={icon} color="DimGrey" />
+            <Icon size="36px" path={icon} />
             <SrOnly>{`Share on ${name}`}</SrOnly>
           </a>
         );

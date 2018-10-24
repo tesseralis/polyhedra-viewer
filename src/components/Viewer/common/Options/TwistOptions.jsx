@@ -33,7 +33,7 @@ function TwistOption({ orientation, onClick, disabled }) {
       className={styles('twistOption')}
     >
       <Icon
-        name={orientation === 'left' ? mdiRotateLeft : mdiRotateRight}
+        path={orientation === 'left' ? mdiRotateLeft : mdiRotateRight}
         rotate={180}
         size="48px"
       />

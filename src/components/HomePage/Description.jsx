@@ -26,13 +26,16 @@ const styles = makeStyles({
   },
 
   toggle: {
-    textAlign: 'center',
+    display: 'flex',
+    alignItems: 'center',
 
+    textAlign: 'center',
     backgroundColor: 'transparent',
     margin: 'auto 0',
     fontSize: 14,
     border: 'none',
     color: 'blue',
+    fill: 'blue',
     cursor: 'pointer',
     fontFamily: fonts.times,
 
@@ -73,7 +76,9 @@ export default class Description extends Component<Props, State> {
         </div>
         {collapsed && (
           <button className={styles('toggle')} onClick={this.toggle}>
-            <Icon path={mdiMenuDown} />
+            <span>
+              <Icon path={mdiMenuDown} size="20px" />
+            </span>
             {'More'}
             <SrOnly>{`about ${title}`}</SrOnly>
           </button>

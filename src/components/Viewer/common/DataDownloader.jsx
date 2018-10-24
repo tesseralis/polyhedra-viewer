@@ -85,7 +85,10 @@ export default function DataDownloader({ solid }: Props) {
               href={url}
               className={styles('downloadLink')}
             >
-              <SrOnly>Download as</SrOnly>.{ext} <Icon path={mdiDownload} />
+              <SrOnly>Download as</SrOnly>.{ext}{' '}
+              <span>
+                <Icon path={mdiDownload} size="18px" />
+              </span>
             </a>
           );
         })}
