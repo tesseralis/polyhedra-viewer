@@ -4,44 +4,34 @@ import React, { Component } from 'react';
 import Icon from '@mdi/react';
 import { mdiMenuDown } from '@mdi/js';
 
-import { makeStyles, fonts } from 'styles';
+import { styled, fonts } from 'styles';
 import { SrOnly } from 'components/common';
 import Markdown from './Markdown';
 
-// https://css-tricks.com/text-fade-read-more/
-const styles = makeStyles({
-  description: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-  },
+const Container = styled.div({
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+});
 
-  content: {
-    transition: 'height 2s',
-    overflowY: 'hidden',
-  },
+const Text = styled.div({});
 
-  collapsed: {
-    position: 'relative',
-  },
+const Toggle = styled.button({
+  display: 'flex',
+  alignItems: 'center',
 
-  toggle: {
-    display: 'flex',
-    alignItems: 'center',
+  textAlign: 'center',
+  backgroundColor: 'transparent',
+  margin: 'auto 0',
+  fontSize: 14,
+  border: 'none',
+  color: 'blue',
+  fill: 'blue',
+  cursor: 'pointer',
+  fontFamily: fonts.times,
 
-    textAlign: 'center',
-    backgroundColor: 'transparent',
-    margin: 'auto 0',
-    fontSize: 14,
-    border: 'none',
-    color: 'blue',
-    fill: 'blue',
-    cursor: 'pointer',
-    fontFamily: fonts.times,
-
-    ':hover': {
-      textDecoration: 'underline',
-    },
+  ':hover': {
+    textDecoration: 'underline',
   },
 });
 
@@ -70,20 +60,20 @@ export default class Description extends Component<Props, State> {
     const brief = content.split('\n\n')[0];
 
     return (
-      <div className={styles('description')}>
-        <div className={styles('content', collapsed && 'collapsed')}>
+      <Container>
+        <Text>
           <Markdown source={collapsed ? brief : content} />
-        </div>
+        </Text>
         {collapsed && (
-          <button className={styles('toggle')} onClick={this.toggle}>
+          <Toggle onClick={this.toggle}>
             <span>
               <Icon path={mdiMenuDown} size="20px" />
             </span>
             {'More'}
             <SrOnly>{`about ${title}`}</SrOnly>
-          </button>
+          </Toggle>
         )}
-      </div>
+      </Container>
     );
   }
 

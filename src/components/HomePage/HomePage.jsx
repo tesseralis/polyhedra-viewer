@@ -1,7 +1,7 @@
 // @flow strict
 import React from 'react';
 
-import { makeStyles } from 'styles';
+import { styled } from 'styles';
 import { type TableSection as TableSectionType } from 'math/polyhedra/tables';
 import { DeviceTracker } from 'components/DeviceContext';
 import { PageTitle } from 'components/common';
@@ -13,36 +13,28 @@ import * as text from './text';
 import Masthead from './Masthead';
 import ShareLinks from './ShareLinks';
 
-const styles = makeStyles({
-  homePage: {
-    width: '100%',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+const Container = styled.div({
+  width: '100%',
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  justifyContent: 'center',
+});
 
-  main: {
-    width: '100%',
-  },
+const Main = styled.main({ width: '100%' });
 
-  sections: {
-    padding: '50px 0',
-  },
+const Sections = styled.div({ padding: '50px 0' });
 
-  shareLinks: {
-    marginBottom: 20,
-  },
+const ShareContainer = styled.div({ marginBottom: 20 });
 
-  footer: {
-    boxShadow: '1px -1px 4px LightGray',
-    width: '100%',
-    padding: '20px 50px',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    textAlign: 'center',
-  },
+const Footer = styled.footer({
+  boxShadow: '1px -1px 4px LightGray',
+  width: '100%',
+  padding: '20px 50px',
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  textAlign: 'center',
 });
 
 interface Props {
@@ -63,12 +55,12 @@ class HomePage extends React.Component<Props> {
   render() {
     const { data, narrow = false } = this.props;
     return (
-      <div className={styles('homePage')}>
+      <Container>
         <PageTitle title="Polyhedra Viewer" />
-        <main className={styles('main')}>
+        <Main>
           {/* only play video if we're at the top of the page */}
           <Masthead />
-          <div className={styles('sections')}>
+          <Sections>
             {data.map(sectionData => (
               <TableSection
                 narrow={narrow}
@@ -76,15 +68,15 @@ class HomePage extends React.Component<Props> {
                 data={sectionData}
               />
             ))}
-          </div>
-        </main>
-        <footer className={styles('footer')}>
-          <div className={styles('shareLinks')}>
+          </Sections>
+        </Main>
+        <Footer>
+          <ShareContainer>
             <ShareLinks />
-          </div>
+          </ShareContainer>
           <Markdown source={text.footer} />
-        </footer>
-      </div>
+        </Footer>
+      </Container>
     );
   }
 }

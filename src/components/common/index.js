@@ -7,3 +7,4 @@
 
 export { default as SrOnly } from './SrOnly';
 export { default as PageTitle } from './PageTitle';
+export { default as ExternalLink } from './ExternalLink';

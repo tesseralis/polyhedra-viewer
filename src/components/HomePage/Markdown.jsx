@@ -1,14 +1,14 @@
 // @flow strict
-import _ from 'lodash';
 import React from 'react';
 import Markdown from 'react-markdown';
 
-import { makeStyles, fonts } from 'styles';
+import { ExternalLink } from 'components/common';
+import { styled, fonts } from 'styles';
 
 const listIndent = 20;
 
-const styles = makeStyles({
-  p: {
+const renderers = {
+  paragraph: styled.p({
     fontSize: 16,
     fontFamily: fonts.times,
     color: 'DimGrey',
@@ -16,54 +16,31 @@ const styles = makeStyles({
     ':not(:last-child)': {
       marginBottom: 10,
     },
-  },
-
-  a: {
+  }),
+  linkReference: styled(ExternalLink)({
     textDecoration: 'none',
     color: 'MediumBlue',
 
     ':hover': {
       textDecoration: 'underline',
     },
-  },
-  ul: {
+  }),
+  // FIXME test warnings bc of passed props
+  list: styled.ul({
     listStyle: 'disc inside',
     margin: '0 20px',
     marginBottom: 10,
-  },
-
-  li: {
+  }),
+  listItem: styled.li({
     fontSize: 16,
     fontFamily: fonts.times,
     color: 'DimGrey',
     lineHeight: 1.5,
     textIndent: -listIndent,
     paddingLeft: listIndent,
-  },
-
-  em: {
-    fontStyle: 'italic',
-  },
-
-  strong: {
-    fontWeight: 'bold',
-  },
-});
-
-function makeRenderer(El, ownProps = {}) {
-  return props => {
-    const allowedProps = _.pick(props, ['children', 'href']);
-    return <El {...allowedProps} {...ownProps} className={styles(El)} />;
-  };
-}
-
-const renderers = {
-  paragraph: makeRenderer('p'),
-  linkReference: makeRenderer('a', { target: '_blank', rel: 'noopener' }),
-  list: makeRenderer('ul'),
-  listItem: makeRenderer('li'),
-  emphasis: makeRenderer('em'),
-  strong: makeRenderer('strong'),
+  }),
+  emphasis: styled.em({ fontStyle: 'italic' }),
+  strong: styled.strong({ fontWeight: 'bold' }),
 };
 
 interface Props {

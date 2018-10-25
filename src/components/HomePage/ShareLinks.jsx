@@ -3,23 +3,23 @@ import React from 'react';
 import Icon from '@mdi/react';
 import { mdiFacebookBox, mdiTumblrBox, mdiTwitter, mdiReddit } from '@mdi/js';
 
-import { fonts, makeStyles } from 'styles';
+import { styled, fonts } from 'styles';
 import { SrOnly } from 'components/common';
 
-const styles = makeStyles({
-  share: {
-    display: 'flex',
-    alignItems: 'center',
-  },
-  text: {
-    fontFamily: fonts.andaleMono,
-    fontWeight: 'bold',
-    marginRight: 5,
-  },
-  link: {
-    margin: '0 10px',
-    fill: 'DimGrey',
-  },
+const Container = styled.div({
+  display: 'flex',
+  alignItems: 'center',
+});
+
+const ShareText = styled.span({
+  fontFamily: fonts.andaleMono,
+  fontWeight: 'bold',
+  marginRight: 5,
+});
+
+const ShareLink = styled.a({
+  margin: '0 10px',
+  fill: 'DimGrey',
 });
 
 const url = 'http://polyhedra.tessera.li';
@@ -52,12 +52,11 @@ const links = [
 
 export default function ShareLinks() {
   return (
-    <div className={styles('share')}>
-      <span className={styles('text')}>Share:</span>
+    <Container>
+      <ShareText>Share:</ShareText>
       {links.map(({ url, icon, name }) => {
         return (
-          <a
-            className={styles('link')}
+          <ShareLink
             href={url}
             key={icon}
             target="_blank"
@@ -73,9 +72,9 @@ export default function ShareLinks() {
           >
             <Icon size="36px" path={icon} />
             <SrOnly>{`Share on ${name}`}</SrOnly>
-          </a>
+          </ShareLink>
         );
       })}
-    </div>
+    </Container>
   );
 }
