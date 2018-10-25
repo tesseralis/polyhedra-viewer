@@ -67,7 +67,7 @@ const LabelledInput = ({ input, value, setValue }) => {
   );
 };
 
-const ResetButton = styled.button({
+const ResetButton = styled.button.attrs({ type: 'button', children: 'Reset' })({
   ...hover,
 
   width: 120,
@@ -101,10 +101,7 @@ export default function ConfigForm() {
               setValue={value => setValue(key, value)}
             />
           ))}
-          {/* TODO put type and text onto children prop */}
-          <ResetButton type="button" onClick={reset}>
-            Reset
-          </ResetButton>
+          <ResetButton onClick={reset} />
         </Form>
       )}
     </WithConfig>

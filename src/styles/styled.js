@@ -42,15 +42,15 @@ const domElements = [
   'label',
 ];
 
-function withProps(component, propsToAdd) {
+const withProps = propsToAdd => (component: React$ElementType) => {
   const Component = component;
   return props => <Component {...propsToAdd} {...props} />;
-}
+};
 
 domElements.forEach(el => {
-  styled[el] = styled(el);
-  // TODO this breaks flow...
-  // styled[el].attrs = props => withProps(styled(el), props);
+  const styledEl = styled(el);
+  styled[el] = styledEl;
+  styled[el].attrs = props => def => withProps(props)(styledEl(def));
 });
 
 export default styled;
