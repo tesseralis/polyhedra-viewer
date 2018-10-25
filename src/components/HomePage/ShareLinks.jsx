@@ -4,7 +4,7 @@ import Icon from '@mdi/react';
 import { mdiFacebookBox, mdiTumblrBox, mdiTwitter, mdiReddit } from '@mdi/js';
 
 import { styled, fonts } from 'styles';
-import { SrOnly } from 'components/common';
+import { ExternalLink, SrOnly } from 'components/common';
 
 const Container = styled.div({
   display: 'flex',
@@ -17,7 +17,7 @@ const ShareText = styled.span({
   marginRight: 5,
 });
 
-const ShareLink = styled.a({
+const ShareLink = styled(ExternalLink)({
   margin: '0 10px',
   fill: 'DimGrey',
 });
@@ -59,8 +59,6 @@ export default function ShareLinks() {
           <ShareLink
             href={url}
             key={icon}
-            target="_blank"
-            rel="noopener noreferrer"
             onClick={() =>
               // https://stackoverflow.com/questions/34507160/how-can-i-handle-an-event-to-open-a-window-in-react-js
               window.open(

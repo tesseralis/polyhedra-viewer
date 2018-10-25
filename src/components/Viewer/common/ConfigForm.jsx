@@ -1,6 +1,6 @@
 // @flow strict
 import React from 'react';
-import { makeStyles } from 'styles';
+import { styled } from 'styles';
 import _ from 'lodash';
 
 import { WithConfig } from 'components/ConfigContext';
@@ -50,63 +50,49 @@ const ConfigInput = ({ input, value, setValue }) => {
   }
 };
 
-const LabelledInput = ({ input, value, setValue }) => {
-  const styles = makeStyles({
-    label: {
-      width: '100%',
-      marginBottom: 16,
-      display: 'flex',
-      justifyContent: 'space-between',
-      fontFamily: andaleMono,
-    },
-  });
+const Label = styled.label({
+  width: '100%',
+  marginBottom: 16,
+  display: 'flex',
+  justifyContent: 'space-between',
+  fontFamily: andaleMono,
+});
 
+const LabelledInput = ({ input, value, setValue }) => {
   return (
-    <label className={styles('label')}>
+    <Label>
       {input.display}
       <ConfigInput input={input} value={value} setValue={setValue} />
-    </label>
+    </Label>
   );
 };
 
-const ResetButton = ({ reset }) => {
-  const styles = makeStyles({
-    resetButton: {
-      ...hover,
+const ResetButton = styled.button({
+  ...hover,
 
-      width: 120,
-      height: 30,
-      marginTop: 20,
+  width: 120,
+  height: 30,
+  marginTop: 20,
 
-      border: '1px LightGray solid',
+  border: '1px LightGray solid',
 
-      fontFamily: andaleMono,
-      fontSize: 14,
-    },
-  });
+  fontFamily: andaleMono,
+  fontSize: 14,
+});
 
-  return (
-    <button type="button" onClick={reset} className={styles('resetButton')}>
-      Reset
-    </button>
-  );
-};
+const Form = styled.form({
+  width: '100%',
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'flex-end',
+  padding: 20,
+});
 
 export default function ConfigForm() {
-  const styles = makeStyles({
-    configMenu: {
-      width: '100%',
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'flex-end',
-      padding: 20,
-    },
-  });
-
   return (
     <WithConfig>
       {({ config, setValue, reset }) => (
-        <form className={styles('configMenu')}>
+        <Form>
           {configInputs.map(({ key, ...input }) => (
             <LabelledInput
               key={key}
@@ -115,8 +101,9 @@ export default function ConfigForm() {
               setValue={value => setValue(key, value)}
             />
           ))}
-          <ResetButton reset={reset} />
-        </form>
+          {/* FIXME why does this reset refresh the page? */}
+          <ResetButton onClick={reset}>Reset</ResetButton>
+        </Form>
       )}
     </WithConfig>
   );

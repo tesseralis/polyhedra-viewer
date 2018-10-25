@@ -21,6 +21,7 @@ const domElements = [
   'span',
   'main',
   'footer',
+  'section',
   'h1',
   'h2',
   'h3',
@@ -34,8 +35,11 @@ const domElements = [
   'td',
   'a',
   'button',
+  'img',
   'em',
   'strong',
+  'form',
+  'label',
 ];
 
 function withProps(component, propsToAdd) {

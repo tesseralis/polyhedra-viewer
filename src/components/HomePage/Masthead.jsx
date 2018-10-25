@@ -2,7 +2,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-import { SrOnly } from 'components/common';
+import { SrOnly, ExternalLink } from 'components/common';
 import Markdown from './Markdown';
 import video from 'images/transitions.mp4';
 import { styled, media, fonts } from 'styles';
@@ -30,7 +30,7 @@ const Abstract = styled.div({
   alignItems: 'center',
 });
 
-const AuthorLink = styled.a({
+const AuthorLink = styled(ExternalLink)({
   textDecoration: 'none',
   ':hover': {
     textDecoration: 'underline',
@@ -73,14 +73,7 @@ export default function Masthead() {
       <Abstract>
         <Title>Polyhedra Viewer</Title>
         <Subtitle>
-          by{' '}
-          <AuthorLink
-            target="_blank"
-            rel="noopener noreferrer"
-            href="https://www.tessera.li"
-          >
-            @tesseralis
-          </AuthorLink>
+          by <AuthorLink href="https://www.tessera.li">@tesseralis</AuthorLink>
         </Subtitle>
         <Markdown source={text.abstract} />
       </Abstract>
