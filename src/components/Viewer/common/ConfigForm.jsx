@@ -101,8 +101,10 @@ export default function ConfigForm() {
               setValue={value => setValue(key, value)}
             />
           ))}
-          {/* FIXME why does this reset refresh the page? */}
-          <ResetButton onClick={reset}>Reset</ResetButton>
+          {/* TODO put type and text onto children prop */}
+          <ResetButton type="button" onClick={reset}>
+            Reset
+          </ResetButton>
         </Form>
       )}
     </WithConfig>
