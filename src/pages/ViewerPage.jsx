@@ -2,15 +2,28 @@
 import { Polyhedron } from 'math/polyhedra';
 import AppPage from './AppPage';
 
+function splitListOfLists(listStr, outerSep, innerSep) {
+  return listStr
+    .split(outerSep)
+    .map(inner => inner.split(innerSep).map(parseFloat));
+}
+
 export default class ViewerPage extends AppPage {
   constructor(solid: string, panel?: string = 'operations') {
     super(`/${solid}/${panel}`);
   }
 
   getPolyhedron() {
-    // FIXME now we have no access to the polyhedron data since we use hooks everywhere
-    const solidData = this.wrapper.find('X3dPolyhedron').prop('solidData');
-    return new Polyhedron(solidData);
+    const vertexStr = this.wrapper
+      .find('coordinate')
+      .first()
+      .prop('point');
+    const vertices = splitListOfLists(vertexStr, ', ', ' ');
+
+    const faceStr = this.wrapper.find('indexedfaceset').prop('coordindex');
+    const faces = splitListOfLists(faceStr, ' -1 ', ' ');
+
+    return new Polyhedron({ vertices, faces });
   }
 
   clickFace(face: *) {
@@ -25,7 +38,7 @@ export default class ViewerPage extends AppPage {
   }
 
   clickAnyFace() {
-    return this.clickFace(this.getPolyhedron().getFace());
+    return this.clickFace(this.getPolyhedron());
   }
 
   clickFaceWithNumSides(n: number) {
