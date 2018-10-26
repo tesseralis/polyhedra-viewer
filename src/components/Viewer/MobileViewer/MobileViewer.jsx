@@ -1,5 +1,6 @@
 // @flow
-import React from 'react';
+// $FlowFixMe
+import React, { useRef, useCallback } from 'react';
 
 import { makeStyles, media } from 'styles';
 import { scroll } from 'styles/common';
@@ -83,54 +84,44 @@ interface Props {
   solid: string;
 }
 
-export default class MobileViewer extends React.Component<Props> {
-  header: *;
+export default function MobileViewer({ panel, solid }: Props) {
+  const header = useRef(null);
 
-  constructor(props: Props) {
-    super(props);
-    this.header = React.createRef();
-  }
+  const focusOnHeader = useCallback(
+    () => {
+      header.current.focus();
+    },
+    [header.current],
+  );
 
-  render() {
-    const { panel, solid } = this.props;
-    const panelNode = (
-      <Panels panel={panel} operationsPanel={OperationsPanel} />
-    );
-    return (
-      <section className={styles('viewer')}>
-        <div className={styles('title')}>
-          <BackLink solid={solid} />
-          <Title name={solid} />
+  const panelNode = <Panels panel={panel} operationsPanel={OperationsPanel} />;
+  return (
+    <section className={styles('viewer')}>
+      <div className={styles('title')}>
+        <BackLink solid={solid} />
+        <Title name={solid} />
+      </div>
+      {panelNode && (
+        <div
+          className={styles(
+            'content',
+            panel === 'operations' ? 'operations' : 'contentFull',
+          )}
+        >
+          <SrOnly>
+            <h2 tabIndex={0} ref={header}>
+              {panel}
+            </h2>
+          </SrOnly>
+          {panelNode}
         </div>
-        {panelNode && (
-          <div
-            className={styles(
-              'content',
-              panel === 'operations' ? 'operations' : 'contentFull',
-            )}
-          >
-            <SrOnly>
-              <h2 tabIndex={0} ref={this.header}>
-                {panel}
-              </h2>
-            </SrOnly>
-            {panelNode}
-          </div>
-        )}
-        <main className={styles('scene')}>
-          <X3dScene label={solid} />
-        </main>
-        <div className={styles('menu')}>
-          <NavMenu solid={solid} onClick={this.focusOnHeader} />
-        </div>
-      </section>
-    );
-  }
-
-  // TODO dedupe with desktop
-  focusOnHeader = () => {
-    if (this.header.current) {
-      this.header.current.focus();
-    }
-  };
+      )}
+      <main className={styles('scene')}>
+        <X3dScene label={solid} />
+      </main>
+      <div className={styles('menu')}>
+        <NavMenu solid={solid} onClick={focusOnHeader} />
+      </div>
+    </section>
+  );
 }

@@ -1,6 +1,7 @@
 // @flow strict
 
-import React, { Component } from 'react';
+// $FlowFixMe
+import React, { useState, useCallback } from 'react';
 import Icon from '@mdi/react';
 import { mdiMenuDown } from '@mdi/js';
 
@@ -37,47 +38,29 @@ const Toggle = styled.button({
 
 interface Props {
   content: string;
-  collapsed: boolean;
   title: string; // used for a11y
 }
 
-interface State {
-  collapsed: boolean;
-}
+export default function Description({ title, content }: Props) {
+  const [collapsed, setCollapsed] = useState(true);
+  const toggle = useCallback(() => setCollapsed(!collapsed), [collapsed]);
 
-export default class Description extends Component<Props, State> {
-  constructor(props: Props) {
-    super(props);
-    this.state = {
-      collapsed: props.collapsed,
-    };
-  }
+  const brief = content.split('\n\n')[0];
 
-  render() {
-    const { title, content } = this.props;
-    const { collapsed } = this.state;
-
-    const brief = content.split('\n\n')[0];
-
-    return (
-      <Container>
-        <Text>
-          <Markdown source={collapsed ? brief : content} />
-        </Text>
-        {collapsed && (
-          <Toggle onClick={this.toggle}>
-            <span>
-              <Icon path={mdiMenuDown} size="20px" />
-            </span>
-            {'More'}
-            <SrOnly>{`about ${title}`}</SrOnly>
-          </Toggle>
-        )}
-      </Container>
-    );
-  }
-
-  toggle = () => {
-    this.setState(({ collapsed }) => ({ collapsed: !collapsed }));
-  };
+  return (
+    <Container>
+      <Text>
+        <Markdown source={collapsed ? brief : content} />
+      </Text>
+      {collapsed && (
+        <Toggle onClick={toggle}>
+          <span>
+            <Icon path={mdiMenuDown} size="20px" />
+          </span>
+          {'More'}
+          <SrOnly>{`about ${title}`}</SrOnly>
+        </Toggle>
+      )}
+    </Container>
+  );
 }

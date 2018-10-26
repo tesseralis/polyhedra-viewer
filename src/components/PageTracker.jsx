@@ -1,5 +1,6 @@
 // @flow strict
-import { Component } from 'react';
+// $FlowFixMe
+import { useEffect } from 'react';
 import { withRouter, type Location } from 'react-router-dom';
 import ReactGA from 'react-ga';
 
@@ -7,26 +8,16 @@ interface Props {
   location: Location;
 }
 
-class PageTracker extends Component<Props> {
-  constructor(props: Props) {
-    super(props);
-    this.sendPageView(props.location);
-  }
-
-  render() {
-    return null;
-  }
-
-  componentDidUpdate(prevProps) {
-    if (prevProps.location.pathname !== this.props.location.pathname) {
-      this.sendPageView(this.props.location);
-    }
-  }
-
-  sendPageView(location: Location) {
-    const { pathname, search } = location;
-    ReactGA.pageview(pathname + search);
-  }
+// TODO figure out how to make this just a regular hook
+function PageTracker({ location }: Props) {
+  const { pathname, search } = location;
+  useEffect(
+    () => {
+      ReactGA.pageview(pathname + search);
+    },
+    [location.pathname],
+  );
+  return null;
 }
 
 export default withRouter(PageTracker);

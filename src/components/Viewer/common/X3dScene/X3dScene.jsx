@@ -1,5 +1,6 @@
 // @flow
-import * as React from 'react';
+// $FlowFixMe
+import React, { useRef, useEffect } from 'react';
 import x3dom from 'x3dom.js';
 import 'x3dom/x3dom.css';
 
@@ -20,39 +21,30 @@ const styles = makeStyles({
 
 interface Props {
   label: string;
-  children: React.Node;
+  children: React$Node;
 }
 
-export default class X3dScene extends React.Component<Props> {
-  x3d: *;
+export default function X3dScene({ label, children }: Props) {
+  const x3d = useRef(null);
 
-  constructor(props: Props) {
-    super(props);
-    this.x3d = React.createRef();
-  }
-
-  componentDidMount() {
+  useEffect(() => {
     // Reload X3DOM asynchronously so that it tracks the re-created instance
     setTimeout(() => {
       x3dom.reload();
-      if (this.x3d.current) {
-        // X3DOM generates this canvas which isn't controlled by react,
-        // so we have to manually fix things
-        const canvas = this.x3d.current.querySelector('canvas');
-        canvas.setAttribute('tabIndex', -1);
-        canvas.setAttribute('aria-label', this.props.label);
-      }
+      // X3DOM generates this canvas which isn't controlled by react,
+      // so we have to manually fix things
+      const canvas = x3d.current.querySelector('canvas');
+      canvas.setAttribute('tabIndex', -1);
+      canvas.setAttribute('aria-label', label);
     });
-  }
+  }, []);
 
-  render() {
-    return (
-      <x3d is="x3d" class={styles('x3dScene')} ref={this.x3d}>
-        <scene is="x3d">
-          <viewpoint is="x3d" position="0,0,5" />
-          {this.props.children}
-        </scene>
-      </x3d>
-    );
-  }
+  return (
+    <x3d is="x3d" class={styles('x3dScene')} ref={x3d}>
+      <scene is="x3d">
+        <viewpoint is="x3d" position="0,0,5" />
+        {children}
+      </scene>
+    </x3d>
+  );
 }

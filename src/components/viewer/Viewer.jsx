@@ -1,9 +1,9 @@
 // @flow
 import _ from 'lodash';
-import React, { PureComponent, Fragment } from 'react';
+import React, { Fragment } from 'react';
 import { Route, Redirect, type RouterHistory } from 'react-router-dom';
 
-import { PageTitle } from 'components/common';
+import { usePageTitle } from 'components/common';
 import { OperationProvider, PolyhedronProvider } from './context';
 import DesktopViewer from './DesktopViewer';
 import MobileViewer from './MobileViewer';
@@ -15,20 +15,18 @@ interface InnerProps {
   panel: string;
 }
 
-class InnerViewer extends PureComponent<InnerProps> {
-  render() {
-    const { solid, panel } = this.props;
-    const pageTitle = `${_.capitalize(unescapeName(solid))} - Polyhedra Viewer`;
-    return (
-      <Fragment>
-        <PageTitle title={pageTitle} />
-        <DeviceTracker
-          renderDesktop={() => <DesktopViewer solid={solid} panel={panel} />}
-          renderMobile={$ => <MobileViewer solid={solid} panel={panel} />}
-        />
-      </Fragment>
-    );
-  }
+// TODO this used to be a pure component -- check if perf is okay!
+function InnerViewer({ solid, panel }: InnerProps) {
+  usePageTitle(`${_.capitalize(unescapeName(solid))} - Polyhedra Viewer`);
+
+  return (
+    <Fragment>
+      <DeviceTracker
+        renderDesktop={() => <DesktopViewer solid={solid} panel={panel} />}
+        renderMobile={$ => <MobileViewer solid={solid} panel={panel} />}
+      />
+    </Fragment>
+  );
 }
 
 interface Props {

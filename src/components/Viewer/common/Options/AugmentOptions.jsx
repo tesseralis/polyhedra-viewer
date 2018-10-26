@@ -1,10 +1,9 @@
 // @flow strict
-import _ from 'lodash';
-import React from 'react';
+// $FlowFixMe
+import React, { useContext } from 'react';
 import { makeStyles } from 'styles';
 
-import connect from 'components/connect';
-import { WithPolyhedron, WithOperation } from 'components/Viewer/context';
+import { PolyhedronContext, OperationContext } from 'components/Viewer/context';
 import OptionIcon from './OptionIcon';
 import { verdana } from 'styles/fonts';
 import { hover } from 'styles/common';
@@ -53,14 +52,10 @@ const getOptionName = optValue => {
   }
 };
 
-interface Props {
-  operation: *;
-  options: *;
-  polyhedron: *;
-  setOption(option: string, value: string): void;
-}
+export default function AugmentOptions() {
+  const { polyhedron } = useContext(PolyhedronContext);
+  const { operation, options, setOption } = useContext(OperationContext);
 
-function AugmentOptions({ operation, options, polyhedron, setOption }: Props) {
   const { gyrate, using } = options;
   const optionArgs = [
     {
@@ -101,14 +96,3 @@ function AugmentOptions({ operation, options, polyhedron, setOption }: Props) {
     </div>
   );
 }
-
-export default _.flow([
-  connect(
-    WithPolyhedron,
-    ['polyhedron'],
-  ),
-  connect(
-    WithOperation,
-    ['operation', 'options', 'setOption'],
-  ),
-])(AugmentOptions);

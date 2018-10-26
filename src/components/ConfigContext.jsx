@@ -2,7 +2,8 @@
 import _ from 'lodash';
 import { defaultConfig } from './configOptions';
 
-import React, { Component } from 'react';
+// $FlowFixMe
+import React, { useState, useMemo } from 'react';
 
 const ConfigContext = React.createContext({
   config: defaultConfig,
@@ -10,32 +11,23 @@ const ConfigContext = React.createContext({
   reset: _.noop,
 });
 
-export class ConfigProvider extends Component<*, *> {
-  constructor(props: *) {
-    super(props);
-    this.state = {
-      config: defaultConfig,
-      setValue: this.setValue,
-      reset: this.reset,
-    };
-  }
-  render() {
-    return (
-      <ConfigContext.Provider value={this.state}>
-        {this.props.children}
-      </ConfigContext.Provider>
-    );
-  }
+export default ConfigContext;
 
-  setValue = (key: string, value: *) => {
-    this.setState(({ config }) => ({
-      config: _.set(_.cloneDeep(config), key, value),
-    }));
+// TODO now we can split out setValue and reset!
+export function ConfigProvider({ children }: *) {
+  const [config, setConfig] = useState(defaultConfig);
+
+  const setValue = (key, value) => {
+    setConfig(_.set(_.cloneDeep(config), key, value));
   };
 
-  reset = () => {
-    this.setState({ config: defaultConfig });
-  };
+  const reset = () => setConfig(defaultConfig);
+
+  const state = useMemo(() => ({ config, setValue, reset }), [config]);
+
+  return (
+    <ConfigContext.Provider value={state}>{children}</ConfigContext.Provider>
+  );
 }
 
 export const WithConfig = ConfigContext.Consumer;

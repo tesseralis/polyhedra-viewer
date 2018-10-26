@@ -58,6 +58,8 @@ const PolyhedronContext = React.createContext({
   ...mapObject(actions, action => [action, _.noop]),
 });
 
+export default PolyhedronContext;
+
 class BasePolyhedronProvider extends PureComponent<*, *> {
   transitionId: *;
 

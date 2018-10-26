@@ -1,48 +1,34 @@
 // @flow strict
 import _ from 'lodash';
-import * as React from 'react';
+// $FlowFixMe
+import React, { useState, useCallback } from 'react';
 import EventListener from 'react-event-listener';
 import { media } from 'styles';
 
-const DeviceContext = React.createContext({
-  width: media.desktopMinWidth,
-});
+function getWidth() {
+  return window.innerWidth > 0 ? window.innerWidth : window.screen.width;
+}
+
+// TODO I think this might be better as just a prop
+const DeviceContext = React.createContext(media.desktopMinWidth);
 
 interface ProviderProps {
-  children?: React.Node;
+  children?: React$Node;
 }
 
-interface ProviderState {
-  width: number;
-}
+export function DeviceProvider({ children }: ProviderProps) {
+  const [width, setWidth] = useState(getWidth());
+  const handleResize = useCallback(() => {
+    setWidth(getWidth());
+  });
 
-export class DeviceProvider extends React.Component<
-  ProviderProps,
-  ProviderState,
-> {
-  constructor(props: ProviderProps) {
-    super(props);
-    this.state = {
-      width: this.getWidth(),
-    };
-  }
-
-  render() {
-    return (
-      <DeviceContext.Provider value={this.state}>
-        <EventListener target="window" onResize={this.handleResize} />
-        {this.props.children}
-      </DeviceContext.Provider>
-    );
-  }
-
-  handleResize = () => {
-    this.setState({ width: this.getWidth() });
-  };
-
-  getWidth = (): number => {
-    return window.innerWidth > 0 ? window.innerWidth : window.screen.width;
-  };
+  return (
+    <DeviceContext.Provider value={width}>
+      {/* TODO get rid of event listener! */}
+      <EventListener target="window" onResize={handleResize} />
+      {children}
+    </DeviceContext.Provider>
+  );
 }
 
 function isMobile(width) {
@@ -68,7 +54,7 @@ export function DeviceTracker({
 }: Props) {
   return (
     <DeviceContext.Consumer>
-      {({ width }) =>
+      {width =>
         isMobile(width)
           ? renderMobile({ orientation: getOrientation(width) })
           : renderDesktop()

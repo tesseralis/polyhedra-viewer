@@ -18,6 +18,8 @@ const OperationContext = React.createContext({
   ...mapObject(actions, a => [a, _.noop]),
 });
 
+export default OperationContext;
+
 export class OperationProvider extends Component<*, *> {
   constructor(props: *) {
     super(props);

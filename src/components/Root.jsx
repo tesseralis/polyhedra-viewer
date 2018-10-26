@@ -8,15 +8,17 @@ import PageTracker from './PageTracker';
 
 import App from './App';
 
-const Root = () => (
-  <BrowserRouter>
-    <DeviceProvider>
-      <ConfigProvider>
-        <PageTracker />
-        <App />
-      </ConfigProvider>
-    </DeviceProvider>
-  </BrowserRouter>
-);
+const Root = () => {
+  return (
+    <BrowserRouter>
+      <DeviceProvider>
+        <ConfigProvider>
+          <PageTracker />
+          <App />
+        </ConfigProvider>
+      </DeviceProvider>
+    </BrowserRouter>
+  );
+};
 
 export default Root;

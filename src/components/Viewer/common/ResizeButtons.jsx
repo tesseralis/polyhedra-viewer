@@ -1,5 +1,5 @@
 // @flow strict
-import React, { Component } from 'react';
+import React from 'react';
 import { makeStyles } from 'styles';
 
 import connect from 'components/connect';
@@ -26,29 +26,25 @@ const styles = makeStyles({
   },
 });
 
-class ResizeButtons extends Component<*> {
-  render() {
-    const { disabled, recenter, resize } = this.props;
-
-    return (
-      <div className={styles('buttons')}>
-        <button
-          disabled={disabled}
-          onClick={recenter}
-          className={styles('resetButton')}
-        >
-          Recenter
-        </button>
-        <button
-          disabled={disabled}
-          onClick={resize}
-          className={styles('resetButton')}
-        >
-          Resize
-        </button>
-      </div>
-    );
-  }
+function ResizeButtons({ disabled, recenter, resize }: *) {
+  return (
+    <div className={styles('buttons')}>
+      <button
+        disabled={disabled}
+        onClick={recenter}
+        className={styles('resetButton')}
+      >
+        Recenter
+      </button>
+      <button
+        disabled={disabled}
+        onClick={resize}
+        className={styles('resetButton')}
+      >
+        Resize
+      </button>
+    </div>
+  );
 }
 
 export default connect(

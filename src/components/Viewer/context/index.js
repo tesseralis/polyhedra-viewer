@@ -1,4 +1,12 @@
 // @flow strict
 export { default as ApplyOperation } from './ApplyOperation';
-export { OperationProvider, WithOperation } from './OperationContext';
-export { PolyhedronProvider, WithPolyhedron } from './PolyhedronContext';
+export {
+  default as OperationContext,
+  OperationProvider,
+  WithOperation,
+} from './OperationContext';
+export {
+  default as PolyhedronContext,
+  PolyhedronProvider,
+  WithPolyhedron,
+} from './PolyhedronContext';

@@ -1,10 +1,11 @@
 // @flow strict
-import React from 'react';
+// $FlowFixMe
+import React, { useEffect } from 'react';
 
 import { styled } from 'styles';
 import { type TableSection as TableSectionType } from 'math/polyhedra/tables';
 import { DeviceTracker } from 'components/DeviceContext';
-import { PageTitle } from 'components/common';
+import { usePageTitle } from 'components/common';
 
 import Markdown from './Markdown';
 import TableSection from './TableSection';
@@ -43,42 +44,42 @@ interface Props {
   narrow?: boolean;
 }
 
-class HomePage extends React.Component<Props> {
-  componentDidMount() {
-    const { hash = '' } = this.props;
-    const el = document.getElementById(hash);
-    if (el !== null) {
-      el.scrollIntoView(false);
-    }
-  }
+function HomePage({ hash = '', data, narrow = false }: Props) {
+  useEffect(
+    () => {
+      const el = document.getElementById(hash);
+      if (el !== null) {
+        el.scrollIntoView(false);
+      }
+    },
+    [hash],
+  );
 
-  render() {
-    const { data, narrow = false } = this.props;
-    return (
-      <Container>
-        <PageTitle title="Polyhedra Viewer" />
-        <Main>
-          {/* only play video if we're at the top of the page */}
-          <Masthead />
-          <Sections>
-            {data.map(sectionData => (
-              <TableSection
-                narrow={narrow}
-                key={sectionData.header}
-                data={sectionData}
-              />
-            ))}
-          </Sections>
-        </Main>
-        <Footer>
-          <ShareContainer>
-            <ShareLinks />
-          </ShareContainer>
-          <Markdown source={text.footer} />
-        </Footer>
-      </Container>
-    );
-  }
+  usePageTitle('Polyhedra Viewer');
+
+  return (
+    <Container>
+      <Main>
+        {/* only play video if we're at the top of the page */}
+        <Masthead />
+        <Sections>
+          {data.map(sectionData => (
+            <TableSection
+              narrow={narrow}
+              key={sectionData.header}
+              data={sectionData}
+            />
+          ))}
+        </Sections>
+      </Main>
+      <Footer>
+        <ShareContainer>
+          <ShareLinks />
+        </ShareContainer>
+        <Markdown source={text.footer} />
+      </Footer>
+    </Container>
+  );
 }
 
 export default (props: *) => {

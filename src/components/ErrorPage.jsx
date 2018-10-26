@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 
 import { styled, fonts, media } from 'styles';
 import image from 'images/sad-scutoid.png';
-import { PageTitle } from 'components/common';
+import { usePageTitle } from 'components/common';
 
 const Section = styled.section({
   position: 'absolute',
@@ -49,9 +49,10 @@ const BackLink = styled(Link)({
 });
 
 export default function ErrorPage() {
+  usePageTitle('Error - Polyhedra Viewer');
+
   return (
     <Section>
-      <PageTitle title="Error - Polyhedra Viewer" />
       <Image src={image} alt="" />
       <Title>Uh oh! We don't know about that polyhedron!</Title>
       <BackLink to="/">Go back</BackLink>

@@ -1,5 +1,6 @@
 // @flow
-import React, { Component } from 'react';
+// $FlowFixMe
+import React, { useRef, useCallback } from 'react';
 import { makeStyles } from 'styles';
 
 import { SrOnly } from 'components/common';
@@ -43,43 +44,30 @@ interface Props {
   compact?: boolean;
 }
 
-export default class Sidebar extends Component<Props> {
-  header: *;
+export default function Sidebar({ panel, solid, compact }: Props) {
+  const header = useRef(null);
+  const focusOnHeader = useCallback(
+    () => {
+      header.current.focus();
+    },
+    [header.current],
+  );
 
-  constructor(props: Props) {
-    super(props);
-    this.header = React.createRef();
-  }
-
-  render() {
-    const { compact, panel, solid } = this.props;
-    return (
-      <section className={styles('sidebar', !compact && 'full')}>
-        <div className={styles('menu', !compact && 'menuFull')}>
-          <NavMenu
-            solid={solid}
-            compact={!!compact}
-            onClick={this.focusOnHeader}
-          />
+  return (
+    <section className={styles('sidebar', !compact && 'full')}>
+      <div className={styles('menu', !compact && 'menuFull')}>
+        <NavMenu solid={solid} compact={!!compact} onClick={focusOnHeader} />
+      </div>
+      {!compact && (
+        <div className={styles('content')}>
+          <SrOnly>
+            <h2 tabIndex={0} ref={header}>
+              {panel}
+            </h2>
+          </SrOnly>
+          <Panels panel={panel} operationsPanel={OperationsPanel} />
         </div>
-        {!compact && (
-          <div className={styles('content')}>
-            <SrOnly>
-              <h2 tabIndex={0} ref={this.header}>
-                {panel}
-              </h2>
-            </SrOnly>
-            <Panels panel={panel} operationsPanel={OperationsPanel} />
-          </div>
-        )}
-      </section>
-    );
-  }
-
-  // TODO dedupe with mobile
-  focusOnHeader = () => {
-    if (this.header.current) {
-      this.header.current.focus();
-    }
-  };
+      )}
+    </section>
+  );
 }
