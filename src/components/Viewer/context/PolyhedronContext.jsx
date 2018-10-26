@@ -147,5 +147,3 @@ export function PolyhedronProvider({ disabled, setName, name, children }: *) {
     </PolyhedronContext.Provider>
   );
 }
-
-export const WithPolyhedron = PolyhedronContext.Consumer;

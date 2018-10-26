@@ -60,8 +60,10 @@ export default function X3dPolyhedron() {
   useEffect(
     () => {
       if (shape.current !== null) {
-        _.forEach(listeners, (fn, type) => {
-          shape.current.addEventListener(type, fn);
+        document.addEventListener('load', () => {
+          _.forEach(listeners, (fn, type) => {
+            shape.current.addEventListener(type, fn);
+          });
         });
       }
 
@@ -73,7 +75,7 @@ export default function X3dPolyhedron() {
         }
       };
     },
-    [onClick, onHover, onMouseOut],
+    // [onClick, onHover, onMouseOut],
   );
 
   const { polyhedron } = useContext(PolyhedronContext);

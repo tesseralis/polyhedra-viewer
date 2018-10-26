@@ -29,5 +29,3 @@ export function ConfigProvider({ children }: *) {
     <ConfigContext.Provider value={state}>{children}</ConfigContext.Provider>
   );
 }
-
-export const WithConfig = ConfigContext.Consumer;

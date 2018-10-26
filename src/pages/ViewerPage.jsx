@@ -8,6 +8,7 @@ export default class ViewerPage extends AppPage {
   }
 
   getPolyhedron() {
+    // FIXME now we have no access to the polyhedron data since we use hooks everywhere
     const solidData = this.wrapper.find('X3dPolyhedron').prop('solidData');
     return new Polyhedron(solidData);
   }

@@ -62,5 +62,3 @@ export function OperationProvider({ disabled, children }: *) {
     </OperationContext.Provider>
   );
 }
-
-export const WithOperation = OperationContext.Consumer;
