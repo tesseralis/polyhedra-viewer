@@ -2,16 +2,17 @@ import _ from 'lodash';
 import React from 'react';
 import X3dPolyhedron from '../X3dPolyhedron';
 
-import { shallow } from 'enzyme';
+import { mount } from 'enzyme';
 import { defaultConfig } from 'components/configOptions';
 import { Polyhedron } from 'math/polyhedra';
 
 let wrapper;
 
-function setup(props) {
-  wrapper = shallow(<X3dPolyhedron />);
+function setup() {
+  wrapper = mount(<X3dPolyhedron />);
 }
 
+// FIXME figure out how to separate out concerns using hooks
 xdescribe('X3dPolyhedron', () => {
   beforeEach(() => {
     setup();
