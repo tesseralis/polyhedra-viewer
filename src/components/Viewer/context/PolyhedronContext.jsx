@@ -1,8 +1,9 @@
 // @flow strict
 import _ from 'lodash';
-import React, { PureComponent } from 'react';
+// $FlowFixMe
+import React, { useRef, useState, useEffect, useContext } from 'react';
 
-import { WithConfig } from 'components/ConfigContext';
+import ConfigContext from 'components/ConfigContext';
 import transition from 'transition';
 import { Polyhedron } from 'math/polyhedra';
 import { PRECISION } from 'math/geom';
@@ -51,7 +52,7 @@ const defaultState = {
   faceColors: null,
 };
 
-const actions = ['setPolyhedron', 'transitionPolyhedron', 'recenter', 'resize'];
+const actions = ['setPolyhedron', 'transitionPolyhedron'];
 
 const PolyhedronContext = React.createContext({
   ...defaultState,
@@ -60,71 +61,42 @@ const PolyhedronContext = React.createContext({
 
 export default PolyhedronContext;
 
-class BasePolyhedronProvider extends PureComponent<*, *> {
-  transitionId: *;
+export function PolyhedronProvider({ disabled, setName, name, children }: *) {
+  const [polyhedron, setPolyhedron] = useState(Polyhedron.get(name));
+  const [faceColors, setFaceColors] = useState(null);
+  const transitionId = useRef(null);
 
-  constructor(props: *) {
-    super(props);
-    this.state = {
-      ...defaultState,
-      ..._.pick(this, actions),
-      polyhedron: Polyhedron.get(props.name),
-      setName: props.setName,
-    };
-  }
+  const { config } = useContext(ConfigContext);
 
-  componentDidUpdate(prevProps) {
-    const { name, disabled } = this.props;
-    if (disabled && !prevProps.disabled) {
-      this.setState({ faceColors: null });
-    }
+  // If this is disabled, derive the polyhedron from the passed in name
+  useEffect(
+    () => {
+      if (disabled) {
+        setFaceColors(null);
+        setPolyhedron(Polyhedron.get(name));
+      }
+    },
+    [disabled, name],
+  );
 
-    if (disabled && name !== prevProps.name) {
-      this.setState({
-        polyhedron: Polyhedron.get(name),
-      });
-    }
-  }
+  useEffect(
+    () => {
+      return () => {
+        if (transitionId.current) {
+          // TODO godddamit
+          cancelAnimationFrame(transitionId.current.current);
+        }
+      };
+    },
+    [transitionId.current],
+  );
 
-  componentWillUnmount() {
-    if (this.transitionId) {
-      cancelAnimationFrame(this.transitionId.current);
-    }
-  }
-
-  render() {
-    const value = {
-      ...this.state,
-      // TODO more secure way to calc this other than faceColors
-      isTransitioning: !!this.state.faceColors,
-    };
-    return (
-      <PolyhedronContext.Provider value={value}>
-        {this.props.children}
-      </PolyhedronContext.Provider>
-    );
-  }
-
-  recenter = () => {
-    this.setState(({ polyhedron }) => ({
-      polyhedron: polyhedron.center(),
-    }));
-  };
-
-  resize = () => {
-    this.setState(({ polyhedron }) => ({
-      polyhedron: polyhedron.normalizeToVolume(5),
-    }));
-  };
-
-  transitionPolyhedron = (result: Polyhedron, animationData: *) => {
-    const { config } = this.props;
+  const transitionPolyhedron = (result: Polyhedron, animationData: *) => {
     const { colors, animationSpeed, enableAnimation } = config;
 
     if (!enableAnimation || !animationData) {
-      return this.setState({
-        polyhedron: result,
-      });
+      setPolyhedron(result);
+      return;
     }
 
     const colorStart = getFaceColors(animationData.start, colors);
@@ -134,12 +106,10 @@ class BasePolyhedronProvider extends PureComponent<*, *> {
     );
     const allColorStart = arrayDefaults(colorStart, colorEnd);
 
-    this.setState({
-      polyhedron: animationData.start,
-      faceColors: allColorStart,
-    });
+    setPolyhedron(animationData.start);
+    setFaceColors(allColorStart);
 
-    this.transitionId = transition(
+    transitionId.current = transition(
       {
         duration: 1000 / animationSpeed,
         startValue: {
@@ -151,26 +121,31 @@ class BasePolyhedronProvider extends PureComponent<*, *> {
           faceColors: arrayDefaults(colorEnd, colorStart),
         },
         onFinish: () => {
-          this.setState({
-            polyhedron: result,
-            faceColors: null,
-          });
+          setPolyhedron(result);
+          setFaceColors(null);
         },
       },
       ({ vertices, faceColors }) => {
-        this.setState({
-          polyhedron: animationData.start.withVertices(vertices),
-          faceColors,
-        });
+        setPolyhedron(animationData.start.withVertices(vertices));
+        setFaceColors(faceColors);
       },
     );
   };
-}
 
-export const PolyhedronProvider = (props: *) => (
-  <WithConfig>
-    {({ config }) => <BasePolyhedronProvider {...props} config={config} />}
-  </WithConfig>
-);
+  const value = {
+    polyhedron,
+    faceColors,
+    // TODO more secure way to calc this other than faceColors
+    isTransitioning: !!faceColors,
+    setPolyhedron,
+    transitionPolyhedron,
+    setName,
+  };
+  return (
+    <PolyhedronContext.Provider value={value}>
+      {children}
+    </PolyhedronContext.Provider>
+  );
+}
 
 export const WithPolyhedron = PolyhedronContext.Consumer;

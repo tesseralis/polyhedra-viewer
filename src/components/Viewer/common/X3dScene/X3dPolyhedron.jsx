@@ -1,22 +1,12 @@
 // @flow strict
-import React, { Component, Fragment } from 'react';
+// $FlowFixMe
+import React, { useEffect, useRef, useContext, Fragment } from 'react';
 import _ from 'lodash';
-import EventListener from 'react-event-listener';
 
-import { type Point } from 'types';
-import { SolidData } from 'math/polyhedra';
-import connect from 'components/connect';
-import { WithConfig } from 'components/ConfigContext';
-import { WithPolyhedron } from '../../context';
-import SolidColors from './SolidColors';
-import HitOptions from './HitOptions';
-
-interface X3DEvent {
-  hitPnt: Point;
-}
-
-// TODO this is hella sketchy; figure out this typing
-type X3DEventHandler = (e: X3DEvent) => void;
+import { PolyhedronContext } from '../../context';
+import useSolidColors from './useSolidColors';
+import useHitOptions from './useHitOptions';
+import ConfigContext from 'components/ConfigContext';
 
 // Join a list of lists with an inner and outer separator.
 const joinListOfLists = (list: *, outerSep: string, innerSep: string) => {
@@ -39,136 +29,88 @@ const Edges = ({ edges, vertices }) => {
   );
 };
 
-interface PolyhedronProps {
-  solidData: SolidData;
-  config: *;
-  colors: *;
-  onClick(hitPnt: Point): void;
-  onHover(hitPnt: Point): void;
-  onMouseOut(): void;
-}
+export default function X3dPolyhedron() {
+  const shape = useRef(null);
+  const hitPnt = useRef(null);
 
-interface PolyhedronState {
-  error?: Error;
-}
+  const colors = useSolidColors();
+  const {
+    setHitOption: onHover,
+    unsetHitOption: onMouseOut,
+    applyWithHitOption: onClick,
+  } = useHitOptions();
 
-export class X3dPolyhedron extends Component<PolyhedronProps, PolyhedronState> {
-  shape: *;
-  hitPnt: * = undefined;
-
-  constructor(props: PolyhedronProps) {
-    super(props);
-    this.state = {};
-    this.shape = React.createRef();
-  }
-
-  render() {
-    const { solidData, config } = this.props;
-    const { error } = this.state;
-    const { vertices, faces, edges } = solidData;
-    const { showFaces, showEdges, showInnerFaces, opacity } = config;
-
-    if (error) {
-      throw error;
-    }
-    return (
-      <Fragment>
-        <EventListener target="document" onLoad={_.once(this.handleLoad)} />
-        {showFaces && (
-          // NOTE: The mouse handlers are duplicated to make it easy to test on enzyme.
-          // They don't actually do anything in production
-          <shape
-            is="x3d"
-            ref={this.shape}
-            onMouseDown={this.handleMouseDown}
-            onMouseMove={this.handleMouseMove}
-            onMouseUp={this.handleMouseUp}
-            onMouseOut={this.handleMouseOut}
-          >
-            <appearance is="x3d">
-              <material is="x3d" transparency={1 - opacity} />
-            </appearance>
-            <indexedfaceset
-              is="x3d"
-              solid={(!showInnerFaces).toString()}
-              colorpervertex="false"
-              coordindex={joinListOfLists(faces, ' -1 ', ' ')}
-            >
-              <Coordinates points={vertices} />
-              <color is="x3d" color={this.getColors()} />
-            </indexedfaceset>
-          </shape>
-        )}
-        {showEdges && <Edges edges={edges} vertices={vertices} />}
-      </Fragment>
-    );
-  }
-
-  getColors = () => {
-    return joinListOfLists(this.props.colors, ',', ' ');
-  };
-
-  // Manually adding event listeners swallows errors, so we have to store it in the component itself
-  wrapError = (fn: X3DEventHandler) => (event: X3DEvent) => {
-    try {
-      fn(event);
-    } catch (error) {
-      this.setState({ error });
-    }
-  };
-
-  addEventListener(type: string, fn: X3DEventHandler) {
-    if (this.shape.current !== null) {
-      this.shape.current.addEventListener(type, this.wrapError(fn));
-    }
-  }
-
-  handleLoad = () => {
-    this.addEventListener('mousedown', this.handleMouseDown);
-    this.addEventListener('mouseup', this.handleMouseUp);
-    this.addEventListener('mousemove', this.handleMouseMove);
-    this.addEventListener('mouseout', this.handleMouseOut);
-  };
-
-  handleMouseDown = (event: X3DEvent) => {
-    // logic to ensure drags aren't registered as clicks
-    this.hitPnt = event.hitPnt;
-  };
-
-  handleMouseUp = (event: X3DEvent) => {
-    if (!_.isEqual(this.hitPnt, event.hitPnt)) return;
-    this.props.onClick(event.hitPnt);
-  };
-
-  handleMouseMove = (event: X3DEvent) => {
-    this.hitPnt = event.hitPnt;
-    this.props.onHover(event.hitPnt);
-  };
-
-  handleMouseOut = () => {
-    this.props.onMouseOut();
-  };
-}
-
-export default _.flow([
-  connect(
-    WithConfig,
-    ['config'],
-  ),
-  connect(
-    WithPolyhedron,
-    ({ polyhedron }) => ({ solidData: polyhedron.solidData }),
-  ),
-  connect(
-    SolidColors,
-    ['colors'],
-  ),
-  connect(
-    HitOptions,
-    {
-      onHover: 'setHitOption',
-      onMouseOut: 'unsetHitOption',
-      onClick: 'applyWithHitOption',
+  const listeners = {
+    mousedown(e) {
+      hitPnt.current = e.hitPnt;
     },
-  ),
-])(X3dPolyhedron);
+    mouseup(e) {
+      if (!_.isEqual(hitPnt.current, e.hitPnt)) return;
+      onClick(e.hitPnt);
+    },
+    mousemove(e) {
+      hitPnt.current = e.hitPnt;
+      onHover(e.hitPnt);
+    },
+    mouseout() {
+      onMouseOut();
+    },
+  };
+
+  useEffect(
+    () => {
+      if (shape.current !== null) {
+        _.forEach(listeners, (fn, type) => {
+          shape.current.addEventListener(type, fn);
+        });
+      }
+
+      return () => {
+        if (shape.current !== null) {
+          _.forEach(listeners, (fn, type) => {
+            shape.current.removeEventListener(type, fn);
+          });
+        }
+      };
+    },
+    [onClick, onHover, onMouseOut],
+  );
+
+  const { polyhedron } = useContext(PolyhedronContext);
+  const { config } = useContext(ConfigContext);
+
+  const { vertices, faces, edges } = polyhedron.solidData;
+  const { showFaces, showEdges, showInnerFaces, opacity } = config;
+
+  const colorStr = joinListOfLists(colors, ',', ' ');
+  return (
+    <Fragment>
+      {showFaces && (
+        // NOTE: The mouse handlers are duplicated to make it easy to test on enzyme.
+        // They don't actually do anything in production
+        <shape
+          is="x3d"
+          ref={shape}
+          onMouseDown={listeners.mousedown}
+          onMouseMove={listeners.mousemove}
+          onMouseUp={listeners.mouseup}
+          onMouseOut={listeners.mouseout}
+        >
+          <appearance is="x3d">
+            <material is="x3d" transparency={1 - opacity} />
+          </appearance>
+          <indexedfaceset
+            is="x3d"
+            solid={(!showInnerFaces).toString()}
+            colorpervertex="false"
+            coordindex={joinListOfLists(faces, ' -1 ', ' ')}
+          >
+            <Coordinates points={vertices} />
+            <color is="x3d" color={colorStr} />
+          </indexedfaceset>
+        </shape>
+      )}
+      {showEdges && <Edges edges={edges} vertices={vertices} />}
+    </Fragment>
+  );
+}

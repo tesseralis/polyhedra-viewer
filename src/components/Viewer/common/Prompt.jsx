@@ -1,10 +1,10 @@
 // @flow strict
-import React from 'react';
+// $FlowFixMe
+import React, { useContext } from 'react';
 import { makeStyles } from 'styles';
 
 import { media, fonts } from 'styles';
-import { WithOperation } from 'components/Viewer/context';
-import connect from 'components/connect';
+import { OperationContext } from 'components/Viewer/context';
 
 const styles = makeStyles({
   prompt: {
@@ -33,12 +33,8 @@ function getMessage(opName) {
   }
 }
 
-function Prompt({ opName }) {
+export default function Prompt() {
+  const { opName } = useContext(OperationContext);
   const message = getMessage(opName);
   return message && <div className={styles('prompt')}>{message}</div>;
 }
-
-export default connect(
-  WithOperation,
-  ['opName'],
-)(Prompt);

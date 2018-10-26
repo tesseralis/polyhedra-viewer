@@ -1,15 +1,18 @@
 // @flow strict
-import React, { Fragment } from 'react';
-import _ from 'lodash';
 
-import { WithOperation } from 'components/Viewer/context';
-import connect from 'components/connect';
+import _ from 'lodash';
+// $FlowFixMe
+import React, { useContext, Fragment } from 'react';
+
+import { OperationContext } from 'components/Viewer/context';
 import TwistOptions from './TwistOptions';
 import AugmentOptions from './AugmentOptions';
 
-function Options({ opName }) {
+export default function Options() {
+  const { opName } = useContext(OperationContext);
   return (
     <Fragment>
+      {/* TODO determine this within the operation */}
       {_.includes(
         ['shorten', 'snub', 'twist', 'gyroelongate', 'turn'],
         opName,
@@ -18,8 +21,3 @@ function Options({ opName }) {
     </Fragment>
   );
 }
-
-export default connect(
-  WithOperation,
-  ['opName'],
-)(Options);

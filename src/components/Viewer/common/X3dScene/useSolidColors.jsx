@@ -1,30 +1,27 @@
 // @flow strict
 import _ from 'lodash';
-import { PureComponent } from 'react';
+/// $FlowFixMe
+import { useContext } from 'react';
 import tinycolor from 'tinycolor2';
-import connect from 'components/connect';
-import { WithConfig } from 'components/ConfigContext';
-import { WithPolyhedron, WithOperation } from '../../context';
+import ConfigContext from 'components/ConfigContext';
+import { PolyhedronContext, OperationContext } from '../../context';
 
 function toRgb(hex: string) {
   const { r, g, b } = tinycolor(hex).toRgb();
   return [r / 255, g / 255, b / 255];
 }
 
-class SolidColors extends PureComponent<*> {
-  render() {
-    // TODO this is a pretty expensive calculation (probably)
-    return this.props.children({ colors: this.getColors().map(toRgb) });
-  }
+// TODO we should be able to just turn this into a hook
 
-  getColors = () => {
-    const {
-      faceColors,
-      polyhedron,
-      operation,
-      config: { colors },
-      options,
-    } = this.props;
+export default function useSolidColors() {
+  const {
+    config: { colors },
+  } = useContext(ConfigContext);
+  const { polyhedron, faceColors } = useContext(PolyhedronContext);
+  const { operation, options } = useContext(OperationContext);
+
+  // TODO fun memo stuff
+  const getColors = () => {
     if (!_.isEmpty(faceColors)) {
       return polyhedron.faces.map(
         (face, i) => faceColors[i] || colors[face.numSides],
@@ -44,19 +41,5 @@ class SolidColors extends PureComponent<*> {
       }
     });
   };
+  return getColors().map(toRgb);
 }
-
-export default _.flow([
-  connect(
-    WithConfig,
-    ['config'],
-  ),
-  connect(
-    WithOperation,
-    ['operation', 'options'],
-  ),
-  connect(
-    WithPolyhedron,
-    ['polyhedron', 'faceColors'],
-  ),
-])(SolidColors);

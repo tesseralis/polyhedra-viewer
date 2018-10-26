@@ -1,13 +1,13 @@
 // @flow strict
-import React, { Fragment } from 'react';
+// $FlowFixMe
+import React, { useContext, Fragment } from 'react';
 import { makeStyles } from 'styles';
 import _ from 'lodash';
 
 import { polygonNames } from 'math/polygons';
 import { fonts } from 'styles';
 
-import connect from 'components/connect';
-import { WithPolyhedron } from 'components/Viewer/context';
+import { PolyhedronContext } from 'components/Viewer/context';
 import DataDownloader from './DataDownloader';
 
 const styles = makeStyles({
@@ -257,7 +257,8 @@ const info: InfoRow[] = [
   },
 ];
 
-function InfoPanel({ polyhedron }) {
+export default function InfoPanel() {
+  const { polyhedron } = useContext(PolyhedronContext);
   return (
     <div className={styles('infoPanel')}>
       <h2 className={styles('solidName')}>
@@ -286,8 +287,3 @@ function InfoPanel({ polyhedron }) {
     </div>
   );
 }
-
-export default connect(
-  WithPolyhedron,
-  ['polyhedron'],
-)(InfoPanel);

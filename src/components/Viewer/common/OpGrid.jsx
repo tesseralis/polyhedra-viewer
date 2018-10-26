@@ -1,17 +1,17 @@
 // @flow strict
 import _ from 'lodash';
-import React from 'react';
+// $FlowFixMe
+import React, { useContext } from 'react';
 
 import { flatMap } from 'utils';
 import { makeStyles } from 'styles';
 import { media, fonts } from 'styles';
 import { hover, scroll } from 'styles/common';
 import { operations } from 'math/operations';
-import connect from 'components/connect';
 import {
-  ApplyOperation,
-  WithOperation,
-  WithPolyhedron,
+  useApplyOperation,
+  OperationContext,
+  PolyhedronContext,
 } from 'components/Viewer/context';
 import OperationIcon from './OperationIcon';
 
@@ -85,8 +85,11 @@ function OpButton({ name, highlighted, ...btnProps }) {
   );
 }
 
-function OpGrid({ isTransitioning, polyhedron, opName, selectOperation }) {
+export default function OpGrid() {
   // TODO can we not pull in the entire polyhedron?
+  const { polyhedron, isTransitioning } = useContext(PolyhedronContext);
+  const { opName } = useContext(OperationContext);
+  const { selectOperation } = useApplyOperation();
   return (
     <div className={styles('opGrid')}>
       {opList.map(name => (
@@ -101,18 +104,3 @@ function OpGrid({ isTransitioning, polyhedron, opName, selectOperation }) {
     </div>
   );
 }
-
-export default _.flow([
-  connect(
-    WithPolyhedron,
-    ['polyhedron', 'isTransitioning'],
-  ),
-  connect(
-    ApplyOperation,
-    ['selectOperation'],
-  ),
-  connect(
-    WithOperation,
-    ['opName'],
-  ),
-])(OpGrid);

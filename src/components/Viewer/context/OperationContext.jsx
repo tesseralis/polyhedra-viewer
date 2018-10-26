@@ -1,6 +1,7 @@
 // @flow strict
 import _ from 'lodash';
-import React, { Component } from 'react';
+// $FlowFixMe
+import React, { useState, useEffect } from 'react';
 
 import { mapObject } from 'utils';
 import { operations, type OpName } from 'math/operations';
@@ -20,54 +21,46 @@ const OperationContext = React.createContext({
 
 export default OperationContext;
 
-export class OperationProvider extends Component<*, *> {
-  constructor(props: *) {
-    super(props);
-    this.state = {
-      ...defaultState,
-      ..._.pick(this, actions),
-    };
-  }
+export function OperationProvider({ disabled, children }: *) {
+  const [opName, setOpName] = useState('');
+  const [options, setOptions] = useState({});
 
-  componentDidUpdate(prevProps: *) {
-    const { disabled } = this.props;
-    if (disabled && !prevProps.disabled) {
-      this.unsetOperation();
-    }
-  }
-
-  render() {
-    const value = {
-      ...this.state,
-      operation: operations[this.state.opName],
-    };
-    return (
-      <OperationContext.Provider value={value}>
-        {this.props.children}
-      </OperationContext.Provider>
-    );
-  }
-
-  setOperation = (opName: OpName, solid: Polyhedron) => {
-    this.setState({
-      opName,
-      // TODO should we just store the operation instead?
-      options: operations[opName].defaultOptions(solid),
-    });
+  const setOperation = (opName: OpName, solid: Polyhedron) => {
+    setOpName(opName);
+    setOptions(operations[opName].defaultOptions(solid));
   };
 
-  unsetOperation = () => {
-    this.setState({
-      opName: '',
-      options: undefined,
-    });
+  const unsetOperation = () => {
+    setOpName('');
+    setOptions(undefined);
   };
 
-  setOption = (name: string, value: *) => {
-    this.setState(({ options }) => ({
-      options: { ...options, [name]: value },
-    }));
+  const setOption = (name: string, value: *) => {
+    setOptions({ ...options, [name]: value });
   };
+
+  useEffect(
+    () => {
+      if (disabled) {
+        unsetOperation();
+      }
+    },
+    [disabled],
+  );
+
+  const value = {
+    opName,
+    options,
+    operation: operations[opName],
+    setOperation,
+    unsetOperation,
+    setOption,
+  };
+  return (
+    <OperationContext.Provider value={value}>
+      {children}
+    </OperationContext.Provider>
+  );
 }
 
 export const WithOperation = OperationContext.Consumer;

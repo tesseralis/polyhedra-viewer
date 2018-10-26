@@ -33,9 +33,11 @@ export default function X3dScene({ label, children }: Props) {
       x3dom.reload();
       // X3DOM generates this canvas which isn't controlled by react,
       // so we have to manually fix things
-      const canvas = x3d.current.querySelector('canvas');
-      canvas.setAttribute('tabIndex', -1);
-      canvas.setAttribute('aria-label', label);
+      if (x3d.current) {
+        const canvas = x3d.current.querySelector('canvas');
+        canvas.setAttribute('tabIndex', -1);
+        canvas.setAttribute('aria-label', label);
+      }
     });
   }, []);
 

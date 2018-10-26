@@ -1,9 +1,10 @@
 // @flow strict
-import React from 'react';
+// $FlowFixMe
+import React, { useContext } from 'react';
 import { styled } from 'styles';
 import _ from 'lodash';
 
-import { WithConfig } from 'components/ConfigContext';
+import ConfigContext from 'components/ConfigContext';
 import { configInputs } from 'components/configOptions';
 import { hover } from 'styles/common';
 import { andaleMono } from 'styles/fonts';
@@ -89,21 +90,18 @@ const Form = styled.form({
 });
 
 export default function ConfigForm() {
+  const { config, setValue, reset } = useContext(ConfigContext);
   return (
-    <WithConfig>
-      {({ config, setValue, reset }) => (
-        <Form>
-          {configInputs.map(({ key, ...input }) => (
-            <LabelledInput
-              key={key}
-              input={input}
-              value={_.get(config, key)}
-              setValue={value => setValue(key, value)}
-            />
-          ))}
-          <ResetButton onClick={reset} />
-        </Form>
-      )}
-    </WithConfig>
+    <Form>
+      {configInputs.map(({ key, ...input }) => (
+        <LabelledInput
+          key={key}
+          input={input}
+          value={_.get(config, key)}
+          setValue={value => setValue(key, value)}
+        />
+      ))}
+      <ResetButton onClick={reset} />
+    </Form>
   );
 }

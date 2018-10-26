@@ -5,12 +5,12 @@ import FileSaver from 'file-saver';
 
 import { escapeName } from 'math/polyhedra/names';
 import { allSolidNames } from 'data';
-import { WithPolyhedron } from '../context';
 
 /**
  * Utility class to download image thumbnails. Do NOT use in production
  */
-class ImageDownloader extends React.Component<*> {
+// TODO rebuild this class with hoooks~~
+export default class ImageDownloader extends React.Component<*> {
   downloadImages = async () => {
     const zip = new JSZip();
     const canvas = document.getElementsByTagName('canvas');
@@ -29,7 +29,7 @@ class ImageDownloader extends React.Component<*> {
     });
   };
 
-  addImage = async (canvas, folder, solid) => {
+  addImage = async (canvas: *, folder: *, solid: *) => {
     const { setPolyhedron } = this.props;
     return await new Promise(resolve => {
       setPolyhedron(solid, () => {
@@ -47,11 +47,3 @@ class ImageDownloader extends React.Component<*> {
     return <button onClick={this.downloadImages}>download images</button>;
   }
 }
-
-export default () => {
-  return (
-    <WithPolyhedron>
-      {({ setPolyhedron }) => <ImageDownloader setPolyhedron={setPolyhedron} />}
-    </WithPolyhedron>
-  );
-};

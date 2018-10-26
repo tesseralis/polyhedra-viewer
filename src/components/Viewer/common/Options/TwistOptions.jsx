@@ -1,12 +1,11 @@
 // @flow strict
-import _ from 'lodash';
-import React from 'react';
+// $FlowFixMe
+import React, { useContext } from 'react';
 import { makeStyles } from 'styles';
 import Icon from '@mdi/react';
 
-import connect from 'components/connect';
 import { SrOnly } from 'components/common';
-import { ApplyOperation, WithPolyhedron } from '../../context';
+import { useApplyOperation, PolyhedronContext } from '../../context';
 import { mdiRotateLeft, mdiRotateRight } from '@mdi/js';
 
 const styles = makeStyles({
@@ -44,11 +43,12 @@ function TwistOption({ orientation, onClick, disabled }) {
 
 interface Props {
   opName: string;
-  onClick(opName: string, twistOpts: *): void;
-  disabled: boolean;
 }
 
-function TwistOptions({ opName, onClick, disabled }: Props) {
+export default function TwistOptions({ opName }: Props) {
+  const { isTransitioning: disabled } = useContext(PolyhedronContext);
+  const { applyOperation: onClick } = useApplyOperation();
+
   return (
     <div className={styles('twistOptions')}>
       <TwistOption
@@ -64,14 +64,3 @@ function TwistOptions({ opName, onClick, disabled }: Props) {
     </div>
   );
 }
-
-export default _.flow([
-  connect(
-    WithPolyhedron,
-    { disabled: 'isTransitioning' },
-  ),
-  connect(
-    ApplyOperation,
-    { onClick: 'applyOperation' },
-  ),
-])(TwistOptions);

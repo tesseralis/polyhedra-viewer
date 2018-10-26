@@ -8,7 +8,8 @@ export default class ViewerPage extends AppPage {
   }
 
   getPolyhedron() {
-    return this.wrapper.find('HitOptions').prop('polyhedron');
+    const solidData = this.wrapper.find('X3dPolyhedron').prop('solidData');
+    return new Polyhedron(solidData);
   }
 
   clickFace(face: *) {
@@ -31,7 +32,11 @@ export default class ViewerPage extends AppPage {
   }
 
   expectOperation(operation: ?string) {
-    const actual = this.wrapper.find('OpGrid').prop('opName');
+    const button = this.wrapper
+      .find('OpGrid')
+      .find('OpButton')
+      .filterWhere(n => !!n.prop('highlighted'));
+    const actual = button.length ? button.prop('name') : '';
     expect(actual).toEqual(operation);
     return this;
   }

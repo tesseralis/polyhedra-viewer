@@ -1,9 +1,9 @@
 // @flow strict
-import React from 'react';
+// $FlowFixMe
+import React, { useContext } from 'react';
 import { makeStyles } from 'styles';
 
-import connect from 'components/connect';
-import { WithPolyhedron } from 'components/Viewer/context';
+import { PolyhedronContext } from 'components/Viewer/context';
 
 import { andaleMono } from 'styles/fonts';
 import { hover } from 'styles/common';
@@ -26,19 +26,22 @@ const styles = makeStyles({
   },
 });
 
-function ResizeButtons({ disabled, recenter, resize }: *) {
+export default function ResizeButtons() {
+  const { polyhedron, isTransitioning, setPolyhedron } = useContext(
+    PolyhedronContext,
+  );
   return (
     <div className={styles('buttons')}>
       <button
-        disabled={disabled}
-        onClick={recenter}
+        disabled={isTransitioning}
+        onClick={() => setPolyhedron(polyhedron.center())}
         className={styles('resetButton')}
       >
         Recenter
       </button>
       <button
-        disabled={disabled}
-        onClick={resize}
+        disabled={isTransitioning}
+        onClick={() => setPolyhedron(polyhedron.normalizeToVolume(5))}
         className={styles('resetButton')}
       >
         Resize
@@ -46,8 +49,3 @@ function ResizeButtons({ disabled, recenter, resize }: *) {
     </div>
   );
 }
-
-export default connect(
-  WithPolyhedron,
-  { resize: 'resize', recenter: 'recenter', disabled: 'isTransitioning' },
-)(ResizeButtons);

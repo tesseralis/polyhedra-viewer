@@ -1,5 +1,5 @@
 // @flow strict
-export { default as ApplyOperation } from './ApplyOperation';
+export { default as useApplyOperation } from './useApplyOperation';
 export {
   default as OperationContext,
   OperationProvider,
