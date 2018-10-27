@@ -7,7 +7,7 @@ import { usePageTitle } from 'components/common';
 import { OperationProvider, PolyhedronProvider } from './context';
 import DesktopViewer from './DesktopViewer';
 import MobileViewer from './MobileViewer';
-import { DeviceTracker } from 'components/DeviceContext';
+import { useMediaInfo } from 'components/DeviceContext';
 import { escapeName, unescapeName } from 'math/polyhedra/names';
 
 interface InnerProps {
@@ -19,14 +19,11 @@ interface InnerProps {
 function InnerViewer({ solid, panel }: InnerProps) {
   usePageTitle(`${_.capitalize(unescapeName(solid))} - Polyhedra Viewer`);
 
-  return (
-    <Fragment>
-      <DeviceTracker
-        renderDesktop={() => <DesktopViewer solid={solid} panel={panel} />}
-        renderMobile={$ => <MobileViewer solid={solid} panel={panel} />}
-      />
-    </Fragment>
-  );
+  const { device } = useMediaInfo();
+
+  const Viewer = device === 'desktop' ? DesktopViewer : MobileViewer;
+
+  return <Viewer solid={solid} panel={panel} />;
 }
 
 interface Props {

@@ -4,7 +4,7 @@ import React, { useEffect } from 'react';
 
 import { styled } from 'styles';
 import { type TableSection as TableSectionType } from 'math/polyhedra/tables';
-import { DeviceTracker } from 'components/DeviceContext';
+import { useMediaInfo } from 'components/DeviceContext';
 import { usePageTitle } from 'components/common';
 
 import Markdown from './Markdown';
@@ -44,7 +44,10 @@ interface Props {
   narrow?: boolean;
 }
 
-function HomePage({ hash = '', data, narrow = false }: Props) {
+export default function HomePage({ hash = '' }: Props) {
+  const { device, orientation } = useMediaInfo();
+  const narrow = device === 'mobile' && orientation === 'portrait';
+
   useEffect(
     () => {
       const el = document.getElementById(hash);
@@ -63,7 +66,7 @@ function HomePage({ hash = '', data, narrow = false }: Props) {
         {/* only play video if we're at the top of the page */}
         <Masthead />
         <Sections>
-          {data.map(sectionData => (
+          {tableSections.map(sectionData => (
             <TableSection
               narrow={narrow}
               key={sectionData.header}
@@ -81,18 +84,3 @@ function HomePage({ hash = '', data, narrow = false }: Props) {
     </Container>
   );
 }
-
-export default (props: *) => {
-  return (
-    <DeviceTracker
-      renderDesktop={() => <HomePage {...props} data={tableSections} />}
-      renderMobile={({ orientation }) => (
-        <HomePage
-          {...props}
-          narrow={orientation === 'portrait'}
-          data={tableSections}
-        />
-      )}
-    />
-  );
-};

@@ -27,11 +27,7 @@ export default class AppPage {
       device === 'mobile'
         ? media.mobilePortraitMaxWidth
         : media.desktopMinWidth;
-    const resize = this.wrapper
-      .find('EventListener')
-      .filterWhere(n => n.prop('onResize'))
-      .prop('onResize');
-    resize();
+    global.dispatchEvent(new Event('resize'));
     this.wrapper.update();
     return this;
   }
