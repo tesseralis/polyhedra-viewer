@@ -1,10 +1,9 @@
 // @flow
-// $FlowFixMe
-import React, { useRef, useCallback } from 'react';
+import React from 'react';
 
 import { makeStyles, media } from 'styles';
 import { scroll } from 'styles/common';
-import { SrOnly } from 'components/common';
+import { useFocuser, SrOnly } from 'components/common';
 import { BackLink, Title, NavMenu, X3dScene, Panels } from '../common';
 
 import OperationsPanel from './OperationsPanel';
@@ -85,16 +84,9 @@ interface Props {
 }
 
 export default function MobileViewer({ panel, solid }: Props) {
-  const header = useRef(null);
-
-  const focusOnHeader = useCallback(
-    () => {
-      header.current.focus();
-    },
-    [header.current],
-  );
-
+  const [header, focusOnHeader] = useFocuser();
   const panelNode = <Panels panel={panel} operationsPanel={OperationsPanel} />;
+
   return (
     <section className={styles('viewer')}>
       <div className={styles('title')}>

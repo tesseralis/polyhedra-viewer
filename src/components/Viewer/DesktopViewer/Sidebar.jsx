@@ -1,9 +1,8 @@
 // @flow
-// $FlowFixMe
-import React, { useRef, useCallback } from 'react';
+import React from 'react';
 import { makeStyles } from 'styles';
 
-import { SrOnly } from 'components/common';
+import { useFocuser, SrOnly } from 'components/common';
 import { NavMenu, Panels } from '../common';
 import { scroll } from 'styles/common';
 
@@ -45,13 +44,7 @@ interface Props {
 }
 
 export default function Sidebar({ panel, solid, compact }: Props) {
-  const header = useRef(null);
-  const focusOnHeader = useCallback(
-    () => {
-      header.current.focus();
-    },
-    [header.current],
-  );
+  const [header, focusOnHeader] = useFocuser();
 
   return (
     <section className={styles('sidebar', !compact && 'full')}>

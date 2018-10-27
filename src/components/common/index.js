@@ -6,5 +6,6 @@
 // Examples include generic buttons and wrappers around 3rd party components.
 
 export { default as SrOnly } from './SrOnly';
-export { default as usePageTitle } from './usePageTitle';
 export { default as ExternalLink } from './ExternalLink';
+export { default as usePageTitle } from './usePageTitle';
+export { default as useFocuser } from './useFocuser';
