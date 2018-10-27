@@ -3,7 +3,6 @@ import _ from 'lodash';
 // $FlowFixMe
 import { useContext } from 'react';
 
-import { type OpName } from 'math/operations';
 import { operations } from 'math/operations';
 import PolyhedronContext from './PolyhedronContext';
 import OperationContext from './OperationContext';
@@ -39,18 +38,5 @@ export default function useApplyOperation() {
     }
   };
 
-  const selectOperation = (_opName: OpName) => {
-    const operation = operations[_opName];
-    if (_opName === opName) {
-      return unsetOperation();
-    }
-
-    if (!operation.hasOptions(polyhedron)) {
-      applyOperation(_opName);
-    } else {
-      setOperation(_opName, polyhedron);
-    }
-  };
-
-  return { applyOperation, selectOperation };
+  return { applyOperation };
 }

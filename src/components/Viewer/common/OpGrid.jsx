@@ -72,12 +72,30 @@ const styles = makeStyles({
   },
 });
 
-function OpButton({ name, highlighted, ...btnProps }) {
+function OpButton({ name }) {
+  const { polyhedron, isTransitioning } = useContext(PolyhedronContext);
+  const { opName, setOperation, unsetOperation } = useContext(OperationContext);
+  const { applyOperation } = useApplyOperation();
+  const operation = operations[name];
+  const isCurrent = name === opName;
+
+  const selectOperation = () => {
+    if (isCurrent) {
+      return unsetOperation();
+    }
+
+    if (!operation.hasOptions(polyhedron)) {
+      applyOperation(name);
+    } else {
+      setOperation(name, polyhedron);
+    }
+  };
   return (
     <button
-      {...btnProps}
-      className={styles('operationButton', highlighted && 'isHighlighted')}
+      className={styles('operationButton', isCurrent && 'isHighlighted')}
       style={{ gridArea: name }}
+      onClick={selectOperation}
+      disabled={!operation.canApplyTo(polyhedron) || isTransitioning}
     >
       <OperationIcon name={name} />
       {name}
@@ -86,20 +104,10 @@ function OpButton({ name, highlighted, ...btnProps }) {
 }
 
 export default function OpGrid() {
-  // TODO can we not pull in the entire polyhedron?
-  const { polyhedron, isTransitioning } = useContext(PolyhedronContext);
-  const { opName } = useContext(OperationContext);
-  const { selectOperation } = useApplyOperation();
   return (
     <div className={styles('opGrid')}>
       {opList.map(name => (
-        <OpButton
-          key={name}
-          name={name}
-          highlighted={opName === name}
-          onClick={() => selectOperation(name)}
-          disabled={!operations[name].canApplyTo(polyhedron) || isTransitioning}
-        />
+        <OpButton key={name} name={name} />
       ))}
     </div>
   );
