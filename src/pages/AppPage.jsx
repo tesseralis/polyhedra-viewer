@@ -7,7 +7,7 @@ import { mount } from 'enzyme';
 
 import { media } from 'styles';
 import App from 'components/App';
-import { DeviceProvider } from 'components/DeviceContext';
+import { DeviceProvider } from 'components/useMediaInfo';
 
 export default class AppPage {
   wrapper: *;

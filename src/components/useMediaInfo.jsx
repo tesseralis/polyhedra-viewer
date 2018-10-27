@@ -7,7 +7,7 @@ function getWindowWidth() {
   return window.innerWidth > 0 ? window.innerWidth : window.screen.width;
 }
 
-// TODO I think this might be better as just a prop
+// The reason we use context is so that we only need to bind one listener to the window
 const DeviceContext = React.createContext(media.desktopMinWidth);
 
 interface ProviderProps {
@@ -38,7 +38,7 @@ function getOrientation(width) {
   return width <= media.mobilePortraitMaxWidth ? 'portrait' : 'landscape';
 }
 
-export function useMediaInfo() {
+export default function useMediaInfo() {
   const width = useContext(DeviceContext);
   if (isMobile(width)) {
     return { device: 'mobile', orientation: getOrientation(width) };

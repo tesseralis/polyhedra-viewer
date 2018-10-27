@@ -7,7 +7,7 @@ import { usePageTitle } from 'components/common';
 import { OperationProvider, PolyhedronProvider } from './context';
 import DesktopViewer from './DesktopViewer';
 import MobileViewer from './MobileViewer';
-import { useMediaInfo } from 'components/DeviceContext';
+import useMediaInfo from 'components/useMediaInfo';
 import { escapeName, unescapeName } from 'math/polyhedra/names';
 
 interface InnerProps {
