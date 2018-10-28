@@ -1,7 +1,8 @@
-import React, { Component } from 'react';
+import React, { useState } from 'react';
 import Icon from '@mdi/react';
 import { mdiMagnify } from '@mdi/js';
 
+import memo from 'memo';
 import { makeStyles } from 'styles';
 import { andaleMono } from 'styles/fonts';
 import { transition } from 'styles/common';
@@ -48,32 +49,23 @@ const styles = makeStyles({
   },
 });
 
-export default class SearchBar extends Component {
-  state = { isFocused: false };
-
-  setFocus(value) {
-    this.setState(() => ({ isFocused: value }));
-  }
-
-  render() {
-    const { value, onChange } = this.props;
-    const { isFocused } = this.state;
-    return (
-      <label className={styles('searchBar')}>
-        <input
-          type="text"
-          placeholder="Search..."
-          aria-label="search"
-          value={value}
-          onChange={e => onChange(e.target.value)}
-          onFocus={() => this.setFocus(true)}
-          onBlur={() => this.setFocus(false)}
-          className={styles('input')}
-        />
-        <span className={styles('icon', isFocused && 'iconFocus')}>
-          <Icon path={mdiMagnify} size="20px" />
-        </span>
-      </label>
-    );
-  }
-}
+export default memo(function SearchBar({ value, onChange }) {
+  const [isFocused, setFocus] = useState(false);
+  return (
+    <label className={styles('searchBar')}>
+      <input
+        type="text"
+        placeholder="Search..."
+        aria-label="search"
+        value={value}
+        onChange={e => onChange(e.target.value)}
+        onFocus={() => setFocus(true)}
+        onBlur={() => setFocus(false)}
+        className={styles('input')}
+      />
+      <span className={styles('icon', isFocused && 'iconFocus')}>
+        <Icon path={mdiMagnify} size="20px" />
+      </span>
+    </label>
+  );
+});

@@ -1,5 +1,6 @@
 import _ from 'lodash';
-import React, { Component } from 'react';
+// $FlowFixMe
+import React, { useState } from 'react';
 import { NavLink, Route } from 'react-router-dom';
 import { makeStyles } from 'styles';
 
@@ -129,29 +130,16 @@ const styles = makeStyles({
   },
 });
 
-export default class PolyhedronList extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      filterText: '',
-    };
-  }
-
-  render() {
-    const { filterText } = this.state;
-    const filteredGroups =
-      filterText === '' ? groups : filterGroups(groups, filterText);
-    return (
-      <section className={styles('list')}>
-        <SearchBar text={filterText} onChange={this.handleFilterChange} />
-        {filteredGroups.map(({ name, ...group }) => (
-          <PolyhedronGroup key={name} group={group} />
-        ))}
-      </section>
-    );
-  }
-
-  handleFilterChange = value => {
-    this.setState({ filterText: value });
-  };
+export default function PolyhedronList() {
+  const [filterText, setFilterText] = useState('');
+  const filteredGroups =
+    filterText === '' ? groups : filterGroups(groups, filterText);
+  return (
+    <section className={styles('list')}>
+      <SearchBar text={filterText} onChange={setFilterText} />
+      {filteredGroups.map(({ name, ...group }) => (
+        <PolyhedronGroup key={name} group={group} />
+      ))}
+    </section>
+  );
 }
