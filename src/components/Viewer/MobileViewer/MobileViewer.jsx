@@ -1,5 +1,6 @@
 // @flow
 import React from 'react';
+import _ from 'lodash';
 
 import { makeStyles, media } from 'styles';
 import { scroll } from 'styles/common';
@@ -54,7 +55,7 @@ const styles = makeStyles({
     zIndex: 100,
   },
 
-  operations: {
+  transparent: {
     pointerEvents: 'none',
   },
 
@@ -85,7 +86,7 @@ interface Props {
 
 export default function MobileViewer({ panel, solid }: Props) {
   const [header, focusOnHeader] = useFocuser();
-  const panelNode = <Panels panel={panel} operationsPanel={OperationsPanel} />;
+  const isTransparent = _.includes(['operations', 'full'], panel);
 
   return (
     <section className={styles('viewer')}>
@@ -93,21 +94,19 @@ export default function MobileViewer({ panel, solid }: Props) {
         <BackLink solid={solid} />
         <Title name={solid} />
       </div>
-      {panelNode && (
-        <div
-          className={styles(
-            'content',
-            panel === 'operations' ? 'operations' : 'contentFull',
-          )}
-        >
-          <SrOnly>
-            <h2 tabIndex={0} ref={header}>
-              {panel}
-            </h2>
-          </SrOnly>
-          {panelNode}
-        </div>
-      )}
+      <div
+        className={styles(
+          'content',
+          isTransparent ? 'transparent' : 'contentFull',
+        )}
+      >
+        <SrOnly>
+          <h2 tabIndex={0} ref={header}>
+            {panel}
+          </h2>
+        </SrOnly>
+        <Panels panel={panel} operationsPanel={OperationsPanel} />;
+      </div>
       <main className={styles('scene')}>
         <X3dScene label={solid} />
       </main>
