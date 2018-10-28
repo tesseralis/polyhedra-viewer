@@ -1,8 +1,9 @@
 // @flow strict
 import _ from 'lodash';
-import React, { PureComponent, Fragment } from 'react';
-import { makeStyles } from 'styles';
+import React, { Fragment } from 'react';
+import memo from 'memo';
 
+import { makeStyles } from 'styles';
 import { Polygon, PolyLine, PolyShape, polygonPoints } from 'components/svg';
 
 const color = 'DimGray';
@@ -165,14 +166,10 @@ function drawIcon(name) {
       throw new Error('unknown icon type');
   }
 }
-// PureComponent so we don't rerender when name is the same
-export default class OptionIcon extends PureComponent<Props> {
-  render() {
-    const { name } = this.props;
-    return (
-      <svg viewBox="0 0 200 200" className={styles('icon')}>
-        {drawIcon(name)}
-      </svg>
-    );
-  }
-}
+export default memo(function OptionIcon({ name }: Props) {
+  return (
+    <svg viewBox="0 0 200 200" className={styles('icon')}>
+      {drawIcon(name)}
+    </svg>
+  );
+});

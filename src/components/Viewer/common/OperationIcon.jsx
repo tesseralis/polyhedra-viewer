@@ -1,8 +1,9 @@
 // @flow strict
 import _ from 'lodash';
-import React, { PureComponent, Fragment } from 'react';
+import React, { Fragment } from 'react';
 import { makeStyles } from 'styles';
 
+import memo from 'memo.js';
 import { type OpName } from 'math/operations';
 import { Polygon, PolyLine } from 'components/svg';
 const { sqrt } = Math;
@@ -350,14 +351,10 @@ interface Props {
   name: OpName;
 }
 
-// PureComponent so we don't rerender when name is the same
-export default class OperationIcon extends PureComponent<Props> {
-  render() {
-    const { name } = this.props;
-    return (
-      <svg viewBox="0 0 200 200" className={styles('operationIcon')}>
-        {drawIcon(name)}
-      </svg>
-    );
-  }
-}
+export default memo(function OperationIcon({ name }: Props) {
+  return (
+    <svg viewBox="0 0 200 200" className={styles('operationIcon')}>
+      {drawIcon(name)}
+    </svg>
+  );
+});

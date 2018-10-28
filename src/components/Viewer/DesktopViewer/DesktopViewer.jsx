@@ -1,7 +1,8 @@
 // @flow
-import React, { PureComponent } from 'react';
+import React from 'react';
 import { makeStyles } from 'styles';
 
+import memo from 'memo';
 import Sidebar from './Sidebar';
 import Overlay from './Overlay';
 import { X3dScene } from '../common';
@@ -38,20 +39,17 @@ const styles = makeStyles({
   },
 });
 
-export default class DesktopViewer extends PureComponent<*> {
-  render() {
-    const { solid, panel } = this.props;
-    const full = panel === 'full';
-    return (
-      <div className={styles('viewer')}>
-        <div className={styles('scene', full && 'full')}>
-          <X3dScene label={solid} />
-          <Overlay solid={solid} panel={panel} />
-        </div>
-        <div className={styles(full ? 'sidebarCompact' : 'sidebarFull')}>
-          <Sidebar panel={panel} solid={solid} compact={full} />
-        </div>
+export default memo(function DesktopViewer({ solid, panel }) {
+  const full = panel === 'full';
+  return (
+    <div className={styles('viewer')}>
+      <div className={styles('scene', full && 'full')}>
+        <X3dScene label={solid} />
+        <Overlay solid={solid} panel={panel} />
       </div>
-    );
-  }
-}
+      <div className={styles(full ? 'sidebarCompact' : 'sidebarFull')}>
+        <Sidebar panel={panel} solid={solid} compact={full} />
+      </div>
+    </div>
+  );
+});
