@@ -105,7 +105,6 @@ export function TransitionProvider({ disabled, children }: *) {
     const colorEnd = getFaceColors(start.withVertices(endVertices), colors);
     const allColorStart = arrayDefaults(colorStart, colorEnd);
 
-    // setPolyhedron(start);
     setTransitionData(start.solidData);
     setFaceColors(allColorStart);
 
@@ -135,7 +134,6 @@ export function TransitionProvider({ disabled, children }: *) {
 
   const value = {
     faceColors,
-    // TODO more secure way to calc this other than faceColors
     transitionData: transitionData || polyhedron.solidData,
     isTransitioning: !!transitionData,
     transitionPolyhedron,
