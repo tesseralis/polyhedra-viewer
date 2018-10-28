@@ -4,12 +4,12 @@ import _ from 'lodash';
 import React, { useState, useEffect } from 'react';
 
 import { mapObject } from 'utils';
-import { operations, type OpName } from 'math/operations';
+import { type Operation } from 'math/operations';
 import { Polyhedron } from 'math/polyhedra';
 
 const defaultState = {
-  opName: '',
-  options: {},
+  operation: null,
+  options: null,
 };
 
 const actions = ['setOption', 'unsetOperation', 'setOperation'];
@@ -22,17 +22,17 @@ const OperationContext = React.createContext({
 export default OperationContext;
 
 export function OperationProvider({ disabled, children }: *) {
-  const [opName, setOpName] = useState('');
-  const [options, setOptions] = useState({});
+  const [operation, _setOperation] = useState(null);
+  const [options, setOptions] = useState(null);
 
-  const setOperation = (opName: OpName, solid: Polyhedron) => {
-    setOpName(opName);
-    setOptions(operations[opName].defaultOptions(solid));
+  const setOperation = (operation: Operation, solid: Polyhedron) => {
+    _setOperation(operation);
+    setOptions(operation.defaultOptions(solid));
   };
 
   const unsetOperation = () => {
-    setOpName('');
-    setOptions(undefined);
+    _setOperation(null);
+    setOptions(null);
   };
 
   const setOption = (name: string, value: *) => {
@@ -49,9 +49,8 @@ export function OperationProvider({ disabled, children }: *) {
   );
 
   const value = {
-    opName,
+    operation,
     options,
-    operation: operations[opName],
     setOperation,
     unsetOperation,
     setOption,

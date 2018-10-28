@@ -34,7 +34,8 @@ function getMessage(opName) {
 }
 
 export default function Prompt() {
-  const { opName } = useContext(OperationContext);
-  const message = getMessage(opName);
+  const { operation } = useContext(OperationContext);
+  if (!operation) return null;
+  const message = getMessage(operation.name);
   return message && <div className={styles('prompt')}>{message}</div>;
 }

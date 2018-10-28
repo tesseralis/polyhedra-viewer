@@ -4,6 +4,8 @@ import { dual, expand, snub, contract, twist } from './resizeOps';
 import { elongate, gyroelongate, shorten, turn } from './prismOps';
 import { augment, diminish, gyrate } from './cutPasteOps';
 
+export type { Operation } from './makeOperation';
+
 export const operations = {
   dual,
   truncate,

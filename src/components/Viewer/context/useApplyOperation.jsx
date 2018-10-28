@@ -3,7 +3,7 @@ import _ from 'lodash';
 // $FlowFixMe
 import { useContext } from 'react';
 
-import { operations } from 'math/operations';
+import { type Operation } from 'math/operations';
 import PolyhedronContext from './PolyhedronContext';
 import OperationContext from './OperationContext';
 
@@ -13,16 +13,18 @@ export default function useApplyOperation() {
     PolyhedronContext,
   );
 
-  const applyOperation = (opName: string, options: * = {}, callback?: *) => {
-    const operation = operations[opName];
-
+  const applyOperation = (
+    operation: Operation,
+    options: * = {},
+    callback?: *,
+  ) => {
     if (!operation) throw new Error('no operation defined');
 
     const { result, animationData } = operation.apply(polyhedron, options);
     if (!operation.hasOptions(result) || _.isEmpty(options)) {
       unsetOperation();
     } else {
-      setOperation(opName, result);
+      setOperation(operation, result);
     }
 
     transitionPolyhedron(result, animationData);

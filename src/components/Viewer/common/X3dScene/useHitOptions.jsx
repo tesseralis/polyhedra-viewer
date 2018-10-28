@@ -43,7 +43,7 @@ export default function useHitOptions() {
     // only apply operation if we have a hit
     if (options && newValue) {
       applyOperation(
-        operation.name,
+        operation,
         { ...options, [hitOption]: newValue },
         result => {
           if (hitOption === 'cap' && options[hitOption]) {

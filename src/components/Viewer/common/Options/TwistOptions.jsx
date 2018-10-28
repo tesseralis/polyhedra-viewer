@@ -24,8 +24,8 @@ function TwistOption({ orientation }) {
   const applyOperation = useApplyOperation();
 
   const handleClick = useCallback(
-    () => applyOperation(operation.name, { twist: orientation }),
-    [orientation, operation.name, applyOperation],
+    () => applyOperation(operation, { twist: orientation }),
+    [orientation, operation, applyOperation],
   );
   return (
     <TwistButton disabled={isTransitioning} onClick={handleClick}>

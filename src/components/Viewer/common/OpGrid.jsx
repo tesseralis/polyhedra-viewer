@@ -74,10 +74,12 @@ const styles = makeStyles({
 
 function OpButton({ name }) {
   const { polyhedron, isTransitioning } = useContext(PolyhedronContext);
-  const { opName, setOperation, unsetOperation } = useContext(OperationContext);
+  const { operation: currentOp, setOperation, unsetOperation } = useContext(
+    OperationContext,
+  );
   const applyOperation = useApplyOperation();
   const operation = operations[name];
-  const isCurrent = name === opName;
+  const isCurrent = !!currentOp && name === currentOp.name;
 
   const selectOperation = () => {
     if (isCurrent) {
@@ -85,9 +87,9 @@ function OpButton({ name }) {
     }
 
     if (!operation.hasOptions(polyhedron)) {
-      applyOperation(name);
+      applyOperation(operation);
     } else {
-      setOperation(name, polyhedron);
+      setOperation(operation, polyhedron);
     }
   };
   return (

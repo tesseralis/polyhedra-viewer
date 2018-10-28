@@ -102,7 +102,10 @@ export function deduplicateVertices(polyhedron: Polyhedron) {
   );
 }
 
-interface Operation<Options = {}> {
+type Options = { [string]: mixed };
+
+export interface Operation {
+  name: string;
   apply(polyhedron: Polyhedron, options: Options): OperationResult;
 
   // this is only defined in the stuff we pull into this,
@@ -144,7 +147,7 @@ interface Operation<Options = {}> {
   defaultOptions(polyhedron: Polyhedron): Options;
 }
 
-export default function makeOperation(name: string, op: *): Operation<*> {
+export default function makeOperation(name: string, op: *): Operation {
   const withDefaults = fillDefaults(
     typeof op === 'function' ? { apply: op } : op,
   );
