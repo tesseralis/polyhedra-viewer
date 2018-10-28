@@ -14,7 +14,7 @@ export default function useApplyOperation() {
   const { polyhedron, setName, transitionPolyhedron } = useContext(
     PolyhedronContext,
   );
-  // FIXME this is annoying
+
   const applyOperation = (
     _opName: string = opName,
     _options: {} = options,
@@ -38,5 +38,5 @@ export default function useApplyOperation() {
     }
   };
 
-  return { applyOperation };
+  return applyOperation;
 }

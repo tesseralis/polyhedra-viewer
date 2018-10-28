@@ -14,7 +14,7 @@ import {
 export default function useHitOptions() {
   const { polyhedron, isTransitioning } = useContext(PolyhedronContext);
   const { operation, options, setOption } = useContext(OperationContext);
-  const { applyOperation } = useApplyOperation();
+  const applyOperation = useApplyOperation();
   const { hitOption, getHitOption } = operation || {};
 
   const setHitOption = (hitPnt: Point) => {

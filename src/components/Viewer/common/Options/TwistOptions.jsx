@@ -47,7 +47,7 @@ interface Props {
 
 export default function TwistOptions({ opName }: Props) {
   const { isTransitioning: disabled } = useContext(PolyhedronContext);
-  const { applyOperation: onClick } = useApplyOperation();
+  const onClick = useApplyOperation();
 
   return (
     <div className={styles('twistOptions')}>

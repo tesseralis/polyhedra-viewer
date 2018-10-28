@@ -75,7 +75,7 @@ const styles = makeStyles({
 function OpButton({ name }) {
   const { polyhedron, isTransitioning } = useContext(PolyhedronContext);
   const { opName, setOperation, unsetOperation } = useContext(OperationContext);
-  const { applyOperation } = useApplyOperation();
+  const applyOperation = useApplyOperation();
   const operation = operations[name];
   const isCurrent = name === opName;
 
