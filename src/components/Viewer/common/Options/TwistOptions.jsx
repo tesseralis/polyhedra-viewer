@@ -1,66 +1,57 @@
 // @flow strict
 // $FlowFixMe
-import React, { useContext } from 'react';
-import { makeStyles } from 'styles';
+import React, { useCallback, useContext } from 'react';
+import { styled } from 'styles';
 import Icon from '@mdi/react';
 
 import { SrOnly } from 'components/common';
-import { useApplyOperation, PolyhedronContext } from '../../context';
+import {
+  useApplyOperation,
+  PolyhedronContext,
+  OperationContext,
+} from '../../context';
 import { mdiRotateLeft, mdiRotateRight } from '@mdi/js';
 
-const styles = makeStyles({
-  twistOption: {
-    border: 'none',
-    pointerEvents: 'initial',
-    background: 'none',
-  },
-
-  twistOptions: {
-    width: '100%',
-    height: '100%',
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
+const TwistButton = styled.button({
+  border: 'none',
+  pointerEvents: 'initial',
+  background: 'none',
 });
 
-function TwistOption({ orientation, onClick, disabled }) {
+function TwistOption({ orientation }) {
+  const { isTransitioning } = useContext(PolyhedronContext);
+  const { operation } = useContext(OperationContext);
+  const applyOperation = useApplyOperation();
+
+  const handleClick = useCallback(
+    () => applyOperation(operation.name, { twist: orientation }),
+    [orientation, operation.name, applyOperation],
+  );
   return (
-    <button
-      disabled={disabled}
-      onClick={onClick}
-      className={styles('twistOption')}
-    >
+    <TwistButton disabled={isTransitioning} onClick={handleClick}>
       <Icon
         path={orientation === 'left' ? mdiRotateLeft : mdiRotateRight}
         rotate={180}
         size="48px"
       />
       <SrOnly>{orientation}</SrOnly>
-    </button>
+    </TwistButton>
   );
 }
 
-interface Props {
-  opName: string;
-}
+const Container = styled.div({
+  width: '100%',
+  height: '100%',
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+});
 
-export default function TwistOptions({ opName }: Props) {
-  const { isTransitioning: disabled } = useContext(PolyhedronContext);
-  const onClick = useApplyOperation();
-
+export default function TwistOptions() {
   return (
-    <div className={styles('twistOptions')}>
-      <TwistOption
-        orientation="left"
-        disabled={disabled}
-        onClick={() => onClick(opName, { twist: 'left' })}
-      />
-      <TwistOption
-        orientation="right"
-        disabled={disabled}
-        onClick={() => onClick(opName, { twist: 'right' })}
-      />
-    </div>
+    <Container>
+      <TwistOption orientation="left" />
+      <TwistOption orientation="right" />
+    </Container>
   );
 }

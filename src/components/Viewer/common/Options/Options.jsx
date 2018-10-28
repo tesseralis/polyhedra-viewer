@@ -16,7 +16,7 @@ export default function Options() {
       {_.includes(
         ['shorten', 'snub', 'twist', 'gyroelongate', 'turn'],
         opName,
-      ) && <TwistOptions opName={opName} />}
+      ) && <TwistOptions />}
       {_.includes(['augment'], opName) && <AugmentOptions />}
     </Fragment>
   );
