@@ -21,7 +21,9 @@ export function PolyhedronProvider({ disabled, setName, name, children }: *) {
         setPolyhedron(Polyhedron.get(name));
       }
     },
-    [disabled, name],
+    // We memoize only the *name* because we want to keep the current model even if
+    // we go from enabled to something else.
+    [name],
   );
 
   const value = {
