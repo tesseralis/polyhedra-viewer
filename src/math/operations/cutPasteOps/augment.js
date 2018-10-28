@@ -260,6 +260,9 @@ const getUsingOpts = polyhedron => {
   if (polyhedron.name === 'triangular prism') {
     return ['Y4', 'U2'];
   }
+  if (inRow(polyhedron.name, 'prisms', 'decagonal')) {
+    return ['U5', 'R5'];
+  }
   const rows = ['pentagonal cupola', 'pentagonal rotunda'];
   if (_.some(rows, row => inRow(polyhedron.name, 'capstones', row))) {
     return ['U5', 'R5'];
