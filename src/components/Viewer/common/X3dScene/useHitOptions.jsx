@@ -9,10 +9,12 @@ import {
   OperationContext,
   useApplyOperation,
 } from '../../context';
+import TransitionContext from '../../context/TransitionContext';
 
 // TODO turn this into a hook too
 export default function useHitOptions() {
-  const { polyhedron, isTransitioning } = useContext(PolyhedronContext);
+  const { polyhedron } = useContext(PolyhedronContext);
+  const { isTransitioning } = useContext(TransitionContext);
   const { operation, options, setOption } = useContext(OperationContext);
   const applyOperation = useApplyOperation();
   const { hitOption, getHitOption } = operation || {};

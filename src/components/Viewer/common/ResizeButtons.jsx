@@ -7,6 +7,7 @@ import { PolyhedronContext } from 'components/Viewer/context';
 
 import { andaleMono } from 'styles/fonts';
 import { hover } from 'styles/common';
+import TransitionContext from '../context/TransitionContext';
 
 const styles = makeStyles({
   buttons: {
@@ -27,9 +28,8 @@ const styles = makeStyles({
 });
 
 export default function ResizeButtons() {
-  const { polyhedron, isTransitioning, setPolyhedron } = useContext(
-    PolyhedronContext,
-  );
+  const { polyhedron, setPolyhedron } = useContext(PolyhedronContext);
+  const { isTransitioning } = useContext(TransitionContext);
   return (
     <div className={styles('buttons')}>
       <button

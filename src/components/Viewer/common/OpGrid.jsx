@@ -14,6 +14,7 @@ import {
   PolyhedronContext,
 } from 'components/Viewer/context';
 import OperationIcon from './OperationIcon';
+import TransitionContext from '../context/TransitionContext';
 
 const opLayout = [
   ['truncate', 'rectify', 'sharpen', 'dual'],
@@ -73,7 +74,8 @@ const styles = makeStyles({
 });
 
 function OpButton({ name }) {
-  const { polyhedron, isTransitioning } = useContext(PolyhedronContext);
+  const { polyhedron } = useContext(PolyhedronContext);
+  const { isTransitioning } = useContext(TransitionContext);
   const { operation: currentOp, setOperation, unsetOperation } = useContext(
     OperationContext,
   );

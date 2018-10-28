@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useContext, Fragment } from 'react';
 import _ from 'lodash';
 
-import { PolyhedronContext } from '../../context';
+import { TransitionContext } from '../../context';
 import useSolidColors from './useSolidColors';
 import useHitOptions from './useHitOptions';
 import ConfigContext from 'components/ConfigContext';
@@ -76,10 +76,10 @@ export default function X3dPolyhedron() {
     [onClick, onHover, onMouseOut],
   );
 
-  const { polyhedron } = useContext(PolyhedronContext);
+  const { transitionData } = useContext(TransitionContext);
   const { config } = useContext(ConfigContext);
 
-  const { vertices, faces, edges } = polyhedron.solidData;
+  const { vertices, faces, edges } = transitionData;
   const { showFaces, showEdges, showInnerFaces, opacity } = config;
 
   const colorStr = joinListOfLists(colors, ',', ' ');

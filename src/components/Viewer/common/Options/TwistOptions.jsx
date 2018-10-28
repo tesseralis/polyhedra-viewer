@@ -7,7 +7,7 @@ import Icon from '@mdi/react';
 import { SrOnly } from 'components/common';
 import {
   useApplyOperation,
-  PolyhedronContext,
+  TransitionContext,
   OperationContext,
 } from '../../context';
 import { mdiRotateLeft, mdiRotateRight } from '@mdi/js';
@@ -19,7 +19,7 @@ const TwistButton = styled.button({
 });
 
 function TwistOption({ orientation }) {
-  const { isTransitioning } = useContext(PolyhedronContext);
+  const { isTransitioning } = useContext(TransitionContext);
   const { operation } = useContext(OperationContext);
   const applyOperation = useApplyOperation();
 
