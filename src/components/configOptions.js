@@ -17,6 +17,7 @@ interface ConfigInput {
   key: string;
   type: string;
   default: mixed;
+  display: string;
 }
 
 const colorOptionsList = polygons.map(n => {

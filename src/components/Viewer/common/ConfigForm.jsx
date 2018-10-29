@@ -1,23 +1,25 @@
 // @flow strict
-import React from 'react';
+// $FlowFixMe
+import React, { useCallback } from 'react';
 import { styled } from 'styles';
 import _ from 'lodash';
 
+import memo from 'memo';
 import Config from 'components/ConfigContext';
 import { configInputs } from 'components/configOptions';
 import { hover } from 'styles/common';
 import { andaleMono } from 'styles/fonts';
 
-const getInputValue = (input, el) => {
+function getInputValue(input, el) {
   switch (input.type) {
     case 'checkbox':
       return el.checked;
     default:
       return el.value;
   }
-};
+}
 
-const getInputProps = (input, value) => {
+function getInputProps(input, value) {
   switch (input.type) {
     case 'checkbox':
       return { checked: value };
@@ -29,16 +31,19 @@ const getInputProps = (input, value) => {
     default:
       return { value };
   }
-};
+}
 
-const ConfigInput = ({ input, value, setValue }) => {
+function ConfigInput({ input, value, setValue }) {
   const inputProps = getInputProps(input, value);
-  const onChange = evt => setValue(getInputValue(input, evt.target));
+  const onChange = useCallback(
+    e => setValue(input.key, getInputValue(input, e.target)),
+    [],
+  );
   switch (input.type) {
     case 'select':
       return (
         <select onChange={onChange} {...inputProps}>
-          {_.map(input.options, option => (
+          {_.map(_.get(input, 'options'), option => (
             <option key={option} value={option}>
               {option}
             </option>
@@ -48,7 +53,7 @@ const ConfigInput = ({ input, value, setValue }) => {
     default:
       return <input type={input.type} onChange={onChange} {...inputProps} />;
   }
-};
+}
 
 const Label = styled.label({
   width: '100%',
@@ -58,14 +63,14 @@ const Label = styled.label({
   fontFamily: andaleMono,
 });
 
-const LabelledInput = ({ input, value, setValue }) => {
+const LabelledInput = memo(({ input, value, setValue }) => {
   return (
     <Label>
       {input.display}
       <ConfigInput input={input} value={value} setValue={setValue} />
     </Label>
   );
-};
+});
 
 const ResetButton = styled.button.attrs({ type: 'button', children: 'Reset' })({
   ...hover,
@@ -93,12 +98,12 @@ export default function ConfigForm() {
   const { setValue, reset } = Config.useActions();
   return (
     <Form>
-      {configInputs.map(({ key, ...input }) => (
+      {configInputs.map(input => (
         <LabelledInput
-          key={key}
+          key={input.key}
           input={input}
-          value={_.get(config, key)}
-          setValue={value => setValue(key, value)}
+          value={_.get(config, input.key)}
+          setValue={setValue}
         />
       ))}
       <ResetButton onClick={reset} />
