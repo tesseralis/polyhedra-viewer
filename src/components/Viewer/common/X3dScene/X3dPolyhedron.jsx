@@ -6,7 +6,7 @@ import _ from 'lodash';
 import { TransitionContext } from '../../context';
 import useSolidColors from './useSolidColors';
 import useHitOptions from './useHitOptions';
-import ConfigContext from 'components/ConfigContext';
+import Config from 'components/ConfigContext';
 
 // Join a list of lists with an inner and outer separator.
 const joinListOfLists = (list: *, outerSep: string, innerSep: string) => {
@@ -77,7 +77,7 @@ export default function X3dPolyhedron() {
   );
 
   const { transitionData } = useContext(TransitionContext);
-  const { config } = useContext(ConfigContext);
+  const config = Config.useState();
 
   const { vertices, faces, edges } = transitionData;
   const { showFaces, showEdges, showInnerFaces, opacity } = config;

@@ -11,6 +11,7 @@ import { operations } from 'math/operations';
 import {
   useApplyOperation,
   OperationContext,
+  OperationActions,
   PolyhedronContext,
 } from 'components/Viewer/context';
 import OperationIcon from './OperationIcon';
@@ -76,9 +77,8 @@ const styles = makeStyles({
 function OpButton({ name }) {
   const { polyhedron } = useContext(PolyhedronContext);
   const { isTransitioning } = useContext(TransitionContext);
-  const { operation: currentOp, setOperation, unsetOperation } = useContext(
-    OperationContext,
-  );
+  const { operation: currentOp } = useContext(OperationContext);
+  const { setOperation, unsetOperation } = useContext(OperationActions);
   const applyOperation = useApplyOperation();
   const operation = operations[name];
   const isCurrent = !!currentOp && name === currentOp.name;

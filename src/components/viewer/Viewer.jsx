@@ -1,13 +1,18 @@
 // @flow
 import _ from 'lodash';
-import React, { Fragment } from 'react';
+// $FlowFixMe
+import React, { useContext, useEffect, Fragment } from 'react';
 import { Route, Redirect, type RouterHistory } from 'react-router-dom';
 
+import { Polyhedron } from 'math/polyhedra';
 import { usePageTitle } from 'components/common';
 import {
   OperationProvider,
+  OperationActions,
   PolyhedronProvider,
+  PolyhedronContext,
   TransitionProvider,
+  TransitionContext,
 } from './context';
 import DesktopViewer from './DesktopViewer';
 import MobileViewer from './MobileViewer';
@@ -17,11 +22,32 @@ import { escapeName, unescapeName } from 'math/polyhedra/names';
 interface InnerProps {
   solid: string;
   panel: string;
+  history: RouterHistory;
 }
 
-// TODO this used to be a pure component -- check if perf is okay!
-function InnerViewer({ solid, panel }: InnerProps) {
+function InnerViewer({ solid, panel, history }: InnerProps) {
+  const { unsetOperation } = useContext(OperationActions);
+  const { setPolyhedron } = useContext(PolyhedronContext);
+  const { resetTransitionData } = useContext(TransitionContext);
   usePageTitle(`${_.capitalize(unescapeName(solid))} - Polyhedra Viewer`);
+
+  const nonOperation = panel !== 'operations' || history.action === 'POP';
+  useEffect(
+    () => {
+      if (nonOperation) {
+        unsetOperation();
+        resetTransitionData();
+      }
+    },
+    [panel, history.action],
+  );
+
+  useEffect(
+    () => {
+      if (nonOperation) setPolyhedron(Polyhedron.get(solid));
+    },
+    [solid, history.action],
+  );
 
   const { device } = useMediaInfo();
 
@@ -48,16 +74,18 @@ export default function Viewer({ solid, history, url }: Props) {
         path={`${url}/:panel`}
         render={({ match, history }) => {
           const { panel } = match.params;
-          const disabled = panel !== 'operations' || history.action === 'POP';
           return (
             <PolyhedronProvider
               name={solid}
               setName={name => history.push(`/${escapeName(name)}/operations`)}
-              disabled={disabled}
             >
-              <TransitionProvider disabled={disabled}>
-                <OperationProvider disabled={disabled}>
-                  <InnerViewer solid={solid} panel={panel || ''} />
+              <TransitionProvider>
+                <OperationProvider>
+                  <InnerViewer
+                    history={history}
+                    solid={solid}
+                    panel={panel || ''}
+                  />
                 </OperationProvider>
               </TransitionProvider>
             </PolyhedronProvider>

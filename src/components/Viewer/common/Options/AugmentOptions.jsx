@@ -3,7 +3,11 @@
 import React, { useContext } from 'react';
 import { makeStyles } from 'styles';
 
-import { PolyhedronContext, OperationContext } from 'components/Viewer/context';
+import {
+  PolyhedronContext,
+  OperationContext,
+  OperationActions,
+} from 'components/Viewer/context';
 import OptionIcon from './OptionIcon';
 import { verdana } from 'styles/fonts';
 import { hover } from 'styles/common';
@@ -54,7 +58,8 @@ const getOptionName = optValue => {
 
 export default function AugmentOptions() {
   const { polyhedron } = useContext(PolyhedronContext);
-  const { operation, options, setOption } = useContext(OperationContext);
+  const { operation, options } = useContext(OperationContext);
+  const { setOption } = useContext(OperationActions);
 
   const { gyrate, using } = options;
   const optionArgs = [

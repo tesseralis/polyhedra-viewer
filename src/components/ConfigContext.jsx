@@ -3,29 +3,45 @@ import _ from 'lodash';
 import { defaultConfig } from './configOptions';
 
 // $FlowFixMe
-import React, { useState, useMemo } from 'react';
+import React, { useMemo, useReducer, useContext } from 'react';
 
-const ConfigContext = React.createContext({
-  config: defaultConfig,
-  setValue: _.noop,
-  reset: _.noop,
-});
+function createModel(actions, defaultState) {
+  const StateContext = React.createContext(defaultState);
+  const ActionContext = React.createContext({});
 
-export default ConfigContext;
+  return {
+    Provider({ children }: *) {
+      const [state, dispatch] = useReducer((state, { type, args }) => {
+        return actions[type](...args)(state);
+      }, defaultState);
 
-// TODO now we can split out setValue and reset!
-export function ConfigProvider({ children }: *) {
-  const [config, setConfig] = useState(defaultConfig);
+      const actionsValue = useMemo(() => {
+        return _.mapValues(actions, (_, type) => (...args) =>
+          dispatch({ type, args }),
+        );
+      }, []);
 
-  const setValue = (key, value) => {
-    setConfig(_.set(_.cloneDeep(config), key, value));
+      return (
+        <StateContext.Provider value={state}>
+          <ActionContext.Provider value={actionsValue}>
+            {children}
+          </ActionContext.Provider>
+        </StateContext.Provider>
+      );
+    },
+    useState() {
+      return useContext(StateContext);
+    },
+    useActions() {
+      return useContext(ActionContext);
+    },
   };
-
-  const reset = () => setConfig(defaultConfig);
-
-  const state = useMemo(() => ({ config, setValue, reset }), [config]);
-
-  return (
-    <ConfigContext.Provider value={state}>{children}</ConfigContext.Provider>
-  );
 }
+
+export default createModel(
+  {
+    setValue: (key, value) => state => _.set(_.cloneDeep(state), key, value),
+    reset: () => () => defaultConfig,
+  },
+  defaultConfig,
+);

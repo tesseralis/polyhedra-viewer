@@ -3,7 +3,7 @@ import _ from 'lodash';
 // $FlowFixMe
 import React, { useRef, useState, useEffect, useContext } from 'react';
 
-import ConfigContext from 'components/ConfigContext';
+import Config from 'components/ConfigContext';
 import PolyhedronContext from './PolyhedronContext';
 import transition from 'transition';
 import { Polyhedron } from 'math/polyhedra';
@@ -60,24 +60,18 @@ const TransitionContext = React.createContext({
 
 export default TransitionContext;
 
-export function TransitionProvider({ disabled, children }: *) {
+export function TransitionProvider({ children }: *) {
   const { polyhedron, setPolyhedron } = useContext(PolyhedronContext);
   const [transitionData, setTransitionData] = useState(null);
   const [faceColors, setFaceColors] = useState(null);
   const transitionId = useRef(null);
 
-  const { config } = useContext(ConfigContext);
+  const { colors, animationSpeed, enableAnimation } = Config.useState();
 
-  // If this is disabled, derive the polyhedron from the passed in name
-  useEffect(
-    () => {
-      if (disabled) {
-        setFaceColors(null);
-        setTransitionData(null);
-      }
-    },
-    [disabled],
-  );
+  const resetTransitionData = () => {
+    setFaceColors(null);
+    setTransitionData(null);
+  };
 
   useEffect(
     () => {
@@ -92,8 +86,6 @@ export function TransitionProvider({ disabled, children }: *) {
   );
 
   const transitionPolyhedron = (result: Polyhedron, animationData: *) => {
-    const { colors, animationSpeed, enableAnimation } = config;
-
     if (!enableAnimation || !animationData) {
       setPolyhedron(result);
       setTransitionData(null);
@@ -121,8 +113,7 @@ export function TransitionProvider({ disabled, children }: *) {
         },
         onFinish: () => {
           setPolyhedron(result);
-          setTransitionData(null);
-          setFaceColors(null);
+          resetTransitionData();
         },
       },
       ({ vertices, faceColors }) => {
@@ -137,6 +128,7 @@ export function TransitionProvider({ disabled, children }: *) {
     transitionData: transitionData || polyhedron.solidData,
     isTransitioning: !!transitionData,
     transitionPolyhedron,
+    resetTransitionData,
   };
   return (
     <TransitionContext.Provider value={value}>

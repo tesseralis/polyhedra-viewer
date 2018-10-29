@@ -1,63 +1,54 @@
 // @flow strict
-import _ from 'lodash';
 // $FlowFixMe
-import React, { useState, useEffect } from 'react';
-
-import { mapObject } from 'utils';
-import { type Operation } from 'math/operations';
-import { Polyhedron } from 'math/polyhedra';
+import React, { useReducer } from 'react';
 
 const defaultState = {
   operation: null,
   options: null,
 };
 
-const actions = ['setOption', 'unsetOperation', 'setOperation'];
-
-const OperationContext = React.createContext({
-  ...defaultState,
-  ...mapObject(actions, a => [a, _.noop]),
-});
-
+const OperationContext = React.createContext(defaultState);
 export default OperationContext;
 
-export function OperationProvider({ disabled, children }: *) {
-  const [operation, _setOperation] = useState(null);
-  const [options, setOptions] = useState(null);
+export const OperationActions = React.createContext({});
 
-  const setOperation = (operation: Operation, solid: Polyhedron) => {
-    _setOperation(operation);
-    setOptions(operation.defaultOptions(solid));
-  };
-
-  const unsetOperation = () => {
-    _setOperation(null);
-    setOptions(null);
-  };
-
-  const setOption = (name: string, value: *) => {
-    setOptions({ ...options, [name]: value });
-  };
-
-  useEffect(
-    () => {
-      if (disabled) {
-        unsetOperation();
+export function OperationProvider({ children }: *) {
+  const [state, dispatch] = useReducer((state, action) => {
+    switch (action.type) {
+      case 'setOperation': {
+        const { operation, solid } = action;
+        return { operation, options: operation.defaultOptions(solid) };
       }
-    },
-    [disabled],
-  );
+      case 'unsetOperation':
+        return defaultState;
+      case 'setOption': {
+        const { operation, options } = state;
+        const { name, value } = action;
+        return { operation, options: { ...options, [name]: value } };
+      }
+      default:
+        return state;
+    }
+  }, defaultState);
 
-  const value = {
-    operation,
-    options,
-    setOperation,
-    unsetOperation,
-    setOption,
+  // FIXME extract this out
+  const actions = {
+    setOperation(operation, solid) {
+      dispatch({ type: 'setOperation', operation, solid });
+    },
+    unsetOperation() {
+      dispatch({ type: 'unsetOperation' });
+    },
+    setOption(name, value) {
+      dispatch({ type: 'setOption', name, value });
+    },
   };
+
   return (
-    <OperationContext.Provider value={value}>
-      {children}
+    <OperationContext.Provider value={state}>
+      <OperationActions.Provider value={actions}>
+        {children}
+      </OperationActions.Provider>
     </OperationContext.Provider>
   );
 }

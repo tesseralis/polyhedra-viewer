@@ -2,7 +2,7 @@
 /// $FlowFixMe
 import { useContext } from 'react';
 import tinycolor from 'tinycolor2';
-import ConfigContext from 'components/ConfigContext';
+import Config from 'components/ConfigContext';
 import { PolyhedronContext, OperationContext } from '../../context';
 import TransitionContext from '../../context/TransitionContext';
 
@@ -12,9 +12,7 @@ function toRgb(hex: string) {
 }
 
 export default function useSolidColors() {
-  const {
-    config: { colors },
-  } = useContext(ConfigContext);
+  const { colors } = Config.useState();
   const { polyhedron } = useContext(PolyhedronContext);
 
   const { transitionData, isTransitioning, faceColors } = useContext(

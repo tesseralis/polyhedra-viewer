@@ -3,6 +3,7 @@ export { default as useApplyOperation } from './useApplyOperation';
 export {
   default as OperationContext,
   OperationProvider,
+  OperationActions,
 } from './OperationContext';
 export {
   default as PolyhedronContext,

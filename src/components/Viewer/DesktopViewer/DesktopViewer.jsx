@@ -2,7 +2,6 @@
 import React from 'react';
 import { makeStyles } from 'styles';
 
-import memo from 'memo';
 import Sidebar from './Sidebar';
 import Overlay from './Overlay';
 import { X3dScene } from '../common';
@@ -39,7 +38,12 @@ const styles = makeStyles({
   },
 });
 
-export default memo(function DesktopViewer({ solid, panel }) {
+interface Props {
+  panel: string;
+  solid: string;
+}
+
+export default function DesktopViewer({ solid, panel }: Props) {
   const full = panel === 'full';
   return (
     <div className={styles('viewer')}>
@@ -52,4 +56,4 @@ export default memo(function DesktopViewer({ solid, panel }) {
       </div>
     </div>
   );
-});
+}
