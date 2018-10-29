@@ -8,7 +8,7 @@ import { SrOnly } from 'components/common';
 import {
   useApplyOperation,
   TransitionContext,
-  OperationContext,
+  OperationModel,
 } from '../../context';
 import { mdiRotateLeft, mdiRotateRight } from '@mdi/js';
 
@@ -20,7 +20,7 @@ const TwistButton = styled.button({
 
 function TwistOption({ orientation }) {
   const { isTransitioning } = useContext(TransitionContext);
-  const { operation } = useContext(OperationContext);
+  const { operation } = OperationModel.useState();
   const applyOperation = useApplyOperation();
 
   const handleClick = useCallback(

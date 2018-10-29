@@ -3,7 +3,8 @@
 import React, { useMemo, useReducer, useContext } from 'react';
 import _ from 'lodash';
 
-type ActionCreator<S> = (...args: mixed[]) => S => S;
+// TODO type this better?
+type ActionCreator<S> = (...args: *) => S => S;
 type ActionCreators<S> = { [string]: ActionCreator<S> };
 
 export default function createModel<S>(

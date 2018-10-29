@@ -6,8 +6,7 @@ import { useContext } from 'react';
 import type { Point } from 'types';
 import {
   PolyhedronContext,
-  OperationContext,
-  OperationActions,
+  OperationModel,
   useApplyOperation,
 } from '../../context';
 import TransitionContext from '../../context/TransitionContext';
@@ -16,8 +15,8 @@ import TransitionContext from '../../context/TransitionContext';
 export default function useHitOptions() {
   const { polyhedron } = useContext(PolyhedronContext);
   const { isTransitioning } = useContext(TransitionContext);
-  const { operation, options } = useContext(OperationContext);
-  const { setOption } = useContext(OperationActions);
+  const { operation, options } = OperationModel.useState();
+  const { setOption } = OperationModel.useActions();
   const applyOperation = useApplyOperation();
   const { hitOption, getHitOption } = operation || {};
 

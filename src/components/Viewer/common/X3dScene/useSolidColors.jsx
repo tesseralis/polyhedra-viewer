@@ -3,7 +3,7 @@
 import { useContext } from 'react';
 import tinycolor from 'tinycolor2';
 import Config from 'components/ConfigModel';
-import { PolyhedronContext, OperationContext } from '../../context';
+import { PolyhedronContext, OperationModel } from '../../context';
 import TransitionContext from '../../context/TransitionContext';
 
 function toRgb(hex: string) {
@@ -18,7 +18,7 @@ export default function useSolidColors() {
   const { transitionData, isTransitioning, faceColors } = useContext(
     TransitionContext,
   );
-  const { operation, options } = useContext(OperationContext);
+  const { operation, options } = OperationModel.useState();
 
   // TODO fun memo stuff
   const getColors = () => {

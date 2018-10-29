@@ -1,15 +1,14 @@
 // @flow strict
 
 import _ from 'lodash';
-// $FlowFixMe
-import React, { useContext, Fragment } from 'react';
+import React, { Fragment } from 'react';
 
-import { OperationContext } from 'components/Viewer/context';
+import { OperationModel } from 'components/Viewer/context';
 import TwistOptions from './TwistOptions';
 import AugmentOptions from './AugmentOptions';
 
 export default function Options() {
-  const { operation } = useContext(OperationContext);
+  const { operation } = OperationModel.useState();
   if (!operation) return null;
   return (
     <Fragment>

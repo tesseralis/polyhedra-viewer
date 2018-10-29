@@ -7,8 +7,7 @@ import { Route, Redirect, type RouterHistory } from 'react-router-dom';
 import { Polyhedron } from 'math/polyhedra';
 import { usePageTitle } from 'components/common';
 import {
-  OperationProvider,
-  OperationActions,
+  OperationModel,
   PolyhedronProvider,
   PolyhedronContext,
   TransitionProvider,
@@ -26,7 +25,7 @@ interface InnerProps {
 }
 
 function InnerViewer({ solid, panel, history }: InnerProps) {
-  const { unsetOperation } = useContext(OperationActions);
+  const { unsetOperation } = OperationModel.useActions();
   const { setPolyhedron } = useContext(PolyhedronContext);
   const { resetTransitionData } = useContext(TransitionContext);
   usePageTitle(`${_.capitalize(unescapeName(solid))} - Polyhedra Viewer`);
@@ -80,13 +79,13 @@ export default function Viewer({ solid, history, url }: Props) {
               setName={name => history.push(`/${escapeName(name)}/operations`)}
             >
               <TransitionProvider>
-                <OperationProvider>
+                <OperationModel.Provider>
                   <InnerViewer
                     history={history}
                     solid={solid}
                     panel={panel || ''}
                   />
-                </OperationProvider>
+                </OperationModel.Provider>
               </TransitionProvider>
             </PolyhedronProvider>
           );
