@@ -16,13 +16,17 @@ export default function createModel<S>(
 
   return {
     Provider({ children }: *) {
-      const [state, dispatch] = useReducer((state, { type, args }) => {
-        return actions[type](...args)(state);
-      }, defaultState);
+      const [state, dispatch] = useReducer(
+        (state, action) => action(state),
+        defaultState,
+      );
 
       const actionsValue = useMemo(() => {
-        return _.mapValues(actions, (_, type) => (...args) =>
-          dispatch({ type, args }),
+        return _.mapValues(actions, action =>
+          _.flow(
+            action,
+            dispatch,
+          ),
         );
       }, []);
 
