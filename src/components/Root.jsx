@@ -3,7 +3,7 @@ import React from 'react';
 import { BrowserRouter } from 'react-router-dom';
 
 import { DeviceProvider } from './useMediaInfo';
-import Config from './ConfigContext';
+import Config from './ConfigModel';
 import PageTracker from './PageTracker';
 
 import App from './App';

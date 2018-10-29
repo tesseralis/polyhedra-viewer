@@ -1,11 +1,15 @@
 // @flow strict
-import _ from 'lodash';
-import { defaultConfig } from './configOptions';
-
 // $FlowFixMe
 import React, { useMemo, useReducer, useContext } from 'react';
+import _ from 'lodash';
 
-function createModel(actions, defaultState) {
+type ActionCreator<S> = (...args: mixed[]) => S => S;
+type ActionCreators<S> = { [string]: ActionCreator<S> };
+
+export default function createModel<S>(
+  actions: ActionCreators<S>,
+  defaultState: S,
+) {
   const StateContext = React.createContext(defaultState);
   const ActionContext = React.createContext({});
 
@@ -37,11 +41,3 @@ function createModel(actions, defaultState) {
     },
   };
 }
-
-export default createModel(
-  {
-    setValue: (key, value) => state => _.set(_.cloneDeep(state), key, value),
-    reset: () => () => defaultConfig,
-  },
-  defaultConfig,
-);

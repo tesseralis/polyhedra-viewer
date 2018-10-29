@@ -2,7 +2,7 @@
 /// $FlowFixMe
 import { useContext } from 'react';
 import tinycolor from 'tinycolor2';
-import Config from 'components/ConfigContext';
+import Config from 'components/ConfigModel';
 import { PolyhedronContext, OperationContext } from '../../context';
 import TransitionContext from '../../context/TransitionContext';
 

@@ -3,7 +3,7 @@ import _ from 'lodash';
 // $FlowFixMe
 import React, { useRef, useState, useEffect, useContext } from 'react';
 
-import Config from 'components/ConfigContext';
+import Config from 'components/ConfigModel';
 import PolyhedronContext from './PolyhedronContext';
 import transition from 'transition';
 import { Polyhedron } from 'math/polyhedra';
