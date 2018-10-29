@@ -2,6 +2,7 @@
 import React from 'react';
 import _ from 'lodash';
 
+import memo from 'memo';
 import { makeStyles, media } from 'styles';
 import { scroll } from 'styles/common';
 import { useFocuser, SrOnly } from 'components/common';
@@ -84,7 +85,7 @@ interface Props {
   solid: string;
 }
 
-export default function MobileViewer({ panel, solid }: Props) {
+export default memo(function MobileViewer({ panel, solid }: Props) {
   const [header, focusOnHeader] = useFocuser();
   const isTransparent = _.includes(['operations', 'full'], panel);
 
@@ -115,4 +116,4 @@ export default function MobileViewer({ panel, solid }: Props) {
       </div>
     </section>
   );
-}
+});
