@@ -7,14 +7,14 @@ import type { Point } from 'types';
 import {
   PolyhedronContext,
   OperationModel,
+  TransitionModel,
   useApplyOperation,
 } from '../../context';
-import TransitionContext from '../../context/TransitionContext';
 
 // TODO turn this into a hook too
 export default function useHitOptions() {
   const { polyhedron } = useContext(PolyhedronContext);
-  const { isTransitioning } = useContext(TransitionContext);
+  const { isTransitioning } = TransitionModel.useState();
   const { operation, options } = OperationModel.useState();
   const { setOption } = OperationModel.useActions();
   const applyOperation = useApplyOperation();

@@ -3,8 +3,11 @@
 import { useContext } from 'react';
 import tinycolor from 'tinycolor2';
 import Config from 'components/ConfigModel';
-import { PolyhedronContext, OperationModel } from '../../context';
-import TransitionContext from '../../context/TransitionContext';
+import {
+  PolyhedronContext,
+  OperationModel,
+  TransitionModel,
+} from '../../context';
 
 function toRgb(hex: string) {
   const { r, g, b } = tinycolor(hex).toRgb();
@@ -15,9 +18,11 @@ export default function useSolidColors() {
   const { colors } = Config.useState();
   const { polyhedron } = useContext(PolyhedronContext);
 
-  const { transitionData, isTransitioning, faceColors } = useContext(
-    TransitionContext,
-  );
+  const {
+    transitionData,
+    isTransitioning,
+    faceColors,
+  } = TransitionModel.useState();
   const { operation, options } = OperationModel.useState();
 
   // TODO fun memo stuff
@@ -41,5 +46,8 @@ export default function useSolidColors() {
       }
     });
   };
-  return getColors().map(toRgb);
+  return {
+    colors: getColors().map(toRgb),
+    solidData: isTransitioning ? transitionData : polyhedron.solidData,
+  };
 }

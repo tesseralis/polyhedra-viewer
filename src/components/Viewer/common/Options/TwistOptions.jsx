@@ -1,13 +1,13 @@
 // @flow strict
 // $FlowFixMe
-import React, { useCallback, useContext } from 'react';
+import React, { useCallback } from 'react';
 import { styled } from 'styles';
 import Icon from '@mdi/react';
 
 import { SrOnly } from 'components/common';
 import {
   useApplyOperation,
-  TransitionContext,
+  TransitionModel,
   OperationModel,
 } from '../../context';
 import { mdiRotateLeft, mdiRotateRight } from '@mdi/js';
@@ -19,7 +19,7 @@ const TwistButton = styled.button({
 });
 
 function TwistOption({ orientation }) {
-  const { isTransitioning } = useContext(TransitionContext);
+  const { isTransitioning } = TransitionModel.useState();
   const { operation } = OperationModel.useState();
   const applyOperation = useApplyOperation();
 

@@ -8,10 +8,9 @@ import { Polyhedron } from 'math/polyhedra';
 import { usePageTitle } from 'components/common';
 import {
   OperationModel,
+  TransitionModel,
   PolyhedronProvider,
   PolyhedronContext,
-  TransitionProvider,
-  TransitionContext,
 } from './context';
 import DesktopViewer from './DesktopViewer';
 import MobileViewer from './MobileViewer';
@@ -27,7 +26,7 @@ interface InnerProps {
 function InnerViewer({ solid, panel, history }: InnerProps) {
   const { unsetOperation } = OperationModel.useActions();
   const { setPolyhedron } = useContext(PolyhedronContext);
-  const { resetTransitionData } = useContext(TransitionContext);
+  const anim = TransitionModel.useActions();
   usePageTitle(`${_.capitalize(unescapeName(solid))} - Polyhedra Viewer`);
 
   const nonOperation = panel !== 'operations' || history.action === 'POP';
@@ -35,7 +34,7 @@ function InnerViewer({ solid, panel, history }: InnerProps) {
     () => {
       if (nonOperation) {
         unsetOperation();
-        resetTransitionData();
+        anim.reset();
       }
     },
     [panel, history.action],
@@ -78,7 +77,7 @@ export default function Viewer({ solid, history, url }: Props) {
               name={solid}
               setName={name => history.push(`/${escapeName(name)}/operations`)}
             >
-              <TransitionProvider>
+              <TransitionModel.Provider>
                 <OperationModel.Provider>
                   <InnerViewer
                     history={history}
@@ -86,7 +85,7 @@ export default function Viewer({ solid, history, url }: Props) {
                     panel={panel || ''}
                   />
                 </OperationModel.Provider>
-              </TransitionProvider>
+              </TransitionModel.Provider>
             </PolyhedronProvider>
           );
         }}

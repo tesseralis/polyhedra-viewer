@@ -11,10 +11,10 @@ import { operations } from 'math/operations';
 import {
   useApplyOperation,
   OperationModel,
+  TransitionModel,
   PolyhedronContext,
 } from 'components/Viewer/context';
 import OperationIcon from './OperationIcon';
-import TransitionContext from '../context/TransitionContext';
 
 const opLayout = [
   ['truncate', 'rectify', 'sharpen', 'dual'],
@@ -75,7 +75,7 @@ const styles = makeStyles({
 
 function OpButton({ name }) {
   const { polyhedron } = useContext(PolyhedronContext);
-  const { isTransitioning } = useContext(TransitionContext);
+  const { isTransitioning } = TransitionModel.useState();
   const { operation: currentOp } = OperationModel.useState();
   const { setOperation, unsetOperation } = OperationModel.useActions();
   const applyOperation = useApplyOperation();

@@ -1,10 +1,11 @@
 // @flow strict
 import _ from 'lodash';
 // $FlowFixMe
-import React, { useRef, useState, useEffect, useContext } from 'react';
+import { useRef, useEffect, useContext } from 'react';
 
 import Config from 'components/ConfigModel';
 import PolyhedronContext from './PolyhedronContext';
+import TransitionModel from './TransitionModel';
 import transition from 'transition';
 import { Polyhedron } from 'math/polyhedra';
 import { PRECISION } from 'math/geom';
@@ -37,9 +38,9 @@ function getFaceColors(polyhedron, colors) {
     mapping[f2.index] = numSides;
   });
 
-  return _.map(
-    polyhedron.faces,
-    face => colors[_.get(mapping, face.index, face.numUniqueSides())],
+  return polyhedron.faces.map(
+    face =>
+      colors[_.get(mapping, face.index.toString(), face.numUniqueSides())],
   );
 }
 
@@ -47,30 +48,11 @@ function arrayDefaults(first, second) {
   return _.map(first, (item, i) => (_.isNil(item) ? second[i] : item));
 }
 
-const defaultState = {
-  transitionData: null,
-  faceColors: null,
-};
-
-const TransitionContext = React.createContext({
-  ...defaultState,
-  transitionPolyhedron: _.noop,
-});
-
-export default TransitionContext;
-
-export function TransitionProvider({ children }: *) {
-  const { polyhedron, setPolyhedron } = useContext(PolyhedronContext);
-  const [transitionData, setTransitionData] = useState(null);
-  const [faceColors, setFaceColors] = useState(null);
+export default function useSolidTransition() {
   const transitionId = useRef(null);
-
+  const { setPolyhedron } = useContext(PolyhedronContext);
   const { colors, animationSpeed, enableAnimation } = Config.useState();
-
-  const resetTransitionData = () => {
-    setFaceColors(null);
-    setTransitionData(null);
-  };
+  const anim = TransitionModel.useActions();
 
   useEffect(
     () => {
@@ -83,11 +65,10 @@ export function TransitionProvider({ children }: *) {
     },
     [transitionId],
   );
-
-  const transitionPolyhedron = (result: Polyhedron, animationData: *) => {
+  return (result: Polyhedron, animationData: *) => {
     if (!enableAnimation || !animationData) {
       setPolyhedron(result);
-      setTransitionData(null);
+      anim.reset();
       return;
     }
 
@@ -96,8 +77,7 @@ export function TransitionProvider({ children }: *) {
     const colorEnd = getFaceColors(start.withVertices(endVertices), colors);
     const allColorStart = arrayDefaults(colorStart, colorEnd);
 
-    setTransitionData(start.solidData);
-    setFaceColors(allColorStart);
+    anim.set(start.solidData, allColorStart);
 
     transitionId.current = transition(
       {
@@ -112,26 +92,12 @@ export function TransitionProvider({ children }: *) {
         },
         onFinish: () => {
           setPolyhedron(result);
-          resetTransitionData();
+          anim.reset();
         },
       },
       ({ vertices, faceColors }) => {
-        setTransitionData({ ...start.solidData, vertices });
-        setFaceColors(faceColors);
+        anim.set({ ...start.solidData, vertices }, faceColors);
       },
     );
   };
-
-  const value = {
-    faceColors,
-    transitionData: transitionData || polyhedron.solidData,
-    isTransitioning: !!transitionData,
-    transitionPolyhedron,
-    resetTransitionData,
-  };
-  return (
-    <TransitionContext.Provider value={value}>
-      {children}
-    </TransitionContext.Provider>
-  );
 }

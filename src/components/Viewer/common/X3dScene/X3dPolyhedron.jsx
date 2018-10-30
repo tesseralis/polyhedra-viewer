@@ -1,10 +1,9 @@
 // @flow strict
 // $FlowFixMe
-import React, { useEffect, useRef, useContext, Fragment } from 'react';
+import React, { useEffect, useRef, Fragment } from 'react';
 import _ from 'lodash';
 
-import { TransitionContext } from '../../context';
-import useSolidColors from './useSolidColors';
+import useSolidContext from './useSolidContext';
 import useHitOptions from './useHitOptions';
 import Config from 'components/ConfigModel';
 
@@ -33,7 +32,7 @@ export default function X3dPolyhedron() {
   const shape = useRef(null);
   const hitPnt = useRef(null);
 
-  const colors = useSolidColors();
+  const { colors, solidData } = useSolidContext();
   const {
     setHitOption: onHover,
     unsetHitOption: onMouseOut,
@@ -76,10 +75,9 @@ export default function X3dPolyhedron() {
     [onClick, onHover, onMouseOut],
   );
 
-  const { transitionData } = useContext(TransitionContext);
   const config = Config.useState();
 
-  const { vertices, faces, edges } = transitionData;
+  const { vertices, faces, edges } = solidData;
   const { showFaces, showEdges, showInnerFaces, opacity } = config;
 
   const colorStr = joinListOfLists(colors, ',', ' ');
