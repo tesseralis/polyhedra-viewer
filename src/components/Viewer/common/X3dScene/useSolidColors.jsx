@@ -24,7 +24,7 @@ export default function useSolidColors() {
   const getColors = () => {
     if (isTransitioning && !!faceColors) {
       return transitionData.faces.map(
-        (face, i) => faceColors[i] || colors[face.numSides],
+        (face, i) => faceColors[i] || colors[face.length],
       );
     }
     if (!operation) return polyhedron.faces.map(f => colors[f.numSides]);

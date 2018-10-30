@@ -28,7 +28,6 @@ function getCoplanarFaces(polyhedron) {
   return pairs;
 }
 
-// FIXME colors for dual stopped working
 function getFaceColors(polyhedron, colors) {
   const pairs = getCoplanarFaces(polyhedron);
   const mapping = {};
@@ -82,7 +81,7 @@ export function TransitionProvider({ children }: *) {
         }
       };
     },
-    [transitionId.current],
+    [transitionId],
   );
 
   const transitionPolyhedron = (result: Polyhedron, animationData: *) => {
