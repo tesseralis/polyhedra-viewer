@@ -5,7 +5,7 @@ import React, { useContext, useEffect, Fragment } from 'react';
 import { Route, Redirect, type RouterHistory } from 'react-router-dom';
 
 import { Polyhedron } from 'math/polyhedra';
-import { usePageTitle } from 'components/common';
+import { usePageTitle, wrapProviders } from 'components/common';
 import {
   OperationModel,
   TransitionModel,
@@ -60,6 +60,11 @@ interface Props {
   history: RouterHistory;
 }
 
+const Providers = wrapProviders([
+  TransitionModel.Provider,
+  OperationModel.Provider,
+]);
+
 export default function Viewer({ solid, history, url }: Props) {
   return (
     <Fragment>
@@ -77,15 +82,13 @@ export default function Viewer({ solid, history, url }: Props) {
               name={solid}
               setName={name => history.push(`/${escapeName(name)}/operations`)}
             >
-              <TransitionModel.Provider>
-                <OperationModel.Provider>
-                  <InnerViewer
-                    history={history}
-                    solid={solid}
-                    panel={panel || ''}
-                  />
-                </OperationModel.Provider>
-              </TransitionModel.Provider>
+              <Providers>
+                <InnerViewer
+                  history={history}
+                  solid={solid}
+                  panel={panel || ''}
+                />
+              </Providers>
             </PolyhedronProvider>
           );
         }}

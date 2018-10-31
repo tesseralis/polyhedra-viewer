@@ -48,6 +48,7 @@ function arrayDefaults(first, second) {
   return _.map(first, (item, i) => (_.isNil(item) ? second[i] : item));
 }
 
+// FIXME snub and twist are broken
 export default function useSolidTransition() {
   const transitionId = useRef(null);
   const { setPolyhedron } = useContext(PolyhedronContext);
