@@ -3,17 +3,17 @@
 import { createModel } from 'components/common';
 
 const defaultState = {
-  transitionData: null,
+  solidData: null,
   faceColors: null,
   isTransitioning: false,
 };
 export default createModel(
   {
     reset: () => () => defaultState,
-    set: (transitionData, faceColors) => () => ({
-      transitionData,
+    set: (solidData, faceColors) => () => ({
+      solidData,
       faceColors,
-      isTransitioning: !!transitionData,
+      isTransitioning: !!solidData,
     }),
   },
   defaultState,

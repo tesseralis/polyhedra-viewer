@@ -54,6 +54,7 @@ export default function useSolidTransition() {
   const { colors, animationSpeed, enableAnimation } = Config.useState();
   const anim = TransitionModel.useActions();
 
+  // Cancel the animation if the component we're a part of gets rerendered.
   useEffect(
     () => {
       return () => {
