@@ -1,7 +1,7 @@
 // @flow
 import _ from 'lodash';
 // $FlowFixMe
-import React, { useContext, useEffect, Fragment } from 'react';
+import React, { useEffect, Fragment } from 'react';
 import { Route, Redirect, type RouterHistory } from 'react-router-dom';
 
 import { Polyhedron } from 'math/polyhedra';
@@ -10,7 +10,7 @@ import {
   OperationModel,
   TransitionModel,
   PolyhedronProvider,
-  PolyhedronContext,
+  PolyhedronModel,
 } from './context';
 import DesktopViewer from './DesktopViewer';
 import MobileViewer from './MobileViewer';
@@ -25,7 +25,7 @@ interface InnerProps {
 
 function InnerViewer({ solid, panel, history }: InnerProps) {
   const { unsetOperation } = OperationModel.useActions();
-  const { setPolyhedron } = useContext(PolyhedronContext);
+  const { setPolyhedron } = PolyhedronModel.useActions();
   const anim = TransitionModel.useActions();
   usePageTitle(`${_.capitalize(unescapeName(solid))} - Polyhedra Viewer`);
 
@@ -77,19 +77,24 @@ export default function Viewer({ solid, history, url }: Props) {
         path={`${url}/:panel`}
         render={({ match, history }) => {
           const { panel } = match.params;
+
+          // FIXME figure out how to pull these out
           return (
-            <PolyhedronProvider
-              name={solid}
-              setName={name => history.push(`/${escapeName(name)}/operations`)}
-            >
-              <Providers>
-                <InnerViewer
-                  history={history}
-                  solid={solid}
-                  panel={panel || ''}
-                />
-              </Providers>
-            </PolyhedronProvider>
+            <PolyhedronModel.Provider name={solid}>
+              <PolyhedronProvider
+                setName={name =>
+                  history.push(`/${escapeName(name)}/operations`)
+                }
+              >
+                <Providers>
+                  <InnerViewer
+                    history={history}
+                    solid={solid}
+                    panel={panel || ''}
+                  />
+                </Providers>
+              </PolyhedronProvider>
+            </PolyhedronModel.Provider>
           );
         }}
       />

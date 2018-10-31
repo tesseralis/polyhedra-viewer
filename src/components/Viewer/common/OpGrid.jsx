@@ -1,7 +1,6 @@
 // @flow strict
 import _ from 'lodash';
-// $FlowFixMe
-import React, { useContext } from 'react';
+import React from 'react';
 
 import { flatMap } from 'utils';
 import { makeStyles } from 'styles';
@@ -12,7 +11,7 @@ import {
   useApplyOperation,
   OperationModel,
   TransitionModel,
-  PolyhedronContext,
+  PolyhedronModel,
 } from 'components/Viewer/context';
 import OperationIcon from './OperationIcon';
 
@@ -74,7 +73,7 @@ const styles = makeStyles({
 });
 
 function OpButton({ name }) {
-  const { polyhedron } = useContext(PolyhedronContext);
+  const polyhedron = PolyhedronModel.useState();
   const { isTransitioning } = TransitionModel.useState();
   const { operation: currentOp } = OperationModel.useState();
   const { setOperation, unsetOperation } = OperationModel.useActions();

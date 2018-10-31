@@ -1,9 +1,8 @@
 // @flow strict
-// $FlowFixMe
-import React, { useContext } from 'react';
+import React from 'react';
 import { makeStyles } from 'styles';
 
-import { TransitionModel, PolyhedronContext } from 'components/Viewer/context';
+import { TransitionModel, PolyhedronModel } from 'components/Viewer/context';
 
 import { andaleMono } from 'styles/fonts';
 import { hover } from 'styles/common';
@@ -27,7 +26,8 @@ const styles = makeStyles({
 });
 
 export default function ResizeButtons() {
-  const { polyhedron, setPolyhedron } = useContext(PolyhedronContext);
+  const polyhedron = PolyhedronModel.useState();
+  const { setPolyhedron } = PolyhedronModel.useActions();
   const { isTransitioning } = TransitionModel.useState();
   return (
     <div className={styles('buttons')}>

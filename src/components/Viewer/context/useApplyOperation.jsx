@@ -5,12 +5,14 @@ import { useContext } from 'react';
 
 import { type Operation } from 'math/operations';
 import PolyhedronContext from './PolyhedronContext';
+import PolyhedronModel from './PolyhedronModel';
 import OperationModel from './OperationModel';
 import useSolidTransition from './useSolidTransition';
 
 export default function useApplyOperation() {
   const { setOperation, unsetOperation } = OperationModel.useActions();
-  const { polyhedron, setName } = useContext(PolyhedronContext);
+  const { setName } = useContext(PolyhedronContext);
+  const polyhedron = PolyhedronModel.useState();
   const transitionPolyhedron = useSolidTransition();
 
   const applyOperation = (

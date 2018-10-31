@@ -1,9 +1,8 @@
 // @flow strict
-// $FlowFixMe
-import React, { useContext } from 'react';
+import React from 'react';
 import { makeStyles } from 'styles';
 
-import { PolyhedronContext, OperationModel } from 'components/Viewer/context';
+import { PolyhedronModel, OperationModel } from 'components/Viewer/context';
 import OptionIcon from './OptionIcon';
 import { verdana } from 'styles/fonts';
 import { hover } from 'styles/common';
@@ -53,7 +52,7 @@ const getOptionName = optValue => {
 };
 
 export default function AugmentOptions() {
-  const { polyhedron } = useContext(PolyhedronContext);
+  const polyhedron = PolyhedronModel.useState();
   const { operation, options } = OperationModel.useState();
   const { setOption } = OperationModel.useActions();
 

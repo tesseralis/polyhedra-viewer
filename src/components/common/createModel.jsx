@@ -9,16 +9,22 @@ type ActionCreators<S> = { [string]: ActionCreator<S> };
 
 export default function createModel<S>(
   actions: ActionCreators<S>,
-  defaultState: S,
+  defaultStateCreator: S | ((...args: *) => S),
 ) {
+  const defaultState =
+    typeof defaultStateCreator === 'function'
+      ? defaultStateCreator()
+      : defaultStateCreator;
   const StateContext = React.createContext(defaultState);
   const ActionContext = React.createContext({});
 
   return {
-    Provider({ children }: *) {
+    Provider({ children, ...props }: *) {
       const [state, dispatch] = useReducer(
         (state, action) => action(state),
-        defaultState,
+        typeof defaultStateCreator === 'function'
+          ? defaultStateCreator(props)
+          : defaultState,
       );
 
       const actionsValue = useMemo(() => {

@@ -1,10 +1,10 @@
 // @flow strict
 import _ from 'lodash';
 // $FlowFixMe
-import { useRef, useEffect, useContext } from 'react';
+import { useRef, useEffect } from 'react';
 
 import Config from 'components/ConfigModel';
-import PolyhedronContext from './PolyhedronContext';
+import PolyhedronModel from './PolyhedronModel';
 import TransitionModel from './TransitionModel';
 import transition from 'transition';
 import { Polyhedron } from 'math/polyhedra';
@@ -51,7 +51,7 @@ function arrayDefaults(first, second) {
 // FIXME snub and twist are broken
 export default function useSolidTransition() {
   const transitionId = useRef(null);
-  const { setPolyhedron } = useContext(PolyhedronContext);
+  const { setPolyhedron } = PolyhedronModel.useActions();
   const { colors, animationSpeed, enableAnimation } = Config.useState();
   const anim = TransitionModel.useActions();
 

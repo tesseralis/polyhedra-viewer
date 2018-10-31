@@ -1,11 +1,10 @@
 // @flow strict
 import _ from 'lodash';
 // $FlowFixMe
-import { useContext } from 'react';
 
 import type { Point } from 'types';
 import {
-  PolyhedronContext,
+  PolyhedronModel,
   OperationModel,
   TransitionModel,
   useApplyOperation,
@@ -13,7 +12,7 @@ import {
 
 // TODO turn this into a hook too
 export default function useHitOptions() {
-  const { polyhedron } = useContext(PolyhedronContext);
+  const polyhedron = PolyhedronModel.useState();
   const { isTransitioning } = TransitionModel.useState();
   const { operation, options } = OperationModel.useState();
   const { setOption } = OperationModel.useActions();
