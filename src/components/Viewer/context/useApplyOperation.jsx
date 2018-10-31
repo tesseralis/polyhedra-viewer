@@ -4,14 +4,14 @@ import _ from 'lodash';
 import { useContext } from 'react';
 
 import { type Operation } from 'math/operations';
-import PolyhedronContext from './PolyhedronContext';
+import PathSetter from './PathSetter';
 import PolyhedronModel from './PolyhedronModel';
 import OperationModel from './OperationModel';
 import useSolidTransition from './useSolidTransition';
 
 export default function useApplyOperation() {
   const { setOperation, unsetOperation } = OperationModel.useActions();
-  const { setName } = useContext(PolyhedronContext);
+  const { setName } = useContext(PathSetter);
   const polyhedron = PolyhedronModel.useState();
   const transitionPolyhedron = useSolidTransition();
 

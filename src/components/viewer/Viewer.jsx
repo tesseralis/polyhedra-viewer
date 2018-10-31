@@ -9,8 +9,8 @@ import { usePageTitle, wrapProviders } from 'components/common';
 import {
   OperationModel,
   TransitionModel,
-  PolyhedronProvider,
   PolyhedronModel,
+  PathSetterProvider,
 } from './context';
 import DesktopViewer from './DesktopViewer';
 import MobileViewer from './MobileViewer';
@@ -81,7 +81,7 @@ export default function Viewer({ solid, history, url }: Props) {
           // FIXME figure out how to pull these out
           return (
             <PolyhedronModel.Provider name={solid}>
-              <PolyhedronProvider
+              <PathSetterProvider
                 setName={name =>
                   history.push(`/${escapeName(name)}/operations`)
                 }
@@ -93,7 +93,7 @@ export default function Viewer({ solid, history, url }: Props) {
                     panel={panel || ''}
                   />
                 </Providers>
-              </PolyhedronProvider>
+              </PathSetterProvider>
             </PolyhedronModel.Provider>
           );
         }}
