@@ -2,7 +2,7 @@
 // $FlowFixMe
 import _ from 'lodash';
 // $FlowFixMe
-import React, { useRef, useEffect, useContext } from 'react';
+import React, { useRef, useEffect, useContext, useCallback } from 'react';
 import { createModel } from 'components/common';
 
 import Config from 'components/ConfigModel';
@@ -68,10 +68,11 @@ const InterpModel = createModel(
 
 const TransitionContext = React.createContext(_.noop);
 
-function Provider({ children }: *) {
+function InnerProvider({ children }: *) {
   const transitionId = useRef(null);
   const { setPolyhedron } = PolyhedronModel.useActions();
-  const { colors, animationSpeed, enableAnimation } = Config.useState();
+  const config = Config.useState();
+  const { colors, animationSpeed, enableAnimation } = config;
   const anim = InterpModel.useActions();
 
   // Cancel the animation if the component we're a part of gets rerendered.
@@ -85,47 +86,56 @@ function Provider({ children }: *) {
     },
     [transitionId],
   );
-  const transitionFn = (result: Polyhedron, animationData: *) => {
-    if (!enableAnimation || !animationData) {
-      setPolyhedron(result);
-      anim.reset();
-      return;
-    }
+  const transitionFn = useCallback(
+    (result: Polyhedron, animationData: *) => {
+      if (!enableAnimation || !animationData) {
+        setPolyhedron(result);
+        anim.reset();
+        return;
+      }
 
-    const { start, endVertices } = animationData;
-    const colorStart = getFaceColors(start, colors);
-    const colorEnd = getFaceColors(start.withVertices(endVertices), colors);
-    const allColorStart = arrayDefaults(colorStart, colorEnd);
+      const { start, endVertices } = animationData;
+      const colorStart = getFaceColors(start, colors);
+      const colorEnd = getFaceColors(start.withVertices(endVertices), colors);
+      const allColorStart = arrayDefaults(colorStart, colorEnd);
 
-    anim.set(start.solidData, allColorStart);
+      anim.set(start.solidData, allColorStart);
 
-    transitionId.current = transition(
-      {
-        duration: 1000 / animationSpeed,
-        startValue: {
-          vertices: start.solidData.vertices,
-          faceColors: allColorStart,
+      transitionId.current = transition(
+        {
+          duration: 1000 / animationSpeed,
+          startValue: {
+            vertices: start.solidData.vertices,
+            faceColors: allColorStart,
+          },
+          endValue: {
+            vertices: endVertices,
+            faceColors: arrayDefaults(colorEnd, colorStart),
+          },
+          onFinish: () => {
+            setPolyhedron(result);
+            anim.reset();
+          },
         },
-        endValue: {
-          vertices: endVertices,
-          faceColors: arrayDefaults(colorEnd, colorStart),
+        ({ vertices, faceColors }) => {
+          anim.set({ ...start.solidData, vertices }, faceColors);
         },
-        onFinish: () => {
-          setPolyhedron(result);
-          anim.reset();
-        },
-      },
-      ({ vertices, faceColors }) => {
-        anim.set({ ...start.solidData, vertices }, faceColors);
-      },
-    );
-  };
+      );
+    },
+    [config],
+  );
 
   return (
+    <TransitionContext.Provider value={transitionFn}>
+      {children}
+    </TransitionContext.Provider>
+  );
+}
+
+function Provider({ children }: *) {
+  return (
     <InterpModel.Provider>
-      <TransitionContext.Provider value={transitionFn}>
-        {children}
-      </TransitionContext.Provider>
+      <InnerProvider>{children}</InnerProvider>
     </InterpModel.Provider>
   );
 }
