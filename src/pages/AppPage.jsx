@@ -7,29 +7,24 @@ import { mount } from 'enzyme';
 
 import { media } from 'styles';
 import App from 'components/App';
-import { DeviceProvider } from 'components/useMediaInfo';
+
+jest.mock('components/useMediaInfo');
+
+const { DeviceProvider } = require('components/useMediaInfo');
 
 export default class AppPage {
   wrapper: *;
 
-  constructor(path: string = '/') {
+  constructor(path: string = '/', options: * = {}) {
+    const { device = 'desktop', orientation = '' } = options;
+    const mediaInfo = { device, orientation };
     this.wrapper = mount(
-      <DeviceProvider>
+      <DeviceProvider value={mediaInfo}>
         <MemoryRouter initialEntries={[path]}>
           <App />
         </MemoryRouter>
       </DeviceProvider>,
     );
-  }
-
-  setDevice(device: 'mobile' | 'desktop'): this {
-    global.innerWidth =
-      device === 'mobile'
-        ? media.mobilePortraitMaxWidth
-        : media.desktopMinWidth;
-    global.dispatchEvent(new Event('resize'));
-    this.wrapper.update();
-    return this;
   }
 
   findElementWithText(element: string, text: string) {

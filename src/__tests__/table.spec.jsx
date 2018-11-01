@@ -6,8 +6,8 @@ import AppPage from 'pages/AppPage';
 describe('table', () => {
   let page;
 
-  function setup() {
-    page = new AppPage('/');
+  function setup(route = '/', options = {}) {
+    page = new AppPage(route, options);
   }
 
   beforeEach(() => {
@@ -18,12 +18,10 @@ describe('table', () => {
     setup();
   });
 
-  // FIXME console.log says it's all working as expected but the functions are still broken
-  xit('generates a compact view on mobile vertical', () => {
-    setup();
+  it('generates a compact view on mobile vertical', () => {
+    setup('/', { device: 'mobile', orientation: 'portrait' });
     // Ensure that these two big tables are split up in two
     page
-      .setDevice('mobile')
       .expectElementWithText('caption', 'Bipyramids')
       .expectElementWithText('caption', 'Gyrate Rhombicos');
   });

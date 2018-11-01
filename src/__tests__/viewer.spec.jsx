@@ -6,8 +6,8 @@ import ViewerPage from 'pages/ViewerPage';
 describe('viewer', () => {
   let page;
 
-  function setup(solid = 'tetrahedron', panel?: string) {
-    page = new ViewerPage(solid, panel);
+  function setup(solid = 'tetrahedron', panel, options) {
+    page = new ViewerPage(solid, panel, options);
   }
 
   beforeEach(() => {
@@ -19,9 +19,8 @@ describe('viewer', () => {
   });
 
   it('works on mobile', () => {
-    setup('tetrahedron');
+    setup('tetrahedron', 'operations', { device: 'mobile' });
     page
-      .setDevice('mobile')
       .clickButtonWithText('truncate')
       .expectTransitionTo('truncated-tetrahedron');
   });
@@ -57,7 +56,7 @@ describe('viewer', () => {
   });
 
   it('unsets the operation when clicking a different tab', () => {
-    setup('tetrahedron/operations');
+    setup('tetrahedron');
     page
       .clickButtonWithText('augment')
       .clickLinkWithText('Options')

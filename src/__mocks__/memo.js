@@ -1,1 +1,1 @@
-module.exports = fn => fn;
+export default fn => fn;

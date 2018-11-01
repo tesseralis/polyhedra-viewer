@@ -9,8 +9,8 @@ function splitListOfLists(listStr, outerSep, innerSep) {
 }
 
 export default class ViewerPage extends AppPage {
-  constructor(solid: string, panel?: string = 'operations') {
-    super(`/${solid}/${panel}`);
+  constructor(solid: string, panel?: string = 'operations', options: * = {}) {
+    super(`/${solid}/${panel}`, options);
   }
 
   getPolyhedron() {
