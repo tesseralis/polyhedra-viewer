@@ -6,14 +6,16 @@ import { mount } from 'enzyme';
 import { defaultConfig } from 'components/configOptions';
 import { Polyhedron } from 'math/polyhedra';
 
+jest.mock('../useHitOptions');
+const { applyWithHitOption } = require('../useHitOptions');
+
 let wrapper;
 
 function setup() {
   wrapper = mount(<X3dPolyhedron />);
 }
 
-// FIXME figure out how to separate out concerns using hooks
-xdescribe('X3dPolyhedron', () => {
+describe('X3dPolyhedron', () => {
   beforeEach(() => {
     setup();
   });
@@ -31,15 +33,15 @@ xdescribe('X3dPolyhedron', () => {
 
     shape.simulate('mousedown', { hitPnt: [0, 0, 0] });
     shape.simulate('mouseup', { hitPnt: [0, 0, 1] });
-    expect(onClick).not.toHaveBeenCalled();
+    expect(applyWithHitOption).not.toHaveBeenCalled();
 
     shape.simulate('mousedown', { hitPnt: [0, 0, 0] });
     shape.simulate('mousemove', { hitPnt: [0, 0, 1] });
     shape.simulate('mouseup', { hitPnt: [0, 0, 0] });
-    expect(onClick).not.toHaveBeenCalled();
+    expect(applyWithHitOption).not.toHaveBeenCalled();
 
     shape.simulate('mousedown', { hitPnt: [0, 0, 0] });
     shape.simulate('mouseup', { hitPnt: [0, 0, 0] });
-    expect(onClick).toHaveBeenCalled();
+    expect(applyWithHitOption).toHaveBeenCalled();
   });
 });
