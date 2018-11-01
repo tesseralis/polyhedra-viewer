@@ -11,7 +11,7 @@ import TransitionModel from './TransitionModel';
 
 export default function useApplyOperation() {
   const { setOperation, unsetOperation } = OperationModel.useActions();
-  const { setName } = useContext(PathSetter);
+  const setName = useContext(PathSetter);
   const polyhedron = PolyhedronModel.useState();
   const transitionPolyhedron = TransitionModel.useTransition();
 

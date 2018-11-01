@@ -15,7 +15,7 @@ import {
 import DesktopViewer from './DesktopViewer';
 import MobileViewer from './MobileViewer';
 import useMediaInfo from 'components/useMediaInfo';
-import { escapeName, unescapeName } from 'math/polyhedra/names';
+import { unescapeName } from 'math/polyhedra/names';
 
 interface InnerProps {
   solid: string;
@@ -62,6 +62,7 @@ interface Props {
 const Providers = wrapProviders([
   TransitionModel.Provider,
   OperationModel.Provider,
+  PathSetterProvider,
 ]);
 
 export default function Viewer({ solid, history, url }: Props) {
@@ -77,22 +78,15 @@ export default function Viewer({ solid, history, url }: Props) {
         render={({ match, history }) => {
           const { panel } = match.params;
 
-          // FIXME figure out how to pull these out
           return (
             <PolyhedronModel.Provider name={solid}>
-              <PathSetterProvider
-                setName={name =>
-                  history.push(`/${escapeName(name)}/operations`)
-                }
-              >
-                <Providers>
-                  <InnerViewer
-                    history={history}
-                    solid={solid}
-                    panel={panel || ''}
-                  />
-                </Providers>
-              </PathSetterProvider>
+              <Providers>
+                <InnerViewer
+                  history={history}
+                  solid={solid}
+                  panel={panel || ''}
+                />
+              </Providers>
             </PolyhedronModel.Provider>
           );
         }}
