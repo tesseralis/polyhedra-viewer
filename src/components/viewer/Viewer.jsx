@@ -26,7 +26,6 @@ interface InnerProps {
 function InnerViewer({ solid, panel, history }: InnerProps) {
   const { unsetOperation } = OperationModel.useActions();
   const { setPolyhedron } = PolyhedronModel.useActions();
-  const anim = TransitionModel.useActions();
   usePageTitle(`${_.capitalize(unescapeName(solid))} - Polyhedra Viewer`);
 
   const nonOperation = panel !== 'operations' || history.action === 'POP';
@@ -34,7 +33,7 @@ function InnerViewer({ solid, panel, history }: InnerProps) {
     () => {
       if (nonOperation) {
         unsetOperation();
-        anim.reset();
+        // TODO cancel animations
       }
     },
     [panel, history.action],

@@ -3,9 +3,7 @@ import _ from 'lodash';
 // $FlowFixMe
 import React from 'react';
 
-const PathSetter = React.createContext({
-  setName: _.noop,
-});
+const PathSetter = React.createContext({ setName: _.noop });
 
 export default PathSetter;
 

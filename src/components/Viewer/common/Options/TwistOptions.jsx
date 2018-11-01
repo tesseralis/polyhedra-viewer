@@ -21,6 +21,8 @@ const TwistButton = styled.button({
 function TwistOption({ orientation }) {
   const { isTransitioning } = TransitionModel.useState();
   const { operation } = OperationModel.useState();
+  // FIXME this is being called from within the operation so it cancels
+  // if it disappears
   const applyOperation = useApplyOperation();
 
   const handleClick = useCallback(

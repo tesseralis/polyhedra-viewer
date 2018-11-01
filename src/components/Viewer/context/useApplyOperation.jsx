@@ -7,13 +7,13 @@ import { type Operation } from 'math/operations';
 import PathSetter from './PathSetter';
 import PolyhedronModel from './PolyhedronModel';
 import OperationModel from './OperationModel';
-import useSolidTransition from './useSolidTransition';
+import TransitionModel from './TransitionModel';
 
 export default function useApplyOperation() {
   const { setOperation, unsetOperation } = OperationModel.useActions();
   const { setName } = useContext(PathSetter);
   const polyhedron = PolyhedronModel.useState();
-  const transitionPolyhedron = useSolidTransition();
+  const transitionPolyhedron = TransitionModel.useTransition();
 
   const applyOperation = (
     operation: Operation,
