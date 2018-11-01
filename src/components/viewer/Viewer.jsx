@@ -20,15 +20,15 @@ import { unescapeName } from 'math/polyhedra/names';
 interface InnerProps {
   solid: string;
   panel: string;
-  history: RouterHistory;
+  action: string;
 }
 
-function InnerViewer({ solid, panel, history }: InnerProps) {
+function InnerViewer({ solid, panel, action }: InnerProps) {
   const { unsetOperation } = OperationModel.useActions();
   const { setPolyhedron } = PolyhedronModel.useActions();
   usePageTitle(`${_.capitalize(unescapeName(solid))} - Polyhedra Viewer`);
 
-  const nonOperation = panel !== 'operations' || history.action === 'POP';
+  const nonOperation = panel !== 'operations' || action === 'POP';
   useEffect(
     () => {
       if (nonOperation) {
@@ -36,14 +36,14 @@ function InnerViewer({ solid, panel, history }: InnerProps) {
         // TODO cancel animations
       }
     },
-    [panel, history.action],
+    [panel, action],
   );
 
   useEffect(
     () => {
       if (nonOperation) setPolyhedron(Polyhedron.get(solid));
     },
-    [solid, history.action],
+    [solid, action],
   );
 
   const { device } = useMediaInfo();
@@ -82,7 +82,7 @@ export default function Viewer({ solid, history, url }: Props) {
             <PolyhedronModel.Provider name={solid}>
               <Providers>
                 <InnerViewer
-                  history={history}
+                  action={history.action}
                   solid={solid}
                   panel={panel || ''}
                 />

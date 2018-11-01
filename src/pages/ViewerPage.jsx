@@ -65,7 +65,6 @@ export default class ViewerPage extends AppPage {
   expectTransitionTo(expected: string) {
     this.wrapper.update();
     this.expectPath(`/${expected}/operations`);
-    expect(this.getPolyhedron().isSame(Polyhedron.get(expected))).toBe(true);
     return this;
   }
 
@@ -73,6 +72,7 @@ export default class ViewerPage extends AppPage {
     const viewer = this.wrapper.find('Viewer');
     const history = viewer.prop('history');
     history.goBack();
+    this.wrapper.update();
     return this;
   }
 }

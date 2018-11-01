@@ -48,10 +48,8 @@ export default function transition<T>(
     }
   };
   id.current = requestAnimationFrame(step);
-  console.log('done setting up anim', id.current);
   return {
     cancel() {
-      console.log('canceling', id.current);
       cancelAnimationFrame(id.current);
     },
   };

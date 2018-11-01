@@ -166,18 +166,16 @@ describe('viewer', () => {
       .expectTransitionTo('diminished-rhombicosidodecahedron');
   });
 
-  // FIXME why is it broken??
+  // TODO the test is broken most likely due to history being mutable.
+  // it works fine when testing -- might want to try to find an alternate
+  // means of checking if you've gone back.
   xit('can go backwards in the url', () => {
     setup('tetrahedron');
     page
       .clickButtonWithText('truncate')
       .expectTransitionTo('truncated-tetrahedron')
       .goBack()
-      .expectTransitionTo('tetrahedron');
-
-    expect(page.getPolyhedron().numFaces()).toEqual(4);
-
-    page
+      .expectTransitionTo('tetrahedron')
       .clickButtonWithText('truncate')
       .expectTransitionTo('truncated-tetrahedron');
   });
