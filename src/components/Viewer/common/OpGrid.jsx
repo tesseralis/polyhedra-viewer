@@ -2,6 +2,7 @@
 import _ from 'lodash';
 import React from 'react';
 
+import memo from 'memo';
 import { flatMap } from 'utils';
 import { makeStyles } from 'styles';
 import { media, fonts } from 'styles';
@@ -72,9 +73,8 @@ const styles = makeStyles({
   },
 });
 
-function OpButton({ name }) {
+const OpButton = memo(function({ name, disabled }) {
   const polyhedron = PolyhedronCtx.useState();
-  const { isTransitioning } = TransitionCtx.useState();
   const { operation: currentOp } = OperationCtx.useState();
   const { setOperation, unsetOperation } = OperationCtx.useActions();
   const applyOperation = useApplyOperation();
@@ -97,19 +97,20 @@ function OpButton({ name }) {
       className={styles('operationButton', isCurrent && 'isHighlighted')}
       style={{ gridArea: name }}
       onClick={selectOperation}
-      disabled={!operation.canApplyTo(polyhedron) || isTransitioning}
+      disabled={!operation.canApplyTo(polyhedron) || disabled}
     >
       <OperationIcon name={name} />
       {name}
     </button>
   );
-}
+});
 
 export default function OpGrid() {
+  const { isTransitioning } = TransitionCtx.useState();
   return (
     <div className={styles('opGrid')}>
       {opList.map(name => (
-        <OpButton key={name} name={name} />
+        <OpButton key={name} name={name} disabled={isTransitioning} />
       ))}
     </div>
   );

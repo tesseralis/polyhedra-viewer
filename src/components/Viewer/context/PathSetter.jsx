@@ -1,7 +1,7 @@
 // @flow strict
 import _ from 'lodash';
 // $FlowFixMe
-import React, { useContext } from 'react';
+import React, { useCallback, useContext } from 'react';
 import { withRouter } from 'react-router-dom';
 import { escapeName } from 'math/polyhedra/names';
 
@@ -10,7 +10,10 @@ const PathSetter = React.createContext({ setName: _.noop });
 export default PathSetter;
 
 export function InnerPathSetterProvider({ history, children }: *) {
-  const setPath = name => history.push(`/${escapeName(name)}/operations`);
+  const setPath = useCallback(
+    name => history.push(`/${escapeName(name)}/operations`),
+    [history],
+  );
   return <PathSetter.Provider value={setPath}>{children}</PathSetter.Provider>;
 }
 

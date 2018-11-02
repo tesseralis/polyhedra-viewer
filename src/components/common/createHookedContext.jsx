@@ -7,7 +7,9 @@ type ActionCreator<S> = (...args: *) => S => S;
 type ActionCreators<S> = { [string]: ActionCreator<S> };
 
 /**
- * Given a set of state actions, generate a context provider and useful hooks.
+ * Given a set of state actions, generate a context provider and useful hooks
+ * to access its state and actions.
+ *
  * @return an object with keys Provider, useState, useActions.
  */
 export default function createHookedContext<S>(
