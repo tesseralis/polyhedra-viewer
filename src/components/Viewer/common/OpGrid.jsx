@@ -9,9 +9,9 @@ import { hover, scroll } from 'styles/common';
 import { operations } from 'math/operations';
 import {
   useApplyOperation,
-  OperationModel,
-  TransitionModel,
-  PolyhedronModel,
+  OperationCtx,
+  TransitionCtx,
+  PolyhedronCtx,
 } from 'components/Viewer/context';
 import OperationIcon from './OperationIcon';
 
@@ -73,10 +73,10 @@ const styles = makeStyles({
 });
 
 function OpButton({ name }) {
-  const polyhedron = PolyhedronModel.useState();
-  const { isTransitioning } = TransitionModel.useState();
-  const { operation: currentOp } = OperationModel.useState();
-  const { setOperation, unsetOperation } = OperationModel.useActions();
+  const polyhedron = PolyhedronCtx.useState();
+  const { isTransitioning } = TransitionCtx.useState();
+  const { operation: currentOp } = OperationCtx.useState();
+  const { setOperation, unsetOperation } = OperationCtx.useActions();
   const applyOperation = useApplyOperation();
   const operation = operations[name];
   const isCurrent = !!currentOp && name === currentOp.name;

@@ -3,10 +3,10 @@
 import _ from 'lodash';
 // $FlowFixMe
 import React, { useRef, useEffect, useContext, useCallback } from 'react';
-import { createModel } from 'components/common';
+import { createHookedContext } from 'components/common';
 
-import Config from 'components/ConfigModel';
-import PolyhedronModel from './PolyhedronModel';
+import Config from 'components/ConfigCtx';
+import PolyhedronCtx from './PolyhedronCtx';
 import transition from 'transition';
 import { Polyhedron } from 'math/polyhedra';
 import { PRECISION } from 'math/geom';
@@ -54,7 +54,7 @@ const defaultState = {
   faceColors: null,
   isTransitioning: false,
 };
-const InterpModel = createModel(
+const InterpModel = createHookedContext(
   {
     reset: () => () => defaultState,
     set: (solidData, faceColors) => () => ({
@@ -70,7 +70,7 @@ const TransitionContext = React.createContext(_.noop);
 
 function InnerProvider({ children }: *) {
   const transitionId = useRef(null);
-  const { setPolyhedron } = PolyhedronModel.useActions();
+  const { setPolyhedron } = PolyhedronCtx.useActions();
   const config = Config.useState();
   const { colors, animationSpeed, enableAnimation } = config;
   const anim = InterpModel.useActions();

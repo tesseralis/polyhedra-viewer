@@ -1,19 +1,17 @@
 // @flow strict
 import _ from 'lodash';
-// $FlowFixMe
-import { useContext } from 'react';
 
 import { type Operation } from 'math/operations';
-import PathSetter from './PathSetter';
-import PolyhedronModel from './PolyhedronModel';
-import OperationModel from './OperationModel';
-import TransitionModel from './TransitionModel';
+import { usePathSetter } from './PathSetter';
+import PolyhedronCtx from './PolyhedronCtx';
+import OperationCtx from './OperationCtx';
+import TransitionCtx from './TransitionCtx';
 
 export default function useApplyOperation() {
-  const { setOperation, unsetOperation } = OperationModel.useActions();
-  const setName = useContext(PathSetter);
-  const polyhedron = PolyhedronModel.useState();
-  const transitionPolyhedron = TransitionModel.useTransition();
+  const { setOperation, unsetOperation } = OperationCtx.useActions();
+  const setName = usePathSetter();
+  const polyhedron = PolyhedronCtx.useState();
+  const transitionPolyhedron = TransitionCtx.useTransition();
 
   const applyOperation = (
     operation: Operation,

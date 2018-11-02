@@ -5,11 +5,7 @@ import { styled } from 'styles';
 import Icon from '@mdi/react';
 
 import { SrOnly } from 'components/common';
-import {
-  useApplyOperation,
-  TransitionModel,
-  OperationModel,
-} from '../../context';
+import { useApplyOperation, TransitionCtx, OperationCtx } from '../../context';
 import { mdiRotateLeft, mdiRotateRight } from '@mdi/js';
 
 const TwistButton = styled.button({
@@ -19,8 +15,8 @@ const TwistButton = styled.button({
 });
 
 function TwistOption({ orientation }) {
-  const { isTransitioning } = TransitionModel.useState();
-  const { operation } = OperationModel.useState();
+  const { isTransitioning } = TransitionCtx.useState();
+  const { operation } = OperationCtx.useState();
   const applyOperation = useApplyOperation();
 
   const handleClick = useCallback(

@@ -4,7 +4,7 @@ import React from 'react';
 import { makeStyles } from 'styles';
 
 import { media, fonts } from 'styles';
-import { OperationModel } from 'components/Viewer/context';
+import { OperationCtx } from 'components/Viewer/context';
 
 const styles = makeStyles({
   prompt: {
@@ -34,7 +34,7 @@ function getMessage(opName) {
 }
 
 export default function Prompt() {
-  const { operation } = OperationModel.useState();
+  const { operation } = OperationCtx.useState();
   if (!operation) return null;
   const message = getMessage(operation.name);
   return message && <div className={styles('prompt')}>{message}</div>;

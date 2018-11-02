@@ -1,9 +1,9 @@
 // @flow strict
 import { Polyhedron } from 'math/polyhedra';
-import { createModel } from 'components/common';
+import { createHookedContext } from 'components/common';
 
 const defaultProps = { name: 'tetrahedron' };
-export default createModel(
+export default createHookedContext(
   {
     setPolyhedron: polyhedron => () => polyhedron,
   },

@@ -7,7 +7,11 @@ import _ from 'lodash';
 type ActionCreator<S> = (...args: *) => S => S;
 type ActionCreators<S> = { [string]: ActionCreator<S> };
 
-export default function createModel<S>(
+/**
+ * Given a set of state actions, generate a context provider and useful hooks.
+ * @return an object with keys Provider, useState, useActions.
+ */
+export default function createHookedContext<S>(
   actions: ActionCreators<S>,
   defaultStateCreator: S | ((...args: *) => S),
 ) {

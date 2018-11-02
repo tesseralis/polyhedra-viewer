@@ -6,7 +6,7 @@ import _ from 'lodash';
 import { polygonNames } from 'math/polygons';
 import { fonts } from 'styles';
 
-import { PolyhedronModel } from 'components/Viewer/context';
+import { PolyhedronCtx } from 'components/Viewer/context';
 import DataDownloader from './DataDownloader';
 
 const styles = makeStyles({
@@ -257,7 +257,7 @@ const info: InfoRow[] = [
 ];
 
 export default function InfoPanel() {
-  const polyhedron = PolyhedronModel.useState();
+  const polyhedron = PolyhedronCtx.useState();
   return (
     <div className={styles('infoPanel')}>
       <h2 className={styles('solidName')}>

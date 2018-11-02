@@ -2,12 +2,8 @@
 // $FlowFixMe
 import { useMemo } from 'react';
 import tinycolor from 'tinycolor2';
-import Config from 'components/ConfigModel';
-import {
-  PolyhedronModel,
-  OperationModel,
-  TransitionModel,
-} from '../../context';
+import Config from 'components/ConfigCtx';
+import { PolyhedronCtx, OperationCtx, TransitionCtx } from '../../context';
 
 function toRgb(hex: string) {
   const { r, g, b } = tinycolor(hex).toRgb();
@@ -17,10 +13,10 @@ function toRgb(hex: string) {
 // Hook that takes data from Polyhedron and Animation states and decides which to use.
 export default function useSolidContext() {
   const { colors } = Config.useState();
-  const polyhedron = PolyhedronModel.useState();
+  const polyhedron = PolyhedronCtx.useState();
 
-  const { solidData, isTransitioning, faceColors } = TransitionModel.useState();
-  const { operation, options } = OperationModel.useState();
+  const { solidData, isTransitioning, faceColors } = TransitionCtx.useState();
+  const { operation, options } = OperationCtx.useState();
 
   // Colors when animation is being applied
   const transitionColors = useMemo(

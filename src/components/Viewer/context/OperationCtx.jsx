@@ -1,12 +1,12 @@
 // @flow strict
-import { createModel } from 'components/common';
+import { createHookedContext } from 'components/common';
 
 const defaultState = {
   operation: null,
   options: null,
 };
 
-export default createModel(
+export default createHookedContext(
   {
     setOperation: (operation, solid) => state => {
       return { operation, options: operation.defaultOptions(solid) };

@@ -5,7 +5,7 @@ import _ from 'lodash';
 
 import useSolidContext from './useSolidContext';
 import useHitOptions from './useHitOptions';
-import Config from 'components/ConfigModel';
+import Config from 'components/ConfigCtx';
 
 // Join a list of lists with an inner and outer separator.
 const joinListOfLists = (list: *, outerSep: string, innerSep: string) => {

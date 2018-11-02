@@ -7,9 +7,9 @@ import { Route, Redirect, type RouterHistory } from 'react-router-dom';
 import { Polyhedron } from 'math/polyhedra';
 import { usePageTitle, wrapProviders } from 'components/common';
 import {
-  OperationModel,
-  TransitionModel,
-  PolyhedronModel,
+  OperationCtx,
+  TransitionCtx,
+  PolyhedronCtx,
   PathSetterProvider,
 } from './context';
 import DesktopViewer from './DesktopViewer';
@@ -24,8 +24,8 @@ interface InnerProps {
 }
 
 function InnerViewer({ solid, panel, action }: InnerProps) {
-  const { unsetOperation } = OperationModel.useActions();
-  const { setPolyhedron } = PolyhedronModel.useActions();
+  const { unsetOperation } = OperationCtx.useActions();
+  const { setPolyhedron } = PolyhedronCtx.useActions();
   usePageTitle(`${_.capitalize(unescapeName(solid))} - Polyhedra Viewer`);
 
   const nonOperation = panel !== 'operations' || action === 'POP';
@@ -60,8 +60,8 @@ interface Props {
 }
 
 const Providers = wrapProviders([
-  TransitionModel.Provider,
-  OperationModel.Provider,
+  TransitionCtx.Provider,
+  OperationCtx.Provider,
   PathSetterProvider,
 ]);
 
@@ -79,7 +79,7 @@ export default function Viewer({ solid, history, url }: Props) {
           const { panel } = match.params;
 
           return (
-            <PolyhedronModel.Provider name={solid}>
+            <PolyhedronCtx.Provider name={solid}>
               <Providers>
                 <InnerViewer
                   action={history.action}
@@ -87,7 +87,7 @@ export default function Viewer({ solid, history, url }: Props) {
                   panel={panel || ''}
                 />
               </Providers>
-            </PolyhedronModel.Provider>
+            </PolyhedronCtx.Provider>
           );
         }}
       />

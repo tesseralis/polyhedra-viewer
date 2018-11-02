@@ -3,12 +3,12 @@
 import _ from 'lodash';
 import React, { Fragment } from 'react';
 
-import { OperationModel } from 'components/Viewer/context';
+import { OperationCtx } from 'components/Viewer/context';
 import TwistOptions from './TwistOptions';
 import AugmentOptions from './AugmentOptions';
 
 export default function Options() {
-  const { operation } = OperationModel.useState();
+  const { operation } = OperationCtx.useState();
   if (!operation) return null;
   return (
     <Fragment>

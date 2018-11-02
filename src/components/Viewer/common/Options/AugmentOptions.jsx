@@ -2,7 +2,7 @@
 import React from 'react';
 import { makeStyles } from 'styles';
 
-import { PolyhedronModel, OperationModel } from 'components/Viewer/context';
+import { PolyhedronCtx, OperationCtx } from 'components/Viewer/context';
 import OptionIcon from './OptionIcon';
 import { verdana } from 'styles/fonts';
 import { hover } from 'styles/common';
@@ -52,9 +52,9 @@ const getOptionName = optValue => {
 };
 
 export default function AugmentOptions() {
-  const polyhedron = PolyhedronModel.useState();
-  const { operation, options } = OperationModel.useState();
-  const { setOption } = OperationModel.useActions();
+  const polyhedron = PolyhedronCtx.useState();
+  const { operation, options } = OperationCtx.useState();
+  const { setOption } = OperationCtx.useActions();
 
   const { gyrate, using } = options;
   const optionArgs = [

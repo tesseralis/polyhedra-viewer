@@ -4,18 +4,18 @@ import _ from 'lodash';
 
 import type { Point } from 'types';
 import {
-  PolyhedronModel,
-  OperationModel,
-  TransitionModel,
+  PolyhedronCtx,
+  OperationCtx,
+  TransitionCtx,
   useApplyOperation,
 } from '../../context';
 
 // TODO turn this into a hook too
 export default function useHitOptions() {
-  const polyhedron = PolyhedronModel.useState();
-  const { isTransitioning } = TransitionModel.useState();
-  const { operation, options } = OperationModel.useState();
-  const { setOption } = OperationModel.useActions();
+  const polyhedron = PolyhedronCtx.useState();
+  const { isTransitioning } = TransitionCtx.useState();
+  const { operation, options } = OperationCtx.useState();
+  const { setOption } = OperationCtx.useActions();
   const applyOperation = useApplyOperation();
   const { hitOption, getHitOption } = operation || {};
 

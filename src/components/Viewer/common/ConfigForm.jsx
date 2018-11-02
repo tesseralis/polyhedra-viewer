@@ -5,7 +5,7 @@ import { styled } from 'styles';
 import _ from 'lodash';
 
 import memo from 'memo';
-import Config from 'components/ConfigModel';
+import Config from 'components/ConfigCtx';
 import { configInputs } from 'components/configOptions';
 import { hover } from 'styles/common';
 import { andaleMono } from 'styles/fonts';
