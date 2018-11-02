@@ -18,6 +18,9 @@ export default function useSolidContext() {
   const { solidData, isTransitioning, faceColors } = TransitionCtx.useState();
   const { operation, options } = OperationCtx.useState();
 
+  // TODO I'm trying to useMemo here so it's similar to reselect?
+  // but is that a bad idea?
+
   // Colors when animation is being applied
   const transitionColors = useMemo(
     () =>
