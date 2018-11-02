@@ -6,7 +6,7 @@ function wrapProvider(Provider, children) {
   return <Provider>{children}</Provider>;
 }
 
-export default function wrapProviders(providers: *) {
+export default function wrapProviders(providers: *[]) {
   return ({ children }: *) =>
     _.reduceRight(
       providers,
