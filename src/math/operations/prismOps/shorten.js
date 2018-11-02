@@ -30,6 +30,7 @@ function doShorten(polyhedron: Polyhedron, options) {
 
 export const shorten = makeOperation('shorten', {
   apply: doShorten,
+  optionTypes: ['twist'],
   resultsFilter(polyhedron, options) {
     if (!isGyroelongatedBiCupola(polyhedron)) return;
     const { twist } = options;

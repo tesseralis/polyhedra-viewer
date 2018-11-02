@@ -55,6 +55,7 @@ function applyGyrate(polyhedron, { cap }) {
 
 export const gyrate = makeOperation('gyrate', {
   apply: applyGyrate,
+  optionTypes: ['cap'],
 
   resultsFilter(polyhedron, config, relations) {
     const options = {};

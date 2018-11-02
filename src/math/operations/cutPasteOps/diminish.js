@@ -19,6 +19,7 @@ export const diminish = makeOperation('diminish', {
   apply(polyhedron, { cap }) {
     return removeCap(polyhedron, cap);
   },
+  optionTypes: ['cap'],
 
   resultsFilter(polyhedron, config, relations) {
     const options = {};

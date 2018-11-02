@@ -10,7 +10,6 @@ import {
   useApplyOperation,
 } from '../../context';
 
-// TODO turn this into a hook too
 export default function useHitOptions() {
   const polyhedron = PolyhedronCtx.useState();
   const { isTransitioning } = TransitionCtx.useState();

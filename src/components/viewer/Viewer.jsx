@@ -33,7 +33,8 @@ function InnerViewer({ solid, panel, action }: InnerProps) {
     () => {
       if (nonOperation) {
         unsetOperation();
-        // TODO cancel animations
+        // TODO cancel animations when switching panels
+        // (I don't think I've ever had that happen so low prio)
       }
     },
     [panel, action],

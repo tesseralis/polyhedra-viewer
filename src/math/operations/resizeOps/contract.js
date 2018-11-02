@@ -62,6 +62,7 @@ export function applyContract(
 // NOTE: We are using the same operation for contracting both expanded and snub solids.
 export const contract = makeOperation('contract', {
   apply: applyContract,
+  optionTypes: ['facetype'],
 
   resultsFilter(polyhedron, config) {
     const { faceType } = config;

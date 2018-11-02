@@ -296,6 +296,7 @@ export const augment = makeOperation('augment', {
       : defaultAugmentType(face.numSides);
     return doAugment(polyhedron, face, augmentType, gyrate);
   },
+  optionTypes: ['face', 'gyrate', 'using'],
 
   resultsFilter(polyhedron, config, relations) {
     const { face } = config;

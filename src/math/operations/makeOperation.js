@@ -108,6 +108,10 @@ export interface Operation {
   name: string;
   apply(polyhedron: Polyhedron, options: Options): OperationResult;
 
+  hitOption?: string;
+
+  optionTypes: string[];
+
   // this is only defined in the stuff we pull into this,
   // but Flow is terrible
   resultsFilter(polyhedron: Polyhedron, options: Options): ?{};
@@ -177,7 +181,8 @@ export default function makeOperation(name: string, op: *): Operation {
     hasOptions(polyhedron) {
       const relations = getOpResults(polyhedron, name);
       if (_.isEmpty(relations)) return false;
-      // TODO should this be split up among operations?
+      // TODO maybe split up among operations?
+      // but I think that might just grow the code...
       switch (name) {
         case 'turn':
           return relations.length > 1 || !!_.find(relations, 'chiral');

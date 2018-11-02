@@ -98,6 +98,7 @@ export const snub = makeOperation('snub', {
   apply(polyhedron, { twist = 'left' }, result: string) {
     return doExpansion(polyhedron, result, twist);
   },
+  optionTypes: ['twist'],
   allOptionCombos(polyhedron) {
     return [{ twist: 'left' }, { twist: 'right' }];
   },

@@ -14,6 +14,7 @@ export function InnerPathSetterProvider({ history, children }: *) {
   return <PathSetter.Provider value={setPath}>{children}</PathSetter.Provider>;
 }
 
+// TODO the provider will no longer be necessary once useRouter becomes a thing
 export const PathSetterProvider = withRouter(InnerPathSetterProvider);
 
 export function usePathSetter() {

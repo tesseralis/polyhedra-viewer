@@ -99,6 +99,7 @@ function doTurn(polyhedron, { twist = 'left' }) {
 
 export const turn = makeOperation('turn', {
   apply: doTurn,
+  optionTypes: ['twist'],
   resultsFilter(polyhedron, options) {
     if (!isGyroelongatedBiCupola(polyhedron)) return;
     const { twist } = options;

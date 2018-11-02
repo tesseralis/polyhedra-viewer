@@ -3,7 +3,6 @@
 import React, { useMemo, useReducer, useContext } from 'react';
 import _ from 'lodash';
 
-// TODO type this better?
 type ActionCreator<S> = (...args: *) => S => S;
 type ActionCreators<S> = { [string]: ActionCreator<S> };
 

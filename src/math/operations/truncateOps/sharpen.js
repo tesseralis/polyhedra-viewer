@@ -112,6 +112,7 @@ function applySharpen(
 
 export const sharpen = makeOperation('sharpen', {
   apply: applySharpen,
+  optionTypes: ['faceType'],
 
   resultsFilter(polyhedron, config) {
     const { faceType } = config;

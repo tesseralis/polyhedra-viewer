@@ -10,14 +10,11 @@ import AugmentOptions from './AugmentOptions';
 export default function Options() {
   const { operation } = OperationCtx.useState();
   if (!operation) return null;
+  if (!operation.optionTypes) return null;
   return (
     <Fragment>
-      {/* TODO determine this within the operation */}
-      {_.includes(
-        ['shorten', 'snub', 'twist', 'gyroelongate', 'turn'],
-        operation.name,
-      ) && <TwistOptions />}
-      {_.includes(['augment'], operation.name) && <AugmentOptions />}
+      {_.includes(operation.optionTypes, 'twist') && <TwistOptions />}
+      {operation.name === 'augment' && <AugmentOptions />}
     </Fragment>
   );
 }
