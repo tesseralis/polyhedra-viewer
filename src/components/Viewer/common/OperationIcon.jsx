@@ -1,9 +1,9 @@
 // @flow strict
 import _ from 'lodash';
-import React, { Fragment } from 'react';
+// $FlowFixMe
+import React, { memo, Fragment } from 'react';
 import { makeStyles } from 'styles';
 
-import memo from 'memo.js';
 import { type OpName } from 'math/operations';
 import { Polygon, PolyLine } from 'components/svg';
 const { sqrt } = Math;

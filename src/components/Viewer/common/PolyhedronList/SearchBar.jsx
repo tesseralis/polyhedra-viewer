@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+// $FlowFixMe
+import React, { memo, useState } from 'react';
 import Icon from '@mdi/react';
 import { mdiMagnify } from '@mdi/js';
 
-import memo from 'memo';
 import { makeStyles } from 'styles';
 import { andaleMono } from 'styles/fonts';
 import { transition } from 'styles/common';

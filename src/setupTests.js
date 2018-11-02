@@ -7,4 +7,3 @@ configure({ adapter: new Adapter() });
 StyleSheetTestUtils.suppressStyleInjection();
 
 jest.mock('x3dom.js');
-jest.mock('memo.js');

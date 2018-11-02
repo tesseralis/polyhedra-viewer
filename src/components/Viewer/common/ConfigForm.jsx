@@ -1,10 +1,9 @@
 // @flow strict
 // $FlowFixMe
-import React, { useCallback } from 'react';
+import React, { memo, useCallback } from 'react';
 import { styled } from 'styles';
 import _ from 'lodash';
 
-import memo from 'memo';
 import Config from 'components/ConfigCtx';
 import { configInputs } from 'components/configOptions';
 import { hover } from 'styles/common';

@@ -1,8 +1,8 @@
 // @flow
-import React from 'react';
+// $FlowFixMe
+import React, { memo } from 'react';
 import _ from 'lodash';
 
-import memo from 'memo';
 import { makeStyles, media } from 'styles';
 import { scroll } from 'styles/common';
 import { useFocuser, SrOnly } from 'components/common';

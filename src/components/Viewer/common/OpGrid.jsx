@@ -1,8 +1,8 @@
 // @flow strict
 import _ from 'lodash';
-import React from 'react';
+// $FlowFixMe
+import React, { memo } from 'react';
 
-import memo from 'memo';
 import { flatMap } from 'utils';
 import { makeStyles } from 'styles';
 import { media, fonts } from 'styles';

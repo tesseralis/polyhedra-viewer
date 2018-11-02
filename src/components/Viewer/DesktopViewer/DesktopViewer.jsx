@@ -1,8 +1,8 @@
 // @flow
-import React from 'react';
+// $FlowFixMe
+import React, { memo } from 'react';
 import { makeStyles } from 'styles';
 
-import memo from 'memo';
 import Sidebar from './Sidebar';
 import Overlay from './Overlay';
 import { X3dScene } from '../common';

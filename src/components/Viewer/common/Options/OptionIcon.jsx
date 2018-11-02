@@ -1,7 +1,7 @@
 // @flow strict
 import _ from 'lodash';
-import React, { Fragment } from 'react';
-import memo from 'memo';
+// $FlowFixMe
+import React, { memo, Fragment } from 'react';
 
 import { makeStyles } from 'styles';
 import { Polygon, PolyLine, PolyShape, polygonPoints } from 'components/svg';
