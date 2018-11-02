@@ -8,6 +8,6 @@
 export { default as SrOnly } from './SrOnly';
 export { default as ExternalLink } from './ExternalLink';
 export { default as usePageTitle } from './usePageTitle';
-export { default as useFocuser } from './useFocuser';
+export { default as useFocus } from './useFocus';
 export { default as createHookedContext } from './createHookedContext';
 export { default as wrapProviders } from './wrapProviders';

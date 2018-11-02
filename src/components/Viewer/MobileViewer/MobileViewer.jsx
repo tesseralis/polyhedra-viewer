@@ -5,7 +5,7 @@ import _ from 'lodash';
 
 import { makeStyles, media } from 'styles';
 import { scroll } from 'styles/common';
-import { useFocuser, SrOnly } from 'components/common';
+import { useFocus, SrOnly } from 'components/common';
 import { BackLink, Title, NavMenu, X3dScene, Panels } from '../common';
 
 import OperationsPanel from './OperationsPanel';
@@ -86,7 +86,7 @@ interface Props {
 }
 
 export default memo(function MobileViewer({ panel, solid }: Props) {
-  const [header, focusOnHeader] = useFocuser();
+  const [header, focusOnHeader] = useFocus();
   const isTransparent = _.includes(['operations', 'full'], panel);
 
   return (

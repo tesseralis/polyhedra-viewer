@@ -3,7 +3,7 @@
 // $FlowFixMe
 import { useRef, useCallback } from 'react';
 
-export default function useFocuser() {
+export default function useFocus() {
   const ref = useRef(null);
   const focusFn = useCallback(
     () => {

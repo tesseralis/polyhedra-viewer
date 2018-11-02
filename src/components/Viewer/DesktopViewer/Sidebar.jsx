@@ -2,7 +2,7 @@
 import React from 'react';
 import { makeStyles } from 'styles';
 
-import { useFocuser, SrOnly } from 'components/common';
+import { useFocus, SrOnly } from 'components/common';
 import { NavMenu, Panels } from '../common';
 import { scroll } from 'styles/common';
 
@@ -44,7 +44,7 @@ interface Props {
 }
 
 export default function Sidebar({ panel, solid, compact }: Props) {
-  const [header, focusOnHeader] = useFocuser();
+  const [header, focusOnHeader] = useFocus();
 
   return (
     <section className={styles('sidebar', !compact && 'full')}>
