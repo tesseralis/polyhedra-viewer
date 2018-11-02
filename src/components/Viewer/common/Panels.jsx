@@ -4,7 +4,14 @@ import InfoPanel from './InfoPanel';
 import ConfigForm from './ConfigForm';
 import PolyhedronList from './PolyhedronList';
 
-export default function Panels({ panel, operationsPanel: OperationsPanel }: *) {
+interface Props {
+  panel: string;
+  operationsPanel: React$ComponentType<{}>;
+}
+export default function Panels({
+  panel,
+  operationsPanel: OperationsPanel,
+}: Props) {
   switch (panel) {
     case 'info':
       return <InfoPanel />;

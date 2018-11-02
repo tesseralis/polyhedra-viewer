@@ -34,7 +34,7 @@ const styles = makeStyles({
   },
 });
 
-const Cell = ({ cell, colSpan = 1 }: { cell: *, colSpan?: * }) => {
+const Cell = ({ cell, colSpan = 1 }: { cell: *, colSpan?: number }) => {
   const isFake = cell[0] === '!';
   const polyhedron = fromConwayNotation(isFake ? cell.substring(1) : cell);
 

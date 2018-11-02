@@ -4,6 +4,7 @@ import { makeStyles } from 'styles';
 import _ from 'lodash';
 
 import { polygonNames } from 'math/polygons';
+import { Polyhedron } from 'math/polyhedra';
 import { fonts } from 'styles';
 
 import { PolyhedronCtx } from 'components/Viewer/context';
@@ -100,12 +101,6 @@ function Sup({ children }: { children: number }) {
   return <sup className={styles('sup')}>{value}</sup>;
 }
 
-interface InfoRow {
-  name: string;
-  area: string;
-  render: *;
-}
-
 function groupedVertexConfig(config) {
   const array = config.split('.');
   const result = [];
@@ -183,6 +178,12 @@ function displaySymmetry({ polyhedron }) {
       {sub ? <Sub>{sub}</Sub> : undefined}
     </Fragment>
   );
+}
+
+interface InfoRow {
+  name: string;
+  area: string;
+  render: ({ polyhedron: Polyhedron }) => React$Node;
 }
 
 const info: InfoRow[] = [

@@ -2,7 +2,7 @@
 import _ from 'lodash';
 import type { Twist } from 'types';
 import { find } from 'utils';
-import { Polyhedron, Cap } from 'math/polyhedra';
+import { Polyhedron, Cap, VEList } from 'math/polyhedra';
 import { inRow, inColumn } from 'math/polyhedra/tableUtils';
 import { withOrigin, isInverse } from 'math/geom';
 import { getTwistSign, getTransformedVertices } from '../operationUtils';
@@ -107,8 +107,14 @@ export function getAdjustInformation(polyhedron: Polyhedron) {
   };
 }
 
+interface AdjustInfo {
+  vertexSets: *;
+  +boundary: VEList;
+  multiplier: number;
+}
+
 export function getScaledPrismVertices(
-  adjustInfo: *,
+  adjustInfo: AdjustInfo,
   scale: number,
   twist: ?Twist,
 ) {

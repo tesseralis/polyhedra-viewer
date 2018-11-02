@@ -3,7 +3,7 @@ import _ from 'lodash';
 import React from 'react';
 import { MemoryRouter } from 'react-router-dom';
 
-import { mount } from 'enzyme';
+import { mount, ReactWrapper } from 'enzyme';
 
 import { media } from 'styles';
 import App from 'components/App';
@@ -12,10 +12,15 @@ jest.mock('components/useMediaInfo');
 
 const { DeviceProvider } = require('components/useMediaInfo');
 
-export default class AppPage {
-  wrapper: *;
+export interface PageOptions {
+  device?: string;
+  orientation?: string;
+}
 
-  constructor(path: string = '/', options: * = {}) {
+export default class AppPage {
+  wrapper: ReactWrapper;
+
+  constructor(path: string = '/', options: PageOptions = {}) {
     const { device = 'desktop', orientation = '' } = options;
     const mediaInfo = { device, orientation };
     this.wrapper = mount(

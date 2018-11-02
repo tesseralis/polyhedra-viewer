@@ -7,6 +7,7 @@ import { makeStyles } from 'styles';
 import { SrOnly } from 'components/common';
 import { fonts } from 'styles';
 
+import { type SolidData } from 'math/polyhedra';
 import { hover } from 'styles/common';
 import { mdiDownload } from '@mdi/js';
 
@@ -33,10 +34,6 @@ const styles = makeStyles({
     },
   },
 });
-
-interface Props {
-  solid: *;
-}
 
 function formatDecimal(number) {
   return Number.isInteger(number) ? `${number}.0` : number;
@@ -67,13 +64,18 @@ const fileFormats = [
   },
 ];
 
+interface Props {
+  solid: SolidData;
+}
+
 export default function DataDownloader({ solid }: Props) {
+  const name = solid.name || 'polyhedron';
   return (
     <div>
       <h2 className={styles('header')}>Download model</h2>
       <div>
         {fileFormats.map(({ ext, serializer }) => {
-          const filename = `${solid.name}.${ext}`;
+          const filename = `${name}.${ext}`;
           const blob = new Blob([serializer(solid)], {
             type: 'text/plain;charset=utf-8',
           });

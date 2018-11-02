@@ -2,9 +2,10 @@
 import Polyhedron from './Polyhedron';
 
 describe('Polyhedron', () => {
-  let vertices = [[1, 1, 1], [-1, -1, 1], [1, -1, -1], [-1, 1, -1]];
-  let faces = [[0, 1, 2], [0, 3, 1], [0, 2, 3], [1, 3, 2]];
-  let polyhedron = new Polyhedron({ vertices, faces });
+  const vertices = [[1, 1, 1], [-1, -1, 1], [1, -1, -1], [-1, 1, -1]];
+  const faces = [[0, 1, 2], [0, 3, 1], [0, 2, 3], [1, 3, 2]];
+  const name = 'tetrahedron';
+  const polyhedron = new Polyhedron({ name, vertices, faces });
 
   describe('edges', () => {
     it('populates on load if not provided', () => {

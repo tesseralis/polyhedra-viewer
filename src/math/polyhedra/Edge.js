@@ -8,7 +8,7 @@ export default class Edge implements VertexList {
   v1: Vertex;
   v2: Vertex;
 
-  constructor(v1: *, v2: *) {
+  constructor(v1: Vertex, v2: Vertex) {
     this.polyhedron = v1.polyhedron;
     this.v1 = v1;
     this.v2 = v2;

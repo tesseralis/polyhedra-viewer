@@ -1,6 +1,6 @@
 // @flow
-import { Polyhedron } from 'math/polyhedra';
-import AppPage from './AppPage';
+import { Polyhedron, Face } from 'math/polyhedra';
+import AppPage, { type PageOptions } from './AppPage';
 
 function splitListOfLists(listStr, outerSep, innerSep) {
   return listStr
@@ -9,7 +9,11 @@ function splitListOfLists(listStr, outerSep, innerSep) {
 }
 
 export default class ViewerPage extends AppPage {
-  constructor(solid: string, panel?: string = 'operations', options: * = {}) {
+  constructor(
+    solid: string,
+    panel?: string = 'operations',
+    options: PageOptions = {},
+  ) {
     super(`/${solid}/${panel}`, options);
   }
 
@@ -23,10 +27,15 @@ export default class ViewerPage extends AppPage {
     const faceStr = this.wrapper.find('indexedfaceset').prop('coordindex');
     const faces = splitListOfLists(faceStr, ' -1 ', ' ');
 
-    return new Polyhedron({ vertices, faces });
+    const name = this.wrapper
+      .find('Title')
+      .text()
+      .toLowerCase();
+
+    return new Polyhedron({ name, vertices, faces });
   }
 
-  clickFace(face: *) {
+  clickFace(face: Face) {
     const hitPnt = face.centroid().toArray();
     const shape = this.wrapper
       .find('shape')

@@ -89,7 +89,7 @@ function doExpansion(polyhedron, referenceName, twist) {
 
 export const expand = makeOperation(
   'expand',
-  (polyhedron: Polyhedron, options: *, result: string) => {
+  (polyhedron: Polyhedron, options: mixed, result: string) => {
     return doExpansion(polyhedron, result);
   },
 );

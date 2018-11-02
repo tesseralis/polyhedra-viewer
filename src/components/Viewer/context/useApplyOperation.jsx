@@ -3,11 +3,14 @@ import _ from 'lodash';
 
 // $FlowFixMe
 import { useCallback } from 'react';
-import { type Operation } from 'math/operations';
+import type { Operation, Options } from 'math/operations';
+import type { Polyhedron } from 'math/polyhedra';
 import { usePathSetter } from './PathSetter';
 import PolyhedronCtx from './PolyhedronCtx';
 import OperationCtx from './OperationCtx';
 import TransitionCtx from './TransitionCtx';
+
+type ResultCallback = Polyhedron => void;
 
 export default function useApplyOperation() {
   const { setOperation, unsetOperation } = OperationCtx.useActions();
@@ -16,7 +19,11 @@ export default function useApplyOperation() {
   const transition = TransitionCtx.useTransition();
 
   const applyOperation = useCallback(
-    (operation: Operation, options: * = {}, callback?: *) => {
+    (
+      operation: Operation,
+      options: Options = {},
+      callback?: ResultCallback,
+    ) => {
       if (!operation) throw new Error('no operation defined');
 
       const { result, animationData } = operation.apply(polyhedron, options);

@@ -8,9 +8,9 @@ import useHitOptions from './useHitOptions';
 import Config from 'components/ConfigCtx';
 
 // Join a list of lists with an inner and outer separator.
-const joinListOfLists = (list: *, outerSep: string, innerSep: string) => {
+function joinListOfLists<T>(list: T[][], outerSep: string, innerSep: string) {
   return _.map(list, elem => elem.join(innerSep)).join(outerSep);
-};
+}
 
 const Coordinates = ({ points }) => {
   return <coordinate is="x3d" point={joinListOfLists(points, ', ', ' ')} />;

@@ -12,13 +12,15 @@ import type { Point } from 'types';
 
 type SelectState = 'selected' | 'selectable' | null;
 
+interface AnimationData {
+  start: Polyhedron;
+  endVertices: Point[];
+}
+
 interface OperationResult {
   result: Polyhedron;
   name: string;
-  animationData: ?{
-    start: Polyhedron,
-    endVertices: Point[],
-  };
+  animationData: ?AnimationData;
 }
 
 const methodDefaults = {
@@ -102,7 +104,7 @@ export function deduplicateVertices(polyhedron: Polyhedron) {
   );
 }
 
-type Options = { [string]: mixed };
+export type Options = { [string]: mixed };
 
 export interface Operation {
   name: string;
