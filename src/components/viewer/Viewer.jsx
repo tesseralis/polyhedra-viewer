@@ -44,7 +44,11 @@ function InnerViewer({ solid, panel, action }: InnerProps) {
     () => {
       if (nonOperation) setPolyhedron(Polyhedron.get(solid));
     },
-    [solid, action],
+    // Make sure we don't reset the polyhedron if we just change panels.
+    // If this is just [action], it'll be called when switching because action
+    // goes from 'PUSH' to 'REPLACE'
+    // TODO this is really hacky and I dunno how to test this find something better
+    [solid, action === 'POP'],
   );
 
   const { device } = useMediaInfo();
