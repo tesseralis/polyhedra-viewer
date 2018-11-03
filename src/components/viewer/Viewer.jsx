@@ -28,10 +28,12 @@ function InnerViewer({ solid, panel, action }: InnerProps) {
   const { setPolyhedron } = PolyhedronCtx.useActions();
   usePageTitle(`${_.capitalize(unescapeName(solid))} - Polyhedra Viewer`);
 
-  const nonOperation = panel !== 'operations' || action === 'POP';
+  // TODO I wish we could make this less verbose...
+
+  // Unset operation if we move away from the operations panel
   useEffect(
     () => {
-      if (nonOperation) {
+      if (panel !== 'operations' || action === 'POP') {
         unsetOperation();
         // TODO cancel animations when switching panels
         // (I don't think I've ever had that happen so low prio)
@@ -40,15 +42,24 @@ function InnerViewer({ solid, panel, action }: InnerProps) {
     [panel, action],
   );
 
+  // If we're not on the operations panel, the solid data is determined
+  // by the URL.
+  // NOTE: do not depend on "panel" here -- if we go from operation -> something else
+  // we want to keep the current data.
   useEffect(
     () => {
-      if (nonOperation) setPolyhedron(Polyhedron.get(solid));
+      if (panel !== 'operations') setPolyhedron(Polyhedron.get(solid));
     },
-    // Make sure we don't reset the polyhedron if we just change panels.
-    // If this is just [action], it'll be called when switching because action
-    // goes from 'PUSH' to 'REPLACE'
-    // TODO this is really hacky and I dunno how to test this find something better
-    [solid, action === 'POP'],
+    [solid],
+  );
+
+  // Reset the polyhedron whenever we go back.
+  // We may replace this with a "stack".
+  useEffect(
+    () => {
+      if (action === 'POP') setPolyhedron(Polyhedron.get(solid));
+    },
+    [solid, action],
   );
 
   const { device } = useMediaInfo();
