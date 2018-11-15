@@ -7,7 +7,7 @@ import { Vec3D, Ray3D, Triangle3D, Plane, Matrix4x4 } from 'toxiclibsjs/geom';
 export { Vec3D };
 
 export const PRECISION_DIGITS = 3;
-export const PRECISION = Math.pow(10, -PRECISION_DIGITS);
+export const PRECISION = 10 ** -PRECISION_DIGITS;
 
 // convert an array of vertices into a vector
 export const vec = (p: Point) => new Vec3D(...p);

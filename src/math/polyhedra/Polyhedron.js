@@ -157,7 +157,7 @@ export default class Polyhedron {
   }
 
   normalizedSurfaceArea() {
-    return this.surfaceArea() / Math.pow(this.edgeLength(), 2);
+    return this.surfaceArea() / this.edgeLength() ** 2;
   }
 
   volume() {
@@ -167,13 +167,13 @@ export default class Polyhedron {
   }
 
   normalizedVolume() {
-    return this.volume() / Math.pow(this.edgeLength(), 3);
+    return this.volume() / this.edgeLength() ** 3;
   }
 
   sphericity() {
     const v = this.volume();
     const a = this.surfaceArea();
-    return (Math.pow(Math.PI, 1 / 3) * Math.pow(6 * v, 2 / 3)) / a;
+    return (Math.PI ** (1 / 3) * (6 * v) ** (2 / 3)) / a;
   }
 
   /** Get the face that is closest to the given point. */
