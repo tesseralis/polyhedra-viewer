@@ -19,7 +19,7 @@ function getRectifiedMultiplier(result: string) {
 }
 
 function duplicateVertices(polyhedron: Polyhedron) {
-  const mapping: Record<number, Record<number, number>> = {};
+  const mapping: NestedRecord<number, number, number> = {};
   const count = polyhedron.getVertex().adjacentFaces().length;
   _.forEach(polyhedron.vertices, v => {
     _.forEach(v.adjacentFaces(), (face, i) => {

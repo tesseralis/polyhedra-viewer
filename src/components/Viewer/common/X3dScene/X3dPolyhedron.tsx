@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, Fragment } from 'react';
+import React, { useEffect, useRef, Fragment, MouseEvent } from 'react';
 import _ from 'lodash';
 
 import { Point } from 'types';
@@ -18,7 +18,10 @@ const Coordinates = ({ points }: { points: Point[] }) => {
 
 /* Edges */
 
-const Edges = ({ edges = [], vertices = [] }: Partial<SolidData>) => {
+const Edges = ({
+  edges = [],
+  vertices = [],
+}: Pick<SolidData, 'edges' | 'vertices'>) => {
   return (
     <shape is="x3d">
       <indexedlineset is="x3d" coordindex={joinListOfLists(edges, ' -1 ', ' ')}>
@@ -28,9 +31,13 @@ const Edges = ({ edges = [], vertices = [] }: Partial<SolidData>) => {
   );
 };
 
+interface X3dEvent extends MouseEvent {
+  hitPnt: Point;
+}
+
 export default function X3dPolyhedron() {
   const shape = useRef<any>(null);
-  const hitPnt = useRef<any>(null);
+  const hitPnt = useRef<Point | null>(null);
 
   const { colors, solidData } = useSolidContext();
   const {
@@ -40,14 +47,14 @@ export default function X3dPolyhedron() {
   } = useHitOptions();
 
   const listeners = {
-    mousedown(e: any) {
+    mousedown(e: X3dEvent) {
       hitPnt.current = e.hitPnt;
     },
-    mouseup(e: any) {
+    mouseup(e: X3dEvent) {
       if (!_.isEqual(hitPnt.current, e.hitPnt)) return;
       onClick(e.hitPnt);
     },
-    mousemove(e: any) {
+    mousemove(e: X3dEvent) {
       hitPnt.current = e.hitPnt;
       onHover(e.hitPnt);
     },

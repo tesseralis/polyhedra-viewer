@@ -1,4 +1,3 @@
-
 /** Type representing a point in 3D space */
 export type Point = [number, number, number];
 

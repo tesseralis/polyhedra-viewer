@@ -19,7 +19,7 @@ function getShiftedAdjacentFaces(vertex: Vertex, facesTosharpen: Face[]) {
 
 function duplicateVertices(polyhedron: Polyhedron, facesTosharpen: Face[]) {
   const offset = polyhedron.numVertices();
-  const mapping: Record<number, Record<number, any>> = {};
+  const mapping: NestedRecord<number, number, any> = {};
   _.forEach(polyhedron.vertices, vertex => {
     const v = vertex.index;
     const v2 = v + offset;
