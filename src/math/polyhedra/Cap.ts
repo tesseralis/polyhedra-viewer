@@ -37,12 +37,16 @@ function getBoundary(faces: Face[]) {
   return new VEList(_.map(result, 'v1'), result);
 }
 
-function createMapper(property: string, Base: any) {
+interface Constructor<T> {
+  new (polyhedron: Polyhedron, arg: T): Cap;
+}
+function createMapper<T>(property: string, Base: Constructor<T>) {
   return (polyhedron: Polyhedron) => {
     const mapper = _.get(polyhedron, property);
-    return (_.isFunction(mapper) ? mapper() : mapper)
-      .map((arg: any) => new Base(polyhedron, arg))
-      .filter((cap: Cap) => cap.isValid());
+    const values: T[] = _.isFunction(mapper) ? mapper() : mapper;
+    return values
+      .map(arg => new Base(polyhedron, arg))
+      .filter(cap => cap.isValid());
   };
 }
 

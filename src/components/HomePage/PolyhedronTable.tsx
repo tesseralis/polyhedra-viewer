@@ -32,7 +32,7 @@ const styles = makeStyles({
   },
 });
 
-const Cell = ({ cell, colSpan = 1 }: { cell: any; colSpan?: number }) => {
+const Cell = ({ cell, colSpan = 1 }: { cell: string; colSpan?: number }) => {
   const isFake = cell[0] === '!';
   const polyhedron = fromConwayNotation(isFake ? cell.substring(1) : cell);
 
@@ -47,7 +47,7 @@ const Cell = ({ cell, colSpan = 1 }: { cell: any; colSpan?: number }) => {
   );
 };
 
-const ColumnHeaders = ({ columns }: any) => {
+const ColumnHeaders = ({ columns }: Pick<Table, 'columns'>) => {
   return (
     <thead>
       {/* Render the subcolumn headers first, where they exist. */}
@@ -56,7 +56,7 @@ const ColumnHeaders = ({ columns }: any) => {
         {_.flatMap(columns, (col, j) =>
           typeof col === 'string'
             ? [<th key={j} />]
-            : col.sub.map((subCol: any) => (
+            : col.sub.map(subCol => (
                 <th className={styles('cell')} key={`${j}-${subCol}`}>
                   {subCol}
                 </th>
@@ -66,7 +66,7 @@ const ColumnHeaders = ({ columns }: any) => {
       {/* Render the main column headers, making sure to span more than one column for those with subcolumns */}
       <tr>
         <th />
-        {columns.map((col: any, j: number) => (
+        {columns.map((col, j) => (
           <th
             className={styles('cell')}
             key={j}
@@ -99,17 +99,16 @@ export default function PolyhedronTable({
             <th className={styles('cell')}>{rows[i]}</th>
             {_.flatMap(row, (cell, j) => {
               const col = columns[j];
-              if (typeof col === 'string') {
-                return [<Cell key={j} cell={cell} />];
-              } else if (!_.isArray(cell)) {
-                // If the cell does *not* have subcells, make it span the length of the subcolumns
-                return [<Cell key={j} cell={cell} colSpan={col.sub.length} />];
-              } else {
-                // If the cell does have subcells render and return them
+              if (_.isArray(cell)) {
                 return cell.map((subcell, k) => (
                   <Cell key={`${j}-${k}`} cell={subcell} />
                 ));
               }
+              if (typeof col === 'string') {
+                return [<Cell key={j} cell={cell} />];
+              }
+              return [<Cell key={j} cell={cell} colSpan={col.sub.length} />];
+              // If the cell does have subcells render and return them
             })}
           </tr>
         ))}

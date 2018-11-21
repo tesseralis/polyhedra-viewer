@@ -70,8 +70,10 @@ function doElongate(polyhedron: Polyhedron, twist?: Twist) {
   };
 }
 
-export const elongate = makeOperation('elongate', (polyhedron: Polyhedron) => {
-  return doElongate(polyhedron);
+export const elongate = makeOperation('elongate', {
+  apply(polyhedron) {
+    return doElongate(polyhedron);
+  },
 });
 
 interface Options {

@@ -15,7 +15,7 @@ import makeOperation from '../makeOperation';
 // TODO deduplicate with turn
 function bisectEdgeFaces(expandedFaces: Face[], twist: Twist) {
   let newFaces: any[] = [];
-  const found: any[] = [];
+  const found: Face[] = [];
 
   _.forEach(expandedFaces, face => {
     _.forEach(face.edges, edge => {
@@ -43,7 +43,7 @@ function bisectEdgeFaces(expandedFaces: Face[], twist: Twist) {
 
 function joinEdgeFaces(twistFaces: Face[], twist: Twist) {
   const newFaces: any[] = [];
-  const found: any[] = [];
+  const found: Face[] = [];
   _.forEach(twistFaces, face => {
     _.forEach(face.edges, edge => {
       const edgeFace = edge.twinFace();

@@ -10,13 +10,15 @@ export interface TransitionOptions<T> {
   onFinish(): void;
 }
 
+export type Callback<T> = (val: T) => void;
+
 /**
  * An animation function based on d3's interpolate.
  * @returns an cancel() function
  */
 export default function transition<T extends object>(
   options: TransitionOptions<T>,
-  updateCallback: (val: T) => void,
+  updateCallback: Callback<T>,
 ) {
   const {
     startValue,
@@ -27,7 +29,7 @@ export default function transition<T extends object>(
     onFinish = _.noop,
   } = options;
   let start = 0;
-  const id: { current?: any } = {};
+  const id: { current?: number } = {};
   // Adapted from:
   // https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame
   const interp = interpolate(startValue, endValue);
@@ -48,7 +50,7 @@ export default function transition<T extends object>(
   id.current = requestAnimationFrame(step);
   return {
     cancel() {
-      cancelAnimationFrame(id.current);
+      cancelAnimationFrame(id.current!);
     },
   };
 }

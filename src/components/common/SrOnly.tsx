@@ -1,8 +1,7 @@
-
 import { styled } from 'styles';
 
 export default styled.span({
-  position: 'absolute !important',
+  position: 'absolute',
   height: 1,
   width: 1,
   overflow: 'hidden',

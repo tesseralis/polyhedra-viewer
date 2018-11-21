@@ -1,5 +1,5 @@
 import React from 'react';
-import { Route, NavLink } from 'react-router-dom';
+import { Route, NavLink, NavLinkProps } from 'react-router-dom';
 import { makeStyles } from 'styles';
 import Icon from '@mdi/react';
 
@@ -40,14 +40,10 @@ const styles = makeStyles({
   },
 });
 
-interface Props {
+interface Props extends NavLinkProps {
   iconName: string;
   iconOnly?: boolean;
   title: string;
-  to: any; // FIXME should be string | LocationShape but gets weird
-  replace?: boolean;
-  exact?: boolean;
-  onClick?: () => void;
 }
 
 export default function IconLink({

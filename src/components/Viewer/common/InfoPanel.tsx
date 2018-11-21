@@ -102,8 +102,8 @@ function Sup({ children }: { children: number }) {
 
 function groupedVertexConfig(config: string) {
   const array = config.split('.');
-  const result: any[] = [];
   let current = { type: '', count: 0 };
+  const result: (typeof current)[] = [];
   _.each(array, type => {
     if (type === current.type) {
       current.count++;

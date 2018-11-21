@@ -14,8 +14,17 @@ import {
   snubAntiprisms,
   others,
   othersTwoRows,
-  TableSection,
+  Table,
 } from 'math/polyhedra/tables';
+
+export interface TableSection {
+  header: string;
+  description?: string;
+  sticky?: boolean;
+  tables?: Table[];
+  narrowTables?: Table[];
+  subsections?: TableSection[];
+}
 
 const polyhedronTables: TableSection[] = [
   {

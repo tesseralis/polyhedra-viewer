@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { HTMLAttributes } from 'react';
 import Markdown from 'react-markdown';
 
 import { ExternalLink } from 'components/common';
@@ -20,6 +20,11 @@ const ListItem = styled.li({
   paddingLeft: listIndent,
 });
 
+interface RenderProps extends HTMLAttributes<any> {
+  ordered: boolean;
+  tight: boolean;
+}
+
 const renderers = {
   paragraph: styled.p({
     fontSize: 16,
@@ -39,8 +44,10 @@ const renderers = {
     },
   }),
   // Don't pass in the custom react-markdown props
-  list: ({ ordered, tight, ...props }: any) => <List {...props} />,
-  listItem: ({ ordered, tight, ...props }: any) => <ListItem {...props} />,
+  list: ({ ordered, tight, ...props }: RenderProps) => <List {...props} />,
+  listItem: ({ ordered, tight, ...props }: RenderProps) => (
+    <ListItem {...props} />
+  ),
   emphasis: styled.em({ fontStyle: 'italic' }),
   strong: styled.strong({ fontWeight: 'bold' }),
 };

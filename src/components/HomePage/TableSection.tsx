@@ -1,10 +1,11 @@
 import React from 'react';
 import { makeStyles } from 'styles';
 
+import { Table } from 'math/polyhedra/tables';
 import { media, fonts } from 'styles';
-import { TableSection as TableSectionType } from 'math/polyhedra/tables';
 import Description from './Description';
 import PolyhedronTable from './PolyhedronTable';
+import { TableSection as TableSectionType } from './tableSections';
 
 const sectionMapping: Record<string, string> = {
   'Uniform Polyhedra': 'uniform',
@@ -124,7 +125,7 @@ const styles = makeStyles({
   },
 });
 
-const GridArea = ({ area, data }: any) => {
+const GridArea = ({ area, data }: { area: string; data: Table }) => {
   return (
     <div style={{ gridArea: area }}>
       <PolyhedronTable {...data} />
@@ -132,10 +133,13 @@ const GridArea = ({ area, data }: any) => {
   );
 };
 
-const TableGrid = ({ tables, header }: any) => {
+const TableGrid = ({
+  tables,
+  header,
+}: Pick<TableSectionType, 'tables' | 'header'>) => {
   return (
     <div className={styles('grid', sectionMapping[header])}>
-      {tables.map((table: any) => {
+      {tables!.map(table => {
         const area = gridAreaMapping[table.caption];
         return <GridArea key={area} area={area} data={table} />;
       })}

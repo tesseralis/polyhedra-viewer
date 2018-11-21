@@ -1,9 +1,10 @@
 import ViewerPage from 'pages/ViewerPage';
+import { PageOptions } from 'pages/AppPage';
 
 describe('viewer', () => {
   let page: ViewerPage;
 
-  function setup(solid = 'tetrahedron', panel?: string, options?: any) {
+  function setup(solid = 'tetrahedron', panel?: string, options?: PageOptions) {
     page = new ViewerPage(solid, panel, options);
   }
 

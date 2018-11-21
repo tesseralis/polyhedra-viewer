@@ -150,7 +150,7 @@ function ExpandIcon({
       styled={styled}
       innerAngle={-90}
       hollow={hollow}
-      render={({ cx, cy, r, ap, r1, ap1 }: any) => (
+      render={({ cx, cy, r, ap, r1, ap1 }) => (
         <Fragment>
           {_.range(3).map(i => (
             <PolyLine
@@ -179,9 +179,9 @@ interface ElongateIconRenderProps {
 }
 interface ElongateIconProps {
   styled: string;
-  render?: (props: ElongateIconRenderProps) => any;
+  render?: ComponentType<ElongateIconRenderProps>;
 }
-function ElongateIcon({ styled, render }: ElongateIconProps) {
+function ElongateIcon({ styled, render: Renderer }: ElongateIconProps) {
   // TODO consolidate with expand
   const [cx, cy] = [100, 100];
   const r = 80;
@@ -197,8 +197,8 @@ function ElongateIcon({ styled, render }: ElongateIconProps) {
         className={styles('invariant')}
         points={[[cx - ap, cy + r / 2], [cx, cy + r], [cx + ap, cy + r / 2]]}
       />
-      {render ? (
-        render({ cx, cy, r, ap })
+      {Renderer ? (
+        <Renderer {...{ cx, cy, r, ap }} />
       ) : (
         <rect
           className={styles(styled)}
@@ -212,7 +212,7 @@ function ElongateIcon({ styled, render }: ElongateIconProps) {
   );
 }
 
-function AugmentIcon({ styled }: any) {
+function AugmentIcon({ styled }: { styled: string }) {
   const [cx, cy] = [100, 100];
   const r = 80;
   const ap = (sqrt(3) * r) / 2;

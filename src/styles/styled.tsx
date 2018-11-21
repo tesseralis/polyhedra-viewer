@@ -1,7 +1,7 @@
-import React, { ReactType, ReactElement, ComponentType } from 'react';
-import { StyleSheet, css } from 'aphrodite/no-important';
+import React, { ReactType, ComponentType } from 'react';
+import { StyleSheet, css, CSSProperties } from 'aphrodite/no-important';
 
-type SheetDefinition = { [key: string]: any };
+type SheetDefinition = CSSProperties;
 type Props = { [key: string]: any };
 
 const domElements = [

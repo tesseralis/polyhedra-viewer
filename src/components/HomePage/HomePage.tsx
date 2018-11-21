@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
 
 import { styled } from 'styles';
-import { TableSection as TableSectionType } from 'math/polyhedra/tables';
 import useMediaInfo from 'components/useMediaInfo';
 import { usePageTitle } from 'components/common';
 

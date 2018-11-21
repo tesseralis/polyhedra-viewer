@@ -1,6 +1,5 @@
-import React from 'react';
+import React, { SVGProps } from 'react';
 import _ from 'lodash';
-import { number } from 'prop-types';
 
 const { PI, sin, cos } = Math;
 const TAU = 2 * PI;

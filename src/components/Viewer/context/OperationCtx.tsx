@@ -11,7 +11,9 @@ interface State {
   options?: Options;
 }
 
-export default createHookedContext<State>(
+type Actions = 'setOperation' | 'unsetOperation' | 'setOption';
+
+export default createHookedContext<State, Actions>(
   {
     setOperation: (operation, solid) => () => {
       return { operation, options: operation.defaultOptions(solid) };

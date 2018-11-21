@@ -11,15 +11,6 @@ export interface Table {
   data: DataRow[];
 }
 
-export interface TableSection {
-  header: string;
-  description?: string;
-  sticky?: boolean;
-  tables?: Table[];
-  narrowTables?: Table[];
-  subsections?: TableSection[];
-}
-
 export const archimedean: Table = {
   caption: 'Platonic and Archimedean Solids',
   rows: [

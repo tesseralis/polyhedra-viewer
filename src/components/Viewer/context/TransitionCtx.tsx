@@ -6,12 +6,12 @@ import { createHookedContext } from 'components/common';
 import Config from 'components/ConfigCtx';
 import PolyhedronCtx from './PolyhedronCtx';
 import transition from 'transition';
-import { Polyhedron, SolidData } from 'math/polyhedra';
+import { Polyhedron, Face, SolidData } from 'math/polyhedra';
 import { PRECISION } from 'math/geom';
 
 function getCoplanarFaces(polyhedron: Polyhedron) {
-  const found: any[] = [];
-  const pairs: any[] = [];
+  const found: Face[] = [];
+  const pairs: [Face, Face][] = [];
   _.forEach(polyhedron.faces, f1 => {
     if (f1.inSet(found) || !f1.isValid()) return;
 
@@ -30,7 +30,7 @@ function getCoplanarFaces(polyhedron: Polyhedron) {
 
 function getFaceColors(polyhedron: Polyhedron, colors: any) {
   const pairs = getCoplanarFaces(polyhedron);
-  const mapping: any = {};
+  const mapping: { [fIndex: number]: number } = {};
   _.forEach(pairs, ([f1, f2]) => {
     const numSides = f1.numSides + f2.numSides - 2;
     mapping[f1.index] = numSides;
@@ -43,7 +43,7 @@ function getFaceColors(polyhedron: Polyhedron, colors: any) {
   );
 }
 
-function arrayDefaults<T extends any[]>(first: T, second: T) {
+function arrayDefaults<T>(first: T[], second: T[]) {
   return _.map(first, (item, i) => (_.isNil(item) ? second[i] : item));
 }
 
@@ -57,7 +57,7 @@ interface State {
   faceColors?: any[];
   isTransitioning: boolean;
 }
-const InterpModel = createHookedContext<State>(
+const InterpModel = createHookedContext<State, 'set' | 'reset'>(
   {
     reset: () => () => defaultState,
     set: (solidData, faceColors) => () => ({

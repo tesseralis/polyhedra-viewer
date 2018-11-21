@@ -42,7 +42,9 @@ export default class Vertex {
 
   adjacentEdges() {
     // find an edge with this as a source
-    const v2 = _.findIndex(this.polyhedron.edgeToFaceGraph()[this.index]);
+    const v2 = parseInt(
+      _.findKey(this.polyhedron.edgeToFaceGraph()[this.index])!,
+    );
     const e0 = new Edge(this, this.polyhedron.vertices[v2]);
     let e = e0;
     const result = [];

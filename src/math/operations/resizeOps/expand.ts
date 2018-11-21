@@ -98,32 +98,34 @@ export const expand = makeOperation('expand', {
 });
 
 export const snub = makeOperation('snub', {
-  apply(polyhedron, { twist = 'left' }, result: string) {
+  apply(polyhedron, { twist = 'left' }, result) {
     return doExpansion(polyhedron, result, twist);
   },
   optionTypes: ['twist'],
-  allOptionCombos(polyhedron) {
+  allOptionCombos() {
     return [{ twist: 'left' }, { twist: 'right' }];
   },
 });
 
-export const dual = makeOperation('dual', (polyhedron: Polyhedron) => {
-  // Scale to create a dual polyhedron with the same midradius
-  const scale = (() => {
-    const f = polyhedron.getFace().distanceToCenter();
-    const e = polyhedron.getEdge().distanceToCenter();
-    return (e * e) / (f * f);
-  })();
-  const duplicated = duplicateVertices(polyhedron);
-  const faces = polyhedron.faces.map(face => face.withPolyhedron(duplicated));
-  const endVertices = getTransformedVertices(faces, f =>
-    withOrigin(polyhedron.centroid(), v => v.scale(scale))(f.centroid()),
-  );
+export const dual = makeOperation('dual', {
+  apply(polyhedron) {
+    // Scale to create a dual polyhedron with the same midradius
+    const scale = (() => {
+      const f = polyhedron.getFace().distanceToCenter();
+      const e = polyhedron.getEdge().distanceToCenter();
+      return (e * e) / (f * f);
+    })();
+    const duplicated = duplicateVertices(polyhedron);
+    const faces = polyhedron.faces.map(face => face.withPolyhedron(duplicated));
+    const endVertices = getTransformedVertices(faces, f =>
+      withOrigin(polyhedron.centroid(), v => v.scale(scale))(f.centroid()),
+    );
 
-  return {
-    animationData: {
-      start: duplicated,
-      endVertices,
-    },
-  };
+    return {
+      animationData: {
+        start: duplicated,
+        endVertices,
+      },
+    };
+  },
 });

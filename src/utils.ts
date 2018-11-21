@@ -54,6 +54,7 @@ export function getSingle<T>(array: T[]): T {
 /**
  * Like _.find, but throws an error if no valid element found.
  */
+// TODO rename this to be something like "findAssert"
 export function find<T>(
   array: T[],
   predicate: ListIterateeCustom<T, boolean>,

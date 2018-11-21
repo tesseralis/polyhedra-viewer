@@ -1,6 +1,7 @@
 import _ from 'lodash';
 
-import React, { useCallback, useContext } from 'react';
+import React, { ReactNode, useCallback, useContext } from 'react';
+import { History } from 'history';
 import { withRouter } from 'react-router-dom';
 import { escapeName } from 'math/polyhedra/names';
 
@@ -8,8 +9,11 @@ const PathSetter = React.createContext(_.noop);
 
 export default PathSetter;
 
-// FIXME props
-export function InnerPathSetterProvider({ history, children }: any) {
+interface Props {
+  history: History;
+  children?: ReactNode;
+}
+export function InnerPathSetterProvider({ history, children }: Props) {
   const setPath = useCallback(
     name => history.push(`/${escapeName(name)}/operations`),
     [history],

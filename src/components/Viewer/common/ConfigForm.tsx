@@ -43,7 +43,7 @@ function ConfigInput({ input, value, setValue }: InputProps<any>) {
   const inputProps = getInputProps(input, value);
   const onChange = useCallback(
     e => setValue(input.key, getInputValue(input, e.target)),
-    [],
+    [input],
   );
   switch (input.type) {
     case 'select':

@@ -18,93 +18,7 @@ interface AnimationData {
 
 interface OperationResult {
   result: Polyhedron;
-  name: string;
   animationData?: AnimationData;
-}
-
-const methodDefaults = {
-  getHitOption: {},
-  allOptionCombos: [null],
-  resultsFilter: undefined,
-  faceSelectionStates: [],
-  defaultOptions: {},
-};
-
-export function getOpResults(solid: Polyhedron, opName: string) {
-  return operationGraph[toConwayNotation(solid.name)][opName];
-}
-
-function fillDefaults(op: any) {
-  return {
-    ..._.mapValues(
-      methodDefaults,
-      (fnDefault, fn) => op[fn] || _.constant(fnDefault),
-    ),
-    ...op,
-  };
-}
-// Get the polyhedron name as a result of applying the operation to the given polyhedron
-function getNextPolyhedron<O>(
-  solid: Polyhedron,
-  operation: string,
-  filterOpts: O,
-) {
-  const results = getOpResults(solid, operation);
-  const next = _(results)
-    .filter(!_.isEmpty(filterOpts) ? filterOpts : _.stubTrue)
-    .value();
-  return fromConwayNotation(getSingle(next).value);
-}
-
-function normalizeOpResult(opResult: any, newName: string) {
-  if (!opResult.animationData) {
-    return { result: deduplicateVertices(opResult).withName(newName) };
-  }
-  const { result, animationData } = opResult;
-  const { start, endVertices } = animationData;
-
-  const normedResult =
-    result || deduplicateVertices(start.withVertices(endVertices));
-
-  return {
-    result: normedResult.withName(newName),
-    animationData: {
-      start,
-      endVertices: endVertices.map(normalizeVertex),
-    },
-  };
-}
-
-// Remove vertices (and faces) from the polyhedron when they are all the same
-export function deduplicateVertices(polyhedron: Polyhedron) {
-  // group vertex indices by same
-  const unique: Vertex[] = [];
-  const oldToNew: Record<number, number> = {};
-
-  _.forEach(polyhedron.vertices, (v, vIndex: number) => {
-    const match = _.find(unique, point =>
-      v.vec.equalsWithTolerance(point.vec, PRECISION),
-    );
-    if (match === undefined) {
-      unique.push(v);
-      oldToNew[vIndex] = vIndex;
-    } else {
-      oldToNew[vIndex] = match.index;
-    }
-  });
-
-  if (_.isEmpty(oldToNew)) return polyhedron;
-
-  // replace vertices that are the same
-  let newFaces = _(polyhedron.faces)
-    .map(face => _.uniq(face.vertices.map(v => oldToNew[v.index])))
-    .filter(vIndices => vIndices.length >= 3)
-    .value();
-
-  // remove extraneous vertices
-  return removeExtraneousVertices(
-    polyhedron.withChanges(s => s.withFaces(newFaces)),
-  );
 }
 
 export type Options = { [key: string]: any };
@@ -185,13 +99,100 @@ interface OperationArgs extends Partial<BaseOperation> {
   ): Options;
 }
 
+type OperationArg = keyof OperationArgs;
+const methodDefaults = {
+  getHitOption: {},
+  allOptionCombos: [null],
+  resultsFilter: undefined,
+  faceSelectionStates: [],
+  defaultOptions: {},
+};
+
+export function getOpResults(solid: Polyhedron, opName: string) {
+  return operationGraph[toConwayNotation(solid.name)][opName];
+}
+
+function fillDefaults(op: OperationArgs) {
+  return {
+    ..._.mapValues(
+      methodDefaults,
+      (fnDefault, fn: OperationArg) => op[fn] || _.constant(fnDefault),
+    ),
+    ...op,
+  };
+}
+// Get the polyhedron name as a result of applying the operation to the given polyhedron
+function getNextPolyhedron<O>(
+  solid: Polyhedron,
+  operation: string,
+  filterOpts: O,
+) {
+  const results = getOpResults(solid, operation);
+  const next = _(results)
+    .filter(!_.isEmpty(filterOpts) ? filterOpts : _.stubTrue)
+    .value();
+  return fromConwayNotation(getSingle(next).value);
+}
+
+function normalizeOpResult(
+  opResult: PartialOpResult | Polyhedron,
+  newName: string,
+): OperationResult {
+  if (opResult instanceof Polyhedron) {
+    return { result: deduplicateVertices(opResult).withName(newName) };
+  }
+  const { result, animationData } = opResult;
+  const { start, endVertices } = animationData!;
+
+  const normedResult =
+    result || deduplicateVertices(start.withVertices(endVertices));
+
+  return {
+    result: normedResult.withName(newName),
+    animationData: {
+      start,
+      endVertices: endVertices.map(normalizeVertex),
+    },
+  };
+}
+
+// Remove vertices (and faces) from the polyhedron when they are all the same
+export function deduplicateVertices(polyhedron: Polyhedron) {
+  // group vertex indices by same
+  const unique: Vertex[] = [];
+  const oldToNew: Record<number, number> = {};
+
+  _.forEach(polyhedron.vertices, (v, vIndex: number) => {
+    const match = _.find(unique, point =>
+      v.vec.equalsWithTolerance(point.vec, PRECISION),
+    );
+    if (match === undefined) {
+      unique.push(v);
+      oldToNew[vIndex] = vIndex;
+    } else {
+      oldToNew[vIndex] = match.index;
+    }
+  });
+
+  if (_.isEmpty(oldToNew)) return polyhedron;
+
+  // replace vertices that are the same
+  let newFaces = _(polyhedron.faces)
+    .map(face => _.uniq(face.vertices.map(v => oldToNew[v.index])))
+    .filter(vIndices => vIndices.length >= 3)
+    .value();
+
+  // remove extraneous vertices
+  return removeExtraneousVertices(
+    polyhedron.withChanges(s => s.withFaces(newFaces)),
+  );
+}
+
 export default function makeOperation(
   name: string,
   op: OperationArgs,
 ): Operation {
-  const withDefaults = fillDefaults(
-    typeof op === 'function' ? { apply: op } : op,
-  );
+  const withDefaults: any = fillDefaults(op);
   return {
     ...withDefaults,
     name,

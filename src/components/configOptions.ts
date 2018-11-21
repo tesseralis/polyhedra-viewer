@@ -13,7 +13,7 @@ const defaultColors: PolygonMap<string> = {
   10: '#984ea3',
 };
 
-export interface ConfigInput<T> {
+export interface ConfigInput<T = any> {
   key: string;
   type: string;
   default: T;
@@ -29,7 +29,7 @@ const colorOptionsList = polygons.map(n => {
   };
 });
 
-export const configInputs: ConfigInput<any>[] = [
+export const configInputs: ConfigInput[] = [
   {
     key: 'showEdges',
     type: 'checkbox',
