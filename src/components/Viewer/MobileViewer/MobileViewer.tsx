@@ -3,7 +3,6 @@ import _ from 'lodash';
 
 import { makeStyles, media } from 'styles';
 import { scroll } from 'styles/common';
-import { useFocus, SrOnly } from 'components/common';
 import {
   BackLink,
   Title,
