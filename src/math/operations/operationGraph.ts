@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import { polygonPrefixes } from 'math/polygons';
 import { Table, prisms, capstones, augmented } from 'math/polyhedra/tables';
 import { toConwayNotation } from '../polyhedra/names';
 import { mapObject } from 'utils';
@@ -161,19 +162,10 @@ const getAugmentations = (using: string) => (
     .value();
 };
 
-const nameMapping: Record<string, number> = {
-  digonal: 2,
-  triangular: 3,
-  square: 4,
-  pentagonal: 5,
-  hexagonal: 6,
-  octagonal: 8,
-  decagonal: 10,
-};
 const divName = (name: string) => {
-  const m = nameMapping[name];
+  const m = polygonPrefixes.of(name);
   if (m <= 5) return name;
-  return _.invert(nameMapping)[m / 2];
+  return polygonPrefixes.get(m / 2);
 };
 
 const getPyramidFromPrism = (prismRow: string) => {
@@ -187,7 +179,7 @@ const getPyramidFromPrism = (prismRow: string) => {
 const getPrismFromPyramid = (name: string, anti?: boolean) => {
   const [prefix, type] = name.split(' ');
   const isCupola = _.includes(['cupola', 'rotunda', 'cupola-rotunda'], type);
-  const index = nameMapping[prefix] * (isCupola ? 2 : 1);
+  const index = polygonPrefixes.of(prefix) * (isCupola ? 2 : 1);
   return `${anti ? 'A' : 'P'}${index}`;
 };
 
@@ -199,7 +191,7 @@ const pyramidCupolaConway: Record<string, string> = {
 
 const getPyramidCupolaConway = (name: string) => {
   const [sides, type] = name.split(' ');
-  return `${pyramidCupolaConway[type]}${nameMapping[sides]}`;
+  return `${pyramidCupolaConway[type]}${polygonPrefixes.of(sides)}`;
 };
 
 const getElongations = (prism: any, antiprism: any) => (

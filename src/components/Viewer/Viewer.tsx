@@ -1,6 +1,6 @@
 import _ from 'lodash';
 
-import React, { useEffect, Fragment } from 'react';
+import React, { useEffect } from 'react';
 import { History } from 'history';
 import { Route, Redirect } from 'react-router-dom';
 
@@ -83,7 +83,7 @@ const Providers = wrapProviders([
 
 export default function Viewer({ solid, history, url }: Props) {
   return (
-    <Fragment>
+    <>
       <Route
         exact
         path={url}
@@ -107,6 +107,6 @@ export default function Viewer({ solid, history, url }: Props) {
           );
         }}
       />
-    </Fragment>
+    </>
   );
 }

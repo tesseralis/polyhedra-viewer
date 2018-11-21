@@ -1,6 +1,6 @@
 import _ from 'lodash';
 
-import React, { memo, Fragment, ComponentType } from 'react';
+import React, { memo, ComponentType } from 'react';
 import { makeStyles } from 'styles';
 
 import { OpName } from 'math/operations';
@@ -58,7 +58,7 @@ function TruncateIcon({
   const center = { cx: 100, cy: 120 };
   const r = 100;
   return (
-    <Fragment>
+    <>
       <Polygon className={styles(styled)} n={3} r={r} a={-90} {...center} />
       <Polygon
         className={styles('invariant')}
@@ -67,7 +67,7 @@ function TruncateIcon({
         a={innerAngle}
         {...center}
       />
-    </Fragment>
+    </>
   );
 }
 
@@ -75,7 +75,7 @@ function DualIcon() {
   const center = { cx: 100, cy: 100 };
   const r = 75;
   return (
-    <Fragment>
+    <>
       <Polygon
         className={styles('subtracted')}
         n={3}
@@ -91,7 +91,7 @@ function DualIcon() {
         a={0}
         {...center}
       />
-    </Fragment>
+    </>
   );
 }
 
@@ -124,7 +124,7 @@ function BaseExpandIcon({
   const r1 = r / sqrt(3);
   const ap1 = r1 / 2;
   return (
-    <Fragment>
+    <>
       <Polygon className={styles(styled)} n={6} r={r} a={0} cx={cx} cy={cy} />
       <Polygon
         className={styles(hollow ? styled : 'invariant')}
@@ -135,7 +135,7 @@ function BaseExpandIcon({
         cy={cy}
       />
       <Renderer {...{ cx, cy, r, ap, r1, ap1 }} />
-    </Fragment>
+    </>
   );
 }
 
@@ -151,7 +151,7 @@ function ExpandIcon({
       innerAngle={-90}
       hollow={hollow}
       render={({ cx, cy, r, ap, r1, ap1 }) => (
-        <Fragment>
+        <>
           {_.range(3).map(i => (
             <PolyLine
               key={i}
@@ -165,7 +165,7 @@ function ExpandIcon({
             />
           ))}
           <Renderer {...{ cx, cy, r, ap, r1, ap1 }} />
-        </Fragment>
+        </>
       )}
     />
   );
@@ -187,7 +187,7 @@ function ElongateIcon({ styled, render: Renderer }: ElongateIconProps) {
   const r = 80;
   const ap = (sqrt(3) * r) / 2;
   return (
-    <Fragment>
+    <>
       <Polygon className={styles(styled)} n={6} r={r} a={90} cx={cx} cy={cy} />
       <PolyLine
         className={styles('invariant')}
@@ -208,7 +208,7 @@ function ElongateIcon({ styled, render: Renderer }: ElongateIconProps) {
           height={r + 10}
         />
       )}
-    </Fragment>
+    </>
   );
 }
 
@@ -217,7 +217,7 @@ function AugmentIcon({ styled }: { styled: string }) {
   const r = 80;
   const ap = (sqrt(3) * r) / 2;
   return (
-    <Fragment>
+    <>
       <Polygon className={styles(styled)} n={6} r={r} a={90} cx={cx} cy={cy} />
       <PolyLine
         className={styles('invariant')}
@@ -229,7 +229,7 @@ function AugmentIcon({ styled }: { styled: string }) {
           [cx + ap, cy - r / 2],
         ]}
       />
-    </Fragment>
+    </>
   );
 }
 
@@ -354,12 +354,12 @@ function drawIcon(name: OpName) {
     case 'gyrate':
       // TODO simplify the ExpandIcon hierarchy
       return (
-        <Fragment>
+        <>
           <ExpandIcon styled="subtracted" hollow />
           <g transform="rotate(180 100 100)">
             <ExpandIcon styled="added" hollow />
           </g>
-        </Fragment>
+        </>
       );
     default:
       throw new Error(`Unknown operation: ${name}`);

@@ -23,7 +23,7 @@ export interface ConfigInput<T = any> {
 const colorOptionsList = polygons.map(n => {
   return {
     key: `colors[${n}]`,
-    display: `${_.startCase(polygonNames[n])} Color`,
+    display: `${_.startCase(polygonNames.get(n))} Color`,
     type: 'color',
     default: defaultColors[n],
   };

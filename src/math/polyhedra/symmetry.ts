@@ -1,23 +1,12 @@
 import _ from 'lodash';
 
+import { polygonPrefixes } from 'math/polygons';
 import { unescapeName, getType } from './names';
 import { getJohnsonSymmetry } from 'data';
 
 /**
  * Utilities to get symmetry information out of polyhedra names
  */
-
-const adjectiveMap: Record<string, number> = {
-  digonal: 2,
-  triangular: 3,
-  square: 4,
-  pentagonal: 5,
-  hexagonal: 6,
-  octagonal: 8,
-  decagonal: 10,
-};
-
-const reverseAdjectiveMap = _.invert(adjectiveMap);
 
 interface Symmetry {
   group: string;
@@ -43,11 +32,11 @@ export function getSymmetry(name: string): Symmetry {
     return { group, sub: chiral ? '' : 'h' };
   }
   if (type === 'Prism') {
-    const n = adjectiveMap[_.lowerCase(name.split('-')[0])];
+    const n = polygonPrefixes.of(_.lowerCase(name.split('-')[0]));
     return { group: 'D', sub: `${n}h` };
   }
   if (type === 'Antiprism') {
-    const n = adjectiveMap[_.lowerCase(name.split('-')[0])];
+    const n = polygonPrefixes.of(_.lowerCase(name.split('-')[0]));
     return { group: 'D', sub: `${n}d` };
   }
   return getJohnsonSymmetry(unescapeName(name));
@@ -78,21 +67,21 @@ export function getSymmetryName({ group, sub }: Symmetry) {
       return 'biradial';
     }
     const n = parseInt(_.trimEnd(sub, 'v'), 10);
-    return reverseAdjectiveMap[n] + ' pyramidal';
+    return polygonPrefixes.get(n) + ' pyramidal';
   }
   if (group === 'D') {
     const last = sub.substr(sub.length - 1);
     if (last === 'h') {
       const n = parseInt(_.trimEnd(sub, 'h'), 10);
-      return reverseAdjectiveMap[n] + ' prismatic';
+      return polygonPrefixes.get(n) + ' prismatic';
     }
     if (last === 'd') {
       const n = parseInt(_.trimEnd(sub, 'd'), 10);
-      return reverseAdjectiveMap[n] + ' antiprismatic';
+      return polygonPrefixes.get(n) + ' antiprismatic';
     }
 
     const n = parseInt(sub, 10);
-    return reverseAdjectiveMap[n] + ' dihedral';
+    return polygonPrefixes.get(n) + ' dihedral';
   }
   throw new Error('invalid group');
 }

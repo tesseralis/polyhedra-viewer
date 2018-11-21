@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, Fragment, MouseEvent } from 'react';
+import React, { useEffect, useRef, MouseEvent } from 'react';
 import _ from 'lodash';
 
 import { Point } from 'types';
@@ -89,7 +89,7 @@ export default function X3dPolyhedron() {
 
   const colorStr = joinListOfLists(colors, ',', ' ');
   return (
-    <Fragment>
+    <>
       {showFaces && (
         // NOTE: The mouse handlers are duplicated to make it easy to test on enzyme.
         // They don't actually do anything in production
@@ -116,6 +116,6 @@ export default function X3dPolyhedron() {
         </shape>
       )}
       {showEdges && <Edges edges={edges} vertices={vertices} />}
-    </Fragment>
+    </>
   );
 }

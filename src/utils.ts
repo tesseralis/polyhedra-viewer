@@ -75,3 +75,17 @@ export function pivot<T>(list: T[], value: T) {
   const index = _.indexOf(list, value);
   return [..._.slice(list, index), ..._.slice(list, 0, index)];
 }
+
+export function bimap<K extends string | number, V extends string | number>(
+  obj: Record<K, V>,
+) {
+  const inverse = _.invert(obj);
+  return {
+    get(key: string | number): V {
+      return obj[key];
+    },
+    of(val: string | number): K {
+      return inverse[val] as K;
+    },
+  };
+}

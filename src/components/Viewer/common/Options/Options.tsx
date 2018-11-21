@@ -1,7 +1,5 @@
-
-
 import _ from 'lodash';
-import React, { Fragment } from 'react';
+import React from 'react';
 
 import { OperationCtx } from 'components/Viewer/context';
 import TwistOptions from './TwistOptions';
@@ -12,9 +10,9 @@ export default function Options() {
   if (!operation) return null;
   if (!operation.optionTypes) return null;
   return (
-    <Fragment>
+    <>
       {_.includes(operation.optionTypes, 'twist') && <TwistOptions />}
       {operation.name === 'augment' && <AugmentOptions />}
-    </Fragment>
+    </>
   );
 }

@@ -1,6 +1,6 @@
 import _ from 'lodash';
 
-import React, { memo, Fragment } from 'react';
+import React, { memo } from 'react';
 
 import { makeStyles } from 'styles';
 import {
@@ -41,7 +41,7 @@ function drawIcon(name: string) {
   switch (name) {
     case 'ortho':
       return (
-        <Fragment>
+        <>
           <Polygon
             className={styles('outer')}
             n={5}
@@ -58,11 +58,11 @@ function drawIcon(name: string) {
             a={90}
             r={66}
           />
-        </Fragment>
+        </>
       );
     case 'gyro':
       return (
-        <Fragment>
+        <>
           <Polygon
             className={styles('outer')}
             n={5}
@@ -79,11 +79,11 @@ function drawIcon(name: string) {
             a={-90}
             r={66}
           />
-        </Fragment>
+        </>
       );
     case 'pyramid':
       return (
-        <Fragment>
+        <>
           <PolyShape
             className={styles('outer')}
             points={[[100, 50], [10, 170], [190, 170]]}
@@ -92,7 +92,7 @@ function drawIcon(name: string) {
             className={styles('inner')}
             points={[[140, 170], [100, 50], [60, 170]]}
           />
-        </Fragment>
+        </>
       );
     case 'fastigium': {
       const center = 100;
@@ -100,7 +100,7 @@ function drawIcon(name: string) {
       const topY = center - height;
       const bottomY = center + height;
       return (
-        <Fragment>
+        <>
           <PolyShape
             className={styles('outer')}
             points={[[150, topY], [50, topY], [10, bottomY], [190, bottomY]]}
@@ -109,7 +109,7 @@ function drawIcon(name: string) {
             className={styles('inner')}
             points={[[150, topY], [120, bottomY]]}
           />
-        </Fragment>
+        </>
       );
     }
     case 'cupola': {
@@ -122,7 +122,7 @@ function drawIcon(name: string) {
       const topLeftX = center - topWidth;
       const topRightX = center + topWidth;
       return (
-        <Fragment>
+        <>
           <PolyShape
             className={styles('outer')}
             points={[
@@ -141,7 +141,7 @@ function drawIcon(name: string) {
               [topRightX, topY],
             ]}
           />
-        </Fragment>
+        </>
       );
     }
     case 'rotunda': {
@@ -154,7 +154,7 @@ function drawIcon(name: string) {
       const q1: Point2D = [p3[0], p2[1]];
       const q2: Point2D = [p5[0], p6[1]];
       return (
-        <Fragment>
+        <>
           <PolyShape className={styles('outer')} points={points} />
           <PolyShape
             className={styles('inner')}
@@ -164,7 +164,7 @@ function drawIcon(name: string) {
             className={styles('inner')}
             points={[p3, q1, [40, bottomY], [160, bottomY], q2, p5]}
           />
-        </Fragment>
+        </>
       );
     }
     default:

@@ -1,10 +1,7 @@
-
-import React from 'react';
-
 import AppPage from 'pages/AppPage';
 
 describe('table', () => {
-  let page;
+  let page: AppPage;
 
   function setup(route = '/', options = {}) {
     page = new AppPage(route, options);

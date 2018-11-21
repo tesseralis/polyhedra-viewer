@@ -1,4 +1,4 @@
-import React, { Fragment, ComponentType } from 'react';
+import React, { ComponentType } from 'react';
 import { makeStyles } from 'styles';
 import _ from 'lodash';
 
@@ -84,15 +84,15 @@ function Sup({ children }: { children: number }) {
   const value = (() => {
     switch (children) {
       case 1:
-        return <Fragment>&#x00B9;</Fragment>;
+        return <>&#x00B9;</>;
       case 2:
-        return <Fragment>&#x00B2;</Fragment>;
+        return <>&#x00B2;</>;
       case 3:
-        return <Fragment>&#x00B3;</Fragment>;
+        return <>&#x00B3;</>;
       case 4:
-        return <Fragment>&#x2074;</Fragment>;
+        return <>&#x2074;</>;
       case 5:
-        return <Fragment>&#x2075;</Fragment>;
+        return <>&#x2075;</>;
       default:
         return children;
     }
@@ -125,15 +125,15 @@ function getShortVertexConfig(config: string) {
       count === 1 ? (
         type
       ) : (
-        <Fragment>
+        <>
           {type}
           <Sup>{count}</Sup>
-        </Fragment>
+        </>
       );
     if (i === 0) return val;
-    return <Fragment>.{val}</Fragment>;
+    return <>.{val}</>;
   });
-  return <Fragment>{children}</Fragment>;
+  return <>{children}</>;
 }
 
 interface RenderProps {
@@ -163,7 +163,7 @@ function displayFaceTypes({ polyhedron }: RenderProps) {
     <ul>
       {_.map(faceCounts, (count, type: number) => (
         <li key={type}>
-          {count} {polygonNames[type]}
+          {count} {polygonNames.get(type)}
           {count !== 1 ? 's' : ''}
         </li>
       ))}
@@ -176,10 +176,10 @@ function displaySymmetry({ polyhedron }: RenderProps) {
   const symName = polyhedron.symmetryName();
   const { group = '', sub } = symmetry;
   return (
-    <Fragment>
+    <>
       {_.capitalize(symName)}, {group}
       {sub ? <Sub>{sub}</Sub> : undefined}
-    </Fragment>
+    </>
   );
 }
 
@@ -220,18 +220,18 @@ const info: InfoRow[] = [
     name: 'Volume',
     area: 'vol',
     render: ({ polyhedron: p }) => (
-      <Fragment>
+      <>
         ≈{_.round(p.normalizedVolume(), 3)}s<Sup>{3}</Sup>
-      </Fragment>
+      </>
     ),
   },
   {
     name: 'Surface area',
     area: 'sa',
     render: ({ polyhedron: p }) => (
-      <Fragment>
+      <>
         ≈{_.round(p.normalizedSurfaceArea(), 3)}s<Sup>{2}</Sup>
-      </Fragment>
+      </>
     ),
   },
   {
