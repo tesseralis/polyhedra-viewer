@@ -26,7 +26,7 @@ const styles = makeStyles({
     })),
   },
   menu: {
-    ...mobile((mobTitleH, menuH) => ({
+    ...mobile(($, menuH) => ({
       height: menuH,
     })),
     gridArea: 'menu',

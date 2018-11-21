@@ -59,7 +59,7 @@ export const gyrate = makeOperation('gyrate', {
   apply: applyGyrate,
   optionTypes: ['cap'],
 
-  resultsFilter(polyhedron: Polyhedron, config: any, relations: any) {
+  resultsFilter(polyhedron, config, relations) {
     const options: any = {};
     const { cap } = config;
     if (!cap) {
@@ -80,17 +80,17 @@ export const gyrate = makeOperation('gyrate', {
     return options;
   },
 
-  allOptionCombos(polyhedron: Polyhedron) {
+  allOptionCombos(polyhedron) {
     return Cap.getAll(polyhedron).map(cap => ({ cap }));
   },
 
   hitOption: 'cap',
-  getHitOption(polyhedron: Polyhedron, hitPnt: Vec3D) {
+  getHitOption(polyhedron, hitPnt) {
     const cap = Cap.find(polyhedron, hitPnt);
     return cap ? { cap } : {};
   },
 
-  faceSelectionStates(polyhedron: Polyhedron, { cap }: Options) {
+  faceSelectionStates(polyhedron, { cap }) {
     const allCapFaces = _.flatMap(Cap.getAll(polyhedron), cap => cap.faces());
     return _.map(polyhedron.faces, face => {
       if (_.isObject(cap) && face.inSet(cap.faces())) return 'selected';

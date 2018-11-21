@@ -93,7 +93,7 @@ function canAugment(base: Face) {
 }
 
 // Computes the set equality of two arrays
-const setEquals = <T extends any[]>(array1: T, array2: T) =>
+const setEquals = <T>(array1: T[], array2: T[]) =>
   _.xor(array1, array2).length === 0;
 
 function getBaseType(base: Face) {
@@ -304,14 +304,9 @@ const hasGyrateOpts = (polyhedron: Polyhedron) => {
   }
   return false;
 };
-interface Options {
-  face: Face;
-  gyrate?: 'ortho' | 'gyro';
-  using?: string;
-}
 
 export const augment = makeOperation('augment', {
-  apply(polyhedron: Polyhedron, { face, gyrate, using }: Options) {
+  apply(polyhedron, { face, gyrate, using }) {
     const augmentType = using
       ? augmentTypes[using[0]]
       : defaultAugmentType(face.numSides);
@@ -319,7 +314,7 @@ export const augment = makeOperation('augment', {
   },
   optionTypes: ['face', 'gyrate', 'using'],
 
-  resultsFilter(polyhedron: Polyhedron, config: any, relations: any) {
+  resultsFilter(polyhedron, config, relations) {
     const { face } = config;
 
     if (!face) {
@@ -340,7 +335,7 @@ export const augment = makeOperation('augment', {
     };
   },
 
-  allOptionCombos(polyhedron: Polyhedron) {
+  allOptionCombos(polyhedron) {
     const gyrateOpts = hasGyrateOpts(polyhedron)
       ? ['ortho', 'gyro']
       : [undefined];

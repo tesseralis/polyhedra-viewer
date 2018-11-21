@@ -19,12 +19,12 @@ interface Options {
 }
 
 export const diminish = makeOperation('diminish', {
-  apply(polyhedron: Polyhedron, { cap }: Options) {
+  apply(polyhedron, { cap }) {
     return removeCap(polyhedron, cap);
   },
   optionTypes: ['cap'],
 
-  resultsFilter(polyhedron: Polyhedron, config: any, relations: any) {
+  resultsFilter(polyhedron, config, relations) {
     const options: Record<string, string> = {};
     const { cap } = config;
     if (!cap) {
@@ -48,17 +48,17 @@ export const diminish = makeOperation('diminish', {
     return options;
   },
 
-  allOptionCombos(polyhedron: Polyhedron) {
+  allOptionCombos(polyhedron) {
     return Cap.getAll(polyhedron).map(cap => ({ cap }));
   },
 
   hitOption: 'cap',
-  getHitOption(polyhedron: Polyhedron, hitPnt: Vec3D) {
+  getHitOption(polyhedron, hitPnt) {
     const cap = Cap.find(polyhedron, hitPnt);
     return cap ? { cap } : {};
   },
 
-  faceSelectionStates(polyhedron: Polyhedron, { cap }: Options) {
+  faceSelectionStates(polyhedron, { cap }) {
     const allCapFaces = _.flatMap(Cap.getAll(polyhedron), cap => cap.faces());
     return _.map(polyhedron.faces, face => {
       if (_.isObject(cap) && face.inSet(cap.faces())) return 'selected';
