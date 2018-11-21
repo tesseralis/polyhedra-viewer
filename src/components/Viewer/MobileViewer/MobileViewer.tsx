@@ -4,7 +4,14 @@ import _ from 'lodash';
 import { makeStyles, media } from 'styles';
 import { scroll } from 'styles/common';
 import { useFocus, SrOnly } from 'components/common';
-import { BackLink, Title, NavMenu, X3dScene, Panels } from '../common';
+import {
+  BackLink,
+  Title,
+  NavMenu,
+  X3dScene,
+  Panels,
+  useHiddenHeading,
+} from '../common';
 
 import OperationsPanel from './OperationsPanel';
 
@@ -84,7 +91,7 @@ interface Props {
 }
 
 export default memo(function MobileViewer({ panel, solid }: Props) {
-  const [header, focusOnHeader] = useFocus();
+  const [header, focusOnHeader] = useHiddenHeading(panel);
   const isTransparent = _.includes(['operations', 'full'], panel);
 
   return (
@@ -99,11 +106,7 @@ export default memo(function MobileViewer({ panel, solid }: Props) {
           isTransparent ? 'transparent' : 'contentFull',
         )}
       >
-        <SrOnly>
-          <h2 tabIndex={0} ref={header}>
-            {panel}
-          </h2>
-        </SrOnly>
+        {header}
         <Panels panel={panel} operationsPanel={OperationsPanel} />;
       </div>
       <main className={styles('scene')}>

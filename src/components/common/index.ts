@@ -1,5 +1,3 @@
-
-
 // Common Components
 // =================
 // Simple components that are used throughout the app.
@@ -8,6 +6,5 @@
 export { default as SrOnly } from './SrOnly';
 export { default as ExternalLink } from './ExternalLink';
 export { default as usePageTitle } from './usePageTitle';
-export { default as useFocus } from './useFocus';
 export { default as createHookedContext } from './createHookedContext';
 export { default as wrapProviders } from './wrapProviders';

@@ -1,4 +1,3 @@
-
 export { default as OpGrid } from './OpGrid';
 export { default as ResizeButtons } from './ResizeButtons';
 export { default as Options } from './Options';
@@ -10,3 +9,4 @@ export { default as Panels } from './Panels';
 export { default as Title } from './Title';
 export { default as ImageDownloader } from './ImageDownloader';
 export { default as Prompt } from './Prompt';
+export { default as useHiddenHeading } from './useHiddenHeading';

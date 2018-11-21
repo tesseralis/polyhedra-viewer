@@ -1,6 +1,5 @@
 import _ from 'lodash';
 import polygons, { polygonNames, PolygonMap } from 'math/polygons';
-import { string } from 'prop-types';
 
 // Colors from d3-scale-chromatic:
 // https://github.com/d3/d3-scale-chromatic#schemeCategory10

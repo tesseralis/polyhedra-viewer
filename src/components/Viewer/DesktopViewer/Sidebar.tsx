@@ -1,9 +1,7 @@
-
 import React from 'react';
 import { makeStyles } from 'styles';
 
-import { useFocus, SrOnly } from 'components/common';
-import { NavMenu, Panels } from '../common';
+import { NavMenu, Panels, useHiddenHeading } from '../common';
 import { scroll } from 'styles/common';
 
 import OperationsPanel from './OperationsPanel';
@@ -44,7 +42,7 @@ interface Props {
 }
 
 export default function Sidebar({ panel, solid, compact }: Props) {
-  const [header, focusOnHeader] = useFocus();
+  const [header, focusOnHeader] = useHiddenHeading(panel);
 
   return (
     <section className={styles('sidebar', !compact && 'full')}>
@@ -53,11 +51,7 @@ export default function Sidebar({ panel, solid, compact }: Props) {
       </div>
       {!compact && (
         <div className={styles('content')}>
-          <SrOnly>
-            <h2 tabIndex={0} ref={header}>
-              {panel}
-            </h2>
-          </SrOnly>
+          {header}
           <Panels panel={panel} operationsPanel={OperationsPanel} />
         </div>
       )}
