@@ -4,12 +4,12 @@ import { toConwayNotation } from 'math/polyhedra/names';
 import operationGraph from './operationGraph';
 import { getSingle } from 'utils';
 import { fromConwayNotation } from 'math/polyhedra/names';
-import { vec, PRECISION } from 'math/geom';
-import { Polyhedron, normalizeVertex } from 'math/polyhedra';
+import { Vec3D, vec, PRECISION } from 'math/geom';
+import { Polyhedron, Vertex, VertexArg, normalizeVertex } from 'math/polyhedra';
 import { removeExtraneousVertices } from './operationUtils';
 import { Point } from 'types';
 
-type SelectState = 'selected' | 'selectable' | null;
+type SelectState = 'selected' | 'selectable' | undefined;
 
 interface AnimationData {
   start: Polyhedron;
@@ -34,7 +34,7 @@ export function getOpResults(solid: Polyhedron, opName: string) {
   return operationGraph[toConwayNotation(solid.name)][opName];
 }
 
-function fillDefaults(op) {
+function fillDefaults(op: any) {
   return {
     ..._.mapValues(
       methodDefaults,
@@ -44,7 +44,11 @@ function fillDefaults(op) {
   };
 }
 // Get the polyhedron name as a result of applying the operation to the given polyhedron
-function getNextPolyhedron<O>(solid, operation: string, filterOpts: O) {
+function getNextPolyhedron<O>(
+  solid: Polyhedron,
+  operation: string,
+  filterOpts: O,
+) {
   const results = getOpResults(solid, operation);
   const next = _(results)
     .filter(!_.isEmpty(filterOpts) ? filterOpts : _.stubTrue)
@@ -52,7 +56,7 @@ function getNextPolyhedron<O>(solid, operation: string, filterOpts: O) {
   return fromConwayNotation(getSingle(next).value);
 }
 
-function normalizeOpResult(opResult, newName) {
+function normalizeOpResult(opResult: any, newName: string) {
   if (!opResult.animationData) {
     return { result: deduplicateVertices(opResult).withName(newName) };
   }
@@ -74,8 +78,8 @@ function normalizeOpResult(opResult, newName) {
 // Remove vertices (and faces) from the polyhedron when they are all the same
 export function deduplicateVertices(polyhedron: Polyhedron) {
   // group vertex indices by same
-  const unique = [];
-  const oldToNew = {};
+  const unique: Vertex[] = [];
+  const oldToNew: Record<number, number> = {};
 
   _.forEach(polyhedron.vertices, (v, vIndex: number) => {
     const match = _.find(unique, point =>
@@ -105,28 +109,10 @@ export function deduplicateVertices(polyhedron: Polyhedron) {
 
 export type Options = { [key: string]: any };
 
-export interface Operation {
-  name: string;
-  apply(polyhedron: Polyhedron, options: Options): OperationResult;
-
-  hitOption?: string;
-
+interface BaseOperation {
   optionTypes: string[];
 
-  // this is only defined in the stuff we pull into this,
-  // but Flow is terrible
-  resultsFilter(polyhedron: Polyhedron, options: Options): {};
-
-  getHitOption(
-    polyhedron: Polyhedron,
-    hitPnt: Point,
-    options: Options,
-  ): Options;
-
-  /**
-   * @return all the options for the given option name.
-   */
-  allOptions(polyhedron: Polyhedron, optionName: string): any[];
+  hitOption?: string;
 
   /**
    * Test utility.
@@ -141,9 +127,9 @@ export interface Operation {
   faceSelectionStates(polyhedron: Polyhedron, options: Options): SelectState[];
 
   /**
-   * @return whether this operation has results for the given polyhedron.
+   * @return all the options for the given option name.
    */
-  hasOptions(polyhedron: Polyhedron): boolean;
+  allOptions(polyhedron: Polyhedron, optionName: string): any[];
 
   /**
    * Return the default selected apply options when an operation is
@@ -152,7 +138,57 @@ export interface Operation {
   defaultOptions(polyhedron: Polyhedron): Options;
 }
 
-export default function makeOperation(name: string, op: any): Operation {
+export interface Operation extends BaseOperation {
+  name: string;
+
+  apply(polyhedron: Polyhedron, options: Options): OperationResult;
+
+  canApplyTo(polyhedron: Polyhedron): boolean;
+
+  getHitOption(
+    polyhedron: Polyhedron,
+    hitPnt: Point,
+    options: Options,
+  ): Options;
+
+  /**
+   * @return whether this operation has results for the given polyhedron.
+   */
+  hasOptions(polyhedron: Polyhedron): boolean;
+}
+
+interface PartialOpResult {
+  result?: Polyhedron;
+  animationData?: {
+    start: Polyhedron;
+    endVertices: VertexArg[];
+  };
+}
+
+interface OperationArgs extends Partial<BaseOperation> {
+  apply(
+    polyhedron: Polyhedron,
+    options: Options,
+    resultName: string,
+  ): PartialOpResult | Polyhedron;
+
+  resultsFilter?(
+    polyhedron: Polyhedron,
+    options: Options,
+    results: any[],
+  ): object | undefined;
+
+  getHitOption?(
+    polyhedron: Polyhedron,
+    hitPnt: Vec3D,
+    options: Options,
+  ): Options;
+}
+
+export default function makeOperation(
+  name: string,
+  op: OperationArgs,
+): Operation {
   const withDefaults = fillDefaults(
     typeof op === 'function' ? { apply: op } : op,
   );

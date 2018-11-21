@@ -1,11 +1,12 @@
 import _ from 'lodash';
 
+import { Vec3D } from 'math/geom';
 import { removeExtraneousVertices } from '../operationUtils';
 import makeOperation from '../makeOperation';
-import { Cap } from 'math/polyhedra';
+import { Polyhedron, Cap } from 'math/polyhedra';
 import { hasMultiple, getCapAlignment, getCupolaGyrate } from './cutPasteUtils';
 
-function removeCap(polyhedron, cap) {
+function removeCap(polyhedron: Polyhedron, cap: Cap) {
   return removeExtraneousVertices(
     polyhedron.withChanges(solid =>
       solid.withoutFaces(cap.faces()).addFaces([cap.boundary().vertices]),
@@ -13,14 +14,18 @@ function removeCap(polyhedron, cap) {
   );
 }
 
+interface Options {
+  cap: Cap;
+}
+
 export const diminish = makeOperation('diminish', {
-  apply(polyhedron, { cap }) {
+  apply(polyhedron: Polyhedron, { cap }: Options) {
     return removeCap(polyhedron, cap);
   },
   optionTypes: ['cap'],
 
-  resultsFilter(polyhedron, config, relations) {
-    const options = {};
+  resultsFilter(polyhedron: Polyhedron, config: any, relations: any) {
+    const options: Record<string, string> = {};
     const { cap } = config;
     if (!cap) {
       throw new Error('Invalid cap');
@@ -43,17 +48,17 @@ export const diminish = makeOperation('diminish', {
     return options;
   },
 
-  allOptionCombos(polyhedron) {
+  allOptionCombos(polyhedron: Polyhedron) {
     return Cap.getAll(polyhedron).map(cap => ({ cap }));
   },
 
   hitOption: 'cap',
-  getHitOption(polyhedron, hitPnt) {
+  getHitOption(polyhedron: Polyhedron, hitPnt: Vec3D) {
     const cap = Cap.find(polyhedron, hitPnt);
     return cap ? { cap } : {};
   },
 
-  faceSelectionStates(polyhedron, { cap }) {
+  faceSelectionStates(polyhedron: Polyhedron, { cap }: Options) {
     const allCapFaces = _.flatMap(Cap.getAll(polyhedron), cap => cap.faces());
     return _.map(polyhedron.faces, face => {
       if (_.isObject(cap) && face.inSet(cap.faces())) return 'selected';

@@ -1,5 +1,5 @@
-
 import { Polyhedron } from 'math/polyhedra';
+import { Twist } from 'types';
 import {
   antiprismHeight,
   getChirality,
@@ -9,7 +9,7 @@ import {
 } from './prismUtils';
 import makeOperation from '../makeOperation';
 
-function doShorten(polyhedron: Polyhedron, options) {
+function doShorten(polyhedron: Polyhedron, options: Options) {
   const adjustInfo = getAdjustInformation(polyhedron);
   const { boundary } = adjustInfo;
   const isAntiprism = boundary.adjacentFaces()[0].numSides === 3;
@@ -28,10 +28,13 @@ function doShorten(polyhedron: Polyhedron, options) {
   };
 }
 
+interface Options {
+  twist?: Twist;
+}
 export const shorten = makeOperation('shorten', {
   apply: doShorten,
   optionTypes: ['twist'],
-  resultsFilter(polyhedron, options) {
+  resultsFilter(polyhedron: Polyhedron, options: Options) {
     if (!isGyroelongatedBiCupola(polyhedron)) return;
     const { twist } = options;
     const chirality = getChirality(polyhedron);
@@ -39,7 +42,7 @@ export const shorten = makeOperation('shorten', {
     return { gyrate };
   },
 
-  allOptionCombos(polyhedron) {
+  allOptionCombos(polyhedron: Polyhedron) {
     if (isGyroelongatedBiCupola(polyhedron)) {
       return [{ twist: 'left' }, { twist: 'right' }];
     }

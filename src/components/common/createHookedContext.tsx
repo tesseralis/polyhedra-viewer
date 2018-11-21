@@ -21,9 +21,9 @@ export default function createHookedContext<S>(
     : defaultStateCreator;
   const StateContext = React.createContext(defaultState);
 
-  const ActionContext = React.createContext<{ [a: string]: (s: S) => void }>(
-    {},
-  );
+  const ActionContext = React.createContext<{
+    [a: string]: (...args: any) => void;
+  }>({});
 
   return {
     Provider({ children, ...props }: any) {
@@ -35,7 +35,9 @@ export default function createHookedContext<S>(
       );
 
       const actionsValue = useMemo(() => {
-        return _.mapValues(actions, action => (s: S) => dispatch(action(s)));
+        return _.mapValues(actions, action => (...args: any) =>
+          dispatch(action(...args)),
+        );
       }, []);
 
       return (

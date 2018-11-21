@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import polygons, { polygonNames, PolygonMap } from 'math/polygons';
+import { string } from 'prop-types';
 
 // Colors from d3-scale-chromatic:
 // https://github.com/d3/d3-scale-chromatic#schemeCategory10
@@ -69,7 +70,7 @@ export const configInputs: ConfigInput<any>[] = [
   display: _.get(input, 'display', _.startCase(input.key)),
 }));
 
-export const defaultConfig = _.reduce(
+export const defaultConfig: Record<string, any> = _.reduce(
   configInputs,
   (obj, option) => {
     _.set(obj, option.key, option.default);

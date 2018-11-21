@@ -1,9 +1,8 @@
-
 import { Polyhedron } from 'math/polyhedra';
 import { createHookedContext } from 'components/common';
 
 const defaultProps = { name: 'tetrahedron' };
-export default createHookedContext(
+export default createHookedContext<Polyhedron>(
   {
     setPolyhedron: polyhedron => () => polyhedron,
   },

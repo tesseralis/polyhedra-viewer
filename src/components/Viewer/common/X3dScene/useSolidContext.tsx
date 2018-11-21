@@ -1,5 +1,3 @@
-
-
 import { useMemo } from 'react';
 import tinycolor from 'tinycolor2';
 import Config from 'components/ConfigCtx';
@@ -15,7 +13,11 @@ export default function useSolidContext() {
   const { colors } = Config.useState();
   const polyhedron = PolyhedronCtx.useState();
 
-  const { solidData, isTransitioning, faceColors } = TransitionCtx.useState();
+  const {
+    solidData,
+    isTransitioning,
+    faceColors = [],
+  } = TransitionCtx.useState();
   const { operation, options } = OperationCtx.useState();
 
   // TODO I'm trying to useMemo here so it's similar to reselect?
@@ -25,7 +27,7 @@ export default function useSolidContext() {
   const transitionColors = useMemo(
     () =>
       isTransitioning &&
-      solidData.faces.map((face, i) => faceColors[i] || colors[face.length]),
+      solidData!.faces.map((face, i) => faceColors[i] || colors[face.length]),
     [solidData, faceColors, colors],
   );
 
@@ -33,7 +35,7 @@ export default function useSolidContext() {
   const operationColors = useMemo(
     () => {
       if (!operation) return;
-      const selectState = operation.faceSelectionStates(polyhedron, options);
+      const selectState = operation.faceSelectionStates(polyhedron, options!);
       return polyhedron.faces.map((face, i) => {
         switch (selectState[i]) {
           case 'selected':
@@ -61,6 +63,6 @@ export default function useSolidContext() {
 
   return {
     colors: normalizedColors,
-    solidData: isTransitioning ? solidData : polyhedron.solidData,
+    solidData: isTransitioning ? solidData! : polyhedron.solidData,
   };
 }

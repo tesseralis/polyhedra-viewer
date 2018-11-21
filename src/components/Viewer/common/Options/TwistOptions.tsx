@@ -1,9 +1,8 @@
-
-
 import React, { useCallback } from 'react';
-import { styled } from 'styles';
 import Icon from '@mdi/react';
 
+import { Twist } from 'types';
+import { styled } from 'styles';
 import { SrOnly } from 'components/common';
 import { useApplyOperation, TransitionCtx, OperationCtx } from '../../context';
 import { mdiRotateLeft, mdiRotateRight } from '@mdi/js';
@@ -14,13 +13,13 @@ const TwistButton = styled.button({
   background: 'none',
 });
 
-function TwistOption({ orientation }) {
+function TwistOption({ orientation }: { orientation: Twist }) {
   const { isTransitioning } = TransitionCtx.useState();
   const { operation } = OperationCtx.useState();
   const applyOperation = useApplyOperation();
 
   const handleClick = useCallback(
-    () => applyOperation(operation, { twist: orientation }),
+    () => applyOperation(operation!, { twist: orientation }),
     [orientation, operation, applyOperation],
   );
   return (

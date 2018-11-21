@@ -1,5 +1,8 @@
 import _ from 'lodash';
 
+import { pivot } from 'utils';
+import { Twist } from 'types';
+import { Polyhedron, VEList } from 'math/polyhedra';
 import makeOperation from '../makeOperation';
 import {
   getChirality,
@@ -9,12 +12,11 @@ import {
   getScaledPrismVertices,
 } from './prismUtils';
 
-function pivot(list, value) {
-  const index = _.indexOf(list, value);
-  return [..._.slice(list, index), ..._.slice(list, 0, index)];
-}
-
-function bisectPrismFaces(polyhedron, boundary, twist) {
+function bisectPrismFaces(
+  polyhedron: Polyhedron,
+  boundary: VEList,
+  twist?: Twist,
+) {
   const prismFaces = _.map(boundary.edges, edge => edge.twinFace());
   const newFaces = _.flatMap(boundary.edges, edge => {
     const twinFace = edge.twinFace();
@@ -33,7 +35,11 @@ function bisectPrismFaces(polyhedron, boundary, twist) {
   );
 }
 
-function joinAntiprismFaces(polyhedron, boundary, twist) {
+function joinAntiprismFaces(
+  polyhedron: Polyhedron,
+  boundary: VEList,
+  twist?: Twist,
+) {
   const antiprismFaces = _.flatMap(boundary.edges, edge => {
     return [
       edge.twinFace(),
@@ -67,7 +73,10 @@ function joinAntiprismFaces(polyhedron, boundary, twist) {
   );
 }
 
-function doTurn(polyhedron, { twist = 'left' }) {
+interface Options {
+  twist?: Twist;
+}
+function doTurn(polyhedron: Polyhedron, { twist = 'left' }: Options) {
   const adjustInfo = getAdjustInformation(polyhedron);
   const { boundary } = adjustInfo;
   const isAntiprism = boundary.adjacentFaces()[0].numSides === 3;

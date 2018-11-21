@@ -37,12 +37,12 @@ function getBoundary(faces: Face[]) {
   return new VEList(_.map(result, 'v1'), result);
 }
 
-function createMapper(property, Base) {
+function createMapper(property: string, Base: any) {
   return (polyhedron: Polyhedron) => {
     const mapper = _.get(polyhedron, property);
-    return (typeof mapper === 'function' ? mapper() : mapper)
-      .map(arg => new Base(polyhedron, arg))
-      .filter(cap => cap.isValid());
+    return (_.isFunction(mapper) ? mapper() : mapper)
+      .map((arg: any) => new Base(polyhedron, arg))
+      .filter((cap: Cap) => cap.isValid());
   };
 }
 
@@ -64,7 +64,7 @@ export default class Cap implements VertexList {
     return _.minBy(caps, cap => cap.topPoint.distanceTo(hitPoint));
   }
 
-  static getAll(polyhedron: Polyhedron) {
+  static getAll(polyhedron: Polyhedron): Cap[] {
     const pyramids = Pyramid.getAll(polyhedron);
     if (pyramids.length > 0) return pyramids;
 
@@ -138,7 +138,7 @@ export default class Cap implements VertexList {
 }
 
 class Pyramid extends Cap {
-  constructor(polyhedron, vertex) {
+  constructor(polyhedron: Polyhedron, vertex: Vertex) {
     super(polyhedron, [vertex], 'pyramid', vertex.vec, {
       '3': vertex.adjacentEdges().length,
     });
@@ -147,7 +147,7 @@ class Pyramid extends Cap {
 }
 
 class Fastigium extends Cap {
-  constructor(polyhedron, edge) {
+  constructor(polyhedron: Polyhedron, edge: Edge) {
     const config = { '3': 1, '4': 2 };
     super(polyhedron, edge.vertices, 'fastigium', edge.midpoint(), config);
   }
@@ -155,7 +155,7 @@ class Fastigium extends Cap {
 }
 
 class Cupola extends Cap {
-  constructor(polyhedron, face) {
+  constructor(polyhedron: Polyhedron, face: Face) {
     super(
       polyhedron,
       face.vertices,
@@ -168,7 +168,7 @@ class Cupola extends Cap {
 }
 
 class Rotunda extends Cap {
-  constructor(polyhedron, face) {
+  constructor(polyhedron: Polyhedron, face: Face) {
     super(
       polyhedron,
       flatMapUniq(face.vertices, v => v.adjacentVertices(), 'index'),

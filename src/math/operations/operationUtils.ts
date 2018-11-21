@@ -1,7 +1,13 @@
 import _ from 'lodash';
 
 import { Twist } from 'types';
-import { Polyhedron, Vertex, Edge, VertexList } from 'math/polyhedra';
+import {
+  Polyhedron,
+  Vertex,
+  Edge,
+  VertexList,
+  VertexArg,
+} from 'math/polyhedra';
 import { Vec3D, Transform } from 'math/geom';
 /**
  * Remove vertices in the polyhedron that aren't connected to any faces,
@@ -24,7 +30,7 @@ export function removeExtraneousVertices(polyhedron: Polyhedron) {
   const oldToNew = _.invert(newToOld);
 
   const newVertices = _(polyhedron.vertices)
-    .map(v => polyhedron.vertices[_.get(oldToNew, v.index, v.index)])
+    .map(v => polyhedron.vertices[_.get(oldToNew, v.index, v.index) as any])
     .dropRight(numToRemove)
     .value();
 
@@ -74,7 +80,7 @@ export function getTransformedVertices<T extends VertexList>(
   iteratee: (key: T) => Transform | Vec3D,
   vertices: Vertex[] = vLists[0].polyhedron.vertices,
 ) {
-  const result = [...vertices];
+  const result: VertexArg[] = [...vertices];
   _.forEach(vLists, vList => {
     _.forEach(vList.vertices, v => {
       const t = iteratee(vList);

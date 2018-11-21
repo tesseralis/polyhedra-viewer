@@ -25,7 +25,7 @@ export default class Polyhedron {
   name: string;
   faces: Face[];
   vertices: Vertex[];
-  _edges: Edge[];
+  _edges?: Edge[];
 
   static get(name: string) {
     if (!isValidSolid(name)) {
@@ -52,7 +52,7 @@ export default class Polyhedron {
 
   get solidData() {
     if (!this._solidData.edges) {
-      this._solidData.edges = _.map(this.edges, 'value');
+      this._solidData.edges = _.map(this.edges, e => e.value);
     }
     return this._solidData;
   }
@@ -66,7 +66,7 @@ export default class Polyhedron {
   }
 
   // Memoized mapping of edges to faces, used for quickly finding adjacency
-  edgeToFaceGraph = _.once(() => {
+  edgeToFaceGraph: any = _.once(() => {
     const edgesToFaces = {};
     _.forEach(this.faces, face => {
       _.forEach(face.edges, ({ v1, v2 }) => {
@@ -111,11 +111,11 @@ export default class Polyhedron {
   }
 
   largestFace() {
-    return _.maxBy(this.faces, 'numSides');
+    return _.maxBy(this.faces, 'numSides')!;
   }
 
   smallestFace() {
-    return _.minBy(this.faces, 'numSides');
+    return _.minBy(this.faces, 'numSides')!;
   }
 
   faceWithNumSides(n: number) {
@@ -177,7 +177,7 @@ export default class Polyhedron {
 
   /** Get the face that is closest to the given point. */
   hitFace(point: Vec3D) {
-    return _.minBy(this.faces, face => face.plane().getDistanceToPoint(point));
+    return _.minBy(this.faces, face => face.plane().getDistanceToPoint(point))!;
   }
 
   // Mutations

@@ -13,11 +13,11 @@ import SearchBar from './SearchBar';
 import GroupHeader from './GroupHeader';
 import SubgroupHeader from './SubgroupHeader';
 
-const getFilteredPolyhedra = (polyhedra, filter) =>
+const getFilteredPolyhedra = (polyhedra: string[], filter: string) =>
   polyhedra.filter(solid => solid.includes(filter.toLowerCase()));
 
-const filterGroups = (groups, filterText) =>
-  groups
+function filterGroups(groups: any[], filterText: string): any {
+  return groups
     .map(group => {
       if (group.groups) {
         return {
@@ -34,8 +34,9 @@ const filterGroups = (groups, filterText) =>
       ({ groups, polyhedra }) =>
         (groups && groups.length > 0) || (polyhedra && polyhedra.length > 0),
     );
+}
 
-const PolyhedronLink = ({ name }) => {
+const PolyhedronLink = ({ name }: { name: string }) => {
   const styles = makeStyles({
     link: {
       ...resetLink,
@@ -61,7 +62,7 @@ const PolyhedronLink = ({ name }) => {
 
   return (
     <Route
-      render={({ match }) => (
+      render={() => (
         <NavLink
           to={`/${escapeName(name)}/list`}
           className={styles('link')}
@@ -74,7 +75,7 @@ const PolyhedronLink = ({ name }) => {
   );
 };
 
-const SubList = ({ polyhedra }) => {
+const SubList = ({ polyhedra }: { polyhedra: string[] }) => {
   return (
     <ul>
       {polyhedra.map(name => (
@@ -86,7 +87,13 @@ const SubList = ({ polyhedra }) => {
   );
 };
 
-const Subgroup = ({ name, polyhedra }) => {
+const Subgroup = ({
+  name,
+  polyhedra,
+}: {
+  name: string;
+  polyhedra: string[];
+}) => {
   const styles = makeStyles({
     subgroup: {
       margin: '18px 0',
@@ -101,7 +108,7 @@ const Subgroup = ({ name, polyhedra }) => {
   );
 };
 
-const PolyhedronGroup = ({ group }) => {
+const PolyhedronGroup = ({ group }: { group: any }) => {
   const { display, polyhedra, groups } = group;
   const styles = makeStyles({
     group: {
@@ -115,7 +122,7 @@ const PolyhedronGroup = ({ group }) => {
       {polyhedra && <SubList polyhedra={polyhedra} />}
       {groups && (
         <div className={styles('subgroups')}>
-          {groups.map(group => (
+          {groups.map((group: any) => (
             <Subgroup key={group.name} {...group} />
           ))}
         </div>
@@ -136,8 +143,8 @@ export default function PolyhedronList() {
     filterText === '' ? groups : filterGroups(groups, filterText);
   return (
     <section className={styles('list')}>
-      <SearchBar text={filterText} onChange={setFilterText} />
-      {filteredGroups.map(({ name, ...group }) => (
+      <SearchBar value={filterText} onChange={setFilterText} />
+      {filteredGroups.map(({ name, ...group }: any) => (
         <PolyhedronGroup key={name} group={group} />
       ))}
     </section>

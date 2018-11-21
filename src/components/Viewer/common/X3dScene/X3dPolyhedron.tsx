@@ -1,8 +1,8 @@
-
-
 import React, { useEffect, useRef, Fragment } from 'react';
 import _ from 'lodash';
 
+import { Point } from 'types';
+import { SolidData } from 'math/polyhedra';
 import useSolidContext from './useSolidContext';
 import useHitOptions from './useHitOptions';
 import Config from 'components/ConfigCtx';
@@ -12,13 +12,13 @@ function joinListOfLists<T>(list: T[][], outerSep: string, innerSep: string) {
   return _.map(list, elem => elem.join(innerSep)).join(outerSep);
 }
 
-const Coordinates = ({ points }) => {
+const Coordinates = ({ points }: { points: Point[] }) => {
   return <coordinate is="x3d" point={joinListOfLists(points, ', ', ' ')} />;
 };
 
 /* Edges */
 
-const Edges = ({ edges, vertices }) => {
+const Edges = ({ edges = [], vertices = [] }: Partial<SolidData>) => {
   return (
     <shape is="x3d">
       <indexedlineset is="x3d" coordindex={joinListOfLists(edges, ' -1 ', ' ')}>
@@ -29,8 +29,8 @@ const Edges = ({ edges, vertices }) => {
 };
 
 export default function X3dPolyhedron() {
-  const shape = useRef(null);
-  const hitPnt = useRef(null);
+  const shape = useRef<any>(null);
+  const hitPnt = useRef<any>(null);
 
   const { colors, solidData } = useSolidContext();
   const {
@@ -40,14 +40,14 @@ export default function X3dPolyhedron() {
   } = useHitOptions();
 
   const listeners = {
-    mousedown(e) {
+    mousedown(e: any) {
       hitPnt.current = e.hitPnt;
     },
-    mouseup(e) {
+    mouseup(e: any) {
       if (!_.isEqual(hitPnt.current, e.hitPnt)) return;
       onClick(e.hitPnt);
     },
-    mousemove(e) {
+    mousemove(e: any) {
       hitPnt.current = e.hitPnt;
       onHover(e.hitPnt);
     },

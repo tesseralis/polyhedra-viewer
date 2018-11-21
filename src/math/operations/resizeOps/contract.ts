@@ -1,4 +1,3 @@
-
 import _ from 'lodash';
 import { Polyhedron } from 'math/polyhedra';
 import {
@@ -21,10 +20,10 @@ function getFamily(polyhedron: Polyhedron) {
   return polyhedron.symmetry().group;
 }
 
-const familyMap = { T: 3, O: 4, I: 5 };
-const coxeterNum = { T: 4, O: 6, I: 10 };
+const familyMap: Record<string, number> = { T: 3, O: 4, I: 5 };
+const coxeterNum: Record<string, number> = { T: 4, O: 6, I: 10 };
 
-function getContractLength(polyhedron, faceType) {
+function getContractLength(polyhedron: Polyhedron, faceType: number) {
   // Calculate dihedral angle
   // https://en.wikipedia.org/wiki/Platonic_solid#Angles
   const family = getFamily(polyhedron);
@@ -99,7 +98,6 @@ export const contract = makeOperation('contract', {
       if (faceType && isExpandedFace(polyhedron, face, faceType))
         return 'selected';
       if (isExpandedFace(polyhedron, face)) return 'selectable';
-      return null;
     });
   },
 });

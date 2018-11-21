@@ -8,7 +8,7 @@ import PolyhedronCtx from './PolyhedronCtx';
 import OperationCtx from './OperationCtx';
 import TransitionCtx from './TransitionCtx';
 
-type ResultCallback = (Polyhedron) => void;
+type ResultCallback = (polyhedron: Polyhedron) => void;
 
 export default function useApplyOperation() {
   const { setOperation, unsetOperation } = OperationCtx.useActions();

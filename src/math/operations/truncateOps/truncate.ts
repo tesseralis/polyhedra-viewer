@@ -1,13 +1,13 @@
 import _ from 'lodash';
 
 import { repeat, find } from 'utils';
-import { withOrigin, PRECISION } from 'math/geom';
-import { Polyhedron } from 'math/polyhedra';
+import { withOrigin, PRECISION, Vec3D } from 'math/geom';
+import { Polyhedron, Vertex } from 'math/polyhedra';
 import makeOperation from '../makeOperation';
 
 // Side ratios gotten when calling our "sharpen" operation on a bevelled polyhedron
 // I couldn't actually figure out the math for this so I reverse engineered it.
-function getRectifiedMultiplier(result) {
+function getRectifiedMultiplier(result: string) {
   switch (result) {
     case 'truncated cuboctahedron':
       return 0.37966751081253297;
@@ -18,8 +18,8 @@ function getRectifiedMultiplier(result) {
   }
 }
 
-function duplicateVertices(polyhedron) {
-  const mapping = {};
+function duplicateVertices(polyhedron: Polyhedron) {
+  const mapping: Record<number, Record<number, number>> = {};
   const count = polyhedron.getVertex().adjacentFaces().length;
   _.forEach(polyhedron.vertices, v => {
     _.forEach(v.adjacentFaces(), (face, i) => {
@@ -45,7 +45,7 @@ function duplicateVertices(polyhedron) {
   });
 }
 
-function getTruncateLength(polyhedron) {
+function getTruncateLength(polyhedron: Polyhedron) {
   const face = polyhedron.smallestFace();
   const n = face.numSides;
   const theta = Math.PI / n;
@@ -53,9 +53,11 @@ function getTruncateLength(polyhedron) {
   return 2 * face.apothem() * Math.tan(newTheta);
 }
 
-function getTruncateTransform(polyhedron, duplicated, result = '') {
+type Transform = (vector: Vec3D, vertex: Vertex) => Vec3D;
+
+function getTruncateTransform(polyhedron: Polyhedron, result = ''): Transform {
   if (polyhedron.isRegular()) {
-    return (vector, vertex) => vector;
+    return vector => vector;
   }
 
   // If we're doing a bevel, we need to do some fidgeting to make sure the created
@@ -86,12 +88,12 @@ function getTruncateTransform(polyhedron, duplicated, result = '') {
   };
 }
 
-function doTruncate(polyhedron, rectify = false, result) {
+function doTruncate(polyhedron: Polyhedron, rectify = false, result?: string) {
   const truncateLength = getTruncateLength(polyhedron);
   const oldSideLength = polyhedron.edgeLength();
   const truncateScale = (oldSideLength - truncateLength) / 2 / oldSideLength;
   const duplicated = duplicateVertices(polyhedron);
-  const transform = getTruncateTransform(polyhedron, duplicated, result);
+  const transform = getTruncateTransform(polyhedron, result);
 
   const truncatedVertices = duplicated.vertices.map(vertex => {
     const adjacentVertices = vertex.adjacentVertices();
@@ -109,7 +111,7 @@ function doTruncate(polyhedron, rectify = false, result) {
 }
 
 export const truncate = makeOperation('truncate', {
-  apply(polyhedron, options, result) {
+  apply(polyhedron, $, result) {
     return doTruncate(polyhedron, false, result);
   },
 });

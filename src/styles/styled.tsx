@@ -45,7 +45,7 @@ const withProps = (propsToAdd: Props) => (component: ReactType) => {
   return (props: Props) => <Component {...propsToAdd} {...props} />;
 };
 
-const styled: Styled = (element: ReactType) => {
+const styled = ((element: ReactType) => {
   const gen = (def: SheetDefinition) => {
     const elementName = typeof element === 'string' ? element : element.name;
     const styles = StyleSheet.create({
@@ -59,7 +59,7 @@ const styled: Styled = (element: ReactType) => {
   gen.attrs = (props: Props) => (def: SheetDefinition) =>
     withProps(props)(gen(def));
   return gen;
-};
+}) as Styled;
 
 domElements.forEach(el => {
   styled[el] = styled(el);

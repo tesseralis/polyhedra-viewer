@@ -1,10 +1,15 @@
-
 import _ from 'lodash';
 
 import React, { memo, Fragment } from 'react';
 
 import { makeStyles } from 'styles';
-import { Polygon, PolyLine, PolyShape, polygonPoints } from 'components/svg';
+import {
+  Point2D,
+  Polygon,
+  PolyLine,
+  PolyShape,
+  polygonPoints,
+} from 'components/svg';
 
 const color = 'DimGray';
 const styles = makeStyles({
@@ -29,10 +34,10 @@ const styles = makeStyles({
 });
 
 interface Props {
-  name: 'ortho' | 'gyro' | 'pyramid' | 'fastigium' | 'cupola' | 'rotunda';
+  name: string;
 }
 
-function drawIcon(name) {
+function drawIcon(name: string) {
   switch (name) {
     case 'ortho':
       return (
@@ -146,8 +151,8 @@ function drawIcon(name) {
       );
       const [p1, p2, p3, p4, p5, p6] = points;
       const bottomY = p1[1];
-      const q1 = [p3[0], p2[1]];
-      const q2 = [p5[0], p6[1]];
+      const q1: Point2D = [p3[0], p2[1]];
+      const q2: Point2D = [p5[0], p6[1]];
       return (
         <Fragment>
           <PolyShape className={styles('outer')} points={points} />

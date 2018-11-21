@@ -2,14 +2,12 @@ import _ from 'lodash';
 import React from 'react';
 import X3dPolyhedron from '../X3dPolyhedron';
 
-import { mount } from 'enzyme';
-import { defaultConfig } from 'components/configOptions';
-import { Polyhedron } from 'math/polyhedra';
+import { mount, ReactWrapper } from 'enzyme';
 
 jest.mock('../useHitOptions');
 const { applyWithHitOption } = require('../useHitOptions');
 
-let wrapper;
+let wrapper: ReactWrapper;
 
 function setup() {
   wrapper = mount(<X3dPolyhedron />);
@@ -25,8 +23,7 @@ describe('X3dPolyhedron', () => {
   });
 
   it("doesn't fire a click if the mouse has been moved", () => {
-    const onClick = jest.fn();
-    setup({ onClick });
+    setup();
     const shape = wrapper
       .find('shape')
       .filterWhere(n => !!n.prop('onMouseMove'));

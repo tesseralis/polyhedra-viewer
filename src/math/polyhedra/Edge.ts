@@ -1,7 +1,7 @@
-
 import { getMidpoint } from 'math/geom';
 import Polyhedron from './Polyhedron';
 import Vertex, { VertexList } from './Vertex';
+import Face from './Face';
 
 export default class Edge implements VertexList {
   polyhedron: Polyhedron;
@@ -14,7 +14,7 @@ export default class Edge implements VertexList {
     this.v2 = v2;
   }
 
-  get value() {
+  get value(): [number, number] {
     return [this.v1.index, this.v2.index];
   }
 
@@ -22,7 +22,7 @@ export default class Edge implements VertexList {
     return [this.v1, this.v2];
   }
 
-  get face() {
+  get face(): Face {
     return this.polyhedron.edgeToFaceGraph()[this.v1.index][this.v2.index];
   }
 

@@ -1,5 +1,3 @@
-
-
 import React from 'react';
 import { makeStyles } from 'styles';
 
@@ -18,7 +16,7 @@ const styles = makeStyles({
   },
 });
 
-function getMessage(opName) {
+function getMessage(opName: string) {
   switch (opName) {
     case 'augment':
       return 'Select a face';

@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, ReactNode } from 'react';
-import x3dom from 'x3dom.ts';
+import x3dom from 'x3domWrapper';
 import 'x3dom/x3dom.css';
 
 import { makeStyles } from 'styles';

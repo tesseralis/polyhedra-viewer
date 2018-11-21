@@ -20,7 +20,7 @@ export function repeat<T>(value: T, n: number) {
  */
 export function mapObject<T, U>(
   arr: T[],
-  iteratee: (T, number) => [string | number, U],
+  iteratee: (item: T, i: number) => [string | number, U],
 ): { [key: string]: U } {
   return _(arr)
     .map(iteratee)
@@ -30,7 +30,7 @@ export function mapObject<T, U>(
 
 export function flatMapUniq<T, U>(
   arr: T[],
-  iteratee1: (T) => U[],
+  iteratee1: (key: T) => U[],
   iteratee2: ValueIteratee<U>,
 ) {
   return _(arr)
@@ -68,4 +68,9 @@ export function find<T>(
 export function choose<T>(choices: T[]): T {
   const index = Math.floor(Math.random() * choices.length);
   return choices[index];
+}
+
+export function pivot<T>(list: T[], value: T) {
+  const index = _.indexOf(list, value);
+  return [..._.slice(list, index), ..._.slice(list, 0, index)];
 }

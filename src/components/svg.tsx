@@ -5,7 +5,7 @@ import { number } from 'prop-types';
 const { PI, sin, cos } = Math;
 const TAU = 2 * PI;
 
-type Point2D = [number, number];
+export type Point2D = [number, number];
 
 interface PointsProps {
   points: Point2D[];

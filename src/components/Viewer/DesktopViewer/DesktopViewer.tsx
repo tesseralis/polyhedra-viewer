@@ -1,5 +1,3 @@
-
-
 import React, { memo } from 'react';
 import { makeStyles } from 'styles';
 
@@ -50,7 +48,7 @@ export default memo(function DesktopViewer({ solid, panel }: Props) {
     <div className={styles('viewer')}>
       <div className={styles('scene', full && 'full')}>
         <X3dScene label={solid} />
-        <Overlay solid={solid} panel={panel} />
+        <Overlay solid={solid} />
       </div>
       <div className={styles(full ? 'sidebarCompact' : 'sidebarFull')}>
         <Sidebar panel={panel} solid={solid} compact={full} />

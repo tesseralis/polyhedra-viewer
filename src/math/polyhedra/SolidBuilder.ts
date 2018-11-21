@@ -61,11 +61,13 @@ export default class Builder {
   }
 
   addVertices(vertices: Vertex[] | VertexArg[]) {
-    return this.withVertices(this.solidData.vertices.concat(vertices));
+    return this.withVertices(
+      (this.solidData.vertices as VertexArg[]).concat(vertices),
+    );
   }
 
   addFaces(faces: FaceArg[]) {
-    return this.withFaces(this.solidData.faces.concat(faces));
+    return this.withFaces((this.solidData.faces as FaceArg[]).concat(faces));
   }
 
   /** Map the faces of the *original* solid to new ones */

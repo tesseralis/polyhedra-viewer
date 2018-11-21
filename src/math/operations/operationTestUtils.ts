@@ -1,11 +1,8 @@
-
 import _ from 'lodash';
-import { allSolidNames } from 'data';
-import { PRECISION, isPlanar } from 'math/geom';
-import { Polyhedron, Cap } from 'math/polyhedra';
-import { operations } from 'math/operations';
+import { PRECISION } from 'math/geom';
+import { Polyhedron } from 'math/polyhedra';
 
-function isProperPolyhedron(polyhedron) {
+function isProperPolyhedron(polyhedron: Polyhedron) {
   const expectedSideLength = polyhedron.edgeLength();
   for (let edge of polyhedron.edges) {
     const sideLength: number = edge.length();

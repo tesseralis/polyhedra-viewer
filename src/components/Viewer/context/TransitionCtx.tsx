@@ -6,12 +6,12 @@ import { createHookedContext } from 'components/common';
 import Config from 'components/ConfigCtx';
 import PolyhedronCtx from './PolyhedronCtx';
 import transition from 'transition';
-import { Polyhedron } from 'math/polyhedra';
+import { Polyhedron, SolidData } from 'math/polyhedra';
 import { PRECISION } from 'math/geom';
 
-function getCoplanarFaces(polyhedron) {
-  const found = [];
-  const pairs = [];
+function getCoplanarFaces(polyhedron: Polyhedron) {
+  const found: any[] = [];
+  const pairs: any[] = [];
   _.forEach(polyhedron.faces, f1 => {
     if (f1.inSet(found) || !f1.isValid()) return;
 
@@ -28,9 +28,9 @@ function getCoplanarFaces(polyhedron) {
   return pairs;
 }
 
-function getFaceColors(polyhedron, colors) {
+function getFaceColors(polyhedron: Polyhedron, colors: any) {
   const pairs = getCoplanarFaces(polyhedron);
-  const mapping = {};
+  const mapping: any = {};
   _.forEach(pairs, ([f1, f2]) => {
     const numSides = f1.numSides + f2.numSides - 2;
     mapping[f1.index] = numSides;
@@ -43,16 +43,21 @@ function getFaceColors(polyhedron, colors) {
   );
 }
 
-function arrayDefaults(first, second) {
+function arrayDefaults<T extends any[]>(first: T, second: T) {
   return _.map(first, (item, i) => (_.isNil(item) ? second[i] : item));
 }
 
 const defaultState = {
-  solidData: null,
-  faceColors: null,
+  solidData: undefined,
+  faceColors: undefined,
   isTransitioning: false,
 };
-const InterpModel = createHookedContext(
+interface State {
+  solidData?: SolidData;
+  faceColors?: any[];
+  isTransitioning: boolean;
+}
+const InterpModel = createHookedContext<State>(
   {
     reset: () => () => defaultState,
     set: (solidData, faceColors) => () => ({
@@ -67,7 +72,7 @@ const InterpModel = createHookedContext(
 const TransitionContext = React.createContext(_.noop);
 
 function InnerProvider({ children }: any) {
-  const transitionId = useRef(null);
+  const transitionId = useRef<any>(null);
   const { setPolyhedron } = PolyhedronCtx.useActions();
   const config = Config.useState();
   const { colors, animationSpeed, enableAnimation } = config;

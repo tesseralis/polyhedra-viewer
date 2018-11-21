@@ -1,6 +1,6 @@
-import { useRef, useCallback } from 'react';
+import { MutableRefObject, useRef, useCallback } from 'react';
 
-export default function useFocus() {
+export default function useFocus(): [MutableRefObject<any>, () => void] {
   const ref = useRef<any>(null);
   const focusFn = useCallback(
     () => {

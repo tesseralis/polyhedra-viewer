@@ -1,6 +1,7 @@
 import _ from 'lodash';
 
 import { Point } from 'types';
+import { Options } from 'math/operations';
 import {
   PolyhedronCtx,
   OperationCtx,
@@ -11,10 +12,11 @@ import {
 export default function useHitOptions() {
   const polyhedron = PolyhedronCtx.useState();
   const { isTransitioning } = TransitionCtx.useState();
-  const { operation, options } = OperationCtx.useState();
+  const { operation, options = {} } = OperationCtx.useState();
   const { setOption } = OperationCtx.useActions();
   const applyOperation = useApplyOperation();
-  const { hitOption, getHitOption } = operation || {};
+  const { hitOption = '', getHitOption = _.constant<Options>({}) } =
+    operation || {};
 
   const setHitOption = (hitPnt: Point) => {
     if (!operation || isTransitioning) return;

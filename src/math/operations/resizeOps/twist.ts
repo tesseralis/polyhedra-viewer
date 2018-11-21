@@ -1,6 +1,7 @@
-
 import _ from 'lodash';
-import { Polyhedron } from 'math/polyhedra';
+import { pivot } from 'utils';
+import { Twist } from 'types';
+import { Face, Polyhedron } from 'math/polyhedra';
 import { getTwistSign } from '../operationUtils';
 import {
   getSnubAngle,
@@ -11,15 +12,10 @@ import {
 } from './resizeUtils';
 import makeOperation from '../makeOperation';
 
-function pivot(list, value) {
-  const index = _.indexOf(list, value);
-  return [..._.slice(list, index), ..._.slice(list, 0, index)];
-}
-
 // TODO deduplicate with turn
-function bisectEdgeFaces(expandedFaces, twist) {
-  let newFaces = [];
-  const found = [];
+function bisectEdgeFaces(expandedFaces: Face[], twist: Twist) {
+  let newFaces: any[] = [];
+  const found: any[] = [];
 
   _.forEach(expandedFaces, face => {
     _.forEach(face.edges, edge => {
@@ -45,9 +41,9 @@ function bisectEdgeFaces(expandedFaces, twist) {
   );
 }
 
-function joinEdgeFaces(twistFaces, twist) {
-  const newFaces = [];
-  const found = [];
+function joinEdgeFaces(twistFaces: Face[], twist: Twist) {
+  const newFaces: any[] = [];
+  const found: any[] = [];
   _.forEach(twistFaces, face => {
     _.forEach(face.edges, edge => {
       const edgeFace = edge.twinFace();
@@ -82,7 +78,11 @@ function joinEdgeFaces(twistFaces, twist) {
 }
 
 // TODO deduplicate with expand/contract
-function doTwist(polyhedron, referenceName, twist = 'left') {
+function doTwist(
+  polyhedron: Polyhedron,
+  referenceName: string,
+  twist: Twist = 'left',
+) {
   const reference = Polyhedron.get(referenceName);
   const isSnub = expansionType(polyhedron) === 'snub';
   const f0 = polyhedron.largestFace();

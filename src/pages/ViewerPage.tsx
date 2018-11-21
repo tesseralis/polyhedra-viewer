@@ -1,7 +1,8 @@
 import { Polyhedron, Face } from 'math/polyhedra';
 import AppPage, { PageOptions } from './AppPage';
+import { History } from 'history';
 
-function splitListOfLists(listStr, outerSep, innerSep) {
+function splitListOfLists(listStr: string, outerSep: string, innerSep: string) {
   return listStr
     .split(outerSep)
     .map(inner => inner.split(innerSep).map(parseFloat));
@@ -20,10 +21,12 @@ export default class ViewerPage extends AppPage {
     const vertexStr = this.wrapper
       .find('coordinate')
       .first()
-      .prop('point');
-    const vertices = splitListOfLists(vertexStr, ', ', ' ');
+      .prop<string>('point');
+    const vertices = splitListOfLists(vertexStr, ', ', ' ') as any;
 
-    const faceStr = this.wrapper.find('indexedfaceset').prop('coordindex');
+    const faceStr = this.wrapper
+      .find('indexedfaceset')
+      .prop<string>('coordindex');
     const faces = splitListOfLists(faceStr, ' -1 ', ' ');
 
     const name = this.wrapper
@@ -32,6 +35,10 @@ export default class ViewerPage extends AppPage {
       .toLowerCase();
 
     return new Polyhedron({ name, vertices, faces });
+  }
+
+  getHistory() {
+    return this.wrapper.find('Viewer').prop<History>('history');
   }
 
   clickFace(face: Face) {
@@ -46,7 +53,7 @@ export default class ViewerPage extends AppPage {
   }
 
   clickAnyFace() {
-    return this.clickFace(this.getPolyhedron());
+    return this.clickFace(this.getPolyhedron().getFace());
   }
 
   clickFaceWithNumSides(n: number) {
@@ -64,9 +71,7 @@ export default class ViewerPage extends AppPage {
   }
 
   expectPath(path: string) {
-    const viewer = this.wrapper.find('Viewer');
-    const history = viewer.prop('history');
-    expect(history.location.pathname).toEqual(path);
+    expect(this.getHistory().location.pathname).toEqual(path);
     return this;
   }
 
@@ -78,9 +83,7 @@ export default class ViewerPage extends AppPage {
   }
 
   goBack() {
-    const viewer = this.wrapper.find('Viewer');
-    const history = viewer.prop('history');
-    history.goBack();
+    this.getHistory().goBack();
     this.wrapper.update();
     return this;
   }

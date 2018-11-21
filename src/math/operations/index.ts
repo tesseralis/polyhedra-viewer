@@ -26,4 +26,4 @@ export const operations = {
   gyrate,
 };
 
-export type OpName = $Keys<typeof operations>;
+export type OpName = keyof typeof operations;

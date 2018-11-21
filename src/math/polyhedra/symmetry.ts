@@ -1,4 +1,3 @@
-
 import _ from 'lodash';
 
 import { unescapeName, getType } from './names';
@@ -8,7 +7,7 @@ import { getJohnsonSymmetry } from 'data';
  * Utilities to get symmetry information out of polyhedra names
  */
 
-const adjectiveMap = {
+const adjectiveMap: Record<string, number> = {
   digonal: 2,
   triangular: 3,
   square: 4,

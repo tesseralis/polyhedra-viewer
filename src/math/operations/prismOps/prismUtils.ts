@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import { Twist } from 'types';
 import { find } from 'utils';
-import { Polyhedron, Cap, VEList } from 'math/polyhedra';
+import { Polyhedron, Cap, VEList, VertexList } from 'math/polyhedra';
 import { inRow, inColumn } from 'math/polyhedra/tableUtils';
 import { withOrigin, isInverse } from 'math/geom';
 import { getTwistSign, getTransformedVertices } from '../operationUtils';
@@ -98,7 +98,7 @@ export function getAdjustInformation(polyhedron: Polyhedron) {
   const faces = polyhedron.faces.filter(face => {
     return _.uniqBy(face.adjacentFaces(), 'numSides').length === 1;
   });
-  const face = _.maxBy(faces, 'numSides');
+  const face = _.maxBy(faces, 'numSides')!;
   return {
     vertexSets: [face],
     boundary: face,
@@ -121,7 +121,7 @@ export function getScaledPrismVertices(
   const n = boundary.numSides;
   const angle = (getTwistSign(twist) * Math.PI) / n;
 
-  return getTransformedVertices(vertexSets, set =>
+  return getTransformedVertices<VEList>(vertexSets, set =>
     withOrigin(set.normalRay(), v =>
       v
         .add(set.normal().scale(scale * multiplier))

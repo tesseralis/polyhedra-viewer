@@ -1,11 +1,15 @@
-
 import _ from 'lodash';
-import { Cap } from 'math/polyhedra';
+import { Twist } from 'types';
+import { Polyhedron, Cap, VEList, VertexList } from 'math/polyhedra';
 import { getEdgeFacePaths } from '../operationUtils';
 import makeOperation from '../makeOperation';
 import { antiprismHeight, getScaledPrismVertices } from './prismUtils';
 
-function duplicateVertices(polyhedron, boundary, twist) {
+function duplicateVertices(
+  polyhedron: Polyhedron,
+  boundary: VEList,
+  twist?: Twist,
+) {
   const newVertexMapping = {};
   _.forEach(boundary.edges, (edge, i) => {
     const oppositeFace = edge.twin().face;
@@ -36,21 +40,23 @@ function duplicateVertices(polyhedron, boundary, twist) {
   );
 }
 
-function doElongate(polyhedron, twist) {
+function doElongate(polyhedron: Polyhedron, twist?: Twist) {
   const caps = Cap.getAll(polyhedron);
   const boundary = caps[0].boundary();
   const n = boundary.numSides;
   const duplicated = duplicateVertices(polyhedron, boundary, twist);
-  const [vertexSets, multiplier] = (() => {
-    const duplicatedCaps = Cap.getAll(duplicated);
-    if (duplicatedCaps.length === 2) {
-      return [duplicatedCaps, 1 / 2];
-    } else {
-      // Otherwise it's the largest face
-      const base = boundary.adjacentFaces()[0].withPolyhedron(duplicated);
-      return [[base], 1];
-    }
-  })();
+  let vertexSets: VertexList[];
+  let multiplier: number;
+
+  const duplicatedCaps = Cap.getAll(duplicated);
+  if (duplicatedCaps.length === 2) {
+    vertexSets = duplicatedCaps;
+    multiplier = 1 / 2;
+  } else {
+    // Otherwise it's the largest face
+    vertexSets = [boundary.adjacentFaces()[0].withPolyhedron(duplicated)];
+    multiplier = 1;
+  }
   const adjustInfo = { vertexSets, boundary, multiplier };
 
   const height = polyhedron.edgeLength() * (twist ? antiprismHeight(n) : 1);
@@ -64,16 +70,19 @@ function doElongate(polyhedron, twist) {
   };
 }
 
-export const elongate = makeOperation('elongate', polyhedron => {
+export const elongate = makeOperation('elongate', (polyhedron: Polyhedron) => {
   return doElongate(polyhedron);
 });
 
+interface Options {
+  twist?: Twist;
+}
 export const gyroelongate = makeOperation('gyroelongate', {
-  apply(polyhedron, { twist = 'left' }) {
+  apply(polyhedron: Polyhedron, { twist = 'left' }: Options) {
     return doElongate(polyhedron, twist);
   },
   optionTypes: ['twist'],
-  allOptionCombos(polyhedron) {
+  allOptionCombos(polyhedron: Polyhedron) {
     return [{ twist: 'left' }, { twist: 'right' }];
   },
 });

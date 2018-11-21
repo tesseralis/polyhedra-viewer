@@ -1,7 +1,7 @@
 import _ from 'lodash';
 
-import { withOrigin } from 'math/geom';
-import { Cap } from 'math/polyhedra';
+import { Vec3D, withOrigin } from 'math/geom';
+import { Polyhedron, Cap } from 'math/polyhedra';
 import { mapObject } from 'utils';
 import { getCapAlignment, getGyrateDirection } from './cutPasteUtils';
 import { getTransformedVertices } from '../operationUtils';
@@ -9,7 +9,11 @@ import makeOperation from '../makeOperation';
 
 const TAU = 2 * Math.PI;
 
-function applyGyrate(polyhedron, { cap }) {
+interface Options {
+  cap: Cap;
+}
+
+function applyGyrate(polyhedron: Polyhedron, { cap }: Options) {
   // get adjacent faces
   const boundary = cap.boundary();
 
@@ -55,8 +59,8 @@ export const gyrate = makeOperation('gyrate', {
   apply: applyGyrate,
   optionTypes: ['cap'],
 
-  resultsFilter(polyhedron, config, relations) {
-    const options = {};
+  resultsFilter(polyhedron: Polyhedron, config: any, relations: any) {
+    const options: any = {};
     const { cap } = config;
     if (!cap) {
       throw new Error('Invalid cap');
@@ -76,17 +80,17 @@ export const gyrate = makeOperation('gyrate', {
     return options;
   },
 
-  allOptionCombos(polyhedron) {
+  allOptionCombos(polyhedron: Polyhedron) {
     return Cap.getAll(polyhedron).map(cap => ({ cap }));
   },
 
   hitOption: 'cap',
-  getHitOption(polyhedron, hitPnt) {
+  getHitOption(polyhedron: Polyhedron, hitPnt: Vec3D) {
     const cap = Cap.find(polyhedron, hitPnt);
     return cap ? { cap } : {};
   },
 
-  faceSelectionStates(polyhedron, { cap }) {
+  faceSelectionStates(polyhedron: Polyhedron, { cap }: Options) {
     const allCapFaces = _.flatMap(Cap.getAll(polyhedron), cap => cap.faces());
     return _.map(polyhedron.faces, face => {
       if (_.isObject(cap) && face.inSet(cap.faces())) return 'selected';

@@ -1,12 +1,9 @@
-
-import React from 'react';
-
 import ViewerPage from 'pages/ViewerPage';
 
 describe('viewer', () => {
-  let page;
+  let page: ViewerPage;
 
-  function setup(solid = 'tetrahedron', panel, options) {
+  function setup(solid = 'tetrahedron', panel?: string, options?: any) {
     page = new ViewerPage(solid, panel, options);
   }
 

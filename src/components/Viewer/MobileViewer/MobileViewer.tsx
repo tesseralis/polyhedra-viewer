@@ -1,5 +1,3 @@
-
-
 import React, { memo } from 'react';
 import _ from 'lodash';
 
@@ -10,7 +8,7 @@ import { BackLink, Title, NavMenu, X3dScene, Panels } from '../common';
 
 import OperationsPanel from './OperationsPanel';
 
-function mobile(styles) {
+function mobile(styles: (mobTitleH: number, menuH: number) => any) {
   return {
     [media.mobileLandscape]: styles(45, 45),
     [media.mobilePortrait]: styles(60, 75),

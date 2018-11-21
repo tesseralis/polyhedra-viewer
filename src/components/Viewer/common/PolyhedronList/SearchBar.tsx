@@ -1,4 +1,3 @@
-
 import React, { memo, useState } from 'react';
 import Icon from '@mdi/react';
 import { mdiMagnify } from '@mdi/js';
@@ -49,7 +48,11 @@ const styles = makeStyles({
   },
 });
 
-export default memo(function SearchBar({ value, onChange }) {
+interface Props {
+  value: string;
+  onChange(value: string): void;
+}
+export default memo(function SearchBar({ value, onChange }: Props) {
   const [isFocused, setFocus] = useState(false);
   return (
     <label className={styles('searchBar')}>

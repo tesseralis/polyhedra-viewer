@@ -1,5 +1,6 @@
 import _ from 'lodash';
-import { Polyhedron } from 'math/polyhedra';
+import { Twist } from 'types';
+import { Polyhedron, Face } from 'math/polyhedra';
 import { withOrigin } from 'math/geom';
 import { repeat } from 'utils';
 import {
@@ -19,10 +20,10 @@ import {
  * Duplicate the vertices, so that each face has its own unique set of vertices,
  * and create a new face for each edge and new vertex set.
  */
-function duplicateVertices(polyhedron, twist) {
+function duplicateVertices(polyhedron: Polyhedron, twist?: Twist) {
   const count = polyhedron.getVertex().adjacentFaces().length;
 
-  const newVertexMapping = {};
+  const newVertexMapping: any = {};
   _.forEach(polyhedron.vertices, (v, vIndex: number) => {
     // For each vertex, pick one adjacent face to be the "head"
     // for every other adjacent face, map it to a duplicated vertex
@@ -54,20 +55,24 @@ function duplicateVertices(polyhedron, twist) {
   );
 }
 
-function doExpansion(polyhedron, referenceName, twist) {
+function doExpansion(
+  polyhedron: Polyhedron,
+  referenceName: string,
+  twist?: Twist,
+) {
   const reference = Polyhedron.get(referenceName);
   const n = polyhedron.getFace().numSides;
   const duplicated = duplicateVertices(polyhedron, twist);
 
   // TODO precalculate this
   const referenceFace =
-    _.find(reference.faces, face => isExpandedFace(reference, face, n)) ||
+    _.find<Face>(reference.faces, face => isExpandedFace(reference, face, n)) ||
     reference.getFace();
   const referenceLength =
     (referenceFace.distanceToCenter() / reference.edgeLength()) *
     polyhedron.edgeLength();
 
-  const expandFaces = _.filter(duplicated.faces, face =>
+  const expandFaces = _.filter<Face>(duplicated.faces, face =>
     isExpandedFace(duplicated, face, n),
   );
   const refFaces = getExpandedFaces(reference, n);
@@ -86,12 +91,11 @@ function doExpansion(polyhedron, referenceName, twist) {
   };
 }
 
-export const expand = makeOperation(
-  'expand',
-  (polyhedron: Polyhedron, options: mixed, result: string) => {
+export const expand = makeOperation('expand', {
+  apply(polyhedron, $, result) {
     return doExpansion(polyhedron, result);
   },
-);
+});
 
 export const snub = makeOperation('snub', {
   apply(polyhedron, { twist = 'left' }, result: string) {

@@ -1,6 +1,5 @@
-
 import _ from 'lodash';
-import * as sections from './tables';
+import { sections } from './tables';
 import { toConwayNotation } from './names';
 
 // TODO do some thinking and make a smarter table data structure,
@@ -11,7 +10,7 @@ import { toConwayNotation } from './names';
 // * Rows along a section like "cupola" or "pyramid"
 // * Multiple rows
 
-function hasDeep(collection, value) {
+function hasDeep(collection: any, value: string): boolean {
   if (collection instanceof Array) {
     return _.some(collection, item => hasDeep(item, value));
   } else if (collection instanceof Object) {

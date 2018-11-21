@@ -1,9 +1,8 @@
-
 import * as sym from '../symmetry';
 
 describe('symmetry', () => {
   describe('getSymmetryName', () => {
-    function expectSymmetryName(solid, expected) {
+    function expectSymmetryName(solid: string, expected: string) {
       expect(sym.getSymmetryName(sym.getSymmetry(solid))).toEqual(expected);
     }
     it('works on platonic and archimedean solids', () => {
@@ -25,7 +24,7 @@ describe('symmetry', () => {
   });
 
   describe('getOrder', () => {
-    function expectOrder(solid, expected) {
+    function expectOrder(solid: string, expected: number) {
       expect(sym.getOrder(solid)).toEqual(expected);
     }
 

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { makeStyles } from 'styles';
 
@@ -36,7 +35,7 @@ const styles = makeStyles({
   },
 });
 
-const getOptionName = optValue => {
+const getOptionName = (optValue: string) => {
   switch (optValue) {
     case 'U2':
       return 'fastigium';
@@ -51,13 +50,20 @@ const getOptionName = optValue => {
   }
 };
 
+interface OptionType<T = any> {
+  name: string;
+  description: string;
+  values: T[];
+  value: T;
+}
+
 export default function AugmentOptions() {
   const polyhedron = PolyhedronCtx.useState();
   const { operation, options } = OperationCtx.useState();
   const { setOption } = OperationCtx.useActions();
 
-  const { gyrate, using } = options;
-  const optionArgs = [
+  const { gyrate, using } = options!;
+  const optionArgs: OptionType[] = [
     {
       name: 'gyrate',
       values: !!gyrate ? ['ortho', 'gyro'] : [],
@@ -67,7 +73,7 @@ export default function AugmentOptions() {
     },
     {
       name: 'using',
-      values: operation.allOptions(polyhedron, 'using') || [],
+      values: operation!.allOptions(polyhedron, 'using') || [],
       value: using,
       description: 'Some solids have more than one option to augment a face.',
     },
@@ -75,7 +81,7 @@ export default function AugmentOptions() {
 
   return (
     <div className={styles('augmentOptions')}>
-      {optionArgs.map(({ name, values, value, description }) => (
+      {optionArgs.map(({ name, values, value }) => (
         <div key={name} className={styles('augmentOption')}>
           {values.map(optValue => (
             <button

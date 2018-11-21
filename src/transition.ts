@@ -16,7 +16,7 @@ export interface TransitionOptions<T> {
  */
 export default function transition<T extends object>(
   options: TransitionOptions<T>,
-  updateCallback: (T) => void,
+  updateCallback: (val: T) => void,
 ) {
   const {
     startValue,
@@ -31,7 +31,7 @@ export default function transition<T extends object>(
   // Adapted from:
   // https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame
   const interp = interpolate(startValue, endValue);
-  const step = timestamp => {
+  const step = (timestamp: number) => {
     if (!start) {
       start = timestamp;
     }

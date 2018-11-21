@@ -1,12 +1,11 @@
-
-import React from 'react';
+import React, { ComponentType } from 'react';
 import InfoPanel from './InfoPanel';
 import ConfigForm from './ConfigForm';
 import PolyhedronList from './PolyhedronList';
 
 interface Props {
   panel: string;
-  operationsPanel: React$ComponentType<{}>;
+  operationsPanel: ComponentType<{}>;
 }
 export default function Panels({
   panel,

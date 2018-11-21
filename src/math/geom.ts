@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import { Vec3D, Ray3D, Triangle3D, Plane, Matrix4x4 } from 'toxiclibsjs/geom';
+import { Point } from 'types';
 
 // Re-export Vec3D so its easier to switch
 export { Vec3D };
@@ -21,8 +22,7 @@ export function getPlane(points: Vec3D[]) {
   if (points.length < 3) {
     throw new Error('Need at least three points for a plane');
   }
-  const triang = _.take(points, 3);
-  return new Plane(new Triangle3D(...triang));
+  return new Plane(new Triangle3D(points[0], points[1], points[2]));
 }
 
 // Return whether the set of points lie on a plane
@@ -48,7 +48,7 @@ export function getNormalRay(vertices: Vec3D[]) {
   return new Ray3D(getCentroid(vertices), getNormal(vertices));
 }
 
-export type Transform = (Vec3D) => Vec3D;
+export type Transform = (v: Vec3D) => Vec3D;
 
 export function withOrigin(o: Vec3D, t: Transform): Transform {
   return v => t(v.sub(o)).add(o);

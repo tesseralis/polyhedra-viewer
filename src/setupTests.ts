@@ -5,4 +5,4 @@ import { StyleSheetTestUtils } from 'aphrodite';
 configure({ adapter: new Adapter() });
 StyleSheetTestUtils.suppressStyleInjection();
 
-jest.mock('x3dom.ts');
+jest.mock('x3domWrapper.ts');

@@ -1,7 +1,6 @@
-
 import _ from 'lodash';
 
-import { Polyhedron } from 'math/polyhedra';
+import { Polyhedron, Vertex, Face, Edge } from 'math/polyhedra';
 import makeOperation from '../makeOperation';
 
 interface SharpenOptions {
@@ -9,7 +8,7 @@ interface SharpenOptions {
 }
 
 // Adjacent faces of the vertex with a sharpen face first
-function getShiftedAdjacentFaces(vertex, facesTosharpen) {
+function getShiftedAdjacentFaces(vertex: Vertex, facesTosharpen: Face[]) {
   const adjFaces = vertex.adjacentFaces();
   const [first, ...last] = adjFaces;
   if (first.inSet(facesTosharpen)) {
@@ -18,9 +17,9 @@ function getShiftedAdjacentFaces(vertex, facesTosharpen) {
   return [...last, first];
 }
 
-function duplicateVertices(polyhedron, facesTosharpen) {
+function duplicateVertices(polyhedron: Polyhedron, facesTosharpen: Face[]) {
   const offset = polyhedron.numVertices();
-  const mapping = {};
+  const mapping: Record<number, Record<number, any>> = {};
   _.forEach(polyhedron.vertices, vertex => {
     const v = vertex.index;
     const v2 = v + offset;
@@ -40,7 +39,7 @@ function duplicateVertices(polyhedron, facesTosharpen) {
   );
 }
 
-function getsharpenFaces(polyhedron, faceType) {
+function getsharpenFaces(polyhedron: Polyhedron, faceType: number) {
   // Special octahedron case
   if (polyhedron.isRegular()) {
     const face0 = polyhedron.getFace();
@@ -51,22 +50,20 @@ function getsharpenFaces(polyhedron, faceType) {
   return _.filter(polyhedron.faces, { numSides: faceType });
 }
 
-function calculatesharpenDist(polyhedron, face, edge) {
+function calculatesharpenDist(face: Face, edge: Edge) {
   const apothem = face.apothem();
   const theta = Math.PI - edge.dihedralAngle();
   return apothem * Math.tan(theta);
 }
 
-function getsharpenDist(polyhedron, face) {
+function getsharpenDist(polyhedron: Polyhedron, face: Face) {
   if (!polyhedron.isRegular() && !polyhedron.isQuasiRegular()) {
-    return _.meanBy(face.edges, edge =>
-      calculatesharpenDist(polyhedron, face, edge),
-    );
+    return _.meanBy(face.edges, edge => calculatesharpenDist(face, edge));
   }
-  return calculatesharpenDist(polyhedron, face, face.edges[0]);
+  return calculatesharpenDist(face, face.edges[0]);
 }
 
-function getVertexToAdd(polyhedron, face) {
+function getVertexToAdd(polyhedron: Polyhedron, face: Face) {
   const dist = getsharpenDist(polyhedron, face);
   return face.normalRay().getPointAtDistance(dist);
 }
@@ -78,7 +75,7 @@ function applySharpen(
   // face indices with the right number of sides
   let sharpenFaces = getsharpenFaces(polyhedron, faceType);
 
-  let mock;
+  let mock: Polyhedron;
   if (polyhedron.isQuasiRegular()) {
     mock = duplicateVertices(polyhedron, sharpenFaces);
     sharpenFaces = sharpenFaces.map(face => face.withPolyhedron(mock));
@@ -88,18 +85,17 @@ function applySharpen(
 
   const verticesToAdd = sharpenFaces.map(face => getVertexToAdd(mock, face));
 
-  const oldToNew = {};
+  const oldToNew: Record<number, number> = {};
   sharpenFaces.forEach((face, i) => {
     face.vertices.forEach(v => {
       oldToNew[v.index] = i;
     });
   });
 
-  const endVertices = mock.vertices.map(
-    (v, vIndex) =>
-      _.has(oldToNew, vIndex.toString())
-        ? verticesToAdd[oldToNew[vIndex]]
-        : v.vec,
+  const endVertices = mock.vertices.map((v, vIndex) =>
+    _.has(oldToNew, vIndex.toString())
+      ? verticesToAdd[oldToNew[vIndex]]
+      : v.vec,
   );
 
   return {

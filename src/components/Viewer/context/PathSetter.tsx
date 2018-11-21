@@ -4,7 +4,7 @@ import React, { useCallback, useContext } from 'react';
 import { withRouter } from 'react-router-dom';
 import { escapeName } from 'math/polyhedra/names';
 
-const PathSetter = React.createContext({ setName: _.noop });
+const PathSetter = React.createContext(_.noop);
 
 export default PathSetter;
 

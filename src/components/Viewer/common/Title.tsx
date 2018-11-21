@@ -20,7 +20,7 @@ const styles = makeStyles({
   },
 });
 
-const Title = ({ name }) => {
+const Title = ({ name }: { name: string }) => {
   return (
     <h1 className={styles('title')}>{_.capitalize(unescapeName(name))}</h1>
   );

@@ -5,7 +5,7 @@ import React, { memo } from 'react';
 import { makeStyles } from 'styles';
 import { media, fonts } from 'styles';
 import { hover, scroll } from 'styles/common';
-import { operations } from 'math/operations';
+import { operations, OpName } from 'math/operations';
 import {
   useApplyOperation,
   OperationCtx,
@@ -14,7 +14,7 @@ import {
 } from 'components/Viewer/context';
 import OperationIcon from './OperationIcon';
 
-const opLayout = [
+const opLayout: OpName[][] = [
   ['truncate', 'rectify', 'sharpen', 'dual'],
   ['expand', 'snub', 'contract', 'twist'],
   ['elongate', 'gyroelongate', 'shorten', 'turn'],
@@ -71,7 +71,11 @@ const styles = makeStyles({
   },
 });
 
-const OpButton = memo(function({ name, disabled }) {
+interface Props {
+  name: OpName;
+  disabled: boolean;
+}
+const OpButton = memo(function({ name, disabled }: Props) {
   const polyhedron = PolyhedronCtx.useState();
   const { operation: currentOp } = OperationCtx.useState();
   const { setOperation, unsetOperation } = OperationCtx.useActions();

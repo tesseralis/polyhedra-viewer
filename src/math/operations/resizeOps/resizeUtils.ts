@@ -1,4 +1,3 @@
-
 import _ from 'lodash';
 
 import { flatMapUniq } from 'utils';
@@ -45,7 +44,7 @@ export function isExpandedFace(
   return _.every(face.adjacentFaces(), { numSides: edgeShape[type] });
 }
 
-function getFaceDistance(face1, face2) {
+function getFaceDistance(face1: Face, face2: Face) {
   let dist = 0;
   let current = [face1];
   while (!face2.inSet(current)) {
@@ -59,7 +58,7 @@ function getFaceDistance(face1, face2) {
   return dist;
 }
 
-function getIcosahedronContractFaces(polyhedron) {
+function getIcosahedronContractFaces(polyhedron: Polyhedron) {
   let result = [];
   let toTest = polyhedron.faces;
   while (toTest.length > 0) {
@@ -70,7 +69,7 @@ function getIcosahedronContractFaces(polyhedron) {
   return result;
 }
 
-function getCuboctahedronContractFaces(polyhedron) {
+function getCuboctahedronContractFaces(polyhedron: Polyhedron) {
   const f0 = polyhedron.faceWithNumSides(3);
   const rest = _.map(f0.edges, e => {
     return e
@@ -101,7 +100,7 @@ export function getSnubAngle(polyhedron: Polyhedron, faces: Face[]) {
   const faceNormal = face0.normal();
   const midpoint = face0.edges[0].midpoint();
 
-  const face1 = _.minBy(rest, face => midpoint.distanceTo(face.centroid()));
+  const face1 = _.minBy(rest, face => midpoint.distanceTo(face.centroid()))!;
 
   const plane = getPlane([
     faceCentroid,
