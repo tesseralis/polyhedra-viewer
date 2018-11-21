@@ -1,6 +1,3 @@
-
-
-
 import React, { useState, useCallback } from 'react';
 import Icon from '@mdi/react';
 import { mdiMenuDown } from '@mdi/js';
@@ -39,20 +36,21 @@ const Toggle = styled.button({
 interface Props {
   content: string;
   title: string; // used for a11y
+  collapsed: boolean;
 }
 
-export default function Description({ title, content }: Props) {
-  const [collapsed, setCollapsed] = useState(true);
-  const toggle = useCallback(() => setCollapsed(!collapsed), [collapsed]);
+export default function Description({ title, content, collapsed }: Props) {
+  const [isCollapsed, setCollapsed] = useState(collapsed);
+  const toggle = useCallback(() => setCollapsed(!isCollapsed), [isCollapsed]);
 
   const brief = content.split('\n\n')[0];
 
   return (
     <Container>
       <Text>
-        <Markdown source={collapsed ? brief : content} />
+        <Markdown source={isCollapsed ? brief : content} />
       </Text>
-      {collapsed && (
+      {isCollapsed && (
         <Toggle onClick={toggle}>
           <span>
             <Icon path={mdiMenuDown} size="20px" />

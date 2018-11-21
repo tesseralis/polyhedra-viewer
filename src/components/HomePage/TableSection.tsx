@@ -158,7 +158,14 @@ export default function TableSection({
   narrow = false,
   isSubsection = false,
 }: Props) {
-  const { header, description, tables, narrowTables, subsections } = data;
+  const {
+    header,
+    description,
+    tables,
+    narrowTables,
+    subsections,
+    sticky,
+  } = data;
   const Header = isSubsection ? 'h3' : 'h2';
   const headerStyle = isSubsection ? 'subsectionHeader' : 'sectionHeader';
 
@@ -167,7 +174,11 @@ export default function TableSection({
       {typeof description !== 'undefined' && (
         <div className={styles('description')}>
           <Header className={styles(headerStyle)}>{header}</Header>
-          <Description title={header} content={description} />
+          <Description
+            title={header}
+            content={description}
+            collapsed={!sticky}
+          />
         </div>
       )}
       {tables && (
