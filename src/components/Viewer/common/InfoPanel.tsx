@@ -147,7 +147,7 @@ function displayVertexConfig({ polyhedron }: RenderProps) {
   if (configKeys.length === 1) return <>{configKeys[0]}</>;
   return (
     <ul>
-      {_.map(vConfig, (count, type: string) => (
+      {_.map(vConfig, (count, type) => (
         <li key={type}>
           {count}({getShortVertexConfig(type)})
         </li>
@@ -161,7 +161,7 @@ function displayFaceTypes({ polyhedron }: RenderProps) {
   // TODO verify order by type of face
   return (
     <ul>
-      {_.map(faceCounts, (count, type: number) => (
+      {_.map(faceCounts, (count, type) => (
         <li key={type}>
           {count} {polygonNames.get(type)}
           {count !== 1 ? 's' : ''}
