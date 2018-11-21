@@ -1,4 +1,3 @@
-
 import _ from 'lodash';
 import { Vec3D } from 'math/geom';
 

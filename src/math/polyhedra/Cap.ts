@@ -50,12 +50,12 @@ function createMapper<T>(property: string, Base: Constructor<T>) {
   };
 }
 
-export default class Cap implements VertexList {
+export default abstract class Cap implements VertexList {
   polyhedron: Polyhedron;
-  _innerVertices: Vertex[];
-  type: CapType;
-  topPoint: Vec3D;
-  faceConfiguration: FaceConfiguration;
+  type: string;
+  private _innerVertices: Vertex[];
+  private topPoint: Vec3D;
+  private faceConfiguration: FaceConfiguration;
 
   static find(polyhedron: Polyhedron, hitPoint: Vec3D) {
     const hitFace = polyhedron.hitFace(hitPoint);

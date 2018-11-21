@@ -6,20 +6,20 @@ describe('symmetry', () => {
       expect(sym.getSymmetryName(sym.getSymmetry(solid))).toEqual(expected);
     }
     it('works on platonic and archimedean solids', () => {
-      expectSymmetryName('snub-cube', 'chiral octahedral');
+      expectSymmetryName('snub cube', 'chiral octahedral');
       expectSymmetryName('cube', 'full octahedral');
     });
 
     it('works on prisms and antiprisms', () => {
-      expectSymmetryName('hexagonal-prism', 'hexagonal prismatic');
-      expectSymmetryName('octagonal-antiprism', 'octagonal antiprismatic');
+      expectSymmetryName('hexagonal prism', 'hexagonal prismatic');
+      expectSymmetryName('octagonal antiprism', 'octagonal antiprismatic');
     });
 
     it('works on johnson solids', () => {
-      expectSymmetryName('augmented-sphenocorona', 'bilateral');
+      expectSymmetryName('augmented sphenocorona', 'bilateral');
       expectSymmetryName('sphenocorona', 'biradial');
-      expectSymmetryName('square-pyramid', 'square pyramidal');
-      expectSymmetryName('triaugmented-dodecahedron', 'triangular pyramidal');
+      expectSymmetryName('square pyramid', 'square pyramidal');
+      expectSymmetryName('triaugmented dodecahedron', 'triangular pyramidal');
     });
   });
 
@@ -35,15 +35,15 @@ describe('symmetry', () => {
     });
 
     it('works on prisms and antiprisms', () => {
-      expectOrder('hexagonal-prism', 24);
-      expectOrder('octagonal-antiprism', 32);
+      expectOrder('hexagonal prism', 24);
+      expectOrder('octagonal antiprism', 32);
     });
 
     it('works on johnson solids', () => {
-      expectOrder('augmented-sphenocorona', 2);
+      expectOrder('augmented sphenocorona', 2);
       expectOrder('sphenocorona', 4);
-      expectOrder('square-pyramid', 8);
-      expectOrder('triaugmented-dodecahedron', 6);
+      expectOrder('square pyramid', 8);
+      expectOrder('triaugmented dodecahedron', 6);
     });
   });
 });

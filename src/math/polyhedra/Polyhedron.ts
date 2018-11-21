@@ -25,7 +25,7 @@ export default class Polyhedron {
   name: string;
   faces: Face[];
   vertices: Vertex[];
-  _edges?: Edge[];
+  private _edges?: Edge[];
 
   static get(name: string) {
     if (!isValidSolid(name)) {

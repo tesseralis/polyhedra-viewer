@@ -32,11 +32,11 @@ export function getSymmetry(name: string): Symmetry {
     return { group, sub: chiral ? '' : 'h' };
   }
   if (type === 'Prism') {
-    const n = polygonPrefixes.of(_.lowerCase(name.split('-')[0]));
+    const n = polygonPrefixes.of(name.split(' ')[0]);
     return { group: 'D', sub: `${n}h` };
   }
   if (type === 'Antiprism') {
-    const n = polygonPrefixes.of(_.lowerCase(name.split('-')[0]));
+    const n = polygonPrefixes.of(name.split(' ')[0]);
     return { group: 'D', sub: `${n}d` };
   }
   return getJohnsonSymmetry(unescapeName(name));
