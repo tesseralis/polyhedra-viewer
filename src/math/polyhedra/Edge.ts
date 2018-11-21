@@ -22,7 +22,7 @@ export default class Edge implements VertexList {
     return [this.v1, this.v2];
   }
 
-  get face(): Face {
+  get face() {
     return this.polyhedron.edgeToFaceGraph()[this.v1.index][this.v2.index];
   }
 
