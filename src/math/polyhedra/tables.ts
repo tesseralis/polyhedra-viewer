@@ -48,10 +48,10 @@ export const prisms: Table = {
     'decagonal',
   ],
   columns: ['prism', 'antiprism'],
-  data: _.zip(
+  data: _.unzip([
     ['P3', '!C', 'P5', 'P6', 'P8', 'P10'],
     ['!O', 'A4', 'A5', 'A6', 'A8', 'A10'],
-  ) as any,
+  ]),
 };
 
 export const capstones: Table = {
@@ -75,7 +75,7 @@ export const capstones: Table = {
     { name: 'elongated bi-', sub: ['ortho-', 'gyro-'] },
     'gyroelongated bi-',
   ],
-  data: _.zip(
+  data: _.unzip([
     ['!T', 'J1', 'J2', '!P3', 'J3', 'J4', 'J5', '', 'J6'],
     ['J7', 'J8', 'J9', 'coplanar', 'J18', 'J19', 'J20', '', 'J21'],
     ['coplanar', 'J10', 'J11', 'concave', 'J22', 'J23', 'J24', '', 'J25'],
@@ -102,7 +102,7 @@ export const capstones: Table = {
       ['J42', 'J43'],
     ],
     ['coplanar', 'J17', '!I', 'concave', 'J44', 'J45', 'J46', 'J47', 'J48'],
-  ) as any,
+  ]),
 };
 
 export const capstonesMono: Table = {
@@ -117,11 +117,11 @@ export const capstonesMono: Table = {
     'pentagonal rotunda',
   ],
   columns: ['--', 'elongated', 'gyroelongated'],
-  data: _.zip(
+  data: _.unzip([
     ['!T', 'J1', 'J2', 'J3', 'J4', 'J5', 'J6'],
     ['J7', 'J8', 'J9', 'J18', 'J19', 'J20', 'J21'],
     ['coplanar', 'J10', 'J11', 'J22', 'J23', 'J24', 'J25'],
-  ) as any,
+  ]),
 };
 
 export const capstonesBi: Table = {
@@ -142,7 +142,7 @@ export const capstonesBi: Table = {
     { name: 'elongated bi-', sub: ['ortho-', 'gyro-'] },
     'gyroelongated bi-',
   ],
-  data: _.zip(
+  data: _.unzip([
     [
       'J12',
       '!O',
@@ -166,7 +166,7 @@ export const capstonesBi: Table = {
       ['J42', 'J43'],
     ],
     ['coplanar', 'J17', '!I', 'concave', 'J44', 'J45', 'J46', 'J47', 'J48'],
-  ) as any,
+  ]),
 };
 
 export const augmented: Table = {

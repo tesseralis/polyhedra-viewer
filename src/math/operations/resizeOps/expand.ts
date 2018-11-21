@@ -23,7 +23,7 @@ import {
 function duplicateVertices(polyhedron: Polyhedron, twist?: Twist) {
   const count = polyhedron.getVertex().adjacentFaces().length;
 
-  const newVertexMapping: any = {};
+  const newVertexMapping: NestedRecord<number, number, number> = {};
   _.forEach(polyhedron.vertices, (v, vIndex: number) => {
     // For each vertex, pick one adjacent face to be the "head"
     // for every other adjacent face, map it to a duplicated vertex
