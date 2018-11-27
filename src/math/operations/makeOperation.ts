@@ -11,12 +11,12 @@ import { Point } from 'types';
 
 type SelectState = 'selected' | 'selectable' | undefined;
 
-interface AnimationData {
+export interface AnimationData {
   start: Polyhedron;
   endVertices: Point[];
 }
 
-interface OperationResult {
+export interface OperationResult {
   result: Polyhedron;
   animationData?: AnimationData;
 }

@@ -2,6 +2,7 @@ import React, { ComponentType } from 'react';
 import { makeStyles } from 'styles';
 import _ from 'lodash';
 
+import { ChildrenProp } from 'types';
 import { polygonNames } from 'math/polygons';
 import { fonts } from 'styles';
 
@@ -73,11 +74,14 @@ const styles = makeStyles({
   },
 });
 
-function Sub({ children }: any) {
+function Sub({ children }: ChildrenProp) {
   return <sub className={styles('sub')}>{children}</sub>;
 }
 
-function Sup({ children }: { children: number }) {
+function Sup({ children }: ChildrenProp<number>) {
+  if (typeof children === 'undefined') {
+    throw new Error('undefined child');
+  }
   if (children < 0 || children > 5) {
     throw new Error('Number not supported');
   }

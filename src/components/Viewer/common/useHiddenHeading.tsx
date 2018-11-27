@@ -7,7 +7,7 @@ import { SrOnly } from 'components/common';
 export default function useHiddenHeading(
   value: string,
 ): [JSX.Element, () => void] {
-  const ref = useRef<any>(null);
+  const ref = useRef<HTMLHeadingElement>(null);
   const focusFn = useCallback(
     () => {
       if (ref.current) ref.current.focus();

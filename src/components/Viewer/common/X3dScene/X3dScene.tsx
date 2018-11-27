@@ -2,6 +2,7 @@ import React, { useRef, useEffect, ReactNode } from 'react';
 import x3dom from 'x3domWrapper';
 import 'x3dom/x3dom.css';
 
+import { ChildrenProp } from 'types';
 import { makeStyles } from 'styles';
 
 // Disable double-clicking to change rotation point
@@ -17,9 +18,8 @@ const styles = makeStyles({
   },
 });
 
-interface Props {
+interface Props extends ChildrenProp {
   label: string;
-  children: ReactNode;
 }
 
 export default function X3dScene({ label, children }: Props) {

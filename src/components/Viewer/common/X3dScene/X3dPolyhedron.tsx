@@ -65,18 +65,18 @@ export default function X3dPolyhedron() {
 
   useEffect(
     () => {
-      if (shape.current !== null) {
-        _.forEach(listeners, (fn, type) => {
+      _.forEach(listeners, (fn, type) => {
+        if (shape.current !== null) {
           shape.current.addEventListener(type, fn);
-        });
-      }
+        }
+      });
 
       return () => {
-        if (shape.current !== null) {
-          _.forEach(listeners, (fn, type) => {
+        _.forEach(listeners, (fn, type) => {
+          if (shape.current !== null) {
             shape.current.removeEventListener(type, fn);
-          });
-        }
+          }
+        });
       };
     },
     [onClick, onHover, onMouseOut],

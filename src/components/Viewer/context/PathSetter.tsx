@@ -1,17 +1,17 @@
 import _ from 'lodash';
 
-import React, { ReactNode, useCallback, useContext } from 'react';
+import React, { useCallback, useContext } from 'react';
 import { History } from 'history';
 import { withRouter } from 'react-router-dom';
 import { escapeName } from 'math/polyhedra/names';
+import { ChildrenProp } from 'types';
 
 const PathSetter = React.createContext(_.noop);
 
 export default PathSetter;
 
-interface Props {
+interface Props extends ChildrenProp {
   history: History;
-  children?: ReactNode;
 }
 export function InnerPathSetterProvider({ history, children }: Props) {
   const setPath = useCallback(

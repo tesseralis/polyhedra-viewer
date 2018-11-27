@@ -1,12 +1,20 @@
 import _ from 'lodash';
 
-import React, { useRef, useEffect, useContext, useCallback } from 'react';
-import { createHookedContext } from 'components/common';
+import React, {
+  useRef,
+  useEffect,
+  useContext,
+  useCallback,
+  ReactNode,
+} from 'react';
+import { ChildrenProp } from 'types';
 
+import { createHookedContext } from 'components/common';
 import Config from 'components/ConfigCtx';
 import PolyhedronCtx from './PolyhedronCtx';
 import transition from 'transition';
 import { Polyhedron, Face, SolidData } from 'math/polyhedra';
+import { AnimationData } from 'math/operations';
 import { PRECISION } from 'math/geom';
 
 function getCoplanarFaces(polyhedron: Polyhedron) {
@@ -71,8 +79,8 @@ const InterpModel = createHookedContext<State, 'set' | 'reset'>(
 
 const TransitionContext = React.createContext(_.noop);
 
-function InnerProvider({ children }: any) {
-  const transitionId = useRef<any>(null);
+function InnerProvider({ children }: ChildrenProp) {
+  const transitionId = useRef<ReturnType<typeof transition> | null>(null);
   const { setPolyhedron } = PolyhedronCtx.useActions();
   const config = Config.useState();
   const { colors, animationSpeed, enableAnimation } = config;
@@ -90,7 +98,7 @@ function InnerProvider({ children }: any) {
     [transitionId],
   );
   const transitionFn = useCallback(
-    (result: Polyhedron, animationData: any) => {
+    (result: Polyhedron, animationData: AnimationData) => {
       if (!enableAnimation || !animationData) {
         setPolyhedron(result);
         anim.reset();
@@ -135,7 +143,7 @@ function InnerProvider({ children }: any) {
   );
 }
 
-function Provider({ children }: any) {
+function Provider({ children }: ChildrenProp) {
   return (
     <InterpModel.Provider>
       <InnerProvider>{children}</InnerProvider>
