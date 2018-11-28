@@ -106,7 +106,7 @@ export default memo(function MobileViewer({ panel, solid }: Props) {
         )}
       >
         {header}
-        <Panels panel={panel} operationsPanel={OperationsPanel} />;
+        <Panels panel={panel} operationsPanel={OperationsPanel} />
       </div>
       <main className={styles('scene')}>
         <X3dScene label={solid} />
