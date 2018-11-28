@@ -2,12 +2,7 @@ import _ from 'lodash';
 
 import { Polyhedron, Face, Cap } from 'math/polyhedra';
 import { inRow, inColumn, inSection } from 'math/polyhedra/tableUtils';
-import {
-  Vec3D,
-  isInverse,
-  getOrthonormalTransform,
-  PRECISION,
-} from 'math/geom';
+import { isInverse, getOrthonormalTransform, PRECISION } from 'math/geom';
 import { getCyclic, getSingle } from 'utils';
 
 import makeOperation from '../makeOperation';

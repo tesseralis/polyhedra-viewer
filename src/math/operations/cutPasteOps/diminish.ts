@@ -1,6 +1,5 @@
 import _ from 'lodash';
 
-import { Vec3D } from 'math/geom';
 import { removeExtraneousVertices } from '../operationUtils';
 import makeOperation from '../makeOperation';
 import { Polyhedron, Cap } from 'math/polyhedra';

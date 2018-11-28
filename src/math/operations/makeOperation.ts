@@ -1,7 +1,7 @@
 import _ from 'lodash';
 
 import { toConwayNotation } from 'math/polyhedra/names';
-import operationGraph from './operationGraph';
+import operationGraph, { Relation } from './operationGraph';
 import { getSingle } from 'utils';
 import { fromConwayNotation } from 'math/polyhedra/names';
 import { Vec3D, vec, PRECISION } from 'math/geom';
@@ -89,7 +89,7 @@ interface OperationArgs extends Partial<BaseOperation> {
   resultsFilter?(
     polyhedron: Polyhedron,
     options: Options,
-    results: any[],
+    results: Relation[],
   ): object | undefined;
 
   getHitOption?(

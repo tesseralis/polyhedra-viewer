@@ -1,6 +1,6 @@
 import _ from 'lodash';
 
-import { Vec3D, withOrigin } from 'math/geom';
+import { withOrigin } from 'math/geom';
 import { Polyhedron, Cap } from 'math/polyhedra';
 import { mapObject } from 'utils';
 import { getCapAlignment, getGyrateDirection } from './cutPasteUtils';

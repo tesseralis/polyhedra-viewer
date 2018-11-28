@@ -10,10 +10,11 @@ import {
 import { toConwayNotation } from '../polyhedra/names';
 import { mapObject } from 'utils';
 
-interface Relation {
+export interface Relation {
   value: string;
   gyrate?: 'ortho' | 'gyro';
   align?: 'meta' | 'para';
+  direction?: 'forward' | 'back';
 }
 type Graph = NestedRecord<string, string, any>;
 

@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import { Twist } from 'types';
 import { find } from 'utils';
-import { Polyhedron, Cap, VEList, VertexList } from 'math/polyhedra';
+import { Polyhedron, Cap, VEList } from 'math/polyhedra';
 import { inRow, inColumn } from 'math/polyhedra/tableUtils';
 import { withOrigin, isInverse } from 'math/geom';
 import { getTwistSign, getTransformedVertices } from '../operationUtils';
