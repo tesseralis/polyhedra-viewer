@@ -1,10 +1,21 @@
 import _ from 'lodash';
 import { polygonPrefixes } from 'math/polygons';
-import { Table, prisms, capstones, augmented } from 'math/polyhedra/tables';
+import {
+  Table,
+  Data as TableData,
+  prisms,
+  capstones,
+  augmented,
+} from 'math/polyhedra/tables';
 import { toConwayNotation } from '../polyhedra/names';
 import { mapObject } from 'utils';
 
-type Graph = any;
+interface Relation {
+  value: string;
+  gyrate?: 'ortho' | 'gyro';
+  align?: 'meta' | 'para';
+}
+type Graph = NestedRecord<string, string, any>;
 
 // Make everything an array
 function normalize(graph: Graph) {
@@ -17,6 +28,7 @@ function normalize(graph: Graph) {
   );
 }
 
+/** Remove nullish values from a graph */
 function compact(graph: Graph) {
   return _.mapValues(graph, ops =>
     _(ops)
@@ -28,18 +40,18 @@ function compact(graph: Graph) {
   );
 }
 
-const customizer = (objValue: any, srcValue: any) => {
+const customizer = (objValue: unknown, srcValue: unknown) => {
   if (_.isArray(objValue)) {
     return objValue.concat(srcValue);
   }
 };
 
-function graphMerge(object: any, other: any) {
+function graphMerge(object: Graph, other: Graph) {
   return _.mergeWith(object, other, customizer);
 }
 
-function graphMergeAll(...objects: any) {
-  return _.reduce(objects, graphMerge);
+function graphMergeAll(...objects: Graph[]) {
+  return _.reduce(objects, graphMerge)!;
 }
 
 const getInverseOperation = (operation: string) => {
@@ -67,8 +79,11 @@ const getInverseOperation = (operation: string) => {
   }
 };
 
+/**
+ * Populate a graph with inverse operations.
+ */
 function makeBidirectional(graph: Graph) {
-  const result: Record<string, any> = {};
+  const result: Graph = {};
   for (let [source, operations] of _.entries(graph)) {
     for (let [operation, sinks] of _.entries(operations)) {
       for (let sink of sinks) {
@@ -98,8 +113,7 @@ function makeBidirectional(graph: Graph) {
 }
 
 function getKeyedTable(table: Table) {
-  const result: Record<string, any> = {};
-  if (!table.rows) return result;
+  const result: NestedRecord<string, string, any> = {};
   table.rows.forEach((row, i) => {
     result[row] = {};
     table.columns.forEach((column, j) => {
@@ -111,7 +125,7 @@ function getKeyedTable(table: Table) {
 }
 
 const invalidNames = ['concave', 'coplanar'];
-function convertTableNotation(notation: string[] | string): any {
+function convertTableNotation(notation: TableData): any {
   if (Array.isArray(notation)) return notation.map(convertTableNotation);
   if (notation[0] === '!') return notation.substring(1);
   if (_.includes(invalidNames, notation)) return null;
@@ -133,7 +147,7 @@ const hasCupolaRotunda = (name: string) =>
   name.includes('pentagonal') && !name.includes('pyramid');
 const cupolaRotunda = capstoneMap['cupola-rotunda'];
 
-const getOrthoGyroAugment = (value: any, using: string) => {
+const getOrthoGyroAugment = (value: TableData, using: string) => {
   if (!_.isArray(value)) {
     return [{ using, value }];
   } else {
@@ -176,13 +190,6 @@ const getPyramidFromPrism = (prismRow: string) => {
   return `${divName(prismRow)} ${isPyramid ? 'pyramid' : 'cupola'}`;
 };
 
-const getPrismFromPyramid = (name: string, anti?: boolean) => {
-  const [prefix, type] = name.split(' ');
-  const isCupola = _.includes(['cupola', 'rotunda', 'cupola-rotunda'], type);
-  const index = polygonPrefixes.of(prefix) * (isCupola ? 2 : 1);
-  return `${anti ? 'A' : 'P'}${index}`;
-};
-
 const pyramidCupolaConway: Record<string, string> = {
   pyramid: 'Y',
   cupola: 'U',
@@ -194,9 +201,9 @@ const getPyramidCupolaConway = (name: string) => {
   return `${pyramidCupolaConway[type]}${polygonPrefixes.of(sides)}`;
 };
 
-const getElongations = (prism: any, antiprism: any) => (
-  pValue: any,
-  aValue: any,
+const elongations = (
+  pValue: string,
+  aValue: string,
   gyrate?: string,
   chiral?: boolean,
 ) => {
@@ -294,10 +301,7 @@ const baseCapstones = (() => {
       'elongated bi-': elongatedBi,
       'gyroelongated bi-': gyroelongatedBi,
     } = row;
-    const prism = getPrismFromPyramid(name);
-    const antiprism = getPrismFromPyramid(name, true);
     const conway = getPyramidCupolaConway(name);
-    const elongations = getElongations(prism, antiprism);
     const augmentations = getAugmentations(conway);
     graph = graphMerge(graph, {
       [base]: {
@@ -370,7 +374,7 @@ const getAugmentee = (name: string) => {
   }
 };
 
-const getBiAugmented = (biaugmented: any, using: string) => {
+const getBiAugmented = (biaugmented: TableData, using: string) => {
   if (!_.isArray(biaugmented)) {
     return [{ using, value: biaugmented }];
   }
@@ -413,9 +417,9 @@ const diminishedIcosahedra = (() => {
 })();
 
 const rhombicosidodecahedra = (() => {
-  const getAugment = (relations: any[]) =>
+  const getAugment = (relations: Relation[]) =>
     relations.map(relation => ({ ...relation, using: 'U5' }));
-  const getGyrate = (relations: any[]) =>
+  const getGyrate = (relations: Relation[]) =>
     relations.map(relation => ({ ...relation, direction: 'forward' }));
   return {
     // tridiminished

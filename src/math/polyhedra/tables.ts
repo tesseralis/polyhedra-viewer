@@ -1,8 +1,8 @@
 import _ from 'lodash';
 
-type Column = { name: string; sub: string[] } | string;
-type Data = string | string[];
-type DataRow = Data[];
+export type Column = { name: string; sub: string[] } | string;
+export type Data = string | string[];
+export type DataRow = Data[];
 
 export interface Table {
   caption: string;
