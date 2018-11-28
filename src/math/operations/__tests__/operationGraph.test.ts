@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import graph from './operationGraph';
+import graph from '../operationGraph';
 import { allSolidNames } from 'data';
 import { toConwayNotation } from 'math/polyhedra/names';
 
