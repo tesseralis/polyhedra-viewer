@@ -17,6 +17,7 @@ export interface Relation {
   direction?: 'forward' | 'back';
 }
 type Graph = NestedRecord<string, string, any>;
+type FullGraph = NestedRecord<string, string, Relation[]>;
 
 // Make everything an array
 function normalize(graph: Graph) {
@@ -83,8 +84,8 @@ const getInverseOperation = (operation: string) => {
 /**
  * Populate a graph with inverse operations.
  */
-function makeBidirectional(graph: Graph) {
-  const result: Graph = {};
+function makeBidirectional(graph: FullGraph) {
+  const result: FullGraph = {};
   for (let [source, operations] of _.entries(graph)) {
     for (let [operation, sinks] of _.entries(operations)) {
       for (let sink of sinks) {
