@@ -112,6 +112,7 @@ export function getOpResults(solid: Polyhedron, opName: string) {
   return operationGraph[toConwayNotation(solid.name)][opName];
 }
 
+// TODO get this to return the correct type
 function fillDefaults(op: OperationArgs) {
   return {
     ..._.mapValues(
@@ -192,14 +193,14 @@ export default function makeOperation(
   name: string,
   op: OperationArgs,
 ): Operation {
-  const withDefaults: any = fillDefaults(op);
+  const withDefaults = fillDefaults(op);
   return {
-    ...withDefaults,
+    ...(withDefaults as any),
     name,
     apply(polyhedron, options = {}) {
       // get the next polyhedron name
       const results = getOpResults(polyhedron, name);
-      const searchOptions = withDefaults.resultsFilter(
+      const searchOptions = withDefaults.resultsFilter!(
         polyhedron,
         options,
         results,
@@ -211,7 +212,7 @@ export default function makeOperation(
       return normalizeOpResult(opResult, next);
     },
     getHitOption(polyhedron, hitPnt, options) {
-      return withDefaults.getHitOption(polyhedron, vec(hitPnt), options);
+      return withDefaults.getHitOption!(polyhedron, vec(hitPnt), options);
     },
     canApplyTo(polyhedron) {
       return !!getOpResults(polyhedron, name);

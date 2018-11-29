@@ -17,6 +17,7 @@ export interface Relation {
   direction?: 'forward' | 'back';
 }
 type Graph = NestedRecord<string, string, any>;
+type FullGraph = NestedRecord<string, string, Relation[]>;
 
 // Make everything an array
 function normalize(graph: Graph) {
@@ -530,4 +531,4 @@ const normalized = [
   .map(normalize)
   .map(compact);
 
-export default makeBidirectional(graphMergeAll(...normalized));
+export default makeBidirectional(graphMergeAll(...normalized)) as FullGraph;
