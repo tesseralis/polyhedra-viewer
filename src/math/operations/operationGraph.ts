@@ -531,4 +531,4 @@ const normalized = [
   .map(normalize)
   .map(compact);
 
-export default makeBidirectional(graphMergeAll(...normalized));
+export default makeBidirectional(graphMergeAll(...normalized)) as FullGraph;
