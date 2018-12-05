@@ -4,13 +4,13 @@ import { makeStyles } from 'styles';
 import { PolyhedronCtx, OperationCtx } from 'components/Viewer/context';
 import OptionIcon from './OptionIcon';
 import { verdana } from 'styles/fonts';
-import { hover } from 'styles/common';
+import { hover, square } from 'styles/common';
 
 const styles = makeStyles({
   augmentOptions: {
-    display: 'flex',
     width: '100%',
     height: '100%',
+    display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
@@ -23,8 +23,7 @@ const styles = makeStyles({
 
   optionButton: {
     ...hover,
-    width: 72,
-    height: 72,
+    ...square(72),
     border: '1px LightGray solid',
     backgroundColor: 'white',
     fontFamily: verdana,

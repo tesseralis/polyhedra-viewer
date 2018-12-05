@@ -8,17 +8,8 @@ import {
   mdiCubeOutline,
 } from '@mdi/js';
 
-import { makeStyles } from 'styles';
+import { useStyle } from 'styles';
 import IconLink from './IconLink';
-
-const styles = makeStyles({
-  menu: {
-    width: '100%',
-    display: 'grid',
-    gridTemplateColumns: '1fr 1fr 1fr 1fr 1fr',
-    justifyItems: 'center',
-  },
-});
 
 interface Props {
   solid: string;
@@ -26,13 +17,21 @@ interface Props {
   onClick?: () => void;
 }
 
+// TODO dedupe <IconLink> declarations
 export default function NavMenu({
   solid,
   compact = false,
   onClick = _.noop,
 }: Props) {
+  const css = useStyle({
+    width: '100%',
+    display: 'grid',
+    gridTemplateColumns: '1fr 1fr 1fr 1fr 1fr',
+    justifyItems: 'center',
+  });
+
   return (
-    <nav className={styles('menu')}>
+    <nav {...css()}>
       <IconLink
         replace
         to={`/${solid}/list`}
