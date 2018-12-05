@@ -1,3 +1,4 @@
+import { CSSProperties } from 'aphrodite';
 
 export const hover = {
   ':hover:not(:disabled)': {
@@ -16,6 +17,21 @@ export const transition = (
   };
 };
 
+export function square(size: number): CSSProperties {
+  return {
+    width: size,
+    height: size,
+  };
+}
+
+export const absoluteFull: CSSProperties = {
+  position: 'absolute',
+  top: 0,
+  left: 0,
+  right: 0,
+  bottom: 0,
+};
+
 /* Position functions */
 
 export const fullScreen = {
@@ -26,12 +42,6 @@ export const fullScreen = {
 
 export const absolute = (vert: 'top' | 'bottom', horiz: 'left' | 'right') => ({
   position: 'absolute',
-  [vert]: 0,
-  [horiz]: 0,
-});
-
-export const fixed = (vert: 'top' | 'bottom', horiz: 'left' | 'right') => ({
-  position: 'fixed',
   [vert]: 0,
   [horiz]: 0,
 });

@@ -1,34 +1,29 @@
 import React from 'react';
 
-import { styled } from 'styles';
-import { fonts } from 'styles';
+import { useStyle, fonts } from 'styles';
+import { absoluteFull } from 'styles/common';
 
 import Icon from '@mdi/react';
 import { mdiHexagonOutline } from '@mdi/js';
 
-const Container = styled.div({
-  position: 'absolute',
-  left: 0,
-  top: 0,
-  right: 0,
-  bottom: 0,
-
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-});
-
-const Text = styled.div({
-  marginLeft: 10,
-  fontFamily: fonts.andaleMono,
-  fontSize: 28,
-});
-
 export default function Loading() {
+  const css = useStyle({
+    ...absoluteFull,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  });
+
+  const text = useStyle({
+    marginLeft: 10,
+    fontFamily: fonts.andaleMono,
+    fontSize: 28,
+  });
+
   return (
-    <Container>
+    <div {...css()}>
       <Icon size="36px" path={mdiHexagonOutline} spin />
-      <Text>Loading...</Text>
-    </Container>
+      <div {...text()}>Loading...</div>
+    </div>
   );
 }

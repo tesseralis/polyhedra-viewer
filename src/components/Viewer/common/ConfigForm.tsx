@@ -1,5 +1,5 @@
-import React, { memo, useCallback } from 'react';
-import { styled } from 'styles';
+import React, { memo, useCallback, ButtonHTMLAttributes } from 'react';
+import { useStyle } from 'styles';
 import _ from 'lodash';
 
 import Config from 'components/ConfigCtx';
@@ -61,49 +61,55 @@ function ConfigInput({ input, value, setValue }: InputProps<any>) {
   }
 }
 
-const Label = styled.label({
-  width: '100%',
-  marginBottom: 16,
-  display: 'flex',
-  justifyContent: 'space-between',
-  fontFamily: andaleMono,
-});
-
 const LabelledInput = memo(({ input, value, setValue }: InputProps<any>) => {
+  const css = useStyle({
+    width: '100%',
+    marginBottom: 16,
+    display: 'flex',
+    justifyContent: 'space-between',
+    fontFamily: andaleMono,
+  });
   return (
-    <Label>
+    <label {...css()}>
       {input.display}
       <ConfigInput input={input} value={value} setValue={setValue} />
-    </Label>
+    </label>
   );
 });
 
-const ResetButton = styled.button.attrs({ type: 'button', children: 'Reset' })({
-  ...hover,
+function ResetButton({ onClick }: ButtonHTMLAttributes<Element>) {
+  const css = useStyle({
+    ...hover,
 
-  width: 120,
-  height: 30,
-  marginTop: 20,
+    width: 120,
+    height: 30,
+    marginTop: 20,
 
-  border: '1px LightGray solid',
+    border: '1px LightGray solid',
 
-  fontFamily: andaleMono,
-  fontSize: 14,
-});
-
-const Form = styled.form({
-  width: '100%',
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'flex-end',
-  padding: 20,
-});
+    fontFamily: andaleMono,
+    fontSize: 14,
+  });
+  return (
+    <button {...css()} type="button" onClick={onClick}>
+      Reset
+    </button>
+  );
+}
 
 export default function ConfigForm() {
   const config = Config.useState();
   const { setValue, reset } = Config.useActions();
+
+  const css = useStyle({
+    width: '100%',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'flex-end',
+    padding: 20,
+  });
   return (
-    <Form>
+    <form {...css()}>
       {configInputs.map(input => (
         <LabelledInput
           key={input.key}
@@ -113,6 +119,6 @@ export default function ConfigForm() {
         />
       ))}
       <ResetButton onClick={reset} />
-    </Form>
+    </form>
   );
 }

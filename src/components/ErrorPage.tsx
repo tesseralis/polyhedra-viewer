@@ -1,61 +1,64 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-import { styled, fonts, media } from 'styles';
+import { useStyle, fonts, media } from 'styles';
+import { square, absoluteFull } from 'styles/common';
 import image from 'images/sad-scutoid.png';
 import { usePageTitle } from 'components/common';
 
-const Section = styled.section({
-  position: 'absolute',
-  top: 0,
-  left: 0,
-  right: 0,
-  bottom: 0,
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-  justifyContent: 'center',
-});
+function Image() {
+  const css = useStyle({
+    ...square(300),
+    marginBottom: 10,
+    [media.mobile]: square(200),
+  });
+  return <img {...css()} src={image} alt="" />;
+}
 
-const Image = styled.img({
-  width: 300,
-  height: 300,
-  marginBottom: 10,
-  [media.mobile]: {
-    width: 200,
-    height: 200,
-  },
-});
+function Title() {
+  const css = useStyle({
+    textAlign: 'center',
+    fontFamily: fonts.andaleMono,
+    marginBottom: 10,
+    fontSize: 24,
+    [media.mobile]: {
+      fontSize: 20,
+    },
+  });
+  return <h1 {...css()}>Uh oh! We don't know about that polyhedron!</h1>;
+}
 
-const Title = styled.h1({
-  textAlign: 'center',
-  fontFamily: fonts.andaleMono,
-  fontSize: 24,
-  marginBottom: 10,
-  [media.mobile]: {
-    fontSize: 20,
-  },
-});
-
-const BackLink = styled(Link)({
-  fontFamily: fonts.andaleMono,
-  textDecoration: 'none',
-  fontSize: 18,
-
-  ':hover': {
-    textDecoration: 'underline',
-  },
-});
+function BackLink() {
+  const css = useStyle({
+    fontFamily: fonts.andaleMono,
+    textDecoration: 'none',
+    fontSize: 18,
+    ':hover': {
+      textDecoration: 'underline',
+    },
+  });
+  return (
+    <Link {...css()} to="/">
+      Go back
+    </Link>
+  );
+}
 
 export default function ErrorPage() {
   usePageTitle('Error - Polyhedra Viewer');
+  const css = useStyle({
+    ...absoluteFull,
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+  });
 
   return (
-    <Section>
-      <Image src={image} alt="" />
-      <Title>Uh oh! We don't know about that polyhedron!</Title>
-      <BackLink to="/">Go back</BackLink>
-    </Section>
+    <section {...css()}>
+      <Image />
+      <Title />
+      <BackLink />
+    </section>
   );
 }

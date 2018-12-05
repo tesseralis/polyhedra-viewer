@@ -1,26 +1,9 @@
-
 import React from 'react';
 import Icon from '@mdi/react';
 import { mdiFacebookBox, mdiTumblrBox, mdiTwitter, mdiReddit } from '@mdi/js';
 
-import { styled, fonts } from 'styles';
+import { useStyle, fonts } from 'styles';
 import { ExternalLink, SrOnly } from 'components/common';
-
-const Container = styled.div({
-  display: 'flex',
-  alignItems: 'center',
-});
-
-const ShareText = styled.span({
-  fontFamily: fonts.andaleMono,
-  fontWeight: 'bold',
-  marginRight: 5,
-});
-
-const ShareLink = styled(ExternalLink)({
-  margin: '0 10px',
-  fill: 'DimGrey',
-});
 
 const url = 'http://polyhedra.tessera.li';
 const title = 'Polyhedra Viewer';
@@ -50,29 +33,47 @@ const links = [
   },
 ];
 
-export default function ShareLinks() {
+function ShareText() {
+  const css = useStyle({
+    fontFamily: fonts.andaleMono,
+    fontWeight: 'bold',
+    marginRight: 5,
+  });
+  return <span {...css()}>Share:</span>;
+}
+
+function ShareLink({ url, icon, name }: typeof links[0]) {
+  const css = useStyle({
+    margin: '0 10px',
+    fill: 'DimGrey',
+  });
   return (
-    <Container>
-      <ShareText>Share:</ShareText>
-      {links.map(({ url, icon, name }) => {
-        return (
-          <ShareLink
-            href={url}
-            key={icon}
-            onClick={() =>
-              // https://stackoverflow.com/questions/34507160/how-can-i-handle-an-event-to-open-a-window-in-react-js
-              window.open(
-                url,
-                'share',
-                'toolbar=0,status=0,width=548,height=325',
-              )
-            }
-          >
-            <Icon size="36px" path={icon} />
-            <SrOnly>{`Share on ${name}`}</SrOnly>
-          </ShareLink>
-        );
-      })}
-    </Container>
+    <ExternalLink
+      {...css()}
+      href={url}
+      key={icon}
+      onClick={() =>
+        // https://stackoverflow.com/questions/34507160/how-can-i-handle-an-event-to-open-a-window-in-react-js
+        window.open(url, 'share', 'toolbar=0,status=0,width=548,height=325')
+      }
+    >
+      <Icon size="36px" path={icon} />
+      <SrOnly>{`Share on ${name}`}</SrOnly>
+    </ExternalLink>
+  );
+}
+
+export default function ShareLinks() {
+  const css = useStyle({
+    display: 'flex',
+    alignItems: 'center',
+  });
+  return (
+    <div {...css()}>
+      <ShareText />
+      {links.map(link => (
+        <ShareLink key={link.name} {...link} />
+      ))}
+    </div>
   );
 }

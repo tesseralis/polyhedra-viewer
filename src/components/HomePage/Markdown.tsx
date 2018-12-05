@@ -1,17 +1,26 @@
-import React, { HTMLAttributes } from 'react';
+import React, { HTMLAttributes, ReactType } from 'react';
 import Markdown from 'react-markdown';
+import { CSSProperties } from 'aphrodite';
 
 import { ExternalLink } from 'components/common';
-import { styled, fonts } from 'styles';
+import { useStyle, fonts } from 'styles';
 
-const List = styled.ul({
+function styled(el: ReactType, styles: CSSProperties) {
+  const El = el;
+  return (props: any) => {
+    const css = useStyle(styles);
+    return <El {...props} {...css()} />;
+  };
+}
+
+const List = styled('ul', {
   listStyle: 'disc inside',
   margin: '0 20px',
   marginBottom: 10,
 });
 
 const listIndent = 20;
-const ListItem = styled.li({
+const ListItem = styled('li', {
   fontSize: 16,
   fontFamily: fonts.times,
   color: 'DimGrey',
@@ -26,7 +35,7 @@ interface RenderProps extends HTMLAttributes<any> {
 }
 
 const renderers = {
-  paragraph: styled.p({
+  paragraph: styled('p', {
     fontSize: 16,
     fontFamily: fonts.times,
     color: 'DimGrey',
@@ -35,7 +44,7 @@ const renderers = {
       marginBottom: 10,
     },
   }),
-  linkReference: styled(ExternalLink)({
+  linkReference: styled(ExternalLink, {
     textDecoration: 'none',
     color: 'MediumBlue',
 
@@ -48,8 +57,8 @@ const renderers = {
   listItem: ({ ordered, tight, ...props }: RenderProps) => (
     <ListItem {...props} />
   ),
-  emphasis: styled.em({ fontStyle: 'italic' }),
-  strong: styled.strong({ fontWeight: 'bold' }),
+  emphasis: styled('em', { fontStyle: 'italic' }),
+  strong: styled('strong', { fontWeight: 'bold' }),
 };
 
 interface Props {
