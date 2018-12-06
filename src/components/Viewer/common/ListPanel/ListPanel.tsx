@@ -137,7 +137,7 @@ const styles = makeStyles({
   },
 });
 
-export default function PolyhedronList() {
+export default function ListPanel() {
   const [filterText, setFilterText] = useState('');
   const filteredGroups =
     filterText === '' ? groups : filterGroups(groups, filterText);

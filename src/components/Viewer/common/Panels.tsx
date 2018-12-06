@@ -1,7 +1,7 @@
 import React, { ComponentType } from 'react';
 import InfoPanel from './InfoPanel';
 import ConfigForm from './ConfigForm';
-import PolyhedronList from './PolyhedronList';
+import ListPanel from './ListPanel';
 
 interface Props {
   panel: string;
@@ -19,7 +19,7 @@ export default function Panels({
     case 'options':
       return <ConfigForm />;
     case 'list':
-      return <PolyhedronList />;
+      return <ListPanel />;
     case 'full':
       return null;
     default:

@@ -2,8 +2,8 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 
 import { escapeName } from 'math/polyhedra/names';
-import { hover } from 'styles/common';
-import { makeStyles, media } from 'styles';
+import { square, hover } from 'styles/common';
+import { useStyle, media } from 'styles';
 
 import 'styles/polyhedronIcons.css';
 
@@ -16,28 +16,13 @@ function scale(ratio: number) {
   return `scale(${ratio}, ${ratio})`;
 }
 
-const styles = makeStyles({
-  link: {
-    ...hover,
-    border: '1px LightGray solid',
-    color: 'black',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    overflow: 'hidden',
-    margin: 'auto', // center inside a table
-    borderRadius: 10,
-    [media.notMobile]: {
-      width: thumbnailSize,
-      height: thumbnailSize,
-    },
-    [media.mobile]: {
-      width: mobThumbnailSize,
-      height: mobThumbnailSize,
-    },
-  },
+interface Props {
+  name: string;
+  isFake: boolean;
+}
 
-  imageWrapper: {
+function Image({ name }: Pick<Props, 'name'>) {
+  const css = useStyle({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -51,31 +36,42 @@ const styles = makeStyles({
       paddingLeft: 4,
       transform: scale((mobThumbnailSize + 15) / baseThumbnailSize),
     },
-  },
-
-  fake: {
-    opacity: 0.5,
-    filter: 'grayscale(50%)',
-  },
-});
-
-interface Props {
-  name: string;
-  isFake: boolean;
+  });
+  return (
+    <div {...css()}>
+      <img className={`icon-${escapeName(name)}`} alt={name} />;
+    </div>
+  );
 }
 
 export default function PolyhedronLink({ name, isFake }: Props) {
   const escapedName = escapeName(name);
+
+  const css = useStyle(
+    {
+      ...hover,
+      ...(isFake ? { opacity: 0.5, filter: 'grayscale(50%)' } : {}),
+      border: '1px LightGray solid',
+      color: 'black',
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      overflow: 'hidden',
+      margin: 'auto', // center inside a table
+      borderRadius: 10,
+      [media.notMobile]: square(thumbnailSize),
+      [media.mobile]: square(mobThumbnailSize),
+    },
+    [isFake],
+  );
   return (
     <Link
+      {...css()}
       id={!isFake ? escapedName : undefined}
       to={'/' + escapedName}
-      className={styles('link', isFake && 'fake')}
       title={name}
     >
-      <div className={styles('imageWrapper')}>
-        <img className={`icon-${escapedName}`} alt={name} />;
-      </div>
+      <Image name={name} />
     </Link>
   );
 }

@@ -1,37 +1,13 @@
 import React from 'react';
 import Icon from '@mdi/react';
 
-import { makeStyles } from 'styles';
+import { useStyle } from 'styles';
 import { SrOnly } from 'components/common';
 import { fonts } from 'styles';
 
 import { SolidData } from 'math/polyhedra';
 import { hover } from 'styles/common';
 import { mdiDownload } from '@mdi/js';
-
-const styles = makeStyles({
-  header: {
-    fontFamily: fonts.times,
-    fontSize: 18,
-    marginBottom: 10,
-  },
-  downloadLink: {
-    display: 'inline-flex',
-    padding: 10,
-    justifyContent: 'center',
-    width: 100,
-
-    textDecoration: 'none',
-    border: '1px solid LightGrey',
-    color: 'black',
-    fontFamily: fonts.andaleMono,
-    ...hover,
-
-    ':not(:first-child)': {
-      marginLeft: 10,
-    },
-  },
-});
 
 function formatDecimal(number: number) {
   return Number.isInteger(number) ? `${number}.0` : number;
@@ -66,32 +42,57 @@ interface Props {
   solid: SolidData;
 }
 
+function DownloadLink({
+  ext,
+  serializer,
+  solid,
+}: typeof fileFormats[0] & Props) {
+  const filename = `${solid.name}.${ext}`;
+  const blob = new Blob([serializer(solid)], {
+    type: 'text/plain;charset=utf-8',
+  });
+  const url = window.URL.createObjectURL(blob);
+
+  const css = useStyle({
+    display: 'inline-flex',
+    padding: 10,
+    justifyContent: 'center',
+    width: 100,
+
+    textDecoration: 'none',
+    border: '1px solid LightGrey',
+    color: 'black',
+    fontFamily: fonts.andaleMono,
+    ...hover,
+
+    ':not(:first-child)': {
+      marginLeft: 10,
+    },
+  });
+
+  return (
+    <a {...css()} key={ext} download={filename} href={url}>
+      <SrOnly>Download as</SrOnly>.{ext}{' '}
+      <span>
+        <Icon path={mdiDownload} size="18px" />
+      </span>
+    </a>
+  );
+}
+
 export default function DataDownloader({ solid }: Props) {
-  const name = solid.name || 'polyhedron';
+  const heading = useStyle({
+    fontFamily: fonts.times,
+    fontSize: 18,
+    marginBottom: 10,
+  });
   return (
     <div>
-      <h2 className={styles('header')}>Download model</h2>
+      <h2 {...heading()}>Download model</h2>
       <div>
-        {fileFormats.map(({ ext, serializer }) => {
-          const filename = `${name}.${ext}`;
-          const blob = new Blob([serializer(solid)], {
-            type: 'text/plain;charset=utf-8',
-          });
-          const url = window.URL.createObjectURL(blob);
-          return (
-            <a
-              key={ext}
-              download={filename}
-              href={url}
-              className={styles('downloadLink')}
-            >
-              <SrOnly>Download as</SrOnly>.{ext}{' '}
-              <span>
-                <Icon path={mdiDownload} size="18px" />
-              </span>
-            </a>
-          );
-        })}
+        {fileFormats.map(format => (
+          <DownloadLink {...format} solid={solid} />
+        ))}
       </div>
     </div>
   );

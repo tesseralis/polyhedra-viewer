@@ -2,9 +2,9 @@ import _ from 'lodash';
 
 import React, { memo } from 'react';
 
-import { makeStyles } from 'styles';
+import { useStyle } from 'styles';
 import { media, fonts } from 'styles';
-import { hover, scroll } from 'styles/common';
+import { hover, scroll, square } from 'styles/common';
 import { operations, OpName } from 'math/operations';
 import {
   useApplyOperation,
@@ -23,54 +23,6 @@ const opLayout: OpName[][] = [
 
 const opList = _.flatMap(opLayout, line => _.uniq(line));
 
-const styles = makeStyles({
-  opGrid: {
-    [media.notMobile]: {
-      display: 'grid',
-      justifyContent: 'space-around',
-      gridColumnGap: 5,
-      gridRowGap: 20,
-      gridTemplateRows: 'repeat(4, 80px)',
-      gridTemplateAreas: opLayout.map(line => `"${line.join(' ')}"`).join('\n'),
-    },
-    [media.mobile]: {
-      ...scroll('x'),
-      height: 85,
-      display: 'flex',
-      width: '100%',
-    },
-  },
-
-  operationButton: {
-    fontFamily: fonts.verdana,
-    fontSize: 12,
-    width: 84,
-    height: 84,
-    border: '1px LightGray solid',
-    color: 'DimGray',
-    backgroundColor: 'white',
-
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-
-    ':disabled': {
-      opacity: 0.3,
-    },
-
-    ...hover,
-
-    [media.mobile]: {
-      margin: '0 8px',
-    },
-  },
-
-  isHighlighted: {
-    border: '2px DarkSlateGray solid',
-  },
-});
-
 interface Props {
   name: OpName;
   disabled: boolean;
@@ -82,6 +34,29 @@ const OpButton = memo(function({ name, disabled }: Props) {
   const applyOperation = useApplyOperation();
   const operation = operations[name];
   const isCurrent = !!currentOp && name === currentOp.name;
+
+  const css = useStyle(
+    {
+      ...hover,
+      ...square(84),
+      border: `${isCurrent ? 2 : 1}px LightGray solid`,
+      fontFamily: fonts.verdana,
+      fontSize: 12,
+      color: 'DimGray',
+      backgroundColor: 'white',
+
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+
+      ':disabled': { opacity: 0.3 },
+      // add spacing since we're displayed in a row
+      // TODO can we do this in the parent styling?
+      [media.mobile]: { margin: '0 8px' },
+    },
+    [isCurrent],
+  );
 
   const selectOperation = () => {
     if (isCurrent) {
@@ -96,7 +71,7 @@ const OpButton = memo(function({ name, disabled }: Props) {
   };
   return (
     <button
-      className={styles('operationButton', isCurrent && 'isHighlighted')}
+      {...css()}
       style={{ gridArea: name }}
       onClick={selectOperation}
       disabled={!operation.canApplyTo(polyhedron) || disabled}
@@ -109,8 +84,24 @@ const OpButton = memo(function({ name, disabled }: Props) {
 
 export default function OpGrid() {
   const { isTransitioning } = TransitionCtx.useState();
+  const css = useStyle({
+    [media.notMobile]: {
+      display: 'grid',
+      justifyContent: 'space-around',
+      gridColumnGap: 5,
+      gridRowGap: 20,
+      gridTemplateRows: 'repeat(4, 80px)',
+      gridTemplateAreas: opLayout.map(line => `"${line.join(' ')}"`).join('\n'),
+    },
+    [media.mobile]: {
+      ...scroll('x'),
+      height: 85,
+      display: 'flex',
+      width: '100%',
+    },
+  });
   return (
-    <div className={styles('opGrid')}>
+    <div {...css()}>
       {opList.map(name => (
         <OpButton key={name} name={name} disabled={isTransitioning} />
       ))}

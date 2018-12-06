@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { makeStyles } from 'styles';
 
@@ -11,7 +10,7 @@ const styles = makeStyles({
     display: 'flex',
     flexDirection: 'column',
     pointerEvents: 'none',
-    [media.mobilePortrait]: {
+    [media.mobile]: {
       padding: 10,
     },
   },
