@@ -1,31 +1,20 @@
 import React from 'react';
 import { Route, NavLink, NavLinkProps } from 'react-router-dom';
-import { makeStyles } from 'styles';
+import { useStyle } from 'styles';
 import Icon from '@mdi/react';
 
 import { resetLink } from 'styles/common';
 import { media, fonts } from 'styles';
 import { SrOnly } from 'components/common';
 
-const styles = makeStyles({
-  link: {
-    ...resetLink,
-    display: 'flex',
-    alignItems: 'center',
-    color: 'DimGray',
-    fill: 'DimGray',
-    padding: 10,
-    flexDirection: 'column',
-    [media.mobileLandscape]: {
-      padding: 0,
-      flexDirection: 'row',
-    },
-  },
-  activeLink: {
-    color: 'DarkSlateGray',
-    fill: 'DarkSlateGray',
-  },
-  title: {
+interface Props extends NavLinkProps {
+  iconName: string;
+  iconOnly?: boolean;
+  title: string;
+}
+
+function LinkText({ text, hidden }: { text: string; hidden: boolean }) {
+  const css = useStyle({
     marginTop: 5,
     fontSize: 12,
     fontFamily: fonts.verdana,
@@ -37,13 +26,8 @@ const styles = makeStyles({
       marginTop: 0,
       paddingLeft: 5,
     },
-  },
-});
-
-interface Props extends NavLinkProps {
-  iconName: string;
-  iconOnly?: boolean;
-  title: string;
+  });
+  return hidden ? <SrOnly>{text}</SrOnly> : <div {...css()}>{text}</div>;
 }
 
 export default function IconLink({
@@ -55,22 +39,38 @@ export default function IconLink({
   onClick,
   iconOnly = false,
 }: Props) {
+  const css = useStyle({
+    ...resetLink,
+    display: 'flex',
+    flexDirection: 'column',
+
+    alignItems: 'center',
+    color: 'DimGray',
+    fill: 'DimGray',
+    padding: 10,
+    [media.mobileLandscape]: {
+      padding: 0,
+      flexDirection: 'row',
+    },
+  });
+
+  const activeCss = useStyle({
+    color: 'DarkSlateGray',
+    fill: 'DarkSlateGray',
+  });
+
   return (
     <Route>
       <NavLink
         to={to}
         replace={replace}
         exact={exact}
-        className={styles('link')}
-        activeClassName={styles('activeLink')}
+        {...css()}
+        {...activeCss('activeClassName')}
         onClick={onClick}
       >
         <Icon path={iconName} size="36px" />
-        {iconOnly ? (
-          <SrOnly>{title}</SrOnly>
-        ) : (
-          <div className={styles('title')}>{title}</div>
-        )}
+        <LinkText text={title} hidden={iconOnly} />
       </NavLink>
     </Route>
   );

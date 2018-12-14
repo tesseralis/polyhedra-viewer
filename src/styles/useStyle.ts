@@ -5,8 +5,8 @@ import { StyleSheet, css, CSSProperties } from 'aphrodite/no-important';
 export default function useStyle(styles: CSSProperties, deps: any[] = []) {
   return useMemo(() => {
     const rule = StyleSheet.create({ styles });
-    return () => ({
-      className: css(rule.styles),
+    return (prop = 'className') => ({
+      [prop]: css(rule.styles),
     });
   }, deps);
 }
