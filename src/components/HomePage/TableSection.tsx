@@ -1,5 +1,6 @@
 import React from 'react';
-import { makeStyles } from 'styles';
+import { CSSProperties } from 'aphrodite';
+import { useStyle } from 'styles';
 
 import { Table } from 'math/polyhedra/tables';
 import { media, fonts } from 'styles';
@@ -29,7 +30,7 @@ const gridAreaMapping: Record<string, string> = {
   'Other Johnson Solids': 'other',
 };
 
-const styles = makeStyles({
+const sectionStyles: Record<string, CSSProperties> = {
   // Section styles
   uniform: {
     gridTemplateAreas: `
@@ -82,48 +83,7 @@ const styles = makeStyles({
       gridTemplateAreas: '"snub other"',
     },
   },
-
-  // Other styles
-  section: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    ':not(:last-child)': {
-      marginBottom: 50,
-    },
-  },
-
-  grid: {
-    display: 'grid',
-    gridRowGap: 50,
-    gridColumnGap: 30,
-    justifyItems: 'center',
-  },
-
-  description: {
-    maxWidth: 800,
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    padding: '0 50px',
-    marginBottom: 30,
-    [media.mobile]: {
-      padding: '0 30px',
-    },
-  },
-
-  sectionHeader: {
-    fontFamily: fonts.times,
-    fontSize: 24,
-    marginBottom: 20,
-  },
-
-  subsectionHeader: {
-    fontFamily: fonts.times,
-    fontSize: 20,
-    marginBottom: 15,
-  },
-});
+};
 
 const GridArea = ({ area, data }: { area: string; data: Table }) => {
   return (
@@ -137,8 +97,18 @@ const TableGrid = ({
   tables,
   header,
 }: Pick<TableSectionType, 'tables' | 'header'>) => {
+  const css = useStyle(
+    {
+      display: 'grid',
+      gridRowGap: 50,
+      gridColumnGap: 30,
+      justifyItems: 'center',
+      ...sectionStyles[sectionMapping[header]],
+    },
+    [header],
+  );
   return (
-    <div className={styles('grid', sectionMapping[header])}>
+    <div {...css()}>
       {tables!.map(table => {
         const area = gridAreaMapping[table.caption];
         return <GridArea key={area} area={area} data={table} />;
@@ -146,6 +116,23 @@ const TableGrid = ({
     </div>
   );
 };
+
+function Heading({ subsection, text }: { subsection: boolean; text: string }) {
+  const H = subsection ? 'h3' : 'h2';
+  const css = useStyle({
+    fontFamily: fonts.times,
+    ...(subsection
+      ? {
+          fontSize: 20,
+          marginBottom: 15,
+        }
+      : {
+          fontSize: 24,
+          marginBottom: 20,
+        }),
+  });
+  return <H {...css()}>{text}</H>;
+}
 
 interface Props {
   data: TableSectionType;
@@ -166,21 +153,34 @@ export default function TableSection({
     subsections,
     sticky,
   } = data;
-  const Header = isSubsection ? 'h3' : 'h2';
-  const headerStyle = isSubsection ? 'subsectionHeader' : 'sectionHeader';
+
+  const css = useStyle({
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    ':not(:last-child)': {
+      marginBottom: 50,
+    },
+  });
+
+  const textCss = useStyle({
+    maxWidth: 800,
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    padding: '0 50px',
+    marginBottom: 30,
+    [media.mobile]: {
+      padding: '0 30px',
+    },
+  });
 
   return (
-    <div key={header} className={styles('section')}>
-      {typeof description !== 'undefined' && (
-        <div className={styles('description')}>
-          <Header className={styles(headerStyle)}>{header}</Header>
-          <Description
-            title={header}
-            content={description}
-            collapsed={!sticky}
-          />
-        </div>
-      )}
+    <section {...css()}>
+      <div {...textCss()}>
+        <Heading subsection={isSubsection} text={header} />
+        <Description title={header} content={description} collapsed={!sticky} />
+      </div>
       {tables && (
         <TableGrid
           header={header}
@@ -196,6 +196,6 @@ export default function TableSection({
             data={subsection}
           />
         ))}
-    </div>
+    </section>
   );
 }

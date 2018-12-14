@@ -46,6 +46,7 @@ export default function ResizeButtons() {
     <div {...css()}>
       {buttons.map(({ name, handler }) => (
         <ResetButton
+          key={name}
           disabled={isTransitioning}
           onClick={() => setPolyhedron(handler(polyhedron))}
         >

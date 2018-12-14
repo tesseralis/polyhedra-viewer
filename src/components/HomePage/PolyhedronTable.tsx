@@ -1,21 +1,13 @@
-import React from 'react';
+import React, { ThHTMLAttributes } from 'react';
 import _ from 'lodash';
 
 import { fromConwayNotation } from 'math/polyhedra/names';
 import { Table } from 'math/polyhedra/tables';
 import PolyhedronLink from './PolyhedronLink';
-import { makeStyles, media, fonts } from 'styles';
+import { media, fonts, useStyle } from 'styles';
 
-const styles = makeStyles({
-  table: {
-    borderSpacing: 8,
-    borderCollapse: 'separate',
-  },
-  caption: {
-    fontSize: 16,
-    fontFamily: fonts.times,
-  },
-  cell: {
+function useCellStyle() {
+  return useStyle({
     fontFamily: fonts.times,
     verticalAlign: 'middle',
     textAlign: 'center',
@@ -26,11 +18,8 @@ const styles = makeStyles({
     [media.mobile]: {
       fontSize: 12,
     },
-  },
-  label: {
-    marginTop: 5,
-  },
-});
+  });
+}
 
 const Cell = ({ cell, colSpan = 1 }: { cell: string; colSpan?: number }) => {
   const isFake = cell[0] === '!';
@@ -39,13 +28,20 @@ const Cell = ({ cell, colSpan = 1 }: { cell: string; colSpan?: number }) => {
   const symbol = isFake ? `(${cell.substring(1)})` : cell;
 
   // Render a link for each cell, or a grayed-out link when indicated by an "!"
+  const css = useCellStyle();
+  const label = useStyle({ marginTop: 5 });
   return (
-    <td className={styles('cell')} colSpan={colSpan}>
+    <td {...css()} colSpan={colSpan}>
       {polyhedron ? <PolyhedronLink isFake={isFake} name={polyhedron} /> : cell}
-      <div className={styles('label')}>{polyhedron && symbol}</div>
+      <div {...label()}>{polyhedron && symbol}</div>
     </td>
   );
 };
+
+function Th(props: ThHTMLAttributes<Element>) {
+  const css = useCellStyle();
+  return <th {...props} {...css()} />;
+}
 
 const ColumnHeaders = ({ columns }: Pick<Table, 'columns'>) => {
   return (
@@ -56,24 +52,16 @@ const ColumnHeaders = ({ columns }: Pick<Table, 'columns'>) => {
         {_.flatMap(columns, (col, j) =>
           typeof col === 'string'
             ? [<th key={j} />]
-            : col.sub.map(subCol => (
-                <th className={styles('cell')} key={`${j}-${subCol}`}>
-                  {subCol}
-                </th>
-              )),
+            : col.sub.map(subCol => <Th key={`${j}-${subCol}`}>{subCol}</Th>),
         )}
       </tr>
       {/* Render the main column headers, making sure to span more than one column for those with subcolumns */}
       <tr>
         <th />
         {columns.map((col, j) => (
-          <th
-            className={styles('cell')}
-            key={j}
-            colSpan={typeof col !== 'string' ? col.sub.length : 1}
-          >
+          <Th key={j} colSpan={typeof col !== 'string' ? col.sub.length : 1}>
             {typeof col !== 'string' ? col.name : col}
-          </th>
+          </Th>
         ))}
       </tr>
     </thead>
@@ -88,15 +76,20 @@ export default function PolyhedronTable({
   columns,
   data,
 }: Props) {
+  const css = useStyle({
+    borderSpacing: 8,
+    borderCollapse: 'separate',
+  });
+  const captionCss = useStyle({ fontSize: 16, fontFamily: fonts.times });
   return (
-    <table className={styles('table')}>
-      <caption className={styles('caption')}>{caption}</caption>
+    <table {...css()}>
+      <caption {...captionCss()}>{caption}</caption>
       <ColumnHeaders columns={columns} />
       <tbody>
         {data.map((row, i) => (
           <tr key={i}>
             {/* Row header */}
-            <th className={styles('cell')}>{rows[i]}</th>
+            <Th>{rows[i]}</Th>
             {_.flatMap(row, (cell, j) => {
               const col = columns[j];
               if (_.isArray(cell)) {

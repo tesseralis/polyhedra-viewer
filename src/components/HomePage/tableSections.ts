@@ -19,7 +19,7 @@ import {
 
 export interface TableSection {
   header: string;
-  description?: string;
+  description: string;
   sticky?: boolean;
   tables?: Table[];
   narrowTables?: Table[];

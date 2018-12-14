@@ -5,7 +5,7 @@ import ListPanel from './ListPanel';
 
 interface Props {
   panel: string;
-  operationsPanel: ComponentType<{}>;
+  operationsPanel: ComponentType;
 }
 export default function Panels({
   panel,
