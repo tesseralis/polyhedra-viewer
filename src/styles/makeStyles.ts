@@ -1,4 +1,3 @@
-
 import { css, StyleSheet } from 'aphrodite/no-important';
 
 type SheetDefinition = { [key: string]: {} };

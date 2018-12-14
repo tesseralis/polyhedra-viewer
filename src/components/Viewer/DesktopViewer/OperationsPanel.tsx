@@ -1,27 +1,22 @@
-
 import React from 'react';
-import { makeStyles } from 'styles';
+import { useStyle } from 'styles';
 
 import { ResizeButtons, OpGrid } from '../common';
 
-const styles = makeStyles({
-  opPanel: {
+export default function OperationsPanel() {
+  const css = useStyle({
     height: '100%',
     padding: '20px 10px',
     display: 'flex',
     flexDirection: 'column',
-  },
+  });
 
-  resizeButtons: {
-    marginTop: 'auto',
-  },
-});
+  const buttonCss = useStyle({ marginTop: 'auto' });
 
-export default function OperationsPanel() {
   return (
-    <section className={styles('opPanel')}>
+    <section {...css()}>
       <OpGrid />
-      <div className={styles('resizeButtons')}>
+      <div {...buttonCss()}>
         <ResizeButtons />
       </div>
     </section>
