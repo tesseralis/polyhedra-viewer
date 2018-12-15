@@ -30,12 +30,15 @@ export default function Sidebar({ panel, solid, compact }: Props) {
     [compact],
   );
 
-  const menuCss = useStyle({
-    gridArea: 'menu',
-    height: menuH,
-    padding: '0 10px',
-    borderBottom: compact ? undefined : '1px solid LightGray',
-  });
+  const menuCss = useStyle(
+    {
+      gridArea: 'menu',
+      height: menuH,
+      padding: '0 10px',
+      borderBottom: compact ? undefined : '1px solid LightGray',
+    },
+    [compact],
+  );
 
   const contentCss = useStyle({
     ...scroll('y'),
