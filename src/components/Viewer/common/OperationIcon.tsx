@@ -1,11 +1,25 @@
 import _ from 'lodash';
 
 import React, { memo, ComponentType } from 'react';
-import { makeStyles } from 'styles';
+import { StyleSheet, css } from 'aphrodite/no-important';
 
 import { OpName } from 'math/operations';
 import { Polygon, PolyLine } from 'components/svg';
 const { sqrt } = Math;
+
+type SheetDefinition = { [key: string]: {} };
+
+type KeyType = string | false;
+
+// TODO usually we would do `useStyle`, but I can't figure out
+// how to make it look reasonable. Plus, I'm thinking of redoing these anyway.
+function makeStyles(inputStyles: SheetDefinition) {
+  const styles = StyleSheet.create(inputStyles);
+
+  return (...keys: KeyType[]) => {
+    return css(...keys.map(key => !!key && styles[key]));
+  };
+}
 
 const color = 'DimGray';
 const styles = makeStyles({

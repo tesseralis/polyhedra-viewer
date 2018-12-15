@@ -15,6 +15,7 @@ function joinPoints(points: Point2D[]) {
   return points.map(point => point.join(',')).join(' ');
 }
 
+// Irregular polygon
 export function PolyShape({ points, ...rest }: PointsProps) {
   return <polygon {...rest} points={joinPoints(points)} />;
 }
@@ -48,6 +49,7 @@ export function polygonPoints({
     .value();
 }
 
+// Regular polygon
 export function Polygon({
   n = 3,
   r = 1,

@@ -2,7 +2,7 @@ import _ from 'lodash';
 
 import React, { memo } from 'react';
 
-import { makeStyles } from 'styles';
+import { useStyle } from 'styles';
 import {
   Point2D,
   Polygon,
@@ -10,88 +10,48 @@ import {
   PolyShape,
   polygonPoints,
 } from 'components/svg';
-
-const color = 'DimGray';
-const styles = makeStyles({
-  icon: {
-    width: 40,
-    height: 40,
-  },
-
-  outer: {
-    stroke: color,
-    fill: 'none',
-    strokeWidth: 8,
-    strokeLinejoin: 'round',
-  },
-
-  inner: {
-    stroke: color,
-    fill: 'none',
-    strokeWidth: 5,
-    strokeLinejoin: 'round',
-  },
-});
+import { square } from 'styles/common';
 
 interface Props {
   name: string;
 }
 
-function drawIcon(name: string) {
+const color = 'DimGray';
+
+function InnerIcon({ name }: Props) {
+  const inner = useStyle({
+    stroke: color,
+    fill: 'none',
+    strokeWidth: 5,
+    strokeLinejoin: 'round',
+  });
+
+  const outer = useStyle({
+    stroke: color,
+    fill: 'none',
+    strokeWidth: 8,
+    strokeLinejoin: 'round',
+  });
   switch (name) {
     case 'ortho':
       return (
         <>
-          <Polygon
-            className={styles('outer')}
-            n={5}
-            cx={100}
-            cy={100}
-            a={90}
-            r={100}
-          />
-          <Polygon
-            className={styles('inner')}
-            n={5}
-            cx={100}
-            cy={100}
-            a={90}
-            r={66}
-          />
+          <Polygon {...outer()} n={5} cx={100} cy={100} a={90} r={100} />
+          <Polygon {...inner()} n={5} cx={100} cy={100} a={90} r={66} />
         </>
       );
     case 'gyro':
       return (
         <>
-          <Polygon
-            className={styles('outer')}
-            n={5}
-            cx={100}
-            cy={100}
-            a={90}
-            r={100}
-          />
-          <Polygon
-            className={styles('inner')}
-            n={5}
-            cx={100}
-            cy={100}
-            a={-90}
-            r={66}
-          />
+          <Polygon {...outer()} n={5} cx={100} cy={100} a={90} r={100} />
+          <Polygon {...inner()} n={5} cx={100} cy={100} a={-90} r={66} />
         </>
       );
     case 'pyramid':
       return (
         <>
-          <PolyShape
-            className={styles('outer')}
-            points={[[100, 50], [10, 170], [190, 170]]}
-          />
-          <PolyLine
-            className={styles('inner')}
-            points={[[140, 170], [100, 50], [60, 170]]}
-          />
+          <PolyShape {...outer()} points={[[100, 50], [10, 170], [190, 170]]} />
+          <PolyLine {...inner()} points={[[140, 170], [100, 50], [60, 170]]} />
         </>
       );
     case 'fastigium': {
@@ -102,13 +62,10 @@ function drawIcon(name: string) {
       return (
         <>
           <PolyShape
-            className={styles('outer')}
+            {...outer()}
             points={[[150, topY], [50, topY], [10, bottomY], [190, bottomY]]}
           />
-          <PolyLine
-            className={styles('inner')}
-            points={[[150, topY], [120, bottomY]]}
-          />
+          <PolyLine {...inner()} points={[[150, topY], [120, bottomY]]} />
         </>
       );
     }
@@ -124,7 +81,7 @@ function drawIcon(name: string) {
       return (
         <>
           <PolyShape
-            className={styles('outer')}
+            {...outer()}
             points={[
               [topRightX, topY],
               [topLeftX, topY],
@@ -133,7 +90,7 @@ function drawIcon(name: string) {
             ]}
           />
           <PolyLine
-            className={styles('inner')}
+            {...inner()}
             points={[
               [topLeftX, topY],
               [topLeftX, bottomY],
@@ -155,13 +112,13 @@ function drawIcon(name: string) {
       const q2: Point2D = [p5[0], p6[1]];
       return (
         <>
-          <PolyShape className={styles('outer')} points={points} />
+          <PolyShape {...outer()} points={points} />
           <PolyShape
-            className={styles('inner')}
+            {...inner()}
             points={[[70, bottomY], q1, p4, q2, [130, bottomY]]}
           />
           <PolyLine
-            className={styles('inner')}
+            {...inner()}
             points={[p3, q1, [40, bottomY], [160, bottomY], q2, p5]}
           />
         </>
@@ -172,9 +129,10 @@ function drawIcon(name: string) {
   }
 }
 export default memo(function OptionIcon({ name }: Props) {
+  const css = useStyle(square(40));
   return (
-    <svg viewBox="0 0 200 200" className={styles('icon')}>
-      {drawIcon(name)}
+    <svg viewBox="0 0 200 200" {...css()}>
+      <InnerIcon name={name} />
     </svg>
   );
 });
