@@ -95,10 +95,10 @@ export default memo(function MobileViewer({ panel, solid }: Props) {
 
   return (
     <section className={styles('viewer')}>
-      <div className={styles('title')}>
+      <header className={styles('title')}>
         <BackLink solid={solid} />
         <Title name={solid} />
-      </div>
+      </header>
       <div
         className={styles(
           'content',

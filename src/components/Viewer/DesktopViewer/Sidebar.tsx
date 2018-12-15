@@ -47,7 +47,7 @@ export default function Sidebar({ panel, solid, compact }: Props) {
   return (
     <section className={styles('sidebar', !compact && 'full')}>
       <div className={styles('menu', !compact && 'menuFull')}>
-        <NavMenu solid={solid} compact={!!compact} onClick={focusOnHeader} />
+        <NavMenu solid={solid} compact={compact} onClick={focusOnHeader} />
       </div>
       {!compact && (
         <div className={styles('content')}>

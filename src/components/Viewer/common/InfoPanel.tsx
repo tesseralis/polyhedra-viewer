@@ -1,5 +1,5 @@
 import React, { ComponentType } from 'react';
-import { makeStyles } from 'styles';
+import { useStyle } from 'styles';
 import _ from 'lodash';
 
 import { ChildrenProp } from 'types';
@@ -10,72 +10,12 @@ import { PolyhedronCtx } from 'components/Viewer/context';
 import DataDownloader from './DataDownloader';
 import { Polyhedron } from '../../../math/polyhedra';
 
-const styles = makeStyles({
-  infoPanel: {
-    height: '100%',
-    borderSpacing: 8,
-    borderCollapse: 'separate',
-    padding: 20,
-    fontFamily: fonts.times,
-    display: 'flex',
-    flexDirection: 'column',
-  },
-
-  solidName: {
-    fontSize: 22,
-    marginBottom: 5,
-  },
-
-  solidType: {
-    fontSize: 18,
-    color: 'DimGrey',
-    marginBottom: 20,
-  },
-
-  dataList: {
-    display: 'grid',
-    gridTemplateAreas: `
-      "verts verts edges edges faces faces"
-      "vconf vconf vconf ftype ftype ftype"
-      "vol   vol   sa    sa    spher spher"
-      "sym   sym   sym   sym   order order"
-      "alt   alt   alt   alt   alt   alt"
-    `,
-    gridRowGap: 15,
-  },
-
-  property: {
-    marginBottom: 10,
-  },
-
-  propName: {
-    fontSize: 18,
-    marginBottom: 5,
-  },
-
-  propValue: {
-    fontFamily: fonts.andaleMono,
-    color: 'DimGrey',
-  },
-
-  sub: {
+function Sub({ children }: ChildrenProp) {
+  const css = useStyle({
     verticalAlign: 'sub',
     fontSize: 'smaller',
-  },
-
-  // Superscript is implemented using Unicode superscripts
-  // so we just need to adjust the style so it looks nice
-  sup: {
-    fontSize: 20,
-  },
-
-  downloader: {
-    marginTop: 'auto',
-  },
-});
-
-function Sub({ children }: ChildrenProp) {
-  return <sub className={styles('sub')}>{children}</sub>;
+  });
+  return <sub {...css()}>{children}</sub>;
 }
 
 function Sup({ children }: ChildrenProp<number>) {
@@ -101,7 +41,8 @@ function Sup({ children }: ChildrenProp<number>) {
         return children;
     }
   })();
-  return <sup className={styles('sup')}>{value}</sup>;
+  const css = useStyle({ fontSize: 20 });
+  return <sup {...css()}>{value}</sup>;
 }
 
 function groupedVertexConfig(config: string) {
@@ -267,31 +208,93 @@ const info: InfoRow[] = [
   },
 ];
 
+function Heading({ polyhedron }: RenderProps) {
+  const css = useStyle({
+    fontSize: 22,
+    marginBottom: 5,
+  });
+  return (
+    <h2 {...css()}>
+      {_.capitalize(polyhedron.name)}, {polyhedron.symbol()}
+    </h2>
+  );
+}
+
+function Property({
+  polyhedron,
+  name,
+  area,
+  render: Renderer,
+}: InfoRow & RenderProps) {
+  const css = useStyle({ marginBottom: 10 });
+  const nameCss = useStyle({
+    fontSize: 18,
+    marginBottom: 5,
+  });
+  const valueCss = useStyle({
+    fontFamily: fonts.andaleMono,
+    color: 'DimGrey',
+  });
+
+  return (
+    <div {...css()} style={{ gridArea: area }}>
+      <dd {...nameCss()}>{name}</dd>
+      <dt {...valueCss()}>
+        <Renderer polyhedron={polyhedron} />
+      </dt>
+    </div>
+  );
+}
+
+function DataList({ polyhedron }: RenderProps) {
+  const css = useStyle({
+    display: 'grid',
+    gridTemplateAreas: `
+      "verts verts edges edges faces faces"
+      "vconf vconf vconf ftype ftype ftype"
+      "vol   vol   sa    sa    spher spher"
+      "sym   sym   sym   sym   order order"
+      "alt   alt   alt   alt   alt   alt"
+    `,
+    gridRowGap: 15,
+  });
+
+  return (
+    <dl {...css()}>
+      {info.map(props => (
+        <Property key={props.name} {...props} polyhedron={polyhedron} />
+      ))}
+    </dl>
+  );
+}
+
 export default function InfoPanel() {
   const polyhedron = PolyhedronCtx.useState();
+
+  const css = useStyle({
+    height: '100%',
+    borderSpacing: 8,
+    borderCollapse: 'separate',
+    padding: 20,
+    fontFamily: fonts.times,
+    display: 'flex',
+    flexDirection: 'column',
+  });
+
+  const typeCss = useStyle({
+    fontSize: 18,
+    color: 'DimGrey',
+    marginBottom: 20,
+  });
+
+  const downloaderCss = useStyle({ marginTop: 'auto' });
+
   return (
-    <div className={styles('infoPanel')}>
-      <h2 className={styles('solidName')}>
-        {_.capitalize(polyhedron.name)}, {polyhedron.symbol()}
-      </h2>
-      <p className={styles('solidType')}>{polyhedron.type()}</p>
-      <dl className={styles('dataList')}>
-        {info.map(({ name, area, render: Renderer }) => {
-          return (
-            <div
-              key={name}
-              className={styles('property')}
-              style={{ gridArea: area }}
-            >
-              <dd className={styles('propName')}>{name}</dd>
-              <dt className={styles('propValue')}>
-                <Renderer polyhedron={polyhedron} />
-              </dt>
-            </div>
-          );
-        })}
-      </dl>
-      <div className={styles('downloader')}>
+    <div {...css()}>
+      <Heading polyhedron={polyhedron} />
+      <p {...typeCss()}>{polyhedron.type()}</p>
+      <DataList polyhedron={polyhedron} />
+      <div {...downloaderCss()}>
         <DataDownloader solid={polyhedron.solidData} />
       </div>
     </div>

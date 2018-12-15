@@ -1,38 +1,10 @@
-import React from 'react';
-import { makeStyles } from 'styles';
+import React, { ButtonHTMLAttributes } from 'react';
+import { useStyle } from 'styles';
 
 import { PolyhedronCtx, OperationCtx } from 'components/Viewer/context';
 import OptionIcon from './OptionIcon';
 import { verdana } from 'styles/fonts';
 import { hover, square } from 'styles/common';
-
-const styles = makeStyles({
-  augmentOptions: {
-    width: '100%',
-    height: '100%',
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-
-  augmentOption: {
-    display: 'flex',
-    flexDirection: 'column',
-    pointerEvents: 'initial',
-  },
-
-  optionButton: {
-    ...hover,
-    ...square(72),
-    border: '1px LightGray solid',
-    backgroundColor: 'white',
-    fontFamily: verdana,
-  },
-
-  isHighlighted: {
-    border: '2px DarkSlateGray solid',
-  },
-});
 
 const getOptionName = (optValue: string) => {
   switch (optValue) {
@@ -48,6 +20,30 @@ const getOptionName = (optValue: string) => {
       return optValue;
   }
 };
+
+interface BtnProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  optValue: string;
+  selected: boolean;
+}
+
+function OptionButton({ optValue, selected, ...htmlProps }: BtnProps) {
+  const css = useStyle(
+    {
+      ...hover,
+      ...square(72),
+      border: selected ? '2px DarkSlateGray solid' : '1px LightGray solid',
+      backgroundColor: 'white',
+      fontFamily: verdana,
+    },
+    [selected],
+  );
+  return (
+    <button {...htmlProps} {...css()}>
+      <OptionIcon name={getOptionName(optValue)} />
+      {getOptionName(optValue)}
+    </button>
+  );
+}
 
 interface OptionType<T = any> {
   name: string;
@@ -78,23 +74,32 @@ export default function AugmentOptions() {
     },
   ];
 
+  const css = useStyle({
+    width: '100%',
+    height: '100%',
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  });
+
+  const optionCss = useStyle({
+    display: 'flex',
+    flexDirection: 'column',
+    pointerEvents: 'initial',
+  });
+
   return (
-    <div className={styles('augmentOptions')}>
+    <div {...css()}>
       {optionArgs.map(({ name, values, value }) => (
-        <div key={name} className={styles('augmentOption')}>
+        <div key={name} {...optionCss()}>
           {values.map(optValue => (
-            <button
+            <OptionButton
               key={optValue}
+              optValue={optValue}
               onClick={() => setOption(name, optValue)}
               disabled={!value}
-              className={styles(
-                'optionButton',
-                optValue === value && 'isHighlighted',
-              )}
-            >
-              <OptionIcon name={getOptionName(optValue)} />
-              {getOptionName(optValue)}
-            </button>
+              selected={value === optValue}
+            />
           ))}
         </div>
       ))}
