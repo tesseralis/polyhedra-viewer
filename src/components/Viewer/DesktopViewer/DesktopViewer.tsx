@@ -1,6 +1,7 @@
 import React, { memo } from 'react';
-import { useStyle } from 'styles';
 
+import { useStyle } from 'styles';
+import { flexRow } from 'styles/common';
 import Sidebar from './Sidebar';
 import Overlay from './Overlay';
 import { X3dScene } from '../common';
@@ -59,7 +60,7 @@ export default memo(function DesktopViewer({ solid, panel }: Props) {
   const full = panel === 'full';
 
   const css = useStyle({
-    display: 'flex',
+    ...flexRow(),
     position: 'fixed',
     width: '100%',
     height: '100%',

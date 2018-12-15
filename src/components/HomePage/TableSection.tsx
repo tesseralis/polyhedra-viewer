@@ -7,6 +7,7 @@ import { media, fonts } from 'styles';
 import Description from './Description';
 import PolyhedronTable from './PolyhedronTable';
 import { TableSection as TableSectionType } from './tableSections';
+import { flexColumn } from 'styles/common';
 
 const sectionMapping: Record<string, string> = {
   'Uniform Polyhedra': 'uniform',
@@ -155,9 +156,7 @@ export default function TableSection({
   } = data;
 
   const css = useStyle({
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
+    ...flexColumn('center'),
     ':not(:last-child)': {
       marginBottom: 50,
     },
@@ -165,9 +164,7 @@ export default function TableSection({
 
   const textCss = useStyle({
     maxWidth: 800,
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
+    ...flexColumn('center'),
     padding: '0 50px',
     marginBottom: 30,
     [media.mobile]: {

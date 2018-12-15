@@ -3,21 +3,19 @@ import Icon from '@mdi/react';
 import { mdiMenuDown } from '@mdi/js';
 
 import { useStyle, fonts } from 'styles';
+import { colorFill, flexRow, flexColumn } from 'styles/common';
 import { SrOnly } from 'components/common';
 import Markdown from './Markdown';
 
 function Toggle({ onClick, title }: any) {
   const css = useStyle({
-    display: 'flex',
-    alignItems: 'center',
-    textAlign: 'center',
+    ...colorFill('blue'),
+    ...flexRow('center', 'center'),
 
     backgroundColor: 'transparent',
     margin: 'auto 0',
     fontSize: 14,
     border: 'none',
-    color: 'blue',
-    fill: 'blue',
     cursor: 'pointer',
     fontFamily: fonts.times,
 
@@ -47,11 +45,7 @@ export default function Description({ title, content, collapsed }: Props) {
   const toggle = useCallback(() => setCollapsed(!isCollapsed), [isCollapsed]);
   const brief = content.split('\n\n')[0];
 
-  const css = useStyle({
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-  });
+  const css = useStyle(flexColumn('center'));
   return (
     <div {...css()}>
       <div>

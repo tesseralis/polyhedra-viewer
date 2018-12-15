@@ -4,7 +4,7 @@ import { useStyle } from 'styles';
 import { PolyhedronCtx, OperationCtx } from 'components/Viewer/context';
 import OptionIcon from './OptionIcon';
 import { verdana } from 'styles/fonts';
-import { hover, square } from 'styles/common';
+import { hover, square, flexRow, flexColumn } from 'styles/common';
 
 const getOptionName = (optValue: string) => {
   switch (optValue) {
@@ -75,16 +75,13 @@ export default function AugmentOptions() {
   ];
 
   const css = useStyle({
+    ...flexRow('center', 'space-between'),
     width: '100%',
     height: '100%',
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
   });
 
   const optionCss = useStyle({
-    display: 'flex',
-    flexDirection: 'column',
+    ...flexColumn(),
     pointerEvents: 'initial',
   });
 

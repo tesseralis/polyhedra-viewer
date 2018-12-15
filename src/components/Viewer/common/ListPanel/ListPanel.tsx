@@ -6,7 +6,7 @@ import { fonts, useStyle } from 'styles';
 
 import { groups } from 'data';
 import { escapeName } from 'math/polyhedra/names';
-import { resetLink, hover } from 'styles/common';
+import { hover } from 'styles/common';
 
 import SearchBar from './SearchBar';
 
@@ -36,8 +36,8 @@ function filterGroups(groups: any[], filterText: string): any {
 
 function PolyhedronLink({ name }: { name: string }) {
   const css = useStyle({
-    ...resetLink,
     ...hover,
+    textDecoration: 'none',
     display: 'block',
     padding: '3px 14px',
     height: 24,

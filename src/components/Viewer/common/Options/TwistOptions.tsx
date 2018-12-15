@@ -1,11 +1,12 @@
 import React, { useCallback } from 'react';
 import Icon from '@mdi/react';
+import { mdiRotateLeft, mdiRotateRight } from '@mdi/js';
 
 import { Twist } from 'types';
 import { useStyle } from 'styles';
+import { flexRow } from 'styles/common';
 import { SrOnly } from 'components/common';
 import { useApplyOperation, TransitionCtx, OperationCtx } from '../../context';
-import { mdiRotateLeft, mdiRotateRight } from '@mdi/js';
 
 function TwistOption({ orientation }: { orientation: Twist }) {
   const { isTransitioning } = TransitionCtx.useState();
@@ -35,11 +36,9 @@ function TwistOption({ orientation }: { orientation: Twist }) {
 
 export default function TwistOptions() {
   const css = useStyle({
+    ...flexRow('center', 'space-between'),
     width: '100%',
     height: '100%',
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
   });
   return (
     <div {...css()}>

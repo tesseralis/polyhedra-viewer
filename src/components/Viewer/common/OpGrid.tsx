@@ -4,7 +4,7 @@ import React, { memo } from 'react';
 
 import { useStyle } from 'styles';
 import { media, fonts } from 'styles';
-import { hover, scroll, square } from 'styles/common';
+import { hover, scroll, square, flexColumn, flexRow } from 'styles/common';
 import { operations, OpName } from 'math/operations';
 import {
   useApplyOperation,
@@ -37,6 +37,7 @@ const OpButton = memo(function({ name, disabled }: Props) {
 
   const css = useStyle(
     {
+      ...flexColumn('center', 'center'),
       ...hover,
       ...square(84),
       border: `${isCurrent ? 2 : 1}px LightGray solid`,
@@ -44,11 +45,6 @@ const OpButton = memo(function({ name, disabled }: Props) {
       fontSize: 12,
       color: 'DimGray',
       backgroundColor: 'white',
-
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      justifyContent: 'center',
 
       ':disabled': { opacity: 0.3 },
       // add spacing since we're displayed in a row
@@ -94,9 +90,9 @@ export default function OpGrid() {
       gridTemplateAreas: opLayout.map(line => `"${line.join(' ')}"`).join('\n'),
     },
     [media.mobile]: {
+      ...flexRow(),
       ...scroll('x'),
       height: 85,
-      display: 'flex',
       width: '100%',
     },
   });

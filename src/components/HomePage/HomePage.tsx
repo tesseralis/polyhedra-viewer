@@ -10,6 +10,7 @@ import tableSections from './tableSections';
 import * as text from './text';
 import Masthead from './Masthead';
 import ShareLinks from './ShareLinks';
+import { flexColumn } from 'styles/common';
 
 function Main() {
   const { device, orientation } = useMediaInfo();
@@ -35,12 +36,10 @@ function Main() {
 
 function Footer() {
   const css = useStyle({
+    ...flexColumn('center'),
     boxShadow: '1px -1px 4px LightGray',
     width: '100%',
     padding: '20px 50px',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
     textAlign: 'center',
   });
 
@@ -73,11 +72,8 @@ export default function HomePage({ hash = '' }: Props) {
   usePageTitle('Polyhedra Viewer');
 
   const css = useStyle({
+    ...flexColumn('center', 'center'),
     width: '100%',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
   });
 
   return (

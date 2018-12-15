@@ -3,12 +3,12 @@ import { useStyle } from 'styles';
 
 import { OpGrid, Prompt, Options, ResizeButtons } from '../common';
 import { media } from 'styles';
+import { flexColumn } from 'styles/common';
 
 export default function OperationsPanel() {
   const css = useStyle({
+    ...flexColumn(),
     height: '100%',
-    display: 'flex',
-    flexDirection: 'column',
     pointerEvents: 'none',
     [media.mobile]: {
       padding: 10,

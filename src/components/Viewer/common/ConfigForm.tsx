@@ -7,7 +7,7 @@ import {
   configInputs,
   ConfigInput as InputType,
 } from 'components/configOptions';
-import { hover } from 'styles/common';
+import { hover, flexRow, flexColumn } from 'styles/common';
 import { andaleMono } from 'styles/fonts';
 
 function getInputValue<T>(input: InputType<T>, el: any) {
@@ -63,10 +63,9 @@ function ConfigInput({ input, value, setValue }: InputProps<any>) {
 
 const LabelledInput = memo(({ input, value, setValue }: InputProps<any>) => {
   const css = useStyle({
+    ...flexRow(undefined, 'space-between'),
     width: '100%',
     marginBottom: 16,
-    display: 'flex',
-    justifyContent: 'space-between',
     fontFamily: andaleMono,
   });
   return (
@@ -102,10 +101,8 @@ export default function ConfigForm() {
   const { setValue, reset } = Config.useActions();
 
   const css = useStyle({
+    ...flexColumn('flex-end'),
     width: '100%',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'flex-end',
     padding: 20,
   });
   return (

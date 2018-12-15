@@ -6,18 +6,18 @@ import Markdown from './Markdown';
 import { useStyle, media, fonts } from 'styles';
 import * as text from './text';
 import video from 'images/transitions.mp4';
+import { flexRow, flexColumn } from 'styles/common';
 
 const videoHeight = 300;
 
 function VideoLink() {
   const css = useStyle({
+    ...flexRow(undefined, 'center'),
     marginRight: 10,
     // make smaller to hide weird video artifacts
     height: videoHeight - 2,
     width: videoHeight - 2,
     overflow: 'hidden',
-    display: 'flex',
-    justifyContent: 'center',
   });
   return (
     <Link {...css()} to="random">
@@ -70,10 +70,8 @@ function Subtitle() {
 
 function Abstract() {
   const css = useStyle({
+    ...flexColumn('center'),
     maxWidth: 600,
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
   });
   return (
     <div {...css()}>
@@ -86,9 +84,7 @@ function Abstract() {
 
 export default function Masthead() {
   const css = useStyle({
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
+    ...flexRow('center', 'center'),
     width: '100%',
     boxShadow: 'inset 0 -1px 4px LightGray',
     padding: '20px 50px',

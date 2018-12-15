@@ -4,6 +4,7 @@ import { mdiFacebookBox, mdiTumblrBox, mdiTwitter, mdiReddit } from '@mdi/js';
 
 import { useStyle, fonts } from 'styles';
 import { ExternalLink, SrOnly } from 'components/common';
+import { flexRow } from 'styles/common';
 
 const url = 'http://polyhedra.tessera.li';
 const title = 'Polyhedra Viewer';
@@ -64,10 +65,7 @@ function ShareLink({ url, icon, name }: typeof links[0]) {
 }
 
 export default function ShareLinks() {
-  const css = useStyle({
-    display: 'flex',
-    alignItems: 'center',
-  });
+  const css = useStyle(flexRow('center'));
   return (
     <div {...css()}>
       <ShareText />

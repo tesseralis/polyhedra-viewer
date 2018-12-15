@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 
 import { escapeName } from 'math/polyhedra/names';
-import { square, hover } from 'styles/common';
+import { square, hover, flexRow } from 'styles/common';
 import { useStyle, media } from 'styles';
 
 import 'styles/polyhedronIcons.css';
@@ -23,9 +23,7 @@ interface Props {
 
 function Image({ name }: Pick<Props, 'name'>) {
   const css = useStyle({
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
+    ...flexRow('center', 'center'),
     [media.notMobile]: {
       // The spriting/scaling process makes everything a little off center
       // so we have to adjust
@@ -51,11 +49,9 @@ export default function PolyhedronLink({ name, isFake }: Props) {
     {
       ...hover,
       ...(isFake ? { opacity: 0.5, filter: 'grayscale(50%)' } : {}),
+      ...flexRow('center', 'center'),
       border: '1px LightGray solid',
       color: 'black',
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
       overflow: 'hidden',
       margin: 'auto', // center inside a table
       borderRadius: 10,

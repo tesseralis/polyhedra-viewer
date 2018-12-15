@@ -9,6 +9,7 @@ import { fonts } from 'styles';
 import { PolyhedronCtx } from 'components/Viewer/context';
 import DataDownloader from './DataDownloader';
 import { Polyhedron } from '../../../math/polyhedra';
+import { flexColumn } from 'styles/common';
 
 function Sub({ children }: ChildrenProp) {
   const css = useStyle({
@@ -272,13 +273,12 @@ export default function InfoPanel() {
   const polyhedron = PolyhedronCtx.useState();
 
   const css = useStyle({
+    ...flexColumn(),
     height: '100%',
     borderSpacing: 8,
     borderCollapse: 'separate',
     padding: 20,
     fontFamily: fonts.times,
-    display: 'flex',
-    flexDirection: 'column',
   });
 
   const typeCss = useStyle({

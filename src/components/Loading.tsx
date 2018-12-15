@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { useStyle, fonts } from 'styles';
-import { absoluteFull } from 'styles/common';
+import { absoluteFull, flexRow } from 'styles/common';
 
 import Icon from '@mdi/react';
 import { mdiHexagonOutline } from '@mdi/js';
@@ -9,9 +9,7 @@ import { mdiHexagonOutline } from '@mdi/js';
 export default function Loading() {
   const css = useStyle({
     ...absoluteFull,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
+    ...flexRow('center', 'center'),
   });
 
   const text = useStyle({

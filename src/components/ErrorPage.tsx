@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 
 import { useStyle, fonts, media } from 'styles';
-import { square, absoluteFull } from 'styles/common';
+import { square, absoluteFull, flexColumn } from 'styles/common';
 import image from 'images/sad-scutoid.png';
 import { usePageTitle } from 'components/common';
 
@@ -48,10 +48,7 @@ export default function ErrorPage() {
   usePageTitle('Error - Polyhedra Viewer');
   const css = useStyle({
     ...absoluteFull,
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
+    ...flexColumn('center', 'center'),
   });
 
   return (

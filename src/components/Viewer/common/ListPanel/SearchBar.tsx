@@ -4,7 +4,7 @@ import { mdiMagnify } from '@mdi/js';
 
 import { useStyle } from 'styles';
 import { andaleMono } from 'styles/fonts';
-import { transition } from 'styles/common';
+import { transition, flexRow } from 'styles/common';
 
 function SearchIcon({ focused }: { focused: boolean }) {
   const css = useStyle(
@@ -41,6 +41,7 @@ function SearchInput(props: InputHTMLAttributes<HTMLInputElement>) {
     ':focus': {
       outline: 'none',
       borderColor: 'Gray',
+      fill: 'Gray',
     },
   });
   return (
@@ -62,8 +63,7 @@ export default memo(function SearchBar({ value, onChange }: Props) {
   const [isFocused, setFocus] = useState(false);
 
   const css = useStyle({
-    display: 'flex',
-    alignItems: 'center',
+    ...flexRow('center'),
     padding: 10,
     width: '100%',
     position: 'relative',

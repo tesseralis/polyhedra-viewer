@@ -3,9 +3,9 @@ import { Route, NavLink, NavLinkProps } from 'react-router-dom';
 import { useStyle } from 'styles';
 import Icon from '@mdi/react';
 
-import { resetLink } from 'styles/common';
 import { media, fonts } from 'styles';
 import { SrOnly } from 'components/common';
+import { colorFill, flexColumn } from 'styles/common';
 
 interface Props extends NavLinkProps {
   iconName: string;
@@ -40,24 +40,19 @@ export default function IconLink({
   iconOnly = false,
 }: Props) {
   const css = useStyle({
-    ...resetLink,
-    display: 'flex',
-    flexDirection: 'column',
+    ...flexColumn('center'),
+    ...colorFill('DimGray'),
+    textDecoration: 'none',
 
-    alignItems: 'center',
-    color: 'DimGray',
-    fill: 'DimGray',
     padding: 10,
+
     [media.mobileLandscape]: {
       padding: 0,
       flexDirection: 'row',
     },
   });
 
-  const activeCss = useStyle({
-    color: 'DarkSlateGray',
-    fill: 'DarkSlateGray',
-  });
+  const activeCss = useStyle(colorFill('DarkSlateGray'));
 
   return (
     <Route>
