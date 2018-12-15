@@ -25,13 +25,13 @@ function InnerIcon({ name }: Props) {
     strokeWidth: 5,
     strokeLinejoin: 'round',
   });
-
   const outer = useStyle({
     stroke: color,
     fill: 'none',
     strokeWidth: 8,
     strokeLinejoin: 'round',
   });
+
   switch (name) {
     case 'ortho':
       return (
