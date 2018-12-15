@@ -17,61 +17,40 @@ interface Props {
   onClick?: () => void;
 }
 
-// TODO dedupe <IconLink> declarations
+const links = [
+  { name: 'list', icon: mdiFormatListBulleted },
+  { name: 'info', icon: mdiInformationOutline },
+  { name: 'options', icon: mdiSettings },
+  { name: 'operations', icon: mdiMathCompass },
+  { name: 'full', title: 'Fullscreen', icon: mdiCubeOutline },
+];
+
 export default function NavMenu({
   solid,
   compact = false,
   onClick = _.noop,
 }: Props) {
   const css = useStyle({
-    width: '100%',
+    // Using grid here bc it's easier to get evenly spaced than flex
     display: 'grid',
-    gridTemplateColumns: '1fr 1fr 1fr 1fr 1fr',
+    gridTemplateColumns: `repeat(${links.length}, 1fr)`,
     justifyItems: 'center',
+    width: '100%',
   });
 
   return (
     <nav {...css()}>
-      <IconLink
-        replace
-        to={`/${solid}/list`}
-        title="List"
-        iconName={mdiFormatListBulleted}
-        iconOnly={compact}
-        onClick={onClick}
-      />
-      <IconLink
-        replace
-        to={`/${solid}/info`}
-        title="Info"
-        iconName={mdiInformationOutline}
-        iconOnly={compact}
-      />
-      <IconLink
-        replace
-        to={`/${solid}/options`}
-        title="Options"
-        iconName={mdiSettings}
-        iconOnly={compact}
-        onClick={onClick}
-      />
-      <IconLink
-        replace
-        to={`/${solid}/operations`}
-        title="Operations"
-        iconName={mdiMathCompass}
-        iconOnly={compact}
-        onClick={onClick}
-      />
-      <IconLink
-        replace
-        to={`/${solid}/full`}
-        title="Fullscreen"
-        iconName={mdiCubeOutline}
-        iconOnly={compact}
-        onClick={onClick}
-        exact
-      />
+      {links.map(({ name, title = name, icon }) => (
+        <IconLink
+          key={name}
+          replace
+          to={`/${solid}/${name}`}
+          title={_.capitalize(title)}
+          iconName={icon}
+          iconOnly={compact}
+          onClick={onClick}
+        />
+      ))}
     </nav>
   );
 }
