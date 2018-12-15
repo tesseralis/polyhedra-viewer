@@ -1,11 +1,11 @@
 import React from 'react';
-import { makeStyles } from 'styles';
+import { useStyle } from 'styles';
 
 import { OpGrid, Prompt, Options, ResizeButtons } from '../common';
 import { media } from 'styles';
 
-const styles = makeStyles({
-  opPanel: {
+export default function OperationsPanel() {
+  const css = useStyle({
     height: '100%',
     display: 'flex',
     flexDirection: 'column',
@@ -13,41 +13,40 @@ const styles = makeStyles({
     [media.mobile]: {
       padding: 10,
     },
-  },
+  });
 
-  resizeButtons: {
+  const resizeButtons = useStyle({
     pointerEvents: 'initial',
-  },
+  });
 
-  prompt: {
+  const prompt = useStyle({
     marginTop: 10,
     marginBottom: 'auto',
-  },
+  });
 
-  options: {
+  const options = useStyle({
     marginTop: 'auto',
     marginBottom: 10,
-  },
+  });
 
-  opGrid: {
+  const opGrid = useStyle({
     width: '100%',
     pointerEvents: 'initial',
-  },
-});
+  });
 
-export default function OperationsPanel() {
+  // TODO I really wanna create a wrapper component for this...
   return (
-    <section className={styles('opPanel')}>
-      <div className={styles('resizeButtons')}>
+    <section {...css()}>
+      <div {...resizeButtons()}>
         <ResizeButtons />
       </div>
-      <div className={styles('prompt')}>
+      <div {...prompt()}>
         <Prompt />
       </div>
-      <div className={styles('options')}>
+      <div {...options()}>
         <Options />
       </div>
-      <div className={styles('opGrid')}>
+      <div {...opGrid()}>
         <OpGrid />
       </div>
     </section>

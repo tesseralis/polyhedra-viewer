@@ -1,7 +1,8 @@
 import React, { memo } from 'react';
 import _ from 'lodash';
+import { CSSProperties } from 'aphrodite';
 
-import { makeStyles, media } from 'styles';
+import { useStyle, media } from 'styles';
 import { scroll } from 'styles/common';
 import {
   BackLink,
@@ -14,34 +15,20 @@ import {
 
 import OperationsPanel from './OperationsPanel';
 
-function mobile(styles: (mobTitleH: number, menuH: number) => any) {
+function mobile(styles: (mobTitleH: number, menuH: number) => CSSProperties) {
   return {
     [media.mobileLandscape]: styles(45, 45),
     [media.mobilePortrait]: styles(60, 75),
   };
 }
-const styles = makeStyles({
-  viewer: {
-    position: 'relative',
-    width: '100vw',
-    height: '100vh',
-    display: 'grid',
-    gridTemplateAreas: '"title" "content" "menu"',
-    ...mobile((mobTitleH, menuH) => ({
-      gridTemplateRows: `${mobTitleH}px 1fr ${menuH}px`,
-    })),
-  },
-  menu: {
-    ...mobile(($, menuH) => ({
-      height: menuH,
-    })),
-    gridArea: 'menu',
-    padding: '5px 10px',
 
-    borderTop: '1px solid LightGray',
-  },
+interface Props {
+  panel: string;
+  solid: string;
+}
 
-  title: {
+function Header({ solid }: Pick<Props, 'solid'>) {
+  const css = useStyle({
     ...mobile((mobTitleH, menuH) => ({
       height: mobTitleH,
     })),
@@ -52,66 +39,78 @@ const styles = makeStyles({
     gridTemplateColumns: '40px 1fr 40px',
     alignItems: 'center',
     justifyItems: 'center',
-  },
-  content: {
-    ...scroll('y'),
-    gridArea: 'content',
+  });
+  return (
+    <header {...css()}>
+      <BackLink solid={solid} />
+      <Title name={solid} />
+    </header>
+  );
+}
+
+function Content({ panel, header }: Pick<Props, 'panel'> & { header: any }) {
+  const transparent = _.includes(['operations', 'full'], panel);
+  const css = useStyle(
+    {
+      ...scroll('y'),
+      gridArea: 'content',
+      position: 'relative',
+      zIndex: 100,
+      ...(transparent
+        ? { pointerEvents: 'none' }
+        : { backgroundColor: 'rgba(255, 255, 255, 0.75)' }),
+    },
+    [transparent],
+  );
+  return (
+    <div {...css()}>
+      {header}
+      <Panels panel={panel} operationsPanel={OperationsPanel} />;
+    </div>
+  );
+}
+
+export default memo(function MobileViewer({ panel, solid }: Props) {
+  const [header, focusOnHeader] = useHiddenHeading(panel);
+
+  const css = useStyle({
     position: 'relative',
-    zIndex: 100,
-  },
+    width: '100vw',
+    height: '100vh',
+    display: 'grid',
+    gridTemplateAreas: '"title" "content" "menu"',
+    ...mobile((mobTitleH, menuH) => ({
+      gridTemplateRows: `${mobTitleH}px 1fr ${menuH}px`,
+    })),
+  });
 
-  transparent: {
-    pointerEvents: 'none',
-  },
-
-  contentFull: {
-    backgroundColor: 'rgba(255, 255, 255, 0.75)',
-  },
-
-  scene: {
+  const sceneCss = useStyle({
     ...mobile((mobTitleH, menuH) => ({
       height: `calc(100vh - ${menuH}px - ${mobTitleH}px)`,
     })),
     zIndex: 0,
     gridArea: 'content',
     position: 'relative',
-  },
-  options: {
-    zIndex: 1,
-    alignSelf: 'start',
-    pointerEvents: 'none',
-    gridArea: 'content',
-  },
-});
+  });
 
-interface Props {
-  panel: string;
-  solid: string;
-}
+  const navCss = useStyle({
+    ...mobile(($, menuH) => ({
+      height: menuH,
+    })),
+    gridArea: 'menu',
+    padding: '5px 10px',
 
-export default memo(function MobileViewer({ panel, solid }: Props) {
-  const [header, focusOnHeader] = useHiddenHeading(panel);
-  const isTransparent = _.includes(['operations', 'full'], panel);
+    borderTop: '1px solid LightGray',
+  });
 
   return (
-    <section className={styles('viewer')}>
-      <header className={styles('title')}>
-        <BackLink solid={solid} />
-        <Title name={solid} />
-      </header>
-      <div
-        className={styles(
-          'content',
-          isTransparent ? 'transparent' : 'contentFull',
-        )}
-      >
-        {header}
-        <Panels panel={panel} operationsPanel={OperationsPanel} />;
-      </div>
-      <main className={styles('scene')}>
+    <section {...css()}>
+      <Header solid={solid} />
+      <Content panel={panel} header={header} />
+      <main {...sceneCss()}>
         <X3dScene label={solid} />
       </main>
-      <div className={styles('menu')}>
+      <div {...navCss()}>
         <NavMenu solid={solid} onClick={focusOnHeader} />
       </div>
     </section>

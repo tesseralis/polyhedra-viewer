@@ -40,11 +40,16 @@ export const fullScreen = {
   width: '100%',
 };
 
-export const absolute = (vert: 'top' | 'bottom', horiz: 'left' | 'right') => ({
-  position: 'absolute',
-  [vert]: 0,
-  [horiz]: 0,
-});
+export function absolute(
+  vert: 'top' | 'bottom',
+  horiz: 'left' | 'right',
+): CSSProperties {
+  return {
+    position: 'absolute',
+    [vert]: 0,
+    [horiz]: 0,
+  };
+}
 
 /* Reset styles */
 
