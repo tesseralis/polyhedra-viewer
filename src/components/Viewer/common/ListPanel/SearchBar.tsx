@@ -1,22 +1,32 @@
-import React, { memo, useState } from 'react';
+import React, { memo, useState, InputHTMLAttributes } from 'react';
 import Icon from '@mdi/react';
 import { mdiMagnify } from '@mdi/js';
 
-import { makeStyles } from 'styles';
+import { useStyle } from 'styles';
 import { andaleMono } from 'styles/fonts';
 import { transition } from 'styles/common';
 
-const styles = makeStyles({
-  searchBar: {
-    display: 'flex',
-    justifyContent: 'left',
-    alignItems: 'center',
-    padding: 10,
-    width: '100%',
-    position: 'relative',
-  },
+function SearchIcon({ focused }: { focused: boolean }) {
+  const css = useStyle(
+    {
+      ...transition('fill', 0.35),
+      position: 'absolute',
+      // TODO This is kinda jank but I'm too lazy to fix it for a not useful feature
+      paddingLeft: 8,
+      paddingTop: 2,
+      fill: focused ? 'Gray' : 'LightGray',
+    },
+    [focused],
+  );
+  return (
+    <span {...css()}>
+      <Icon path={mdiMagnify} size="20px" />
+    </span>
+  );
+}
 
-  input: {
+function SearchInput(props: InputHTMLAttributes<HTMLInputElement>) {
+  const css = useStyle({
     ...transition('border-color', 0.35),
     width: '100%',
     height: 36,
@@ -32,21 +42,17 @@ const styles = makeStyles({
       outline: 'none',
       borderColor: 'Gray',
     },
-  },
-
-  icon: {
-    // TODO This is kinda jank but I'm too lazy to fix it for a not useful feature
-    ...transition('fill', 0.35),
-    position: 'absolute',
-    paddingLeft: 8,
-    paddingTop: 2,
-    fill: 'LightGray',
-  },
-
-  iconFocus: {
-    fill: 'Gray',
-  },
-});
+  });
+  return (
+    <input
+      {...props}
+      {...css()}
+      type="text"
+      placeholder="Search..."
+      aria-label="search"
+    />
+  );
+}
 
 interface Props {
   value: string;
@@ -54,21 +60,23 @@ interface Props {
 }
 export default memo(function SearchBar({ value, onChange }: Props) {
   const [isFocused, setFocus] = useState(false);
+
+  const css = useStyle({
+    display: 'flex',
+    alignItems: 'center',
+    padding: 10,
+    width: '100%',
+    position: 'relative',
+  });
   return (
-    <label className={styles('searchBar')}>
-      <input
-        type="text"
-        placeholder="Search..."
-        aria-label="search"
+    <label {...css()}>
+      <SearchInput
         value={value}
         onChange={e => onChange(e.target.value)}
         onFocus={() => setFocus(true)}
         onBlur={() => setFocus(false)}
-        className={styles('input')}
       />
-      <span className={styles('icon', isFocused && 'iconFocus')}>
-        <Icon path={mdiMagnify} size="20px" />
-      </span>
+      <SearchIcon focused={isFocused} />
     </label>
   );
 });
