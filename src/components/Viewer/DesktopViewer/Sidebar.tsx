@@ -25,7 +25,7 @@ export default function Sidebar({ panel, solid, compact }: Props) {
       display: 'grid',
       gridTemplateRows: `${menuH}px 1fr`,
       gridTemplateAreas: '"menu" "content"',
-      boxShadow: compact ? undefined : 'inset 1px -1px 4px LightGray',
+      borderLeft: compact ? undefined : '1px solid LightGray',
     },
     [compact],
   );

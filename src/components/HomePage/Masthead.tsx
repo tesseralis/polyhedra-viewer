@@ -85,7 +85,7 @@ export default function Masthead() {
     ...padding(spacing.s4, spacing.s5),
     ...flexRow('center', 'center'),
     width: '100%',
-    boxShadow: 'inset 0 -1px 4px LightGray',
+    borderBottom: '1px solid LightGray',
 
     [media.mobilePortrait]: {
       flexDirection: 'column-reverse',

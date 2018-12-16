@@ -41,7 +41,7 @@ function Footer() {
     gridGap: spacing.s4,
     justifyItems: 'center',
     width: '100%',
-    boxShadow: '1px -1px 4px LightGray',
+    borderTop: '1px solid LightGray',
     textAlign: 'center',
   });
 
