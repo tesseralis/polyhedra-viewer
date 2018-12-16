@@ -15,7 +15,7 @@ type PropType = { [prop: string]: any };
  * Given a set of state actions, generate a context provider and useful hooks
  * to access its state and actions.
  *
- * @return an object with keys Provider, useState, useActions.
+ * @returns an object with keys `Provider`, `useState`, `useActions`.
  */
 export default function createHookedContext<S, A extends string>(
   actions: ActionCreators<S, A>,
