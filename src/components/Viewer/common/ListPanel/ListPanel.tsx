@@ -43,7 +43,7 @@ function PolyhedronLink({ name }: { name: string }) {
     height: 24,
 
     color: 'DimGrey',
-    lineHeight: '18px',
+    lineHeight: 1.25,
     fontFamily: fonts.andaleMono,
     fontSize: fontSizes.f6,
     overflow: 'hidden',

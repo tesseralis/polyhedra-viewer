@@ -30,7 +30,7 @@ export default function Sidebar({ panel, solid, compact }: Props) {
     [compact],
   );
 
-  const menuCss = useStyle(
+  const navCss = useStyle(
     {
       ...paddingHoriz(spacing.s2),
       gridArea: 'menu',
@@ -47,7 +47,7 @@ export default function Sidebar({ panel, solid, compact }: Props) {
   });
   return (
     <section {...css()}>
-      <div {...menuCss()}>
+      <div {...navCss()}>
         <NavMenu solid={solid} compact={compact} onClick={focusOnHeader} />
       </div>
       {!compact && (
