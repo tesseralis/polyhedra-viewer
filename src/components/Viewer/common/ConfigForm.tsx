@@ -1,5 +1,5 @@
 import React, { memo, useCallback, ButtonHTMLAttributes } from 'react';
-import { useStyle } from 'styles';
+import { useStyle, fontSizes } from 'styles';
 import _ from 'lodash';
 
 import Config from 'components/ConfigCtx';
@@ -87,7 +87,7 @@ function ResetButton({ onClick }: ButtonHTMLAttributes<Element>) {
     border: '1px LightGray solid',
 
     fontFamily: andaleMono,
-    fontSize: 14,
+    fontSize: fontSizes.f6,
   });
   return (
     <button {...css()} type="button" onClick={onClick}>

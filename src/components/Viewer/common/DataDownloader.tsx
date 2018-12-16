@@ -1,7 +1,7 @@
 import React from 'react';
 import Icon from '@mdi/react';
 
-import { useStyle } from 'styles';
+import { useStyle, fontSizes } from 'styles';
 import { SrOnly } from 'components/common';
 import { fonts } from 'styles';
 
@@ -83,7 +83,7 @@ function DownloadLink({
 export default function DataDownloader({ solid }: Props) {
   const heading = useStyle({
     fontFamily: fonts.times,
-    fontSize: 18,
+    fontSize: fontSizes.f5,
     marginBottom: 10,
   });
   return (

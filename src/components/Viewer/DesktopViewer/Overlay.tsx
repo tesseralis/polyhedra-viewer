@@ -20,7 +20,6 @@ export default function Overlay({ solid }: Props) {
     ...absolute('bottom', 'left'),
     pointerEvents: 'initial',
     padding: 36,
-    textAlign: 'right',
   });
 
   const homeLink = useStyle({

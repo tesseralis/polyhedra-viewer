@@ -1,5 +1,5 @@
 import React, { ComponentType } from 'react';
-import { useStyle } from 'styles';
+import { useStyle, fontSizes } from 'styles';
 import _ from 'lodash';
 
 import { ChildrenProp } from 'types';
@@ -211,7 +211,7 @@ const info: InfoRow[] = [
 
 function Heading({ polyhedron }: RenderProps) {
   const css = useStyle({
-    fontSize: 22,
+    fontSize: fontSizes.f3,
     marginBottom: 5,
   });
   return (
@@ -229,7 +229,7 @@ function Property({
 }: InfoRow & RenderProps) {
   const css = useStyle({ marginBottom: 10 });
   const nameCss = useStyle({
-    fontSize: 18,
+    fontSize: fontSizes.f5,
     marginBottom: 5,
   });
   const valueCss = useStyle({
@@ -282,7 +282,7 @@ export default function InfoPanel() {
   });
 
   const typeCss = useStyle({
-    fontSize: 18,
+    fontSize: fontSizes.f5,
     color: 'DimGrey',
     marginBottom: 20,
   });

@@ -2,7 +2,7 @@ import _ from 'lodash';
 
 import React, { memo } from 'react';
 
-import { useStyle } from 'styles';
+import { useStyle, fontSizes } from 'styles';
 import { media, fonts } from 'styles';
 import { hover, scroll, square, flexColumn, flexRow } from 'styles/common';
 import { operations, OpName } from 'math/operations';
@@ -42,7 +42,7 @@ const OpButton = memo(function({ name, disabled }: Props) {
       ...square(84),
       border: `${isCurrent ? 2 : 1}px LightGray solid`,
       fontFamily: fonts.verdana,
-      fontSize: 12,
+      fontSize: fontSizes.f7,
       color: 'DimGray',
       backgroundColor: 'white',
 

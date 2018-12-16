@@ -4,7 +4,7 @@ import _ from 'lodash';
 import { fromConwayNotation } from 'math/polyhedra/names';
 import { Table } from 'math/polyhedra/tables';
 import PolyhedronLink from './PolyhedronLink';
-import { media, fonts, useStyle } from 'styles';
+import { media, fonts, useStyle, fontSizes } from 'styles';
 
 function useCellStyle() {
   return useStyle({
@@ -13,10 +13,10 @@ function useCellStyle() {
     textAlign: 'center',
     color: 'DimGrey',
     [media.notMobile]: {
-      fontSize: 14,
+      fontSize: fontSizes.f6,
     },
     [media.mobile]: {
-      fontSize: 12,
+      fontSize: fontSizes.f7,
     },
   });
 }
@@ -80,7 +80,10 @@ export default function PolyhedronTable({
     borderSpacing: 8,
     borderCollapse: 'separate',
   });
-  const captionCss = useStyle({ fontSize: 16, fontFamily: fonts.times });
+  const captionCss = useStyle({
+    fontSize: fontSizes.f5,
+    fontFamily: fonts.times,
+  });
   return (
     <table {...css()}>
       <caption {...captionCss()}>{caption}</caption>

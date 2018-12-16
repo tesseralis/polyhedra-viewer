@@ -29,7 +29,7 @@ interface Props {
 
 function Header({ solid }: Pick<Props, 'solid'>) {
   const css = useStyle({
-    ...mobile((mobTitleH, menuH) => ({
+    ...mobile(mobTitleH => ({
       height: mobTitleH,
     })),
     padding: '0 10px',

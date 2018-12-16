@@ -2,7 +2,7 @@ import _ from 'lodash';
 
 import React, { useState } from 'react';
 import { NavLink, Route } from 'react-router-dom';
-import { fonts, useStyle } from 'styles';
+import { fonts, useStyle, fontSizes } from 'styles';
 
 import { groups } from 'data';
 import { escapeName } from 'math/polyhedra/names';
@@ -45,7 +45,7 @@ function PolyhedronLink({ name }: { name: string }) {
     color: 'DimGrey',
     lineHeight: '18px',
     fontFamily: fonts.andaleMono,
-    fontSize: 14,
+    fontSize: fontSizes.f6,
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
@@ -84,7 +84,7 @@ function SubList({ polyhedra }: { polyhedra: string[] }) {
 function SubgroupHeader({ name }: { name: string }) {
   const css = useStyle({
     fontFamily: fonts.times,
-    fontSize: 17,
+    fontSize: fontSizes.f5,
     margin: '3px 12px',
   });
   return <h3 {...css()}>{_.capitalize(name)}</h3>;
@@ -112,7 +112,7 @@ const Subgroup = ({
 function GroupHeader({ text }: { text: string }) {
   const css = useStyle({
     fontFamily: fonts.times,
-    fontSize: 24,
+    fontSize: fontSizes.f4,
     margin: '5px 12px',
   });
   return <h2 {...css()}>{text}</h2>;

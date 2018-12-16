@@ -2,7 +2,7 @@ import React, { useState, useCallback } from 'react';
 import Icon from '@mdi/react';
 import { mdiMenuDown } from '@mdi/js';
 
-import { useStyle, fonts } from 'styles';
+import { useStyle, fonts, fontSizes } from 'styles';
 import { colorFill, flexRow, flexColumn } from 'styles/common';
 import { SrOnly } from 'components/common';
 import Markdown from './Markdown';
@@ -14,7 +14,7 @@ function Toggle({ onClick, title }: any) {
 
     backgroundColor: 'transparent',
     margin: 'auto 0',
-    fontSize: 14,
+    fontSize: fontSizes.f6,
     border: 'none',
     cursor: 'pointer',
     fontFamily: fonts.times,

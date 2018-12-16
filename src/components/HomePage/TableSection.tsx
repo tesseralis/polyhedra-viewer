@@ -1,6 +1,6 @@
 import React from 'react';
 import { CSSProperties } from 'aphrodite';
-import { useStyle } from 'styles';
+import { useStyle, fontSizes } from 'styles';
 
 import { Table } from 'math/polyhedra/tables';
 import { media, fonts } from 'styles';
@@ -124,11 +124,11 @@ function Heading({ subsection, text }: { subsection: boolean; text: string }) {
     fontFamily: fonts.times,
     ...(subsection
       ? {
-          fontSize: 20,
+          fontSize: fontSizes.f4,
           marginBottom: 15,
         }
       : {
-          fontSize: 24,
+          fontSize: fontSizes.f3,
           marginBottom: 20,
         }),
   });

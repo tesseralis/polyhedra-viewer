@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { useStyle, fonts } from 'styles';
+import { useStyle, fonts, fontSizes } from 'styles';
 import { absoluteFull, flexRow } from 'styles/common';
 
 import Icon from '@mdi/react';
@@ -15,7 +15,7 @@ export default function Loading() {
   const text = useStyle({
     marginLeft: 10,
     fontFamily: fonts.andaleMono,
-    fontSize: 28,
+    fontSize: fontSizes.f3,
   });
 
   return (

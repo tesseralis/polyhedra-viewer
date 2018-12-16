@@ -3,7 +3,7 @@ import Markdown from 'react-markdown';
 import { CSSProperties } from 'aphrodite';
 
 import { ExternalLink } from 'components/common';
-import { useStyle, fonts } from 'styles';
+import { useStyle, fonts, fontSizes } from 'styles';
 
 function styled(el: ReactType, styles: CSSProperties) {
   const El = el;
@@ -21,7 +21,7 @@ const List = styled('ul', {
 
 const listIndent = 20;
 const ListItem = styled('li', {
-  fontSize: 16,
+  fontSize: fontSizes.f5,
   fontFamily: fonts.times,
   color: 'DimGrey',
   lineHeight: 1.5,
@@ -36,7 +36,7 @@ interface RenderProps extends HTMLAttributes<any> {
 
 const renderers = {
   paragraph: styled('p', {
-    fontSize: 16,
+    fontSize: fontSizes.f5,
     fontFamily: fonts.times,
     color: 'DimGrey',
     lineHeight: 1.5,

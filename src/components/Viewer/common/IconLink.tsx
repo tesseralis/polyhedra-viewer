@@ -1,6 +1,6 @@
 import React from 'react';
 import { Route, NavLink, NavLinkProps } from 'react-router-dom';
-import { useStyle } from 'styles';
+import { useStyle, fontSizes } from 'styles';
 import Icon from '@mdi/react';
 
 import { media, fonts } from 'styles';
@@ -16,12 +16,9 @@ interface Props extends NavLinkProps {
 function LinkText({ text, hidden }: { text: string; hidden: boolean }) {
   const css = useStyle({
     marginTop: 5,
-    fontSize: 12,
+    fontSize: fontSizes.f7,
     fontFamily: fonts.verdana,
 
-    [media.mobilePortrait]: {
-      fontSize: 9,
-    },
     [media.mobileLandscape]: {
       marginTop: 0,
       paddingLeft: 5,

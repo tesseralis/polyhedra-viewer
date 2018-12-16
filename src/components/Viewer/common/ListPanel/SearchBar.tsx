@@ -2,7 +2,7 @@ import React, { memo, useState, InputHTMLAttributes } from 'react';
 import Icon from '@mdi/react';
 import { mdiMagnify } from '@mdi/js';
 
-import { useStyle } from 'styles';
+import { useStyle, fontSizes } from 'styles';
 import { andaleMono } from 'styles/fonts';
 import { transition, flexRow } from 'styles/common';
 
@@ -35,7 +35,7 @@ function SearchInput(props: InputHTMLAttributes<HTMLInputElement>) {
     border: '2px LightGray solid',
     borderRadius: 28,
 
-    fontSize: 14,
+    fontSize: fontSizes.f6,
     fontFamily: andaleMono,
 
     ':focus': {
