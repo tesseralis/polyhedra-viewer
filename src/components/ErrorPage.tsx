@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 
 import { useStyle, fonts, fontSizes, media, spacing } from 'styles';
-import { square, absoluteFull, flexColumn } from 'styles/common';
+import { square } from 'styles/common';
 import image from 'images/sad-scutoid.png';
 import { usePageTitle } from 'components/common';
 
@@ -46,7 +46,8 @@ export default function ErrorPage() {
   usePageTitle('Error - Polyhedra Viewer');
   // TODO is there any way to *not* rely on defining the "full" width per page?
   const css = useStyle({
-    ...absoluteFull,
+    width: '100vw',
+    height: '100vh',
 
     display: 'grid',
     gridGap: spacing.s2,

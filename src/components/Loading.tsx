@@ -1,14 +1,14 @@
 import React from 'react';
 
 import { useStyle, fonts, fontSizes, spacing } from 'styles';
-import { absoluteFull, flexRow } from 'styles/common';
 
 import Icon from '@mdi/react';
 import { mdiHexagonOutline } from '@mdi/js';
 
 export default function Loading() {
   const css = useStyle({
-    ...absoluteFull,
+    width: '100vw',
+    height: '100vh',
 
     display: 'grid',
     justifyContent: 'center',

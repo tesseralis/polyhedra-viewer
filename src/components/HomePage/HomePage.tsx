@@ -74,7 +74,7 @@ export default function HomePage({ hash = '' }: Props) {
 
   const css = useStyle({
     ...flexColumn('center', 'center'),
-    width: '100%',
+    width: '100vw',
   });
 
   return (

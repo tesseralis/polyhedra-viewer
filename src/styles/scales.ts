@@ -1,6 +1,7 @@
 /**
  * Scales for font sizes, width/height, and spacing based on tachyons
  */
+// FIXME object notation means VSCode can't tell you what the actual values are
 
 // http://tachyons.io/docs/typography/scale/
 /**
@@ -18,10 +19,9 @@ export const fontSizes = {
 
 // http://tachyons.io/docs/layout/spacing/
 /**
- * A scale used for margin/padding.
+ * A scale used for margin/padding/grid gap.
  */
 export const spacing = {
-  s0: 0,
   s1: '0.25rem', // 4px
   s2: '0.5rem', // 8px
   s3: '1rem', //16px
