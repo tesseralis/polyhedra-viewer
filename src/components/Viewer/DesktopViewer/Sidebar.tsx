@@ -1,8 +1,8 @@
 import React from 'react';
-import { useStyle } from 'styles';
+import { useStyle, spacing } from 'styles';
 
 import { NavMenu, Panels, useHiddenHeading } from '../common';
-import { scroll } from 'styles/common';
+import { paddingHoriz, scroll } from 'styles/common';
 
 import OperationsPanel from './OperationsPanel';
 
@@ -32,9 +32,9 @@ export default function Sidebar({ panel, solid, compact }: Props) {
 
   const menuCss = useStyle(
     {
+      ...paddingHoriz(spacing.s2),
       gridArea: 'menu',
       height: menuH,
-      padding: '0 10px',
       borderBottom: compact ? undefined : '1px solid LightGray',
     },
     [compact],

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Route, NavLink, NavLinkProps } from 'react-router-dom';
-import { useStyle, fontSizes } from 'styles';
+import { useStyle, fontSizes, spacing } from 'styles';
 import Icon from '@mdi/react';
 
 import { media, fonts } from 'styles';
@@ -21,7 +21,7 @@ function LinkText({ text, hidden }: { text: string; hidden: boolean }) {
 
     [media.mobileLandscape]: {
       marginTop: 0,
-      paddingLeft: 5,
+      paddingLeft: spacing.s1,
     },
   });
   return hidden ? <SrOnly>{text}</SrOnly> : <div {...css()}>{text}</div>;
@@ -41,7 +41,8 @@ export default function IconLink({
     ...colorFill('DimGray'),
     textDecoration: 'none',
 
-    padding: 10,
+    // FIXME the nav menu looks a little off
+    padding: spacing.s2,
 
     [media.mobileLandscape]: {
       padding: 0,

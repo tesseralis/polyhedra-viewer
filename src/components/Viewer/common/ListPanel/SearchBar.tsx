@@ -2,7 +2,7 @@ import React, { memo, useState, InputHTMLAttributes } from 'react';
 import Icon from '@mdi/react';
 import { mdiMagnify } from '@mdi/js';
 
-import { useStyle, fontSizes } from 'styles';
+import { useStyle, fontSizes, spacing } from 'styles';
 import { andaleMono } from 'styles/fonts';
 import { transition, flexRow } from 'styles/common';
 
@@ -30,7 +30,7 @@ function SearchInput(props: InputHTMLAttributes<HTMLInputElement>) {
     ...transition('border-color', 0.35),
     width: '100%',
     height: 36,
-    paddingLeft: 30,
+    paddingLeft: spacing.s4,
 
     border: '2px LightGray solid',
     borderRadius: 28,
@@ -64,7 +64,7 @@ export default memo(function SearchBar({ value, onChange }: Props) {
 
   const css = useStyle({
     ...flexRow('center'),
-    padding: 10,
+    padding: spacing.s2,
     width: '100%',
     position: 'relative',
   });

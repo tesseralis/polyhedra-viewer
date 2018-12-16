@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 
-import { useStyle } from 'styles';
+import { useStyle, spacing } from 'styles';
 import useMediaInfo from 'components/useMediaInfo';
 import { usePageTitle } from 'components/common';
 
@@ -10,14 +10,14 @@ import tableSections from './tableSections';
 import * as text from './text';
 import Masthead from './Masthead';
 import ShareLinks from './ShareLinks';
-import { flexColumn } from 'styles/common';
+import { flexColumn, paddingVert, padding } from 'styles/common';
 
 function Main() {
   const { device, orientation } = useMediaInfo();
   const narrow = device === 'mobile' && orientation === 'portrait';
 
   const css = useStyle({ width: '100%' });
-  const sections = useStyle({ padding: '50px 0' });
+  const sections = useStyle(paddingVert(spacing.s4));
   return (
     <main {...css()}>
       <Masthead />
@@ -37,9 +37,9 @@ function Main() {
 function Footer() {
   const css = useStyle({
     ...flexColumn('center'),
-    boxShadow: '1px -1px 4px LightGray',
+    ...padding(spacing.s4, spacing.s5),
     width: '100%',
-    padding: '20px 50px',
+    boxShadow: '1px -1px 4px LightGray',
     textAlign: 'center',
   });
 

@@ -2,8 +2,8 @@ import React, { memo } from 'react';
 import _ from 'lodash';
 import { CSSProperties } from 'aphrodite';
 
-import { useStyle, media } from 'styles';
-import { scroll } from 'styles/common';
+import { useStyle, media, spacing } from 'styles';
+import { scroll, padding, paddingHoriz } from 'styles/common';
 import {
   BackLink,
   Title,
@@ -32,7 +32,7 @@ function Header({ solid }: Pick<Props, 'solid'>) {
     ...mobile(mobTitleH => ({
       height: mobTitleH,
     })),
-    padding: '0 10px',
+    ...paddingHoriz(spacing.s2),
     borderBottom: '1px solid LightGray',
     width: '100%',
     display: 'grid',
@@ -97,8 +97,8 @@ export default memo(function MobileViewer({ panel, solid }: Props) {
     ...mobile(($, menuH) => ({
       height: menuH,
     })),
+    ...padding(spacing.s1, spacing.s2),
     gridArea: 'menu',
-    padding: '5px 10px',
 
     borderTop: '1px solid LightGray',
   });

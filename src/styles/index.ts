@@ -1,6 +1,6 @@
 import * as media from './media';
 import * as fonts from './fonts';
-import * as fontSizes from './fontSizes';
+export { fontSizes, spacing } from './scales';
 import useStyle from './useStyle';
 
-export { useStyle, media, fonts, fontSizes };
+export { useStyle, media, fonts };

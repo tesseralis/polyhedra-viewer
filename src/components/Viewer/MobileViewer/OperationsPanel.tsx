@@ -1,8 +1,7 @@
 import React from 'react';
-import { useStyle } from 'styles';
+import { useStyle, spacing } from 'styles';
 
 import { OpGrid, Prompt, Options, ResizeButtons } from '../common';
-import { media } from 'styles';
 import { flexColumn } from 'styles/common';
 
 export default function OperationsPanel() {
@@ -10,9 +9,7 @@ export default function OperationsPanel() {
     ...flexColumn(),
     height: '100%',
     pointerEvents: 'none',
-    [media.mobile]: {
-      padding: 10,
-    },
+    padding: spacing.s2,
   });
 
   const resizeButtons = useStyle({

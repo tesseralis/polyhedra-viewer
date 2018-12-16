@@ -3,7 +3,7 @@ import Markdown from 'react-markdown';
 import { CSSProperties } from 'aphrodite';
 
 import { ExternalLink } from 'components/common';
-import { useStyle, fonts, fontSizes } from 'styles';
+import { useStyle, fonts, fontSizes, spacing } from 'styles';
 
 function styled(el: ReactType, styles: CSSProperties) {
   const El = el;
@@ -19,7 +19,7 @@ const List = styled('ul', {
   marginBottom: 10,
 });
 
-const listIndent = 20;
+const listIndent = spacing.s3;
 const ListItem = styled('li', {
   fontSize: fontSizes.f5,
   fontFamily: fonts.times,

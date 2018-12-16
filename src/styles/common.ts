@@ -1,42 +1,61 @@
 import { CSSProperties } from 'aphrodite';
 
-// TODO this is more of a "theme"
-export const hover = {
-  ':hover:not(:disabled)': {
-    backgroundColor: 'Gainsboro',
-  },
-};
+type Value = string | number;
 
-export const transition = (
-  property: string,
-  duration: number,
-  ease: string = '',
-) => {
-  const value = `${property} ${duration}s ${ease}`.trim();
+/* Spacing utilities */
+
+export function marginVert(m: Value): CSSProperties {
   return {
-    transition: value,
+    marginTop: m,
+    marginBottom: m,
   };
-};
+}
 
-export function square(size: number): CSSProperties {
+export function marginHoriz(m: Value): CSSProperties {
+  return {
+    marginLeft: m,
+    marginRight: m,
+  };
+}
+
+export function margin(vert: Value, horiz: Value = vert): CSSProperties {
+  return {
+    ...marginVert(vert),
+    ...marginHoriz(horiz),
+  };
+}
+
+export function paddingVert(p: Value): CSSProperties {
+  return {
+    paddingTop: p,
+    paddingBottom: p,
+  };
+}
+
+export function paddingHoriz(p: Value): CSSProperties {
+  return {
+    paddingLeft: p,
+    paddingRight: p,
+  };
+}
+
+export function padding(vert: Value, horiz: Value = vert): CSSProperties {
+  return {
+    ...paddingHoriz(horiz),
+    ...paddingVert(vert),
+  };
+}
+
+/* Layout utlities */
+
+export function square(size: Value): CSSProperties {
   return {
     width: size,
     height: size,
   };
 }
 
-/**
- * Populate the `color` and `fill` properties (useful for icons).
- * @param color the color to fill in
- */
-export function colorFill(color: string): CSSProperties {
-  return {
-    color,
-    fill: color,
-  };
-}
-
-/* Layout functions */
+/* Display utilities */
 
 export function flexRow(
   alignItems?: CSSProperties['alignItems'],
@@ -62,7 +81,7 @@ export function flexColumn(
   };
 }
 
-/* Position functions */
+/* Position utilities */
 
 export const fullScreen = {
   position: 'absolute',
@@ -90,11 +109,43 @@ export const absoluteFull: CSSProperties = {
 };
 
 /* Mobile */
+
 export function scroll(direction?: 'x' | 'y') {
   const prop = `overflow${(direction || '').toUpperCase()}`;
   return {
     [prop]: 'scroll',
     // use momentum scrolling on mobile browsers
     '-webkit-overflow-scrolling': 'touch',
+  };
+}
+
+/* Miscellaneous */
+
+// TODO this is more of a "theme"
+export const hover = {
+  ':hover:not(:disabled)': {
+    backgroundColor: 'Gainsboro',
+  },
+};
+
+export const transition = (
+  property: string,
+  duration: number,
+  ease: string = '',
+) => {
+  const value = `${property} ${duration}s ${ease}`.trim();
+  return {
+    transition: value,
+  };
+};
+
+/**
+ * Populate the `color` and `fill` properties (useful for icons).
+ * @param color the color to fill in
+ */
+export function colorFill(color: string): CSSProperties {
+  return {
+    color,
+    fill: color,
   };
 }

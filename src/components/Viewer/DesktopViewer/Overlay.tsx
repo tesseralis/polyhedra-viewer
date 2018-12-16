@@ -1,7 +1,7 @@
 //@flow
 
 import React from 'react';
-import { useStyle } from 'styles';
+import { useStyle, spacing } from 'styles';
 
 import { absolute, absoluteFull } from 'styles/common';
 import { BackLink, Title, Options, Prompt } from '../common';
@@ -19,13 +19,13 @@ export default function Overlay({ solid }: Props) {
   const title = useStyle({
     ...absolute('bottom', 'left'),
     pointerEvents: 'initial',
-    padding: 36,
+    padding: spacing.s4,
   });
 
   const homeLink = useStyle({
     ...absolute('top', 'left'),
     pointerEvents: 'initial',
-    paddingLeft: 10,
+    paddingLeft: spacing.s2,
   });
 
   const options = useStyle({

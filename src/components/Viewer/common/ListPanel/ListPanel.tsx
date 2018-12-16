@@ -2,11 +2,11 @@ import _ from 'lodash';
 
 import React, { useState } from 'react';
 import { NavLink, Route } from 'react-router-dom';
-import { fonts, useStyle, fontSizes } from 'styles';
+import { fonts, useStyle, fontSizes, spacing } from 'styles';
 
 import { groups } from 'data';
 import { escapeName } from 'math/polyhedra/names';
-import { hover } from 'styles/common';
+import { hover, padding, paddingVert } from 'styles/common';
 
 import SearchBar from './SearchBar';
 
@@ -37,9 +37,9 @@ function filterGroups(groups: any[], filterText: string): any {
 function PolyhedronLink({ name }: { name: string }) {
   const css = useStyle({
     ...hover,
+    ...padding(spacing.s1, spacing.s3),
     textDecoration: 'none',
     display: 'block',
-    padding: '3px 14px',
     height: 24,
 
     color: 'DimGrey',
@@ -120,7 +120,7 @@ function GroupHeader({ text }: { text: string }) {
 
 const PolyhedronGroup = ({ group }: { group: any }) => {
   const { display, polyhedra, groups } = group;
-  const css = useStyle({ padding: '10px 0' });
+  const css = useStyle({ paddingTop: spacing.s3 });
 
   return (
     <div {...css()}>
@@ -137,7 +137,7 @@ export default function ListPanel() {
   const filteredGroups =
     filterText === '' ? groups : filterGroups(groups, filterText);
 
-  const css = useStyle({ paddingTop: 10 });
+  const css = useStyle(paddingVert(spacing.s2));
 
   return (
     <section {...css()}>

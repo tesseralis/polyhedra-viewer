@@ -1,5 +1,5 @@
 import React, { ComponentType } from 'react';
-import { useStyle, fontSizes } from 'styles';
+import { useStyle, fontSizes, spacing } from 'styles';
 import _ from 'lodash';
 
 import { ChildrenProp } from 'types';
@@ -277,7 +277,7 @@ export default function InfoPanel() {
     height: '100%',
     borderSpacing: 8,
     borderCollapse: 'separate',
-    padding: 20,
+    padding: spacing.s3,
     fontFamily: fonts.times,
   });
 

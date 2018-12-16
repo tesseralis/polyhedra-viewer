@@ -1,5 +1,5 @@
 import React, { ButtonHTMLAttributes } from 'react';
-import { useStyle, fontSizes } from 'styles';
+import { useStyle, fontSizes, spacing } from 'styles';
 
 import { TransitionCtx, PolyhedronCtx } from 'components/Viewer/context';
 
@@ -14,7 +14,7 @@ function ResetButton(props: ButtonHTMLAttributes<Element>) {
     backgroundColor: 'white',
     border: '1px LightGray solid',
     height: 40,
-    padding: 10,
+    padding: spacing.s2,
     fontSize: fontSizes.f6,
     fontFamily: andaleMono,
   });

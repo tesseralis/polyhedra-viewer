@@ -1,13 +1,13 @@
 import React from 'react';
 import { CSSProperties } from 'aphrodite';
-import { useStyle, fontSizes } from 'styles';
+import { useStyle, fontSizes, spacing } from 'styles';
 
 import { Table } from 'math/polyhedra/tables';
 import { media, fonts } from 'styles';
 import Description from './Description';
 import PolyhedronTable from './PolyhedronTable';
 import { TableSection as TableSectionType } from './tableSections';
-import { flexColumn } from 'styles/common';
+import { flexColumn, paddingHoriz } from 'styles/common';
 
 const sectionMapping: Record<string, string> = {
   'Uniform Polyhedra': 'uniform',
@@ -165,11 +165,10 @@ export default function TableSection({
   const textCss = useStyle({
     maxWidth: 800,
     ...flexColumn('center'),
-    padding: '0 50px',
     marginBottom: 30,
-    [media.mobile]: {
-      padding: '0 30px',
-    },
+    // FIXME seems like we might want to replace this with "measure"?
+    [media.notMobile]: paddingHoriz(spacing.s5),
+    [media.mobile]: paddingHoriz(spacing.s4),
   });
 
   return (

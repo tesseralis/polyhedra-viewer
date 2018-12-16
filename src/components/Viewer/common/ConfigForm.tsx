@@ -1,5 +1,5 @@
 import React, { memo, useCallback, ButtonHTMLAttributes } from 'react';
-import { useStyle, fontSizes } from 'styles';
+import { useStyle, fontSizes, spacing } from 'styles';
 import _ from 'lodash';
 
 import Config from 'components/ConfigCtx';
@@ -7,7 +7,7 @@ import {
   configInputs,
   ConfigInput as InputType,
 } from 'components/configOptions';
-import { hover, flexRow, flexColumn } from 'styles/common';
+import { hover, flexRow, flexColumn, padding } from 'styles/common';
 import { andaleMono } from 'styles/fonts';
 
 function getInputValue<T>(input: InputType<T>, el: any) {
@@ -103,7 +103,7 @@ export default function ConfigForm() {
   const css = useStyle({
     ...flexColumn('flex-end'),
     width: '100%',
-    padding: 20,
+    padding: spacing.s3,
   });
   return (
     <form {...css()}>
