@@ -6,7 +6,7 @@ import { fonts, useStyle, fontSizes, spacing } from 'styles';
 
 import { groups } from 'data';
 import { escapeName } from 'math/polyhedra/names';
-import { hover, padding, paddingVert } from 'styles/common';
+import { hover, padding, paddingVert, margin, marginVert } from 'styles/common';
 
 import SearchBar from './SearchBar';
 
@@ -83,9 +83,9 @@ function SubList({ polyhedra }: { polyhedra: string[] }) {
 
 function SubgroupHeader({ name }: { name: string }) {
   const css = useStyle({
+    ...margin(spacing.s1, spacing.s3),
     fontFamily: fonts.times,
     fontSize: fontSizes.f5,
-    margin: '3px 12px',
   });
   return <h3 {...css()}>{_.capitalize(name)}</h3>;
 }
@@ -97,9 +97,7 @@ const Subgroup = ({
   name: string;
   polyhedra: string[];
 }) => {
-  const css = useStyle({
-    margin: '18px 0',
-  });
+  const css = useStyle(marginVert(spacing.s3));
 
   return (
     <div {...css()}>
@@ -111,9 +109,9 @@ const Subgroup = ({
 
 function GroupHeader({ text }: { text: string }) {
   const css = useStyle({
+    ...margin(spacing.s1, spacing.s3),
     fontFamily: fonts.times,
     fontSize: fontSizes.f4,
-    margin: '5px 12px',
   });
   return <h2 {...css()}>{text}</h2>;
 }

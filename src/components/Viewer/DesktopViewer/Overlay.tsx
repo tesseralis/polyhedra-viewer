@@ -3,13 +3,14 @@
 import React from 'react';
 import { useStyle, spacing } from 'styles';
 
-import { absolute, absoluteFull } from 'styles/common';
+import { absolute, absoluteFull, paddingHoriz } from 'styles/common';
 import { BackLink, Title, Options, Prompt } from '../common';
 
 interface Props {
   solid: string;
 }
 
+// FIXME replace all the padding/absolute values with Grid
 export default function Overlay({ solid }: Props) {
   const css = useStyle({
     ...absoluteFull,
@@ -29,12 +30,12 @@ export default function Overlay({ solid }: Props) {
   });
 
   const options = useStyle({
-    margin: '0 50px',
+    ...paddingHoriz(spacing.s4),
     height: '100%',
   });
 
   const prompt = useStyle({
-    marginTop: 20,
+    paddingTop: spacing.s3,
     position: 'absolute',
     top: 0,
     right: 0,

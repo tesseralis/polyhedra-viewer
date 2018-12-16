@@ -4,6 +4,7 @@ import { CSSProperties } from 'aphrodite';
 
 import { ExternalLink } from 'components/common';
 import { useStyle, fonts, fontSizes, spacing } from 'styles';
+import { marginHoriz } from 'styles/common';
 
 function styled(el: ReactType, styles: CSSProperties) {
   const El = el;
@@ -13,23 +14,25 @@ function styled(el: ReactType, styles: CSSProperties) {
   };
 }
 
+// FIXME I give up for now
 const List = styled('ul', {
+  ...marginHoriz(spacing.s4),
   listStyle: 'disc inside',
-  margin: '0 20px',
-  marginBottom: 10,
+  ':not(:last-child)': {
+    marginBottom: spacing.s3,
+  },
 });
 
-const listIndent = spacing.s3;
 const ListItem = styled('li', {
   fontSize: fontSizes.f5,
   fontFamily: fonts.times,
   color: 'DimGrey',
   lineHeight: 1.5,
-  textIndent: -listIndent,
-  paddingLeft: listIndent,
+  textIndent: `-${spacing.s4}`,
+  paddingLeft: spacing.s3,
 });
 
-interface RenderProps extends HTMLAttributes<any> {
+interface RenderProps extends HTMLAttributes<HTMLElement> {
   ordered: boolean;
   tight: boolean;
 }
@@ -41,7 +44,7 @@ const renderers = {
     color: 'DimGrey',
     lineHeight: 1.5,
     ':not(:last-child)': {
-      marginBottom: 10,
+      marginBottom: spacing.s3,
     },
   }),
   linkReference: styled(ExternalLink, {

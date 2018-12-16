@@ -13,7 +13,6 @@ function Toggle({ onClick, title }: any) {
     ...flexRow('center', 'center'),
 
     backgroundColor: 'transparent',
-    margin: 'auto 0',
     fontSize: fontSizes.f6,
     border: 'none',
     cursor: 'pointer',

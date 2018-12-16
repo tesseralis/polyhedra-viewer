@@ -36,20 +36,21 @@ function Main() {
 
 function Footer() {
   const css = useStyle({
-    ...flexColumn('center'),
     ...padding(spacing.s4, spacing.s5),
+    display: 'grid',
+    gridGap: spacing.s4,
+    justifyItems: 'center',
     width: '100%',
     boxShadow: '1px -1px 4px LightGray',
     textAlign: 'center',
   });
 
-  const share = useStyle({ marginBottom: 20 });
   return (
     <footer {...css()}>
-      <div {...share()}>
-        <ShareLinks />
+      <ShareLinks />
+      <div>
+        <Markdown source={text.footer} />
       </div>
-      <Markdown source={text.footer} />
     </footer>
   );
 }

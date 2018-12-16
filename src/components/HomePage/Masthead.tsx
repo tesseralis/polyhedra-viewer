@@ -13,7 +13,6 @@ const videoHeight = 300;
 function VideoLink() {
   const css = useStyle({
     ...flexRow(undefined, 'center'),
-    marginRight: 10,
     // make smaller to hide weird video artifacts
     height: videoHeight - 2,
     width: videoHeight - 2,
@@ -29,9 +28,7 @@ function VideoLink() {
 
 function Title() {
   const css = useStyle({
-    // FIXME what's the marginTop for?
-    marginTop: 20,
-    marginBottom: 15,
+    marginBottom: spacing.s2,
     fontSize: fontSizes.f2,
     textAlign: 'center',
     fontWeight: 'bold',
@@ -48,7 +45,7 @@ function Subtitle() {
   const css = useStyle({
     fontSize: fontSizes.f5,
     fontFamily: fonts.andaleMono,
-    marginBottom: 20,
+    marginBottom: spacing.s3,
     fontColor: 'dimGray',
   });
 

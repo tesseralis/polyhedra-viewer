@@ -75,7 +75,7 @@ const sectionStyles: Record<string, CSSProperties> = {
   },
 
   elementary: {
-    gridColumnGap: 50,
+    gridColumnGap: spacing.s4,
     gridTemplateAreas: `
       "snub"
       "other"
@@ -101,8 +101,7 @@ const TableGrid = ({
   const css = useStyle(
     {
       display: 'grid',
-      gridRowGap: 50,
-      gridColumnGap: 30,
+      gridGap: spacing.s4,
       justifyItems: 'center',
       ...sectionStyles[sectionMapping[header]],
     },
@@ -121,16 +120,9 @@ const TableGrid = ({
 function Heading({ subsection, text }: { subsection: boolean; text: string }) {
   const H = subsection ? 'h3' : 'h2';
   const css = useStyle({
+    marginBottom: spacing.s3,
     fontFamily: fonts.times,
-    ...(subsection
-      ? {
-          fontSize: fontSizes.f4,
-          marginBottom: 15,
-        }
-      : {
-          fontSize: fontSizes.f3,
-          marginBottom: 20,
-        }),
+    fontSize: subsection ? fontSizes.f4 : fontSizes.f3,
   });
   return <H {...css()}>{text}</H>;
 }
@@ -158,14 +150,14 @@ export default function TableSection({
   const css = useStyle({
     ...flexColumn('center'),
     ':not(:last-child)': {
-      marginBottom: 50,
+      marginBottom: spacing.s5,
     },
   });
 
   const textCss = useStyle({
     maxWidth: 800,
     ...flexColumn('center'),
-    marginBottom: 30,
+    marginBottom: spacing.s4,
     // FIXME seems like we might want to replace this with "measure"?
     [media.notMobile]: paddingHoriz(spacing.s5),
     [media.mobile]: paddingHoriz(spacing.s4),

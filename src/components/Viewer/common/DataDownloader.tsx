@@ -65,8 +65,8 @@ function DownloadLink({
     fontFamily: fonts.andaleMono,
     ...hover,
 
-    ':not(:first-child)': {
-      marginLeft: 10,
+    ':not(:last-child)': {
+      marginRight: spacing.s2,
     },
   });
 
@@ -83,8 +83,8 @@ function DownloadLink({
 export default function DataDownloader({ solid }: Props) {
   const heading = useStyle({
     fontFamily: fonts.times,
-    fontSize: fontSizes.f5,
-    marginBottom: 10,
+    fontSize: fontSizes.f4,
+    marginBottom: spacing.s2,
   });
   return (
     <div>

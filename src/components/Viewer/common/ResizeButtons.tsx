@@ -40,7 +40,7 @@ export default function ResizeButtons() {
   const css = useStyle({
     display: 'grid',
     gridTemplateColumns: '1fr 1fr',
-    columnGap: '10px',
+    columnGap: spacing.s2,
   });
   return (
     <div {...css()}>

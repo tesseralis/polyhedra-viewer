@@ -212,7 +212,7 @@ const info: InfoRow[] = [
 function Heading({ polyhedron }: RenderProps) {
   const css = useStyle({
     fontSize: fontSizes.f3,
-    marginBottom: 5,
+    marginBottom: spacing.s1,
   });
   return (
     <h2 {...css()}>
@@ -230,7 +230,7 @@ function Property({
   const css = useStyle({ marginBottom: 10 });
   const nameCss = useStyle({
     fontSize: fontSizes.f5,
-    marginBottom: 5,
+    marginBottom: spacing.s1,
   });
   const valueCss = useStyle({
     fontFamily: fonts.andaleMono,
@@ -257,7 +257,7 @@ function DataList({ polyhedron }: RenderProps) {
       "sym   sym   sym   sym   order order"
       "alt   alt   alt   alt   alt   alt"
     `,
-    gridRowGap: 15,
+    gridRowGap: spacing.s3,
   });
 
   return (
@@ -284,7 +284,7 @@ export default function InfoPanel() {
   const typeCss = useStyle({
     fontSize: fontSizes.f5,
     color: 'DimGrey',
-    marginBottom: 20,
+    marginBottom: spacing.s3,
   });
 
   const downloaderCss = useStyle({ marginTop: 'auto' });

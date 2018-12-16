@@ -15,7 +15,7 @@ interface Props extends NavLinkProps {
 
 function LinkText({ text, hidden }: { text: string; hidden: boolean }) {
   const css = useStyle({
-    marginTop: 5,
+    marginTop: spacing.s1,
     fontSize: fontSizes.f7,
     fontFamily: fonts.verdana,
 

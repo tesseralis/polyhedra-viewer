@@ -65,8 +65,10 @@ const LabelledInput = memo(({ input, value, setValue }: InputProps<any>) => {
   const css = useStyle({
     ...flexRow(undefined, 'space-between'),
     width: '100%',
-    marginBottom: 16,
     fontFamily: andaleMono,
+    ':not(:last-child)': {
+      marginBottom: spacing.s3,
+    },
   });
   return (
     <label {...css()}>
@@ -82,7 +84,7 @@ function ResetButton({ onClick }: ButtonHTMLAttributes<Element>) {
 
     width: 120,
     height: 30,
-    marginTop: 20,
+    marginTop: spacing.s3,
 
     border: '1px LightGray solid',
 

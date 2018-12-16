@@ -2,9 +2,8 @@ import React from 'react';
 import Icon from '@mdi/react';
 import { mdiFacebookBox, mdiTumblrBox, mdiTwitter, mdiReddit } from '@mdi/js';
 
-import { useStyle, fonts } from 'styles';
+import { useStyle, fonts, spacing } from 'styles';
 import { ExternalLink, SrOnly } from 'components/common';
-import { flexRow } from 'styles/common';
 
 const url = 'http://polyhedra.tessera.li';
 const title = 'Polyhedra Viewer';
@@ -38,16 +37,12 @@ function ShareText() {
   const css = useStyle({
     fontFamily: fonts.andaleMono,
     fontWeight: 'bold',
-    marginRight: 5,
   });
   return <span {...css()}>Share:</span>;
 }
 
 function ShareLink({ url, icon, name }: typeof links[0]) {
-  const css = useStyle({
-    margin: '0 10px',
-    fill: 'DimGrey',
-  });
+  const css = useStyle({ fill: 'DimGrey' });
   return (
     <ExternalLink
       {...css()}
@@ -65,7 +60,12 @@ function ShareLink({ url, icon, name }: typeof links[0]) {
 }
 
 export default function ShareLinks() {
-  const css = useStyle(flexRow('center'));
+  const css = useStyle({
+    display: 'grid',
+    gridAutoFlow: 'column',
+    gridGap: spacing.s3,
+    alignItems: 'center',
+  });
   return (
     <div {...css()}>
       <ShareText />

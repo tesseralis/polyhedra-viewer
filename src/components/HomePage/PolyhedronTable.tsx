@@ -4,7 +4,7 @@ import _ from 'lodash';
 import { fromConwayNotation } from 'math/polyhedra/names';
 import { Table } from 'math/polyhedra/tables';
 import PolyhedronLink from './PolyhedronLink';
-import { media, fonts, useStyle, fontSizes } from 'styles';
+import { media, fonts, useStyle, fontSizes, spacing } from 'styles';
 
 function useCellStyle() {
   return useStyle({
@@ -12,12 +12,8 @@ function useCellStyle() {
     verticalAlign: 'middle',
     textAlign: 'center',
     color: 'DimGrey',
-    [media.notMobile]: {
-      fontSize: fontSizes.f6,
-    },
-    [media.mobile]: {
-      fontSize: fontSizes.f7,
-    },
+    [media.notMobile]: { fontSize: fontSizes.f6 },
+    [media.mobile]: { fontSize: fontSizes.f7 },
   });
 }
 
@@ -29,7 +25,7 @@ const Cell = ({ cell, colSpan = 1 }: { cell: string; colSpan?: number }) => {
 
   // Render a link for each cell, or a grayed-out link when indicated by an "!"
   const css = useCellStyle();
-  const label = useStyle({ marginTop: 5 });
+  const label = useStyle({ marginTop: spacing.s1 });
   return (
     <td {...css()} colSpan={colSpan}>
       {polyhedron ? <PolyhedronLink isFake={isFake} name={polyhedron} /> : cell}

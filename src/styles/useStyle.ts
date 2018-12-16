@@ -9,7 +9,7 @@ import { StyleSheet, css, CSSProperties } from 'aphrodite/no-important';
  * ```
  // Normal usage
  function Component1() {
-   const css = useStyle({ margin: 10 })
+   const css = useStyle({ margin: '1rem' })
    return <div {...css()}>My Component</div>
  }
  
@@ -23,8 +23,8 @@ import { StyleSheet, css, CSSProperties } from 'aphrodite/no-important';
  
  // Choose prop name
  function CustomLink() {
-   const css = useStyle({ color: gray })
-   const activeCss = useStyle({ color: black })
+   const css = useStyle({ color: 'gray' })
+   const activeCss = useStyle({ color: 'black' })
  
    // React Router `Link` component
    return <Link {...css()} {...activeCss('activeClassName')}>Click Me</Link>
