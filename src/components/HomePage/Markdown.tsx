@@ -14,10 +14,9 @@ function styled(el: ReactType, styles: CSSProperties) {
   };
 }
 
-// FIXME I give up for now
 const List = styled('ul', {
   ...marginHoriz(spacing.s4),
-  listStyle: 'disc inside',
+  listStyle: 'disc',
   ':not(:last-child)': {
     marginBottom: spacing.s3,
   },
@@ -28,8 +27,6 @@ const ListItem = styled('li', {
   fontFamily: fonts.times,
   color: 'DimGrey',
   lineHeight: 1.5,
-  textIndent: `-${spacing.s4}`,
-  paddingLeft: spacing.s3,
 });
 
 interface RenderProps extends HTMLAttributes<HTMLElement> {
