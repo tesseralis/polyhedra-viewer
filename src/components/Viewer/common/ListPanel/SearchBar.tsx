@@ -2,7 +2,7 @@ import React, { memo, useState, InputHTMLAttributes } from 'react';
 import Icon from '@mdi/react';
 import { mdiMagnify } from '@mdi/js';
 
-import { useStyle, fontSizes, spacing } from 'styles';
+import { useStyle, fontSizes, spacing, dims } from 'styles';
 import { andaleMono } from 'styles/fonts';
 import { transition, flexRow } from 'styles/common';
 
@@ -29,7 +29,7 @@ function SearchInput(props: InputHTMLAttributes<HTMLInputElement>) {
   const css = useStyle({
     ...transition('border-color', 0.35),
     width: '100%',
-    height: 36,
+    height: dims.d2,
     paddingLeft: spacing.s4,
 
     border: '2px LightGray solid',

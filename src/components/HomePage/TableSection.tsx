@@ -1,6 +1,6 @@
 import React from 'react';
 import { CSSProperties } from 'aphrodite';
-import { useStyle, fontSizes, spacing } from 'styles';
+import { useStyle, fontSizes, spacing, dims } from 'styles';
 
 import { Table } from 'math/polyhedra/tables';
 import { media, fonts } from 'styles';
@@ -155,7 +155,7 @@ export default function TableSection({
   });
 
   const textCss = useStyle({
-    maxWidth: 800,
+    maxWidth: dims.d7,
     ...flexColumn('center'),
     marginBottom: spacing.s4,
     // FIXME seems like we might want to replace this with "measure"?

@@ -2,7 +2,7 @@ import _ from 'lodash';
 
 import React, { memo } from 'react';
 
-import { useStyle } from 'styles';
+import { useStyle, dims } from 'styles';
 import {
   Point2D,
   Polygon,
@@ -129,7 +129,7 @@ function InnerIcon({ name }: Props) {
   }
 }
 export default memo(function OptionIcon({ name }: Props) {
-  const css = useStyle(square(40));
+  const css = useStyle(square(dims.d2));
   return (
     <svg viewBox="0 0 200 200" {...css()}>
       <InnerIcon name={name} />

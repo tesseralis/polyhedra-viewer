@@ -9,8 +9,8 @@ import 'styles/polyhedronIcons.css';
 
 const baseThumbnailSize = 150;
 
-const thumbnailSize = 65;
-const mobThumbnailSize = 50;
+const thumbnailSize = 64;
+const mobThumbnailSize = 48;
 
 function scale(ratio: number) {
   return `scale(${ratio}, ${ratio})`;
@@ -28,10 +28,10 @@ function Image({ name }: Pick<Props, 'name'>) {
     // so we have to adjust
     paddingLeft: spacing.s1,
     [media.notMobile]: {
-      transform: scale((thumbnailSize + 15) / baseThumbnailSize),
+      transform: scale((thumbnailSize + 16) / baseThumbnailSize),
     },
     [media.mobile]: {
-      transform: scale((mobThumbnailSize + 15) / baseThumbnailSize),
+      transform: scale((mobThumbnailSize + 16) / baseThumbnailSize),
     },
   });
   return (

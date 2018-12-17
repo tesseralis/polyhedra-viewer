@@ -1,5 +1,5 @@
 import React, { ButtonHTMLAttributes } from 'react';
-import { useStyle, fontSizes, spacing } from 'styles';
+import { useStyle, fontSizes, spacing, dims } from 'styles';
 
 import { TransitionCtx, PolyhedronCtx } from 'components/Viewer/context';
 
@@ -13,8 +13,7 @@ function ResetButton(props: ButtonHTMLAttributes<Element>) {
     alignSelf: 'flex-end',
     backgroundColor: 'white',
     border: '1px LightGray solid',
-    height: 40,
-    padding: spacing.s2,
+    padding: spacing.s3,
     fontSize: fontSizes.f6,
     fontFamily: andaleMono,
   });

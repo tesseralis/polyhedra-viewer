@@ -73,7 +73,7 @@ export default function PolyhedronTable({
   data,
 }: Props) {
   const css = useStyle({
-    borderSpacing: 8,
+    borderSpacing: spacing.s2,
     borderCollapse: 'separate',
   });
   const captionCss = useStyle({

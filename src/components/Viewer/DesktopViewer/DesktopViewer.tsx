@@ -1,6 +1,6 @@
 import React, { memo } from 'react';
 
-import { useStyle } from 'styles';
+import { useStyle, dims } from 'styles';
 import { flexRow } from 'styles/common';
 import Sidebar from './Sidebar';
 import Overlay from './Overlay';
@@ -11,11 +11,15 @@ interface Props {
   solid: string;
 }
 
+// There's no good measure in the usual scale for the sidebar
+// FIXME still try to get it to work?
+const sidebarW = '24rem';
+
 function Scene({ solid, full }: Pick<Props, 'solid'> & { full: boolean }) {
   const css = useStyle(
     {
       position: 'relative',
-      width: full ? '100%' : 'calc(100% - 400px)',
+      width: full ? '100%' : `calc(100% - ${sidebarW})`,
       height: '100%',
       alignSelf: 'flex-start',
     },
@@ -44,8 +48,8 @@ function StyledSidebar({
       : {
           position: 'relative',
           height: '100%',
-          minWidth: 400,
-          maxWidth: 400,
+          minWidth: sidebarW,
+          maxWidth: sidebarW,
         },
     [compact],
   );

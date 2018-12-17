@@ -39,7 +39,7 @@ const OpButton = memo(function({ name, disabled }: Props) {
     {
       ...flexColumn('center', 'center'),
       ...hover,
-      ...square(84),
+      ...square(80),
       border: `${isCurrent ? 2 : 1}px LightGray solid`,
       fontFamily: fonts.verdana,
       fontSize: fontSizes.f7,
@@ -87,15 +87,13 @@ export default function OpGrid() {
       display: 'grid',
       justifyContent: 'space-around',
       gridColumnGap: spacing.s1,
-      gridRowGap: spacing.s3,
-      gridTemplateRows: 'repeat(4, 80px)',
+      gridRowGap: spacing.s2,
       gridTemplateAreas: opLayout.map(line => `"${line.join(' ')}"`).join('\n'),
     },
     [media.mobile]: {
       ...flexRow(),
       ...scroll('x'),
       width: '100%',
-      height: 85,
     },
   });
   return (

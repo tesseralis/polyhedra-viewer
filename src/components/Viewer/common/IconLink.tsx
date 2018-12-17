@@ -1,6 +1,6 @@
 import React from 'react';
 import { Route, NavLink, NavLinkProps } from 'react-router-dom';
-import { useStyle, fontSizes, spacing } from 'styles';
+import { useStyle, fontSizes, spacing, dims } from 'styles';
 import Icon from '@mdi/react';
 
 import { media, fonts } from 'styles';
@@ -62,7 +62,7 @@ export default function IconLink({
         {...activeCss('activeClassName')}
         onClick={onClick}
       >
-        <Icon path={iconName} size="36px" />
+        <Icon path={iconName} size={dims.d2} />
         <LinkText text={title} hidden={iconOnly} />
       </NavLink>
     </Route>

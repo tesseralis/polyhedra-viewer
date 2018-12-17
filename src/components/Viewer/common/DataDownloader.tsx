@@ -1,7 +1,7 @@
 import React from 'react';
 import Icon from '@mdi/react';
 
-import { useStyle, fontSizes, spacing } from 'styles';
+import { useStyle, fontSizes, spacing, dims } from 'styles';
 import { SrOnly } from 'components/common';
 import { fonts } from 'styles';
 
@@ -57,7 +57,7 @@ function DownloadLink({
     display: 'inline-flex',
     justifyContent: 'center',
     padding: spacing.s2,
-    width: 100,
+    width: dims.d4,
 
     textDecoration: 'none',
     border: '1px solid LightGrey',

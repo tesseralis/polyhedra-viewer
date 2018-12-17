@@ -1,16 +1,13 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-import { useStyle, fonts, fontSizes, media, spacing } from 'styles';
+import { useStyle, fonts, fontSizes, media, spacing, dims } from 'styles';
 import { square } from 'styles/common';
 import image from 'images/sad-scutoid.png';
 import { usePageTitle } from 'components/common';
 
 function Image() {
-  const css = useStyle({
-    ...square(300),
-    [media.mobile]: square(200),
-  });
+  const css = useStyle(square(dims.d5));
   return <img {...css()} src={image} alt="" />;
 }
 
@@ -44,7 +41,6 @@ function BackLink() {
 
 export default function ErrorPage() {
   usePageTitle('Error - Polyhedra Viewer');
-  // TODO is there any way to *not* rely on defining the "full" width per page?
   const css = useStyle({
     width: '100vw',
     height: '100vh',

@@ -1,5 +1,5 @@
 import React from 'react';
-import { useStyle, spacing } from 'styles';
+import { useStyle, spacing, dims } from 'styles';
 
 import { NavMenu, Panels, useHiddenHeading } from '../common';
 import { paddingHoriz, scroll } from 'styles/common';
@@ -12,7 +12,7 @@ interface Props {
   compact?: boolean;
 }
 
-const menuH = 75;
+const menuH = dims.d3;
 
 export default function Sidebar({ panel, solid, compact }: Props) {
   const [header, focusOnHeader] = useHiddenHeading(panel);
@@ -23,7 +23,7 @@ export default function Sidebar({ panel, solid, compact }: Props) {
       height: '100%',
       position: 'relative',
       display: 'grid',
-      gridTemplateRows: `${menuH}px 1fr`,
+      gridTemplateRows: `${menuH} 1fr`,
       gridTemplateAreas: '"menu" "content"',
       borderLeft: compact ? undefined : '1px solid LightGray',
     },

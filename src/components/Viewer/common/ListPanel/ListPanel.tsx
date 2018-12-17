@@ -2,7 +2,7 @@ import _ from 'lodash';
 
 import React, { useState } from 'react';
 import { NavLink, Route } from 'react-router-dom';
-import { fonts, useStyle, fontSizes, spacing } from 'styles';
+import { fonts, useStyle, fontSizes, spacing, dims } from 'styles';
 
 import { groups } from 'data';
 import { escapeName } from 'math/polyhedra/names';
@@ -40,7 +40,6 @@ function PolyhedronLink({ name }: { name: string }) {
     ...padding(spacing.s1, spacing.s3),
     textDecoration: 'none',
     display: 'block',
-    height: 24,
 
     color: 'DimGrey',
     lineHeight: 1.25,
@@ -118,7 +117,7 @@ function GroupHeader({ text }: { text: string }) {
 
 const PolyhedronGroup = ({ group }: { group: any }) => {
   const { display, polyhedra, groups } = group;
-  const css = useStyle({ paddingTop: spacing.s3 });
+  const css = useStyle({ marginTop: spacing.s2 });
 
   return (
     <div {...css()}>

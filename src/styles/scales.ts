@@ -30,3 +30,18 @@ export const spacing = {
   s6: '8rem', // 128px
   s7: '16rem', // 256px
 };
+
+// http://tachyons.io/docs/layout/widths/
+/**
+ * A scale used for widths and heights.
+ */
+export const dims = {
+  d1: '1rem', // 16px
+  d2: '2rem', // 32px
+  d3: '4rem', // 64px
+  d4: '8rem', // 128px
+  d5: '16rem', // 256px
+  d6: '32rem', // 512px
+  d7: '48rem', // 768px
+  d8: '64rem', // 1024px
+};

@@ -2,8 +2,8 @@ import React, { memo } from 'react';
 import _ from 'lodash';
 import { CSSProperties } from 'aphrodite';
 
-import { useStyle, media, spacing } from 'styles';
-import { scroll, padding, paddingHoriz } from 'styles/common';
+import { useStyle, media, spacing, dims } from 'styles';
+import { scroll, padding, paddingHoriz, flexRow } from 'styles/common';
 import {
   BackLink,
   Title,
@@ -15,10 +15,10 @@ import {
 
 import OperationsPanel from './OperationsPanel';
 
-function mobile(styles: (mobTitleH: number, menuH: number) => CSSProperties) {
+function mobile(styles: (mobTitleH: string, navH: string) => CSSProperties) {
   return {
-    [media.mobileLandscape]: styles(45, 45),
-    [media.mobilePortrait]: styles(60, 75),
+    [media.mobileLandscape]: styles('45px', '45px'),
+    [media.mobilePortrait]: styles('64px', '64px'),
   };
 }
 
@@ -36,7 +36,7 @@ function Header({ solid }: Pick<Props, 'solid'>) {
     borderBottom: '1px solid LightGray',
     width: '100%',
     display: 'grid',
-    gridTemplateColumns: '40px 1fr 40px',
+    gridTemplateColumns: `${dims.d2} 1fr ${dims.d2}`,
     alignItems: 'center',
     justifyItems: 'center',
   });
@@ -78,15 +78,15 @@ export default memo(function MobileViewer({ panel, solid }: Props) {
     width: '100vw',
     height: '100vh',
     display: 'grid',
-    gridTemplateAreas: '"title" "content" "menu"',
-    ...mobile((mobTitleH, menuH) => ({
-      gridTemplateRows: `${mobTitleH}px 1fr ${menuH}px`,
+    gridTemplateAreas: '"title" "content" "nav"',
+    ...mobile((mobTitleH, navH) => ({
+      gridTemplateRows: `${mobTitleH} 1fr ${navH}`,
     })),
   });
 
   const sceneCss = useStyle({
-    ...mobile((mobTitleH, menuH) => ({
-      height: `calc(100vh - ${menuH}px - ${mobTitleH}px)`,
+    ...mobile((mobTitleH, navH) => ({
+      height: `calc(100vh - ${navH} - ${mobTitleH})`,
     })),
     zIndex: 0,
     gridArea: 'content',
@@ -94,12 +94,11 @@ export default memo(function MobileViewer({ panel, solid }: Props) {
   });
 
   const navCss = useStyle({
-    ...mobile(($, menuH) => ({
-      height: menuH,
+    ...mobile(($, navH) => ({
+      height: navH,
     })),
-    ...padding(spacing.s1, spacing.s2),
-    gridArea: 'menu',
-
+    ...flexRow('center'),
+    gridArea: 'nav',
     borderTop: '1px solid LightGray',
   });
 

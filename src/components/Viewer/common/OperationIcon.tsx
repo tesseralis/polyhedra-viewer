@@ -5,6 +5,8 @@ import { StyleSheet, css } from 'aphrodite/no-important';
 
 import { OpName } from 'math/operations';
 import { Polygon, PolyLine } from 'components/svg';
+import { square } from 'styles/common';
+import { dims } from 'styles';
 const { sqrt } = Math;
 
 type SheetDefinition = { [key: string]: {} };
@@ -23,10 +25,7 @@ function makeStyles(inputStyles: SheetDefinition) {
 
 const color = 'DimGray';
 const styles = makeStyles({
-  operationIcon: {
-    width: 60,
-    height: 60,
-  },
+  operationIcon: square(dims.d3),
 
   invariant: {
     fill: color,

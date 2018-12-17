@@ -1,5 +1,5 @@
 import React, { ButtonHTMLAttributes } from 'react';
-import { useStyle } from 'styles';
+import { useStyle, dims } from 'styles';
 
 import { PolyhedronCtx, OperationCtx } from 'components/Viewer/context';
 import OptionIcon from './OptionIcon';
@@ -30,7 +30,7 @@ function OptionButton({ optValue, selected, ...htmlProps }: BtnProps) {
   const css = useStyle(
     {
       ...hover,
-      ...square(72),
+      ...square(dims.d3),
       border: selected ? '2px DarkSlateGray solid' : '1px LightGray solid',
       backgroundColor: 'white',
       fontFamily: verdana,
