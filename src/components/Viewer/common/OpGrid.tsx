@@ -39,6 +39,7 @@ const OpButton = memo(function({ name, disabled }: Props) {
     {
       ...flexColumn('center', 'center'),
       ...hover,
+      // FIXME
       ...square(80),
       border: `${isCurrent ? 2 : 1}px LightGray solid`,
       fontFamily: fonts.verdana,
@@ -85,7 +86,7 @@ export default function OpGrid() {
   const css = useStyle({
     [media.notMobile]: {
       display: 'grid',
-      justifyContent: 'space-around',
+      justifyContent: 'space-between',
       gridColumnGap: spacing.s1,
       gridRowGap: spacing.s2,
       gridTemplateAreas: opLayout.map(line => `"${line.join(' ')}"`).join('\n'),

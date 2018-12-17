@@ -2,12 +2,12 @@ import React from 'react';
 import { useStyle, spacing } from 'styles';
 
 import { ResizeButtons, OpGrid } from '../common';
-import { padding, flexColumn } from 'styles/common';
+import { flexColumn } from 'styles/common';
 
 export default function OperationsPanel() {
   const css = useStyle({
     ...flexColumn(),
-    ...padding(spacing.s3, spacing.s2),
+    padding: spacing.s3,
     height: '100%',
   });
 

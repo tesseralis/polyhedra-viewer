@@ -13,7 +13,7 @@ function ResetButton(props: ButtonHTMLAttributes<Element>) {
     alignSelf: 'flex-end',
     backgroundColor: 'white',
     border: '1px LightGray solid',
-    padding: spacing.s3,
+    padding: spacing.s2,
     fontSize: fontSizes.f6,
     fontFamily: andaleMono,
   });

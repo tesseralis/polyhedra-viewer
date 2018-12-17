@@ -40,8 +40,6 @@ export default function IconLink({
     ...flexColumn('center'),
     ...colorFill('DimGray'),
     textDecoration: 'none',
-
-    // FIXME the nav menu looks a little off
     padding: spacing.s2,
 
     [media.mobileLandscape]: {

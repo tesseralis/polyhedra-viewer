@@ -274,6 +274,9 @@ export default function InfoPanel() {
 
   const css = useStyle({
     ...flexColumn(),
+    // FIXME this is needed for the downloader to be on the bottom
+    // but causes spacing to be wonky when it scrolls on mobile
+    height: '100%',
     borderSpacing: 8,
     borderCollapse: 'separate',
     padding: spacing.s3,

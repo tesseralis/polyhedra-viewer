@@ -155,8 +155,8 @@ export default function TableSection({
   });
 
   const textCss = useStyle({
-    maxWidth: dims.d7,
     ...flexColumn('center'),
+    maxWidth: dims.d7,
     marginBottom: spacing.s4,
     // FIXME seems like we might want to replace this with "measure"?
     [media.notMobile]: paddingHoriz(spacing.s5),

@@ -9,19 +9,21 @@ function Title({ name }: { name: string }) {
   const css = useStyle({
     fontFamily: fonts.andaleMono,
     fontSize: fontSizes.f2,
-    fontWeight: 'bold',
-    textAlign: 'left',
+
+    [media.notMobile]: {
+      fontWeight: 'bold',
+      textAlign: 'left',
+    },
 
     [media.tabletPortrait]: {
+      // Otherwise, it bleeds into the sidebar
       fontSize: fontSizes.f3,
     },
 
     // TODO consider making this style-less and defining the styles
     // in mobile/desktop viewers
     [media.mobile]: {
-      fontFamily: fonts.times,
-      fontWeight: 'initial',
-      fontSize: fontSizes.f4,
+      fontSize: fontSizes.f5,
       lineHeight: 1.25,
       textAlign: 'center',
     },
