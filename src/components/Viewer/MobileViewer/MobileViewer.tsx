@@ -17,8 +17,8 @@ import OperationsPanel from './OperationsPanel';
 
 function mobile(styles: (mobTitleH: string, navH: string) => CSSProperties) {
   return {
-    [media.mobileLandscape]: styles('45px', '45px'),
-    [media.mobilePortrait]: styles('64px', '64px'),
+    [media.mobileLandscape]: styles('48px', '48px'),
+    [media.mobilePortrait]: styles('48px', '64px'),
   };
 }
 
@@ -65,7 +65,7 @@ function Content({ panel, header }: Pick<Props, 'panel'> & { header: any }) {
   return (
     <div {...css()}>
       {header}
-      <Panels panel={panel} operationsPanel={OperationsPanel} />;
+      <Panels panel={panel} operationsPanel={OperationsPanel} />
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { useStyle, fonts, fontSizes, spacing } from 'styles';
+import { useStyle, fonts, fontSizes, spacing, dims } from 'styles';
 
 import Icon from '@mdi/react';
 import { mdiHexagonOutline } from '@mdi/js';
@@ -25,7 +25,7 @@ export default function Loading() {
 
   return (
     <div {...css()}>
-      <Icon size="36px" path={mdiHexagonOutline} spin />
+      <Icon size={dims.d2} path={mdiHexagonOutline} spin />
       <div {...text()}>Loading...</div>
     </div>
   );

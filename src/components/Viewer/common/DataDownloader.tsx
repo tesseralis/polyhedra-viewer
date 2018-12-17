@@ -74,7 +74,7 @@ function DownloadLink({
     <a {...css()} key={ext} download={filename} href={url}>
       <SrOnly>Download as</SrOnly>.{ext}{' '}
       <span>
-        <Icon path={mdiDownload} size="18px" />
+        <Icon path={mdiDownload} size={dims.d1} />
       </span>
     </a>
   );

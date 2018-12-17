@@ -9,6 +9,7 @@ import 'styles/polyhedronIcons.css';
 
 const baseThumbnailSize = 150;
 
+// FIXME
 const thumbnailSize = 64;
 const mobThumbnailSize = 48;
 

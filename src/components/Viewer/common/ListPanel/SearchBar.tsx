@@ -20,7 +20,7 @@ function SearchIcon({ focused }: { focused: boolean }) {
   );
   return (
     <span {...css()}>
-      <Icon path={mdiMagnify} size="20px" />
+      <Icon path={mdiMagnify} size={dims.d1} />
     </span>
   );
 }
@@ -33,7 +33,7 @@ function SearchInput(props: InputHTMLAttributes<HTMLInputElement>) {
     paddingLeft: spacing.s4,
 
     border: '2px LightGray solid',
-    borderRadius: 28,
+    borderRadius: 9999,
 
     fontSize: fontSizes.f6,
     fontFamily: andaleMono,

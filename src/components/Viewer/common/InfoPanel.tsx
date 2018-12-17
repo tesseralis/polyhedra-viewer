@@ -274,7 +274,6 @@ export default function InfoPanel() {
 
   const css = useStyle({
     ...flexColumn(),
-    height: '100%',
     borderSpacing: 8,
     borderCollapse: 'separate',
     padding: spacing.s3,
