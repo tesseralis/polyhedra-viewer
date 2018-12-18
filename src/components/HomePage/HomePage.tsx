@@ -36,7 +36,7 @@ function Main() {
 
 function Footer() {
   const css = useStyle({
-    ...padding(scales.spacing[4], scales.spacing[5]),
+    padding: scales.spacing[4],
     display: 'grid',
     gridGap: scales.spacing[4],
     justifyItems: 'center',
