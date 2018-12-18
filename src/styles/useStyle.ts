@@ -4,6 +4,13 @@ import { StyleSheet, css, CSSProperties } from 'aphrodite/no-important';
 /**
  * Hook that allows you to define dynamic (or static) css for use in a component.
  *
+ * @param styles The CSS properties to compile
+ * @param deps list of dependencies (like in useMemo). *Unlike* useMemo and useEffect,
+ * this defaults to [], meaning your styles won't be recalculated at each render
+ * (since this is the most common case)
+ * @returns a function to compile the style that takes in an optional `prop` parameter
+ * (default `className`).
+ * 
  * Examples:
  *
  * ```
@@ -29,14 +36,7 @@ import { StyleSheet, css, CSSProperties } from 'aphrodite/no-important';
    // React Router `Link` component
    return <Link {...css()} {...activeCss('activeClassName')}>Click Me</Link>
  }
- * ```
- *
- * @param styles The CSS properties to compile
- * @param deps list of dependencies (like in useMemo). *Unlike* useMemo and useEffect,
- * this defaults to [], meaning your styles won't be recalculated at each render
- * (since this is the most common case)
- * @returns a function to compile the style that takes in an optional `prop` parameter
- * (default `className`).
+ ```
  */
 export default function useStyle(styles: CSSProperties, deps: unknown[] = []) {
   return useMemo(() => {
