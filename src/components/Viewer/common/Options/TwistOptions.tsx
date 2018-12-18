@@ -21,7 +21,7 @@ function TwistOption({ orientation }: { orientation: Twist }) {
     ...flexColumn('center', 'center'),
     ...square(dims.d3),
     ...hover,
-    bodrer: '1px LightGray solid',
+    border: '1px LightGray solid',
     pointerEvents: 'initial',
     background: 'none',
   });
