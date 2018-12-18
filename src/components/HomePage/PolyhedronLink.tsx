@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 
 import { escapeName } from 'math/polyhedra/names';
 import { square, hover, flexRow } from 'styles/common';
-import { useStyle, media, spacing } from 'styles';
+import { useStyle, media, scales } from 'styles';
 
 import 'styles/polyhedronIcons.css';
 
@@ -27,7 +27,7 @@ function Image({ name }: Pick<Props, 'name'>) {
     ...flexRow('center', 'center'),
     // The spriting/scaling process makes everything a little off center
     // so we have to adjust
-    paddingLeft: spacing.s1,
+    paddingLeft: scales.spacing[1],
     [media.notMobile]: {
       transform: scale((thumbnailSize + 16) / baseThumbnailSize),
     },

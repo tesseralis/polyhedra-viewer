@@ -2,7 +2,7 @@ import React from 'react';
 import Icon from '@mdi/react';
 import { mdiFacebookBox, mdiTumblrBox, mdiTwitter, mdiReddit } from '@mdi/js';
 
-import { useStyle, fonts, spacing, dims } from 'styles';
+import { useStyle, fonts, scales } from 'styles';
 import { ExternalLink, SrOnly } from 'components/common';
 
 const url = 'http://polyhedra.tessera.li';
@@ -53,7 +53,7 @@ function ShareLink({ url, icon, name }: typeof links[0]) {
         window.open(url, 'share', 'toolbar=0,status=0,width=548,height=325')
       }
     >
-      <Icon size={dims.d2} path={icon} />
+      <Icon size={scales.size[2]} path={icon} />
       <SrOnly>{`Share on ${name}`}</SrOnly>
     </ExternalLink>
   );
@@ -63,7 +63,7 @@ export default function ShareLinks() {
   const css = useStyle({
     display: 'grid',
     gridAutoFlow: 'column',
-    gridGap: spacing.s3,
+    gridGap: scales.spacing[3],
     alignItems: 'center',
   });
   return (

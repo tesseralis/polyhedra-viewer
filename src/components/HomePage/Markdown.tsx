@@ -3,7 +3,7 @@ import Markdown from 'react-markdown';
 import { CSSProperties } from 'aphrodite';
 
 import { ExternalLink } from 'components/common';
-import { useStyle, fonts, fontSizes, spacing } from 'styles';
+import { useStyle, fonts, scales } from 'styles';
 import { marginHoriz, link } from 'styles/common';
 
 function styled(el: ReactType, styles: CSSProperties) {
@@ -15,15 +15,15 @@ function styled(el: ReactType, styles: CSSProperties) {
 }
 
 const List = styled('ul', {
-  ...marginHoriz(spacing.s4),
+  ...marginHoriz(scales.spacing[4]),
   listStyle: 'disc',
   ':not(:last-child)': {
-    marginBottom: spacing.s3,
+    marginBottom: scales.spacing[3],
   },
 });
 
 const ListItem = styled('li', {
-  fontSize: fontSizes.f5,
+  fontSize: scales.font[5],
   fontFamily: fonts.times,
   color: 'DimGrey',
   lineHeight: 1.5,
@@ -36,12 +36,12 @@ interface RenderProps extends HTMLAttributes<HTMLElement> {
 
 const renderers = {
   paragraph: styled('p', {
-    fontSize: fontSizes.f5,
+    fontSize: scales.font[5],
     fontFamily: fonts.times,
     color: 'DimGrey',
     lineHeight: 1.5,
     ':not(:last-child)': {
-      marginBottom: spacing.s3,
+      marginBottom: scales.spacing[3],
     },
   }),
   linkReference: styled(ExternalLink, link),

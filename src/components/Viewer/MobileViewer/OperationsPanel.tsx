@@ -1,5 +1,5 @@
 import React from 'react';
-import { useStyle, spacing } from 'styles';
+import { useStyle, scales } from 'styles';
 
 import { OpGrid, Prompt, Options, ResizeButtons } from '../common';
 import { flexColumn } from 'styles/common';
@@ -9,7 +9,7 @@ export default function OperationsPanel() {
     ...flexColumn(),
     height: '100%',
     pointerEvents: 'none',
-    padding: spacing.s2,
+    padding: scales.spacing[2],
   });
 
   const resizeButtons = useStyle({
@@ -17,13 +17,13 @@ export default function OperationsPanel() {
   });
 
   const prompt = useStyle({
-    marginTop: spacing.s2,
+    marginTop: scales.spacing[2],
     marginBottom: 'auto',
   });
 
   const options = useStyle({
     marginTop: 'auto',
-    marginBottom: spacing.s2,
+    marginBottom: scales.spacing[2],
   });
 
   const opGrid = useStyle({

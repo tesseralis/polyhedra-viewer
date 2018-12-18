@@ -2,7 +2,7 @@ import React, { useState, useCallback } from 'react';
 import Icon from '@mdi/react';
 import { mdiMenuDown } from '@mdi/js';
 
-import { useStyle, fonts, fontSizes, dims } from 'styles';
+import { useStyle, fonts, scales } from 'styles';
 import { flexRow, flexColumn, link } from 'styles/common';
 import { SrOnly } from 'components/common';
 import Markdown from './Markdown';
@@ -13,7 +13,7 @@ function Toggle({ onClick, title }: any) {
     ...flexRow('center', 'center'),
 
     backgroundColor: 'transparent',
-    fontSize: fontSizes.f6,
+    fontSize: scales.font[6],
     border: 'none',
     cursor: 'pointer',
     fontFamily: fonts.times,
@@ -21,7 +21,7 @@ function Toggle({ onClick, title }: any) {
   return (
     <button {...css()} onClick={onClick}>
       <span>
-        <Icon path={mdiMenuDown} size={dims.d1} />
+        <Icon path={mdiMenuDown} size={scales.size[1]} />
       </span>
       {'More'}
       <SrOnly>{`about ${title}`}</SrOnly>

@@ -3,7 +3,7 @@ import Icon from '@mdi/react';
 import { mdiRotateLeft, mdiRotateRight } from '@mdi/js';
 
 import { Twist } from 'types';
-import { useStyle, dims } from 'styles';
+import { useStyle, scales } from 'styles';
 import { flexRow, square, flexColumn, hover } from 'styles/common';
 import { SrOnly } from 'components/common';
 import { useApplyOperation, TransitionCtx, OperationCtx } from '../../context';
@@ -19,7 +19,7 @@ function TwistOption({ orientation }: { orientation: Twist }) {
 
   const css = useStyle({
     ...flexColumn('center', 'center'),
-    ...square(dims.d3),
+    ...square(scales.size[3]),
     ...hover,
     border: '1px LightGray solid',
     pointerEvents: 'initial',
@@ -30,7 +30,7 @@ function TwistOption({ orientation }: { orientation: Twist }) {
       <Icon
         path={orientation === 'left' ? mdiRotateLeft : mdiRotateRight}
         rotate={180}
-        size={dims.d3}
+        size={scales.size[3]}
       />
       <SrOnly>{orientation}</SrOnly>
     </button>

@@ -1,13 +1,13 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-import { useStyle, fonts, fontSizes, media, spacing, dims } from 'styles';
+import { useStyle, fonts, scales, media } from 'styles';
 import { square, link } from 'styles/common';
 import image from 'images/sad-scutoid.png';
 import { usePageTitle } from 'components/common';
 
 function Image() {
-  const css = useStyle(square(dims.d5));
+  const css = useStyle(square(scales.size[5]));
   return <img {...css()} src={image} alt="" />;
 }
 
@@ -15,9 +15,9 @@ function Title() {
   const css = useStyle({
     textAlign: 'center',
     fontFamily: fonts.andaleMono,
-    fontSize: fontSizes.f3,
+    fontSize: scales.font[3],
     [media.mobile]: {
-      fontSize: fontSizes.f4,
+      fontSize: scales.font[4],
     },
   });
   return <h1 {...css()}>Uh oh! We don't know about that polyhedron!</h1>;
@@ -26,7 +26,7 @@ function Title() {
 function BackLink() {
   const css = useStyle({
     fontFamily: fonts.andaleMono,
-    fontSize: fontSizes.f4,
+    fontSize: scales.font[4],
     ...link,
   });
   return (
@@ -43,7 +43,7 @@ export default function ErrorPage() {
     height: '100vh',
 
     display: 'grid',
-    gridGap: spacing.s2,
+    gridGap: scales.spacing[2],
     alignContent: 'center',
     justifyContent: 'center',
     justifyItems: 'center',

@@ -1,7 +1,7 @@
 import React from 'react';
 import Icon from '@mdi/react';
 
-import { useStyle, fontSizes, spacing, dims } from 'styles';
+import { useStyle, scales } from 'styles';
 import { SrOnly } from 'components/common';
 import { fonts } from 'styles';
 
@@ -56,8 +56,8 @@ function DownloadLink({
   const css = useStyle({
     display: 'inline-flex',
     justifyContent: 'center',
-    padding: spacing.s2,
-    width: dims.d4,
+    padding: scales.spacing[2],
+    width: scales.size[4],
 
     textDecoration: 'none',
     border: '1px LightGray solid',
@@ -66,7 +66,7 @@ function DownloadLink({
     ...hover,
 
     ':not(:last-child)': {
-      marginRight: spacing.s2,
+      marginRight: scales.spacing[2],
     },
   });
 
@@ -74,7 +74,7 @@ function DownloadLink({
     <a {...css()} key={ext} download={filename} href={url}>
       <SrOnly>Download as</SrOnly>.{ext}{' '}
       <span>
-        <Icon path={mdiDownload} size={dims.d1} />
+        <Icon path={mdiDownload} size={scales.size[1]} />
       </span>
     </a>
   );
@@ -83,8 +83,8 @@ function DownloadLink({
 export default function DataDownloader({ solid }: Props) {
   const heading = useStyle({
     fontFamily: fonts.times,
-    fontSize: fontSizes.f4,
-    marginBottom: spacing.s2,
+    fontSize: scales.font[4],
+    marginBottom: scales.spacing[2],
   });
   return (
     <div>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { useStyle, fontSizes } from 'styles';
+import { useStyle, scales } from 'styles';
 
 import { media, fonts } from 'styles';
 import { OperationCtx } from 'components/Viewer/context';
@@ -25,12 +25,12 @@ export default function Prompt() {
   const message = getMessage(operation.name);
 
   const css = useStyle({
-    fontSize: fontSizes.f3,
+    fontSize: scales.font[3],
     fontFamily: fonts.andaleMono,
     textAlign: 'center',
 
     [media.mobile]: {
-      fontSize: fontSizes.f4,
+      fontSize: scales.font[4],
     },
   });
   return message && <div {...css()}>{message}</div>;

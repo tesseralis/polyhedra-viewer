@@ -1,49 +1,76 @@
 /**
  * Scales for font sizes, width/height, and spacing based on tachyons
  */
-// FIXME object notation means VSCode can't tell you what the actual values are
-// FIXME the "<letter><number>" notation is kind of annoying
-// FIXME it might even be too confusing to have multiple scales. Possibly consolidate to one?
 
-// http://tachyons.io/docs/typography/scale/
+type ScaleIndex = 1 | 2 | 3 | 4 | 5 | 6 | 7;
+
 /**
- * Font size scale
+ * A scale for font size.
+ *
+ * 1. 3rem (48px)
+ * 2. 2.25rem (36px)
+ * 3. 1.5rem (24px)
+ * 4. 1.25rem (20px)
+ * 5. 1rem (16px)
+ * 6. 0.875rem (14px)
+ * 7. 0.75rem (12px)
+ *
+ * @see http://tachyons.io/docs/typography/scale/
  */
-export const fontSizes = {
-  f1: '3rem', // 48px
-  f2: '2.25rem', // 36px
-  f3: '1.5rem', // 24px
-  f4: '1.25rem', // 20px
-  f5: '1rem', // 16px
-  f6: '0.875rem', // 14px
-  f7: '0.75rem', // 12px
-};
+export const font: Record<ScaleIndex, string> = Object.freeze({
+  1: '3rem',
+  2: '2.25rem',
+  3: '1.5rem',
+  4: '1.25rem',
+  5: '1rem',
+  6: '0.875rem',
+  7: '0.75rem',
+});
 
-// http://tachyons.io/docs/layout/spacing/
 /**
  * A scale used for margin/padding/grid gap.
+ *
+ * 1. 0.25rem (4px)
+ * 2. 0.5rem (8px)
+ * 3. 1rem (16px)
+ * 4. 2rem (32px)
+ * 5. 4rem (64px)
+ * 6. 8rem (128px)
+ * 7. 16rem (256px)
+ *
+ * @see http://tachyons.io/docs/layout/spacing/
  */
-export const spacing = {
-  s1: '0.25rem', // 4px
-  s2: '0.5rem', // 8px
-  s3: '1rem', //16px
-  s4: '2rem', // 32px
-  s5: '4rem', // 64px
-  s6: '8rem', // 128px
-  s7: '16rem', // 256px
-};
+export const spacing: Record<ScaleIndex, string> = Object.freeze({
+  1: '0.25rem',
+  2: '0.5rem',
+  3: '1rem',
+  4: '2rem',
+  5: '4rem',
+  6: '8rem',
+  7: '16rem',
+});
 
-// http://tachyons.io/docs/layout/widths/
 /**
  * A scale used for widths and heights.
+ *
+ * 1. 1rem (16px)
+ * 2. 2rem (32px)
+ * 3. 4rem (64px)
+ * 4. 8rem (128px)
+ * 5. 16rem (256px)
+ * 6. 32rem (512px)
+ * 7. 48rem (768px)
+ * 8. 64rem (1024px)
+ *
+ * @see http://tachyons.io/docs/layout/widths/
  */
-export const dims = {
-  d1: '1rem', // 16px
-  d2: '2rem', // 32px
-  d3: '4rem', // 64px
-  d4: '8rem', // 128px
-  d5: '16rem', // 256px
-  d6: '32rem', // 512px
-  d7: '48rem', // 768px
-  d8: '64rem', // 1024px
-};
+export const size: Record<ScaleIndex | 8, string> = Object.freeze({
+  1: '1rem',
+  2: '2rem',
+  3: '4rem',
+  4: '8rem',
+  5: '16rem',
+  6: '32rem',
+  7: '48rem',
+  8: '64rem',
+});

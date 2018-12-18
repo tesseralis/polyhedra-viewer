@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import React from 'react';
-import { useStyle, fontSizes } from 'styles';
+import { useStyle, scales } from 'styles';
 
 import { unescapeName } from 'math/polyhedra/names';
 import { media, fonts } from 'styles';
@@ -8,7 +8,7 @@ import { media, fonts } from 'styles';
 function Title({ name }: { name: string }) {
   const css = useStyle({
     fontFamily: fonts.andaleMono,
-    fontSize: fontSizes.f2,
+    fontSize: scales.font[2],
 
     [media.notMobile]: {
       fontWeight: 'bold',
@@ -17,13 +17,13 @@ function Title({ name }: { name: string }) {
 
     [media.tabletPortrait]: {
       // Otherwise, it bleeds into the sidebar
-      fontSize: fontSizes.f3,
+      fontSize: scales.font[3],
     },
 
     // TODO consider making this style-less and defining the styles
     // in mobile/desktop viewers
     [media.mobile]: {
-      fontSize: fontSizes.f5,
+      fontSize: scales.font[5],
       lineHeight: 1.25,
       textAlign: 'center',
     },

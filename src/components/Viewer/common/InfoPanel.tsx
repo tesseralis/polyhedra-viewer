@@ -1,5 +1,5 @@
 import React, { ComponentType } from 'react';
-import { useStyle, fontSizes, spacing, media } from 'styles';
+import { useStyle, scales, media } from 'styles';
 import _ from 'lodash';
 
 import { ChildrenProp } from 'types';
@@ -211,8 +211,8 @@ const info: InfoRow[] = [
 
 function Heading({ polyhedron }: RenderProps) {
   const css = useStyle({
-    fontSize: fontSizes.f3,
-    marginBottom: spacing.s1,
+    fontSize: scales.font[3],
+    marginBottom: scales.spacing[1],
     lineHeight: 1.25,
   });
   return (
@@ -230,8 +230,8 @@ function Property({
 }: InfoRow & RenderProps) {
   const css = useStyle({ marginBottom: 10 });
   const nameCss = useStyle({
-    fontSize: fontSizes.f5,
-    marginBottom: spacing.s1,
+    fontSize: scales.font[5],
+    marginBottom: scales.spacing[1],
   });
   const valueCss = useStyle({
     fontFamily: fonts.andaleMono,
@@ -258,7 +258,7 @@ function DataList({ polyhedron }: RenderProps) {
       "sym   sym   sym   sym   order order"
       "alt   alt   alt   alt   alt   alt"
     `,
-    gridRowGap: spacing.s3,
+    gridRowGap: scales.spacing[3],
   });
 
   return (
@@ -277,7 +277,7 @@ export default function InfoPanel() {
     ...flexColumn(),
     borderSpacing: 8,
     borderCollapse: 'separate',
-    padding: spacing.s3,
+    padding: scales.spacing[3],
     fontFamily: fonts.times,
 
     // On non-mobile, display the download links on the bottom
@@ -285,13 +285,13 @@ export default function InfoPanel() {
   });
 
   const typeCss = useStyle({
-    fontSize: fontSizes.f5,
+    fontSize: scales.font[5],
     color: 'DimGrey',
-    marginBottom: spacing.s3,
+    marginBottom: scales.spacing[3],
   });
 
   const downloaderCss = useStyle({
-    [media.mobile]: { marginTop: spacing.s4 },
+    [media.mobile]: { marginTop: scales.spacing[4] },
     [media.notMobile]: { marginTop: 'auto' },
   });
 

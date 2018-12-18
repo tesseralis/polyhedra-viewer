@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 
-import { useStyle, spacing } from 'styles';
+import { useStyle, scales } from 'styles';
 import useMediaInfo from 'components/useMediaInfo';
 import { usePageTitle } from 'components/common';
 
@@ -17,7 +17,7 @@ function Main() {
   const narrow = device === 'mobile' && orientation === 'portrait';
 
   const css = useStyle({ width: '100%' });
-  const sections = useStyle(paddingVert(spacing.s4));
+  const sections = useStyle(paddingVert(scales.spacing[4]));
   return (
     <main {...css()}>
       <Masthead />
@@ -36,9 +36,9 @@ function Main() {
 
 function Footer() {
   const css = useStyle({
-    ...padding(spacing.s4, spacing.s5),
+    ...padding(scales.spacing[4], scales.spacing[5]),
     display: 'grid',
-    gridGap: spacing.s4,
+    gridGap: scales.spacing[4],
     justifyItems: 'center',
     width: '100%',
     borderTop: '1px solid LightGray',

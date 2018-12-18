@@ -1,5 +1,5 @@
 import React from 'react';
-import { useStyle, spacing } from 'styles';
+import { useStyle, scales } from 'styles';
 
 import { ResizeButtons, OpGrid } from '../common';
 import { flexColumn } from 'styles/common';
@@ -7,7 +7,7 @@ import { flexColumn } from 'styles/common';
 export default function OperationsPanel() {
   const css = useStyle({
     ...flexColumn(),
-    padding: spacing.s3,
+    padding: scales.spacing[3],
     height: '100%',
   });
 

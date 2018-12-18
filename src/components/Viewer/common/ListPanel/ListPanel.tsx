@@ -2,7 +2,7 @@ import _ from 'lodash';
 
 import React, { useState } from 'react';
 import { NavLink, Route } from 'react-router-dom';
-import { fonts, useStyle, fontSizes, spacing, dims } from 'styles';
+import { fonts, useStyle, scales } from 'styles';
 
 import { groups } from 'data';
 import { escapeName } from 'math/polyhedra/names';
@@ -37,14 +37,14 @@ function filterGroups(groups: any[], filterText: string): any {
 function PolyhedronLink({ name }: { name: string }) {
   const css = useStyle({
     ...hover,
-    ...padding(spacing.s1, spacing.s3),
+    ...padding(scales.spacing[1], scales.spacing[3]),
     textDecoration: 'none',
     display: 'block',
 
     color: 'DimGrey',
     lineHeight: 1.25,
     fontFamily: fonts.andaleMono,
-    fontSize: fontSizes.f6,
+    fontSize: scales.font[6],
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
@@ -82,9 +82,9 @@ function SubList({ polyhedra }: { polyhedra: string[] }) {
 
 function SubgroupHeader({ name }: { name: string }) {
   const css = useStyle({
-    ...margin(spacing.s1, spacing.s3),
+    ...margin(scales.spacing[1], scales.spacing[3]),
     fontFamily: fonts.times,
-    fontSize: fontSizes.f5,
+    fontSize: scales.font[5],
   });
   return <h3 {...css()}>{_.capitalize(name)}</h3>;
 }
@@ -96,7 +96,7 @@ const Subgroup = ({
   name: string;
   polyhedra: string[];
 }) => {
-  const css = useStyle(marginVert(spacing.s3));
+  const css = useStyle(marginVert(scales.spacing[3]));
 
   return (
     <div {...css()}>
@@ -108,16 +108,16 @@ const Subgroup = ({
 
 function GroupHeader({ text }: { text: string }) {
   const css = useStyle({
-    ...margin(spacing.s1, spacing.s3),
+    ...margin(scales.spacing[1], scales.spacing[3]),
     fontFamily: fonts.times,
-    fontSize: fontSizes.f4,
+    fontSize: scales.font[4],
   });
   return <h2 {...css()}>{text}</h2>;
 }
 
 const PolyhedronGroup = ({ group }: { group: any }) => {
   const { display, polyhedra, groups } = group;
-  const css = useStyle({ marginTop: spacing.s2 });
+  const css = useStyle({ marginTop: scales.spacing[2] });
 
   return (
     <div {...css()}>
@@ -134,7 +134,7 @@ export default function ListPanel() {
   const filteredGroups =
     filterText === '' ? groups : filterGroups(groups, filterText);
 
-  const css = useStyle(paddingVert(spacing.s2));
+  const css = useStyle(paddingVert(scales.spacing[2]));
 
   return (
     <section {...css()}>

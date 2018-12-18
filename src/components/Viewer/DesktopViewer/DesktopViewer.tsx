@@ -1,6 +1,6 @@
 import React, { memo } from 'react';
 
-import { useStyle, dims } from 'styles';
+import { useStyle, scales } from 'styles';
 import { flexRow } from 'styles/common';
 import Sidebar from './Sidebar';
 import Overlay from './Overlay';

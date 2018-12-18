@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { useStyle, fonts, fontSizes, spacing, dims } from 'styles';
+import { useStyle, fonts, scales } from 'styles';
 
 import Icon from '@mdi/react';
 import { mdiHexagonOutline } from '@mdi/js';
@@ -15,17 +15,17 @@ export default function Loading() {
     alignContent: 'center',
     alignItems: 'center',
     gridAutoFlow: 'column',
-    gridGap: spacing.s3,
+    gridGap: scales.spacing[3],
   });
 
   const text = useStyle({
     fontFamily: fonts.andaleMono,
-    fontSize: fontSizes.f3,
+    fontSize: scales.font[3],
   });
 
   return (
     <div {...css()}>
-      <Icon size={dims.d2} path={mdiHexagonOutline} spin />
+      <Icon size={scales.size[2]} path={mdiHexagonOutline} spin />
       <div {...text()}>Loading...</div>
     </div>
   );

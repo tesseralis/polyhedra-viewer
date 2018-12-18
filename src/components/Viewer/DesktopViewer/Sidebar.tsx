@@ -1,5 +1,5 @@
 import React from 'react';
-import { useStyle, spacing, dims } from 'styles';
+import { useStyle, scales } from 'styles';
 
 import { NavMenu, Panels, useHiddenHeading } from '../common';
 import { paddingHoriz, scroll } from 'styles/common';
@@ -12,7 +12,7 @@ interface Props {
   compact?: boolean;
 }
 
-const menuH = dims.d3;
+const menuH = scales.size[3];
 
 export default function Sidebar({ panel, solid, compact }: Props) {
   const [header, focusOnHeader] = useHiddenHeading(panel);
@@ -32,7 +32,7 @@ export default function Sidebar({ panel, solid, compact }: Props) {
 
   const navCss = useStyle(
     {
-      ...paddingHoriz(spacing.s2),
+      ...paddingHoriz(scales.spacing[2]),
       gridArea: 'menu',
       height: menuH,
       borderBottom: compact ? undefined : '1px solid LightGray',

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Route, NavLink, NavLinkProps } from 'react-router-dom';
-import { useStyle, fontSizes, spacing, dims } from 'styles';
+import { useStyle, scales } from 'styles';
 import Icon from '@mdi/react';
 
 import { media, fonts } from 'styles';
@@ -15,13 +15,13 @@ interface Props extends NavLinkProps {
 
 function LinkText({ text, hidden }: { text: string; hidden: boolean }) {
   const css = useStyle({
-    marginTop: spacing.s1,
-    fontSize: fontSizes.f7,
+    marginTop: scales.spacing[1],
+    fontSize: scales.font[7],
     fontFamily: fonts.verdana,
 
     [media.mobileLandscape]: {
       marginTop: 0,
-      paddingLeft: spacing.s1,
+      paddingLeft: scales.spacing[1],
     },
   });
   return hidden ? <SrOnly>{text}</SrOnly> : <div {...css()}>{text}</div>;
@@ -40,7 +40,7 @@ export default function IconLink({
     ...flexColumn('center'),
     ...colorFill('DimGray'),
     textDecoration: 'none',
-    padding: spacing.s2,
+    padding: scales.spacing[2],
 
     [media.mobileLandscape]: {
       padding: 0,
@@ -60,7 +60,7 @@ export default function IconLink({
         {...activeCss('activeClassName')}
         onClick={onClick}
       >
-        <Icon path={iconName} size={dims.d2} />
+        <Icon path={iconName} size={scales.size[2]} />
         <LinkText text={title} hidden={iconOnly} />
       </NavLink>
     </Route>

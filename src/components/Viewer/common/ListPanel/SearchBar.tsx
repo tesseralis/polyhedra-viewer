@@ -2,7 +2,7 @@ import React, { memo, useState, InputHTMLAttributes } from 'react';
 import Icon from '@mdi/react';
 import { mdiMagnify } from '@mdi/js';
 
-import { useStyle, fontSizes, spacing, dims } from 'styles';
+import { useStyle, scales } from 'styles';
 import { andaleMono } from 'styles/fonts';
 import { flexRow } from 'styles/common';
 
@@ -22,7 +22,7 @@ function SearchIcon({ focused }: { focused: boolean }) {
   );
   return (
     <span {...css()}>
-      <Icon path={mdiMagnify} size={dims.d1} />
+      <Icon path={mdiMagnify} size={scales.size[1]} />
     </span>
   );
 }
@@ -31,13 +31,13 @@ function SearchInput(props: InputHTMLAttributes<HTMLInputElement>) {
   const css = useStyle({
     transition: `border-color ${duration}`,
     width: '100%',
-    height: dims.d2,
-    paddingLeft: spacing.s4,
+    height: scales.size[2],
+    paddingLeft: scales.spacing[4],
 
     border: '2px LightGray solid',
     borderRadius: 9999,
 
-    fontSize: fontSizes.f6,
+    fontSize: scales.font[6],
     fontFamily: andaleMono,
 
     ':focus': {
@@ -66,7 +66,7 @@ export default memo(function SearchBar({ value, onChange }: Props) {
 
   const css = useStyle({
     ...flexRow('center'),
-    padding: spacing.s2,
+    padding: scales.spacing[2],
     width: '100%',
     position: 'relative',
   });

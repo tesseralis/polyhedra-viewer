@@ -1,5 +1,5 @@
 import React, { memo, useCallback, ButtonHTMLAttributes } from 'react';
-import { useStyle, fontSizes, spacing } from 'styles';
+import { useStyle, scales } from 'styles';
 import _ from 'lodash';
 
 import Config from 'components/ConfigCtx';
@@ -67,7 +67,7 @@ const LabelledInput = memo(({ input, value, setValue }: InputProps<any>) => {
     width: '100%',
     fontFamily: andaleMono,
     ':not(:last-child)': {
-      marginBottom: spacing.s3,
+      marginBottom: scales.spacing[3],
     },
   });
   return (
@@ -84,12 +84,12 @@ function ResetButton({ onClick }: ButtonHTMLAttributes<Element>) {
 
     width: 120,
     height: 30,
-    marginTop: spacing.s3,
+    marginTop: scales.spacing[3],
 
     border: '1px LightGray solid',
 
     fontFamily: andaleMono,
-    fontSize: fontSizes.f6,
+    fontSize: scales.font[6],
   });
   return (
     <button {...css()} type="button" onClick={onClick}>
@@ -105,7 +105,7 @@ export default function ConfigForm() {
   const css = useStyle({
     ...flexColumn('flex-end'),
     width: '100%',
-    padding: spacing.s3,
+    padding: scales.spacing[3],
   });
   return (
     <form {...css()}>

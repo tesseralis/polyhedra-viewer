@@ -2,7 +2,7 @@ import _ from 'lodash';
 
 import React, { memo } from 'react';
 
-import { useStyle, fontSizes, spacing } from 'styles';
+import { useStyle, scales } from 'styles';
 import { media, fonts } from 'styles';
 import { hover, scroll, square, flexColumn, flexRow } from 'styles/common';
 import { operations, OpName } from 'math/operations';
@@ -42,7 +42,7 @@ const OpButton = memo(function({ name, disabled }: Props) {
       ...square('5rem'),
       border: isCurrent ? '2px DarkSlateGray solid' : '1px LightGray solid',
       fontFamily: fonts.verdana,
-      fontSize: fontSizes.f7,
+      fontSize: scales.font[7],
       color: 'DimGray',
       backgroundColor: 'white',
 
@@ -50,7 +50,7 @@ const OpButton = memo(function({ name, disabled }: Props) {
       // add spacing since we're displayed in a row
       // TODO can we do this in the parent styling?
       [media.mobile]: {
-        ':not(:last-child)': { marginRight: spacing.s2 },
+        ':not(:last-child)': { marginRight: scales.spacing[2] },
       },
     },
     [isCurrent],
@@ -86,8 +86,8 @@ export default function OpGrid() {
     [media.notMobile]: {
       display: 'grid',
       justifyContent: 'space-between',
-      gridColumnGap: spacing.s1,
-      gridRowGap: spacing.s2,
+      gridColumnGap: scales.spacing[1],
+      gridRowGap: scales.spacing[2],
       gridTemplateAreas: opLayout.map(line => `"${line.join(' ')}"`).join('\n'),
     },
     [media.mobile]: {

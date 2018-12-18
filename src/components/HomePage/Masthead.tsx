@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 
 import { SrOnly, ExternalLink } from 'components/common';
 import Markdown from './Markdown';
-import { useStyle, media, fonts, fontSizes, spacing, dims } from 'styles';
+import { useStyle, media, fonts, scales } from 'styles';
 import * as text from './text';
 import video from 'images/transitions.mp4';
 import { flexRow, flexColumn, padding, link } from 'styles/common';
@@ -28,14 +28,14 @@ function VideoLink() {
 
 function Title() {
   const css = useStyle({
-    marginBottom: spacing.s2,
-    fontSize: fontSizes.f2,
+    marginBottom: scales.spacing[2],
+    fontSize: scales.font[2],
     textAlign: 'center',
     fontWeight: 'bold',
     fontFamily: fonts.andaleMono,
 
     [media.mobile]: {
-      fontSize: fontSizes.f3,
+      fontSize: scales.font[3],
     },
   });
   return <h1 {...css()}>Polyhedra Viewer</h1>;
@@ -43,9 +43,9 @@ function Title() {
 
 function Subtitle() {
   const css = useStyle({
-    fontSize: fontSizes.f5,
+    fontSize: scales.font[5],
     fontFamily: fonts.andaleMono,
-    marginBottom: spacing.s3,
+    marginBottom: scales.spacing[3],
     fontColor: 'DimGray',
   });
 
@@ -64,7 +64,7 @@ function Subtitle() {
 function Abstract() {
   const css = useStyle({
     ...flexColumn('center'),
-    maxWidth: dims.d6,
+    maxWidth: scales.size[6],
   });
   return (
     <div {...css()}>
@@ -77,7 +77,7 @@ function Abstract() {
 
 export default function Masthead() {
   const css = useStyle({
-    ...padding(spacing.s4, spacing.s5),
+    ...padding(scales.spacing[4], scales.spacing[5]),
     ...flexRow('center', 'center'),
     width: '100%',
     borderBottom: '1px solid LightGray',

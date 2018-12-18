@@ -1,5 +1,5 @@
 import React, { ButtonHTMLAttributes } from 'react';
-import { useStyle, fontSizes, spacing, dims } from 'styles';
+import { useStyle, scales } from 'styles';
 
 import { TransitionCtx, PolyhedronCtx } from 'components/Viewer/context';
 
@@ -13,8 +13,8 @@ function ResetButton(props: ButtonHTMLAttributes<Element>) {
     alignSelf: 'flex-end',
     backgroundColor: 'white',
     border: '1px LightGray solid',
-    padding: spacing.s2,
-    fontSize: fontSizes.f6,
+    padding: scales.spacing[2],
+    fontSize: scales.font[6],
     fontFamily: andaleMono,
   });
   return <button {...props} {...css()} />;
@@ -39,7 +39,7 @@ export default function ResizeButtons() {
   const css = useStyle({
     display: 'grid',
     gridTemplateColumns: '1fr 1fr',
-    columnGap: spacing.s2,
+    columnGap: scales.spacing[2],
   });
   return (
     <div {...css()}>

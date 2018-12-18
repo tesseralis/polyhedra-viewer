@@ -2,7 +2,7 @@ import React, { memo } from 'react';
 import _ from 'lodash';
 import { CSSProperties } from 'aphrodite';
 
-import { useStyle, media, spacing, dims } from 'styles';
+import { useStyle, media, scales } from 'styles';
 import { scroll, paddingHoriz, flexRow } from 'styles/common';
 import {
   BackLink,
@@ -20,7 +20,7 @@ const titleHeight = '3rem';
 function mobile(styles: (navH: string) => CSSProperties) {
   return {
     [media.mobileLandscape]: styles('3rem'),
-    [media.mobilePortrait]: styles(dims.d3),
+    [media.mobilePortrait]: styles(scales.size[3]),
   };
 }
 
@@ -32,11 +32,11 @@ interface Props {
 function Header({ solid }: Pick<Props, 'solid'>) {
   const css = useStyle({
     height: titleHeight,
-    ...paddingHoriz(spacing.s2),
+    ...paddingHoriz(scales.spacing[2]),
     borderBottom: '1px solid LightGray',
     width: '100%',
     display: 'grid',
-    gridTemplateColumns: `${dims.d2} 1fr ${dims.d2}`,
+    gridTemplateColumns: `${scales.size[2]} 1fr ${scales.size[2]}`,
     alignItems: 'center',
     justifyItems: 'center',
   });

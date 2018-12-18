@@ -1,6 +1,6 @@
 import React from 'react';
 import { CSSProperties } from 'aphrodite';
-import { useStyle, fontSizes, spacing, dims } from 'styles';
+import { useStyle, scales } from 'styles';
 
 import { Table } from 'math/polyhedra/tables';
 import { media, fonts } from 'styles';
@@ -75,7 +75,7 @@ const sectionStyles: Record<string, CSSProperties> = {
   },
 
   elementary: {
-    gridColumnGap: spacing.s4,
+    gridColumnGap: scales.spacing[4],
     gridTemplateAreas: `
       "snub"
       "other"
@@ -101,7 +101,7 @@ const TableGrid = ({
   const css = useStyle(
     {
       display: 'grid',
-      gridGap: spacing.s4,
+      gridGap: scales.spacing[4],
       justifyItems: 'center',
       ...sectionStyles[sectionMapping[header]],
     },
@@ -120,9 +120,9 @@ const TableGrid = ({
 function Heading({ subsection, text }: { subsection: boolean; text: string }) {
   const H = subsection ? 'h3' : 'h2';
   const css = useStyle({
-    marginBottom: spacing.s3,
+    marginBottom: scales.spacing[3],
     fontFamily: fonts.times,
-    fontSize: subsection ? fontSizes.f4 : fontSizes.f3,
+    fontSize: subsection ? scales.font[4] : scales.font[3],
   });
   return <H {...css()}>{text}</H>;
 }
@@ -150,17 +150,17 @@ export default function TableSection({
   const css = useStyle({
     ...flexColumn('center'),
     ':not(:last-child)': {
-      marginBottom: spacing.s5,
+      marginBottom: scales.spacing[5],
     },
   });
 
   const textCss = useStyle({
     ...flexColumn('center'),
-    maxWidth: dims.d7,
-    marginBottom: spacing.s4,
+    maxWidth: scales.size[7],
+    marginBottom: scales.spacing[4],
     // add padding to the side in case we shrink too much
-    [media.notMobile]: paddingHoriz(spacing.s5),
-    [media.mobile]: paddingHoriz(spacing.s4),
+    [media.notMobile]: paddingHoriz(scales.spacing[5]),
+    [media.mobile]: paddingHoriz(scales.spacing[4]),
   });
 
   return (
