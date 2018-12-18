@@ -158,7 +158,7 @@ export default function TableSection({
     ...flexColumn('center'),
     maxWidth: dims.d7,
     marginBottom: spacing.s4,
-    // FIXME seems like we might want to replace this with "measure"?
+    // add padding to the side in case we shrink too much
     [media.notMobile]: paddingHoriz(spacing.s5),
     [media.mobile]: paddingHoriz(spacing.s4),
   });

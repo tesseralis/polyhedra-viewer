@@ -7,12 +7,6 @@ import { useStyle, media, spacing } from 'styles';
 
 import 'styles/polyhedronIcons.css';
 
-const baseThumbnailSize = 150;
-
-// FIXME
-const thumbnailSize = 64;
-const mobThumbnailSize = 48;
-
 function scale(ratio: number) {
   return `scale(${ratio}, ${ratio})`;
 }
@@ -21,6 +15,12 @@ interface Props {
   name: string;
   isFake: boolean;
 }
+
+const baseThumbnailSize = 150;
+
+// using raw pixel values since we need to do math
+const thumbnailSize = 64;
+const mobThumbnailSize = 48;
 
 function Image({ name }: Pick<Props, 'name'>) {
   const css = useStyle({

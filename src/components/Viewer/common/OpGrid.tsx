@@ -39,8 +39,7 @@ const OpButton = memo(function({ name, disabled }: Props) {
     {
       ...flexColumn('center', 'center'),
       ...hover,
-      // FIXME
-      ...square(80),
+      ...square('5rem'),
       border: `${isCurrent ? 2 : 1}px LightGray solid`,
       fontFamily: fonts.verdana,
       fontSize: fontSizes.f7,

@@ -3,7 +3,7 @@ import _ from 'lodash';
 import { CSSProperties } from 'aphrodite';
 
 import { useStyle, media, spacing, dims } from 'styles';
-import { scroll, padding, paddingHoriz, flexRow } from 'styles/common';
+import { scroll, paddingHoriz, flexRow } from 'styles/common';
 import {
   BackLink,
   Title,
@@ -15,10 +15,12 @@ import {
 
 import OperationsPanel from './OperationsPanel';
 
-function mobile(styles: (mobTitleH: string, navH: string) => CSSProperties) {
+const titleHeight = '3rem';
+
+function mobile(styles: (navH: string) => CSSProperties) {
   return {
-    [media.mobileLandscape]: styles('48px', '48px'),
-    [media.mobilePortrait]: styles('48px', '64px'),
+    [media.mobileLandscape]: styles('3rem'),
+    [media.mobilePortrait]: styles(dims.d3),
   };
 }
 
@@ -29,9 +31,7 @@ interface Props {
 
 function Header({ solid }: Pick<Props, 'solid'>) {
   const css = useStyle({
-    ...mobile(mobTitleH => ({
-      height: mobTitleH,
-    })),
+    height: titleHeight,
     ...paddingHoriz(spacing.s2),
     borderBottom: '1px solid LightGray',
     width: '100%',
@@ -79,14 +79,14 @@ export default memo(function MobileViewer({ panel, solid }: Props) {
     height: '100vh',
     display: 'grid',
     gridTemplateAreas: '"title" "content" "nav"',
-    ...mobile((mobTitleH, navH) => ({
-      gridTemplateRows: `${mobTitleH} 1fr ${navH}`,
+    ...mobile(navH => ({
+      gridTemplateRows: `${titleHeight} 1fr ${navH}`,
     })),
   });
 
   const sceneCss = useStyle({
-    ...mobile((mobTitleH, navH) => ({
-      height: `calc(100vh - ${navH} - ${mobTitleH})`,
+    ...mobile(navH => ({
+      height: `calc(100vh - ${navH} - ${titleHeight})`,
     })),
     zIndex: 0,
     gridArea: 'content',
@@ -94,7 +94,7 @@ export default memo(function MobileViewer({ panel, solid }: Props) {
   });
 
   const navCss = useStyle({
-    ...mobile(($, navH) => ({
+    ...mobile(navH => ({
       height: navH,
     })),
     ...flexRow('center'),

@@ -2,6 +2,8 @@
  * Scales for font sizes, width/height, and spacing based on tachyons
  */
 // FIXME object notation means VSCode can't tell you what the actual values are
+// FIXME the "<letter><number>" notation is kind of annoying
+// FIXME it might even be too confusing to have multiple scales. Possibly consolidate to one?
 
 // http://tachyons.io/docs/typography/scale/
 /**

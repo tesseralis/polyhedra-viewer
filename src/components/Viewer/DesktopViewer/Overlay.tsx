@@ -10,7 +10,7 @@ interface Props {
   solid: string;
 }
 
-// FIXME replace all the padding/absolute values with Grid
+// TODO replace all the padding/absolute values with Grid
 export default function Overlay({ solid }: Props) {
   const css = useStyle({
     ...absoluteFull,

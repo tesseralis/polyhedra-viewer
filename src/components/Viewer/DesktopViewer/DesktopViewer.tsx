@@ -11,8 +11,6 @@ interface Props {
   solid: string;
 }
 
-// There's no good measure in the usual scale for the sidebar
-// FIXME still try to get it to work?
 const sidebarW = '24rem';
 
 function Scene({ solid, full }: Pick<Props, 'solid'> & { full: boolean }) {

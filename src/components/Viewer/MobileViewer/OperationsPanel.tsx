@@ -5,7 +5,6 @@ import { OpGrid, Prompt, Options, ResizeButtons } from '../common';
 import { flexColumn } from 'styles/common';
 
 export default function OperationsPanel() {
-  // FIXME can I also replace this with grid?
   const css = useStyle({
     ...flexColumn(),
     height: '100%',

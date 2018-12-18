@@ -1,5 +1,5 @@
 import React, { ComponentType } from 'react';
-import { useStyle, fontSizes, spacing } from 'styles';
+import { useStyle, fontSizes, spacing, media } from 'styles';
 import _ from 'lodash';
 
 import { ChildrenProp } from 'types';
@@ -274,13 +274,13 @@ export default function InfoPanel() {
 
   const css = useStyle({
     ...flexColumn(),
-    // FIXME this is needed for the downloader to be on the bottom
-    // but causes spacing to be wonky when it scrolls on mobile
-    height: '100%',
     borderSpacing: 8,
     borderCollapse: 'separate',
     padding: spacing.s3,
     fontFamily: fonts.times,
+
+    // On non-mobile, display the download links on the bottom
+    [media.notMobile]: { height: '100%' },
   });
 
   const typeCss = useStyle({
@@ -289,7 +289,10 @@ export default function InfoPanel() {
     marginBottom: spacing.s3,
   });
 
-  const downloaderCss = useStyle({ marginTop: 'auto' });
+  const downloaderCss = useStyle({
+    [media.mobile]: { marginTop: spacing.s4 },
+    [media.notMobile]: { marginTop: 'auto' },
+  });
 
   return (
     <div {...css()}>
