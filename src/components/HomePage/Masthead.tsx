@@ -46,7 +46,7 @@ function Subtitle() {
     fontSize: fontSizes.f5,
     fontFamily: fonts.andaleMono,
     marginBottom: spacing.s3,
-    fontColor: 'dimGray',
+    fontColor: 'DimGray',
   });
 
   const author = useStyle({

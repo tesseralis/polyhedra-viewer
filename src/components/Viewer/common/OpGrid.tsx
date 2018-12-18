@@ -40,7 +40,7 @@ const OpButton = memo(function({ name, disabled }: Props) {
       ...flexColumn('center', 'center'),
       ...hover,
       ...square('5rem'),
-      border: `${isCurrent ? 2 : 1}px LightGray solid`,
+      border: isCurrent ? '2px DarkSlateGray solid' : '1px LightGray solid',
       fontFamily: fonts.verdana,
       fontSize: fontSizes.f7,
       color: 'DimGray',

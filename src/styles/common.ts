@@ -124,7 +124,7 @@ export function scroll(direction?: 'x' | 'y') {
 // TODO this is more of a "theme"
 export const hover = {
   ':hover:not(:disabled)': {
-    backgroundColor: 'Gainsboro',
+    backgroundColor: 'LightGray',
   },
 };
 
