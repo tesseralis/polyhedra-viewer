@@ -3,13 +3,13 @@ import Icon from '@mdi/react';
 import { mdiMenuDown } from '@mdi/js';
 
 import { useStyle, fonts, fontSizes, dims } from 'styles';
-import { colorFill, flexRow, flexColumn } from 'styles/common';
+import { flexRow, flexColumn, link } from 'styles/common';
 import { SrOnly } from 'components/common';
 import Markdown from './Markdown';
 
 function Toggle({ onClick, title }: any) {
   const css = useStyle({
-    ...colorFill('blue'),
+    ...link,
     ...flexRow('center', 'center'),
 
     backgroundColor: 'transparent',
@@ -17,10 +17,6 @@ function Toggle({ onClick, title }: any) {
     border: 'none',
     cursor: 'pointer',
     fontFamily: fonts.times,
-
-    ':hover': {
-      textDecoration: 'underline',
-    },
   });
   return (
     <button {...css()} onClick={onClick}>

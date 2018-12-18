@@ -4,7 +4,7 @@ import { CSSProperties } from 'aphrodite';
 
 import { ExternalLink } from 'components/common';
 import { useStyle, fonts, fontSizes, spacing } from 'styles';
-import { marginHoriz } from 'styles/common';
+import { marginHoriz, link } from 'styles/common';
 
 function styled(el: ReactType, styles: CSSProperties) {
   const El = el;
@@ -44,14 +44,7 @@ const renderers = {
       marginBottom: spacing.s3,
     },
   }),
-  linkReference: styled(ExternalLink, {
-    textDecoration: 'none',
-    color: 'MediumBlue',
-
-    ':hover': {
-      textDecoration: 'underline',
-    },
-  }),
+  linkReference: styled(ExternalLink, link),
   // Don't pass in the custom react-markdown props
   list: ({ ordered, tight, ...props }: RenderProps) => <List {...props} />,
   listItem: ({ ordered, tight, ...props }: RenderProps) => (

@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 
 import { useStyle, fonts, fontSizes, media, spacing, dims } from 'styles';
-import { square } from 'styles/common';
+import { square, link } from 'styles/common';
 import image from 'images/sad-scutoid.png';
 import { usePageTitle } from 'components/common';
 
@@ -26,11 +26,8 @@ function Title() {
 function BackLink() {
   const css = useStyle({
     fontFamily: fonts.andaleMono,
-    textDecoration: 'none',
     fontSize: fontSizes.f4,
-    ':hover': {
-      textDecoration: 'underline',
-    },
+    ...link,
   });
   return (
     <Link {...css()} to="/">

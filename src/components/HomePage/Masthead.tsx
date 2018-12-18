@@ -6,7 +6,7 @@ import Markdown from './Markdown';
 import { useStyle, media, fonts, fontSizes, spacing, dims } from 'styles';
 import * as text from './text';
 import video from 'images/transitions.mp4';
-import { flexRow, flexColumn, padding } from 'styles/common';
+import { flexRow, flexColumn, padding, link } from 'styles/common';
 
 const videoHeight = 300;
 
@@ -49,12 +49,7 @@ function Subtitle() {
     fontColor: 'DimGray',
   });
 
-  const author = useStyle({
-    textDecoration: 'none',
-    ':hover': {
-      textDecoration: 'underline',
-    },
-  });
+  const author = useStyle(link);
 
   return (
     <p {...css()}>

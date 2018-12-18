@@ -128,6 +128,14 @@ export const hover = {
   },
 };
 
+export const link = {
+  ...colorFill('MediumBlue'),
+  textDecoration: 'none',
+  ':hover': {
+    textDecoration: 'underline',
+  },
+};
+
 export const transition = (
   property: string,
   duration: number,
