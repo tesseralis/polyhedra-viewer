@@ -4,7 +4,7 @@ import { mdiRotateLeft, mdiRotateRight } from '@mdi/js';
 
 import { Twist } from 'types';
 import { useStyle, dims } from 'styles';
-import { flexRow } from 'styles/common';
+import { flexRow, square, flexColumn, hover } from 'styles/common';
 import { SrOnly } from 'components/common';
 import { useApplyOperation, TransitionCtx, OperationCtx } from '../../context';
 
@@ -18,7 +18,10 @@ function TwistOption({ orientation }: { orientation: Twist }) {
   );
 
   const css = useStyle({
-    border: 'none',
+    ...flexColumn('center', 'center'),
+    ...square(dims.d3),
+    ...hover,
+    bodrer: '1px LightGray solid',
     pointerEvents: 'initial',
     background: 'none',
   });
