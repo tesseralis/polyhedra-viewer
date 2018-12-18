@@ -121,7 +121,20 @@ export function scroll(direction?: 'x' | 'y') {
 
 /* Miscellaneous */
 
-// TODO this is more of a "theme"
+/**
+ * Populate the `color` and `fill` properties (useful for icons).
+ * @param color the color to fill in
+ */
+export function colorFill(color: string): CSSProperties {
+  return {
+    color,
+    fill: color,
+  };
+}
+
+/* Themeing */
+// TODO  move to new file
+
 export const hover = {
   ':hover:not(:disabled)': {
     backgroundColor: 'LightGray',
@@ -135,25 +148,3 @@ export const link = {
     textDecoration: 'underline',
   },
 };
-
-export const transition = (
-  property: string,
-  duration: number,
-  ease: string = '',
-) => {
-  const value = `${property} ${duration}s ${ease}`.trim();
-  return {
-    transition: value,
-  };
-};
-
-/**
- * Populate the `color` and `fill` properties (useful for icons).
- * @param color the color to fill in
- */
-export function colorFill(color: string): CSSProperties {
-  return {
-    color,
-    fill: color,
-  };
-}

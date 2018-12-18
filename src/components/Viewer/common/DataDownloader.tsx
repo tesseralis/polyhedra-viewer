@@ -60,7 +60,7 @@ function DownloadLink({
     width: dims.d4,
 
     textDecoration: 'none',
-    border: '1px solid LightGrey',
+    border: '1px LightGray solid',
     color: 'black',
     fontFamily: fonts.andaleMono,
     ...hover,

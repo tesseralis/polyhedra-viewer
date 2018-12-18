@@ -4,12 +4,14 @@ import { mdiMagnify } from '@mdi/js';
 
 import { useStyle, fontSizes, spacing, dims } from 'styles';
 import { andaleMono } from 'styles/fonts';
-import { transition, flexRow } from 'styles/common';
+import { flexRow } from 'styles/common';
+
+const duration = '0.35s';
 
 function SearchIcon({ focused }: { focused: boolean }) {
   const css = useStyle(
     {
-      ...transition('fill', 0.35),
+      transition: `fill ${duration}`,
       position: 'absolute',
       // TODO This is kinda jank but I'm too lazy to fix it for a not useful feature
       paddingLeft: 8,
@@ -27,7 +29,7 @@ function SearchIcon({ focused }: { focused: boolean }) {
 
 function SearchInput(props: InputHTMLAttributes<HTMLInputElement>) {
   const css = useStyle({
-    ...transition('border-color', 0.35),
+    transition: `border-color ${duration}`,
     width: '100%',
     height: dims.d2,
     paddingLeft: spacing.s4,

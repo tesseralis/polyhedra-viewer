@@ -213,6 +213,7 @@ function Heading({ polyhedron }: RenderProps) {
   const css = useStyle({
     fontSize: fontSizes.f3,
     marginBottom: spacing.s1,
+    lineHeight: 1.25,
   });
   return (
     <h2 {...css()}>
