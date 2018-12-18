@@ -54,7 +54,7 @@ export default function PolyhedronLink({ name, isFake }: Props) {
       color: 'black',
       overflow: 'hidden',
       margin: 'auto', // center inside a table
-      borderRadius: 10,
+      borderRadius: '.5rem',
       [media.notMobile]: square(thumbnailSize),
       [media.mobile]: square(mobThumbnailSize),
     },
