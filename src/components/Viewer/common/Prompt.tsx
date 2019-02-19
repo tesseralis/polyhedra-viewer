@@ -20,10 +20,6 @@ function getMessage(opName: string) {
 }
 
 export default function Prompt() {
-  const { operation } = OperationCtx.useState();
-  if (!operation) return null;
-  const message = getMessage(operation.name);
-
   const css = useStyle({
     fontSize: scales.font[3],
     fontFamily: fonts.andaleMono,
@@ -33,5 +29,9 @@ export default function Prompt() {
       fontSize: scales.font[4],
     },
   });
+  const { operation } = OperationCtx.useState();
+  if (!operation) return null;
+  const message = getMessage(operation.name);
+
   return message && <div {...css()}>{message}</div>;
 }

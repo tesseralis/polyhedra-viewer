@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState } from 'react';
 import Icon from '@mdi/react';
 import { mdiMenuDown } from '@mdi/js';
 
@@ -37,7 +37,7 @@ interface Props {
 
 export default function Description({ title, content, collapsed }: Props) {
   const [isCollapsed, setCollapsed] = useState(collapsed);
-  const toggle = useCallback(() => setCollapsed(!isCollapsed), [isCollapsed]);
+  const toggle = () => setCollapsed(collapsed => !collapsed);
   const brief = content.split('\n\n')[0];
 
   const css = useStyle(flexColumn('center'));
