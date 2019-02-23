@@ -48,8 +48,7 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "deploy": "react-scripts build && netlify deploy --prod --dir build"
+    "eject": "react-scripts eject"
   },
   "browserslist": [
     ">0.2%",
