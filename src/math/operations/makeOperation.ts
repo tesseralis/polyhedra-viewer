@@ -129,10 +129,11 @@ function getNextPolyhedron<O>(
   filterOpts: O,
 ) {
   const results = getOpResults(solid, operation);
-  const next = _(results)
-    .filter(!_.isEmpty(filterOpts) ? filterOpts : _.stubTrue)
-    .value();
-  return fromConwayNotation(getSingle(next).value);
+  const next = _.filter(
+    results,
+    !_.isEmpty(filterOpts) ? filterOpts : _.stubTrue,
+  );
+  return fromConwayNotation((getSingle(next) as any).value);
 }
 
 function normalizeOpResult(

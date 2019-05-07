@@ -37,7 +37,7 @@ export default function useApplyOperation() {
         callback(result);
       }
     },
-    [polyhedron, setName, transition],
+    [polyhedron, setName, transition, setOperation, unsetOperation],
   );
 
   return applyOperation;

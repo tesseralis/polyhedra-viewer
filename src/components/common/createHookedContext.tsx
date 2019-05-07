@@ -19,7 +19,7 @@ type PropType = { [prop: string]: any };
  */
 export default function createHookedContext<S, A extends string>(
   actions: ActionCreators<S, A>,
-  defaultStateCreator: S | ((props: PropType) => S),
+  defaultStateCreator: S | ((props?: PropType) => S),
 ) {
   const defaultState = _.isFunction(defaultStateCreator)
     ? defaultStateCreator()

@@ -1,4 +1,4 @@
-import React, { SVGProps } from 'react';
+import React from 'react';
 import _ from 'lodash';
 
 const { PI, sin, cos } = Math;

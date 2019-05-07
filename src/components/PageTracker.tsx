@@ -10,12 +10,9 @@ interface Props {
 // TODO figure out how to make this just a regular hook
 function PageTracker({ location }: Props) {
   const { pathname, search } = location;
-  useEffect(
-    () => {
-      ReactGA.pageview(pathname + search);
-    },
-    [location.pathname],
-  );
+  useEffect(() => {
+    ReactGA.pageview(pathname + search);
+  }, [pathname, search]);
   return null;
 }
 

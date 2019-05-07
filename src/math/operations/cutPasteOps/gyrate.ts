@@ -93,7 +93,7 @@ export const gyrate = makeOperation('gyrate', {
   faceSelectionStates(polyhedron, { cap }) {
     const allCapFaces = _.flatMap(Cap.getAll(polyhedron), cap => cap.faces());
     return _.map(polyhedron.faces, face => {
-      if (_.isObject(cap) && face.inSet(cap.faces())) return 'selected';
+      if (cap instanceof Cap && face.inSet(cap.faces())) return 'selected';
       if (face.inSet(allCapFaces)) return 'selectable';
     });
   },

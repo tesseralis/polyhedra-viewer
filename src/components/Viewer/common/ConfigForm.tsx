@@ -7,7 +7,7 @@ import {
   configInputs,
   ConfigInput as InputType,
 } from 'components/configOptions';
-import { hover, flexRow, flexColumn, padding } from 'styles/common';
+import { hover, flexRow, flexColumn } from 'styles/common';
 import { andaleMono } from 'styles/fonts';
 
 function getInputValue<T>(input: InputType<T>, el: any) {
@@ -43,7 +43,7 @@ function ConfigInput({ input, value, setValue }: InputProps<any>) {
   const inputProps = getInputProps(input, value);
   const onChange = useCallback(
     e => setValue(input.key, getInputValue(input, e.target)),
-    [input],
+    [input, setValue],
   );
   switch (input.type) {
     case 'select':

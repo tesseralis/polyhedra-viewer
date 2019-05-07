@@ -8,12 +8,9 @@ export default function useHiddenHeading(
   value: string,
 ): [JSX.Element, () => void] {
   const ref = useRef<HTMLHeadingElement>(null);
-  const focusFn = useCallback(
-    () => {
-      if (ref.current) ref.current.focus();
-    },
-    [ref.current],
-  );
+  const focusFn = useCallback(() => {
+    if (ref.current) ref.current.focus();
+  }, []);
   const node = (
     <SrOnly>
       <h2 tabIndex={0} ref={ref}>

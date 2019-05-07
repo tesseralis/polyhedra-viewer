@@ -31,36 +31,27 @@ function InnerViewer({ solid, panel, action }: InnerProps) {
   // TODO I wish we could make this less verbose...
 
   // Unset operation if we move away from the operations panel
-  useEffect(
-    () => {
-      if (panel !== 'operations' || action === 'POP') {
-        unsetOperation();
-        // TODO cancel animations when switching panels
-        // (I don't think I've ever had that happen so low prio)
-      }
-    },
-    [panel, action],
-  );
+  useEffect(() => {
+    if (panel !== 'operations' || action === 'POP') {
+      unsetOperation();
+      // TODO cancel animations when switching panels
+      // (I don't think I've ever had that happen so low prio)
+    }
+  }, [panel, action, unsetOperation]);
 
   // If we're not on the operations panel, the solid data is determined
   // by the URL.
   // NOTE: do not depend on "panel" here -- if we go from operation -> something else
   // we want to keep the current data.
-  useEffect(
-    () => {
-      if (panel !== 'operations') setPolyhedron(Polyhedron.get(solid));
-    },
-    [solid],
-  );
+  useEffect(() => {
+    if (panel !== 'operations') setPolyhedron(Polyhedron.get(solid));
+  }, [solid, panel, setPolyhedron]);
 
   // Reset the polyhedron whenever we go back.
   // We may replace this with a "stack".
-  useEffect(
-    () => {
-      if (action === 'POP') setPolyhedron(Polyhedron.get(solid));
-    },
-    [solid, action],
-  );
+  useEffect(() => {
+    if (action === 'POP') setPolyhedron(Polyhedron.get(solid));
+  }, [solid, action, setPolyhedron]);
 
   const { device } = useMediaInfo();
 

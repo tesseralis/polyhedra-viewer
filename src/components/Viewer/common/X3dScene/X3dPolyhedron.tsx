@@ -63,24 +63,22 @@ export default function X3dPolyhedron() {
     },
   };
 
-  useEffect(
-    () => {
+  useEffect(() => {
+    const shapeNode = shape.current;
+    _.forEach(listeners, (fn, type) => {
+      if (shapeNode !== null) {
+        shapeNode.addEventListener(type, fn);
+      }
+    });
+
+    return () => {
       _.forEach(listeners, (fn, type) => {
-        if (shape.current !== null) {
-          shape.current.addEventListener(type, fn);
+        if (shapeNode !== null) {
+          shapeNode.removeEventListener(type, fn);
         }
       });
-
-      return () => {
-        _.forEach(listeners, (fn, type) => {
-          if (shape.current !== null) {
-            shape.current.removeEventListener(type, fn);
-          }
-        });
-      };
-    },
-    [onClick, onHover, onMouseOut],
-  );
+    };
+  }, [onClick, onHover, onMouseOut, listeners]);
 
   const config = Config.useState();
 

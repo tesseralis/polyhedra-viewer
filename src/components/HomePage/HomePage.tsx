@@ -10,7 +10,7 @@ import tableSections from './tableSections';
 import * as text from './text';
 import Masthead from './Masthead';
 import ShareLinks from './ShareLinks';
-import { flexColumn, paddingVert, padding } from 'styles/common';
+import { flexColumn, paddingVert } from 'styles/common';
 
 function Main() {
   const { device, orientation } = useMediaInfo();
@@ -60,15 +60,12 @@ interface Props {
 }
 
 export default function HomePage({ hash = '' }: Props) {
-  useEffect(
-    () => {
-      const el = document.getElementById(hash);
-      if (el !== null) {
-        el.scrollIntoView(false);
-      }
-    },
-    [hash],
-  );
+  useEffect(() => {
+    const el = document.getElementById(hash);
+    if (el !== null) {
+      el.scrollIntoView(false);
+    }
+  }, [hash]);
 
   usePageTitle('Polyhedra Viewer');
 

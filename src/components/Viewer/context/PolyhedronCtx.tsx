@@ -6,5 +6,5 @@ export default createHookedContext<Polyhedron, 'setPolyhedron'>(
   {
     setPolyhedron: polyhedron => () => polyhedron,
   },
-  ({ name } = defaultProps) => Polyhedron.get(name),
+  (props = defaultProps) => Polyhedron.get(props.name),
 );

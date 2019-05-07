@@ -28,38 +28,32 @@ export default function useSolidContext() {
     () =>
       isTransitioning &&
       solidData!.faces.map((face, i) => faceColors[i] || colors[face.length]),
-    [solidData, faceColors, colors],
+    [solidData, faceColors, colors, isTransitioning],
   );
 
   // Colors when in operation mode and hit options are being selected
-  const operationColors = useMemo(
-    () => {
-      if (!operation) return;
-      const selectState = operation.faceSelectionStates(polyhedron, options!);
-      return polyhedron.faces.map((face, i) => {
-        switch (selectState[i]) {
-          case 'selected':
-            return tinycolor.mix(colors[face.numSides], 'lime');
-          case 'selectable':
-            return tinycolor.mix(colors[face.numSides], 'yellow', 25);
-          default:
-            return colors[face.numSides];
-        }
-      });
-    },
-    [polyhedron, operation, options, colors],
-  );
+  const operationColors = useMemo(() => {
+    if (!operation) return;
+    const selectState = operation.faceSelectionStates(polyhedron, options!);
+    return polyhedron.faces.map((face, i) => {
+      switch (selectState[i]) {
+        case 'selected':
+          return tinycolor.mix(colors[face.numSides], 'lime');
+        case 'selectable':
+          return tinycolor.mix(colors[face.numSides], 'yellow', 25);
+        default:
+          return colors[face.numSides];
+      }
+    });
+  }, [polyhedron, operation, options, colors]);
 
-  const normalizedColors = useMemo(
-    () => {
-      const rawColors =
-        transitionColors ||
-        operationColors ||
-        polyhedron.faces.map(f => colors[f.numSides]);
-      return rawColors.map(toRgb);
-    },
-    [transitionColors, operationColors, polyhedron, colors],
-  );
+  const normalizedColors = useMemo(() => {
+    const rawColors =
+      transitionColors ||
+      operationColors ||
+      polyhedron.faces.map(f => colors[f.numSides]);
+    return rawColors.map(toRgb);
+  }, [transitionColors, operationColors, polyhedron, colors]);
 
   return {
     colors: normalizedColors,

@@ -98,6 +98,7 @@ export const contract = makeOperation('contract', {
       if (faceType && isExpandedFace(polyhedron, face, faceType))
         return 'selected';
       if (isExpandedFace(polyhedron, face)) return 'selectable';
+      return undefined;
     });
   },
 });

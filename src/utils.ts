@@ -82,7 +82,7 @@ export function bimap<K extends string | number, V extends string | number>(
   const inverse = _.invert(obj);
   return {
     get(key: string | number): V {
-      return obj[key];
+      return (obj as any)[key] as V;
     },
     of(val: string | number): K {
       return inverse[val] as K;

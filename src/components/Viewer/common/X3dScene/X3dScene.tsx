@@ -29,7 +29,7 @@ export default function X3dScene({ label, children }: Props) {
         canvas.setAttribute('aria-label', label);
       }
     });
-  }, []);
+  }, [label]);
 
   const css = useStyle({
     border: 'none',

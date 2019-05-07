@@ -1,7 +1,6 @@
 import { getMidpoint } from 'math/geom';
 import Polyhedron from './Polyhedron';
 import Vertex, { VertexList } from './Vertex';
-import Face from './Face';
 
 export default class Edge implements VertexList {
   polyhedron: Polyhedron;

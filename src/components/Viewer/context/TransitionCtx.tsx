@@ -1,12 +1,6 @@
 import _ from 'lodash';
 
-import React, {
-  useRef,
-  useEffect,
-  useContext,
-  useCallback,
-  ReactNode,
-} from 'react';
+import React, { useRef, useEffect, useContext, useCallback } from 'react';
 import { ChildrenProp } from 'types';
 
 import { createHookedContext } from 'components/common';
@@ -87,16 +81,13 @@ function InnerProvider({ children }: ChildrenProp) {
   const anim = InterpModel.useActions();
 
   // Cancel the animation if the component we're a part of gets rerendered.
-  useEffect(
-    () => {
-      return () => {
-        if (transitionId.current) {
-          transitionId.current.cancel();
-        }
-      };
-    },
-    [transitionId],
-  );
+  useEffect(() => {
+    return () => {
+      if (transitionId.current) {
+        transitionId.current.cancel();
+      }
+    };
+  }, [transitionId]);
   const transitionFn = useCallback(
     (result: Polyhedron, animationData: AnimationData) => {
       if (!enableAnimation || !animationData) {
@@ -133,7 +124,7 @@ function InnerProvider({ children }: ChildrenProp) {
         },
       );
     },
-    [config],
+    [anim, animationSpeed, colors, enableAnimation, setPolyhedron],
   );
 
   return (

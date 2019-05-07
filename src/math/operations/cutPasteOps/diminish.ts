@@ -56,7 +56,7 @@ export const diminish = makeOperation('diminish', {
   faceSelectionStates(polyhedron, { cap }) {
     const allCapFaces = _.flatMap(Cap.getAll(polyhedron), cap => cap.faces());
     return _.map(polyhedron.faces, face => {
-      if (_.isObject(cap) && face.inSet(cap.faces())) return 'selected';
+      if (cap instanceof Cap && face.inSet(cap.faces())) return 'selected';
       if (face.inSet(allCapFaces)) return 'selectable';
     });
   },
