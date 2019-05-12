@@ -74,6 +74,9 @@ export function getEdgeFacePaths(edge: Edge, twist?: Twist) {
   }
 }
 
+/**
+ * Apply the given transformation to all the vertices that are part of the given vLists
+ */
 export function getTransformedVertices<T extends VertexList>(
   vLists: T[],
   iteratee: (key: T) => Transform | Vec3D,

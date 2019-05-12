@@ -1,16 +1,58 @@
 import _ from 'lodash';
 
-import { removeExtraneousVertices } from '../operationUtils';
+import { mapObject } from 'utils';
+import {
+  getTransformedVertices,
+  removeExtraneousVertices,
+} from '../operationUtils';
 import makeOperation from '../makeOperation';
 import { Polyhedron, Cap } from 'math/polyhedra';
 import { hasMultiple, getCapAlignment, getCupolaGyrate } from './cutPasteUtils';
 
 function removeCap(polyhedron: Polyhedron, cap: Cap) {
-  return removeExtraneousVertices(
-    polyhedron.withChanges(solid =>
-      solid.withoutFaces(cap.faces()).addFaces([cap.boundary().vertices]),
-    ),
+  const boundary = cap.boundary();
+  const oldToNew = mapObject(boundary.vertices, (vertex, i) => [
+    vertex.index,
+    i,
+  ]);
+  const mockPolyhedron = polyhedron.withChanges(solid =>
+    solid
+      .addVertices(boundary.vertices)
+      .mapFaces(face => {
+        if (face.inSet(cap.faces())) {
+          return face;
+        }
+        return face.vertices.map(v => {
+          return v.inSet(boundary.vertices)
+            ? polyhedron.numVertices() + oldToNew[v.index]
+            : v.index;
+        });
+      })
+      .addFaces([
+        _.range(
+          polyhedron.numVertices(),
+          polyhedron.numVertices() + boundary.numSides,
+        ),
+      ]),
   );
+
+  const endVertices = getTransformedVertices(
+    [cap],
+    p => boundary.centroid(),
+    mockPolyhedron.vertices,
+  );
+
+  return {
+    animationData: {
+      start: mockPolyhedron,
+      endVertices,
+    },
+    result: removeExtraneousVertices(
+      polyhedron.withChanges(solid =>
+        solid.withoutFaces(cap.faces()).addFaces([cap.boundary().vertices]),
+      ),
+    ),
+  };
 }
 
 export const diminish = makeOperation('diminish', {

@@ -3,7 +3,8 @@ import _ from 'lodash';
 import { Polyhedron, Face, Cap } from 'math/polyhedra';
 import { inRow, inColumn, inSection } from 'math/polyhedra/tableUtils';
 import { isInverse, getOrthonormalTransform, PRECISION } from 'math/geom';
-import { getCyclic, getSingle } from 'utils';
+import { repeat, getCyclic, getSingle } from 'utils';
+import { deduplicateVertices } from '../makeOperation';
 
 import makeOperation from '../makeOperation';
 import { hasMultiple } from './cutPasteUtils';
@@ -237,9 +238,26 @@ function doAugment(
   const newAugmentee = augmentee.withChanges(solid =>
     solid.withVertices(rotatedVertices).withoutFaces([underside]),
   );
-  return polyhedron.withChanges(solid =>
-    solid.withoutFaces([base]).addPolyhedron(newAugmentee),
+
+  const augmenteeInitial = augmentee.withVertices(
+    repeat(base.centroid(), augmentee.numVertices()),
   );
+
+  const endResult = polyhedron.withChanges(solid =>
+    solid.addPolyhedron(newAugmentee),
+  );
+
+  return {
+    animationData: {
+      start: polyhedron.withChanges(solid =>
+        solid.addPolyhedron(augmenteeInitial),
+      ),
+      endVertices: endResult.vertices,
+    },
+    result: deduplicateVertices(
+      endResult.withChanges(solid => solid.withoutFaces([base])),
+    ),
+  };
 }
 
 function defaultAugmentType(numSides: number) {
