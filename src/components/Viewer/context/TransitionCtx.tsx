@@ -106,7 +106,7 @@ function InnerProvider({ children }: ChildrenProp) {
       transitionId.current = transition(
         {
           duration: 1000 / animationSpeed,
-          ease: 'easeExpInOut',
+          ease: 'easeQuadInOut',
           startValue: {
             vertices: start.solidData.vertices,
             faceColors: allColorStart,
