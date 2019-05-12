@@ -41,11 +41,12 @@ function InnerViewer({ solid, panel, action }: InnerProps) {
 
   // If we're not on the operations panel, the solid data is determined
   // by the URL.
-  // NOTE: do not depend on "panel" here -- if we go from operation -> something else
-  // we want to keep the current data.
   useEffect(() => {
     if (panel !== 'operations') setPolyhedron(Polyhedron.get(solid));
-  }, [solid, panel, setPolyhedron]);
+    // NOTE: do not depend on "panel" here -- if we go from operation -> something else
+    // we want to keep the current data.
+    // eslint-disable-next-line
+  }, [solid, setPolyhedron]);
 
   // Reset the polyhedron whenever we go back.
   // We may replace this with a "stack".
