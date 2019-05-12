@@ -6,7 +6,7 @@ export interface TransitionOptions<T> {
   startValue: T;
   endValue: T;
   duration: number;
-  ease?: 'easePolyInOut' | 'easePolyOut' | 'easePolyIn';
+  ease: string;
   onFinish(): void;
 }
 
@@ -25,7 +25,7 @@ export default function transition<T extends object>(
     endValue,
     // Duration, in milliseconds
     duration,
-    ease = 'easePolyInOut',
+    ease,
     onFinish = _.noop,
   } = options;
   let start = 0;
@@ -39,7 +39,7 @@ export default function transition<T extends object>(
     }
     const delta = timestamp - start;
     const progress = Math.min(delta / duration, 1);
-    const currentValue = interp(d3[ease](progress));
+    const currentValue = interp(_.get(d3, ease)(progress));
     updateCallback(currentValue);
     if (delta < duration) {
       id.current = requestAnimationFrame(step);
