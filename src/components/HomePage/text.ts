@@ -81,7 +81,7 @@ While they are not directly composed of other polyhedra, these solids may still 
 `;
 
 export const more = `
-The polyhedra represented above are just a small subset of the wondrous world of geometric shapes and figures. For instance, the [Kepler-Poinsot polyhedra] are regular like the Platonic solids but non-convex, while the [Catalan solids] are the duals of the Archimedian solids and have non-regular faces. Beyond three dimensions, one can explore four dimensional shapes like the [tesseract] or the [grand antiprism].
+The polyhedra represented above are just a small subset of the wondrous world of geometric shapes and figures. For instance, the [Kepler-Poinsot polyhedra] are regular like the Platonic solids but non-convex, while the [Catalan solids] are the duals of the Archimedean solids and have non-regular faces. Beyond three dimensions, one can explore four dimensional shapes like the [tesseract] or the [grand antiprism].
 
 [Kepler-Poinsot polyhedra]: https://en.wikipedia.org/wiki/Kepler%E2%80%93Poinsot_polyhedron
 [Catalan solids]: https://en.wikipedia.org/wiki/Catalan_solid
