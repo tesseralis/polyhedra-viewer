@@ -12,7 +12,7 @@ import { flexColumn, paddingHoriz } from 'styles/common';
 const sectionMapping: Record<string, string> = {
   'Uniform Polyhedra': 'uniform',
   'Johnson Solids': 'johnson',
-  'Pyramids, Cupoplæ, and Rotundæ': 'capstones',
+  'Pyramids, Cupolæ, and Rotundæ': 'capstones',
   'Augmented, Diminished, and Gyrate Polyhedra': 'cutPaste',
   'Elementary Johnson Solids': 'elementary',
 };
@@ -20,8 +20,8 @@ const sectionMapping: Record<string, string> = {
 const gridAreaMapping: Record<string, string> = {
   'Platonic and Archimedean Solids': 'plato',
   'Prisms and Antiprisms': 'prism',
-  'Pyramids, Cupoplæ, and Rotundæ': 'caps',
-  'Bipyramids, Cupoplæ, and Rotundæ': 'bi',
+  'Pyramids, Cupolæ, and Rotundæ': 'caps',
+  'Bipyramids, Cupolæ, and Rotundæ': 'bi',
   'Augmented Polyhedra': 'aug',
   'Diminished Icosahedra': 'icos',
   'Gyrate and Diminished Rhombicosidodecahedra': 'rhombicos',

@@ -55,7 +55,7 @@ export const prisms: Table = {
 };
 
 export const capstones: Table = {
-  caption: 'Pyramids, Cupoplæ, and Rotundæ',
+  caption: 'Pyramids, Cupolæ, and Rotundæ',
   rows: [
     'triangular pyramid',
     'square pyramid',
@@ -106,7 +106,7 @@ export const capstones: Table = {
 };
 
 export const capstonesMono: Table = {
-  caption: 'Pyramids, Cupoplæ, and Rotundæ',
+  caption: 'Pyramids, Cupolæ, and Rotundæ',
   rows: [
     'triangular pyramid',
     'square pyramid',
@@ -125,7 +125,7 @@ export const capstonesMono: Table = {
 };
 
 export const capstonesBi: Table = {
-  caption: 'Bipyramids, Cupoplæ, and Rotundæ',
+  caption: 'Bipyramids, Cupolæ, and Rotundæ',
   rows: [
     'triangular pyramid',
     'square pyramid',
