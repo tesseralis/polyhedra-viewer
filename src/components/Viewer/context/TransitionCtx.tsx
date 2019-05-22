@@ -11,6 +11,7 @@ import { Polyhedron, Face, SolidData } from 'math/polyhedra';
 import { AnimationData } from 'math/operations';
 import { PRECISION } from 'math/geom';
 
+// TODO move this to the math section
 function getCoplanarFaces(polyhedron: Polyhedron) {
   const found: Face[] = [];
   const pairs: [Face, Face][] = [];
@@ -99,8 +100,9 @@ function InnerProvider({ children }: ChildrenProp) {
       const { start, endVertices } = animationData;
       const colorStart = getFaceColors(start, colors);
       const colorEnd = getFaceColors(start.withVertices(endVertices), colors);
-      const allColorStart = arrayDefaults(colorStart, colorEnd);
 
+      // if no colors are defined at the start, use the end colors
+      const allColorStart = arrayDefaults(colorStart, colorEnd);
       anim.set(start.solidData, allColorStart);
 
       transitionId.current = transition(
