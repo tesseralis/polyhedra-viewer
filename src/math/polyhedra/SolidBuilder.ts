@@ -9,7 +9,7 @@ import Polyhedron from './Polyhedron';
 
 export type VertexArg = Point | Vec3D | Vertex;
 
-type FaceArg = VIndex[] | (VIndex | Vertex)[] | Face;
+export type FaceArg = VIndex[] | (VIndex | Vertex)[] | Face;
 
 export function normalizeVertex(v: VertexArg) {
   // If it's a raw point

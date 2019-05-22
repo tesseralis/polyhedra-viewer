@@ -185,9 +185,7 @@ export function deduplicateVertices(polyhedron: Polyhedron) {
     .value();
 
   // remove extraneous vertices
-  return removeExtraneousVertices(
-    polyhedron.withChanges(s => s.withFaces(newFaces)),
-  );
+  return removeExtraneousVertices(polyhedron.withFaces(newFaces));
 }
 
 export default function makeOperation(

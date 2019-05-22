@@ -235,28 +235,22 @@ function doAugment(
   // Rotate the vertices so that they align with the base
   const rotatedVertices = alignedVertices.map(v => transform(v));
 
-  const newAugmentee = augmentee.withChanges(solid =>
-    solid.withVertices(rotatedVertices).withoutFaces([underside]),
+  const newAugmentee = augmentee.withChanges(s =>
+    s.withVertices(rotatedVertices).withoutFaces([underside]),
   );
 
   const augmenteeInitial = augmentee.withVertices(
     repeat(base.centroid(), augmentee.numVertices()),
   );
 
-  const endResult = polyhedron.withChanges(solid =>
-    solid.addPolyhedron(newAugmentee),
-  );
+  const endResult = polyhedron.addPolyhedron(newAugmentee);
 
   return {
     animationData: {
-      start: polyhedron.withChanges(solid =>
-        solid.addPolyhedron(augmenteeInitial),
-      ),
+      start: polyhedron.addPolyhedron(augmenteeInitial),
       endVertices: endResult.vertices,
     },
-    result: deduplicateVertices(
-      endResult.withChanges(solid => solid.withoutFaces([base])),
-    ),
+    result: deduplicateVertices(endResult.withoutFaces([base])),
   };
 }
 

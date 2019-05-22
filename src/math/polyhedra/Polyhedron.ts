@@ -11,7 +11,7 @@ import Face from './Face';
 import Vertex from './Vertex';
 import Edge from './Edge';
 import Builder from './SolidBuilder';
-import { VertexArg } from './SolidBuilder';
+import { VertexArg, FaceArg } from './SolidBuilder';
 
 function calculateEdges(faces: Face[]) {
   return _(faces)
@@ -191,9 +191,22 @@ export default class Polyhedron {
     return new Polyhedron({ ...this.solidData, name });
   }
 
+  // TODO support all the solid builder functions
   // return a new polyhedron with the given vertices
   withVertices(vertices: VertexArg[]) {
     return this.withChanges(s => s.withVertices(vertices));
+  }
+
+  withFaces(faces: FaceArg[]) {
+    return this.withChanges(s => s.withFaces(faces));
+  }
+
+  withoutFaces(faces: Face[]) {
+    return this.withChanges(s => s.withoutFaces(faces));
+  }
+
+  addPolyhedron(other: Polyhedron) {
+    return this.withChanges(s => s.addPolyhedron(other));
   }
 
   /** Center the polyhedron on its centroid. */

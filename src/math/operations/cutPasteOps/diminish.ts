@@ -15,8 +15,8 @@ function removeCap(polyhedron: Polyhedron, cap: Cap) {
     vertex.index,
     i,
   ]);
-  const mockPolyhedron = polyhedron.withChanges(solid =>
-    solid
+  const mockPolyhedron = polyhedron.withChanges(s =>
+    s
       .addVertices(boundary.vertices)
       .mapFaces(face => {
         if (face.inSet(cap.faces())) {
@@ -48,8 +48,8 @@ function removeCap(polyhedron: Polyhedron, cap: Cap) {
       endVertices,
     },
     result: removeExtraneousVertices(
-      polyhedron.withChanges(solid =>
-        solid.withoutFaces(cap.faces()).addFaces([cap.boundary().vertices]),
+      polyhedron.withChanges(s =>
+        s.withoutFaces(cap.faces()).addFaces([cap.boundary().vertices]),
       ),
     ),
   };
