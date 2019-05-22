@@ -12,20 +12,20 @@ import { withOrigin } from '../../geom';
 
 const augmentees = {
   pyramid: {
-    '3': 'tetrahedron',
-    '4': 'square-pyramid',
-    '5': 'pentagonal-pyramid',
+    3: 'tetrahedron',
+    4: 'square-pyramid',
+    5: 'pentagonal-pyramid',
   },
 
   cupola: {
-    '2': 'triangular-prism',
-    '3': 'triangular-cupola',
-    '4': 'square-cupola',
-    '5': 'pentagonal-cupola',
+    2: 'triangular-prism',
+    3: 'triangular-cupola',
+    4: 'square-cupola',
+    5: 'pentagonal-cupola',
   },
 
   rotunda: {
-    '5': 'pentagonal-rotunda',
+    5: 'pentagonal-rotunda',
   },
 };
 
