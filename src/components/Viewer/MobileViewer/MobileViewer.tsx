@@ -8,7 +8,7 @@ import {
   BackLink,
   Title,
   NavMenu,
-  X3dScene,
+  SolidScene,
   Panels,
   useHiddenHeading,
 } from '../common';
@@ -107,7 +107,7 @@ export default memo(function MobileViewer({ panel, solid }: Props) {
       <Header solid={solid} />
       <Content panel={panel} header={header} />
       <main {...sceneCss()}>
-        <X3dScene label={solid} />
+        <SolidScene label={solid} />
       </main>
       <div {...navCss()}>
         <NavMenu solid={solid} onClick={focusOnHeader} />

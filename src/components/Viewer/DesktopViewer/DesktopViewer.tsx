@@ -4,7 +4,7 @@ import { useStyle } from 'styles';
 import { flexRow } from 'styles/common';
 import Sidebar from './Sidebar';
 import Overlay from './Overlay';
-import { X3dScene } from '../common';
+import { SolidScene } from '../common';
 
 interface Props {
   panel: string;
@@ -25,7 +25,7 @@ function Scene({ solid, full }: Pick<Props, 'solid'> & { full: boolean }) {
   );
   return (
     <div {...css()}>
-      <X3dScene label={solid} />
+      <SolidScene label={solid} />
       <Overlay solid={solid} />
     </div>
   );

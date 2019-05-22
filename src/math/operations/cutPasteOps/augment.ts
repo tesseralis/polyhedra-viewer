@@ -122,7 +122,7 @@ function getOppositePrismFace(base: Face) {
 }
 
 function isCupolaRotunda(baseType: string, augmentType: string) {
-  return _.xor(['cupola', 'rotunda'], [baseType, augmentType]).length === 0;
+  return setEquals(['cupola', 'rotunda'], [baseType, augmentType]);
 }
 
 // Return true if the base and augmentee are aligned
