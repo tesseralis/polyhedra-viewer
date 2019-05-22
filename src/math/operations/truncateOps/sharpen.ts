@@ -78,7 +78,7 @@ function applySharpen(
   let mock: Polyhedron;
   if (polyhedron.isQuasiRegular()) {
     mock = duplicateVertices(polyhedron, sharpenFaces);
-    sharpenFaces = sharpenFaces.map(face => face.withPolyhedron(mock));
+    sharpenFaces = sharpenFaces.map(face => mock.faces[face.index]);
   } else {
     mock = polyhedron;
   }

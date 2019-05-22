@@ -135,10 +135,6 @@ export default abstract class Cap implements VertexList {
       this.boundary().isPlanar()
     );
   }
-
-  withPolyhedron(other: Polyhedron) {
-    return Cap.find(other, this.topPoint);
-  }
 }
 
 class Pyramid extends Cap {

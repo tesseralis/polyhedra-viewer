@@ -54,7 +54,7 @@ function doElongate(polyhedron: Polyhedron, twist?: Twist) {
     multiplier = 1 / 2;
   } else {
     // Otherwise it's the largest face
-    vertexSets = [boundary.adjacentFaces()[0].withPolyhedron(duplicated)];
+    vertexSets = [duplicated.faces[boundary.adjacentFaces()[0].index]];
     multiplier = 1;
   }
   const adjustInfo = { vertexSets, boundary, multiplier };

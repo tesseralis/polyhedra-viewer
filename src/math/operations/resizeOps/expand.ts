@@ -116,7 +116,7 @@ export const dual = makeOperation('dual', {
       return (e * e) / (f * f);
     })();
     const duplicated = duplicateVertices(polyhedron);
-    const faces = polyhedron.faces.map(face => face.withPolyhedron(duplicated));
+    const faces = _.take(duplicated.faces, polyhedron.numFaces());
     const endVertices = getTransformedVertices(faces, f =>
       withOrigin(polyhedron.centroid(), v => v.scale(scale))(f.centroid()),
     );

@@ -2,6 +2,7 @@ import _ from 'lodash';
 
 import { Point } from 'types';
 import { Options } from 'math/operations';
+import { Cap } from 'math/polyhedra';
 import {
   PolyhedronCtx,
   OperationCtx,
@@ -47,8 +48,9 @@ export default function useHitOptions() {
         operation,
         { ...options, [hitOption]: newValue },
         result => {
+          // If we're still on a cap, select it
           if (hitOption === 'cap' && options[hitOption]) {
-            setOption('cap', options[hitOption].withPolyhedron(result));
+            setOption('cap', Cap.find(result, options[hitOption].topPoint));
           }
         },
       );

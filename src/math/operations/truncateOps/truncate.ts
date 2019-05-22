@@ -78,7 +78,7 @@ function getTruncateTransform(polyhedron: Polyhedron, result = ''): Transform {
     const smallFace = find(vertex.adjacentFaces(), {
       numSides: 6,
     });
-    const normal = smallFace.withPolyhedron(polyhedron).normal();
+    const normal = polyhedron.faces[smallFace.index].normal();
     const transform = withOrigin(smallFace.centroid(), v =>
       v
         .scale(faceResizeScale)
