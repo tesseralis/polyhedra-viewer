@@ -75,13 +75,13 @@ function getOppositePrismFaces(polyhedron: Polyhedron) {
   return undefined;
 }
 
+// Get information for figuring out how to twist or shorten a polyhedron
 export function getAdjustInformation(polyhedron: Polyhedron) {
   const oppositePrismFaces = getOppositePrismFaces(polyhedron);
   if (oppositePrismFaces) {
     return {
       vertexSets: oppositePrismFaces,
       boundary: oppositePrismFaces[0],
-      multiplier: 1 / 2,
     };
   }
   const oppositeCaps = getOppositeCaps(polyhedron);
@@ -90,7 +90,6 @@ export function getAdjustInformation(polyhedron: Polyhedron) {
     return {
       vertexSets: oppositeCaps,
       boundary: oppositeCaps[0].boundary(),
-      multiplier: 1 / 2,
     };
   }
 
@@ -99,17 +98,18 @@ export function getAdjustInformation(polyhedron: Polyhedron) {
     return _.uniqBy(face.adjacentFaces(), 'numSides').length === 1;
   });
   const face = _.maxBy(faces, 'numSides')!;
+  const cap = Cap.getAll(polyhedron).find(cap =>
+    isInverse(cap.normal(), face.normal()),
+  );
   return {
-    vertexSets: [face],
+    vertexSets: [face, cap],
     boundary: face,
-    multiplier: 1,
   };
 }
 
 interface AdjustInfo {
   vertexSets: any;
   readonly boundary: VEList;
-  multiplier: number;
 }
 
 export function getScaledPrismVertices(
@@ -117,15 +117,15 @@ export function getScaledPrismVertices(
   scale: number,
   twist?: Twist,
 ) {
-  const { vertexSets, boundary, multiplier } = adjustInfo;
+  const { vertexSets, boundary } = adjustInfo;
   const n = boundary.numSides;
   const angle = (getTwistSign(twist) * Math.PI) / n;
 
   return getTransformedVertices<VEList>(vertexSets, set =>
     withOrigin(set.normalRay(), v =>
       v
-        .add(set.normal().scale(scale * multiplier))
-        .getRotatedAroundAxis(set.normal(), angle * multiplier),
+        .add(set.normal().scale((scale * 1) / 2))
+        .getRotatedAroundAxis(set.normal(), (angle * 1) / 2),
     ),
   );
 }

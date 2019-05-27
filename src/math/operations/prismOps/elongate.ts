@@ -46,18 +46,18 @@ function doElongate(polyhedron: Polyhedron, twist?: Twist) {
   const n = boundary.numSides;
   const duplicated = duplicateVertices(polyhedron, boundary, twist);
   let vertexSets: VertexList[];
-  let multiplier: number;
 
   const duplicatedCaps = Cap.getAll(duplicated);
   if (duplicatedCaps.length === 2) {
     vertexSets = duplicatedCaps;
-    multiplier = 1 / 2;
   } else {
     // Otherwise it's the largest face
-    vertexSets = [duplicated.faces[boundary.adjacentFaces()[0].index]];
-    multiplier = 1;
+    vertexSets = [
+      duplicated.faces[boundary.adjacentFaces()[0].index],
+      Cap.getAll(duplicated)[0],
+    ];
   }
-  const adjustInfo = { vertexSets, boundary, multiplier };
+  const adjustInfo = { vertexSets, boundary };
 
   const height = polyhedron.edgeLength() * (twist ? antiprismHeight(n) : 1);
 
