@@ -3,9 +3,7 @@ import { Link } from 'react-router-dom';
 
 import { escapeName } from 'math/polyhedra/names';
 import { square, hover, flexRow } from 'styles/common';
-import { useStyle, media, scales } from 'styles';
-
-import 'styles/polyhedronIcons.css';
+import { useStyle, media } from 'styles';
 
 function scale(ratio: number) {
   return `scale(${ratio}, ${ratio})`;
@@ -25,9 +23,6 @@ const mobThumbnailSize = 48;
 function Image({ name }: Pick<Props, 'name'>) {
   const css = useStyle({
     ...flexRow('center', 'center'),
-    // The spriting/scaling process makes everything a little off center
-    // so we have to adjust
-    paddingLeft: scales.spacing[1],
     [media.notMobile]: {
       transform: scale((thumbnailSize + 16) / baseThumbnailSize),
     },
@@ -35,10 +30,13 @@ function Image({ name }: Pick<Props, 'name'>) {
       transform: scale((mobThumbnailSize + 16) / baseThumbnailSize),
     },
   });
+  const escapedName = escapeName(name);
   return (
-    <div {...css()}>
-      <img className={`icon-${escapeName(name)}`} alt={name} />;
-    </div>
+    <img
+      {...css()}
+      alt={name}
+      src={require(`images/thumbnails/${escapedName}.png`)}
+    />
   );
 }
 
