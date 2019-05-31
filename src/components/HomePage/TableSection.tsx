@@ -37,7 +37,7 @@ const sectionStyles: Record<string, CSSProperties> = {
     gridTemplateAreas: `
       "plato prism"
     `,
-    [media.mobilePortrait]: {
+    [media.mobile]: {
       gridTemplateAreas: `
       "plato"
       "prism"

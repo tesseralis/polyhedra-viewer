@@ -12,8 +12,8 @@ function useCellStyle() {
     verticalAlign: 'middle',
     textAlign: 'center',
     color: 'DimGrey',
-    [media.notMobile]: { fontSize: scales.font[6] },
-    [media.mobile]: { fontSize: scales.font[7] },
+    [media.notMobile]: { fontSize: scales.font[7] },
+    [media.mobile]: { fontSize: 8 },
   });
 }
 
