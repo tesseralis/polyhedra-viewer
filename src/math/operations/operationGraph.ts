@@ -236,6 +236,11 @@ const archimedean = {
     expand: 'eC',
     snub: { value: 'sC', chiral: true },
   },
+  tT: { expand: 'tO' },
+  tC: { expand: 'bC' },
+  tO: { expand: 'bC' },
+  tD: { expand: 'bD' },
+  tI: { expand: 'bD' },
   aC: {
     // TODO (possibly) coxeter snub (semi-snub) and rectify relations
     truncate: 'bC',
