@@ -44,7 +44,8 @@ function getCLBev(polyhedron: Polyhedron, faceType: any, result: string) {
   const referenceLength =
     (referenceFace.distanceToCenter() / reference.edgeLength()) *
     polyhedron.edgeLength();
-  return polyhedron.faceWithNumSides(faceType);
+  // return polyhedron.faceWithNumSides(faceType).distanceToCenter() * referenceLength;
+  return referenceLength;
 }
 
 export function applyContract(
