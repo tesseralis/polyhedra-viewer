@@ -11,7 +11,7 @@ This application visualizes the relationships between the convex, regular-faced 
 `;
 
 export const uniform = `
-The uniform polyhedra are the Platonic solids, the Archimedean solids, and the infinte set of prisms and antiprisms.
+The uniform polyhedra are the Platonic solids, the Archimedean solids, and the infinite set of prisms and antiprisms.
 
 A polyhedron is _uniform_ if all its faces are regular polygons and it is _vertex transitive_. That is, if you rotate any vertex to any other vertex, there is a way to make all the faces and vertices match up so that it looks like the original polyhedron.
 
