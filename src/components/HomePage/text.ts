@@ -95,15 +95,12 @@ If you would like to learn more about polyhedra and other geometric figures, che
 * [polyHédronisme] by Anselm Levskaya - Build complex polyhedra using Conway operations
 * [Polyhedra] by Stacy Speyer - Paper models of polyhedra and other artistic imaginings
 * [Johnson Solids] by Allison Chen - Diagrams categorizing the Johnson solids based on their operations
-* [4D Toys] - An interactive catalogue of 4D shapes
-
 
 [Virtual Polyhedra]: http://www.georgehart.com/virtual-polyhedra/vp.html
 [Visual Polyhedra]: http://dmccooey.com/polyhedra/
 [polyHédronisme]: http://levskaya.github.io/polyhedronisme/
 [Polyhedra]: http://polyhedra.stacyspeyer.net/
 [Johnson Solids]: http://portfolios.risd.edu/gallery/Johnson-Solids/8807383
-[4D Toys]: http://4dtoys.com/
 `;
 
 export const footer = `
