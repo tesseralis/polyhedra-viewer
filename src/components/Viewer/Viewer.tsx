@@ -6,12 +6,7 @@ import { Route, Redirect } from 'react-router-dom';
 
 import { Polyhedron } from 'math/polyhedra';
 import { usePageTitle, wrapProviders } from 'components/common';
-import {
-  OperationCtx,
-  TransitionCtx,
-  PolyhedronCtx,
-  PathSetterProvider,
-} from './context';
+import { OperationCtx, TransitionCtx, PolyhedronCtx } from './context';
 import DesktopViewer from './DesktopViewer';
 import MobileViewer from './MobileViewer';
 import useMediaInfo from 'components/useMediaInfo';
@@ -70,10 +65,9 @@ interface Props {
 const Providers = wrapProviders([
   TransitionCtx.Provider,
   OperationCtx.Provider,
-  PathSetterProvider,
 ]);
 
-export default function Viewer({ solid, history, url }: Props) {
+export default function Viewer({ solid, url }: Props) {
   return (
     <>
       <Route

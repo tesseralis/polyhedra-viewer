@@ -1,9 +1,10 @@
 import _ from 'lodash';
 
 import { useCallback } from 'react';
+import { useHistory } from 'react-router-dom';
 import { Operation, Options } from 'math/operations';
 import { Polyhedron } from 'math/polyhedra';
-import { usePathSetter } from './PathSetter';
+import { escapeName } from 'math/polyhedra/names';
 import PolyhedronCtx from './PolyhedronCtx';
 import OperationCtx from './OperationCtx';
 import TransitionCtx from './TransitionCtx';
@@ -11,8 +12,8 @@ import TransitionCtx from './TransitionCtx';
 type ResultCallback = (polyhedron: Polyhedron) => void;
 
 export default function useApplyOperation() {
+  const history = useHistory();
   const { setOperation, unsetOperation } = OperationCtx.useActions();
-  const setName = usePathSetter();
   const polyhedron = PolyhedronCtx.useState();
   const transition = TransitionCtx.useTransition();
 
@@ -32,12 +33,12 @@ export default function useApplyOperation() {
       }
 
       transition(result, animationData);
-      setName(result.name);
+      history.push(`/${escapeName(result.name)}/operations`);
       if (typeof callback === 'function') {
         callback(result);
       }
     },
-    [polyhedron, setName, transition, setOperation, unsetOperation],
+    [polyhedron, history, transition, setOperation, unsetOperation],
   );
 
   return applyOperation;
