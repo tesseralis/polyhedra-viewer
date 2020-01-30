@@ -66,7 +66,7 @@ function doExpansion(
 
   // TODO precalculate this
   const referenceFace =
-    _.find<Face>(reference.faces, face => isExpandedFace(reference, face, n)) ||
+    _.find<Face>(reference.faces, face => isExpandedFace(reference, face, n)) ??
     reference.getFace();
   const referenceLength =
     (referenceFace.distanceToCenter() / reference.edgeLength()) *

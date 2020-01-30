@@ -35,7 +35,7 @@ export default () => (
       <Route
         path="/:solid"
         render={({ match, history }) => {
-          const solid = match.params.solid || '';
+          const solid = match.params.solid ?? '';
           if (isConwaySymbol(solid)) {
             const fullName = escapeName(fromConwayNotation(solid));
             const newPath = history.location.pathname.replace(solid, fullName);

@@ -40,7 +40,7 @@ export default class Polyhedron {
       (vertex, vIndex) => new Vertex(this, vIndex),
     );
     this.faces = solidData.faces.map((face, fIndex) => new Face(this, fIndex));
-    this.name = solidData.name || '';
+    this.name = solidData.name ?? '';
   }
 
   get edges() {
@@ -132,8 +132,9 @@ export default class Polyhedron {
   }
 
   vertexConfiguration() {
-    return _.countBy(this.vertices.map(v => v.configuration()), config =>
-      config.join('.'),
+    return _.countBy(
+      this.vertices.map(v => v.configuration()),
+      config => config.join('.'),
     );
   }
 

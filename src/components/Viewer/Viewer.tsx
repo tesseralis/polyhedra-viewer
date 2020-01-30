@@ -92,7 +92,7 @@ export default function Viewer({ solid, history, url }: Props) {
                 <InnerViewer
                   action={history.action}
                   solid={solid}
-                  panel={panel || ''}
+                  panel={panel ?? ''}
                 />
               </Providers>
             </PolyhedronCtx.Provider>

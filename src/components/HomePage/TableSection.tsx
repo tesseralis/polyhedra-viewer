@@ -172,7 +172,7 @@ export default function TableSection({
       {tables && (
         <TableGrid
           header={header}
-          tables={narrow ? narrowTables || tables : tables}
+          tables={narrow ? narrowTables ?? tables : tables}
         />
       )}
       {subsections &&

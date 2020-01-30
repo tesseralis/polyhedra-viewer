@@ -68,7 +68,7 @@ export default function AugmentOptions() {
     },
     {
       name: 'using',
-      values: operation!.allOptions(polyhedron, 'using') || [],
+      values: operation!.allOptions(polyhedron, 'using') ?? [],
       value: using,
       description: 'Some solids have more than one option to augment a face.',
     },

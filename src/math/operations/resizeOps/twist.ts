@@ -29,8 +29,14 @@ function bisectEdgeFaces(expandedFaces: Face[], twist: Twist) {
 
       const fs =
         twist === 'left'
-          ? [[v1, v2, v4], [v2, v3, v4]]
-          : [[v1, v2, v3], [v1, v3, v4]];
+          ? [
+              [v1, v2, v4],
+              [v2, v3, v4],
+            ]
+          : [
+              [v1, v2, v3],
+              [v1, v3, v4],
+            ];
       newFaces = newFaces.concat(fs);
       found.push(twinFace);
     });
@@ -90,7 +96,7 @@ function doTwist(
   const twistFaces = getExpandedFaces(polyhedron, n);
 
   const referenceFace =
-    _.find(reference.faces, face => isExpandedFace(reference, face, n)) ||
+    _.find(reference.faces, face => isExpandedFace(reference, face, n)) ??
     reference.getFace();
   const referenceLength =
     (referenceFace.distanceToCenter() / reference.edgeLength()) *

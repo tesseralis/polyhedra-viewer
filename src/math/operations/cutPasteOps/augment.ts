@@ -348,7 +348,7 @@ export const augment = makeOperation('augment', {
       ? ['ortho', 'gyro']
       : [undefined];
 
-    const usingOpts = getUsingOpts(polyhedron) || [null];
+    const usingOpts = getUsingOpts(polyhedron) ?? [null];
     const faceOpts = _.map(polyhedron.faces.filter(face => canAugment(face)));
 
     const options = [];
@@ -395,7 +395,7 @@ export const augment = makeOperation('augment', {
       case 'gyrate':
         return hasGyrateOpts(polyhedron) ? ['ortho', 'gyro'] : [];
       case 'using':
-        return getUsingOpts(polyhedron) || [];
+        return getUsingOpts(polyhedron) ?? [];
       default:
         return [];
     }
@@ -403,7 +403,7 @@ export const augment = makeOperation('augment', {
 
   defaultOptions(solid) {
     if (!solid) return {};
-    const usingOpts = getUsingOpts(solid) || [];
+    const usingOpts = getUsingOpts(solid) ?? [];
     return _.pickBy({
       gyrate: hasGyrateOpts(solid) && 'gyro',
       using: usingOpts.length > 1 && usingOpts[0],

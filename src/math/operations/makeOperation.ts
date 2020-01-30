@@ -117,7 +117,7 @@ function fillDefaults(op: OperationArgs) {
   return {
     ..._.mapValues(
       methodDefaults,
-      (fnDefault, fn: OperationArg) => op[fn] || _.constant(fnDefault),
+      (fnDefault, fn: OperationArg) => op[fn] ?? _.constant(fnDefault),
     ),
     ...op,
   };
@@ -147,7 +147,7 @@ function normalizeOpResult(
   const { start, endVertices } = animationData!;
 
   const normedResult =
-    result || deduplicateVertices(start.withVertices(endVertices));
+    result ?? deduplicateVertices(start.withVertices(endVertices));
 
   return {
     result: normedResult.withName(newName),
