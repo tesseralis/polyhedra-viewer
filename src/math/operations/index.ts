@@ -4,16 +4,16 @@ import { elongate, gyroelongate, shorten, turn } from './prismOps';
 import { augment, diminish, gyrate } from './cutPasteOps';
 
 import {
-  Operation,
-  Options,
-  OperationResult,
-  AnimationData,
+  Operation as _Operation,
+  Options as _Options,
+  OperationResult as _OperationResult,
+  AnimationData as _AnimationData,
 } from './makeOperation';
 
-export type Operation = Operation;
-export type Options = Options;
-export type OperationResult = OperationResult;
-export type AnimationData = AnimationData;
+export type Operation = _Operation;
+export type Options = _Options;
+export type OperationResult = _OperationResult;
+export type AnimationData = _AnimationData;
 
 export const operations = {
   dual,

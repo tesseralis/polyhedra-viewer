@@ -42,7 +42,7 @@ export function polygonPoints({
 }: PolygonProps) {
   return _(n)
     .range()
-    .map<number, Point2D>(i => [
+    .map<Point2D>(i => [
       cx + r * cos(TAU * (a / 360 + i / n)),
       cy + r * sin(TAU * (a / 360 + i / n)),
     ])
