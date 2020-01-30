@@ -34,7 +34,7 @@ export default function createHookedContext<S, A extends string>(
         ? defaultStateCreator(props)
         : defaultStateCreator;
       const [state, dispatch] = useReducer(
-        (state, action: Action<S>) => action(state),
+        (state: S, action: Action<S>) => action(state),
         defaultState,
       );
 
