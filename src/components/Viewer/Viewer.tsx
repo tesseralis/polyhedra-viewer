@@ -1,7 +1,6 @@
 import _ from 'lodash';
 
 import React, { useEffect } from 'react';
-import { History } from 'history';
 import { Route, Redirect } from 'react-router-dom';
 
 import { Polyhedron } from 'math/polyhedra';
@@ -59,7 +58,6 @@ function InnerViewer({ solid, panel, action }: InnerProps) {
 interface Props {
   solid: string;
   url: string;
-  history: History;
 }
 
 const Providers = wrapProviders([

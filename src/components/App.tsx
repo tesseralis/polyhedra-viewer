@@ -47,7 +47,7 @@ export default () => (
             return <Redirect to={newPath} />;
           }
           if (isValidSolid(solid)) {
-            return <Viewer solid={solid} url={match.url} history={history} />;
+            return <Viewer solid={solid} url={match.url} />;
           }
           return <ErrorPage />;
         }}
