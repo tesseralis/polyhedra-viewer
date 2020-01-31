@@ -273,7 +273,13 @@ export default class Polyhedron {
 
   isHoneycomb() {
     return _.includes(
-      ['cube', 'truncated octahedron', 'triangular prism', 'hexagonal prism'],
+      [
+        'cube',
+        'truncated octahedron',
+        'triangular prism',
+        'hexagonal prism',
+        'gyrobifastigium',
+      ],
       this.name,
     );
   }
