@@ -11,7 +11,7 @@ This application visualizes the relationships between the convex, regular-faced 
 `;
 
 export const uniform = `
-The uniform polyhedra are the Platonic solids, the Archimedean solids, and the infinte set of prisms and antiprisms.
+The uniform polyhedra are the Platonic solids, the Archimedean solids, and the infinite set of prisms and antiprisms.
 
 A polyhedron is _uniform_ if all its faces are regular polygons and it is _vertex transitive_. That is, if you rotate any vertex to any other vertex, there is a way to make all the faces and vertices match up so that it looks like the original polyhedron.
 
@@ -81,7 +81,7 @@ While they are not directly composed of other polyhedra, these solids may still 
 `;
 
 export const more = `
-The polyhedra represented above are just a small subset of the wondrous world of geometric shapes and figures. For instance, the [Kepler-Poinsot polyhedra] are regular like the Platonic solids but non-convex, while the [Catalan solids] are the duals of the Archimedian solids and have non-regular faces. Beyond three dimensions, one can explore four dimensional shapes like the [tesseract] or the [grand antiprism].
+The polyhedra represented above are just a small subset of the wondrous world of geometric shapes and figures. For instance, the [Kepler-Poinsot polyhedra] are regular like the Platonic solids but non-convex, while the [Catalan solids] are the duals of the Archimedean solids and have non-regular faces. Beyond three dimensions, one can explore four dimensional shapes like the [tesseract] or the [grand antiprism].
 
 [Kepler-Poinsot polyhedra]: https://en.wikipedia.org/wiki/Kepler%E2%80%93Poinsot_polyhedron
 [Catalan solids]: https://en.wikipedia.org/wiki/Catalan_solid
@@ -95,15 +95,12 @@ If you would like to learn more about polyhedra and other geometric figures, che
 * [polyHédronisme] by Anselm Levskaya - Build complex polyhedra using Conway operations
 * [Polyhedra] by Stacy Speyer - Paper models of polyhedra and other artistic imaginings
 * [Johnson Solids] by Allison Chen - Diagrams categorizing the Johnson solids based on their operations
-* [4D Toys] - An interactive catalogue of 4D shapes
-
 
 [Virtual Polyhedra]: http://www.georgehart.com/virtual-polyhedra/vp.html
 [Visual Polyhedra]: http://dmccooey.com/polyhedra/
 [polyHédronisme]: http://levskaya.github.io/polyhedronisme/
 [Polyhedra]: http://polyhedra.stacyspeyer.net/
 [Johnson Solids]: http://portfolios.risd.edu/gallery/Johnson-Solids/8807383
-[4D Toys]: http://4dtoys.com/
 `;
 
 export const footer = `

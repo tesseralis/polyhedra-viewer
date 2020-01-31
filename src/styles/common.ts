@@ -111,7 +111,7 @@ export const absoluteFull: CSSProperties = {
 /* Mobile */
 
 export function scroll(direction?: 'x' | 'y') {
-  const prop = `overflow${(direction || '').toUpperCase()}`;
+  const prop = `overflow${(direction ?? '').toUpperCase()}`;
   return {
     [prop]: 'scroll',
     // use momentum scrolling on mobile browsers

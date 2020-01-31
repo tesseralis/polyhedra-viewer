@@ -78,11 +78,11 @@ const inverseAlternateNames = _(alternateNames)
   .value();
 
 export function getCanonicalName(name: string) {
-  return inverseAlternateNames[unescapeName(name)] || name;
+  return inverseAlternateNames[unescapeName(name)] ?? name;
 }
 
 export function getAlternateNames(name: string) {
-  return alternateNames[unescapeName(name)] || [];
+  return alternateNames[unescapeName(name)] ?? [];
 }
 
 export function isAlternateName(name: string) {

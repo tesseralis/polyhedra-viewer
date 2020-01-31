@@ -87,21 +87,24 @@ export default function X3dPolyhedron({
   };
 
   useEffect(() => {
-    const shapeNode = shape.current;
     _.forEach(listeners, (fn, type) => {
-      if (shapeNode !== null) {
-        shapeNode.addEventListener(type, fn);
+      if (shape.current !== null) {
+        shape.current.addEventListener(type, fn);
       }
     });
 
     return () => {
       _.forEach(listeners, (fn, type) => {
+        // The X3DOM node isn't managed by React so this rule doesn't apply
+        // If we store this in a var this causes a type error
+        // eslint-disable-next-line
+        const shapeNode = shape.current;
         if (shapeNode !== null) {
           shapeNode.removeEventListener(type, fn);
         }
       });
     };
-  }, [onClick, onHover, onMouseOut, listeners]);
+  }, [listeners]);
 
   const colorStr = joinListOfLists(colors, ',', ' ');
   return (

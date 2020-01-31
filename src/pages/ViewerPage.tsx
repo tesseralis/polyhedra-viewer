@@ -1,6 +1,5 @@
 import { Polyhedron, Face } from 'math/polyhedra';
 import AppPage, { PageOptions } from './AppPage';
-import { History } from 'history';
 
 function splitListOfLists(listStr: string, outerSep: string, innerSep: string) {
   return listStr
@@ -37,10 +36,6 @@ export default class ViewerPage extends AppPage {
     return new Polyhedron({ name, vertices, faces });
   }
 
-  getHistory() {
-    return this.wrapper.find('Viewer').prop<History>('history');
-  }
-
   clickFace(face: Face) {
     const hitPnt = face.centroid().toArray();
     const shape = this.wrapper
@@ -70,21 +65,10 @@ export default class ViewerPage extends AppPage {
     return this;
   }
 
-  expectPath(path: string) {
-    expect(this.getHistory().location.pathname).toEqual(path);
-    return this;
-  }
-
   expectTransitionTo(expected: string) {
     this.wrapper.update();
     this.expectPath(`/${expected}/operations`);
     expect(this.getPolyhedron().isSame(Polyhedron.get(expected))).toBe(true);
-    return this;
-  }
-
-  goBack() {
-    this.getHistory().goBack();
-    this.wrapper.update();
     return this;
   }
 }

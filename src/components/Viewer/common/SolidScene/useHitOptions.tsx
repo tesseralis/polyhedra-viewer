@@ -17,7 +17,7 @@ export default function useHitOptions() {
   const { setOption } = OperationCtx.useActions();
   const applyOperation = useApplyOperation();
   const { hitOption = '', getHitOption = _.constant<Options>({}) } =
-    operation || {};
+    operation ?? {};
 
   const setHitOption = (hitPnt: Point) => {
     if (!operation || isTransitioning) return;

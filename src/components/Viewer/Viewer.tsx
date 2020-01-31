@@ -1,17 +1,11 @@
 import _ from 'lodash';
 
 import React, { useEffect } from 'react';
-import { History } from 'history';
 import { Route, Redirect } from 'react-router-dom';
 
 import { Polyhedron } from 'math/polyhedra';
 import { usePageTitle, wrapProviders } from 'components/common';
-import {
-  OperationCtx,
-  TransitionCtx,
-  PolyhedronCtx,
-  PathSetterProvider,
-} from './context';
+import { OperationCtx, TransitionCtx, PolyhedronCtx } from './context';
 import DesktopViewer from './DesktopViewer';
 import MobileViewer from './MobileViewer';
 import useMediaInfo from 'components/useMediaInfo';
@@ -64,16 +58,14 @@ function InnerViewer({ solid, panel, action }: InnerProps) {
 interface Props {
   solid: string;
   url: string;
-  history: History;
 }
 
 const Providers = wrapProviders([
   TransitionCtx.Provider,
   OperationCtx.Provider,
-  PathSetterProvider,
 ]);
 
-export default function Viewer({ solid, history, url }: Props) {
+export default function Viewer({ solid, url }: Props) {
   return (
     <>
       <Route
@@ -92,7 +84,7 @@ export default function Viewer({ solid, history, url }: Props) {
                 <InnerViewer
                   action={history.action}
                   solid={solid}
-                  panel={panel || ''}
+                  panel={panel ?? ''}
                 />
               </Providers>
             </PolyhedronCtx.Provider>

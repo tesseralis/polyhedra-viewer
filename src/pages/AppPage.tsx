@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import React from 'react';
-import { MemoryRouter } from 'react-router-dom';
+import { createMemoryHistory, History } from 'history';
+import { Router } from 'react-router-dom';
 
 import { mount, ReactWrapper } from 'enzyme';
 
@@ -17,17 +18,31 @@ export interface PageOptions {
 
 export default class AppPage {
   wrapper: ReactWrapper;
+  history: History;
 
   constructor(path: string = '/', options: PageOptions = {}) {
     const { device = 'desktop', orientation = '' } = options;
     const mediaInfo = { device, orientation };
+    this.history = createMemoryHistory();
+    this.history.push(path);
     this.wrapper = mount(
       <DeviceProvider value={mediaInfo}>
-        <MemoryRouter initialEntries={[path]}>
+        <Router history={this.history}>
           <App />
-        </MemoryRouter>
+        </Router>
       </DeviceProvider>,
     );
+  }
+
+  expectPath(path: string) {
+    expect(this.history.location.pathname).toEqual(path);
+    return this;
+  }
+
+  goBack() {
+    this.history.goBack();
+    this.wrapper.update();
+    return this;
   }
 
   findElementWithText(element: string, text: string) {

@@ -10,7 +10,8 @@ import makeOperation from '../makeOperation';
 import { hasMultiple } from './cutPasteUtils';
 import { withOrigin } from '../../geom';
 
-const augmentees = {
+type AugmentType = 'pyramid' | 'cupola' | 'rotunda';
+const augmentees: Record<AugmentType, Record<number, string>> = {
   pyramid: {
     3: 'tetrahedron',
     4: 'square-pyramid',
@@ -33,7 +34,7 @@ const augmentData = _.mapValues(augmentees, type =>
   _.mapValues(type, Polyhedron.get),
 );
 
-const augmentTypes: Record<string, string> = {
+const augmentTypes: Record<string, AugmentType> = {
   Y: 'pyramid',
   U: 'cupola',
   R: 'rotunda',
@@ -65,7 +66,7 @@ function canAugmentWith(base: Face, augmentee: Polyhedron, offset: number) {
   });
 }
 
-function canAugmentWithType(base: Face, augmentType: string) {
+function canAugmentWithType(base: Face, augmentType: AugmentType) {
   const n = augmentType === 'pyramid' ? base.numSides : base.numSides / 2;
   for (let offset of [0, 1]) {
     if (canAugmentWith(base, augmentData[augmentType][n], offset)) {
@@ -172,7 +173,7 @@ function isAligned(
   return isOrtho === (gyrate === 'ortho');
 }
 
-function getAugmentee(augmentType: string, numSides: number) {
+function getAugmentee(augmentType: AugmentType, numSides: number) {
   const index = _.includes(['cupola', 'rotunda'], augmentType)
     ? numSides / 2
     : numSides;
@@ -187,7 +188,7 @@ function isFastigium(augmentType: string, numSides: number) {
 function doAugment(
   polyhedron: Polyhedron,
   base: Face,
-  augmentType: string,
+  augmentType: AugmentType,
   gyrate?: string,
 ) {
   const numSides = base.numSides;
@@ -347,7 +348,7 @@ export const augment = makeOperation('augment', {
       ? ['ortho', 'gyro']
       : [undefined];
 
-    const usingOpts = getUsingOpts(polyhedron) || [null];
+    const usingOpts = getUsingOpts(polyhedron) ?? [null];
     const faceOpts = _.map(polyhedron.faces.filter(face => canAugment(face)));
 
     const options = [];
@@ -394,7 +395,7 @@ export const augment = makeOperation('augment', {
       case 'gyrate':
         return hasGyrateOpts(polyhedron) ? ['ortho', 'gyro'] : [];
       case 'using':
-        return getUsingOpts(polyhedron) || [];
+        return getUsingOpts(polyhedron) ?? [];
       default:
         return [];
     }
@@ -402,7 +403,7 @@ export const augment = makeOperation('augment', {
 
   defaultOptions(solid) {
     if (!solid) return {};
-    const usingOpts = getUsingOpts(solid) || [];
+    const usingOpts = getUsingOpts(solid) ?? [];
     return _.pickBy({
       gyrate: hasGyrateOpts(solid) && 'gyro',
       using: usingOpts.length > 1 && usingOpts[0],

@@ -5,16 +5,10 @@ import { escapeName } from 'math/polyhedra/names';
 import { square, hover, flexRow } from 'styles/common';
 import { useStyle, media } from 'styles';
 
-function scale(ratio: number) {
-  return `scale(${ratio}, ${ratio})`;
-}
-
 interface Props {
   name: string;
   isFake: boolean;
 }
-
-const baseThumbnailSize = 150;
 
 // using raw pixel values since we need to do math
 const thumbnailSize = 64;
@@ -24,10 +18,10 @@ function Image({ name }: Pick<Props, 'name'>) {
   const css = useStyle({
     ...flexRow('center', 'center'),
     [media.notMobile]: {
-      transform: scale((thumbnailSize + 16) / baseThumbnailSize),
+      height: thumbnailSize,
     },
     [media.mobile]: {
-      transform: scale((mobThumbnailSize + 16) / baseThumbnailSize),
+      height: mobThumbnailSize,
     },
   });
   const escapedName = escapeName(name);
