@@ -256,6 +256,33 @@ export default class Polyhedron {
     return this.type() === 'Platonic solid';
   }
 
+  isChiral() {
+    return _.includes(
+      [
+        'snub cube',
+        'snub dodecahedron',
+        'gyroelongated triangular bicupola',
+        'gyroelongated square bicupola',
+        'gyroelongated pentagonal bicupola',
+        'gyroelongated pentagonal cupolarotunda',
+        'gyroelongated pentagonal birotunda',
+      ],
+      this.name,
+    );
+  }
+
+  isHoneycomb() {
+    return _.includes(
+      ['cube', 'truncated octahedron', 'triangular prism', 'hexagonal prism'],
+      this.name,
+    );
+  }
+
+  isDeltahedron() {
+    const facesBySides = _.keys(this.numFacesBySides());
+    return facesBySides.length === 1 && +facesBySides[0] === 3;
+  }
+
   faceAdjacencyList() {
     const faceAdjacencyCounts = _.map(this.faces, face => ({
       n: face.numSides,
