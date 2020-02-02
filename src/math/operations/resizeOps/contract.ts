@@ -51,7 +51,7 @@ function getCLBev(polyhedron: Polyhedron, faceType: any, result: string) {
 
 export function applyContract(
   polyhedron: Polyhedron,
-  { faceType = 3 }: ContractOptions,
+  { faceType = isBevelled(polyhedron) ? 6 : 3 }: ContractOptions,
   result: string,
 ) {
   const resultLength = isBevelled(polyhedron)
@@ -59,9 +59,7 @@ export function applyContract(
     : getContractLength(polyhedron, faceType);
 
   // Take all the stuff and push it inwards
-  const contractFaces = isBevelled(polyhedron)
-    ? polyhedron.faces.filter(f => f.numSides === faceType)
-    : getExpandedFaces(polyhedron, faceType);
+  const contractFaces = getExpandedFaces(polyhedron, faceType);
 
   const angle = isBevelled(polyhedron)
     ? 0

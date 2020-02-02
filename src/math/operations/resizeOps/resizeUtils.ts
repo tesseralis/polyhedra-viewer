@@ -81,12 +81,31 @@ function getCuboctahedronContractFaces(polyhedron: Polyhedron) {
   return [f0, ...rest];
 }
 
+function getTruncatedOctahedronContractFaces(polyhedron: Polyhedron) {
+  const f0 = polyhedron.faceWithNumSides(6);
+  const rest = f0.edges
+    .filter(e => e.twinFace().numSides === 4)
+    .map(e =>
+      e
+        .twin()
+        .next()
+        .next()
+        .twinFace(),
+    );
+  return [f0, ...rest];
+}
+
 export function getExpandedFaces(polyhedron: Polyhedron, faceType?: number) {
   switch (polyhedron.name) {
     case 'cuboctahedron':
       return getCuboctahedronContractFaces(polyhedron);
     case 'icosahedron':
       return getIcosahedronContractFaces(polyhedron);
+    case 'truncated octahedron':
+      return getTruncatedOctahedronContractFaces(polyhedron);
+    case 'truncated icosidodecahedron':
+    case 'truncated cuboctahedron':
+      return polyhedron.faces.filter(f => f.numSides === faceType);
     default:
       return _.filter(polyhedron.faces, face =>
         isExpandedFace(polyhedron, face, faceType),
