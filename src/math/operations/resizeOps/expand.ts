@@ -63,12 +63,12 @@ function duplicateVerticesSemi(polyhedron: Polyhedron) {
   return polyhedron.withChanges(solid =>
     solid
       .withVertices(_.flatMap(polyhedron.vertices, v => repeat(v.value, 2)))
-      // duplicate the vertices of "small" faces
-      // update the vertices of "big" ones
       .mapFaces(face => {
         if (face.numSides !== largeFaceType) {
+          // Duplicate vertices of "small" faces
           return _.flatMap(face.vertices, v => [v.index * 2, v.index * 2 + 1]);
         } else {
+          // Update the vertices of "big" faces
           return face.edges.map(e => {
             if (e.twinFace().numSides !== largeFaceType) {
               return e.v1.index * 2;
@@ -78,7 +78,7 @@ function duplicateVerticesSemi(polyhedron: Polyhedron) {
           });
         }
       })
-      // add faces for each edge between "large" faces
+      // add square faces for each edge between "large" faces
       .addFaces(
         polyhedron.edges
           .filter(
@@ -100,6 +100,8 @@ function isTruncated(polyhedron: Polyhedron) {
   return polyhedron.name.includes('truncated');
 }
 
+// TODO figure out a way to deduplicate these functions?
+// (or not)
 function doSemiExpansion(polyhedron: Polyhedron, referenceName: string) {
   const reference = Polyhedron.get(referenceName);
   const largeFaceType = polyhedron.largestFace().numSides;

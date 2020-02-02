@@ -39,6 +39,7 @@ function getContractLength(polyhedron: Polyhedron, faceType: number) {
 }
 
 // contract length of a bevelled polyhedron
+// TODO calculate this without a reference
 function getContractLengthSemi(
   polyhedron: Polyhedron,
   faceType: any,
@@ -49,7 +50,6 @@ function getContractLengthSemi(
   const referenceLength =
     (referenceFace.distanceToCenter() / reference.edgeLength()) *
     polyhedron.edgeLength();
-  // return polyhedron.faceWithNumSides(faceType).distanceToCenter() * referenceLength;
   return referenceLength;
 }
 
