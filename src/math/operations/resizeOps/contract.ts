@@ -39,7 +39,11 @@ function getContractLength(polyhedron: Polyhedron, faceType: number) {
 }
 
 // contract length of a bevelled polyhedron
-function getCLBev(polyhedron: Polyhedron, faceType: any, result: string) {
+function getContractLengthSemi(
+  polyhedron: Polyhedron,
+  faceType: any,
+  result: string,
+) {
   const reference = Polyhedron.get(result);
   const referenceFace = reference.faceWithNumSides(faceType);
   const referenceLength =
@@ -55,7 +59,7 @@ export function applyContract(
   result: string,
 ) {
   const resultLength = isBevelled(polyhedron)
-    ? getCLBev(polyhedron, faceType, result)
+    ? getContractLengthSemi(polyhedron, faceType, result)
     : getContractLength(polyhedron, faceType);
 
   // Take all the stuff and push it inwards
@@ -74,7 +78,6 @@ export function applyContract(
   };
 }
 
-// FIXME get rid of these duplicated calls
 function isBevelled(polyhedron: Polyhedron) {
   return polyhedron.name.includes('truncated');
 }
@@ -86,21 +89,21 @@ export const contract = makeOperation('contract', {
 
   resultsFilter(polyhedron, config) {
     const { faceType } = config;
-    if (!isBevelled(polyhedron)) {
-      switch (getFamily(polyhedron)) {
-        case 'O':
-          return { value: faceType === 3 ? 'O' : 'C' };
-        case 'I':
-          return { value: faceType === 3 ? 'I' : 'D' };
+    if (isBevelled(polyhedron)) {
+      switch (polyhedron.name) {
+        case 'truncated cuboctahedron':
+          return { value: faceType === 6 ? 'tO' : 'tC' };
+        case 'truncated icosidodecahedron':
+          return { value: faceType === 6 ? 'tI' : 'tD' };
         default:
           return;
       }
     }
-    switch (polyhedron.name) {
-      case 'truncated cuboctahedron':
-        return { value: faceType === 6 ? 'tO' : 'tC' };
-      case 'truncated icosidodecahedron':
-        return { value: faceType === 6 ? 'tI' : 'tD' };
+    switch (getFamily(polyhedron)) {
+      case 'O':
+        return { value: faceType === 3 ? 'O' : 'C' };
+      case 'I':
+        return { value: faceType === 3 ? 'I' : 'D' };
       default:
         return;
     }
@@ -109,49 +112,49 @@ export const contract = makeOperation('contract', {
   hitOption: 'faceType',
   getHitOption(polyhedron, hitPoint) {
     const hitFace = polyhedron.hitFace(hitPoint);
-    if (!isBevelled(polyhedron)) {
-      const isValid = isExpandedFace(polyhedron, hitFace);
+    if (isBevelled(polyhedron)) {
+      const isValid = hitFace.numSides > 4;
       return isValid ? { faceType: hitFace.numSides } : {};
     }
-    const isValid = hitFace.numSides > 4;
+    const isValid = isExpandedFace(polyhedron, hitFace);
     return isValid ? { faceType: hitFace.numSides } : {};
   },
 
   allOptionCombos(polyhedron) {
-    if (!isBevelled(polyhedron)) {
-      switch (getFamily(polyhedron)) {
-        case 'O':
-          return [{ faceType: 3 }, { faceType: 4 }];
-        case 'I':
-          return [{ faceType: 3 }, { faceType: 5 }];
+    if (isBevelled(polyhedron)) {
+      switch (polyhedron.name) {
+        case 'truncated cuboctahedron':
+          return [{ faceType: 6 }, { faceType: 8 }];
+        case 'truncated icosidodecahedron':
+          return [{ faceType: 6 }, { faceType: 10 }];
         default:
           return [{}];
       }
     }
-    switch (polyhedron.name) {
-      case 'truncated cuboctahedron':
-        return [{ faceType: 6 }, { faceType: 8 }];
-      case 'truncated icosidodecahedron':
-        return [{ faceType: 6 }, { faceType: 10 }];
+    switch (getFamily(polyhedron)) {
+      case 'O':
+        return [{ faceType: 3 }, { faceType: 4 }];
+      case 'I':
+        return [{ faceType: 3 }, { faceType: 5 }];
       default:
         return [{}];
     }
   },
 
   faceSelectionStates(polyhedron, { faceType }) {
-    if (!isBevelled(polyhedron)) {
+    if (isBevelled(polyhedron)) {
       return polyhedron.faces.map(face => {
-        if (faceType && isExpandedFace(polyhedron, face, faceType))
+        if (faceType && face.numSides === faceType) {
           return 'selected';
-        if (isExpandedFace(polyhedron, face)) return 'selectable';
+        }
+        if (face.numSides !== 4) return 'selectable';
         return undefined;
       });
     }
     return polyhedron.faces.map(face => {
-      if (faceType && face.numSides === faceType) {
+      if (faceType && isExpandedFace(polyhedron, face, faceType))
         return 'selected';
-      }
-      if (face.numSides !== 4) return 'selectable';
+      if (isExpandedFace(polyhedron, face)) return 'selectable';
       return undefined;
     });
   },

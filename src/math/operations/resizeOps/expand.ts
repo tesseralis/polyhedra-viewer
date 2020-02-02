@@ -58,7 +58,7 @@ function duplicateVertices(polyhedron: Polyhedron, twist?: Twist) {
 /**
  * Duplication function for semi-expanding truncated polyhedra
  */
-function duplicateVerticesTrunc(polyhedron: Polyhedron) {
+function duplicateVerticesSemi(polyhedron: Polyhedron) {
   const largeFaceType = polyhedron.largestFace().numSides;
   return polyhedron.withChanges(solid =>
     solid
@@ -110,7 +110,7 @@ function doSemiExpansion(polyhedron: Polyhedron, referenceName: string) {
   const largeFaceIndices = polyhedron.faces
     .filter(face => face.numSides === largeFaceType)
     .map(face => face.index);
-  const duplicated = duplicateVerticesTrunc(polyhedron);
+  const duplicated = duplicateVerticesSemi(polyhedron);
   const expandFaces = duplicated.faces.filter(face =>
     largeFaceIndices.includes(face.index),
   );
