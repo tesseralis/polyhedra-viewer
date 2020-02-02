@@ -55,19 +55,22 @@ function duplicateVertices(polyhedron: Polyhedron, twist?: Twist) {
   );
 }
 
+/**
+ * Duplication function for semi-expanding truncated polyhedra
+ */
 function duplicateVerticesTrunc(polyhedron: Polyhedron) {
-  const [smallFaceType, largeFaceType] = polyhedron.faceTypes();
+  const largeFaceType = polyhedron.largestFace().numSides;
   return polyhedron.withChanges(solid =>
     solid
       .withVertices(_.flatMap(polyhedron.vertices, v => repeat(v.value, 2)))
       // duplicate the vertices of "small" faces
       // update the vertices of "big" ones
       .mapFaces(face => {
-        if (face.numSides === smallFaceType) {
+        if (face.numSides !== largeFaceType) {
           return _.flatMap(face.vertices, v => [v.index * 2, v.index * 2 + 1]);
         } else {
           return face.edges.map(e => {
-            if (e.twinFace().numSides === smallFaceType) {
+            if (e.twinFace().numSides !== largeFaceType) {
               return e.v1.index * 2;
             } else {
               return e.v1.index * 2 + 1;
