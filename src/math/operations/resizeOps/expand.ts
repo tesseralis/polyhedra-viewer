@@ -55,6 +55,71 @@ function duplicateVertices(polyhedron: Polyhedron, twist?: Twist) {
   );
 }
 
+function duplicateVerticesTrunc(polyhedron: Polyhedron) {
+  const [smallFaceType, largeFaceType] = polyhedron.faceTypes();
+  return polyhedron.withChanges(solid =>
+    solid
+      .withVertices(_.flatMap(polyhedron.vertices, v => repeat(v.value, 2)))
+      // duplicate the vertices of "small" faces
+      // update the vertices of "big" ones
+      .mapFaces(face => {
+        if (face.numSides === smallFaceType) {
+          return _.flatMap(face.vertices, v => [v.index * 2, v.index * 2 + 1]);
+        } else {
+          return face.edges.map(e => {
+            if (e.twinFace().numSides === smallFaceType) {
+              return e.v1.index * 2;
+            } else {
+              return e.v1.index * 2 + 1;
+            }
+          });
+        }
+      })
+      // add faces for each edge between "large" faces
+      .addFaces(
+        polyhedron.edges
+          .filter(
+            e =>
+              e.face.numSides === largeFaceType &&
+              e.twinFace().numSides === largeFaceType,
+          )
+          .map(e => [
+            e.v1.index * 2 + 1,
+            e.v1.index * 2,
+            e.v2.index * 2 + 1,
+            e.v2.index * 2,
+          ]),
+      ),
+  );
+}
+
+function isTruncated(polyhedron: Polyhedron) {
+  return polyhedron.name.includes('truncated');
+}
+
+function doSemiExpansion(polyhedron: Polyhedron, referenceName: string) {
+  const reference = Polyhedron.get(referenceName);
+  const largeFaceType = polyhedron.largestFace().numSides;
+  const referenceFace = reference.faceWithNumSides(largeFaceType);
+  const referenceLength =
+    (referenceFace.distanceToCenter() / reference.edgeLength()) *
+    polyhedron.edgeLength();
+  const largeFaceIndices = polyhedron.faces
+    .filter(face => face.numSides === largeFaceType)
+    .map(face => face.index);
+  const duplicated = duplicateVerticesTrunc(polyhedron);
+  const expandFaces = duplicated.faces.filter(face =>
+    largeFaceIndices.includes(face.index),
+  );
+  const endVertices = getResizedVertices(expandFaces, referenceLength);
+  return {
+    animationData: {
+      start: duplicated,
+      endVertices,
+    },
+  };
+}
+
 function doExpansion(
   polyhedron: Polyhedron,
   referenceName: string,
@@ -93,6 +158,9 @@ function doExpansion(
 
 export const expand = makeOperation('expand', {
   apply(polyhedron, $, result) {
+    if (isTruncated(polyhedron)) {
+      return doSemiExpansion(polyhedron, result);
+    }
     return doExpansion(polyhedron, result);
   },
 });

@@ -38,6 +38,7 @@ function getContractLength(polyhedron: Polyhedron, faceType: number) {
   return (s / 2 / Math.tan(Math.PI / p)) * tanTheta2;
 }
 
+// contract length of a bevelled polyhedron
 function getCLBev(polyhedron: Polyhedron, faceType: any, result: string) {
   const reference = Polyhedron.get(result);
   const referenceFace = reference.faceWithNumSides(faceType);
