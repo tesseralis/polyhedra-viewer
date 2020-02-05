@@ -61,21 +61,51 @@ export function getEdgeFacePaths(edge: Edge, twist?: Twist) {
   switch (twist) {
     case 'left':
       return [
-        [[f1, v1], [f2, v2], [f1, v2]], // face 1
-        [[f1, v1], [f2, v1], [f2, v2]], // face 2
+        [
+          [f1, v1],
+          [f2, v2],
+          [f1, v2],
+        ],
+        [
+          [f1, v1],
+          [f2, v1],
+          [f2, v2],
+        ],
       ];
     case 'right':
       return [
-        [[f1, v2], [f1, v1], [f2, v1]], // face 1
-        [[f2, v1], [f2, v2], [f1, v2]], // face 2
+        [
+          [f1, v2],
+          [f1, v1],
+          [f2, v1],
+        ],
+        [
+          [f2, v1],
+          [f2, v2],
+          [f1, v2],
+        ],
       ];
     default:
-      return [[[f1, v2], [f1, v1], [f2, v1], [f2, v2]]];
+      return [
+        [
+          [f1, v2],
+          [f1, v1],
+          [f2, v1],
+          [f2, v2],
+        ],
+      ];
   }
 }
 
 /**
- * Apply the given transformation to all the vertices that are part of the given vLists
+ * Apply a transformation per vertex list. This function allows transformations like
+ * "blow up these faces away from a center point" or "expand these faces out radially".
+ *
+ * @param vLists The list of `VertexList`s to apply transformations to
+ * @param iteratee the function to apply on each `VertexList` to generate a transform.
+ * The function can either return a transform or a single vector value.
+ * @param vertices The list of vertices to transform and return.
+ * This defaults to the vertices of the polyhedron attached to the first `VertexList`.
  */
 export function getTransformedVertices<T extends VertexList>(
   vLists: T[],
