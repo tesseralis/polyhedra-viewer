@@ -1,50 +1,14 @@
-import _ from 'lodash';
 import { Twist } from 'types';
-import { Polyhedron, Cap, VEList, VertexList } from 'math/polyhedra';
-import { getEdgeFacePaths } from '../operationUtils';
+import { Polyhedron, Cap, VertexList } from 'math/polyhedra';
+import { expandEdges } from '../operationUtils';
 import makeOperation from '../makeOperation';
 import { antiprismHeight, getScaledPrismVertices } from './prismUtils';
-
-function duplicateVertices(
-  polyhedron: Polyhedron,
-  boundary: VEList,
-  twist?: Twist,
-) {
-  const newVertexMapping = {};
-  _.forEach(boundary.edges, (edge, i) => {
-    const oppositeFace = edge.twin().face;
-    _.forEach(edge.vertices, (v, j) => {
-      _.set(
-        newVertexMapping,
-        [oppositeFace.index, v.index],
-        polyhedron.numVertices() + ((i + j) % boundary.numSides),
-      );
-    });
-  });
-
-  return polyhedron.withChanges(solid =>
-    solid
-      .addVertices(boundary.vertices)
-      .mapFaces(face =>
-        face.vertices.map(v =>
-          _.get(newVertexMapping, [face.index, v.index], v.index),
-        ),
-      )
-      .addFaces(
-        _.flatMap(boundary.edges, edge =>
-          _.map(getEdgeFacePaths(edge, twist), face =>
-            _.map(face, path => _.get(newVertexMapping, path, path[1])),
-          ),
-        ),
-      ),
-  );
-}
 
 function doElongate(polyhedron: Polyhedron, twist?: Twist) {
   const caps = Cap.getAll(polyhedron);
   const boundary = caps[0].boundary();
   const n = boundary.numSides;
-  const duplicated = duplicateVertices(polyhedron, boundary, twist);
+  const duplicated = expandEdges(polyhedron, boundary.edges, twist);
   let vertexSets: VertexList[];
 
   const duplicatedCaps = Cap.getAll(duplicated);
@@ -84,7 +48,7 @@ export const gyroelongate = makeOperation('gyroelongate', {
     return doElongate(polyhedron, twist);
   },
   optionTypes: ['twist'],
-  allOptionCombos(polyhedron: Polyhedron) {
+  allOptionCombos() {
     return [{ twist: 'left' }, { twist: 'right' }];
   },
 });
