@@ -97,6 +97,14 @@ export function getEdgeFacePaths(edge: Edge, twist?: Twist) {
   }
 }
 
+export function expandEdges(
+  polyhedron: Polyhedron,
+  edges: Edge[],
+  twist?: Twist,
+) {
+  //
+}
+
 /**
  * Apply a transformation per vertex list. This function allows transformations like
  * "blow up these faces away from a center point" or "expand these faces out radially".
