@@ -54,43 +54,55 @@ export function getTwistSign(twist?: Twist) {
   }
 }
 
+/**
+ * Get the expansion face arrangement for the given vertices
+ * @param vs the four vertex indices to arrange
+ * @param twist the pattern to arrange: left | right for two triangles, square by default
+ */
+function getEdgeFaces<V>([v1, v2, v3, v4]: V[], twist?: Twist) {
+  switch (twist) {
+    case 'left':
+      // v1 - v4
+      // |  \ |
+      // v2 - v3
+      return [
+        [v1, v2, v3],
+        [v1, v3, v4],
+      ];
+    case 'right':
+      // v1 - v4
+      // |  / |
+      // v2 - v3
+      return [
+        [v1, v2, v4],
+        [v2, v3, v4],
+      ];
+    default:
+      // v1 - v4
+      // |    |
+      // v2 - v3
+      return [[v1, v2, v3, v4]];
+  }
+}
+
 export function expandEdges(
   polyhedron: Polyhedron,
   edges: Edge[],
   twist?: Twist,
 ) {
   // Collect the list of vertices that are connected to the extruding edges
-  interface VE {
-    vertex: Vertex;
-    edges: Edge[];
-  }
-  const vertsToDupe: Record<string, VE> = {};
+  const vertsToDupe = polyhedron.vertices.map<Edge[]>(v => []);
   for (let edge of edges) {
-    if (!vertsToDupe[edge.v1.index]) {
-      vertsToDupe[edge.v1.index] = {
-        vertex: edge.v1,
-        edges: [],
-      };
-    }
-    vertsToDupe[edge.v1.index].edges.push(edge);
-
-    if (!vertsToDupe[edge.v2.index]) {
-      vertsToDupe[edge.v2.index] = {
-        vertex: edge.v2,
-        edges: [],
-      };
-    }
-    vertsToDupe[edge.v2.index].edges.push(edge.twin());
+    vertsToDupe[edge.v1.index].push(edge);
+    vertsToDupe[edge.v2.index].push(edge.twin());
   }
 
-  // maps old vertices to new vertices
+  // Use to keep track of any other new faces that are created
   const newFaces: number[][] = [];
 
-  // maps old vertices to faces to vertices
-  const v2fMap = polyhedron.faces.map(f => [] as number[][]);
-
-  // maps old vertices to new vertex edges
-  const v2eMap = polyhedron.vertices.map(v => [] as number[][]);
+  // Keep track of the new vIndices that each face and edge should be mapped to
+  const v2fMap = polyhedron.faces.map<number[][]>(f => []);
+  const v2eMap = polyhedron.vertices.map<[number, number][]>(v => []);
 
   const newVertices = polyhedron.vertices.map(v => v.vec);
   // create a new vertex and return its index
@@ -102,11 +114,14 @@ export function expandEdges(
   // For each changed vertex:
   // 1. duplicate it some number of times
   // 2. keep track of the edges/faces that are mapped to it
-  _.forEach(vertsToDupe, ({ vertex: v, edges }) => {
+  _.forEach(vertsToDupe, edges => {
+    // If the vertex isn't associated with any edges, do nothing
+    if (!edges.length) return;
+
+    const v = edges[0].v1;
     const adjFaces = v.adjacentFaces();
     // If there is only one adjacent edge
     if (edges.length === 1) {
-      // FIXME this should work on antiprisms, crap
       if (adjFaces.length === 3) {
         // If the vertex has an odd number of faces, add a new side to the middle face
         const vIndex2 = newVertex(v);
@@ -132,11 +147,11 @@ export function expandEdges(
         );
       }
     } else if (edges.length === 2) {
-      // If there are two edges, do one duplicationg
+      // If there are two edges, do one duplication
       const vIndex2 = newVertex(v);
-      // v2vMap[v.index].push(vIndex2);
 
-      // split into two "sides", picking one or the other based on the side
+      // split into two "sides", picking one or the other based which side of the edges
+      // we fall across
 
       //          |
       //          v2
@@ -190,32 +205,11 @@ export function expandEdges(
         )
         .addFaces(
           _.flatMap(edges, e => {
-            const [vi1, vi2] = v2eMap[e.v1.index][e.v2.index];
-            const [vi3, vi4] = v2eMap[e.v2.index][e.v1.index];
-            // TODO handle twists
-            switch (twist) {
-              case 'left':
-                // v1 - v4
-                // |  \ |
-                // v2 - v3
-                return [
-                  [vi1, vi2, vi3],
-                  [vi1, vi3, vi4],
-                ];
-              case 'right':
-                // v1 - v4
-                // |  / |
-                // v2 - v3
-                return [
-                  [vi1, vi2, vi4],
-                  [vi2, vi3, vi4],
-                ];
-              default:
-                // v1 - v4
-                // |    |
-                // v2 - v3
-                return [[vi1, vi2, vi3, vi4]];
-            }
+            const { v1, v2 } = e;
+            return getEdgeFaces(
+              [...v2eMap[v1.index][v2.index], ...v2eMap[v2.index][v1.index]],
+              twist,
+            );
           }),
         )
         .addFaces(newFaces),
