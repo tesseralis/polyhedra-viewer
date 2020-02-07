@@ -87,11 +87,7 @@ export function expandEdges(
   const newFaces: number[][] = [];
 
   // maps old vertices to faces to vertices
-  const v2fMap = polyhedron.faces.map(f => {
-    const x: number[][] = [];
-    f.vertices.forEach(v => (x[v.index] = [v.index]));
-    return x;
-  });
+  const v2fMap = polyhedron.faces.map(f => [] as number[][]);
 
   // maps old vertices to new vertex edges
   const v2eMap = polyhedron.vertices.map(v => [] as number[][]);
@@ -189,7 +185,9 @@ export function expandEdges(
     solid =>
       solid
         .withVertices(newVertices)
-        .mapFaces(f => _.flatMap(f.vertices, v => v2fMap[f.index][v.index]))
+        .mapFaces(f =>
+          _.flatMap(f.vertices, v => v2fMap[f.index][v.index] ?? v.index),
+        )
         .addFaces(
           _.flatMap(edges, e => {
             const [vi1, vi2] = v2eMap[e.v1.index][e.v2.index];
