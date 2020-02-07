@@ -196,24 +196,22 @@ export function expandEdges(
     }
   });
 
-  return polyhedron.withChanges(
-    solid =>
-      solid
-        .withVertices(newVertices)
-        .mapFaces(f =>
-          _.flatMap(f.vertices, v => v2fMap[f.index][v.index] ?? v.index),
-        )
-        .addFaces(
-          _.flatMap(edges, e => {
-            const { v1, v2 } = e;
-            return getEdgeFaces(
-              [...v2eMap[v1.index][v2.index], ...v2eMap[v2.index][v1.index]],
-              twist,
-            );
-          }),
-        )
-        .addFaces(newFaces),
-    // TODO handle adding faces
+  return polyhedron.withChanges(solid =>
+    solid
+      .withVertices(newVertices)
+      .mapFaces(f =>
+        _.flatMap(f.vertices, v => v2fMap[f.index][v.index] ?? v.index),
+      )
+      .addFaces(
+        _.flatMap(edges, e => {
+          const { v1, v2 } = e;
+          return getEdgeFaces(
+            [...v2eMap[v1.index][v2.index], ...v2eMap[v2.index][v1.index]],
+            twist,
+          );
+        }),
+      )
+      .addFaces(newFaces),
   );
 }
 
