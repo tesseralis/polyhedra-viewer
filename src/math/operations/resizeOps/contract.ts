@@ -42,7 +42,7 @@ function getContractLength(polyhedron: Polyhedron, faceType: number) {
 // TODO calculate this without a reference
 function getContractLengthSemi(
   polyhedron: Polyhedron,
-  faceType: any,
+  faceType: number,
   result: string,
 ) {
   const reference = Polyhedron.get(result);

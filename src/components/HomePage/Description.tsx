@@ -7,7 +7,11 @@ import { flexRow, flexColumn, link } from 'styles/common';
 import { SrOnly } from 'components/common';
 import Markdown from './Markdown';
 
-function Toggle({ onClick, title }: any) {
+interface ToggleProps {
+  onClick(): void;
+  title: string;
+}
+function Toggle({ onClick, title }: ToggleProps) {
   const css = useStyle({
     ...link,
     ...flexRow('center', 'center'),

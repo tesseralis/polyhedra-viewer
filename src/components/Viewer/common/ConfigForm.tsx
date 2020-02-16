@@ -10,7 +10,7 @@ import {
 import { hover, flexRow, flexColumn } from 'styles/common';
 import { andaleMono } from 'styles/fonts';
 
-function getInputValue<T>(input: InputType<T>, el: any) {
+function getInputValue<T>(input: InputType<T>, el: HTMLInputElement) {
   switch (input.type) {
     case 'checkbox':
       return el.checked;

@@ -48,7 +48,10 @@ function Header({ solid }: Pick<Props, 'solid'>) {
   );
 }
 
-function Content({ panel, header }: Pick<Props, 'panel'> & { header: any }) {
+function Content({
+  panel,
+  header,
+}: Pick<Props, 'panel'> & { header: JSX.Element }) {
   const transparent = _.includes(['operations', 'full'], panel);
   const css = useStyle(
     {
