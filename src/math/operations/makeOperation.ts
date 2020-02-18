@@ -21,9 +21,9 @@ export interface OperationResult {
   animationData?: AnimationData;
 }
 
-export type Options = { [key: string]: any };
+// export type Options = { [key: string]: any };
 
-interface BaseOperation {
+interface BaseOperation<Options extends {}> {
   optionTypes: string[];
 
   hitOption?: string;
@@ -49,13 +49,13 @@ interface BaseOperation {
    * Return the default selected apply options when an operation is
    * selected on a polyhedron.
    */
-  defaultOptions(polyhedron: Polyhedron): Options;
+  defaultOptions(polyhedron: Polyhedron): Partial<Options>;
 }
 
-export interface Operation extends BaseOperation {
+export interface Operation<Options extends {}> extends BaseOperation<Options> {
   name: string;
 
-  apply(polyhedron: Polyhedron, options: Options): OperationResult;
+  apply(polyhedron: Polyhedron, options: Partial<Options>): OperationResult;
 
   canApplyTo(polyhedron: Polyhedron): boolean;
 
@@ -79,16 +79,17 @@ interface PartialOpResult {
   };
 }
 
-interface OperationArgs extends Partial<BaseOperation> {
+interface OperationArgs<Options extends {}>
+  extends Partial<BaseOperation<Options>> {
   apply(
     polyhedron: Polyhedron,
-    options: Options,
+    options: Partial<Options>,
     resultName: string,
   ): PartialOpResult | Polyhedron;
 
   resultsFilter?(
     polyhedron: Polyhedron,
-    options: Options,
+    options: Partial<Options>,
     results: Relation[],
   ): object | undefined;
 
@@ -96,10 +97,10 @@ interface OperationArgs extends Partial<BaseOperation> {
     polyhedron: Polyhedron,
     hitPnt: Vec3D,
     options: Options,
-  ): Options;
+  ): Partial<Options>;
 }
 
-type OperationArg = keyof OperationArgs;
+type OperationArg = keyof OperationArgs<any>;
 const methodDefaults = {
   getHitOption: {},
   allOptionCombos: [null],
@@ -113,7 +114,7 @@ export function getOpResults(solid: Polyhedron, opName: string) {
 }
 
 // TODO get this to return the correct type
-function fillDefaults(op: OperationArgs) {
+function fillDefaults<Options extends {}>(op: OperationArgs<Options>) {
   return {
     ..._.mapValues(
       methodDefaults,
@@ -188,10 +189,10 @@ export function deduplicateVertices(polyhedron: Polyhedron) {
   return removeExtraneousVertices(polyhedron.withFaces(newFaces));
 }
 
-export default function makeOperation(
+export default function makeOperation<Options extends {}>(
   name: string,
-  op: OperationArgs,
-): Operation {
+  op: OperationArgs<Options>,
+): Operation<Options> {
   const withDefaults = fillDefaults(op);
   return {
     ...(withDefaults as any),

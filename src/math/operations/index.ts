@@ -5,13 +5,11 @@ import { augment, diminish, gyrate } from './cutPasteOps';
 
 import {
   Operation as _Operation,
-  Options as _Options,
   OperationResult as _OperationResult,
   AnimationData as _AnimationData,
 } from './makeOperation';
 
-export type Operation = _Operation;
-export type Options = _Options;
+export type Operation<Opts> = _Operation<Opts>;
 export type OperationResult = _OperationResult;
 export type AnimationData = _AnimationData;
 

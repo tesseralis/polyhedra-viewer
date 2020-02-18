@@ -313,12 +313,19 @@ const hasGyrateOpts = (polyhedron: Polyhedron) => {
   return false;
 };
 
-export const augment = makeOperation('augment', {
+type GyrateOpts = 'ortho' | 'gyro';
+
+interface Options {
+  face: Face;
+  gyrate?: GyrateOpts;
+  using?: string;
+}
+export const augment = makeOperation<Options>('augment', {
   apply(polyhedron, { face, gyrate, using }) {
     const augmentType = using
       ? augmentTypes[using[0]]
-      : defaultAugmentType(face.numSides);
-    return doAugment(polyhedron, face, augmentType, gyrate);
+      : defaultAugmentType(face!.numSides);
+    return doAugment(polyhedron, face!, augmentType, gyrate);
   },
   optionTypes: ['face', 'gyrate', 'using'],
 
@@ -329,7 +336,7 @@ export const augment = makeOperation('augment', {
       throw new Error('Invalid face');
     }
     const n = face.numSides;
-    const using = getUsingOpt(config.using, n);
+    const using = getUsingOpt(config.using!, n);
 
     const baseConfig = {
       using,
@@ -345,13 +352,13 @@ export const augment = makeOperation('augment', {
 
   allOptionCombos(polyhedron) {
     const gyrateOpts = hasGyrateOpts(polyhedron)
-      ? ['ortho', 'gyro']
+      ? (['ortho', 'gyro'] as GyrateOpts[])
       : [undefined];
 
-    const usingOpts = getUsingOpts(polyhedron) ?? [null];
+    const usingOpts = getUsingOpts(polyhedron) ?? [undefined];
     const faceOpts = _.map(polyhedron.faces.filter(face => canAugment(face)));
 
-    const options = [];
+    const options: Options[] = [];
 
     for (let face of faceOpts) {
       for (let gyrate of gyrateOpts) {

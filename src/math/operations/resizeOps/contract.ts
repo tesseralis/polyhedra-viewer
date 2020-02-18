@@ -9,7 +9,7 @@ import {
 import makeOperation from '../makeOperation';
 
 interface ContractOptions {
-  faceType: number;
+  faceType?: number;
 }
 
 // Return the symmetry group of an *expanded* polyhedron
@@ -83,7 +83,7 @@ function isBevelled(polyhedron: Polyhedron) {
 }
 
 // NOTE: We are using the same operation for contracting both expanded and snub solids.
-export const contract = makeOperation('contract', {
+export const contract = makeOperation<ContractOptions>('contract', {
   apply: applyContract,
   optionTypes: ['facetype'],
 
