@@ -12,7 +12,7 @@ import TransitionCtx from './TransitionCtx';
 type ResultCallback = (polyhedron: Polyhedron) => void;
 
 // FIXME
-type Options = Record<string, any>;
+type Options = any;
 export default function useApplyOperation() {
   const history = useHistory();
   const { setOperation, unsetOperation } = OperationCtx.useActions();

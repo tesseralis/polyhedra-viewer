@@ -100,7 +100,7 @@ export const expand = makeOperation('expand', {
 });
 
 interface SnubOpts {
-  twist: 'left' | 'right';
+  twist: Twist;
 }
 export const snub = makeOperation<SnubOpts>('snub', {
   apply(polyhedron, { twist = 'left' }, result) {

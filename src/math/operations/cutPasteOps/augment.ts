@@ -324,8 +324,8 @@ export const augment = makeOperation<Options>('augment', {
   apply(polyhedron, { face, gyrate, using }) {
     const augmentType = using
       ? augmentTypes[using[0]]
-      : defaultAugmentType(face!.numSides);
-    return doAugment(polyhedron, face!, augmentType, gyrate);
+      : defaultAugmentType(face.numSides);
+    return doAugment(polyhedron, face, augmentType, gyrate);
   },
   optionTypes: ['face', 'gyrate', 'using'],
 

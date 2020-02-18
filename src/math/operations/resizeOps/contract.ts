@@ -8,7 +8,7 @@ import {
 } from './resizeUtils';
 import makeOperation from '../makeOperation';
 
-interface ContractOptions {
+interface Options {
   faceType?: number;
 }
 
@@ -55,7 +55,7 @@ function getContractLengthSemi(
 
 export function applyContract(
   polyhedron: Polyhedron,
-  { faceType = isBevelled(polyhedron) ? 6 : 3 }: ContractOptions,
+  { faceType = isBevelled(polyhedron) ? 6 : 3 }: Options,
   result: string,
 ) {
   const resultLength = isBevelled(polyhedron)
@@ -83,7 +83,7 @@ function isBevelled(polyhedron: Polyhedron) {
 }
 
 // NOTE: We are using the same operation for contracting both expanded and snub solids.
-export const contract = makeOperation<ContractOptions>('contract', {
+export const contract = makeOperation<Options>('contract', {
   apply: applyContract,
   optionTypes: ['facetype'],
 

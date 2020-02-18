@@ -43,8 +43,8 @@ export const elongate = makeOperation('elongate', {
 interface Options {
   twist?: Twist;
 }
-export const gyroelongate = makeOperation('gyroelongate', {
-  apply(polyhedron: Polyhedron, { twist = 'left' }: Options) {
+export const gyroelongate = makeOperation<Options>('gyroelongate', {
+  apply(polyhedron: Polyhedron, { twist = 'left' }) {
     return doElongate(polyhedron, twist);
   },
   optionTypes: ['twist'],

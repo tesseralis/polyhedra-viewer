@@ -26,7 +26,7 @@ export interface OperationResult {
 interface BaseOperation<Options extends {}> {
   optionTypes: string[];
 
-  hitOption?: string;
+  hitOption?: keyof Options;
 
   /**
    * Test utility.
@@ -55,7 +55,7 @@ interface BaseOperation<Options extends {}> {
 export interface Operation<Options extends {}> extends BaseOperation<Options> {
   name: string;
 
-  apply(polyhedron: Polyhedron, options: Partial<Options>): OperationResult;
+  apply(polyhedron: Polyhedron, options: Options): OperationResult;
 
   canApplyTo(polyhedron: Polyhedron): boolean;
 
@@ -83,7 +83,7 @@ interface OperationArgs<Options extends {}>
   extends Partial<BaseOperation<Options>> {
   apply(
     polyhedron: Polyhedron,
-    options: Partial<Options>,
+    options: Options,
     resultName: string,
   ): PartialOpResult | Polyhedron;
 
@@ -197,18 +197,18 @@ export default function makeOperation<Options extends {}>(
   return {
     ...(withDefaults as any),
     name,
-    apply(polyhedron, options = {}) {
+    apply(polyhedron, options) {
       // get the next polyhedron name
       const results = getOpResults(polyhedron, name);
       const searchOptions = withDefaults.resultsFilter!(
         polyhedron,
-        options,
+        options ?? {},
         results,
       );
       const next = getNextPolyhedron(polyhedron, name, _.pickBy(searchOptions));
 
       // Get the actual operation result
-      const opResult = withDefaults.apply(polyhedron, options, next);
+      const opResult = withDefaults.apply(polyhedron, options ?? {}, next);
       return normalizeOpResult(opResult, next);
     },
     getHitOption(polyhedron, hitPnt, options) {
