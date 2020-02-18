@@ -11,7 +11,7 @@ import TransitionCtx from './TransitionCtx';
 
 type ResultCallback = (polyhedron: Polyhedron) => void;
 
-// FIXME
+// TODO figure out stricter typing here
 type Options = any;
 export default function useApplyOperation() {
   const history = useHistory();

@@ -7,14 +7,14 @@ const defaultState = {
 };
 
 type Options = Record<string, any>;
-interface State<Options extends {}> {
+interface State {
   operation?: Operation<Options>;
   options?: Options;
 }
 
 type Actions = 'setOperation' | 'unsetOperation' | 'setOption';
 
-export default createHookedContext<State<Options>, Actions>(
+export default createHookedContext<State, Actions>(
   {
     setOperation: (operation, solid) => () => {
       return { operation, options: operation.defaultOptions(solid) };
