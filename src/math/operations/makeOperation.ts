@@ -24,7 +24,7 @@ export interface OperationResult {
 // export type Options = { [key: string]: any };
 
 interface BaseOperation<Options extends {}> {
-  optionTypes: string[];
+  optionTypes: (keyof Options)[];
 
   hitOption?: keyof Options;
 

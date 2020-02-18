@@ -314,6 +314,7 @@ const hasGyrateOpts = (polyhedron: Polyhedron) => {
 };
 
 type GyrateOpts = 'ortho' | 'gyro';
+const allGyrateOpts: GyrateOpts[] = ['ortho', 'gyro'];
 
 interface Options {
   face: Face;
@@ -351,9 +352,7 @@ export const augment = makeOperation<Options>('augment', {
   },
 
   allOptionCombos(polyhedron) {
-    const gyrateOpts = hasGyrateOpts(polyhedron)
-      ? (['ortho', 'gyro'] as GyrateOpts[])
-      : [undefined];
+    const gyrateOpts = hasGyrateOpts(polyhedron) ? allGyrateOpts : [undefined];
 
     const usingOpts = getUsingOpts(polyhedron) ?? [undefined];
     const faceOpts = _.map(polyhedron.faces.filter(face => canAugment(face)));

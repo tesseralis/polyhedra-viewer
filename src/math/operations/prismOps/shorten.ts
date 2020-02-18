@@ -31,10 +31,10 @@ function doShorten(polyhedron: Polyhedron, options: Options) {
 interface Options {
   twist?: Twist;
 }
-export const shorten = makeOperation('shorten', {
+export const shorten = makeOperation<Options>('shorten', {
   apply: doShorten,
   optionTypes: ['twist'],
-  resultsFilter(polyhedron: Polyhedron, options: Options) {
+  resultsFilter(polyhedron, options) {
     if (!isGyroelongatedBiCupola(polyhedron)) return;
     const { twist } = options;
     const chirality = getChirality(polyhedron);
@@ -42,7 +42,7 @@ export const shorten = makeOperation('shorten', {
     return { gyrate };
   },
 
-  allOptionCombos(polyhedron: Polyhedron) {
+  allOptionCombos(polyhedron) {
     if (isGyroelongatedBiCupola(polyhedron)) {
       return [{ twist: 'left' }, { twist: 'right' }];
     }
