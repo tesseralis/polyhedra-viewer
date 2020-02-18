@@ -8,8 +8,8 @@ import {
 } from './resizeUtils';
 import makeOperation from '../makeOperation';
 
-interface ContractOptions {
-  faceType: number;
+interface Options {
+  faceType?: number;
 }
 
 // Return the symmetry group of an *expanded* polyhedron
@@ -55,7 +55,7 @@ function getContractLengthSemi(
 
 export function applyContract(
   polyhedron: Polyhedron,
-  { faceType = isBevelled(polyhedron) ? 6 : 3 }: ContractOptions,
+  { faceType = isBevelled(polyhedron) ? 6 : 3 }: Options,
   result: string,
 ) {
   const resultLength = isBevelled(polyhedron)
@@ -83,9 +83,9 @@ function isBevelled(polyhedron: Polyhedron) {
 }
 
 // NOTE: We are using the same operation for contracting both expanded and snub solids.
-export const contract = makeOperation('contract', {
+export const contract = makeOperation<Options>('contract', {
   apply: applyContract,
-  optionTypes: ['facetype'],
+  optionTypes: ['faceType'],
 
   resultsFilter(polyhedron, config) {
     const { faceType } = config;

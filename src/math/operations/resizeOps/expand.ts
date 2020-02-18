@@ -99,7 +99,10 @@ export const expand = makeOperation('expand', {
   },
 });
 
-export const snub = makeOperation('snub', {
+interface SnubOpts {
+  twist: Twist;
+}
+export const snub = makeOperation<SnubOpts>('snub', {
   apply(polyhedron, { twist = 'left' }, result) {
     return doExpansion(polyhedron, result, twist);
   },

@@ -26,8 +26,14 @@ function bisectPrismFaces(
     );
 
     return twist === 'left'
-      ? [[v1, v2, v4], [v2, v3, v4]]
-      : [[v1, v2, v3], [v1, v3, v4]];
+      ? [
+          [v1, v2, v4],
+          [v2, v3, v4],
+        ]
+      : [
+          [v1, v2, v3],
+          [v1, v3, v4],
+        ];
   });
 
   return polyhedron.withChanges(solid =>
@@ -103,7 +109,7 @@ function doTurn(polyhedron: Polyhedron, { twist = 'left' }: Options) {
   };
 }
 
-export const turn = makeOperation('turn', {
+export const turn = makeOperation<Options>('turn', {
   apply: doTurn,
   optionTypes: ['twist'],
   resultsFilter(polyhedron, options) {

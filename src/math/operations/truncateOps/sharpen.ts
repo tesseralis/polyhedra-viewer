@@ -106,7 +106,10 @@ function applySharpen(
   };
 }
 
-export const sharpen = makeOperation('sharpen', {
+interface Options {
+  faceType?: number;
+}
+export const sharpen = makeOperation<Options>('sharpen', {
   apply: applySharpen,
   optionTypes: ['faceType'],
 

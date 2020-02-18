@@ -55,7 +55,10 @@ function removeCap(polyhedron: Polyhedron, cap: Cap) {
   };
 }
 
-export const diminish = makeOperation('diminish', {
+interface Options {
+  cap: Cap;
+}
+export const diminish = makeOperation<Options>('diminish', {
   apply(polyhedron, { cap }) {
     return removeCap(polyhedron, cap);
   },

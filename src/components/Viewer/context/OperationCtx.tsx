@@ -1,4 +1,4 @@
-import { Operation, Options } from 'math/operations';
+import { Operation } from 'math/operations';
 import { createHookedContext } from 'components/common';
 
 const defaultState = {
@@ -6,8 +6,9 @@ const defaultState = {
   options: undefined,
 };
 
+type Options = Record<string, any>;
 interface State {
-  operation?: Operation;
+  operation?: Operation<Options>;
   options?: Options;
 }
 

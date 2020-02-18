@@ -124,7 +124,10 @@ function doTwist(
   };
 }
 
-export const twist = makeOperation('twist', {
+interface Options {
+  twist?: Twist;
+}
+export const twist = makeOperation<Options>('twist', {
   apply(polyhedron, { twist: twistOpt }, result) {
     return doTwist(polyhedron, result, twistOpt);
   },

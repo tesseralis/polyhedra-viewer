@@ -2,7 +2,7 @@ import _ from 'lodash';
 
 import { useCallback } from 'react';
 import { useHistory } from 'react-router-dom';
-import { Operation, Options } from 'math/operations';
+import { Operation } from 'math/operations';
 import { Polyhedron } from 'math/polyhedra';
 import { escapeName } from 'math/polyhedra/names';
 import PolyhedronCtx from './PolyhedronCtx';
@@ -11,6 +11,8 @@ import TransitionCtx from './TransitionCtx';
 
 type ResultCallback = (polyhedron: Polyhedron) => void;
 
+// TODO figure out stricter typing here
+type Options = any;
 export default function useApplyOperation() {
   const history = useHistory();
   const { setOperation, unsetOperation } = OperationCtx.useActions();
@@ -19,7 +21,7 @@ export default function useApplyOperation() {
 
   const applyOperation = useCallback(
     (
-      operation: Operation,
+      operation: Operation<Options>,
       options: Options = {},
       callback?: ResultCallback,
     ) => {
