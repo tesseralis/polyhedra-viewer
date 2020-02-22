@@ -178,29 +178,27 @@ const getAugmentations = (using: string) => (
     .value();
 };
 
-const divName = (name: string) => {
-  const m = polygonPrefixes.of(name);
-  if (m <= 5) return name;
-  return polygonPrefixes.get(m / 2);
-};
-
-const getPyramidFromPrism = (prismRow: string) => {
+const getCapstoneFromPrism = (prismRow: string) => {
   const isPyramid = _.includes(
     ['triangular', 'square', 'pentagonal'],
     prismRow,
   );
-  return `${divName(prismRow)} ${isPyramid ? 'pyramid' : 'cupola'}`;
+  if (isPyramid) {
+    return `${prismRow} pyramid`;
+  }
+  const m = polygonPrefixes.of(prismRow as any);
+  return `${polygonPrefixes.get((m / 2) as any)} cupola`;
 };
 
-const pyramidCupolaConway: Record<string, string> = {
+const capstoneConway: Record<string, string> = {
   pyramid: 'Y',
   cupola: 'U',
   rotunda: 'R', // not official, I don't think
 };
 
-const getPyramidCupolaConway = (name: string) => {
+const getCapstoneConway = (name: string) => {
   const [sides, type] = name.split(' ');
-  return `${pyramidCupolaConway[type]}${polygonPrefixes.of(sides)}`;
+  return `${capstoneConway[type]}${polygonPrefixes.of(sides as any)}`;
 };
 
 const elongations = (
@@ -276,10 +274,10 @@ const baseCapstones = (() => {
   _.forEach(prismMap, (row, name) => {
     const { prism, antiprism } = row;
     const hasRotunda = name.startsWith('decagonal');
-    const pyramidRow = getPyramidFromPrism(name);
-    const { elongated, gyroelongated } = capstoneMap[pyramidRow];
+    const capstoneRow = getCapstoneFromPrism(name);
+    const { elongated, gyroelongated } = capstoneMap[capstoneRow];
     const rotundaRow = capstoneMap['pentagonal rotunda'];
-    const using = getPyramidCupolaConway(pyramidRow);
+    const using = getCapstoneConway(capstoneRow);
     graph = graphMerge(graph, {
       [prism]: {
         augment: [
@@ -308,7 +306,7 @@ const baseCapstones = (() => {
       'elongated bi-': elongatedBi,
       'gyroelongated bi-': gyroelongatedBi,
     } = row;
-    const conway = getPyramidCupolaConway(name);
+    const conway = getCapstoneConway(name);
     const augmentations = getAugmentations(conway);
     graph = graphMerge(graph, {
       [base]: {
@@ -415,7 +413,10 @@ const baseAugmentations = (() => {
 const diminishedIcosahedra = (() => {
   return {
     J63: {
-      augment: [{ using: 'Y3', value: 'J64' }, { using: 'Y5', value: 'J62' }],
+      augment: [
+        { using: 'Y3', value: 'J64' },
+        { using: 'Y5', value: 'J62' },
+      ],
     },
     J62: {
       augment: { using: 'Y5', align: 'meta', value: 'J11' },
