@@ -178,18 +178,16 @@ const getAugmentations = (using: string) => (
     .value();
 };
 
-const divName = (name: string) => {
-  const m = polygonPrefixes.of(name as any);
-  if (m <= 5) return name;
-  return polygonPrefixes.get((m / 2) as any);
-};
-
 const getCapstoneFromPrism = (prismRow: string) => {
   const isPyramid = _.includes(
     ['triangular', 'square', 'pentagonal'],
     prismRow,
   );
-  return `${divName(prismRow)} ${isPyramid ? 'pyramid' : 'cupola'}`;
+  if (isPyramid) {
+    return `${prismRow} pyramid`;
+  }
+  const m = polygonPrefixes.of(prismRow as any);
+  return `${polygonPrefixes.get((m / 2) as any)} cupola`;
 };
 
 const capstoneConway: Record<string, string> = {
