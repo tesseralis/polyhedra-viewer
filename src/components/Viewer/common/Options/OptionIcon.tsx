@@ -1,22 +1,22 @@
-import _ from 'lodash';
+import _ from 'lodash'
 
-import React, { memo } from 'react';
+import React, { memo } from 'react'
 
-import { useStyle, scales } from 'styles';
+import { useStyle, scales } from 'styles'
 import {
   Point2D,
   Polygon,
   PolyLine,
   PolyShape,
   polygonPoints,
-} from 'components/svg';
-import { square } from 'styles/common';
+} from 'components/svg'
+import { square } from 'styles/common'
 
 interface Props {
-  name: string;
+  name: string
 }
 
-const color = 'DimGray';
+const color = 'DimGray'
 
 function InnerIcon({ name }: Props) {
   const inner = useStyle({
@@ -24,13 +24,13 @@ function InnerIcon({ name }: Props) {
     fill: 'none',
     strokeWidth: 5,
     strokeLinejoin: 'round',
-  });
+  })
   const outer = useStyle({
     stroke: color,
     fill: 'none',
     strokeWidth: 8,
     strokeLinejoin: 'round',
-  });
+  })
 
   switch (name) {
     case 'ortho':
@@ -39,45 +39,70 @@ function InnerIcon({ name }: Props) {
           <Polygon {...outer()} n={5} cx={100} cy={100} a={90} r={100} />
           <Polygon {...inner()} n={5} cx={100} cy={100} a={90} r={66} />
         </>
-      );
+      )
     case 'gyro':
       return (
         <>
           <Polygon {...outer()} n={5} cx={100} cy={100} a={90} r={100} />
           <Polygon {...inner()} n={5} cx={100} cy={100} a={-90} r={66} />
         </>
-      );
+      )
     case 'pyramid':
-      return (
-        <>
-          <PolyShape {...outer()} points={[[100, 50], [10, 170], [190, 170]]} />
-          <PolyLine {...inner()} points={[[140, 170], [100, 50], [60, 170]]} />
-        </>
-      );
-    case 'fastigium': {
-      const center = 100;
-      const height = 50;
-      const topY = center - height;
-      const bottomY = center + height;
       return (
         <>
           <PolyShape
             {...outer()}
-            points={[[150, topY], [50, topY], [10, bottomY], [190, bottomY]]}
+            points={[
+              [100, 50],
+              [10, 170],
+              [190, 170],
+            ]}
           />
-          <PolyLine {...inner()} points={[[150, topY], [120, bottomY]]} />
+          <PolyLine
+            {...inner()}
+            points={[
+              [140, 170],
+              [100, 50],
+              [60, 170],
+            ]}
+          />
         </>
-      );
+      )
+    case 'fastigium': {
+      const center = 100
+      const height = 50
+      const topY = center - height
+      const bottomY = center + height
+      return (
+        <>
+          <PolyShape
+            {...outer()}
+            points={[
+              [150, topY],
+              [50, topY],
+              [10, bottomY],
+              [190, bottomY],
+            ]}
+          />
+          <PolyLine
+            {...inner()}
+            points={[
+              [150, topY],
+              [120, bottomY],
+            ]}
+          />
+        </>
+      )
     }
     case 'cupola': {
-      const center = 100;
-      const height = 50;
-      const topY = center - height;
-      const bottomY = center + height;
-      const topWidth = 50;
-      const bottomWidth = 90;
-      const topLeftX = center - topWidth;
-      const topRightX = center + topWidth;
+      const center = 100
+      const height = 50
+      const topY = center - height
+      const bottomY = center + height
+      const topWidth = 50
+      const bottomWidth = 90
+      const topLeftX = center - topWidth
+      const topRightX = center + topWidth
       return (
         <>
           <PolyShape
@@ -99,17 +124,17 @@ function InnerIcon({ name }: Props) {
             ]}
           />
         </>
-      );
+      )
     }
     case 'rotunda': {
       const points = _.take(
         polygonPoints({ n: 12, cx: 100, cy: 150, r: -90 }),
         7,
-      );
-      const [p1, p2, p3, p4, p5, p6] = points;
-      const bottomY = p1[1];
-      const q1: Point2D = [p3[0], p2[1]];
-      const q2: Point2D = [p5[0], p6[1]];
+      )
+      const [p1, p2, p3, p4, p5, p6] = points
+      const bottomY = p1[1]
+      const q1: Point2D = [p3[0], p2[1]]
+      const q2: Point2D = [p5[0], p6[1]]
       return (
         <>
           <PolyShape {...outer()} points={points} />
@@ -122,17 +147,17 @@ function InnerIcon({ name }: Props) {
             points={[p3, q1, [40, bottomY], [160, bottomY], q2, p5]}
           />
         </>
-      );
+      )
     }
     default:
-      throw new Error('unknown icon type');
+      throw new Error('unknown icon type')
   }
 }
 export default memo(function OptionIcon({ name }: Props) {
-  const css = useStyle(square(scales.size[2]));
+  const css = useStyle(square(scales.size[2]))
   return (
     <svg viewBox="0 0 200 200" {...css()}>
       <InnerIcon name={name} />
     </svg>
-  );
-});
+  )
+})

@@ -1,29 +1,29 @@
-import React, { ButtonHTMLAttributes } from 'react';
-import { useStyle, scales } from 'styles';
+import React, { ButtonHTMLAttributes } from 'react'
+import { useStyle, scales } from 'styles'
 
-import { PolyhedronCtx, OperationCtx } from 'components/Viewer/context';
-import OptionIcon from './OptionIcon';
-import { verdana } from 'styles/fonts';
-import { hover, square, flexRow, flexColumn } from 'styles/common';
+import { PolyhedronCtx, OperationCtx } from 'components/Viewer/context'
+import OptionIcon from './OptionIcon'
+import { verdana } from 'styles/fonts'
+import { hover, square, flexRow, flexColumn } from 'styles/common'
 
 const getOptionName = (optValue: string) => {
   switch (optValue) {
     case 'U2':
-      return 'fastigium';
+      return 'fastigium'
     case 'Y4':
-      return 'pyramid';
+      return 'pyramid'
     case 'U5':
-      return 'cupola';
+      return 'cupola'
     case 'R5':
-      return 'rotunda';
+      return 'rotunda'
     default:
-      return optValue;
+      return optValue
   }
-};
+}
 
 interface BtnProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  optValue: string;
-  selected: boolean;
+  optValue: string
+  selected: boolean
 }
 
 function OptionButton({ optValue, selected, ...htmlProps }: BtnProps) {
@@ -36,28 +36,28 @@ function OptionButton({ optValue, selected, ...htmlProps }: BtnProps) {
       fontFamily: verdana,
     },
     [selected],
-  );
+  )
   return (
     <button {...htmlProps} {...css()}>
       <OptionIcon name={getOptionName(optValue)} />
       {getOptionName(optValue)}
     </button>
-  );
+  )
 }
 
 interface OptionType<T = any> {
-  name: string;
-  description: string;
-  values: T[];
-  value: T;
+  name: string
+  description: string
+  values: T[]
+  value: T
 }
 
 export default function AugmentOptions() {
-  const polyhedron = PolyhedronCtx.useState();
-  const { operation, options } = OperationCtx.useState();
-  const { setOption } = OperationCtx.useActions();
+  const polyhedron = PolyhedronCtx.useState()
+  const { operation, options } = OperationCtx.useState()
+  const { setOption } = OperationCtx.useActions()
 
-  const { gyrate, using } = options!;
+  const { gyrate, using } = options!
   const optionArgs: OptionType[] = [
     {
       name: 'gyrate',
@@ -72,18 +72,18 @@ export default function AugmentOptions() {
       value: using,
       description: 'Some solids have more than one option to augment a face.',
     },
-  ];
+  ]
 
   const css = useStyle({
     ...flexRow('center', 'space-between'),
     width: '100%',
     height: '100%',
-  });
+  })
 
   const optionCss = useStyle({
     ...flexColumn(),
     pointerEvents: 'initial',
-  });
+  })
 
   return (
     <div {...css()}>
@@ -101,5 +101,5 @@ export default function AugmentOptions() {
         </div>
       ))}
     </div>
-  );
+  )
 }

@@ -1,11 +1,11 @@
-import React, { ComponentType } from 'react';
-import InfoPanel from './InfoPanel';
-import ConfigForm from './ConfigForm';
-import ListPanel from './ListPanel';
+import React, { ComponentType } from 'react'
+import InfoPanel from './InfoPanel'
+import ConfigForm from './ConfigForm'
+import ListPanel from './ListPanel'
 
 interface Props {
-  panel: string;
-  operationsPanel: ComponentType;
+  panel: string
+  operationsPanel: ComponentType
 }
 export default function Panels({
   panel,
@@ -13,16 +13,16 @@ export default function Panels({
 }: Props) {
   switch (panel) {
     case 'info':
-      return <InfoPanel />;
+      return <InfoPanel />
     case 'operations':
-      return <OperationsPanel />;
+      return <OperationsPanel />
     case 'options':
-      return <ConfigForm />;
+      return <ConfigForm />
     case 'list':
-      return <ListPanel />;
+      return <ListPanel />
     case 'full':
-      return null;
+      return null
     default:
-      throw new Error('unknown tab');
+      throw new Error('unknown tab')
   }
 }

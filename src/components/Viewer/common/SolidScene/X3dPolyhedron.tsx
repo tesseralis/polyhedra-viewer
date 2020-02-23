@@ -1,17 +1,17 @@
-import React, { useEffect, useRef, MouseEvent } from 'react';
-import _ from 'lodash';
+import React, { useEffect, useRef, MouseEvent } from 'react'
+import _ from 'lodash'
 
-import { Point } from 'types';
-import { SolidData } from 'math/polyhedra';
+import { Point } from 'types'
+import { SolidData } from 'math/polyhedra'
 
 // Join a list of lists with an inner and outer separator.
 function joinListOfLists<T>(list: T[][], outerSep: string, innerSep: string) {
-  return _.map(list, elem => elem.join(innerSep)).join(outerSep);
+  return _.map(list, elem => elem.join(innerSep)).join(outerSep)
 }
 
 const Coordinates = ({ points }: { points: Point[] }) => {
-  return <coordinate is="x3d" point={joinListOfLists(points, ', ', ' ')} />;
-};
+  return <coordinate is="x3d" point={joinListOfLists(points, ', ', ' ')} />
+}
 
 /* Edges */
 
@@ -25,27 +25,27 @@ const Edges = ({
         <Coordinates points={vertices} />
       </indexedlineset>
     </shape>
-  );
-};
+  )
+}
 
 interface X3dEvent extends MouseEvent {
-  hitPnt: Point;
+  hitPnt: Point
 }
 
 interface SolidConfig {
-  showFaces: boolean;
-  showEdges: boolean;
-  showInnerFaces: boolean;
-  opacity: number;
+  showFaces: boolean
+  showEdges: boolean
+  showInnerFaces: boolean
+  opacity: number
 }
 
 interface Props {
-  value: SolidData;
-  colors: number[][];
-  config?: SolidConfig;
-  onHover?: (p: Point) => void;
-  onMouseOut?: () => void;
-  onClick?: (p: Point) => void;
+  value: SolidData
+  colors: number[][]
+  config?: SolidConfig
+  onHover?: (p: Point) => void
+  onMouseOut?: () => void
+  onClick?: (p: Point) => void
 }
 
 const defaultConfig = {
@@ -53,7 +53,7 @@ const defaultConfig = {
   showEdges: true,
   showInnerFaces: true,
   opacity: 0.7,
-};
+}
 
 export default function X3dPolyhedron({
   value,
@@ -63,50 +63,50 @@ export default function X3dPolyhedron({
   onMouseOut = _.noop,
   onClick = _.noop,
 }: Props) {
-  const shape = useRef<any>(null);
-  const hitPnt = useRef<Point | null>(null);
+  const shape = useRef<any>(null)
+  const hitPnt = useRef<Point | null>(null)
 
-  const { vertices, faces, edges } = value;
-  const { showFaces, showEdges, showInnerFaces, opacity } = config;
+  const { vertices, faces, edges } = value
+  const { showFaces, showEdges, showInnerFaces, opacity } = config
 
   const listeners = {
     mousedown(e: X3dEvent) {
-      hitPnt.current = e.hitPnt;
+      hitPnt.current = e.hitPnt
     },
     mouseup(e: X3dEvent) {
-      if (!_.isEqual(hitPnt.current, e.hitPnt)) return;
-      onClick(e.hitPnt);
+      if (!_.isEqual(hitPnt.current, e.hitPnt)) return
+      onClick(e.hitPnt)
     },
     mousemove(e: X3dEvent) {
-      hitPnt.current = e.hitPnt;
-      onHover(e.hitPnt);
+      hitPnt.current = e.hitPnt
+      onHover(e.hitPnt)
     },
     mouseout() {
-      onMouseOut();
+      onMouseOut()
     },
-  };
+  }
 
   useEffect(() => {
     _.forEach(listeners, (fn, type) => {
       if (shape.current !== null) {
-        shape.current.addEventListener(type, fn);
+        shape.current.addEventListener(type, fn)
       }
-    });
+    })
 
     return () => {
       _.forEach(listeners, (fn, type) => {
         // The X3DOM node isn't managed by React so this rule doesn't apply
         // If we store this in a var this causes a type error
         // eslint-disable-next-line
-        const shapeNode = shape.current;
+        const shapeNode = shape.current
         if (shapeNode !== null) {
-          shapeNode.removeEventListener(type, fn);
+          shapeNode.removeEventListener(type, fn)
         }
-      });
-    };
-  }, [listeners]);
+      })
+    }
+  }, [listeners])
 
-  const colorStr = joinListOfLists(colors, ',', ' ');
+  const colorStr = joinListOfLists(colors, ',', ' ')
   return (
     <>
       {showFaces && (
@@ -136,5 +136,5 @@ export default function X3dPolyhedron({
       )}
       {showEdges && <Edges edges={edges} vertices={vertices} />}
     </>
-  );
+  )
 }

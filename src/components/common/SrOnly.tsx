@@ -1,6 +1,6 @@
-import React from 'react';
-import { useStyle } from 'styles';
-import { ChildrenProp } from 'types';
+import React from 'react'
+import { useStyle } from 'styles'
+import { ChildrenProp } from 'types'
 
 export default function SrOnly({ children }: ChildrenProp) {
   const css = useStyle({
@@ -9,6 +9,6 @@ export default function SrOnly({ children }: ChildrenProp) {
     position: 'absolute',
     overflow: 'hidden',
     clip: 'rect(1px, 1px, 1px, 1px)',
-  });
-  return <span {...css()}>{children}</span>;
+  })
+  return <span {...css()}>{children}</span>
 }

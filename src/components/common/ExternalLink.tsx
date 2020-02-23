@@ -1,4 +1,4 @@
-import React, { AnchorHTMLAttributes } from 'react';
+import React, { AnchorHTMLAttributes } from 'react'
 
 export default function ExternalLink({
   href,
@@ -9,5 +9,5 @@ export default function ExternalLink({
     <a target="_blank" rel="noopener noreferrer" href={href} {...props}>
       {children}
     </a>
-  );
+  )
 }

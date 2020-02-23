@@ -1,8 +1,8 @@
-import _ from 'lodash';
-import { createHookedContext } from 'components/common';
-import { defaultConfig } from './configOptions';
+import _ from 'lodash'
+import { createHookedContext } from 'components/common'
+import { defaultConfig } from './configOptions'
 
-type Actions = 'setValue' | 'reset';
+type Actions = 'setValue' | 'reset'
 export default createHookedContext<typeof defaultConfig, Actions>(
   {
     setValue: <T>(key: string, value: T) => state =>
@@ -10,4 +10,4 @@ export default createHookedContext<typeof defaultConfig, Actions>(
     reset: () => () => defaultConfig,
   },
   defaultConfig,
-);
+)

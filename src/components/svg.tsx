@@ -1,36 +1,36 @@
-import React from 'react';
-import _ from 'lodash';
+import React from 'react'
+import _ from 'lodash'
 
-const { PI, sin, cos } = Math;
-const TAU = 2 * PI;
+const { PI, sin, cos } = Math
+const TAU = 2 * PI
 
-export type Point2D = [number, number];
+export type Point2D = [number, number]
 
 interface PointsProps {
-  points: Point2D[];
-  [prop: string]: any;
+  points: Point2D[]
+  [prop: string]: any
 }
 
 function joinPoints(points: Point2D[]) {
-  return points.map(point => point.join(',')).join(' ');
+  return points.map(point => point.join(',')).join(' ')
 }
 
 // Irregular polygon
 export function PolyShape({ points, ...rest }: PointsProps) {
-  return <polygon {...rest} points={joinPoints(points)} />;
+  return <polygon {...rest} points={joinPoints(points)} />
 }
 
 export function PolyLine({ points, ...rest }: PointsProps) {
-  return <polyline {...rest} points={joinPoints(points)} />;
+  return <polyline {...rest} points={joinPoints(points)} />
 }
 
 interface PolygonProps {
-  n?: number;
-  r?: number;
-  cx?: number;
-  cy?: number;
-  a?: number;
-  [prop: string]: any;
+  n?: number
+  r?: number
+  cx?: number
+  cy?: number
+  a?: number
+  [prop: string]: any
 }
 
 export function polygonPoints({
@@ -46,7 +46,7 @@ export function polygonPoints({
       cx + r * cos(TAU * (a / 360 + i / n)),
       cy + r * sin(TAU * (a / 360 + i / n)),
     ])
-    .value();
+    .value()
 }
 
 // Regular polygon
@@ -58,6 +58,6 @@ export function Polygon({
   a = 0,
   ...rest
 }: PolygonProps) {
-  const points = polygonPoints({ n, r, cx, cy, a });
-  return <PolyShape {...rest} points={points} />;
+  const points = polygonPoints({ n, r, cx, cy, a })
+  return <PolyShape {...rest} points={points} />
 }

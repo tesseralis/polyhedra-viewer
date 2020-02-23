@@ -1,4 +1,4 @@
-import * as text from './text';
+import * as text from './text'
 
 import {
   archimedean,
@@ -15,15 +15,15 @@ import {
   others,
   othersTwoRows,
   Table,
-} from 'math/polyhedra/tables';
+} from 'math/polyhedra/tables'
 
 export interface TableSection {
-  header: string;
-  description: string;
-  sticky?: boolean;
-  tables?: Table[];
-  narrowTables?: Table[];
-  subsections?: TableSection[];
+  header: string
+  description: string
+  sticky?: boolean
+  tables?: Table[]
+  narrowTables?: Table[]
+  subsections?: TableSection[]
 }
 
 const polyhedronTables: TableSection[] = [
@@ -66,5 +66,5 @@ const polyhedronTables: TableSection[] = [
     sticky: true,
     description: text.more,
   },
-];
-export default polyhedronTables;
+]
+export default polyhedronTables

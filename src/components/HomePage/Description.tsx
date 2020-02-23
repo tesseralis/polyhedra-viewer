@@ -1,15 +1,15 @@
-import React, { useState } from 'react';
-import Icon from '@mdi/react';
-import { mdiMenuDown } from '@mdi/js';
+import React, { useState } from 'react'
+import Icon from '@mdi/react'
+import { mdiMenuDown } from '@mdi/js'
 
-import { useStyle, fonts, scales } from 'styles';
-import { flexRow, flexColumn, link } from 'styles/common';
-import { SrOnly } from 'components/common';
-import Markdown from './Markdown';
+import { useStyle, fonts, scales } from 'styles'
+import { flexRow, flexColumn, link } from 'styles/common'
+import { SrOnly } from 'components/common'
+import Markdown from './Markdown'
 
 interface ToggleProps {
-  onClick(): void;
-  title: string;
+  onClick(): void
+  title: string
 }
 function Toggle({ onClick, title }: ToggleProps) {
   const css = useStyle({
@@ -21,7 +21,7 @@ function Toggle({ onClick, title }: ToggleProps) {
     border: 'none',
     cursor: 'pointer',
     fontFamily: fonts.times,
-  });
+  })
   return (
     <button {...css()} onClick={onClick}>
       <span>
@@ -30,21 +30,21 @@ function Toggle({ onClick, title }: ToggleProps) {
       {'More'}
       <SrOnly>{`about ${title}`}</SrOnly>
     </button>
-  );
+  )
 }
 
 interface Props {
-  content: string;
-  title: string; // used for a11y
-  collapsed: boolean;
+  content: string
+  title: string // used for a11y
+  collapsed: boolean
 }
 
 export default function Description({ title, content, collapsed }: Props) {
-  const [isCollapsed, setCollapsed] = useState(collapsed);
-  const toggle = () => setCollapsed(collapsed => !collapsed);
-  const brief = content.split('\n\n')[0];
+  const [isCollapsed, setCollapsed] = useState(collapsed)
+  const toggle = () => setCollapsed(collapsed => !collapsed)
+  const brief = content.split('\n\n')[0]
 
-  const css = useStyle(flexColumn('center'));
+  const css = useStyle(flexColumn('center'))
   return (
     <div {...css()}>
       <div>
@@ -52,5 +52,5 @@ export default function Description({ title, content, collapsed }: Props) {
       </div>
       {isCollapsed && <Toggle onClick={toggle} title={title} />}
     </div>
-  );
+  )
 }

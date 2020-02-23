@@ -1,23 +1,23 @@
-import _ from 'lodash';
+import _ from 'lodash'
 
-import { useCallback } from 'react';
-import { useHistory } from 'react-router-dom';
-import { Operation } from 'math/operations';
-import { Polyhedron } from 'math/polyhedra';
-import { escapeName } from 'math/polyhedra/names';
-import PolyhedronCtx from './PolyhedronCtx';
-import OperationCtx from './OperationCtx';
-import TransitionCtx from './TransitionCtx';
+import { useCallback } from 'react'
+import { useHistory } from 'react-router-dom'
+import { Operation } from 'math/operations'
+import { Polyhedron } from 'math/polyhedra'
+import { escapeName } from 'math/polyhedra/names'
+import PolyhedronCtx from './PolyhedronCtx'
+import OperationCtx from './OperationCtx'
+import TransitionCtx from './TransitionCtx'
 
-type ResultCallback = (polyhedron: Polyhedron) => void;
+type ResultCallback = (polyhedron: Polyhedron) => void
 
 // TODO figure out stricter typing here
-type Options = any;
+type Options = any
 export default function useApplyOperation() {
-  const history = useHistory();
-  const { setOperation, unsetOperation } = OperationCtx.useActions();
-  const polyhedron = PolyhedronCtx.useState();
-  const transition = TransitionCtx.useTransition();
+  const history = useHistory()
+  const { setOperation, unsetOperation } = OperationCtx.useActions()
+  const polyhedron = PolyhedronCtx.useState()
+  const transition = TransitionCtx.useTransition()
 
   const applyOperation = useCallback(
     (
@@ -25,23 +25,23 @@ export default function useApplyOperation() {
       options: Options = {},
       callback?: ResultCallback,
     ) => {
-      if (!operation) throw new Error('no operation defined');
+      if (!operation) throw new Error('no operation defined')
 
-      const { result, animationData } = operation.apply(polyhedron, options);
+      const { result, animationData } = operation.apply(polyhedron, options)
       if (!operation.hasOptions(result) || _.isEmpty(options)) {
-        unsetOperation();
+        unsetOperation()
       } else {
-        setOperation(operation, result);
+        setOperation(operation, result)
       }
 
-      transition(result, animationData);
-      history.push(`/${escapeName(result.name)}/operations`);
+      transition(result, animationData)
+      history.push(`/${escapeName(result.name)}/operations`)
       if (typeof callback === 'function') {
-        callback(result);
+        callback(result)
       }
     },
     [polyhedron, history, transition, setOperation, unsetOperation],
-  );
+  )
 
-  return applyOperation;
+  return applyOperation
 }

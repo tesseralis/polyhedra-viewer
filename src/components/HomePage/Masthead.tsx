@@ -1,14 +1,14 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React from 'react'
+import { Link } from 'react-router-dom'
 
-import { SrOnly, ExternalLink } from 'components/common';
-import Markdown from './Markdown';
-import { useStyle, media, fonts, scales } from 'styles';
-import * as text from './text';
-import video from 'images/transitions.mp4';
-import { flexRow, flexColumn, padding, link } from 'styles/common';
+import { SrOnly, ExternalLink } from 'components/common'
+import Markdown from './Markdown'
+import { useStyle, media, fonts, scales } from 'styles'
+import * as text from './text'
+import video from 'images/transitions.mp4'
+import { flexRow, flexColumn, padding, link } from 'styles/common'
 
-const videoHeight = 300;
+const videoHeight = 300
 
 function VideoLink() {
   const css = useStyle({
@@ -17,13 +17,13 @@ function VideoLink() {
     height: videoHeight - 2,
     width: videoHeight - 2,
     overflow: 'hidden',
-  });
+  })
   return (
     <Link {...css()} to="random">
       <SrOnly>View random polyhedron</SrOnly>
       <video muted autoPlay playsInline src={video} height={videoHeight} />
     </Link>
-  );
+  )
 }
 
 function Title() {
@@ -37,8 +37,8 @@ function Title() {
     [media.mobile]: {
       fontSize: scales.font[3],
     },
-  });
-  return <h1 {...css()}>Polyhedra Viewer</h1>;
+  })
+  return <h1 {...css()}>Polyhedra Viewer</h1>
 }
 
 function Subtitle() {
@@ -47,9 +47,9 @@ function Subtitle() {
     fontFamily: fonts.andaleMono,
     marginBottom: scales.spacing[3],
     fontColor: 'DimGray',
-  });
+  })
 
-  const author = useStyle(link);
+  const author = useStyle(link)
 
   return (
     <p {...css()}>
@@ -58,21 +58,21 @@ function Subtitle() {
         @tesseralis
       </ExternalLink>
     </p>
-  );
+  )
 }
 
 function Abstract() {
   const css = useStyle({
     ...flexColumn('center'),
     maxWidth: scales.size[6],
-  });
+  })
   return (
     <div {...css()}>
       <Title />
       <Subtitle />
       <Markdown source={text.abstract} />
     </div>
-  );
+  )
 }
 
 export default function Masthead() {
@@ -85,12 +85,12 @@ export default function Masthead() {
     [media.mobilePortrait]: {
       flexDirection: 'column-reverse',
     },
-  });
+  })
 
   return (
     <div {...css()}>
       <Abstract />
       <VideoLink />
     </div>
-  );
+  )
 }

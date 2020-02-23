@@ -1,14 +1,14 @@
-import React from 'react';
-import Icon from '@mdi/react';
-import { mdiFacebookBox, mdiTumblrBox, mdiTwitter, mdiReddit } from '@mdi/js';
+import React from 'react'
+import Icon from '@mdi/react'
+import { mdiFacebookBox, mdiTumblrBox, mdiTwitter, mdiReddit } from '@mdi/js'
 
-import { useStyle, fonts, scales } from 'styles';
-import { ExternalLink, SrOnly } from 'components/common';
+import { useStyle, fonts, scales } from 'styles'
+import { ExternalLink, SrOnly } from 'components/common'
 
-const url = 'http://polyhedra.tessera.li';
-const title = 'Polyhedra Viewer';
-const author = 'tesseralis';
-const caption = 'Jinkies! Check out this cool polyhedral geometry app!';
+const url = 'http://polyhedra.tessera.li'
+const title = 'Polyhedra Viewer'
+const author = 'tesseralis'
+const caption = 'Jinkies! Check out this cool polyhedral geometry app!'
 
 const links = [
   {
@@ -31,18 +31,18 @@ const links = [
     icon: mdiReddit,
     name: 'Reddit',
   },
-];
+]
 
 function ShareText() {
   const css = useStyle({
     fontFamily: fonts.andaleMono,
     fontWeight: 'bold',
-  });
-  return <span {...css()}>Share:</span>;
+  })
+  return <span {...css()}>Share:</span>
 }
 
 function ShareLink({ url, icon, name }: typeof links[0]) {
-  const css = useStyle({ fill: 'DimGrey' });
+  const css = useStyle({ fill: 'DimGrey' })
   return (
     <ExternalLink
       {...css()}
@@ -56,7 +56,7 @@ function ShareLink({ url, icon, name }: typeof links[0]) {
       <Icon size={scales.size[2]} path={icon} />
       <SrOnly>{`Share on ${name}`}</SrOnly>
     </ExternalLink>
-  );
+  )
 }
 
 export default function ShareLinks() {
@@ -65,7 +65,7 @@ export default function ShareLinks() {
     gridAutoFlow: 'column',
     gridGap: scales.spacing[3],
     alignItems: 'center',
-  });
+  })
   return (
     <div {...css()}>
       <ShareText />
@@ -73,5 +73,5 @@ export default function ShareLinks() {
         <ShareLink key={link.name} {...link} />
       ))}
     </div>
-  );
+  )
 }

@@ -1,14 +1,14 @@
-import _ from 'lodash';
+import _ from 'lodash'
 
-export type Column = { name: string; sub: string[] } | string;
-export type Data = string | string[];
-export type DataRow = Data[];
+export type Column = { name: string; sub: string[] } | string
+export type Data = string | string[]
+export type DataRow = Data[]
 
 export interface Table {
-  caption: string;
-  rows: string[];
-  columns: Column[];
-  data: DataRow[];
+  caption: string
+  rows: string[]
+  columns: Column[]
+  data: DataRow[]
 }
 
 export const archimedean: Table = {
@@ -35,7 +35,7 @@ export const archimedean: Table = {
     ['!aC', 'eC', 'eD'],
     ['!I', 'sC', 'sD'],
   ],
-};
+}
 
 export const prisms: Table = {
   caption: 'Prisms and Antiprisms',
@@ -52,7 +52,7 @@ export const prisms: Table = {
     ['P3', '!C', 'P5', 'P6', 'P8', 'P10'],
     ['!O', 'A4', 'A5', 'A6', 'A8', 'A10'],
   ]),
-};
+}
 
 export const capstones: Table = {
   caption: 'Pyramids, Cupolæ, and Rotundæ',
@@ -103,7 +103,7 @@ export const capstones: Table = {
     ],
     ['coplanar', 'J17', '!I', 'concave', 'J44', 'J45', 'J46', 'J47', 'J48'],
   ]),
-};
+}
 
 export const capstonesMono: Table = {
   caption: 'Pyramids, Cupolæ, and Rotundæ',
@@ -122,7 +122,7 @@ export const capstonesMono: Table = {
     ['J7', 'J8', 'J9', 'J18', 'J19', 'J20', 'J21'],
     ['coplanar', 'J10', 'J11', 'J22', 'J23', 'J24', 'J25'],
   ]),
-};
+}
 
 export const capstonesBi: Table = {
   caption: 'Bipyramids, Cupolæ, and Rotundæ',
@@ -167,7 +167,7 @@ export const capstonesBi: Table = {
     ],
     ['coplanar', 'J17', '!I', 'concave', 'J44', 'J45', 'J46', 'J47', 'J48'],
   ]),
-};
+}
 
 export const augmented: Table = {
   caption: 'Augmented Polyhedra',
@@ -194,7 +194,7 @@ export const augmented: Table = {
     ['J66', 'J67'],
     ['J68', ['J69', 'J70'], 'J71'],
   ],
-};
+}
 
 export const icosahedra: Table = {
   caption: 'Diminished Icosahedra',
@@ -205,7 +205,7 @@ export const icosahedra: Table = {
     { name: 'tridiminished', sub: ['--', 'augmented'] },
   ],
   data: [['!J11', ['!A5', 'J62'], ['J63', 'J64']]],
-};
+}
 
 export const rhombicosidodecahedra: Table = {
   caption: 'Gyrate and Diminished Rhombicosidodecahedra',
@@ -222,14 +222,14 @@ export const rhombicosidodecahedra: Table = {
     [['J73', 'J74'], 'J79'],
     ['J75'],
   ],
-};
+}
 
 export const gyrateRhombicosidodecahedra: Table = {
   caption: 'Gyrate Rhombicosidodecahedra',
   rows: ['gyrate', 'bigyrate', 'trigyrate'],
   columns: [{ name: '--', sub: ['para-', 'meta-'] }],
   data: [['J72'], [['J73', 'J74']], ['J75']],
-};
+}
 export const diminishedRhombicosidodecahedra: Table = {
   caption: 'Diminished Rhombicosidodecahedra',
   rows: ['--', 'gyrate', 'bigyrate'],
@@ -239,27 +239,30 @@ export const diminishedRhombicosidodecahedra: Table = {
     'tridiminished',
   ],
   data: [['J76', ['J80', 'J81'], 'J83'], [['J77', 'J78'], 'J82'], ['J79']],
-};
+}
 export const snubAntiprisms: Table = {
   caption: 'Snub Antiprisms',
   rows: ['snub'],
   columns: ['digonal', 'triangular', 'square'],
   data: [['J84', '!I', 'J85']],
-};
+}
 
 export const others: Table = {
   caption: 'Other Johnson Solids',
   rows: [''],
   columns: ['', '', '', '', '', '', ''],
   data: [['J86', 'J87', 'J88', 'J89', 'J90', 'J91', 'J92']],
-};
+}
 
 export const othersTwoRows: Table = {
   caption: 'Other Johnson Solids',
   rows: [''],
   columns: ['', '', '', ''],
-  data: [['J86', 'J87', 'J88', 'J89'], ['J90', 'J91', 'J92']],
-};
+  data: [
+    ['J86', 'J87', 'J88', 'J89'],
+    ['J90', 'J91', 'J92'],
+  ],
+}
 
 export const sections: Record<string, Table> = {
   archimedean,
@@ -275,4 +278,4 @@ export const sections: Record<string, Table> = {
   snubAntiprisms,
   others,
   othersTwoRows,
-};
+}

@@ -1,8 +1,8 @@
-import { Polyhedron } from 'math/polyhedra';
-import { operations } from 'math/operations';
-import { setupOperations } from '../operationTestUtils';
+import { Polyhedron } from 'math/polyhedra'
+import { operations } from 'math/operations'
+import { setupOperations } from '../operationTestUtils'
 
-setupOperations();
+setupOperations()
 
 describe('chained tests', () => {
   const tests = [
@@ -62,41 +62,41 @@ describe('chained tests', () => {
         },
       ],
     },
-  ];
+  ]
 
   function getArgs(args, polyhedron) {
     if (args.n) {
-      return { face: polyhedron.faceWithNumSides(args.n) };
+      return { face: polyhedron.faceWithNumSides(args.n) }
     }
-    return args;
+    return args
   }
 
   function getOpInfo(opInfo, polyhedron) {
     if (Array.isArray(opInfo)) {
-      return { op: operations[opInfo[0]], expected: opInfo[1] };
+      return { op: operations[opInfo[0]], expected: opInfo[1] }
     }
-    const { op, args, expected } = opInfo;
+    const { op, args, expected } = opInfo
     return {
       op: operations[op],
       expected,
       args: getArgs(args, polyhedron),
-    };
+    }
   }
 
   tests.forEach(test => {
-    const { start, description, operations } = test;
-    let polyhedron = Polyhedron.get(start);
-    let solidName = start;
+    const { start, description, operations } = test
+    let polyhedron = Polyhedron.get(start)
+    let solidName = start
     it(description, () => {
       operations.forEach(opInfo => {
-        const { op, args, expected } = getOpInfo(opInfo, polyhedron);
-        const result = op.apply(polyhedron, args);
-        expect(result).toBeValidPolyhedron();
+        const { op, args, expected } = getOpInfo(opInfo, polyhedron)
+        const result = op.apply(polyhedron, args)
+        expect(result).toBeValidPolyhedron()
 
-        polyhedron = result.result;
-        expect(polyhedron.name).toBe(expected);
-        solidName = result.name;
-      });
-    });
-  });
-});
+        polyhedron = result.result
+        expect(polyhedron.name).toBe(expected)
+        solidName = result.name
+      })
+    })
+  })
+})

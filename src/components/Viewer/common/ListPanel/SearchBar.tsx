@@ -1,12 +1,12 @@
-import React, { memo, useState, InputHTMLAttributes } from 'react';
-import Icon from '@mdi/react';
-import { mdiMagnify } from '@mdi/js';
+import React, { memo, useState, InputHTMLAttributes } from 'react'
+import Icon from '@mdi/react'
+import { mdiMagnify } from '@mdi/js'
 
-import { useStyle, scales } from 'styles';
-import { andaleMono } from 'styles/fonts';
-import { flexRow } from 'styles/common';
+import { useStyle, scales } from 'styles'
+import { andaleMono } from 'styles/fonts'
+import { flexRow } from 'styles/common'
 
-const duration = '0.35s';
+const duration = '0.35s'
 
 function SearchIcon({ focused }: { focused: boolean }) {
   const css = useStyle(
@@ -19,12 +19,12 @@ function SearchIcon({ focused }: { focused: boolean }) {
       fill: focused ? 'Gray' : 'LightGray',
     },
     [focused],
-  );
+  )
   return (
     <span {...css()}>
       <Icon path={mdiMagnify} size={scales.size[1]} />
     </span>
-  );
+  )
 }
 
 function SearchInput(props: InputHTMLAttributes<HTMLInputElement>) {
@@ -45,7 +45,7 @@ function SearchInput(props: InputHTMLAttributes<HTMLInputElement>) {
       borderColor: 'Gray',
       fill: 'Gray',
     },
-  });
+  })
   return (
     <input
       {...props}
@@ -54,22 +54,22 @@ function SearchInput(props: InputHTMLAttributes<HTMLInputElement>) {
       placeholder="Search..."
       aria-label="search"
     />
-  );
+  )
 }
 
 interface Props {
-  value: string;
-  onChange(value: string): void;
+  value: string
+  onChange(value: string): void
 }
 export default memo(function SearchBar({ value, onChange }: Props) {
-  const [isFocused, setFocus] = useState(false);
+  const [isFocused, setFocus] = useState(false)
 
   const css = useStyle({
     ...flexRow('center'),
     padding: scales.spacing[2],
     width: '100%',
     position: 'relative',
-  });
+  })
   return (
     <label {...css()}>
       <SearchInput
@@ -80,5 +80,5 @@ export default memo(function SearchBar({ value, onChange }: Props) {
       />
       <SearchIcon focused={isFocused} />
     </label>
-  );
-});
+  )
+})

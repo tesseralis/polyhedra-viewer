@@ -2,7 +2,7 @@
  * Scales for font sizes, width/height, and spacing based on tachyons
  */
 
-type ScaleIndex = 1 | 2 | 3 | 4 | 5 | 6 | 7;
+type ScaleIndex = 1 | 2 | 3 | 4 | 5 | 6 | 7
 
 /**
  * A scale for font size.
@@ -25,7 +25,7 @@ export const font: Record<ScaleIndex, string> = Object.freeze({
   5: '1rem',
   6: '0.875rem',
   7: '0.75rem',
-});
+})
 
 /**
  * A scale used for margin/padding/grid gap.
@@ -48,7 +48,7 @@ export const spacing: Record<ScaleIndex, string> = Object.freeze({
   5: '4rem',
   6: '8rem',
   7: '16rem',
-});
+})
 
 /**
  * A scale used for widths and heights.
@@ -73,4 +73,4 @@ export const size: Record<ScaleIndex | 8, string> = Object.freeze({
   6: '32rem',
   7: '48rem',
   8: '64rem',
-});
+})

@@ -1,18 +1,18 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React from 'react'
+import { Link } from 'react-router-dom'
 
-import { escapeName } from 'math/polyhedra/names';
-import { square, hover, flexRow } from 'styles/common';
-import { useStyle, media } from 'styles';
+import { escapeName } from 'math/polyhedra/names'
+import { square, hover, flexRow } from 'styles/common'
+import { useStyle, media } from 'styles'
 
 interface Props {
-  name: string;
-  isFake: boolean;
+  name: string
+  isFake: boolean
 }
 
 // using raw pixel values since we need to do math
-const thumbnailSize = 64;
-const mobThumbnailSize = 48;
+const thumbnailSize = 64
+const mobThumbnailSize = 48
 
 function Image({ name }: Pick<Props, 'name'>) {
   const css = useStyle({
@@ -23,19 +23,19 @@ function Image({ name }: Pick<Props, 'name'>) {
     [media.mobile]: {
       height: mobThumbnailSize,
     },
-  });
-  const escapedName = escapeName(name);
+  })
+  const escapedName = escapeName(name)
   return (
     <img
       {...css()}
       alt={name}
       src={require(`images/thumbnails/${escapedName}.png`)}
     />
-  );
+  )
 }
 
 export default function PolyhedronLink({ name, isFake }: Props) {
-  const escapedName = escapeName(name);
+  const escapedName = escapeName(name)
 
   const css = useStyle(
     {
@@ -51,7 +51,7 @@ export default function PolyhedronLink({ name, isFake }: Props) {
       [media.mobile]: square(mobThumbnailSize),
     },
     [isFake],
-  );
+  )
   return (
     <Link
       {...css()}
@@ -61,5 +61,5 @@ export default function PolyhedronLink({ name, isFake }: Props) {
     >
       <Image name={name} />
     </Link>
-  );
+  )
 }

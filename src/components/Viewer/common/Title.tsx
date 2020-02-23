@@ -1,9 +1,9 @@
-import _ from 'lodash';
-import React from 'react';
-import { useStyle, scales } from 'styles';
+import _ from 'lodash'
+import React from 'react'
+import { useStyle, scales } from 'styles'
 
-import { unescapeName } from 'math/polyhedra/names';
-import { media, fonts } from 'styles';
+import { unescapeName } from 'math/polyhedra/names'
+import { media, fonts } from 'styles'
 
 function Title({ name }: { name: string }) {
   const css = useStyle({
@@ -27,8 +27,8 @@ function Title({ name }: { name: string }) {
       lineHeight: 1.25,
       textAlign: 'center',
     },
-  });
-  return <h1 {...css()}>{_.capitalize(unescapeName(name))}</h1>;
+  })
+  return <h1 {...css()}>{_.capitalize(unescapeName(name))}</h1>
 }
 
-export default Title;
+export default Title

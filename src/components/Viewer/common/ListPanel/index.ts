@@ -1,1 +1,1 @@
-export { default } from './ListPanel';
+export { default } from './ListPanel'

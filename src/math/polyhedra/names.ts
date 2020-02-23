@@ -1,12 +1,12 @@
-import _ from 'lodash';
+import _ from 'lodash'
 
-import { johnsonSolids, allSolidNames } from 'data';
-import { choose, bimap } from 'utils';
-import polygons, { polygonPrefixes } from '../polygons';
+import { johnsonSolids, allSolidNames } from 'data'
+import { choose, bimap } from 'utils'
+import polygons, { polygonPrefixes } from '../polygons'
 
-export const escapeName = (name: string) => name.replace(/ /g, '-');
+export const escapeName = (name: string) => name.replace(/ /g, '-')
 
-export const unescapeName = (name: string) => name.replace(/-/g, ' ');
+export const unescapeName = (name: string) => name.replace(/-/g, ' ')
 
 const platonicMapping = bimap({
   T: 'tetrahedron',
@@ -14,7 +14,7 @@ const platonicMapping = bimap({
   O: 'octahedron',
   D: 'dodecahedron',
   I: 'icosahedron',
-});
+})
 
 const archimedeanMapping = bimap({
   tT: 'truncated tetrahedron',
@@ -30,7 +30,7 @@ const archimedeanMapping = bimap({
   eD: 'rhombicosidodecahedron',
   bD: 'truncated icosidodecahedron',
   sD: 'snub dodecahedron',
-});
+})
 
 export const alternateNames: Record<string, string[]> = {
   tetrahedron: ['triangular pyramid', 'digonal antiprism', 'disphenoid'],
@@ -71,101 +71,101 @@ export const alternateNames: Record<string, string[]> = {
   ],
   'elongated square cupola': ['diminished rhombicuboctahedron'],
   'octagonal prism': ['bidiminished rhombicuboctahedron'],
-};
+}
 const inverseAlternateNames = _(alternateNames)
   .flatMap((alts, canonical) => _.map(alts, alt => [alt, canonical]))
   .fromPairs()
-  .value();
+  .value()
 
 export function getCanonicalName(name: string) {
-  return inverseAlternateNames[unescapeName(name)] ?? name;
+  return inverseAlternateNames[unescapeName(name)] ?? name
 }
 
 export function getAlternateNames(name: string) {
-  return alternateNames[unescapeName(name)] ?? [];
+  return alternateNames[unescapeName(name)] ?? []
 }
 
 export function isAlternateName(name: string) {
-  return _.has(inverseAlternateNames, unescapeName(name));
+  return _.has(inverseAlternateNames, unescapeName(name))
 }
 
 export function randomSolidName(): string {
-  return escapeName(choose(allSolidNames));
+  return escapeName(choose(allSolidNames))
 }
 
 export function isConwaySymbol(symbol: string) {
   if (platonicMapping.hasKey(symbol) || archimedeanMapping.hasKey(symbol)) {
-    return true;
+    return true
   }
-  const prefix = symbol[0];
-  const number = parseInt(symbol.substring(1), 10);
+  const prefix = symbol[0]
+  const number = parseInt(symbol.substring(1), 10)
   if (prefix === 'J' && number >= 0 && number <= 92) {
-    return true;
+    return true
   }
   if (_.includes(['P', 'A'], prefix) && _.includes(polygons, number)) {
-    return true;
+    return true
   }
-  return false;
+  return false
 }
 
 export const fromConwayNotation = (notation: string) => {
-  const prefix = notation[0];
-  const number = parseInt(notation.substring(1));
+  const prefix = notation[0]
+  const number = parseInt(notation.substring(1))
   if (platonicMapping.hasKey(notation)) {
-    return platonicMapping.get(notation);
+    return platonicMapping.get(notation)
   }
   if (archimedeanMapping.hasKey(notation)) {
-    return archimedeanMapping.get(notation);
+    return archimedeanMapping.get(notation)
   }
   if (prefix === 'J') {
-    return johnsonSolids[_.toNumber(number) - 1];
+    return johnsonSolids[_.toNumber(number) - 1]
   }
   if (prefix === 'P' && polygonPrefixes.hasKey(number)) {
-    return `${polygonPrefixes.get(number)} prism`;
+    return `${polygonPrefixes.get(number)} prism`
   }
   if (prefix === 'A' && polygonPrefixes.hasKey(number)) {
-    return `${polygonPrefixes.get(number)} antiprism`;
+    return `${polygonPrefixes.get(number)} antiprism`
   }
-  return '';
-};
+  return ''
+}
 
 export const toConwayNotation = (solid: string) => {
-  const name = solid;
+  const name = solid
   if (platonicMapping.hasValue(name)) {
-    return platonicMapping.of(name);
+    return platonicMapping.of(name)
   }
   if (archimedeanMapping.hasValue(name)) {
-    return archimedeanMapping.of(name);
+    return archimedeanMapping.of(name)
   }
   if (_.includes(johnsonSolids, name)) {
-    return 'J' + (johnsonSolids.indexOf(name) + 1);
+    return 'J' + (johnsonSolids.indexOf(name) + 1)
   }
-  const [prefix] = name.split(' ');
+  const [prefix] = name.split(' ')
   if (name.includes('antiprism') && polygonPrefixes.hasValue(prefix)) {
-    return 'A' + polygonPrefixes.of(prefix);
+    return 'A' + polygonPrefixes.of(prefix)
   }
   if (name.includes('prism') && polygonPrefixes.hasValue(prefix)) {
-    return 'P' + polygonPrefixes.of(prefix);
+    return 'P' + polygonPrefixes.of(prefix)
   }
-  throw new Error(`Invalid solid name ${solid}`);
-};
+  throw new Error(`Invalid solid name ${solid}`)
+}
 
 export function getType(solid: string) {
-  const name = unescapeName(solid);
+  const name = unescapeName(solid)
   if (platonicMapping.hasValue(name)) {
-    return 'Platonic solid';
+    return 'Platonic solid'
   }
   if (archimedeanMapping.hasValue(name)) {
-    return 'Archimedean solid';
+    return 'Archimedean solid'
   }
   if (_.includes(johnsonSolids, name)) {
-    return 'Johnson solid';
+    return 'Johnson solid'
   }
   if (name.includes('antiprism')) {
-    return 'Antiprism';
+    return 'Antiprism'
   }
   if (name.includes('prism')) {
-    return 'Prism';
+    return 'Prism'
   }
-  throw new Error(`Invalid solid name ${solid}`);
+  throw new Error(`Invalid solid name ${solid}`)
 }

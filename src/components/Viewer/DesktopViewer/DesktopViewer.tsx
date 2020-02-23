@@ -1,17 +1,17 @@
-import React, { memo } from 'react';
+import React, { memo } from 'react'
 
-import { useStyle } from 'styles';
-import { flexRow } from 'styles/common';
-import Sidebar from './Sidebar';
-import Overlay from './Overlay';
-import { SolidScene } from '../common';
+import { useStyle } from 'styles'
+import { flexRow } from 'styles/common'
+import Sidebar from './Sidebar'
+import Overlay from './Overlay'
+import { SolidScene } from '../common'
 
 interface Props {
-  panel: string;
-  solid: string;
+  panel: string
+  solid: string
 }
 
-const sidebarW = '24rem';
+const sidebarW = '24rem'
 
 function Scene({ solid, full }: Pick<Props, 'solid'> & { full: boolean }) {
   const css = useStyle(
@@ -22,13 +22,13 @@ function Scene({ solid, full }: Pick<Props, 'solid'> & { full: boolean }) {
       alignSelf: 'flex-start',
     },
     [full],
-  );
+  )
   return (
     <div {...css()}>
       <SolidScene label={solid} />
       <Overlay solid={solid} />
     </div>
-  );
+  )
 }
 
 function StyledSidebar({
@@ -50,16 +50,16 @@ function StyledSidebar({
           maxWidth: sidebarW,
         },
     [compact],
-  );
+  )
   return (
     <div {...css()}>
       <Sidebar panel={panel} solid={solid} compact={compact} />
     </div>
-  );
+  )
 }
 
 export default memo(function DesktopViewer({ solid, panel }: Props) {
-  const full = panel === 'full';
+  const full = panel === 'full'
 
   const css = useStyle({
     ...flexRow(),
@@ -67,11 +67,11 @@ export default memo(function DesktopViewer({ solid, panel }: Props) {
     width: '100vw',
     height: '100vh',
     overflow: 'hidden',
-  });
+  })
   return (
     <div {...css()}>
       <Scene solid={solid} full={full} />
       <StyledSidebar solid={solid} panel={panel} compact={full} />
     </div>
-  );
-});
+  )
+})

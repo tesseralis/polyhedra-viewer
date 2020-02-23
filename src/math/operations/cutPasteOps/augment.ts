@@ -1,16 +1,16 @@
-import _ from 'lodash';
+import _ from 'lodash'
 
-import { Polyhedron, Face, Cap } from 'math/polyhedra';
-import { inRow, inColumn, inSection } from 'math/polyhedra/tableUtils';
-import { isInverse, getOrthonormalTransform, PRECISION } from 'math/geom';
-import { repeat, getCyclic, getSingle } from 'utils';
-import { deduplicateVertices } from '../makeOperation';
+import { Polyhedron, Face, Cap } from 'math/polyhedra'
+import { inRow, inColumn, inSection } from 'math/polyhedra/tableUtils'
+import { isInverse, getOrthonormalTransform, PRECISION } from 'math/geom'
+import { repeat, getCyclic, getSingle } from 'utils'
+import { deduplicateVertices } from '../makeOperation'
 
-import makeOperation from '../makeOperation';
-import { hasMultiple } from './cutPasteUtils';
-import { withOrigin } from '../../geom';
+import makeOperation from '../makeOperation'
+import { hasMultiple } from './cutPasteUtils'
+import { withOrigin } from '../../geom'
 
-type AugmentType = 'pyramid' | 'cupola' | 'rotunda';
+type AugmentType = 'pyramid' | 'cupola' | 'rotunda'
 const augmentees: Record<AugmentType, Record<number, string>> = {
   pyramid: {
     3: 'tetrahedron',
@@ -28,89 +28,89 @@ const augmentees: Record<AugmentType, Record<number, string>> = {
   rotunda: {
     5: 'pentagonal-rotunda',
   },
-};
+}
 
 const augmentData = _.mapValues(augmentees, type =>
   _.mapValues(type, Polyhedron.get),
-);
+)
 
 const augmentTypes: Record<string, AugmentType> = {
   Y: 'pyramid',
   U: 'cupola',
   R: 'rotunda',
-};
+}
 
 function getAugmentAlignment(polyhedron: Polyhedron, face: Face) {
-  const boundary = getSingle(Cap.getAll(polyhedron)).boundary();
-  return isInverse(boundary.normal(), face.normal()) ? 'para' : 'meta';
+  const boundary = getSingle(Cap.getAll(polyhedron)).boundary()
+  return isInverse(boundary.normal(), face.normal()) ? 'para' : 'meta'
 }
 
 function getPossibleAugmentees(n: number) {
-  const { pyramid, cupola, rotunda } = augmentData;
-  return _.compact([pyramid[n], cupola[n / 2], rotunda[n / 2]]);
+  const { pyramid, cupola, rotunda } = augmentData
+  return _.compact([pyramid[n], cupola[n / 2], rotunda[n / 2]])
 }
 
 // Checks to see if the polyhedron can be augmented at the base while remaining convex
 function canAugmentWith(base: Face, augmentee: Polyhedron, offset: number) {
-  const n = base.numSides;
-  if (!augmentee) return false;
-  const underside = augmentee.faceWithNumSides(n);
+  const n = base.numSides
+  if (!augmentee) return false
+  const underside = augmentee.faceWithNumSides(n)
 
   return _.every(base.edges, (edge, i: number) => {
-    const baseAngle = edge.dihedralAngle();
+    const baseAngle = edge.dihedralAngle()
 
-    const edge2 = getCyclic(underside.edges, i - 1 + offset);
-    const augmenteeAngle = edge2.dihedralAngle();
+    const edge2 = getCyclic(underside.edges, i - 1 + offset)
+    const augmenteeAngle = edge2.dihedralAngle()
 
-    return baseAngle + augmenteeAngle < Math.PI - PRECISION;
-  });
+    return baseAngle + augmenteeAngle < Math.PI - PRECISION
+  })
 }
 
 function canAugmentWithType(base: Face, augmentType: AugmentType) {
-  const n = augmentType === 'pyramid' ? base.numSides : base.numSides / 2;
+  const n = augmentType === 'pyramid' ? base.numSides : base.numSides / 2
   for (let offset of [0, 1]) {
     if (canAugmentWith(base, augmentData[augmentType][n], offset)) {
-      return true;
+      return true
     }
   }
-  return false;
+  return false
 }
 
 function canAugment(base: Face) {
-  const n = base.numSides;
-  const augmentees = getPossibleAugmentees(n);
+  const n = base.numSides
+  const augmentees = getPossibleAugmentees(n)
   for (let augmentee of augmentees) {
     for (let offset of [0, 1]) {
       if (canAugmentWith(base, augmentee, offset)) {
-        return true;
+        return true
       }
     }
   }
-  return false;
+  return false
 }
 
 // Computes the set equality of two arrays
 const setEquals = <T>(array1: T[], array2: T[]) =>
-  _.xor(array1, array2).length === 0;
+  _.xor(array1, array2).length === 0
 
 function getBaseType(base: Face) {
-  const adjacentFaces = base.adjacentFaces();
+  const adjacentFaces = base.adjacentFaces()
   const adjacentFaceCounts = _(adjacentFaces)
     .map('numSides')
     .uniq()
-    .value();
+    .value()
   if (setEquals(adjacentFaceCounts, [3, 4])) {
-    return 'cupola';
+    return 'cupola'
   } else if (setEquals(adjacentFaceCounts, [4])) {
-    return 'prism';
+    return 'prism'
   } else if (setEquals(adjacentFaceCounts, [3])) {
-    return _.intersection(adjacentFaces).length > 0 ? 'pyramid' : 'antiprism';
+    return _.intersection(adjacentFaces).length > 0 ? 'pyramid' : 'antiprism'
   } else if (setEquals(adjacentFaceCounts, [3, 5])) {
-    return 'rotunda';
+    return 'rotunda'
   } else if (setEquals(adjacentFaceCounts, [4, 5])) {
-    return 'rhombicosidodecahedron';
+    return 'rhombicosidodecahedron'
   } else {
-    return 'truncated';
+    return 'truncated'
   }
 }
 
@@ -119,11 +119,11 @@ function getOppositePrismFace(base: Face) {
     .twin()
     .next()
     .next()
-    .twinFace();
+    .twinFace()
 }
 
 function isCupolaRotunda(baseType: string, augmentType: string) {
-  return setEquals(['cupola', 'rotunda'], [baseType, augmentType]);
+  return setEquals(['cupola', 'rotunda'], [baseType, augmentType])
 }
 
 // Return true if the base and augmentee are aligned
@@ -134,54 +134,54 @@ function isAligned(
   gyrate: string | undefined,
   augmentType: string,
 ) {
-  if (augmentType === 'pyramid') return true;
-  const baseType = getBaseType(base);
+  if (augmentType === 'pyramid') return true
+  const baseType = getBaseType(base)
   if (baseType === 'pyramid' || baseType === 'antiprism') {
-    return true;
+    return true
   }
 
   if (baseType === 'prism' && Cap.getAll(polyhedron).length === 0) {
-    return true;
+    return true
   }
 
   if (baseType !== 'truncated' && _.isNil(gyrate)) {
-    throw new Error(`Must define 'gyrate' for augmenting ${baseType} `);
+    throw new Error(`Must define 'gyrate' for augmenting ${baseType} `)
   }
 
   const adjFace =
-    baseType === 'prism' ? getOppositePrismFace(base) : base.adjacentFaces()[0];
-  const alignedFace = getCyclic(underside.adjacentFaces(), -1);
+    baseType === 'prism' ? getOppositePrismFace(base) : base.adjacentFaces()[0]
+  const alignedFace = getCyclic(underside.adjacentFaces(), -1)
 
   if (baseType === 'rhombicosidodecahedron') {
-    const isOrtho = (adjFace.numSides !== 4) === (alignedFace.numSides !== 4);
-    return isOrtho === (gyrate === 'ortho');
+    const isOrtho = (adjFace.numSides !== 4) === (alignedFace.numSides !== 4)
+    return isOrtho === (gyrate === 'ortho')
   }
 
   // It's orthogonal if triangle faces are aligned or non-triangle faces are aligned
-  const isOrtho = (adjFace.numSides !== 3) === (alignedFace.numSides !== 3);
+  const isOrtho = (adjFace.numSides !== 3) === (alignedFace.numSides !== 3)
 
   if (baseType === 'truncated') {
-    return !isOrtho;
+    return !isOrtho
   }
 
   // "ortho" or "gyro" is actually determined by whether the *tops* are aligned, not the bottoms
   // So for a cupola-rotunda, it's actually the opposite of everything else
   if (isCupolaRotunda(Cap.getAll(polyhedron)[0].type, augmentType)) {
-    return isOrtho !== (gyrate === 'ortho');
+    return isOrtho !== (gyrate === 'ortho')
   }
 
-  return isOrtho === (gyrate === 'ortho');
+  return isOrtho === (gyrate === 'ortho')
 }
 
 function getAugmentee(augmentType: AugmentType, numSides: number) {
   const index = _.includes(['cupola', 'rotunda'], augmentType)
     ? numSides / 2
-    : numSides;
-  return augmentData[augmentType][index];
+    : numSides
+  return augmentData[augmentType][index]
 }
 
 function isFastigium(augmentType: string, numSides: number) {
-  return augmentType === 'cupola' && numSides === 4;
+  return augmentType === 'cupola' && numSides === 4
 }
 
 // Augment the following
@@ -191,14 +191,14 @@ function doAugment(
   augmentType: AugmentType,
   gyrate?: string,
 ) {
-  const numSides = base.numSides;
-  const augmentee = getAugmentee(augmentType, numSides);
-  const underside = augmentee.faceWithNumSides(base.numSides);
+  const numSides = base.numSides
+  const augmentee = getAugmentee(augmentType, numSides)
+  const underside = augmentee.faceWithNumSides(base.numSides)
 
   // Determine the orientations of the underside and the base
   const undersideRadius = underside.vertices[0].vec
     .sub(underside.centroid())
-    .getNormalized();
+    .getNormalized()
 
   const baseIsAligned = isAligned(
     polyhedron,
@@ -206,11 +206,11 @@ function doAugment(
     underside,
     isFastigium(augmentType, numSides) ? 'gyro' : gyrate,
     augmentType,
-  );
-  const offset = baseIsAligned ? 0 : 1;
+  )
+  const offset = baseIsAligned ? 0 : 1
   const baseRadius = base.vertices[offset].vec
     .sub(base.centroid())
-    .getNormalized();
+    .getNormalized()
 
   // https://math.stackexchange.com/questions/624348/finding-rotation-axis-and-angle-to-align-two-oriented-vectors
   // Determine the transformation that rotates the underside orientation to the base orientation
@@ -220,31 +220,29 @@ function doAugment(
     underside.normal().getInverted(),
     baseRadius,
     base.normal(),
-  );
-  const transform = withOrigin(base.centroid(), u =>
-    transformMatrix.applyTo(u),
-  );
+  )
+  const transform = withOrigin(base.centroid(), u => transformMatrix.applyTo(u))
 
   // Scale and position the augmentee so that it lines up with the base
   const alignedVertices = augmentee.vertices.map(v => {
     return v.vec
       .sub(underside.centroid())
       .scale(base.sideLength() / augmentee.edgeLength())
-      .add(base.centroid());
-  });
+      .add(base.centroid())
+  })
 
   // Rotate the vertices so that they align with the base
-  const rotatedVertices = alignedVertices.map(v => transform(v));
+  const rotatedVertices = alignedVertices.map(v => transform(v))
 
   const newAugmentee = augmentee.withChanges(s =>
     s.withVertices(rotatedVertices).withoutFaces([underside]),
-  );
+  )
 
   const augmenteeInitial = augmentee.withVertices(
     repeat(base.centroid(), augmentee.numVertices()),
-  );
+  )
 
-  const endResult = polyhedron.addPolyhedron(newAugmentee);
+  const endResult = polyhedron.addPolyhedron(newAugmentee)
 
   return {
     animationData: {
@@ -252,11 +250,11 @@ function doAugment(
       endVertices: endResult.vertices,
     },
     result: deduplicateVertices(endResult.withoutFaces([base])),
-  };
+  }
 }
 
 function defaultAugmentType(numSides: number) {
-  return numSides <= 5 ? 'pyramid' : 'cupola';
+  return numSides <= 5 ? 'pyramid' : 'cupola'
 }
 
 const defaultAugmentees: Record<number, string> = {
@@ -266,153 +264,153 @@ const defaultAugmentees: Record<number, string> = {
   6: 'U3',
   8: 'U4',
   10: 'U5',
-};
+}
 
 function getAugmenteeNumSides(using: string) {
-  const prefix = using[0];
-  const index = _.toNumber(using.substring(1));
-  return 'RU'.includes(prefix) ? index * 2 : index;
+  const prefix = using[0]
+  const index = _.toNumber(using.substring(1))
+  return 'RU'.includes(prefix) ? index * 2 : index
 }
 
 function getUsingOpt(using: string, numSides: number) {
   return typeof using === 'string' && getAugmenteeNumSides(using) === numSides
     ? using
-    : defaultAugmentees[numSides];
+    : defaultAugmentees[numSides]
 }
 
 const getUsingOpts = (polyhedron: Polyhedron) => {
   if (polyhedron.name === 'triangular prism') {
-    return ['Y4', 'U2'];
+    return ['Y4', 'U2']
   }
   if (inRow(polyhedron.name, 'prisms', 'decagonal')) {
-    return ['U5', 'R5'];
+    return ['U5', 'R5']
   }
-  const rows = ['pentagonal cupola', 'pentagonal rotunda'];
+  const rows = ['pentagonal cupola', 'pentagonal rotunda']
   if (_.some(rows, row => inRow(polyhedron.name, 'capstones', row))) {
-    return ['U5', 'R5'];
+    return ['U5', 'R5']
   }
-  return null;
-};
+  return null
+}
 
 const hasGyrateOpts = (polyhedron: Polyhedron) => {
   if (inSection(polyhedron.name, 'rhombicosidodecahedra')) {
-    return true;
+    return true
   }
   const cupolaRows = [
     'triangular cupola',
     'square cupola',
     'pentagonal cupola',
     'pentagonal rotunda',
-  ];
+  ]
   if (inColumn(polyhedron.name, 'capstones', 'gyroelongated')) {
-    return false;
+    return false
   }
   if (_.some(cupolaRows, row => inRow(polyhedron.name, 'capstones', row))) {
-    return true;
+    return true
   }
-  return false;
-};
+  return false
+}
 
-type GyrateOpts = 'ortho' | 'gyro';
-const allGyrateOpts: GyrateOpts[] = ['ortho', 'gyro'];
+type GyrateOpts = 'ortho' | 'gyro'
+const allGyrateOpts: GyrateOpts[] = ['ortho', 'gyro']
 
 interface Options {
-  face: Face;
-  gyrate?: GyrateOpts;
-  using?: string;
+  face: Face
+  gyrate?: GyrateOpts
+  using?: string
 }
 export const augment = makeOperation<Options>('augment', {
   apply(polyhedron, { face, gyrate, using }) {
     const augmentType = using
       ? augmentTypes[using[0]]
-      : defaultAugmentType(face.numSides);
-    return doAugment(polyhedron, face, augmentType, gyrate);
+      : defaultAugmentType(face.numSides)
+    return doAugment(polyhedron, face, augmentType, gyrate)
   },
   optionTypes: ['face', 'gyrate', 'using'],
 
   resultsFilter(polyhedron, config, relations) {
-    const { face } = config;
+    const { face } = config
 
     if (!face) {
-      throw new Error('Invalid face');
+      throw new Error('Invalid face')
     }
-    const n = face.numSides;
-    const using = getUsingOpt(config.using!, n);
+    const n = face.numSides
+    const using = getUsingOpt(config.using!, n)
 
     const baseConfig = {
       using,
       gyrate: using === 'U2' ? 'gyro' : config.gyrate,
-    };
+    }
     return {
       ...baseConfig,
       align: hasMultiple(relations, 'align')
         ? getAugmentAlignment(polyhedron, face)
         : undefined,
-    };
+    }
   },
 
   allOptionCombos(polyhedron) {
-    const gyrateOpts = hasGyrateOpts(polyhedron) ? allGyrateOpts : [undefined];
+    const gyrateOpts = hasGyrateOpts(polyhedron) ? allGyrateOpts : [undefined]
 
-    const usingOpts = getUsingOpts(polyhedron) ?? [undefined];
-    const faceOpts = _.map(polyhedron.faces.filter(face => canAugment(face)));
+    const usingOpts = getUsingOpts(polyhedron) ?? [undefined]
+    const faceOpts = _.map(polyhedron.faces.filter(face => canAugment(face)))
 
-    const options: Options[] = [];
+    const options: Options[] = []
 
     for (let face of faceOpts) {
       for (let gyrate of gyrateOpts) {
         for (let using of usingOpts) {
           if (!using || canAugmentWithType(face, augmentTypes[using[0]])) {
-            options.push({ gyrate, using, face });
+            options.push({ gyrate, using, face })
           }
         }
       }
     }
 
-    return options;
+    return options
   },
 
   hitOption: 'face',
   getHitOption(polyhedron, hitPnt, options) {
-    if (!options) return {};
-    const face = polyhedron.hitFace(hitPnt);
+    if (!options) return {}
+    const face = polyhedron.hitFace(hitPnt)
     if (!options.using) {
-      return canAugment(face) ? { face } : {};
+      return canAugment(face) ? { face } : {}
     }
     if (!canAugmentWithType(face, augmentTypes[options.using[0]])) {
-      return {};
+      return {}
     }
-    return { face };
+    return { face }
   },
 
   faceSelectionStates(polyhedron, { face, using }) {
     return _.map(polyhedron.faces, f => {
-      if (face && f.equals(face)) return 'selected';
+      if (face && f.equals(face)) return 'selected'
 
-      if (!using && canAugment(f)) return 'selectable';
+      if (!using && canAugment(f)) return 'selectable'
 
       if (using && canAugmentWithType(f, augmentTypes[using[0]]))
-        return 'selectable';
-    });
+        return 'selectable'
+    })
   },
 
   allOptions(polyhedron, optionName) {
     switch (optionName) {
       case 'gyrate':
-        return hasGyrateOpts(polyhedron) ? ['ortho', 'gyro'] : [];
+        return hasGyrateOpts(polyhedron) ? ['ortho', 'gyro'] : []
       case 'using':
-        return getUsingOpts(polyhedron) ?? [];
+        return getUsingOpts(polyhedron) ?? []
       default:
-        return [];
+        return []
     }
   },
 
   defaultOptions(solid) {
-    if (!solid) return {};
-    const usingOpts = getUsingOpts(solid) ?? [];
+    if (!solid) return {}
+    const usingOpts = getUsingOpts(solid) ?? []
     return _.pickBy({
       gyrate: hasGyrateOpts(solid) && 'gyro',
       using: usingOpts.length > 1 && usingOpts[0],
-    });
+    })
   },
-});
+})

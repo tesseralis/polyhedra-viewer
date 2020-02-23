@@ -1,17 +1,17 @@
-import _ from 'lodash';
+import _ from 'lodash'
 
-import React, { useState } from 'react';
-import { NavLink, Route } from 'react-router-dom';
-import { fonts, useStyle, scales } from 'styles';
+import React, { useState } from 'react'
+import { NavLink, Route } from 'react-router-dom'
+import { fonts, useStyle, scales } from 'styles'
 
-import { groups } from 'data';
-import { escapeName } from 'math/polyhedra/names';
-import { hover, padding, paddingVert, margin, marginVert } from 'styles/common';
+import { groups } from 'data'
+import { escapeName } from 'math/polyhedra/names'
+import { hover, padding, paddingVert, margin, marginVert } from 'styles/common'
 
-import SearchBar from './SearchBar';
+import SearchBar from './SearchBar'
 
 function getFilteredPolyhedra(polyhedra: string[], filter: string) {
-  return polyhedra.filter(solid => solid.includes(filter.toLowerCase()));
+  return polyhedra.filter(solid => solid.includes(filter.toLowerCase()))
 }
 
 function filterGroups(groups: any[], filterText: string): any {
@@ -21,17 +21,17 @@ function filterGroups(groups: any[], filterText: string): any {
         return {
           ...group,
           groups: filterGroups(group.groups, filterText),
-        };
+        }
       }
       return {
         ...group,
         polyhedra: getFilteredPolyhedra(group.polyhedra, filterText),
-      };
+      }
     })
     .filter(
       ({ groups, polyhedra }) =>
         (groups && groups.length > 0) || (polyhedra && polyhedra.length > 0),
-    );
+    )
 }
 
 function PolyhedronLink({ name }: { name: string }) {
@@ -48,12 +48,12 @@ function PolyhedronLink({ name }: { name: string }) {
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
-  });
+  })
 
   const activeCss = useStyle({
     color: 'DarkSlateGray',
     fontWeight: 'bolder',
-  });
+  })
 
   return (
     <Route>
@@ -65,7 +65,7 @@ function PolyhedronLink({ name }: { name: string }) {
         {_.capitalize(name)}
       </NavLink>
     </Route>
-  );
+  )
 }
 
 function SubList({ polyhedra }: { polyhedra: string[] }) {
@@ -77,7 +77,7 @@ function SubList({ polyhedra }: { polyhedra: string[] }) {
         </li>
       ))}
     </ul>
-  );
+  )
 }
 
 function SubgroupHeader({ name }: { name: string }) {
@@ -85,39 +85,39 @@ function SubgroupHeader({ name }: { name: string }) {
     ...margin(scales.spacing[1], scales.spacing[3]),
     fontFamily: fonts.times,
     fontSize: scales.font[5],
-  });
-  return <h3 {...css()}>{_.capitalize(name)}</h3>;
+  })
+  return <h3 {...css()}>{_.capitalize(name)}</h3>
 }
 
 const Subgroup = ({
   name,
   polyhedra,
 }: {
-  name: string;
-  polyhedra: string[];
+  name: string
+  polyhedra: string[]
 }) => {
-  const css = useStyle(marginVert(scales.spacing[3]));
+  const css = useStyle(marginVert(scales.spacing[3]))
 
   return (
     <div {...css()}>
       <SubgroupHeader name={name} />
       <SubList polyhedra={polyhedra} />
     </div>
-  );
-};
+  )
+}
 
 function GroupHeader({ text }: { text: string }) {
   const css = useStyle({
     ...margin(scales.spacing[1], scales.spacing[3]),
     fontFamily: fonts.times,
     fontSize: scales.font[4],
-  });
-  return <h2 {...css()}>{text}</h2>;
+  })
+  return <h2 {...css()}>{text}</h2>
 }
 
 const PolyhedronGroup = ({ group }: { group: any }) => {
-  const { display, polyhedra, groups } = group;
-  const css = useStyle({ marginTop: scales.spacing[2] });
+  const { display, polyhedra, groups } = group
+  const css = useStyle({ marginTop: scales.spacing[2] })
 
   return (
     <div {...css()}>
@@ -126,15 +126,15 @@ const PolyhedronGroup = ({ group }: { group: any }) => {
       {groups &&
         groups.map((group: any) => <Subgroup key={group.name} {...group} />)}
     </div>
-  );
-};
+  )
+}
 
 export default function ListPanel() {
-  const [filterText, setFilterText] = useState('');
+  const [filterText, setFilterText] = useState('')
   const filteredGroups =
-    filterText === '' ? groups : filterGroups(groups, filterText);
+    filterText === '' ? groups : filterGroups(groups, filterText)
 
-  const css = useStyle(paddingVert(scales.spacing[2]));
+  const css = useStyle(paddingVert(scales.spacing[2]))
 
   return (
     <section {...css()}>
@@ -143,5 +143,5 @@ export default function ListPanel() {
         <PolyhedronGroup key={name} group={group} />
       ))}
     </section>
-  );
+  )
 }

@@ -1,7 +1,7 @@
-import React, { ComponentType } from 'react';
-import _ from 'lodash';
-import { useStyle, scales } from 'styles';
-import { fonts } from 'styles';
+import React, { ComponentType } from 'react'
+import _ from 'lodash'
+import { useStyle, scales } from 'styles'
+import { fonts } from 'styles'
 
 import {
   Sup,
@@ -10,12 +10,12 @@ import {
   displayVertexConfig,
   displaySymmetry,
   displayProperties,
-} from './renderFuncs';
+} from './renderFuncs'
 
 interface InfoRow {
-  name: string;
-  area: string;
-  render: ComponentType<RenderProps>;
+  name: string
+  area: string
+  render: ComponentType<RenderProps>
 }
 
 const infoRows: InfoRow[] = [
@@ -84,18 +84,18 @@ const infoRows: InfoRow[] = [
     name: 'Also known as',
     area: 'alt',
     render: ({ polyhedron }: RenderProps) => {
-      const alts = polyhedron.alternateNames();
-      if (alts.length === 0) return <>--</>;
+      const alts = polyhedron.alternateNames()
+      if (alts.length === 0) return <>--</>
       return (
         <ul>
           {alts.map(alt => (
             <li key={alt}>{alt}</li>
           ))}
         </ul>
-      );
+      )
     },
   },
-];
+]
 
 function Datum({
   polyhedron,
@@ -103,15 +103,15 @@ function Datum({
   area,
   render: Renderer,
 }: InfoRow & RenderProps) {
-  const css = useStyle({ marginBottom: 10 });
+  const css = useStyle({ marginBottom: 10 })
   const nameCss = useStyle({
     fontSize: scales.font[5],
     marginBottom: scales.spacing[1],
-  });
+  })
   const valueCss = useStyle({
     fontFamily: fonts.andaleMono,
     color: 'DimGrey',
-  });
+  })
 
   return (
     <div {...css()} style={{ gridArea: area }}>
@@ -120,7 +120,7 @@ function Datum({
         <Renderer polyhedron={polyhedron} />
       </dt>
     </div>
-  );
+  )
 }
 
 export default function DataList({ polyhedron }: RenderProps) {
@@ -135,7 +135,7 @@ export default function DataList({ polyhedron }: RenderProps) {
       "alt   alt   alt   alt   alt   alt"
     `,
     gridRowGap: scales.spacing[2],
-  });
+  })
 
   return (
     <dl {...css()}>
@@ -143,5 +143,5 @@ export default function DataList({ polyhedron }: RenderProps) {
         <Datum key={props.name} {...props} polyhedron={polyhedron} />
       ))}
     </dl>
-  );
+  )
 }

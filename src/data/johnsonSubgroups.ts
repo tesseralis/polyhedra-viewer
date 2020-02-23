@@ -1,4 +1,3 @@
-
 export default [
   { name: 'pyramids', index: 0 },
   { name: 'cupolæ and rotunda', index: 2 },
@@ -24,4 +23,4 @@ export default [
   { name: 'diminished rhombicosidodecahedra', index: 75 },
   { name: 'snub antiprisms', index: 83 },
   { name: 'others', index: 85 },
-];
+]

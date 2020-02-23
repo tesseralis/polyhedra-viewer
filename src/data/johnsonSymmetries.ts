@@ -1,4 +1,3 @@
-
 export default [
   { group: 'C', sub: '4v' },
   { group: 'C', sub: '5v' },
@@ -92,4 +91,4 @@ export default [
   { group: 'D', sub: '2d' },
   { group: 'D', sub: '2h' },
   { group: 'C', sub: '3v' },
-];
+]

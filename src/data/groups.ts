@@ -1,4 +1,3 @@
-
 export default [
   {
     name: 'platonic',
@@ -35,4 +34,4 @@ export default [
       'Strictly convex, non-uniform polyhedra, whose faces are regular polygons.',
     infoLink: 'http://en.wikipedia.org/wiki/Johnson_solid',
   },
-];
+]

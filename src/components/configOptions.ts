@@ -1,5 +1,5 @@
-import _ from 'lodash';
-import polygons, { polygonNames, PolygonMap } from 'math/polygons';
+import _ from 'lodash'
+import polygons, { polygonNames, PolygonMap } from 'math/polygons'
 
 // Colors from d3-scale-chromatic:
 // https://github.com/d3/d3-scale-chromatic#schemeCategory10
@@ -10,13 +10,13 @@ const defaultColors: PolygonMap<string> = {
   6: '#4daf4a',
   8: '#a65628',
   10: '#984ea3',
-};
+}
 
 export interface ConfigInput<T = any> {
-  key: string;
-  type: string;
-  default: T;
-  display: string;
+  key: string
+  type: string
+  default: T
+  display: string
 }
 
 const colorOptionsList = polygons.map(n => {
@@ -25,8 +25,8 @@ const colorOptionsList = polygons.map(n => {
     display: `${_.startCase(polygonNames.get(n))} Color`,
     type: 'color',
     default: defaultColors[n],
-  };
-});
+  }
+})
 
 export const configInputs: ConfigInput[] = [
   {
@@ -67,13 +67,13 @@ export const configInputs: ConfigInput[] = [
 ].map(input => ({
   ...input,
   display: _.get(input, 'display', _.startCase(input.key)),
-}));
+}))
 
 export const defaultConfig: Record<string, any> = _.reduce(
   configInputs,
   (obj, option) => {
-    _.set(obj, option.key, option.default);
-    return obj;
+    _.set(obj, option.key, option.default)
+    return obj
   },
   {},
-);
+)

@@ -1,23 +1,23 @@
-import _ from 'lodash';
-import { polygonPrefixes } from 'math/polygons';
+import _ from 'lodash'
+import { polygonPrefixes } from 'math/polygons'
 import {
   Table,
   Data as TableData,
   prisms,
   capstones,
   augmented,
-} from 'math/polyhedra/tables';
-import { toConwayNotation } from '../polyhedra/names';
-import { mapObject } from 'utils';
+} from 'math/polyhedra/tables'
+import { toConwayNotation } from '../polyhedra/names'
+import { mapObject } from 'utils'
 
 export interface Relation {
-  value: string;
-  gyrate?: 'ortho' | 'gyro';
-  align?: 'meta' | 'para';
-  direction?: 'forward' | 'back';
+  value: string
+  gyrate?: 'ortho' | 'gyro'
+  align?: 'meta' | 'para'
+  direction?: 'forward' | 'back'
 }
-type Graph = NestedRecord<string, string, any>;
-type FullGraph = NestedRecord<string, string, Relation[]>;
+type Graph = NestedRecord<string, string, any>
+type FullGraph = NestedRecord<string, string, Relation[]>
 
 // Make everything an array
 function normalize(graph: Graph) {
@@ -25,9 +25,9 @@ function normalize(graph: Graph) {
     _.mapValues(ops, relations => {
       return _.castArray(relations).map(relation =>
         _.isObject(relation) ? relation : { value: relation },
-      );
+      )
     }),
-  );
+  )
 }
 
 /** Remove nullish values from a graph */
@@ -35,25 +35,25 @@ function compact(graph: Graph) {
   return _.mapValues(graph, ops =>
     _(ops)
       .mapValues(options => {
-        return _.filter(options, option => !!option.value);
+        return _.filter(options, option => !!option.value)
       })
       .pickBy('length')
       .value(),
-  );
+  )
 }
 
 const customizer = (objValue: unknown, srcValue: unknown) => {
   if (_.isArray(objValue)) {
-    return objValue.concat(srcValue);
+    return objValue.concat(srcValue)
   }
-};
+}
 
 function graphMerge(object: Graph, other: Graph) {
-  return _.mergeWith(object, other, customizer);
+  return _.mergeWith(object, other, customizer)
 }
 
 function graphMergeAll(...objects: Graph[]) {
-  return _.reduce(objects, graphMerge)!;
+  return _.reduce(objects, graphMerge)!
 }
 
 const getInverseOperation = (operation: string) => {
@@ -62,108 +62,108 @@ const getInverseOperation = (operation: string) => {
     case 'gyrate':
     case 'twist':
     case 'turn':
-      return operation;
+      return operation
     case 'augment':
-      return 'diminish';
+      return 'diminish'
     case 'diminish':
-      return 'augment';
+      return 'augment'
     case 'truncate':
     case 'rectify':
-      return 'sharpen';
+      return 'sharpen'
     case 'expand':
     case 'snub':
-      return 'contract';
+      return 'contract'
     case 'elongate':
     case 'gyroelongate':
-      return 'shorten';
+      return 'shorten'
     default:
-      throw new Error(`Invalid operation: ${operation}`);
+      throw new Error(`Invalid operation: ${operation}`)
   }
-};
+}
 
 /**
  * Populate a graph with inverse operations.
  */
 function makeBidirectional(graph: FullGraph) {
-  const result: FullGraph = {};
+  const result: FullGraph = {}
   for (let [source, operations] of _.entries(graph)) {
     for (let [operation, sinks] of _.entries(operations)) {
       for (let sink of sinks) {
-        const sinkValue = sink.value;
+        const sinkValue = sink.value
         if (!sinkValue) {
-          continue;
+          continue
         }
         if (!result[sinkValue]) {
-          result[sinkValue] = {};
+          result[sinkValue] = {}
         }
-        const reverseOp = getInverseOperation(operation);
+        const reverseOp = getInverseOperation(operation)
         if (!result[sinkValue][reverseOp]) {
-          result[sinkValue][reverseOp] = [];
+          result[sinkValue][reverseOp] = []
         }
         if (sinkValue === source) {
-          continue;
+          continue
         }
-        const newValue = { ...sink, value: source };
+        const newValue = { ...sink, value: source }
         if (operation === 'gyrate' && sink.direction) {
-          newValue.direction = 'back';
+          newValue.direction = 'back'
         }
-        result[sinkValue][reverseOp].push(newValue);
+        result[sinkValue][reverseOp].push(newValue)
       }
     }
   }
-  return graphMerge(result, graph);
+  return graphMerge(result, graph)
 }
 
 function getKeyedTable(table: Table) {
-  const result: NestedRecord<string, string, any> = {};
+  const result: NestedRecord<string, string, any> = {}
   table.rows.forEach((row, i) => {
-    result[row] = {};
+    result[row] = {}
     table.columns.forEach((column, j) => {
-      const colName = typeof column === 'object' ? column.name : column;
-      result[row][colName] = table.data[i][j];
-    });
-  });
-  return result;
+      const colName = typeof column === 'object' ? column.name : column
+      result[row][colName] = table.data[i][j]
+    })
+  })
+  return result
 }
 
-const invalidNames = ['concave', 'coplanar'];
+const invalidNames = ['concave', 'coplanar']
 function convertTableNotation(notation: TableData): any {
-  if (Array.isArray(notation)) return notation.map(convertTableNotation);
-  if (notation[0] === '!') return notation.substring(1);
-  if (_.includes(invalidNames, notation)) return null;
-  return notation;
+  if (Array.isArray(notation)) return notation.map(convertTableNotation)
+  if (notation[0] === '!') return notation.substring(1)
+  if (_.includes(invalidNames, notation)) return null
+  return notation
 }
 
 function convertTable(table: Table) {
   return {
     ...table,
     data: table.data.map(row => row.map(convertTableNotation)),
-  };
+  }
 }
 
 const [prismMap, capstoneMap, augmentationMap] = [prisms, capstones, augmented]
   .map(convertTable)
-  .map(getKeyedTable);
+  .map(getKeyedTable)
 
 const hasCupolaRotunda = (name: string) =>
-  name.includes('pentagonal') && !name.includes('pyramid');
-const cupolaRotunda = capstoneMap['cupola-rotunda'];
+  name.includes('pentagonal') && !name.includes('pyramid')
+const cupolaRotunda = capstoneMap['cupola-rotunda']
 
 const getOrthoGyroAugment = (value: TableData, using: string) => {
   if (!_.isArray(value)) {
-    return [{ using, value }];
+    return [{ using, value }]
   } else {
     return [
       { using, value: value[0], gyrate: 'ortho' },
       { using, value: value[1], gyrate: 'gyro' },
-    ];
+    ]
   }
-};
+}
 
 const getCupolaRotunda = (using: string, colName: string) => {
-  const altUsing = using.includes('U') ? 'R5' : 'U5';
-  return getOrthoGyroAugment(cupolaRotunda[colName], altUsing);
-};
+  const altUsing = using.includes('U') ? 'R5' : 'U5'
+  return getOrthoGyroAugment(cupolaRotunda[colName], altUsing)
+}
 
 const getAugmentations = (using: string) => (
   rowName: string,
@@ -175,31 +175,28 @@ const getAugmentations = (using: string) => (
   ] as any)
     .flatten()
     .compact()
-    .value();
-};
+    .value()
+}
 
 const getCapstoneFromPrism = (prismRow: string) => {
-  const isPyramid = _.includes(
-    ['triangular', 'square', 'pentagonal'],
-    prismRow,
-  );
+  const isPyramid = _.includes(['triangular', 'square', 'pentagonal'], prismRow)
   if (isPyramid) {
-    return `${prismRow} pyramid`;
+    return `${prismRow} pyramid`
   }
-  const m = polygonPrefixes.of(prismRow as any);
-  return `${polygonPrefixes.get((m / 2) as any)} cupola`;
-};
+  const m = polygonPrefixes.of(prismRow as any)
+  return `${polygonPrefixes.get((m / 2) as any)} cupola`
+}
 
 const capstoneConway: Record<string, string> = {
   pyramid: 'Y',
   cupola: 'U',
   rotunda: 'R', // not official, I don't think
-};
+}
 
 const getCapstoneConway = (name: string) => {
-  const [sides, type] = name.split(' ');
-  return `${capstoneConway[type]}${polygonPrefixes.of(sides as any)}`;
-};
+  const [sides, type] = name.split(' ')
+  return `${capstoneConway[type]}${polygonPrefixes.of(sides as any)}`
+}
 
 const elongations = (
   pValue: string,
@@ -210,8 +207,8 @@ const elongations = (
   return {
     elongate: { value: pValue },
     gyroelongate: { value: aValue, gyrate, chiral },
-  };
-};
+  }
+}
 
 const archimedean = {
   T: {
@@ -266,18 +263,18 @@ const archimedean = {
   eD: {
     twist: { value: 'sD', chiral: true },
   },
-};
+}
 
 const baseCapstones = (() => {
-  let graph: Graph = {};
+  let graph: Graph = {}
   // relation of prisms and antiprisms
   _.forEach(prismMap, (row, name) => {
-    const { prism, antiprism } = row;
-    const hasRotunda = name.startsWith('decagonal');
-    const capstoneRow = getCapstoneFromPrism(name);
-    const { elongated, gyroelongated } = capstoneMap[capstoneRow];
-    const rotundaRow = capstoneMap['pentagonal rotunda'];
-    const using = getCapstoneConway(capstoneRow);
+    const { prism, antiprism } = row
+    const hasRotunda = name.startsWith('decagonal')
+    const capstoneRow = getCapstoneFromPrism(name)
+    const { elongated, gyroelongated } = capstoneMap[capstoneRow]
+    const rotundaRow = capstoneMap['pentagonal rotunda']
+    const using = getCapstoneConway(capstoneRow)
     graph = graphMerge(graph, {
       [prism]: {
         augment: [
@@ -292,10 +289,10 @@ const baseCapstones = (() => {
           hasRotunda && { value: rotundaRow.gyroelongated, using: 'R5' },
         ],
       },
-    });
-  });
+    })
+  })
   // for diminished icosahedra
-  graph['A5']['augment'][0].align = 'para';
+  graph['A5']['augment'][0].align = 'para'
 
   _.forEach(capstoneMap, (row, name) => {
     const {
@@ -305,9 +302,9 @@ const baseCapstones = (() => {
       'bi-': bi,
       'elongated bi-': elongatedBi,
       'gyroelongated bi-': gyroelongatedBi,
-    } = row;
-    const conway = getCapstoneConway(name);
-    const augmentations = getAugmentations(conway);
+    } = row
+    const conway = getCapstoneConway(name)
+    const augmentations = getAugmentations(conway)
     graph = graphMerge(graph, {
       [base]: {
         ...elongations(elongated, gyroelongated),
@@ -323,7 +320,7 @@ const baseCapstones = (() => {
       [gyroelongatedBi]: {
         gyrate: _.isArray(bi) ? { value: gyroelongatedBi } : null,
       },
-    });
+    })
 
     if (!_.isArray(bi)) {
       graph = graphMerge(graph, {
@@ -331,10 +328,10 @@ const baseCapstones = (() => {
         [elongatedBi]: {
           turn: gyroelongatedBi,
         },
-      });
+      })
     } else {
-      const [ortho, gyro] = bi;
-      const [elongBiOrtho, elongBiGyro] = elongatedBi;
+      const [ortho, gyro] = bi
+      const [elongBiOrtho, elongBiGyro] = elongatedBi
       graph = graphMerge(graph, {
         [ortho]: elongations(elongBiOrtho, gyroelongatedBi, 'ortho', true),
         [gyro]: elongations(elongBiGyro, gyroelongatedBi, 'gyro', true),
@@ -344,57 +341,57 @@ const baseCapstones = (() => {
         [elongBiGyro]: {
           turn: { value: gyroelongatedBi, gyrate: 'gyro', chiral: true },
         },
-      });
+      })
     }
 
     // gyrate relationships
     _.forEach(row, cell => {
       if (_.isArray(cell)) {
-        const [ortho, gyro] = cell;
+        const [ortho, gyro] = cell
         graph = graphMerge(graph, {
           [ortho]: {
             gyrate: gyro,
           },
-        });
+        })
       }
-    });
-  });
+    })
+  })
 
-  return graph;
-})();
+  return graph
+})()
 
 const getAugmentee = (name: string) => {
-  if (name.includes('prism')) return 'Y4';
-  if (name === 'dodecahedron') return 'Y5';
-  const type = name.split(' ')[1];
+  if (name.includes('prism')) return 'Y4'
+  if (name === 'dodecahedron') return 'Y5'
+  const type = name.split(' ')[1]
   switch (type) {
     case 'tetrahedron':
-      return 'U3';
+      return 'U3'
     case 'cube':
-      return 'U4';
+      return 'U4'
     case 'dodecahedron':
-      return 'U5';
+      return 'U5'
     default:
-      return null;
+      return null
   }
-};
+}
 
 const getBiAugmented = (biaugmented: TableData, using: string) => {
   if (!_.isArray(biaugmented)) {
-    return [{ using, value: biaugmented }];
+    return [{ using, value: biaugmented }]
   }
   return [
     { using, value: biaugmented[0], align: 'para' },
     { using, value: biaugmented[1], align: 'meta' },
-  ];
-};
+  ]
+}
 
 const baseAugmentations = (() => {
-  let graph = {};
+  let graph = {}
   _.forEach(augmentationMap, (row, name) => {
-    const base = toConwayNotation(name);
-    const { augmented, biaugmented, triaugmented } = row;
-    const augmentee = getAugmentee(name);
+    const base = toConwayNotation(name)
+    const { augmented, biaugmented, triaugmented } = row
+    const augmentee = getAugmentee(name)
     graph = graphMerge(graph, {
       [base]: {
         augment: { using: augmentee, value: augmented },
@@ -405,10 +402,10 @@ const baseAugmentations = (() => {
       [_.isArray(biaugmented) ? biaugmented[1] : biaugmented]: {
         augment: { using: augmentee, value: triaugmented },
       },
-    });
-  });
-  return graph;
-})();
+    })
+  })
+  return graph
+})()
 
 const diminishedIcosahedra = (() => {
   return {
@@ -421,14 +418,14 @@ const diminishedIcosahedra = (() => {
     J62: {
       augment: { using: 'Y5', align: 'meta', value: 'J11' },
     },
-  };
-})();
+  }
+})()
 
 const rhombicosidodecahedra = (() => {
   const getAugment = (relations: Relation[]) =>
-    relations.map(relation => ({ ...relation, using: 'U5' }));
+    relations.map(relation => ({ ...relation, using: 'U5' }))
   const getGyrate = (relations: Relation[]) =>
-    relations.map(relation => ({ ...relation, direction: 'forward' }));
+    relations.map(relation => ({ ...relation, direction: 'forward' }))
   return {
     // tridiminished
     J83: {
@@ -501,11 +498,11 @@ const rhombicosidodecahedra = (() => {
     J74: {
       gyrate: getGyrate([{ value: 'J75' }]),
     },
-  };
-})();
+  }
+})()
 
 const elementary = (() => {
-  const empty = mapObject(_.range(87, 93), j => [`J${j}`, {}]);
+  const empty = mapObject(_.range(87, 93), j => [`J${j}`, {}])
   return {
     ...empty,
     // TODO semisnub to create snub antiprisms
@@ -523,8 +520,8 @@ const elementary = (() => {
     J86: {
       augment: { using: 'Y4', value: 'J87' },
     },
-  };
-})();
+  }
+})()
 
 const normalized = [
   archimedean,
@@ -535,6 +532,6 @@ const normalized = [
   elementary,
 ]
   .map(normalize)
-  .map(compact);
+  .map(compact)
 
-export default makeBidirectional(graphMergeAll(...normalized)) as FullGraph;
+export default makeBidirectional(graphMergeAll(...normalized)) as FullGraph

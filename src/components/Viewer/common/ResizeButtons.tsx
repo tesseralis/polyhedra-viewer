@@ -1,11 +1,11 @@
-import React, { ButtonHTMLAttributes } from 'react';
-import { useStyle, scales } from 'styles';
+import React, { ButtonHTMLAttributes } from 'react'
+import { useStyle, scales } from 'styles'
 
-import { TransitionCtx, PolyhedronCtx } from 'components/Viewer/context';
+import { TransitionCtx, PolyhedronCtx } from 'components/Viewer/context'
 
-import { Polyhedron } from 'math/polyhedra';
-import { andaleMono } from 'styles/fonts';
-import { hover } from 'styles/common';
+import { Polyhedron } from 'math/polyhedra'
+import { andaleMono } from 'styles/fonts'
+import { hover } from 'styles/common'
 
 function ResetButton(props: ButtonHTMLAttributes<Element>) {
   const css = useStyle({
@@ -16,8 +16,8 @@ function ResetButton(props: ButtonHTMLAttributes<Element>) {
     padding: scales.spacing[2],
     fontSize: scales.font[6],
     fontFamily: andaleMono,
-  });
-  return <button {...props} {...css()} />;
+  })
+  return <button {...props} {...css()} />
 }
 
 const buttons = [
@@ -29,18 +29,18 @@ const buttons = [
     name: 'Resize',
     handler: (polyhedron: Polyhedron) => polyhedron.normalizeToVolume(5),
   },
-];
+]
 
 export default function ResizeButtons() {
-  const polyhedron = PolyhedronCtx.useState();
-  const { setPolyhedron } = PolyhedronCtx.useActions();
-  const { isTransitioning } = TransitionCtx.useState();
+  const polyhedron = PolyhedronCtx.useState()
+  const { setPolyhedron } = PolyhedronCtx.useActions()
+  const { isTransitioning } = TransitionCtx.useState()
 
   const css = useStyle({
     display: 'grid',
     gridTemplateColumns: '1fr 1fr',
     columnGap: scales.spacing[2],
-  });
+  })
   return (
     <div {...css()}>
       {buttons.map(({ name, handler }) => (
@@ -53,5 +53,5 @@ export default function ResizeButtons() {
         </ResetButton>
       ))}
     </div>
-  );
+  )
 }
