@@ -6,8 +6,7 @@ Polyhedra include:
 
 - [Platonic Solids](http://en.wikipedia.org/wiki/Platonic_solid)
 - [Archimedean Solids](http://en.wikipedia.org/wiki/Archimedean_solid)
-- [Prisms](<http://en.wikipedia.org/wiki/Prism_(geometry)>)
-- [Antiprisms](http://en.wikipedia.org/wiki/Antiprism)
+- [Prisms](<http://en.wikipedia.org/wiki/Prism_(geometry)>) and [Antiprisms](http://en.wikipedia.org/wiki/Antiprism)
 - [Johnson Solids](http://en.wikipedia.org/wiki/Johnson_solid)
 
 Geometric data taken from George W. Hart's [Virtual Polyhedra].
