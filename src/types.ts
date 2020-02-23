@@ -1,5 +1,4 @@
 import { ReactNode } from "react"
-// TODO should these be d.ts files?
 
 /** Type representing a point in 3D space */
 export type Point = [number, number, number]
