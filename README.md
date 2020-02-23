@@ -1,6 +1,8 @@
 # Polyhedra Viewer
 
-An interactive tool that lets you transform various convex polyhedra:
+An interactive tool that lets you transform various convex polyhedra and view information about them.
+
+Polyhedra include:
 
 - [Platonic Solids](http://en.wikipedia.org/wiki/Platonic_solid)
 - [Archimedean Solids](http://en.wikipedia.org/wiki/Archimedean_solid)
@@ -8,20 +10,13 @@ An interactive tool that lets you transform various convex polyhedra:
 - [Antiprisms](http://en.wikipedia.org/wiki/Antiprism)
 - [Johnson Solids](http://en.wikipedia.org/wiki/Johnson_solid)
 
-It was built with (among [other things]):
-
-- [React](https://facebook.github.io/react/)
-- [Aphrodite](https://github.com/Khan/aphrodite)
-- [x3dom](http://www.x3dom.org/)
-
 Geometric data taken from George W. Hart's [Virtual Polyhedra].
 
 [virtual polyhedra]: http://www.georgehart.com/virtual-polyhedra/vp.html
-[other things]: ./package.json
 
 ## Getting started
 
-1. `git clone https://github.com/tesseralis/polyhedra-viewer
+1. `git clone https://github.com/tesseralis/polyhedra-viewer`
 2. `cd polyhedra-viewer
 3. `npm install`
 
