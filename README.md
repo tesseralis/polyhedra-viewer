@@ -16,7 +16,7 @@ Geometric data taken from George W. Hart's [Virtual Polyhedra].
 ## Getting started
 
 1. `git clone https://github.com/tesseralis/polyhedra-viewer`
-2. `cd polyhedra-viewer
+2. `cd polyhedra-viewer`
 3. `npm install`
 
 ### Running locally
