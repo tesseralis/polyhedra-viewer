@@ -30,3 +30,5 @@ Run `npm test` to run the test suite.
 ## Contributing
 
 Check out the [open issues](https://github.com/tesseralis/polyhedra-viewer/issues), especially the ones labelled [help wanted](https://github.com/tesseralis/polyhedra-viewer/issues?q=is%3Aopen+is%3Aissue+label%3A%22help+wanted%22) for issues that you can help out on!
+
+All contributors are expected to abide by the [Code of Conduct](/CODE_OF_CONDUCT.md).
