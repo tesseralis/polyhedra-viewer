@@ -104,7 +104,7 @@ If you would like to learn more about polyhedra and other geometric figures, che
 `;
 
 export const footer = `
-Copyright © 2018 Nat Alison
+Copyright © 2018-2020 Nat Alison
 
 If you enjoyed this and would like to see more, please consider buying me a [Ko-fi].
 
