@@ -1,5 +1,5 @@
-import { useMemo } from 'react';
-import { StyleSheet, css, CSSProperties } from 'aphrodite/no-important';
+import { useMemo } from "react"
+import { StyleSheet, css, CSSProperties } from "aphrodite/no-important"
 
 /**
  * Hook that allows you to define dynamic (or static) css for use in a component.
@@ -40,10 +40,10 @@ import { StyleSheet, css, CSSProperties } from 'aphrodite/no-important';
  */
 export default function useStyle(styles: CSSProperties, deps: unknown[] = []) {
   return useMemo(() => {
-    const rule = StyleSheet.create({ styles });
-    return (prop: string = 'className') => ({
+    const rule = StyleSheet.create({ styles })
+    return (prop: string = "className") => ({
       [prop]: css(rule.styles),
-    });
+    })
     // eslint-disable-next-line
-  }, [styles, ...deps]);
+  }, [styles, ...deps])
 }

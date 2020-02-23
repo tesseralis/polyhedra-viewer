@@ -1,16 +1,16 @@
-import React from 'react';
-import { Route, NavLink, NavLinkProps } from 'react-router-dom';
-import { useStyle, scales } from 'styles';
-import Icon from '@mdi/react';
+import React from "react"
+import { Route, NavLink, NavLinkProps } from "react-router-dom"
+import { useStyle, scales } from "styles"
+import Icon from "@mdi/react"
 
-import { media, fonts } from 'styles';
-import { SrOnly } from 'components/common';
-import { colorFill, flexColumn } from 'styles/common';
+import { media, fonts } from "styles"
+import { SrOnly } from "components/common"
+import { colorFill, flexColumn } from "styles/common"
 
 interface Props extends NavLinkProps {
-  iconName: string;
-  iconOnly?: boolean;
-  title: string;
+  iconName: string
+  iconOnly?: boolean
+  title: string
 }
 
 function LinkText({ text, hidden }: { text: string; hidden: boolean }) {
@@ -23,8 +23,8 @@ function LinkText({ text, hidden }: { text: string; hidden: boolean }) {
       marginTop: 0,
       paddingLeft: scales.spacing[1],
     },
-  });
-  return hidden ? <SrOnly>{text}</SrOnly> : <div {...css()}>{text}</div>;
+  })
+  return hidden ? <SrOnly>{text}</SrOnly> : <div {...css()}>{text}</div>
 }
 
 export default function IconLink({
@@ -37,18 +37,18 @@ export default function IconLink({
   iconOnly = false,
 }: Props) {
   const css = useStyle({
-    ...flexColumn('center'),
-    ...colorFill('DimGray'),
-    textDecoration: 'none',
+    ...flexColumn("center"),
+    ...colorFill("DimGray"),
+    textDecoration: "none",
     padding: scales.spacing[2],
 
     [media.mobileLandscape]: {
       padding: 0,
-      flexDirection: 'row',
+      flexDirection: "row",
     },
-  });
+  })
 
-  const activeCss = useStyle(colorFill('DarkSlateGray'));
+  const activeCss = useStyle(colorFill("DarkSlateGray"))
 
   return (
     <Route>
@@ -57,12 +57,12 @@ export default function IconLink({
         replace={replace}
         exact={exact}
         {...css()}
-        {...activeCss('activeClassName')}
+        {...activeCss("activeClassName")}
         onClick={onClick}
       >
         <Icon path={iconName} size={scales.size[2]} />
         <LinkText text={title} hidden={iconOnly} />
       </NavLink>
     </Route>
-  );
+  )
 }

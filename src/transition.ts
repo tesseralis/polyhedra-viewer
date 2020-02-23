@@ -1,16 +1,16 @@
-import _ from 'lodash';
-import * as d3 from 'd3-ease';
-import { interpolate } from 'd3-interpolate';
+import _ from "lodash"
+import * as d3 from "d3-ease"
+import { interpolate } from "d3-interpolate"
 
 export interface TransitionOptions<T> {
-  startValue: T;
-  endValue: T;
-  duration: number;
-  ease: string;
-  onFinish(): void;
+  startValue: T
+  endValue: T
+  duration: number
+  ease: string
+  onFinish(): void
 }
 
-export type Callback<T> = (val: T) => void;
+export type Callback<T> = (val: T) => void
 
 /**
  * An animation function based on d3's interpolate.
@@ -27,30 +27,30 @@ export default function transition<T extends object>(
     duration,
     ease,
     onFinish = _.noop,
-  } = options;
-  let start = 0;
-  const id: { current?: number } = {};
+  } = options
+  let start = 0
+  const id: { current?: number } = {}
   // Adapted from:
   // https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame
-  const interp = interpolate(startValue, endValue);
+  const interp = interpolate(startValue, endValue)
   const step = (timestamp: number) => {
     if (!start) {
-      start = timestamp;
+      start = timestamp
     }
-    const delta = timestamp - start;
-    const progress = Math.min(delta / duration, 1);
-    const currentValue = interp(_.get(d3, ease)(progress));
-    updateCallback(currentValue);
+    const delta = timestamp - start
+    const progress = Math.min(delta / duration, 1)
+    const currentValue = interp(_.get(d3, ease)(progress))
+    updateCallback(currentValue)
     if (delta < duration) {
-      id.current = requestAnimationFrame(step);
+      id.current = requestAnimationFrame(step)
     } else {
-      onFinish();
+      onFinish()
     }
-  };
-  id.current = requestAnimationFrame(step);
+  }
+  id.current = requestAnimationFrame(step)
   return {
     cancel() {
-      cancelAnimationFrame(id.current!);
+      cancelAnimationFrame(id.current!)
     },
-  };
+  }
 }

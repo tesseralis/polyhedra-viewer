@@ -1,29 +1,29 @@
-import _ from 'lodash';
-import React from 'react';
+import _ from "lodash"
+import React from "react"
 import {
   mdiFormatListBulleted,
   mdiInformationOutline,
   mdiSettings,
   mdiMathCompass,
   mdiCubeOutline,
-} from '@mdi/js';
+} from "@mdi/js"
 
-import { useStyle } from 'styles';
-import IconLink from './IconLink';
+import { useStyle } from "styles"
+import IconLink from "./IconLink"
 
 interface Props {
-  solid: string;
-  compact?: boolean;
-  onClick?: () => void;
+  solid: string
+  compact?: boolean
+  onClick?: () => void
 }
 
 const links = [
-  { name: 'list', icon: mdiFormatListBulleted },
-  { name: 'info', icon: mdiInformationOutline },
-  { name: 'options', icon: mdiSettings },
-  { name: 'operations', icon: mdiMathCompass },
-  { name: 'full', title: 'Fullscreen', icon: mdiCubeOutline },
-];
+  { name: "list", icon: mdiFormatListBulleted },
+  { name: "info", icon: mdiInformationOutline },
+  { name: "options", icon: mdiSettings },
+  { name: "operations", icon: mdiMathCompass },
+  { name: "full", title: "Fullscreen", icon: mdiCubeOutline },
+]
 
 export default function NavMenu({
   solid,
@@ -32,11 +32,11 @@ export default function NavMenu({
 }: Props) {
   const css = useStyle({
     // Using grid here bc it's easier to get evenly spaced than flex
-    display: 'grid',
+    display: "grid",
     gridTemplateColumns: `repeat(${links.length}, 1fr)`,
-    justifyItems: 'center',
-    width: '100%',
-  });
+    justifyItems: "center",
+    width: "100%",
+  })
 
   return (
     <nav {...css()}>
@@ -52,5 +52,5 @@ export default function NavMenu({
         />
       ))}
     </nav>
-  );
+  )
 }

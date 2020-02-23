@@ -1,13 +1,13 @@
-import React, { useContext } from 'react';
+import React, { useContext } from "react"
 
 const state = {
-  device: 'desktop',
+  device: "desktop",
   orientation: null,
-};
+}
 
-const DeviceContext = React.createContext(state);
-export const DeviceProvider = DeviceContext.Provider;
+const DeviceContext = React.createContext(state)
+export const DeviceProvider = DeviceContext.Provider
 
 export default function useMediaInfo() {
-  return useContext(DeviceContext);
+  return useContext(DeviceContext)
 }

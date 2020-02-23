@@ -1,1 +1,1 @@
-export { default } from './InfoPanel';
+export { default } from "./InfoPanel"

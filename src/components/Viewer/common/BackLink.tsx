@@ -1,10 +1,11 @@
+import React from "react"
+import { mdiChevronLeft } from "@mdi/js"
 
-import React from 'react';
-import { mdiChevronLeft } from '@mdi/js';
+import IconLink from "./IconLink"
 
-import IconLink from './IconLink';
-
-interface Props { solid: string }
+interface Props {
+  solid: string
+}
 
 export default function BackLink({ solid }: Props) {
   return (
@@ -13,9 +14,9 @@ export default function BackLink({ solid }: Props) {
       iconName={mdiChevronLeft}
       title="Back"
       to={{
-        pathname: '/',
+        pathname: "/",
         hash: solid,
       }}
     />
-  );
+  )
 }

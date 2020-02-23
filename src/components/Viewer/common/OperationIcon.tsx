@@ -1,29 +1,29 @@
-import _ from 'lodash';
+import _ from "lodash"
 
-import React, { memo, ComponentType } from 'react';
-import { StyleSheet, css } from 'aphrodite/no-important';
+import React, { memo, ComponentType } from "react"
+import { StyleSheet, css } from "aphrodite/no-important"
 
-import { OpName } from 'math/operations';
-import { Polygon, PolyLine } from 'components/svg';
-import { square } from 'styles/common';
-import { scales } from 'styles';
-const { sqrt } = Math;
+import { OpName } from "math/operations"
+import { Polygon, PolyLine } from "components/svg"
+import { square } from "styles/common"
+import { scales } from "styles"
+const { sqrt } = Math
 
-type SheetDefinition = { [key: string]: {} };
+type SheetDefinition = { [key: string]: {} }
 
-type KeyType = string | false;
+type KeyType = string | false
 
 // TODO usually we would do `useStyle`, but I can't figure out
 // how to make it look reasonable. Plus, I'm thinking of redoing these anyway.
 function makeStyles(inputStyles: SheetDefinition) {
-  const styles = StyleSheet.create(inputStyles);
+  const styles = StyleSheet.create(inputStyles)
 
   return (...keys: KeyType[]) => {
-    return css(...keys.map(key => !!key && styles[key]));
-  };
+    return css(...keys.map(key => !!key && styles[key]))
+  }
 }
 
-const color = 'DimGray';
+const color = "DimGray"
 const styles = makeStyles({
   operationIcon: square(scales.size[3]),
 
@@ -31,35 +31,35 @@ const styles = makeStyles({
     fill: color,
     stroke: color,
     strokeWidth: 5,
-    strokeLinejoin: 'round',
+    strokeLinejoin: "round",
   },
 
   subtracted: {
-    fill: 'none',
+    fill: "none",
     stroke: color,
     strokeWidth: 5,
     strokeDasharray: 10,
   },
 
   added: {
-    fill: 'none',
+    fill: "none",
     stroke: color,
     strokeWidth: 5,
-    strokeLinejoin: 'round',
+    strokeLinejoin: "round",
   },
 
   changed: {
-    fill: 'none',
+    fill: "none",
     stroke: color,
     strokeWidth: 5,
   },
-});
+})
 
 interface TruncateIconProps {
-  styled: string;
-  innerSides?: number;
-  innerScale?: number;
-  innerAngle?: number;
+  styled: string
+  innerSides?: number
+  innerScale?: number
+  innerAngle?: number
 }
 
 function TruncateIcon({
@@ -68,61 +68,61 @@ function TruncateIcon({
   innerScale = 1 / sqrt(3),
   innerAngle = 0,
 }: TruncateIconProps) {
-  const center = { cx: 100, cy: 120 };
-  const r = 100;
+  const center = { cx: 100, cy: 120 }
+  const r = 100
   return (
     <>
       <Polygon className={styles(styled)} n={3} r={r} a={-90} {...center} />
       <Polygon
-        className={styles('invariant')}
+        className={styles("invariant")}
         n={innerSides}
         r={r * innerScale}
         a={innerAngle}
         {...center}
       />
     </>
-  );
+  )
 }
 
 function DualIcon() {
-  const center = { cx: 100, cy: 100 };
-  const r = 75;
+  const center = { cx: 100, cy: 100 }
+  const r = 75
   return (
     <>
       <Polygon
-        className={styles('subtracted')}
+        className={styles("subtracted")}
         n={3}
         r={r}
         a={-90}
         {...center}
       />
-      <Polygon className={styles('added')} n={3} r={r} a={90} {...center} />
+      <Polygon className={styles("added")} n={3} r={r} a={90} {...center} />
       <Polygon
-        className={styles('invariant')}
+        className={styles("invariant")}
         n={6}
         r={r / sqrt(3)}
         a={0}
         {...center}
       />
     </>
-  );
+  )
 }
 
 interface ExpandIconRenderProps {
-  cx: number;
-  cy: number;
-  r: number;
-  ap: number;
-  r1: number;
-  ap1: number;
+  cx: number
+  cy: number
+  r: number
+  ap: number
+  r1: number
+  ap1: number
 }
 
 interface ExpandIconProps {
-  styled: string;
-  render?: ComponentType<ExpandIconRenderProps>;
-  hollow?: boolean;
-  innerStyle?: string;
-  innerAngle?: number;
+  styled: string
+  render?: ComponentType<ExpandIconRenderProps>
+  hollow?: boolean
+  innerStyle?: string
+  innerAngle?: number
 }
 
 function BaseExpandIcon({
@@ -131,16 +131,16 @@ function BaseExpandIcon({
   hollow = false,
   innerAngle = 0,
 }: ExpandIconProps) {
-  const [cx, cy] = [100, 100];
-  const r = 80;
-  const ap = (sqrt(3) * r) / 2;
-  const r1 = r / sqrt(3);
-  const ap1 = r1 / 2;
+  const [cx, cy] = [100, 100]
+  const r = 80
+  const ap = (sqrt(3) * r) / 2
+  const r1 = r / sqrt(3)
+  const ap1 = r1 / 2
   return (
     <>
       <Polygon className={styles(styled)} n={6} r={r} a={0} cx={cx} cy={cy} />
       <Polygon
-        className={styles(hollow ? styled : 'invariant')}
+        className={styles(hollow ? styled : "invariant")}
         n={3}
         r={r1}
         a={innerAngle}
@@ -149,7 +149,7 @@ function BaseExpandIcon({
       />
       <Renderer {...{ cx, cy, r, ap, r1, ap1 }} />
     </>
-  );
+  )
 }
 
 function ExpandIcon({
@@ -181,34 +181,42 @@ function ExpandIcon({
         </>
       )}
     />
-  );
+  )
 }
 
 interface ElongateIconRenderProps {
-  cx: number;
-  cy: number;
-  r: number;
-  ap: number;
+  cx: number
+  cy: number
+  r: number
+  ap: number
 }
 interface ElongateIconProps {
-  styled: string;
-  render?: ComponentType<ElongateIconRenderProps>;
+  styled: string
+  render?: ComponentType<ElongateIconRenderProps>
 }
 function ElongateIcon({ styled, render: Renderer }: ElongateIconProps) {
   // TODO consolidate with expand
-  const [cx, cy] = [100, 100];
-  const r = 80;
-  const ap = (sqrt(3) * r) / 2;
+  const [cx, cy] = [100, 100]
+  const r = 80
+  const ap = (sqrt(3) * r) / 2
   return (
     <>
       <Polygon className={styles(styled)} n={6} r={r} a={90} cx={cx} cy={cy} />
       <PolyLine
-        className={styles('invariant')}
-        points={[[cx - ap, cy - r / 2], [cx, cy - r], [cx + ap, cy - r / 2]]}
+        className={styles("invariant")}
+        points={[
+          [cx - ap, cy - r / 2],
+          [cx, cy - r],
+          [cx + ap, cy - r / 2],
+        ]}
       />
       <PolyLine
-        className={styles('invariant')}
-        points={[[cx - ap, cy + r / 2], [cx, cy + r], [cx + ap, cy + r / 2]]}
+        className={styles("invariant")}
+        points={[
+          [cx - ap, cy + r / 2],
+          [cx, cy + r],
+          [cx + ap, cy + r / 2],
+        ]}
       />
       {Renderer ? (
         <Renderer {...{ cx, cy, r, ap }} />
@@ -222,18 +230,18 @@ function ElongateIcon({ styled, render: Renderer }: ElongateIconProps) {
         />
       )}
     </>
-  );
+  )
 }
 
 function AugmentIcon({ styled }: { styled: string }) {
-  const [cx, cy] = [100, 100];
-  const r = 80;
-  const ap = (sqrt(3) * r) / 2;
+  const [cx, cy] = [100, 100]
+  const r = 80
+  const ap = (sqrt(3) * r) / 2
   return (
     <>
       <Polygon className={styles(styled)} n={6} r={r} a={90} cx={cx} cy={cy} />
       <PolyLine
-        className={styles('invariant')}
+        className={styles("invariant")}
         points={[
           [cx - ap, cy - r / 2],
           [cx - ap, cy + r / 2],
@@ -243,14 +251,14 @@ function AugmentIcon({ styled }: { styled: string }) {
         ]}
       />
     </>
-  );
+  )
 }
 
 function drawIcon(name: OpName) {
   switch (name) {
-    case 'truncate':
-      return <TruncateIcon styled="subtracted" />;
-    case 'rectify':
+    case "truncate":
+      return <TruncateIcon styled="subtracted" />
+    case "rectify":
       return (
         <TruncateIcon
           styled="subtracted"
@@ -258,15 +266,15 @@ function drawIcon(name: OpName) {
           innerScale={1 / 2}
           innerAngle={90}
         />
-      );
-    case 'sharpen':
-      return <TruncateIcon styled="added" />;
-    case 'dual':
-      return <DualIcon />;
-    case 'expand': {
-      return <ExpandIcon styled="added" />;
+      )
+    case "sharpen":
+      return <TruncateIcon styled="added" />
+    case "dual":
+      return <DualIcon />
+    case "expand": {
+      return <ExpandIcon styled="added" />
     }
-    case 'snub': {
+    case "snub": {
       return (
         <BaseExpandIcon
           styled="added"
@@ -277,7 +285,7 @@ function drawIcon(name: OpName) {
               {_.range(3).map(i => (
                 <PolyLine
                   key={i}
-                  className={styles('added')}
+                  className={styles("added")}
                   transform={`rotate(${i * 120} ${cx} ${cy})`}
                   points={[
                     [cx - ap1, cy - r / 2],
@@ -290,12 +298,12 @@ function drawIcon(name: OpName) {
             </>
           )}
         />
-      );
+      )
     }
-    case 'contract': {
-      return <ExpandIcon styled="subtracted" />;
+    case "contract": {
+      return <ExpandIcon styled="subtracted" />
     }
-    case 'twist': {
+    case "twist": {
       return (
         <ExpandIcon
           styled="changed"
@@ -305,27 +313,30 @@ function drawIcon(name: OpName) {
               {_.range(3).map(i => (
                 <PolyLine
                   key={i}
-                  className={styles('changed')}
+                  className={styles("changed")}
                   transform={`rotate(${i * 120} ${cx} ${cy})`}
-                  points={[[cx - r / 2, cy + ap1], [cx + r / 2, cy + ap]]}
+                  points={[
+                    [cx - r / 2, cy + ap1],
+                    [cx + r / 2, cy + ap],
+                  ]}
                 />
               ))}
             </>
           )}
         />
-      );
+      )
     }
 
-    case 'elongate':
-      return <ElongateIcon styled="added" />;
+    case "elongate":
+      return <ElongateIcon styled="added" />
 
-    case 'gyroelongate':
+    case "gyroelongate":
       return (
         <ElongateIcon
           styled="added"
           render={({ cx, cy, r, ap }) => (
             <PolyLine
-              className={styles('added')}
+              className={styles("added")}
               points={[
                 [cx - ap, cy - r / 2],
                 [cx - r / 2, cy + r / 2],
@@ -336,18 +347,18 @@ function drawIcon(name: OpName) {
             />
           )}
         />
-      );
+      )
 
-    case 'shorten':
-      return <ElongateIcon styled="subtracted" />;
+    case "shorten":
+      return <ElongateIcon styled="subtracted" />
 
-    case 'turn':
+    case "turn":
       return (
         <ElongateIcon
           styled="added"
           render={({ cx, cy, r, ap }) => (
             <PolyLine
-              className={styles('added')}
+              className={styles("added")}
               points={[
                 [cx - ap, cy - r / 2],
                 [cx - r / 2, cy + r / 2],
@@ -359,12 +370,12 @@ function drawIcon(name: OpName) {
             />
           )}
         />
-      );
-    case 'augment':
-      return <AugmentIcon styled="added" />;
-    case 'diminish':
-      return <AugmentIcon styled="subtracted" />;
-    case 'gyrate':
+      )
+    case "augment":
+      return <AugmentIcon styled="added" />
+    case "diminish":
+      return <AugmentIcon styled="subtracted" />
+    case "gyrate":
       // TODO simplify the ExpandIcon hierarchy
       return (
         <>
@@ -373,20 +384,20 @@ function drawIcon(name: OpName) {
             <ExpandIcon styled="added" hollow />
           </g>
         </>
-      );
+      )
     default:
-      throw new Error(`Unknown operation: ${name}`);
+      throw new Error(`Unknown operation: ${name}`)
   }
 }
 
 interface Props {
-  name: OpName;
+  name: OpName
 }
 
 export default memo(function OperationIcon({ name }: Props) {
   return (
-    <svg viewBox="0 0 200 200" className={styles('operationIcon')}>
+    <svg viewBox="0 0 200 200" className={styles("operationIcon")}>
       {drawIcon(name)}
     </svg>
-  );
-});
+  )
+})

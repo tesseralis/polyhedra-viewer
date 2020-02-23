@@ -8,7 +8,7 @@ This application visualizes the relationships between the convex, regular-faced 
 [prisms]: http://en.wikipedia.org/wiki/Prism_(geometry)
 [antiprisms]: http://en.wikipedia.org/wiki/Antiprism
 [Johnson solids]: http://en.wikipedia.org/wiki/Johnson_solid
-`;
+`
 
 export const uniform = `
 The uniform polyhedra are the Platonic solids, the Archimedean solids, and the infinite set of prisms and antiprisms.
@@ -25,13 +25,13 @@ The 13 Archimedean solids can be constructed from the Platonic solids by a set o
 * **snub** - Pull the faces of the solid out and twist them
 
 In contrast to the Archimedean solids, there are infinitely many prisms and antiprisms, one for each type of polygon. A small number are included here because of their relationship to the Johnson solids.
-`;
+`
 
 export const johnson = `
 The 92 Johnson solids, named after Norman Johnson, are the *non-uniform* convex regular-faced polyhedra—solids whose vertices aren't transitive.
 
 Almost all of the Johnson solids can be created by gluing together pieces of uniform polyhedra so that the dihedral angle between their faces remains less than 180 degrees. Even though there is no hard restriction on which polygons can be used, all the Johnson solids can be made using faces of 3, 4, 5, 6, 8 or 10 sides.
-`;
+`
 
 export const capstones = `
 The majority of Johnson solids are created from combining _pyramids_, _cupolæ_, and _rotundæ_ with prisms and antiprisms.
@@ -49,7 +49,7 @@ The following operations are defined:
 * **bi** - Glue two pieces of the same type together
 
 Cupolae and rotundae can be oriented two different ways: _ortho-_ means that opposite faces are aligned with each other, while _gyro-_ means that they are unaligned.
-`;
+`
 
 export const cutPaste = `
 The next group of Johnson solids are defined by _augmenting_, _diminishing_, and _gyrating_ uniform polyhedra.
@@ -61,7 +61,7 @@ These operations are defined:
 * **gyrate** - rotate a cupola
 
 When more than one operation is applied, sometimes there is more than one way in which the solid can be modified. A solid _para-_ if the modified components are opposite each other, and _meta-_ if they are not.
-`;
+`
 
 export const elementary = `
 The remaining Johnson solids cannot be created by gluing together other polyhedra.
@@ -78,7 +78,7 @@ Of those, two of them can be created by applying the snub operation to antiprism
 While they are not directly composed of other polyhedra, these solids may still be have interesting relationships with other solids. For example, the bilunabirotunda makes a [honeycomb] with the cube and dodecahedron.
 
 [honeycomb]: https://en.wikipedia.org/wiki/Regular_dodecahedron#Space_filling_with_cube_and_bilunabirotunda
-`;
+`
 
 export const more = `
 The polyhedra represented above are just a small subset of the wondrous world of geometric shapes and figures. For instance, the [Kepler-Poinsot polyhedra] are regular like the Platonic solids but non-convex, while the [Catalan solids] are the duals of the Archimedean solids and have non-regular faces. Beyond three dimensions, one can explore four dimensional shapes like the [tesseract] or the [grand antiprism].
@@ -101,7 +101,7 @@ If you would like to learn more about polyhedra and other geometric figures, che
 [polyHédronisme]: http://levskaya.github.io/polyhedronisme/
 [Polyhedra]: http://polyhedra.stacyspeyer.net/
 [Johnson Solids]: http://portfolios.risd.edu/gallery/Johnson-Solids/8807383
-`;
+`
 
 export const footer = `
 Copyright © 2018-2020 Nat Alison
@@ -121,4 +121,4 @@ Made with [React] and [X3DOM].
 [React]: https://reactjs.org/
 [X3DOM]: https://www.x3dom.org/
 [Source]: https://www.github.com/tesseralis/polyhedra-viewer
-`;
+`

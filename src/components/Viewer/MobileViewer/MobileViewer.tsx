@@ -1,9 +1,9 @@
-import React, { memo } from 'react';
-import _ from 'lodash';
-import { CSSProperties } from 'aphrodite';
+import React, { memo } from "react"
+import _ from "lodash"
+import { CSSProperties } from "aphrodite"
 
-import { useStyle, media, scales } from 'styles';
-import { scroll, paddingHoriz, flexRow } from 'styles/common';
+import { useStyle, media, scales } from "styles"
+import { scroll, paddingHoriz, flexRow } from "styles/common"
 import {
   BackLink,
   Title,
@@ -11,99 +11,99 @@ import {
   SolidScene,
   Panels,
   useHiddenHeading,
-} from '../common';
+} from "../common"
 
-import OperationsPanel from './OperationsPanel';
+import OperationsPanel from "./OperationsPanel"
 
-const titleHeight = '3rem';
+const titleHeight = "3rem"
 
 function mobile(styles: (navH: string) => CSSProperties) {
   return {
-    [media.mobileLandscape]: styles('3rem'),
+    [media.mobileLandscape]: styles("3rem"),
     [media.mobilePortrait]: styles(scales.size[3]),
-  };
+  }
 }
 
 interface Props {
-  panel: string;
-  solid: string;
+  panel: string
+  solid: string
 }
 
-function Header({ solid }: Pick<Props, 'solid'>) {
+function Header({ solid }: Pick<Props, "solid">) {
   const css = useStyle({
     height: titleHeight,
     ...paddingHoriz(scales.spacing[2]),
-    borderBottom: '1px solid LightGray',
-    width: '100%',
-    display: 'grid',
+    borderBottom: "1px solid LightGray",
+    width: "100%",
+    display: "grid",
     gridTemplateColumns: `${scales.size[2]} 1fr ${scales.size[2]}`,
-    alignItems: 'center',
-    justifyItems: 'center',
-  });
+    alignItems: "center",
+    justifyItems: "center",
+  })
   return (
     <header {...css()}>
       <BackLink solid={solid} />
       <Title name={solid} />
     </header>
-  );
+  )
 }
 
 function Content({
   panel,
   header,
-}: Pick<Props, 'panel'> & { header: JSX.Element }) {
-  const transparent = _.includes(['operations', 'full'], panel);
+}: Pick<Props, "panel"> & { header: JSX.Element }) {
+  const transparent = _.includes(["operations", "full"], panel)
   const css = useStyle(
     {
-      ...scroll('y'),
-      gridArea: 'content',
-      position: 'relative',
+      ...scroll("y"),
+      gridArea: "content",
+      position: "relative",
       zIndex: 100,
       ...(transparent
-        ? { pointerEvents: 'none' }
-        : { backgroundColor: 'rgba(255, 255, 255, 0.75)' }),
+        ? { pointerEvents: "none" }
+        : { backgroundColor: "rgba(255, 255, 255, 0.75)" }),
     },
     [transparent],
-  );
+  )
   return (
     <div {...css()}>
       {header}
       <Panels panel={panel} operationsPanel={OperationsPanel} />
     </div>
-  );
+  )
 }
 
 export default memo(function MobileViewer({ panel, solid }: Props) {
-  const [header, focusOnHeader] = useHiddenHeading(panel);
+  const [header, focusOnHeader] = useHiddenHeading(panel)
 
   const css = useStyle({
-    position: 'relative',
-    width: '100vw',
-    height: '100vh',
-    display: 'grid',
+    position: "relative",
+    width: "100vw",
+    height: "100vh",
+    display: "grid",
     gridTemplateAreas: '"title" "content" "nav"',
     ...mobile(navH => ({
       gridTemplateRows: `${titleHeight} 1fr ${navH}`,
     })),
-  });
+  })
 
   const sceneCss = useStyle({
     ...mobile(navH => ({
       height: `calc(100vh - ${navH} - ${titleHeight})`,
     })),
     zIndex: 0,
-    gridArea: 'content',
-    position: 'relative',
-  });
+    gridArea: "content",
+    position: "relative",
+  })
 
   const navCss = useStyle({
     ...mobile(navH => ({
       height: navH,
     })),
-    ...flexRow('center'),
-    gridArea: 'nav',
-    borderTop: '1px solid LightGray',
-  });
+    ...flexRow("center"),
+    gridArea: "nav",
+    borderTop: "1px solid LightGray",
+  })
 
   return (
     <section {...css()}>
@@ -116,5 +116,5 @@ export default memo(function MobileViewer({ panel, solid }: Props) {
         <NavMenu solid={solid} onClick={focusOnHeader} />
       </div>
     </section>
-  );
-});
+  )
+})

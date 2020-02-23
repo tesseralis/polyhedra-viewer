@@ -1,74 +1,74 @@
-import { Polyhedron, Face } from 'math/polyhedra';
-import AppPage, { PageOptions } from './AppPage';
+import { Polyhedron, Face } from "math/polyhedra"
+import AppPage, { PageOptions } from "./AppPage"
 
 function splitListOfLists(listStr: string, outerSep: string, innerSep: string) {
   return listStr
     .split(outerSep)
-    .map(inner => inner.split(innerSep).map(parseFloat));
+    .map(inner => inner.split(innerSep).map(parseFloat))
 }
 
 export default class ViewerPage extends AppPage {
   constructor(
     solid: string,
-    panel: string = 'operations',
+    panel: string = "operations",
     options: PageOptions = {},
   ) {
-    super(`/${solid}/${panel}`, options);
+    super(`/${solid}/${panel}`, options)
   }
 
   getPolyhedron() {
     const vertexStr = this.wrapper
-      .find('coordinate')
+      .find("coordinate")
       .first()
-      .prop<string>('point');
-    const vertices = splitListOfLists(vertexStr, ', ', ' ') as any;
+      .prop<string>("point")
+    const vertices = splitListOfLists(vertexStr, ", ", " ") as any
 
     const faceStr = this.wrapper
-      .find('indexedfaceset')
-      .prop<string>('coordindex');
-    const faces = splitListOfLists(faceStr, ' -1 ', ' ');
+      .find("indexedfaceset")
+      .prop<string>("coordindex")
+    const faces = splitListOfLists(faceStr, " -1 ", " ")
 
     const name = this.wrapper
-      .find('Title')
+      .find("Title")
       .text()
-      .toLowerCase();
+      .toLowerCase()
 
-    return new Polyhedron({ name, vertices, faces });
+    return new Polyhedron({ name, vertices, faces })
   }
 
   clickFace(face: Face) {
-    const hitPnt = face.centroid().toArray();
+    const hitPnt = face.centroid().toArray()
     const shape = this.wrapper
-      .find('shape')
-      .filterWhere(n => !!n.prop('onMouseMove'));
-    shape.simulate('mousemove', { hitPnt });
-    shape.simulate('mousedown', { hitPnt });
-    shape.simulate('mouseup', { hitPnt });
-    return this;
+      .find("shape")
+      .filterWhere(n => !!n.prop("onMouseMove"))
+    shape.simulate("mousemove", { hitPnt })
+    shape.simulate("mousedown", { hitPnt })
+    shape.simulate("mouseup", { hitPnt })
+    return this
   }
 
   clickAnyFace() {
-    return this.clickFace(this.getPolyhedron().getFace());
+    return this.clickFace(this.getPolyhedron().getFace())
   }
 
   clickFaceWithNumSides(n: number) {
-    return this.clickFace(this.getPolyhedron().faceWithNumSides(n));
+    return this.clickFace(this.getPolyhedron().faceWithNumSides(n))
   }
 
   expectOperation(operation?: string) {
     const button = this.wrapper
-      .find('OpGrid')
-      .find('OpButton')
-      .filterWhere(n => !!n.prop('highlighted'));
-    const actual = button.length ? button.prop('name') : '';
-    expect(actual).toEqual(operation);
-    return this;
+      .find("OpGrid")
+      .find("OpButton")
+      .filterWhere(n => !!n.prop("highlighted"))
+    const actual = button.length ? button.prop("name") : ""
+    expect(actual).toEqual(operation)
+    return this
   }
 
   expectTransitionTo(expected: string) {
-    this.wrapper.update();
-    this.expectPath(`/${expected}/operations`);
-    expect(this.getPolyhedron().isSame(Polyhedron.get(expected))).toBe(true);
-    return this;
+    this.wrapper.update()
+    this.expectPath(`/${expected}/operations`)
+    expect(this.getPolyhedron().isSame(Polyhedron.get(expected))).toBe(true)
+    return this
   }
 }
