@@ -92,5 +92,11 @@ export function bimap<K extends Key, V extends Key>(obj: Record<K, V>) {
     hasValue(val: Key): val is V {
       return !!(inverse as any)[val];
     },
+    keys(): K[] {
+      return Object.keys(obj) as K[];
+    },
+    values(): V[] {
+      return Object.values(obj);
+    },
   };
 }

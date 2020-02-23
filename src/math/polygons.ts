@@ -1,6 +1,4 @@
 import { bimap } from 'utils';
-const polygons = [3, 4, 5, 6, 8, 10];
-export default polygons;
 
 export type PolygonMap<T> = { [n: number]: T };
 
@@ -22,3 +20,6 @@ export const polygonPrefixes = bimap({
   8: 'octagonal',
   10: 'decagonal',
 });
+
+const polygons = polygonNames.keys();
+export default polygons;
