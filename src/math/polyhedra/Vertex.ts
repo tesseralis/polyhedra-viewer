@@ -1,9 +1,9 @@
-import _ from 'lodash'
-import { Point } from 'types'
-import { vec, Vec3D } from 'math/geom'
-import { VIndex } from './solidTypes'
-import Polyhedron from './Polyhedron'
-import Edge from './Edge'
+import _ from "lodash"
+import { Point } from "types"
+import { vec, Vec3D } from "math/geom"
+import { VIndex } from "./solidTypes"
+import Polyhedron from "./Polyhedron"
+import Edge from "./Edge"
 
 function getCycles<T>(array: T[]) {
   return _.map(array, (val, i) => _.drop(array, i).concat(_.take(array, i)))
@@ -53,21 +53,21 @@ export default class Vertex {
       count++
       result.push(e)
       e = e.prev().twin()
-      if (count > 10) throw new Error('we done messed up')
+      if (count > 10) throw new Error("we done messed up")
     } while (!e.equals(e0))
     return result
   }
 
   adjacentVertices() {
-    return _.map(this.adjacentEdges(), 'v2')
+    return _.map(this.adjacentEdges(), "v2")
   }
 
   adjacentFaces() {
-    return _.map(this.adjacentEdges(), 'face')
+    return _.map(this.adjacentEdges(), "face")
   }
 
   configuration() {
-    const config = _.map(this.adjacentFaces(), 'numSides')
+    const config = _.map(this.adjacentFaces(), "numSides")
     const allConfigs = getCycles(config).concat(
       getCycles(_.reverse([...config])),
     )
@@ -76,7 +76,7 @@ export default class Vertex {
 
   /** Return adjacent faces counted by number of sides */
   adjacentFaceCounts() {
-    return _.countBy(this.adjacentFaces(), 'numSides')
+    return _.countBy(this.adjacentFaces(), "numSides")
   }
 }
 

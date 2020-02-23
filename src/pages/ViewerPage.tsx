@@ -1,5 +1,5 @@
-import { Polyhedron, Face } from 'math/polyhedra'
-import AppPage, { PageOptions } from './AppPage'
+import { Polyhedron, Face } from "math/polyhedra"
+import AppPage, { PageOptions } from "./AppPage"
 
 function splitListOfLists(listStr: string, outerSep: string, innerSep: string) {
   return listStr
@@ -10,7 +10,7 @@ function splitListOfLists(listStr: string, outerSep: string, innerSep: string) {
 export default class ViewerPage extends AppPage {
   constructor(
     solid: string,
-    panel: string = 'operations',
+    panel: string = "operations",
     options: PageOptions = {},
   ) {
     super(`/${solid}/${panel}`, options)
@@ -18,18 +18,18 @@ export default class ViewerPage extends AppPage {
 
   getPolyhedron() {
     const vertexStr = this.wrapper
-      .find('coordinate')
+      .find("coordinate")
       .first()
-      .prop<string>('point')
-    const vertices = splitListOfLists(vertexStr, ', ', ' ') as any
+      .prop<string>("point")
+    const vertices = splitListOfLists(vertexStr, ", ", " ") as any
 
     const faceStr = this.wrapper
-      .find('indexedfaceset')
-      .prop<string>('coordindex')
-    const faces = splitListOfLists(faceStr, ' -1 ', ' ')
+      .find("indexedfaceset")
+      .prop<string>("coordindex")
+    const faces = splitListOfLists(faceStr, " -1 ", " ")
 
     const name = this.wrapper
-      .find('Title')
+      .find("Title")
       .text()
       .toLowerCase()
 
@@ -39,11 +39,11 @@ export default class ViewerPage extends AppPage {
   clickFace(face: Face) {
     const hitPnt = face.centroid().toArray()
     const shape = this.wrapper
-      .find('shape')
-      .filterWhere(n => !!n.prop('onMouseMove'))
-    shape.simulate('mousemove', { hitPnt })
-    shape.simulate('mousedown', { hitPnt })
-    shape.simulate('mouseup', { hitPnt })
+      .find("shape")
+      .filterWhere(n => !!n.prop("onMouseMove"))
+    shape.simulate("mousemove", { hitPnt })
+    shape.simulate("mousedown", { hitPnt })
+    shape.simulate("mouseup", { hitPnt })
     return this
   }
 
@@ -57,10 +57,10 @@ export default class ViewerPage extends AppPage {
 
   expectOperation(operation?: string) {
     const button = this.wrapper
-      .find('OpGrid')
-      .find('OpButton')
-      .filterWhere(n => !!n.prop('highlighted'))
-    const actual = button.length ? button.prop('name') : ''
+      .find("OpGrid")
+      .find("OpButton")
+      .filterWhere(n => !!n.prop("highlighted"))
+    const actual = button.length ? button.prop("name") : ""
     expect(actual).toEqual(operation)
     return this
   }

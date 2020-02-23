@@ -1,13 +1,13 @@
-import _ from 'lodash'
-import johnsonSubgroups from './johnsonSubgroups'
-import johnsonSymmetries from './johnsonSymmetries'
-import groupData from './groups'
+import _ from "lodash"
+import johnsonSubgroups from "./johnsonSubgroups"
+import johnsonSymmetries from "./johnsonSymmetries"
+import groupData from "./groups"
 
 const getPolyhedra = (groupName: string) =>
   require(`./groups/${groupName}.json`)
 
 /* Johnson Solid Subgroups */
-export const johnsonSolids = getPolyhedra('johnson')
+export const johnsonSolids = getPolyhedra("johnson")
 const getEndIndex = (i: number) =>
   i === johnsonSubgroups.length - 1 ? 92 : johnsonSubgroups[i + 1].index
 const getJohnsonPolyhedra = () => {
@@ -18,7 +18,7 @@ const getJohnsonPolyhedra = () => {
 }
 
 const getNestedPolyhedra = (groupName: string) => {
-  if (groupName === 'johnson') return { groups: getJohnsonPolyhedra() }
+  if (groupName === "johnson") return { groups: getJohnsonPolyhedra() }
   return { polyhedra: getPolyhedra(groupName) }
 }
 
@@ -32,14 +32,14 @@ export const groups = groupData.map(group => ({
   ...getNestedPolyhedra(group.name),
 }))
 
-export const allSolidNames: string[] = _.flatMap(flatGroups, 'polyhedra')
+export const allSolidNames: string[] = _.flatMap(flatGroups, "polyhedra")
 
 export const isValidSolid = (escapedSolidName: string) => {
-  return allSolidNames.includes(escapedSolidName.replace(/-/g, ' '))
+  return allSolidNames.includes(escapedSolidName.replace(/-/g, " "))
 }
 
 export const getSolidData = (solidName: string) => {
-  return require(`data/polyhedra/${solidName.replace(/ /g, '-')}.json`)
+  return require(`data/polyhedra/${solidName.replace(/ /g, "-")}.json`)
 }
 
 export function getJohnsonSymmetry(name: string) {

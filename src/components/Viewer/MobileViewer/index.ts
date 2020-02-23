@@ -1,1 +1,1 @@
-export { default } from './MobileViewer'
+export { default } from "./MobileViewer"

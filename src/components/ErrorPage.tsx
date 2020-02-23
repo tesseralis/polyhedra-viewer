@@ -1,10 +1,10 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
+import React from "react"
+import { Link } from "react-router-dom"
 
-import { useStyle, fonts, scales, media } from 'styles'
-import { square, link } from 'styles/common'
-import image from 'images/sad-scutoid.png'
-import { usePageTitle } from 'components/common'
+import { useStyle, fonts, scales, media } from "styles"
+import { square, link } from "styles/common"
+import image from "images/sad-scutoid.png"
+import { usePageTitle } from "components/common"
 
 function Image() {
   const css = useStyle(square(scales.size[5]))
@@ -13,7 +13,7 @@ function Image() {
 
 function Title() {
   const css = useStyle({
-    textAlign: 'center',
+    textAlign: "center",
     fontFamily: fonts.andaleMono,
     fontSize: scales.font[3],
     [media.mobile]: {
@@ -37,16 +37,16 @@ function BackLink() {
 }
 
 export default function ErrorPage() {
-  usePageTitle('Error - Polyhedra Viewer')
+  usePageTitle("Error - Polyhedra Viewer")
   const css = useStyle({
-    width: '100vw',
-    height: '100vh',
+    width: "100vw",
+    height: "100vh",
 
-    display: 'grid',
+    display: "grid",
     gridGap: scales.spacing[2],
-    alignContent: 'center',
-    justifyContent: 'center',
-    justifyItems: 'center',
+    alignContent: "center",
+    justifyContent: "center",
+    justifyItems: "center",
   })
 
   return (

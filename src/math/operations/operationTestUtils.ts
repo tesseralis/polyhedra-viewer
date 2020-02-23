@@ -1,6 +1,6 @@
-import _ from 'lodash'
-import { PRECISION } from 'math/geom'
-import { Polyhedron } from 'math/polyhedra'
+import _ from "lodash"
+import { PRECISION } from "math/geom"
+import { Polyhedron } from "math/polyhedra"
 
 function isProperPolyhedron(polyhedron: Polyhedron) {
   const expectedSideLength = polyhedron.edgeLength()
@@ -47,9 +47,9 @@ export function setupOperations() {
         message: () => {
           if (!isProper)
             return `expected ${
-              this.isNot ? 'an improper' : 'a proper'
+              this.isNot ? "an improper" : "a proper"
             } CRF polyhedron`
-          return `expected polyhedron to ${this.isNot ? 'not be' : 'be'} a ${
+          return `expected polyhedron to ${this.isNot ? "not be" : "be"} a ${
             result.name
           }`
         },

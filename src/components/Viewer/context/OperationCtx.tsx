@@ -1,5 +1,5 @@
-import { Operation } from 'math/operations'
-import { createHookedContext } from 'components/common'
+import { Operation } from "math/operations"
+import { createHookedContext } from "components/common"
 
 const defaultState = {
   operation: undefined,
@@ -12,7 +12,7 @@ interface State {
   options?: Options
 }
 
-type Actions = 'setOperation' | 'unsetOperation' | 'setOption'
+type Actions = "setOperation" | "unsetOperation" | "setOption"
 
 export default createHookedContext<State, Actions>(
   {

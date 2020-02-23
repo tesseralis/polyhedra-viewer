@@ -1,7 +1,7 @@
-import React, { ComponentType } from 'react'
-import _ from 'lodash'
-import { useStyle, scales } from 'styles'
-import { fonts } from 'styles'
+import React, { ComponentType } from "react"
+import _ from "lodash"
+import { useStyle, scales } from "styles"
+import { fonts } from "styles"
 
 import {
   Sup,
@@ -10,7 +10,7 @@ import {
   displayVertexConfig,
   displaySymmetry,
   displayProperties,
-} from './renderFuncs'
+} from "./renderFuncs"
 
 interface InfoRow {
   name: string
@@ -20,34 +20,34 @@ interface InfoRow {
 
 const infoRows: InfoRow[] = [
   {
-    name: 'Vertices',
-    area: 'verts',
+    name: "Vertices",
+    area: "verts",
     render: ({ polyhedron }) => <>{polyhedron.numVertices()}</>,
   },
   {
-    name: 'Edges',
-    area: 'edges',
+    name: "Edges",
+    area: "edges",
     render: ({ polyhedron }) => <>{polyhedron.numEdges()}</>,
   },
   {
-    name: 'Faces',
-    area: 'faces',
+    name: "Faces",
+    area: "faces",
     render: ({ polyhedron }) => <>{polyhedron.numFaces()}</>,
   },
   {
-    name: 'Vertex configuration',
-    area: 'vconf',
+    name: "Vertex configuration",
+    area: "vconf",
     render: displayVertexConfig,
   },
   {
-    name: 'Faces by type',
-    area: 'ftype',
+    name: "Faces by type",
+    area: "ftype",
     render: displayFaceTypes,
   },
 
   {
-    name: 'Volume',
-    area: 'vol',
+    name: "Volume",
+    area: "vol",
     render: ({ polyhedron: p }) => (
       <>
         ≈{_.round(p.normalizedVolume(), 3)}s<Sup>{3}</Sup>
@@ -55,8 +55,8 @@ const infoRows: InfoRow[] = [
     ),
   },
   {
-    name: 'Surface area',
-    area: 'sa',
+    name: "Surface area",
+    area: "sa",
     render: ({ polyhedron: p }) => (
       <>
         ≈{_.round(p.normalizedSurfaceArea(), 3)}s<Sup>{2}</Sup>
@@ -64,25 +64,25 @@ const infoRows: InfoRow[] = [
     ),
   },
   {
-    name: 'Sphericity',
-    area: 'spher',
+    name: "Sphericity",
+    area: "spher",
     render: ({ polyhedron: p }) => <>≈{_.round(p.sphericity(), 3)}</>,
   },
 
-  { name: 'Symmetry', area: 'sym', render: displaySymmetry },
+  { name: "Symmetry", area: "sym", render: displaySymmetry },
   {
-    name: 'Order',
-    area: 'order',
+    name: "Order",
+    area: "order",
     render: ({ polyhedron: p }) => <>{p.order()}</>,
   },
   {
-    name: 'Properties',
-    area: 'props',
+    name: "Properties",
+    area: "props",
     render: displayProperties,
   },
   {
-    name: 'Also known as',
-    area: 'alt',
+    name: "Also known as",
+    area: "alt",
     render: ({ polyhedron }: RenderProps) => {
       const alts = polyhedron.alternateNames()
       if (alts.length === 0) return <>--</>
@@ -110,7 +110,7 @@ function Datum({
   })
   const valueCss = useStyle({
     fontFamily: fonts.andaleMono,
-    color: 'DimGrey',
+    color: "DimGrey",
   })
 
   return (
@@ -125,7 +125,7 @@ function Datum({
 
 export default function DataList({ polyhedron }: RenderProps) {
   const css = useStyle({
-    display: 'grid',
+    display: "grid",
     gridTemplateAreas: `
       "verts verts edges edges faces faces"
       "vconf vconf vconf ftype ftype ftype"

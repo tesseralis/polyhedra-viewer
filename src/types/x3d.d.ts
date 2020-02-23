@@ -1,4 +1,4 @@
-import { RefAttributes, HTMLAttributes } from 'react'
+import { RefAttributes, HTMLAttributes } from "react"
 // https://github.com/Microsoft/TypeScript/issues/15449
 
 type X3dNode = { is: string; class?: string } & RefAttributes<any> &

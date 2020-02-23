@@ -1,4 +1,4 @@
-import * as text from './text'
+import * as text from "./text"
 
 import {
   archimedean,
@@ -15,7 +15,7 @@ import {
   others,
   othersTwoRows,
   Table,
-} from 'math/polyhedra/tables'
+} from "math/polyhedra/tables"
 
 export interface TableSection {
   header: string
@@ -28,22 +28,22 @@ export interface TableSection {
 
 const polyhedronTables: TableSection[] = [
   {
-    header: 'Uniform Polyhedra',
+    header: "Uniform Polyhedra",
     description: text.uniform,
     tables: [archimedean, prisms],
   },
   {
-    header: 'Johnson Solids',
+    header: "Johnson Solids",
     description: text.johnson,
     subsections: [
       {
-        header: 'Pyramids, Cupolæ, and Rotundæ',
+        header: "Pyramids, Cupolæ, and Rotundæ",
         description: text.capstones,
         tables: [capstones],
         narrowTables: [capstonesMono, capstonesBi],
       },
       {
-        header: 'Augmented, Diminished, and Gyrate Polyhedra',
+        header: "Augmented, Diminished, and Gyrate Polyhedra",
         description: text.cutPaste,
         tables: [augmented, icosahedra, rhombicosidodecahedra],
         narrowTables: [
@@ -54,7 +54,7 @@ const polyhedronTables: TableSection[] = [
         ],
       },
       {
-        header: 'Elementary Johnson Solids',
+        header: "Elementary Johnson Solids",
         description: text.elementary,
         tables: [snubAntiprisms, others],
         narrowTables: [snubAntiprisms, othersTwoRows],
@@ -62,7 +62,7 @@ const polyhedronTables: TableSection[] = [
     ],
   },
   {
-    header: 'And Many More...',
+    header: "And Many More...",
     sticky: true,
     description: text.more,
   },

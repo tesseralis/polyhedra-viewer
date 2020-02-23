@@ -1,7 +1,7 @@
-import Polyhedron from './Polyhedron'
-import { SolidData } from './solidTypes'
+import Polyhedron from "./Polyhedron"
+import { SolidData } from "./solidTypes"
 
-describe('Polyhedron', () => {
+describe("Polyhedron", () => {
   const solidData: SolidData = {
     vertices: [
       [1, 1, 1],
@@ -15,68 +15,68 @@ describe('Polyhedron', () => {
       [0, 2, 3],
       [1, 3, 2],
     ],
-    name: 'tetrahedron',
+    name: "tetrahedron",
   }
   const polyhedron = new Polyhedron(solidData)
 
-  describe('edges', () => {
-    it('populates on load if not provided', () => {
+  describe("edges", () => {
+    it("populates on load if not provided", () => {
       expect(polyhedron.edges).toHaveLength(6)
     })
   })
 
-  describe('vertexConfiguration', () => {
-    it('gets all the correct vertex configurations', () => {
-      expect(Polyhedron.get('icosidodecahedron').vertexConfiguration()).toEqual(
+  describe("vertexConfiguration", () => {
+    it("gets all the correct vertex configurations", () => {
+      expect(Polyhedron.get("icosidodecahedron").vertexConfiguration()).toEqual(
         {
-          '3.5.3.5': 30,
+          "3.5.3.5": 30,
         },
       )
       expect(
-        Polyhedron.get('triangular-hebesphenorotunda').vertexConfiguration(),
+        Polyhedron.get("triangular-hebesphenorotunda").vertexConfiguration(),
       ).toEqual({
-        '3.3.3.5': 3,
-        '3.4.3.5': 6,
-        '3.5.3.5': 3,
-        '3.3.4.6': 6,
+        "3.3.3.5": 3,
+        "3.4.3.5": 6,
+        "3.5.3.5": 3,
+        "3.3.4.6": 6,
       })
     })
   })
 
-  describe('volume, surface area, sphericity', () => {
-    const cube = Polyhedron.get('cube')
-    it('correctly calculates volume', () => {
+  describe("volume, surface area, sphericity", () => {
+    const cube = Polyhedron.get("cube")
+    it("correctly calculates volume", () => {
       expect(cube.normalizedVolume()).toBeCloseTo(1, 3)
     })
 
-    it('correctly calculates surface area', () => {
+    it("correctly calculates surface area", () => {
       expect(cube.normalizedSurfaceArea()).toBeCloseTo(6, 3)
     })
-    it('correctly calculates surface area', () => {
+    it("correctly calculates surface area", () => {
       expect(cube.sphericity()).toBeCloseTo(0.806, 3)
     })
   })
 
-  describe('isUniform', () => {
-    it('counts prisms and antiprisms', () => {
-      expect(Polyhedron.get('decagonal-prism').isUniform()).toBe(true)
-      expect(Polyhedron.get('decagonal-antiprism').isUniform()).toBe(true)
+  describe("isUniform", () => {
+    it("counts prisms and antiprisms", () => {
+      expect(Polyhedron.get("decagonal-prism").isUniform()).toBe(true)
+      expect(Polyhedron.get("decagonal-antiprism").isUniform()).toBe(true)
     })
 
     it("doesn't count the pseudorhombicuboctaheron", () => {
-      expect(Polyhedron.get('elongated-square-gyrobicupola').isUniform()).toBe(
+      expect(Polyhedron.get("elongated-square-gyrobicupola").isUniform()).toBe(
         false,
       )
     })
   })
 
-  describe('isSame', () => {
+  describe("isSame", () => {
     const testCases = [
-      ['rhombicuboctahedron', 'elongated-square-gyrobicupola'],
-      ['metabiaugmented-hexagonal-prism', 'parabiaugmented-hexagonal-prism'],
+      ["rhombicuboctahedron", "elongated-square-gyrobicupola"],
+      ["metabiaugmented-hexagonal-prism", "parabiaugmented-hexagonal-prism"],
       [
-        'parabigyrate-rhombicosidodecahedron',
-        'metabigyrate-rhombicosidodecahedron',
+        "parabigyrate-rhombicosidodecahedron",
+        "metabigyrate-rhombicosidodecahedron",
       ],
     ]
 

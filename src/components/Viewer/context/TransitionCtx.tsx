@@ -1,15 +1,15 @@
-import _ from 'lodash'
+import _ from "lodash"
 
-import React, { useRef, useEffect, useContext, useCallback } from 'react'
-import { ChildrenProp } from 'types'
+import React, { useRef, useEffect, useContext, useCallback } from "react"
+import { ChildrenProp } from "types"
 
-import { createHookedContext } from 'components/common'
-import Config from 'components/ConfigCtx'
-import PolyhedronCtx from './PolyhedronCtx'
-import transition from 'transition'
-import { Polyhedron, Face, SolidData } from 'math/polyhedra'
-import { AnimationData } from 'math/operations'
-import { PRECISION } from 'math/geom'
+import { createHookedContext } from "components/common"
+import Config from "components/ConfigCtx"
+import PolyhedronCtx from "./PolyhedronCtx"
+import transition from "transition"
+import { Polyhedron, Face, SolidData } from "math/polyhedra"
+import { AnimationData } from "math/operations"
+import { PRECISION } from "math/geom"
 
 // TODO move this to the math section
 function getCoplanarFaces(polyhedron: Polyhedron) {
@@ -60,7 +60,7 @@ interface State {
   faceColors?: any[]
   isTransitioning: boolean
 }
-const InterpModel = createHookedContext<State, 'set' | 'reset'>(
+const InterpModel = createHookedContext<State, "set" | "reset">(
   {
     reset: () => () => defaultState,
     set: (solidData, faceColors) => () => ({
@@ -108,7 +108,7 @@ function InnerProvider({ children }: ChildrenProp) {
       transitionId.current = transition(
         {
           duration: 1000 / animationSpeed,
-          ease: 'easeQuadInOut',
+          ease: "easeQuadInOut",
           startValue: {
             vertices: start.solidData.vertices,
             faceColors: allColorStart,

@@ -1,20 +1,20 @@
-import React from 'react'
+import React from "react"
 
-import { useStyle, fonts, scales } from 'styles'
+import { useStyle, fonts, scales } from "styles"
 
-import Icon from '@mdi/react'
-import { mdiHexagonOutline } from '@mdi/js'
+import Icon from "@mdi/react"
+import { mdiHexagonOutline } from "@mdi/js"
 
 export default function Loading() {
   const css = useStyle({
-    width: '100vw',
-    height: '100vh',
+    width: "100vw",
+    height: "100vh",
 
-    display: 'grid',
-    justifyContent: 'center',
-    alignContent: 'center',
-    alignItems: 'center',
-    gridAutoFlow: 'column',
+    display: "grid",
+    justifyContent: "center",
+    alignContent: "center",
+    alignItems: "center",
+    gridAutoFlow: "column",
     gridGap: scales.spacing[3],
   })
 

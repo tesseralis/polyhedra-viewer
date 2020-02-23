@@ -1,53 +1,53 @@
-import _ from 'lodash'
+import _ from "lodash"
 
-import React, { memo } from 'react'
+import React, { memo } from "react"
 
-import { useStyle, scales } from 'styles'
+import { useStyle, scales } from "styles"
 import {
   Point2D,
   Polygon,
   PolyLine,
   PolyShape,
   polygonPoints,
-} from 'components/svg'
-import { square } from 'styles/common'
+} from "components/svg"
+import { square } from "styles/common"
 
 interface Props {
   name: string
 }
 
-const color = 'DimGray'
+const color = "DimGray"
 
 function InnerIcon({ name }: Props) {
   const inner = useStyle({
     stroke: color,
-    fill: 'none',
+    fill: "none",
     strokeWidth: 5,
-    strokeLinejoin: 'round',
+    strokeLinejoin: "round",
   })
   const outer = useStyle({
     stroke: color,
-    fill: 'none',
+    fill: "none",
     strokeWidth: 8,
-    strokeLinejoin: 'round',
+    strokeLinejoin: "round",
   })
 
   switch (name) {
-    case 'ortho':
+    case "ortho":
       return (
         <>
           <Polygon {...outer()} n={5} cx={100} cy={100} a={90} r={100} />
           <Polygon {...inner()} n={5} cx={100} cy={100} a={90} r={66} />
         </>
       )
-    case 'gyro':
+    case "gyro":
       return (
         <>
           <Polygon {...outer()} n={5} cx={100} cy={100} a={90} r={100} />
           <Polygon {...inner()} n={5} cx={100} cy={100} a={-90} r={66} />
         </>
       )
-    case 'pyramid':
+    case "pyramid":
       return (
         <>
           <PolyShape
@@ -68,7 +68,7 @@ function InnerIcon({ name }: Props) {
           />
         </>
       )
-    case 'fastigium': {
+    case "fastigium": {
       const center = 100
       const height = 50
       const topY = center - height
@@ -94,7 +94,7 @@ function InnerIcon({ name }: Props) {
         </>
       )
     }
-    case 'cupola': {
+    case "cupola": {
       const center = 100
       const height = 50
       const topY = center - height
@@ -126,7 +126,7 @@ function InnerIcon({ name }: Props) {
         </>
       )
     }
-    case 'rotunda': {
+    case "rotunda": {
       const points = _.take(
         polygonPoints({ n: 12, cx: 100, cy: 150, r: -90 }),
         7,
@@ -150,7 +150,7 @@ function InnerIcon({ name }: Props) {
       )
     }
     default:
-      throw new Error('unknown icon type')
+      throw new Error("unknown icon type")
   }
 }
 export default memo(function OptionIcon({ name }: Props) {

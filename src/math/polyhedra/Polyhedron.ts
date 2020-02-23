@@ -1,17 +1,17 @@
-import _ from 'lodash'
+import _ from "lodash"
 
-import { find } from 'utils'
-import { isValidSolid, getSolidData } from 'data'
-import { Vec3D, getCentroid } from 'math/geom'
+import { find } from "utils"
+import { isValidSolid, getSolidData } from "data"
+import { Vec3D, getCentroid } from "math/geom"
 
-import * as meta from './names'
-import * as symmetry from './symmetry'
-import { SolidData } from './solidTypes'
-import Face from './Face'
-import Vertex from './Vertex'
-import Edge from './Edge'
-import Builder from './SolidBuilder'
-import { VertexArg, FaceArg } from './SolidBuilder'
+import * as meta from "./names"
+import * as symmetry from "./symmetry"
+import { SolidData } from "./solidTypes"
+import Face from "./Face"
+import Vertex from "./Vertex"
+import Edge from "./Edge"
+import Builder from "./SolidBuilder"
+import { VertexArg, FaceArg } from "./SolidBuilder"
 
 function calculateEdges(faces: Face[]) {
   return _(faces)
@@ -40,7 +40,7 @@ export default class Polyhedron {
       (vertex, vIndex) => new Vertex(this, vIndex),
     )
     this.faces = solidData.faces.map((face, fIndex) => new Face(this, fIndex))
-    this.name = solidData.name ?? ''
+    this.name = solidData.name ?? ""
   }
 
   get edges() {
@@ -92,7 +92,7 @@ export default class Polyhedron {
   }
 
   numFacesBySides() {
-    return _.countBy(this.faces, 'numSides')
+    return _.countBy(this.faces, "numSides")
   }
 
   // Search functions
@@ -111,11 +111,11 @@ export default class Polyhedron {
   }
 
   largestFace() {
-    return _.maxBy(this.faces, 'numSides')!
+    return _.maxBy(this.faces, "numSides")!
   }
 
   smallestFace() {
-    return _.minBy(this.faces, 'numSides')!
+    return _.minBy(this.faces, "numSides")!
   }
 
   faceWithNumSides(n: number) {
@@ -125,7 +125,7 @@ export default class Polyhedron {
   // The list of the type of faces this polyhedron has, ordered
   faceTypes() {
     return _(this.faces)
-      .map('numSides')
+      .map("numSides")
       .uniq()
       .sortBy()
       .value()
@@ -134,7 +134,7 @@ export default class Polyhedron {
   vertexConfiguration() {
     return _.countBy(
       this.vertices.map(v => v.configuration()),
-      config => config.join('.'),
+      config => config.join("."),
     )
   }
 
@@ -147,7 +147,7 @@ export default class Polyhedron {
   }
 
   centroid() {
-    return getCentroid(_.map(this.vertices, 'vec'))
+    return getCentroid(_.map(this.vertices, "vec"))
   }
 
   surfaceArea() {
@@ -240,32 +240,32 @@ export default class Polyhedron {
 
   isUniform() {
     return _.includes(
-      ['Platonic solid', 'Archimedean solid', 'Prism', 'Antiprism'],
+      ["Platonic solid", "Archimedean solid", "Prism", "Antiprism"],
       this.type(),
     )
   }
 
   isQuasiRegular() {
     return _.includes(
-      ['octahedron', 'cuboctahedron', 'icosidodecahedron'],
+      ["octahedron", "cuboctahedron", "icosidodecahedron"],
       this.name,
     )
   }
 
   isRegular() {
-    return this.type() === 'Platonic solid'
+    return this.type() === "Platonic solid"
   }
 
   isChiral() {
     return _.includes(
       [
-        'snub cube',
-        'snub dodecahedron',
-        'gyroelongated triangular bicupola',
-        'gyroelongated square bicupola',
-        'gyroelongated pentagonal bicupola',
-        'gyroelongated pentagonal cupolarotunda',
-        'gyroelongated pentagonal birotunda',
+        "snub cube",
+        "snub dodecahedron",
+        "gyroelongated triangular bicupola",
+        "gyroelongated square bicupola",
+        "gyroelongated pentagonal bicupola",
+        "gyroelongated pentagonal cupolarotunda",
+        "gyroelongated pentagonal birotunda",
       ],
       this.name,
     )
@@ -274,11 +274,11 @@ export default class Polyhedron {
   isHoneycomb() {
     return _.includes(
       [
-        'cube',
-        'truncated octahedron',
-        'triangular prism',
-        'hexagonal prism',
-        'gyrobifastigium',
+        "cube",
+        "truncated octahedron",
+        "triangular prism",
+        "hexagonal prism",
+        "gyrobifastigium",
       ],
       this.name,
     )
@@ -296,7 +296,7 @@ export default class Polyhedron {
     }))
     return _.sortBy(
       faceAdjacencyCounts,
-      ['n', 'adj.length'].concat([3, 4, 5, 6, 8, 10].map(n => `adj[${n}]`)),
+      ["n", "adj.length"].concat([3, 4, 5, 6, 8, 10].map(n => `adj[${n}]`)),
     )
   }
 

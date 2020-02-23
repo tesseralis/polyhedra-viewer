@@ -1,10 +1,10 @@
-import _ from 'lodash'
+import _ from "lodash"
 
-import { getCyclic, flatMapUniq } from 'utils'
-import { VIndex, FIndex } from './solidTypes'
-import Polyhedron from './Polyhedron'
-import VEList from './VEList'
-import Edge from './Edge'
+import { getCyclic, flatMapUniq } from "utils"
+import { VIndex, FIndex } from "./solidTypes"
+import Polyhedron from "./Polyhedron"
+import VEList from "./VEList"
+import Edge from "./Edge"
 
 export default class Face extends VEList {
   index: FIndex
@@ -35,11 +35,11 @@ export default class Face extends VEList {
 
   /** Return the set of faces that share a vertex to this face (including itself) */
   vertexAdjacentFaces() {
-    return flatMapUniq(this.vertices, vertex => vertex.adjacentFaces(), 'index')
+    return flatMapUniq(this.vertices, vertex => vertex.adjacentFaces(), "index")
   }
 
   /** Return adjacent faces counted by number of sides */
   adjacentFaceCounts() {
-    return _.countBy(this.adjacentFaces(), 'numSides')
+    return _.countBy(this.adjacentFaces(), "numSides")
   }
 }

@@ -1,20 +1,20 @@
-import _ from 'lodash'
+import _ from "lodash"
 
-import { repeat, find } from 'utils'
-import { withOrigin, PRECISION, Vec3D } from 'math/geom'
-import { Polyhedron, Vertex } from 'math/polyhedra'
-import makeOperation from '../makeOperation'
+import { repeat, find } from "utils"
+import { withOrigin, PRECISION, Vec3D } from "math/geom"
+import { Polyhedron, Vertex } from "math/polyhedra"
+import makeOperation from "../makeOperation"
 
 // Side ratios gotten when calling our "sharpen" operation on a bevelled polyhedron
 // I couldn't actually figure out the math for this so I reverse engineered it.
 function getRectifiedMultiplier(result: string) {
   switch (result) {
-    case 'truncated cuboctahedron':
+    case "truncated cuboctahedron":
       return 0.37966751081253297
-    case 'truncated icosidodecahedron':
+    case "truncated icosidodecahedron":
       return 0.4059223426569837
     default:
-      throw new Error('Unidentified polyhedron')
+      throw new Error("Unidentified polyhedron")
   }
 }
 
@@ -55,7 +55,7 @@ function getTruncateLength(polyhedron: Polyhedron) {
 
 type Transform = (vector: Vec3D, vertex: Vertex) => Vec3D
 
-function getTruncateTransform(polyhedron: Polyhedron, result = ''): Transform {
+function getTruncateTransform(polyhedron: Polyhedron, result = ""): Transform {
   if (polyhedron.isRegular()) {
     return vector => vector
   }
@@ -110,13 +110,13 @@ function doTruncate(polyhedron: Polyhedron, rectify = false, result?: string) {
   }
 }
 
-export const truncate = makeOperation('truncate', {
+export const truncate = makeOperation("truncate", {
   apply(polyhedron, $, result) {
     return doTruncate(polyhedron, false, result)
   },
 })
 
-export const rectify = makeOperation('rectify', {
+export const rectify = makeOperation("rectify", {
   apply(polyhedron) {
     return doTruncate(polyhedron, true)
   },

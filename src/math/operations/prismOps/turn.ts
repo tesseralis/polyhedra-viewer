@@ -1,16 +1,16 @@
-import _ from 'lodash'
+import _ from "lodash"
 
-import { pivot } from 'utils'
-import { Twist } from 'types'
-import { Polyhedron, VEList } from 'math/polyhedra'
-import makeOperation from '../makeOperation'
+import { pivot } from "utils"
+import { Twist } from "types"
+import { Polyhedron, VEList } from "math/polyhedra"
+import makeOperation from "../makeOperation"
 import {
   getChirality,
   isGyroelongatedBiCupola,
   antiprismHeight,
   getAdjustInformation,
   getScaledPrismVertices,
-} from './prismUtils'
+} from "./prismUtils"
 
 function bisectPrismFaces(
   polyhedron: Polyhedron,
@@ -21,11 +21,11 @@ function bisectPrismFaces(
   const newFaces = _.flatMap(boundary.edges, edge => {
     const twinFace = edge.twinFace()
     const [v1, v2, v3, v4] = pivot(
-      _.map(twinFace.vertices, 'index'),
+      _.map(twinFace.vertices, "index"),
       edge.v2.index,
     )
 
-    return twist === 'left'
+    return twist === "left"
       ? [
           [v1, v2, v4],
           [v2, v3, v4],
@@ -59,7 +59,7 @@ function joinAntiprismFaces(
   const newFaces = _.map(boundary.edges, edge => {
     const [v1, v2] = edge.twin().vertices
     const [v3, v4] =
-      twist === 'left'
+      twist === "left"
         ? edge
             .twin()
             .prev()
@@ -82,7 +82,7 @@ function joinAntiprismFaces(
 interface Options {
   twist?: Twist
 }
-function doTurn(polyhedron: Polyhedron, { twist = 'left' }: Options) {
+function doTurn(polyhedron: Polyhedron, { twist = "left" }: Options) {
   const adjustInfo = getAdjustInformation(polyhedron)
   const { boundary } = adjustInfo
   const isAntiprism = boundary.adjacentFaces()[0].numSides === 3
@@ -109,20 +109,20 @@ function doTurn(polyhedron: Polyhedron, { twist = 'left' }: Options) {
   }
 }
 
-export const turn = makeOperation<Options>('turn', {
+export const turn = makeOperation<Options>("turn", {
   apply: doTurn,
-  optionTypes: ['twist'],
+  optionTypes: ["twist"],
   resultsFilter(polyhedron, options) {
     if (!isGyroelongatedBiCupola(polyhedron)) return
     const { twist } = options
     const chirality = getChirality(polyhedron)
-    const gyrate = twist === chirality ? 'ortho' : 'gyro'
+    const gyrate = twist === chirality ? "ortho" : "gyro"
     return { gyrate }
   },
 
   allOptionCombos(polyhedron) {
     if (isGyroelongatedBiCupola(polyhedron)) {
-      return [{ twist: 'left' }, { twist: 'right' }]
+      return [{ twist: "left" }, { twist: "right" }]
     }
     return [{}]
   },

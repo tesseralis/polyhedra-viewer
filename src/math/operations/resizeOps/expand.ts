@@ -1,26 +1,26 @@
-import _ from 'lodash'
-import { Twist } from 'types'
-import { Polyhedron, Face } from 'math/polyhedra'
-import { withOrigin } from 'math/geom'
+import _ from "lodash"
+import { Twist } from "types"
+import { Polyhedron, Face } from "math/polyhedra"
+import { withOrigin } from "math/geom"
 import {
   getTwistSign,
   getTransformedVertices,
   expandEdges,
-} from '../operationUtils'
-import makeOperation from '../makeOperation'
+} from "../operationUtils"
+import makeOperation from "../makeOperation"
 import {
   getSnubAngle,
   getExpandedFaces,
   isExpandedFace,
   getResizedVertices,
-} from './resizeUtils'
+} from "./resizeUtils"
 
 /**
  * Duplication function for semi-expanding truncated polyhedra
  */
 
 function isTruncated(polyhedron: Polyhedron) {
-  return polyhedron.name.includes('truncated')
+  return polyhedron.name.includes("truncated")
 }
 
 // TODO figure out a way to deduplicate these functions?
@@ -90,7 +90,7 @@ function doExpansion(
   }
 }
 
-export const expand = makeOperation('expand', {
+export const expand = makeOperation("expand", {
   apply(polyhedron, $, result) {
     if (isTruncated(polyhedron)) {
       return doSemiExpansion(polyhedron, result)
@@ -102,17 +102,17 @@ export const expand = makeOperation('expand', {
 interface SnubOpts {
   twist: Twist
 }
-export const snub = makeOperation<SnubOpts>('snub', {
-  apply(polyhedron, { twist = 'left' }, result) {
+export const snub = makeOperation<SnubOpts>("snub", {
+  apply(polyhedron, { twist = "left" }, result) {
     return doExpansion(polyhedron, result, twist)
   },
-  optionTypes: ['twist'],
+  optionTypes: ["twist"],
   allOptionCombos() {
-    return [{ twist: 'left' }, { twist: 'right' }]
+    return [{ twist: "left" }, { twist: "right" }]
   },
 })
 
-export const dual = makeOperation('dual', {
+export const dual = makeOperation("dual", {
   apply(polyhedron) {
     // Scale to create a dual polyhedron with the same midradius
     const scale = (() => {

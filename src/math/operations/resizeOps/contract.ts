@@ -1,12 +1,12 @@
-import _ from 'lodash'
-import { Polyhedron } from 'math/polyhedra'
+import _ from "lodash"
+import { Polyhedron } from "math/polyhedra"
 import {
   getSnubAngle,
   isExpandedFace,
   getResizedVertices,
   getExpandedFaces,
-} from './resizeUtils'
-import makeOperation from '../makeOperation'
+} from "./resizeUtils"
+import makeOperation from "../makeOperation"
 
 interface Options {
   faceType?: number
@@ -14,8 +14,8 @@ interface Options {
 
 // Return the symmetry group of an *expanded* polyhedron
 function getFamily(polyhedron: Polyhedron) {
-  if (_.includes(['cuboctahedron', 'icosahedron'], polyhedron.name)) {
-    return 'T'
+  if (_.includes(["cuboctahedron", "icosahedron"], polyhedron.name)) {
+    return "T"
   }
   return polyhedron.symmetry().group
 }
@@ -79,37 +79,37 @@ export function applyContract(
 }
 
 function isBevelled(polyhedron: Polyhedron) {
-  return polyhedron.name.includes('truncated')
+  return polyhedron.name.includes("truncated")
 }
 
 // NOTE: We are using the same operation for contracting both expanded and snub solids.
-export const contract = makeOperation<Options>('contract', {
+export const contract = makeOperation<Options>("contract", {
   apply: applyContract,
-  optionTypes: ['faceType'],
+  optionTypes: ["faceType"],
 
   resultsFilter(polyhedron, config) {
     const { faceType } = config
     if (isBevelled(polyhedron)) {
       switch (polyhedron.name) {
-        case 'truncated cuboctahedron':
-          return { value: faceType === 6 ? 'tO' : 'tC' }
-        case 'truncated icosidodecahedron':
-          return { value: faceType === 6 ? 'tI' : 'tD' }
+        case "truncated cuboctahedron":
+          return { value: faceType === 6 ? "tO" : "tC" }
+        case "truncated icosidodecahedron":
+          return { value: faceType === 6 ? "tI" : "tD" }
         default:
           return
       }
     }
     switch (getFamily(polyhedron)) {
-      case 'O':
-        return { value: faceType === 3 ? 'O' : 'C' }
-      case 'I':
-        return { value: faceType === 3 ? 'I' : 'D' }
+      case "O":
+        return { value: faceType === 3 ? "O" : "C" }
+      case "I":
+        return { value: faceType === 3 ? "I" : "D" }
       default:
         return
     }
   },
 
-  hitOption: 'faceType',
+  hitOption: "faceType",
   getHitOption(polyhedron, hitPoint) {
     const hitFace = polyhedron.hitFace(hitPoint)
     if (isBevelled(polyhedron)) {
@@ -123,18 +123,18 @@ export const contract = makeOperation<Options>('contract', {
   allOptionCombos(polyhedron) {
     if (isBevelled(polyhedron)) {
       switch (polyhedron.name) {
-        case 'truncated cuboctahedron':
+        case "truncated cuboctahedron":
           return [{ faceType: 6 }, { faceType: 8 }]
-        case 'truncated icosidodecahedron':
+        case "truncated icosidodecahedron":
           return [{ faceType: 6 }, { faceType: 10 }]
         default:
           return [{}]
       }
     }
     switch (getFamily(polyhedron)) {
-      case 'O':
+      case "O":
         return [{ faceType: 3 }, { faceType: 4 }]
-      case 'I':
+      case "I":
         return [{ faceType: 3 }, { faceType: 5 }]
       default:
         return [{}]
@@ -145,16 +145,16 @@ export const contract = makeOperation<Options>('contract', {
     if (isBevelled(polyhedron)) {
       return polyhedron.faces.map(face => {
         if (faceType && face.numSides === faceType) {
-          return 'selected'
+          return "selected"
         }
-        if (face.numSides !== 4) return 'selectable'
+        if (face.numSides !== 4) return "selectable"
         return undefined
       })
     }
     return polyhedron.faces.map(face => {
       if (faceType && isExpandedFace(polyhedron, face, faceType))
-        return 'selected'
-      if (isExpandedFace(polyhedron, face)) return 'selectable'
+        return "selected"
+      if (isExpandedFace(polyhedron, face)) return "selectable"
       return undefined
     })
   },

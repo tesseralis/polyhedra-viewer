@@ -1,7 +1,7 @@
-import React, { Suspense } from 'react'
-import { Route, Redirect, Switch } from 'react-router-dom'
+import React, { Suspense } from "react"
+import { Route, Redirect, Switch } from "react-router-dom"
 
-import { isValidSolid } from 'data'
+import { isValidSolid } from "data"
 import {
   escapeName,
   randomSolidName,
@@ -9,13 +9,13 @@ import {
   fromConwayNotation,
   isAlternateName,
   getCanonicalName,
-} from 'math/polyhedra/names'
+} from "math/polyhedra/names"
 
-import ErrorPage from './ErrorPage'
-import Loading from './Loading'
+import ErrorPage from "./ErrorPage"
+import Loading from "./Loading"
 
-const HomePage = React.lazy(() => import('./HomePage'))
-const Viewer = React.lazy(() => import('./Viewer'))
+const HomePage = React.lazy(() => import("./HomePage"))
+const Viewer = React.lazy(() => import("./Viewer"))
 
 export default () => (
   <Suspense fallback={<Loading />}>
@@ -35,7 +35,7 @@ export default () => (
       <Route
         path="/:solid"
         render={({ match, history }) => {
-          const solid = match.params.solid ?? ''
+          const solid = match.params.solid ?? ""
           if (isConwaySymbol(solid)) {
             const fullName = escapeName(fromConwayNotation(solid))
             const newPath = history.location.pathname.replace(solid, fullName)

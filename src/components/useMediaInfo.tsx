@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useContext } from 'react'
-import { media } from 'styles'
-import { ChildrenProp } from 'types'
+import React, { useState, useEffect, useContext } from "react"
+import { media } from "styles"
+import { ChildrenProp } from "types"
 
 function getWindowWidth() {
   return window.innerWidth > 0 ? window.innerWidth : window.screen.width
@@ -14,9 +14,9 @@ export function DeviceProvider({ children }: ChildrenProp) {
 
   useEffect(() => {
     const handleResize = () => setWidth(getWindowWidth())
-    window.addEventListener('resize', handleResize)
+    window.addEventListener("resize", handleResize)
     return () => {
-      window.removeEventListener('resize', handleResize)
+      window.removeEventListener("resize", handleResize)
     }
   }, [])
 
@@ -30,13 +30,13 @@ function isMobile(width: number) {
 }
 
 function getOrientation(width: number) {
-  return width <= media.mobilePortraitMaxWidth ? 'portrait' : 'landscape'
+  return width <= media.mobilePortraitMaxWidth ? "portrait" : "landscape"
 }
 
 export default function useMediaInfo() {
   const width = useContext(DeviceContext)
   if (isMobile(width)) {
-    return { device: 'mobile', orientation: getOrientation(width) }
+    return { device: "mobile", orientation: getOrientation(width) }
   }
-  return { device: 'desktop', orientation: null }
+  return { device: "desktop", orientation: null }
 }

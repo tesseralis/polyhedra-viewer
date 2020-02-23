@@ -1,5 +1,5 @@
-import _ from 'lodash'
-import { Vec3D } from 'math/geom'
+import _ from "lodash"
+import { Vec3D } from "math/geom"
 
 import {
   PRECISION,
@@ -8,11 +8,11 @@ import {
   getCentroid,
   getNormal,
   getNormalRay,
-} from 'math/geom'
-import { find } from 'utils'
-import Polyhedron from './Polyhedron'
-import Edge from './Edge'
-import Vertex, { VertexList } from './Vertex'
+} from "math/geom"
+import { find } from "utils"
+import Polyhedron from "./Polyhedron"
+import Edge from "./Edge"
+import Vertex, { VertexList } from "./Vertex"
 
 // A list of vertices connected by edges
 export default class VEList implements VertexList {
@@ -25,7 +25,7 @@ export default class VEList implements VertexList {
     this.polyhedron = vertices[0].polyhedron
     this.vertices = vertices
     this.edges = edges
-    this.vectors = _.map(this.vertices, 'vec')
+    this.vectors = _.map(this.vertices, "vec")
   }
 
   get numSides() {

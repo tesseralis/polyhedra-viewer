@@ -1,7 +1,7 @@
-import { useEffect } from 'react'
-import { Location } from 'history'
-import { withRouter } from 'react-router-dom'
-import ReactGA from 'react-ga'
+import { useEffect } from "react"
+import { Location } from "history"
+import { withRouter } from "react-router-dom"
+import ReactGA from "react-ga"
 
 interface Props {
   location: Location

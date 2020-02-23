@@ -1,6 +1,6 @@
-import { getMidpoint } from 'math/geom'
-import Polyhedron from './Polyhedron'
-import Vertex, { VertexList } from './Vertex'
+import { getMidpoint } from "math/geom"
+import Polyhedron from "./Polyhedron"
+import Vertex, { VertexList } from "./Vertex"
 
 export default class Edge implements VertexList {
   polyhedron: Polyhedron

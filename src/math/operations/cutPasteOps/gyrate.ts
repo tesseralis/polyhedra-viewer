@@ -1,11 +1,11 @@
-import _ from 'lodash'
+import _ from "lodash"
 
-import { withOrigin } from 'math/geom'
-import { Polyhedron, Cap } from 'math/polyhedra'
-import { mapObject } from 'utils'
-import { getCapAlignment, getGyrateDirection } from './cutPasteUtils'
-import { getTransformedVertices } from '../operationUtils'
-import makeOperation from '../makeOperation'
+import { withOrigin } from "math/geom"
+import { Polyhedron, Cap } from "math/polyhedra"
+import { mapObject } from "utils"
+import { getCapAlignment, getGyrateDirection } from "./cutPasteUtils"
+import { getTransformedVertices } from "../operationUtils"
+import makeOperation from "../makeOperation"
 
 const TAU = 2 * Math.PI
 
@@ -55,17 +55,17 @@ function applyGyrate(polyhedron: Polyhedron, { cap }: Options) {
   }
 }
 
-export const gyrate = makeOperation('gyrate', {
+export const gyrate = makeOperation("gyrate", {
   apply: applyGyrate,
-  optionTypes: ['cap'],
+  optionTypes: ["cap"],
 
   resultsFilter(polyhedron, config, relations) {
     const options: any = {}
     const { cap } = config
     if (!cap) {
-      throw new Error('Invalid cap')
+      throw new Error("Invalid cap")
     }
-    if (_.some(relations, 'direction')) {
+    if (_.some(relations, "direction")) {
       options.direction = getGyrateDirection(polyhedron, cap)
       if (
         _.filter(
@@ -84,7 +84,7 @@ export const gyrate = makeOperation('gyrate', {
     return Cap.getAll(polyhedron).map(cap => ({ cap }))
   },
 
-  hitOption: 'cap',
+  hitOption: "cap",
   getHitOption(polyhedron, hitPnt) {
     const cap = Cap.find(polyhedron, hitPnt)
     return cap ? { cap } : {}
@@ -93,8 +93,8 @@ export const gyrate = makeOperation('gyrate', {
   faceSelectionStates(polyhedron, { cap }) {
     const allCapFaces = _.flatMap(Cap.getAll(polyhedron), cap => cap.faces())
     return _.map(polyhedron.faces, face => {
-      if (cap instanceof Cap && face.inSet(cap.faces())) return 'selected'
-      if (face.inSet(allCapFaces)) return 'selectable'
+      if (cap instanceof Cap && face.inSet(cap.faces())) return "selected"
+      if (face.inSet(allCapFaces)) return "selectable"
     })
   },
 })

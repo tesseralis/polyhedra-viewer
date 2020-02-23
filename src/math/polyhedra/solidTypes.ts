@@ -1,4 +1,4 @@
-import { Point } from 'types'
+import { Point } from "types"
 export type VIndex = number
 export type FIndex = number
 

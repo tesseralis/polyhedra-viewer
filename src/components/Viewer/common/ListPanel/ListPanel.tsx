@@ -1,14 +1,14 @@
-import _ from 'lodash'
+import _ from "lodash"
 
-import React, { useState } from 'react'
-import { NavLink, Route } from 'react-router-dom'
-import { fonts, useStyle, scales } from 'styles'
+import React, { useState } from "react"
+import { NavLink, Route } from "react-router-dom"
+import { fonts, useStyle, scales } from "styles"
 
-import { groups } from 'data'
-import { escapeName } from 'math/polyhedra/names'
-import { hover, padding, paddingVert, margin, marginVert } from 'styles/common'
+import { groups } from "data"
+import { escapeName } from "math/polyhedra/names"
+import { hover, padding, paddingVert, margin, marginVert } from "styles/common"
 
-import SearchBar from './SearchBar'
+import SearchBar from "./SearchBar"
 
 function getFilteredPolyhedra(polyhedra: string[], filter: string) {
   return polyhedra.filter(solid => solid.includes(filter.toLowerCase()))
@@ -38,21 +38,21 @@ function PolyhedronLink({ name }: { name: string }) {
   const css = useStyle({
     ...hover,
     ...padding(scales.spacing[1], scales.spacing[3]),
-    textDecoration: 'none',
-    display: 'block',
+    textDecoration: "none",
+    display: "block",
 
-    color: 'DimGrey',
+    color: "DimGrey",
     lineHeight: 1.25,
     fontFamily: fonts.andaleMono,
     fontSize: scales.font[6],
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    whiteSpace: 'nowrap',
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+    whiteSpace: "nowrap",
   })
 
   const activeCss = useStyle({
-    color: 'DarkSlateGray',
-    fontWeight: 'bolder',
+    color: "DarkSlateGray",
+    fontWeight: "bolder",
   })
 
   return (
@@ -60,7 +60,7 @@ function PolyhedronLink({ name }: { name: string }) {
       <NavLink
         to={`/${escapeName(name)}/list`}
         {...css()}
-        {...activeCss('activeClassName')}
+        {...activeCss("activeClassName")}
       >
         {_.capitalize(name)}
       </NavLink>
@@ -130,9 +130,9 @@ const PolyhedronGroup = ({ group }: { group: any }) => {
 }
 
 export default function ListPanel() {
-  const [filterText, setFilterText] = useState('')
+  const [filterText, setFilterText] = useState("")
   const filteredGroups =
-    filterText === '' ? groups : filterGroups(groups, filterText)
+    filterText === "" ? groups : filterGroups(groups, filterText)
 
   const css = useStyle(paddingVert(scales.spacing[2]))
 

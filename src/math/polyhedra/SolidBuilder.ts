@@ -1,11 +1,11 @@
-import _ from 'lodash'
+import _ from "lodash"
 
-import { Point } from 'types'
-import { Vec3D } from 'math/geom'
-import { VIndex, SolidData } from './solidTypes'
-import Vertex from './Vertex'
-import Face from './Face'
-import Polyhedron from './Polyhedron'
+import { Point } from "types"
+import { Vec3D } from "math/geom"
+import { VIndex, SolidData } from "./solidTypes"
+import Vertex from "./Vertex"
+import Face from "./Face"
+import Polyhedron from "./Polyhedron"
 
 export type VertexArg = Point | Vec3D | Vertex
 
@@ -18,13 +18,13 @@ export function normalizeVertex(v: VertexArg) {
   if (v instanceof Vec3D) return v.toArray()
   // If it's a vertex object
   if (v instanceof Vertex) return v.value
-  throw new Error('Invalid vertex')
+  throw new Error("Invalid vertex")
 }
 
 function normalizeFace(face: FaceArg) {
   if (Array.isArray(face)) {
     return _.map(face, v => {
-      if (typeof v === 'number') return v
+      if (typeof v === "number") return v
       return v.index
     })
   }
@@ -77,7 +77,7 @@ export default class Builder {
 
   withoutFaces(faces: Face[]) {
     const removed = [...this.solidData.faces]
-    _.pullAt(removed, _.map(faces, 'index'))
+    _.pullAt(removed, _.map(faces, "index"))
     return this.withFaces(removed)
   }
 

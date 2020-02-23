@@ -1,22 +1,22 @@
-import React, { useEffect } from 'react'
+import React, { useEffect } from "react"
 
-import { useStyle, scales } from 'styles'
-import useMediaInfo from 'components/useMediaInfo'
-import { usePageTitle } from 'components/common'
+import { useStyle, scales } from "styles"
+import useMediaInfo from "components/useMediaInfo"
+import { usePageTitle } from "components/common"
 
-import Markdown from './Markdown'
-import TableSection from './TableSection'
-import tableSections from './tableSections'
-import * as text from './text'
-import Masthead from './Masthead'
-import ShareLinks from './ShareLinks'
-import { flexColumn, paddingVert } from 'styles/common'
+import Markdown from "./Markdown"
+import TableSection from "./TableSection"
+import tableSections from "./tableSections"
+import * as text from "./text"
+import Masthead from "./Masthead"
+import ShareLinks from "./ShareLinks"
+import { flexColumn, paddingVert } from "styles/common"
 
 function Main() {
   const { device, orientation } = useMediaInfo()
-  const narrow = device === 'mobile' && orientation === 'portrait'
+  const narrow = device === "mobile" && orientation === "portrait"
 
-  const css = useStyle({ width: '100%' })
+  const css = useStyle({ width: "100%" })
   const sections = useStyle(paddingVert(scales.spacing[4]))
   return (
     <main {...css()}>
@@ -37,12 +37,12 @@ function Main() {
 function Footer() {
   const css = useStyle({
     padding: scales.spacing[4],
-    display: 'grid',
+    display: "grid",
     gridGap: scales.spacing[4],
-    justifyItems: 'center',
-    width: '100%',
-    borderTop: '1px solid LightGray',
-    textAlign: 'center',
+    justifyItems: "center",
+    width: "100%",
+    borderTop: "1px solid LightGray",
+    textAlign: "center",
   })
 
   return (
@@ -59,7 +59,7 @@ interface Props {
   hash?: string
 }
 
-export default function HomePage({ hash = '' }: Props) {
+export default function HomePage({ hash = "" }: Props) {
   useEffect(() => {
     const el = document.getElementById(hash)
     if (el !== null) {
@@ -67,11 +67,11 @@ export default function HomePage({ hash = '' }: Props) {
     }
   }, [hash])
 
-  usePageTitle('Polyhedra Viewer')
+  usePageTitle("Polyhedra Viewer")
 
   const css = useStyle({
-    ...flexColumn('center', 'center'),
-    width: '100vw',
+    ...flexColumn("center", "center"),
+    width: "100vw",
   })
 
   return (

@@ -1,12 +1,12 @@
-import React, { useCallback } from 'react'
-import Icon from '@mdi/react'
-import { mdiRotateLeft, mdiRotateRight } from '@mdi/js'
+import React, { useCallback } from "react"
+import Icon from "@mdi/react"
+import { mdiRotateLeft, mdiRotateRight } from "@mdi/js"
 
-import { Twist } from 'types'
-import { useStyle, scales } from 'styles'
-import { flexRow, square, flexColumn, hover } from 'styles/common'
-import { SrOnly } from 'components/common'
-import { useApplyOperation, TransitionCtx, OperationCtx } from '../../context'
+import { Twist } from "types"
+import { useStyle, scales } from "styles"
+import { flexRow, square, flexColumn, hover } from "styles/common"
+import { SrOnly } from "components/common"
+import { useApplyOperation, TransitionCtx, OperationCtx } from "../../context"
 
 function TwistOption({ orientation }: { orientation: Twist }) {
   const { isTransitioning } = TransitionCtx.useState()
@@ -18,17 +18,17 @@ function TwistOption({ orientation }: { orientation: Twist }) {
   )
 
   const css = useStyle({
-    ...flexColumn('center', 'center'),
+    ...flexColumn("center", "center"),
     ...square(scales.size[3]),
     ...hover,
-    border: '1px LightGray solid',
-    pointerEvents: 'initial',
-    background: 'none',
+    border: "1px LightGray solid",
+    pointerEvents: "initial",
+    background: "none",
   })
   return (
     <button {...css()} disabled={isTransitioning} onClick={handleClick}>
       <Icon
-        path={orientation === 'left' ? mdiRotateLeft : mdiRotateRight}
+        path={orientation === "left" ? mdiRotateLeft : mdiRotateRight}
         rotate={180}
         size={scales.size[3]}
       />
@@ -39,9 +39,9 @@ function TwistOption({ orientation }: { orientation: Twist }) {
 
 export default function TwistOptions() {
   const css = useStyle({
-    ...flexRow('center', 'space-between'),
-    width: '100%',
-    height: '100%',
+    ...flexRow("center", "space-between"),
+    width: "100%",
+    height: "100%",
   })
   return (
     <div {...css()}>

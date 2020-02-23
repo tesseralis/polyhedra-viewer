@@ -1,7 +1,7 @@
-import _ from 'lodash'
+import _ from "lodash"
 
-import { Polyhedron, Vertex, Face, Edge } from 'math/polyhedra'
-import makeOperation from '../makeOperation'
+import { Polyhedron, Vertex, Face, Edge } from "math/polyhedra"
+import makeOperation from "../makeOperation"
 
 interface SharpenOptions {
   faceType?: number
@@ -109,17 +109,17 @@ function applySharpen(
 interface Options {
   faceType?: number
 }
-export const sharpen = makeOperation<Options>('sharpen', {
+export const sharpen = makeOperation<Options>("sharpen", {
   apply: applySharpen,
-  optionTypes: ['faceType'],
+  optionTypes: ["faceType"],
 
   resultsFilter(polyhedron, config) {
     const { faceType } = config
     switch (polyhedron.name) {
-      case 'cuboctahedron':
-        return { value: faceType === 3 ? 'C' : 'O' }
-      case 'icosidodecahedron':
-        return { value: faceType === 3 ? 'D' : 'I' }
+      case "cuboctahedron":
+        return { value: faceType === 3 ? "C" : "O" }
+      case "icosidodecahedron":
+        return { value: faceType === 3 ? "D" : "I" }
       default:
         return {}
     }
@@ -127,16 +127,16 @@ export const sharpen = makeOperation<Options>('sharpen', {
 
   allOptionCombos(polyhedron) {
     switch (polyhedron.name) {
-      case 'cuboctahedron':
+      case "cuboctahedron":
         return [{ faceType: 3 }, { faceType: 4 }]
-      case 'icosidodecahedron':
+      case "icosidodecahedron":
         return [{ faceType: 3 }, { faceType: 5 }]
       default:
         return [{}]
     }
   },
 
-  hitOption: 'faceType',
+  hitOption: "faceType",
   getHitOption(polyhedron, hitPoint) {
     const n = polyhedron.hitFace(hitPoint).numSides
     return n <= 5 ? { faceType: n } : {}
@@ -144,8 +144,8 @@ export const sharpen = makeOperation<Options>('sharpen', {
 
   faceSelectionStates(polyhedron, { faceType }) {
     return _.map(polyhedron.faces, face => {
-      if (_.isNumber(faceType) && face.numSides === faceType) return 'selected'
-      return 'selectable'
+      if (_.isNumber(faceType) && face.numSides === faceType) return "selected"
+      return "selectable"
     })
   },
 })

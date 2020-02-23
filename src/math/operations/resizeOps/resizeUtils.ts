@@ -1,9 +1,9 @@
-import _ from 'lodash'
+import _ from "lodash"
 
-import { flatMapUniq } from 'utils'
-import { Polyhedron, Face } from 'math/polyhedra'
-import { PRECISION, getPlane, withOrigin } from 'math/geom'
-import { getTransformedVertices } from '../operationUtils'
+import { flatMapUniq } from "utils"
+import { Polyhedron, Face } from "math/polyhedra"
+import { PRECISION, getPlane, withOrigin } from "math/geom"
+import { getTransformedVertices } from "../operationUtils"
 
 export function getResizedVertices(
   faces: Face[],
@@ -20,12 +20,12 @@ export function getResizedVertices(
   )
 }
 
-type ExpansionType = 'cantellate' | 'snub'
+type ExpansionType = "cantellate" | "snub"
 
 export function expansionType(polyhedron: Polyhedron): ExpansionType {
   return polyhedron.getVertex().adjacentFaceCounts()[3] >= 3
-    ? 'snub'
-    : 'cantellate'
+    ? "snub"
+    : "cantellate"
 }
 
 const edgeShape = {
@@ -39,7 +39,7 @@ export function isExpandedFace(
   nSides?: number,
 ) {
   const type = expansionType(polyhedron)
-  if (typeof nSides === 'number' && face.numSides !== nSides) return false
+  if (typeof nSides === "number" && face.numSides !== nSides) return false
   if (!face.isValid()) return false
   return _.every(face.adjacentFaces(), { numSides: edgeShape[type] })
 }
@@ -49,10 +49,10 @@ function getFaceDistance(face1: Face, face2: Face) {
   let current = [face1]
   while (!face2.inSet(current)) {
     dist++
-    current = flatMapUniq(current, face => face.adjacentFaces(), 'index')
+    current = flatMapUniq(current, face => face.adjacentFaces(), "index")
 
     if (dist > 10) {
-      throw new Error('we went toooooo far')
+      throw new Error("we went toooooo far")
     }
   }
   return dist
@@ -97,14 +97,14 @@ function getTruncatedOctahedronContractFaces(polyhedron: Polyhedron) {
 
 export function getExpandedFaces(polyhedron: Polyhedron, faceType?: number) {
   switch (polyhedron.name) {
-    case 'cuboctahedron':
+    case "cuboctahedron":
       return getCuboctahedronContractFaces(polyhedron)
-    case 'icosahedron':
+    case "icosahedron":
       return getIcosahedronContractFaces(polyhedron)
-    case 'truncated octahedron':
+    case "truncated octahedron":
       return getTruncatedOctahedronContractFaces(polyhedron)
-    case 'truncated icosidodecahedron':
-    case 'truncated cuboctahedron':
+    case "truncated icosidodecahedron":
+    case "truncated cuboctahedron":
       return polyhedron.faces.filter(f => f.numSides === faceType)
     default:
       return _.filter(polyhedron.faces, face =>

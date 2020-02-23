@@ -1,18 +1,18 @@
-import React, { memo, useCallback, ButtonHTMLAttributes } from 'react'
-import { useStyle, scales } from 'styles'
-import _ from 'lodash'
+import React, { memo, useCallback, ButtonHTMLAttributes } from "react"
+import { useStyle, scales } from "styles"
+import _ from "lodash"
 
-import Config from 'components/ConfigCtx'
+import Config from "components/ConfigCtx"
 import {
   configInputs,
   ConfigInput as InputType,
-} from 'components/configOptions'
-import { hover, flexRow, flexColumn } from 'styles/common'
-import { andaleMono } from 'styles/fonts'
+} from "components/configOptions"
+import { hover, flexRow, flexColumn } from "styles/common"
+import { andaleMono } from "styles/fonts"
 
 function getInputValue<T>(input: InputType<T>, el: HTMLInputElement) {
   switch (input.type) {
-    case 'checkbox':
+    case "checkbox":
       return el.checked
     default:
       return el.value
@@ -21,11 +21,11 @@ function getInputValue<T>(input: InputType<T>, el: HTMLInputElement) {
 
 function getInputProps<T>(input: InputType<T>, value: T) {
   switch (input.type) {
-    case 'checkbox':
+    case "checkbox":
       return { checked: value }
-    case 'range':
+    case "range":
       return {
-        ..._.pick(input, ['min', 'max', 'step']),
+        ..._.pick(input, ["min", "max", "step"]),
         value,
       }
     default:
@@ -46,10 +46,10 @@ function ConfigInput({ input, value, setValue }: InputProps<any>) {
     [input, setValue],
   )
   switch (input.type) {
-    case 'select':
+    case "select":
       return (
         <select onChange={onChange} {...inputProps}>
-          {_.map(_.get(input, 'options'), option => (
+          {_.map(_.get(input, "options"), option => (
             <option key={option} value={option}>
               {option}
             </option>
@@ -63,10 +63,10 @@ function ConfigInput({ input, value, setValue }: InputProps<any>) {
 
 const LabelledInput = memo(({ input, value, setValue }: InputProps<any>) => {
   const css = useStyle({
-    ...flexRow(undefined, 'space-between'),
-    width: '100%',
+    ...flexRow(undefined, "space-between"),
+    width: "100%",
     fontFamily: andaleMono,
-    ':not(:last-child)': {
+    ":not(:last-child)": {
       marginBottom: scales.spacing[3],
     },
   })
@@ -86,7 +86,7 @@ function ResetButton({ onClick }: ButtonHTMLAttributes<Element>) {
     height: 30,
     marginTop: scales.spacing[3],
 
-    border: '1px LightGray solid',
+    border: "1px LightGray solid",
 
     fontFamily: andaleMono,
     fontSize: scales.font[6],
@@ -103,8 +103,8 @@ export default function ConfigForm() {
   const { setValue, reset } = Config.useActions()
 
   const css = useStyle({
-    ...flexColumn('flex-end'),
-    width: '100%',
+    ...flexColumn("flex-end"),
+    width: "100%",
     padding: scales.spacing[3],
   })
   return (

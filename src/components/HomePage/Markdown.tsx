@@ -1,10 +1,10 @@
-import React, { HTMLAttributes, ReactType } from 'react'
-import Markdown from 'react-markdown'
-import { CSSProperties } from 'aphrodite'
+import React, { HTMLAttributes, ReactType } from "react"
+import Markdown from "react-markdown"
+import { CSSProperties } from "aphrodite"
 
-import { ExternalLink } from 'components/common'
-import { useStyle, fonts, scales } from 'styles'
-import { marginHoriz, link } from 'styles/common'
+import { ExternalLink } from "components/common"
+import { useStyle, fonts, scales } from "styles"
+import { marginHoriz, link } from "styles/common"
 
 function styled(el: ReactType, styles: CSSProperties) {
   const El = el
@@ -14,18 +14,18 @@ function styled(el: ReactType, styles: CSSProperties) {
   }
 }
 
-const List = styled('ul', {
+const List = styled("ul", {
   ...marginHoriz(scales.spacing[4]),
-  listStyle: 'disc',
-  ':not(:last-child)': {
+  listStyle: "disc",
+  ":not(:last-child)": {
     marginBottom: scales.spacing[3],
   },
 })
 
-const ListItem = styled('li', {
+const ListItem = styled("li", {
   fontSize: scales.font[5],
   fontFamily: fonts.times,
-  color: 'DimGrey',
+  color: "DimGrey",
   lineHeight: 1.5,
 })
 
@@ -35,12 +35,12 @@ interface RenderProps extends HTMLAttributes<HTMLElement> {
 }
 
 const renderers = {
-  paragraph: styled('p', {
+  paragraph: styled("p", {
     fontSize: scales.font[5],
     fontFamily: fonts.times,
-    color: 'DimGrey',
+    color: "DimGrey",
     lineHeight: 1.5,
-    ':not(:last-child)': {
+    ":not(:last-child)": {
       marginBottom: scales.spacing[3],
     },
   }),
@@ -50,8 +50,8 @@ const renderers = {
   listItem: ({ ordered, tight, ...props }: RenderProps) => (
     <ListItem {...props} />
   ),
-  emphasis: styled('em', { fontStyle: 'italic' }),
-  strong: styled('strong', { fontWeight: 'bold' }),
+  emphasis: styled("em", { fontStyle: "italic" }),
+  strong: styled("strong", { fontWeight: "bold" }),
 }
 
 interface Props {

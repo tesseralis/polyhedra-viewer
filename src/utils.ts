@@ -1,4 +1,4 @@
-import _, { ValueIteratee, ListIterateeCustom } from 'lodash'
+import _, { ValueIteratee, ListIterateeCustom } from "lodash"
 
 function mod(a: number, b: number) {
   return a >= 0 ? a % b : (a % b) + b

@@ -1,5 +1,5 @@
-import React from 'react'
-import _ from 'lodash'
+import React from "react"
+import _ from "lodash"
 
 const { PI, sin, cos } = Math
 const TAU = 2 * PI
@@ -12,7 +12,7 @@ interface PointsProps {
 }
 
 function joinPoints(points: Point2D[]) {
-  return points.map(point => point.join(',')).join(' ')
+  return points.map(point => point.join(",")).join(" ")
 }
 
 // Irregular polygon

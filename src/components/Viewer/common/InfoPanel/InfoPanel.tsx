@@ -1,15 +1,15 @@
-import React from 'react'
-import { useStyle, scales, media } from 'styles'
-import _ from 'lodash'
+import React from "react"
+import { useStyle, scales, media } from "styles"
+import _ from "lodash"
 
-import { fonts } from 'styles'
+import { fonts } from "styles"
 
-import { PolyhedronCtx } from 'components/Viewer/context'
-import DataDownloader from '../DataDownloader'
-import { flexColumn } from 'styles/common'
+import { PolyhedronCtx } from "components/Viewer/context"
+import DataDownloader from "../DataDownloader"
+import { flexColumn } from "styles/common"
 
-import { RenderProps } from './renderFuncs'
-import DataList from './DataList'
+import { RenderProps } from "./renderFuncs"
+import DataList from "./DataList"
 
 function Heading({ polyhedron }: RenderProps) {
   const css = useStyle({
@@ -30,23 +30,23 @@ export default function InfoPanel() {
   const css = useStyle({
     ...flexColumn(),
     borderSpacing: 8,
-    borderCollapse: 'separate',
+    borderCollapse: "separate",
     padding: scales.spacing[3],
     fontFamily: fonts.times,
 
     // On non-mobile, display the download links on the bottom
-    [media.notMobile]: { height: '100%' },
+    [media.notMobile]: { height: "100%" },
   })
 
   const typeCss = useStyle({
     fontSize: scales.font[5],
-    color: 'DimGrey',
+    color: "DimGrey",
     marginBottom: scales.spacing[3],
   })
 
   const downloaderCss = useStyle({
     [media.mobile]: { marginTop: scales.spacing[4] },
-    [media.notMobile]: { marginTop: 'auto' },
+    [media.notMobile]: { marginTop: "auto" },
   })
 
   return (

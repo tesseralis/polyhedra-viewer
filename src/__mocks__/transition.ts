@@ -1,6 +1,6 @@
-import { interpolate } from 'd3-interpolate'
+import { interpolate } from "d3-interpolate"
 
-import { Callback, TransitionOptions } from '../transition'
+import { Callback, TransitionOptions } from "../transition"
 
 export default <T extends object>(
   { startValue, endValue, onFinish }: TransitionOptions<T>,

@@ -1,24 +1,24 @@
-import React, { ThHTMLAttributes } from 'react'
-import _ from 'lodash'
+import React, { ThHTMLAttributes } from "react"
+import _ from "lodash"
 
-import { fromConwayNotation } from 'math/polyhedra/names'
-import { Table } from 'math/polyhedra/tables'
-import PolyhedronLink from './PolyhedronLink'
-import { media, fonts, useStyle, scales } from 'styles'
+import { fromConwayNotation } from "math/polyhedra/names"
+import { Table } from "math/polyhedra/tables"
+import PolyhedronLink from "./PolyhedronLink"
+import { media, fonts, useStyle, scales } from "styles"
 
 function useCellStyle() {
   return useStyle({
     fontFamily: fonts.times,
-    verticalAlign: 'middle',
-    textAlign: 'center',
-    color: 'DimGrey',
+    verticalAlign: "middle",
+    textAlign: "center",
+    color: "DimGrey",
     [media.notMobile]: { fontSize: scales.font[7] },
     [media.mobile]: { fontSize: 8 },
   })
 }
 
 const Cell = ({ cell, colSpan = 1 }: { cell: string; colSpan?: number }) => {
-  const isFake = cell[0] === '!'
+  const isFake = cell[0] === "!"
   const polyhedron = fromConwayNotation(isFake ? cell.substring(1) : cell)
 
   const symbol = isFake ? `(${cell.substring(1)})` : cell
@@ -39,14 +39,14 @@ function Th(props: ThHTMLAttributes<Element>) {
   return <th {...props} {...css()} />
 }
 
-const ColumnHeaders = ({ columns }: Pick<Table, 'columns'>) => {
+const ColumnHeaders = ({ columns }: Pick<Table, "columns">) => {
   return (
     <thead>
       {/* Render the subcolumn headers first, where they exist. */}
       <tr>
         <th />
         {_.flatMap(columns, (col, j) =>
-          typeof col === 'string'
+          typeof col === "string"
             ? [<th key={j} />]
             : col.sub.map(subCol => <Th key={`${j}-${subCol}`}>{subCol}</Th>),
         )}
@@ -55,8 +55,8 @@ const ColumnHeaders = ({ columns }: Pick<Table, 'columns'>) => {
       <tr>
         <th />
         {columns.map((col, j) => (
-          <Th key={j} colSpan={typeof col !== 'string' ? col.sub.length : 1}>
-            {typeof col !== 'string' ? col.name : col}
+          <Th key={j} colSpan={typeof col !== "string" ? col.sub.length : 1}>
+            {typeof col !== "string" ? col.name : col}
           </Th>
         ))}
       </tr>
@@ -74,7 +74,7 @@ export default function PolyhedronTable({
 }: Props) {
   const css = useStyle({
     borderSpacing: scales.spacing[2],
-    borderCollapse: 'separate',
+    borderCollapse: "separate",
   })
   const captionCss = useStyle({
     fontSize: scales.font[5],
@@ -96,7 +96,7 @@ export default function PolyhedronTable({
                   <Cell key={`${j}-${k}`} cell={subcell} />
                 ))
               }
-              if (typeof col === 'string') {
+              if (typeof col === "string") {
                 return [<Cell key={j} cell={cell} />]
               }
               return [<Cell key={j} cell={cell} colSpan={col.sub.length} />]

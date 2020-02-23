@@ -1,39 +1,39 @@
-import React from 'react'
-import Icon from '@mdi/react'
+import React from "react"
+import Icon from "@mdi/react"
 
-import { useStyle, scales } from 'styles'
-import { SrOnly } from 'components/common'
-import { fonts } from 'styles'
+import { useStyle, scales } from "styles"
+import { SrOnly } from "components/common"
+import { fonts } from "styles"
 
-import { SolidData } from 'math/polyhedra'
-import { hover } from 'styles/common'
-import { mdiDownload } from '@mdi/js'
+import { SolidData } from "math/polyhedra"
+import { hover } from "styles/common"
+import { mdiDownload } from "@mdi/js"
 
 function formatDecimal(number: number) {
   return Number.isInteger(number) ? `${number}.0` : number
 }
 
 function vToObj(vertex: number[]) {
-  return 'v ' + vertex.map(formatDecimal).join(' ')
+  return "v " + vertex.map(formatDecimal).join(" ")
 }
 
 function fToObj(face: number[]) {
-  return 'f ' + face.map(i => i + 1).join(' ')
+  return "f " + face.map(i => i + 1).join(" ")
 }
 
 function toObj({ vertices, faces }: SolidData) {
   const vObj = vertices.map(vToObj)
   const fObj = faces.map(fToObj)
-  return vObj.concat(fObj).join('\n')
+  return vObj.concat(fObj).join("\n")
 }
 
 const fileFormats = [
   {
-    ext: 'json',
+    ext: "json",
     serializer: JSON.stringify,
   },
   {
-    ext: 'obj',
+    ext: "obj",
     serializer: toObj,
   },
 ]
@@ -49,30 +49,30 @@ function DownloadLink({
 }: typeof fileFormats[0] & Props) {
   const filename = `${solid.name}.${ext}`
   const blob = new Blob([serializer(solid)], {
-    type: 'text/plain;charset=utf-8',
+    type: "text/plain;charset=utf-8",
   })
   const url = window.URL.createObjectURL(blob)
 
   const css = useStyle({
-    display: 'inline-flex',
-    justifyContent: 'center',
+    display: "inline-flex",
+    justifyContent: "center",
     padding: scales.spacing[2],
     width: scales.size[4],
 
-    textDecoration: 'none',
-    border: '1px LightGray solid',
-    color: 'black',
+    textDecoration: "none",
+    border: "1px LightGray solid",
+    color: "black",
     fontFamily: fonts.andaleMono,
     ...hover,
 
-    ':not(:last-child)': {
+    ":not(:last-child)": {
       marginRight: scales.spacing[2],
     },
   })
 
   return (
     <a {...css()} key={ext} download={filename} href={url}>
-      <SrOnly>Download as</SrOnly>.{ext}{' '}
+      <SrOnly>Download as</SrOnly>.{ext}{" "}
       <span>
         <Icon path={mdiDownload} size={scales.size[1]} />
       </span>

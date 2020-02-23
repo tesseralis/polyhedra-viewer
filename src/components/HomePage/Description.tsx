@@ -1,11 +1,11 @@
-import React, { useState } from 'react'
-import Icon from '@mdi/react'
-import { mdiMenuDown } from '@mdi/js'
+import React, { useState } from "react"
+import Icon from "@mdi/react"
+import { mdiMenuDown } from "@mdi/js"
 
-import { useStyle, fonts, scales } from 'styles'
-import { flexRow, flexColumn, link } from 'styles/common'
-import { SrOnly } from 'components/common'
-import Markdown from './Markdown'
+import { useStyle, fonts, scales } from "styles"
+import { flexRow, flexColumn, link } from "styles/common"
+import { SrOnly } from "components/common"
+import Markdown from "./Markdown"
 
 interface ToggleProps {
   onClick(): void
@@ -14,12 +14,12 @@ interface ToggleProps {
 function Toggle({ onClick, title }: ToggleProps) {
   const css = useStyle({
     ...link,
-    ...flexRow('center', 'center'),
+    ...flexRow("center", "center"),
 
-    backgroundColor: 'transparent',
+    backgroundColor: "transparent",
     fontSize: scales.font[6],
-    border: 'none',
-    cursor: 'pointer',
+    border: "none",
+    cursor: "pointer",
     fontFamily: fonts.times,
   })
   return (
@@ -27,7 +27,7 @@ function Toggle({ onClick, title }: ToggleProps) {
       <span>
         <Icon path={mdiMenuDown} size={scales.size[1]} />
       </span>
-      {'More'}
+      {"More"}
       <SrOnly>{`about ${title}`}</SrOnly>
     </button>
   )
@@ -42,9 +42,9 @@ interface Props {
 export default function Description({ title, content, collapsed }: Props) {
   const [isCollapsed, setCollapsed] = useState(collapsed)
   const toggle = () => setCollapsed(collapsed => !collapsed)
-  const brief = content.split('\n\n')[0]
+  const brief = content.split("\n\n")[0]
 
-  const css = useStyle(flexColumn('center'))
+  const css = useStyle(flexColumn("center"))
   return (
     <div {...css()}>
       <div>

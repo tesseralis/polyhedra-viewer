@@ -1,15 +1,15 @@
-import _ from 'lodash'
+import _ from "lodash"
 
-import { toConwayNotation } from 'math/polyhedra/names'
-import operationGraph, { Relation } from './operationGraph'
-import { getSingle } from 'utils'
-import { fromConwayNotation } from 'math/polyhedra/names'
-import { Vec3D, vec, PRECISION } from 'math/geom'
-import { Polyhedron, Vertex, VertexArg, normalizeVertex } from 'math/polyhedra'
-import { removeExtraneousVertices } from './operationUtils'
-import { Point } from 'types'
+import { toConwayNotation } from "math/polyhedra/names"
+import operationGraph, { Relation } from "./operationGraph"
+import { getSingle } from "utils"
+import { fromConwayNotation } from "math/polyhedra/names"
+import { Vec3D, vec, PRECISION } from "math/geom"
+import { Polyhedron, Vertex, VertexArg, normalizeVertex } from "math/polyhedra"
+import { removeExtraneousVertices } from "./operationUtils"
+import { Point } from "types"
 
-type SelectState = 'selected' | 'selectable' | undefined
+type SelectState = "selected" | "selectable" | undefined
 
 export interface AnimationData {
   start: Polyhedron
@@ -219,20 +219,20 @@ export default function makeOperation<Options extends {}>(
       // TODO maybe split up among operations?
       // but I think that might just grow the code...
       switch (name) {
-        case 'turn':
-          return relations.length > 1 || !!_.find(relations, 'chiral')
-        case 'twist':
-          return relations[0].value[0] === 's'
-        case 'snub':
-        case 'gyroelongate':
-          return !!_.find(relations, 'chiral')
-        case 'sharpen':
-        case 'contract':
-        case 'shorten':
+        case "turn":
+          return relations.length > 1 || !!_.find(relations, "chiral")
+        case "twist":
+          return relations[0].value[0] === "s"
+        case "snub":
+        case "gyroelongate":
+          return !!_.find(relations, "chiral")
+        case "sharpen":
+        case "contract":
+        case "shorten":
           return relations.length > 1
-        case 'augment':
-        case 'diminish':
-        case 'gyrate':
+        case "augment":
+        case "diminish":
+        case "gyrate":
           return true
         default:
           return false

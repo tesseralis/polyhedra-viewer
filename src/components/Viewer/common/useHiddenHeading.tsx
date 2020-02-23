@@ -1,5 +1,5 @@
-import React, { useRef, useCallback } from 'react'
-import { SrOnly } from 'components/common'
+import React, { useRef, useCallback } from "react"
+import { SrOnly } from "components/common"
 
 /**
  * Provides a hidden heading and a function to focus on it.

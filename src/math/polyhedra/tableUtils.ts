@@ -1,6 +1,6 @@
-import _ from 'lodash'
-import { sections } from './tables'
-import { toConwayNotation } from './names'
+import _ from "lodash"
+import { sections } from "./tables"
+import { toConwayNotation } from "./names"
 
 // TODO do some thinking and make a smarter table data structure,
 // and come up with a better API for this stuff.

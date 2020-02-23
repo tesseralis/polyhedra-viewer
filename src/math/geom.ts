@@ -1,6 +1,6 @@
-import _ from 'lodash'
-import { Vec3D, Ray3D, Triangle3D, Plane, Matrix4x4 } from 'toxiclibsjs/geom'
-import { Point } from 'types'
+import _ from "lodash"
+import { Vec3D, Ray3D, Triangle3D, Plane, Matrix4x4 } from "toxiclibsjs/geom"
+import { Point } from "types"
 
 // Re-export Vec3D so its easier to switch
 export { Vec3D }
@@ -20,7 +20,7 @@ export function isInverse(v1: Vec3D, v2: Vec3D) {
 // Get the plane containing the given points
 export function getPlane(points: Vec3D[]) {
   if (points.length < 3) {
-    throw new Error('Need at least three points for a plane')
+    throw new Error("Need at least three points for a plane")
   }
   return new Plane(new Triangle3D(points[0], points[1], points[2]))
 }

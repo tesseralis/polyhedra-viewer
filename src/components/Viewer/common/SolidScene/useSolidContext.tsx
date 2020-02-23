@@ -1,7 +1,7 @@
-import { useMemo } from 'react'
-import tinycolor from 'tinycolor2'
-import Config from 'components/ConfigCtx'
-import { PolyhedronCtx, OperationCtx, TransitionCtx } from '../../context'
+import { useMemo } from "react"
+import tinycolor from "tinycolor2"
+import Config from "components/ConfigCtx"
+import { PolyhedronCtx, OperationCtx, TransitionCtx } from "../../context"
 
 function toRgb(hex: string) {
   const { r, g, b } = tinycolor(hex).toRgb()
@@ -37,10 +37,10 @@ export default function useSolidContext() {
     const selectState = operation.faceSelectionStates(polyhedron, options!)
     return polyhedron.faces.map((face, i) => {
       switch (selectState[i]) {
-        case 'selected':
-          return tinycolor.mix(colors[face.numSides], 'lime')
-        case 'selectable':
-          return tinycolor.mix(colors[face.numSides], 'yellow', 25)
+        case "selected":
+          return tinycolor.mix(colors[face.numSides], "lime")
+        case "selectable":
+          return tinycolor.mix(colors[face.numSides], "yellow", 25)
         default:
           return colors[face.numSides]
       }

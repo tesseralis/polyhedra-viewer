@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect } from "react"
 
 export default function usePageTitle(title: string) {
   // "This is broken because it doesn't have a cleanup function,

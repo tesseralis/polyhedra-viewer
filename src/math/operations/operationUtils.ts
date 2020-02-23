@@ -1,15 +1,15 @@
-import _ from 'lodash'
-import { Twist } from 'types'
-import { Polyhedron, Vertex, Edge, VertexList, VertexArg } from 'math/polyhedra'
-import { Vec3D, Transform } from 'math/geom'
-import { getCyclic } from 'utils'
+import _ from "lodash"
+import { Twist } from "types"
+import { Polyhedron, Vertex, Edge, VertexList, VertexArg } from "math/polyhedra"
+import { Vec3D, Transform } from "math/geom"
+import { getCyclic } from "utils"
 /**
  * Remove vertices in the polyhedron that aren't connected to any faces,
  * and remap the faces to the smaller indices
  */
 export function removeExtraneousVertices(polyhedron: Polyhedron) {
   // Vertex indices to remove
-  const vertsInFaces = _.flatMap(polyhedron.faces, 'vertices')
+  const vertsInFaces = _.flatMap(polyhedron.faces, "vertices")
   const toRemove = _.filter(polyhedron.vertices, v => !v.inSet(vertsInFaces))
   const numToRemove = toRemove.length
 
@@ -39,9 +39,9 @@ export function removeExtraneousVertices(polyhedron: Polyhedron) {
 
 export function getTwistSign(twist?: Twist) {
   switch (twist) {
-    case 'left':
+    case "left":
       return 1
-    case 'right':
+    case "right":
       return -1
     default:
       return 0
@@ -55,7 +55,7 @@ export function getTwistSign(twist?: Twist) {
  */
 function getEdgeFaces<V>([v1, v2, v3, v4]: V[], twist?: Twist) {
   switch (twist) {
-    case 'left':
+    case "left":
       // v1 - v4
       // |  \ |
       // v2 - v3
@@ -63,7 +63,7 @@ function getEdgeFaces<V>([v1, v2, v3, v4]: V[], twist?: Twist) {
         [v1, v2, v3],
         [v1, v3, v4],
       ]
-    case 'right':
+    case "right":
       // v1 - v4
       // |  / |
       // v2 - v3
@@ -137,7 +137,7 @@ export function expandEdges(
         // If it has an even number of faces, create a new triangle face
         // TODO implement this
         throw new Error(
-          'this type of extension not supported yet: single edge at vertex with even number of adjacent faces',
+          "this type of extension not supported yet: single edge at vertex with even number of adjacent faces",
         )
       }
     } else if (edges.length === 2) {
@@ -167,7 +167,7 @@ export function expandEdges(
     } else {
       if (v.adjacentFaces().length !== edges.length) {
         throw new Error(
-          'If there are more than two edges per vertex, all edges of the vertex must be in the list',
+          "If there are more than two edges per vertex, all edges of the vertex must be in the list",
         )
       }
 
@@ -228,7 +228,7 @@ export function getTransformedVertices<T extends VertexList>(
   _.forEach(vLists, vList => {
     _.forEach(vList.vertices, v => {
       const t = iteratee(vList)
-      result[v.index] = typeof t === 'function' ? t(v.vec) : t
+      result[v.index] = typeof t === "function" ? t(v.vec) : t
     })
   })
   return result

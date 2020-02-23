@@ -1,8 +1,8 @@
-import { Twist } from 'types'
-import { Polyhedron, Cap, VertexList } from 'math/polyhedra'
-import { expandEdges } from '../operationUtils'
-import makeOperation from '../makeOperation'
-import { antiprismHeight, getScaledPrismVertices } from './prismUtils'
+import { Twist } from "types"
+import { Polyhedron, Cap, VertexList } from "math/polyhedra"
+import { expandEdges } from "../operationUtils"
+import makeOperation from "../makeOperation"
+import { antiprismHeight, getScaledPrismVertices } from "./prismUtils"
 
 function doElongate(polyhedron: Polyhedron, twist?: Twist) {
   const caps = Cap.getAll(polyhedron)
@@ -34,7 +34,7 @@ function doElongate(polyhedron: Polyhedron, twist?: Twist) {
   }
 }
 
-export const elongate = makeOperation('elongate', {
+export const elongate = makeOperation("elongate", {
   apply(polyhedron) {
     return doElongate(polyhedron)
   },
@@ -43,12 +43,12 @@ export const elongate = makeOperation('elongate', {
 interface Options {
   twist?: Twist
 }
-export const gyroelongate = makeOperation<Options>('gyroelongate', {
-  apply(polyhedron: Polyhedron, { twist = 'left' }) {
+export const gyroelongate = makeOperation<Options>("gyroelongate", {
+  apply(polyhedron: Polyhedron, { twist = "left" }) {
     return doElongate(polyhedron, twist)
   },
-  optionTypes: ['twist'],
+  optionTypes: ["twist"],
   allOptionCombos() {
-    return [{ twist: 'left' }, { twist: 'right' }]
+    return [{ twist: "left" }, { twist: "right" }]
   },
 })

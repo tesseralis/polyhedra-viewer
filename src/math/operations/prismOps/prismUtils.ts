@@ -1,10 +1,10 @@
-import _ from 'lodash'
-import { Twist } from 'types'
-import { find } from 'utils'
-import { Polyhedron, Cap, VEList } from 'math/polyhedra'
-import { inRow, inColumn } from 'math/polyhedra/tableUtils'
-import { withOrigin, isInverse } from 'math/geom'
-import { getTwistSign, getTransformedVertices } from '../operationUtils'
+import _ from "lodash"
+import { Twist } from "types"
+import { find } from "utils"
+import { Polyhedron, Cap, VEList } from "math/polyhedra"
+import { inRow, inColumn } from "math/polyhedra/tableUtils"
+import { withOrigin, isInverse } from "math/geom"
+import { getTwistSign, getTransformedVertices } from "../operationUtils"
 
 // Get antiprism height of a unit antiprism with n sides
 export function antiprismHeight(n: number) {
@@ -27,17 +27,17 @@ export function getChirality(polyhedron: Polyhedron) {
     .twin().face
   // I'm pretty sure this is the same logic as in augment
   if (isCupolaRotunda) {
-    return rightFaceAcross.numSides !== 3 ? 'right' : 'left'
+    return rightFaceAcross.numSides !== 3 ? "right" : "left"
   }
-  return rightFaceAcross.numSides !== 3 ? 'left' : 'right'
+  return rightFaceAcross.numSides !== 3 ? "left" : "right"
 }
 
 export function isGyroelongatedBiCupola(polyhedron: Polyhedron) {
-  const pyrRows = ['square pyramid', 'pentagonal pyramid']
-  if (_.some(pyrRows, row => inRow(polyhedron.name, 'capstones', row))) {
+  const pyrRows = ["square pyramid", "pentagonal pyramid"]
+  if (_.some(pyrRows, row => inRow(polyhedron.name, "capstones", row))) {
     return false
   }
-  return inColumn(polyhedron.name, 'capstones', 'gyroelongated bi-')
+  return inColumn(polyhedron.name, "capstones", "gyroelongated bi-")
 }
 
 function getOppositeCaps(polyhedron: Polyhedron) {
@@ -54,14 +54,14 @@ function getOppositePrismFaces(polyhedron: Polyhedron) {
     _.filter(polyhedron.faces, face => {
       const faceCounts = _.countBy(
         face.vertexAdjacentFaces().filter(f => !f.equals(face)),
-        'numSides',
+        "numSides",
       )
       return (
-        _.isEqual(faceCounts, { '4': face.numSides }) ||
-        _.isEqual(faceCounts, { '3': 2 * face.numSides })
+        _.isEqual(faceCounts, { "4": face.numSides }) ||
+        _.isEqual(faceCounts, { "3": 2 * face.numSides })
       )
     }),
-    'numSides',
+    "numSides",
   )
   if (!face1) return undefined
 
@@ -95,9 +95,9 @@ export function getAdjustInformation(polyhedron: Polyhedron) {
 
   // Otherwise it's an elongated single cap
   const faces = polyhedron.faces.filter(face => {
-    return _.uniqBy(face.adjacentFaces(), 'numSides').length === 1
+    return _.uniqBy(face.adjacentFaces(), "numSides").length === 1
   })
-  const face = _.maxBy(faces, 'numSides')!
+  const face = _.maxBy(faces, "numSides")!
   const cap = Cap.getAll(polyhedron).find(cap =>
     isInverse(cap.normal(), face.normal()),
   )

@@ -1,24 +1,24 @@
-import React from 'react'
-import _ from 'lodash'
-import { ChildrenProp } from 'types'
-import { polygonNames } from 'math/polygons'
-import { Polyhedron } from 'math/polyhedra'
-import { useStyle } from 'styles'
+import React from "react"
+import _ from "lodash"
+import { ChildrenProp } from "types"
+import { polygonNames } from "math/polygons"
+import { Polyhedron } from "math/polyhedra"
+import { useStyle } from "styles"
 
 export function Sub({ children }: ChildrenProp) {
   const css = useStyle({
-    verticalAlign: 'sub',
-    fontSize: 'smaller',
+    verticalAlign: "sub",
+    fontSize: "smaller",
   })
   return <sub {...css()}>{children}</sub>
 }
 
 export function Sup({ children }: ChildrenProp<number>) {
-  if (typeof children === 'undefined') {
-    throw new Error('undefined child')
+  if (typeof children === "undefined") {
+    throw new Error("undefined child")
   }
   if (children < 0 || children > 5) {
-    throw new Error('Number not supported')
+    throw new Error("Number not supported")
   }
   const value = (() => {
     switch (children) {
@@ -41,8 +41,8 @@ export function Sup({ children }: ChildrenProp<number>) {
 }
 
 function groupedVertexConfig(config: string) {
-  const array = config.split('.')
-  let current = { type: '', count: 0 }
+  const array = config.split(".")
+  let current = { type: "", count: 0 }
   const result: typeof current[] = []
   _.each(array, type => {
     if (type === current.type) {
@@ -104,7 +104,7 @@ export function displayFaceTypes({ polyhedron }: RenderProps) {
       {_.map(faceCounts, (count, type) => (
         <li key={type}>
           {count} {polygonNames.get(type as any)}
-          {count !== 1 ? 's' : ''}
+          {count !== 1 ? "s" : ""}
         </li>
       ))}
     </ul>
@@ -114,7 +114,7 @@ export function displayFaceTypes({ polyhedron }: RenderProps) {
 export function displaySymmetry({ polyhedron }: RenderProps) {
   const symmetry = polyhedron.symmetry()
   const symName = polyhedron.symmetryName()
-  const { group = '', sub } = symmetry
+  const { group = "", sub } = symmetry
   return (
     <>
       {_.capitalize(symName)}, {group}
@@ -129,10 +129,10 @@ interface Properties {
 }
 
 const properties: Properties[] = [
-  { name: 'deltahedron', check: p => p.isDeltahedron() },
-  { name: 'chiral', check: p => p.isChiral() },
-  { name: 'honeycomb', check: p => p.isHoneycomb() },
-  { name: 'quasiregular', check: p => p.isQuasiRegular() },
+  { name: "deltahedron", check: p => p.isDeltahedron() },
+  { name: "chiral", check: p => p.isChiral() },
+  { name: "honeycomb", check: p => p.isHoneycomb() },
+  { name: "quasiregular", check: p => p.isQuasiRegular() },
 ]
 
 export function displayProperties({ polyhedron }: RenderProps) {
@@ -140,5 +140,5 @@ export function displayProperties({ polyhedron }: RenderProps) {
     property.check(polyhedron),
   )
 
-  return <>{filteredProps.map(prop => prop.name).join(', ') || '--'}</>
+  return <>{filteredProps.map(prop => prop.name).join(", ") || "--"}</>
 }

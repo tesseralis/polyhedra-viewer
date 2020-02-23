@@ -1,8 +1,8 @@
-import React, { useEffect, useRef, MouseEvent } from 'react'
-import _ from 'lodash'
+import React, { useEffect, useRef, MouseEvent } from "react"
+import _ from "lodash"
 
-import { Point } from 'types'
-import { SolidData } from 'math/polyhedra'
+import { Point } from "types"
+import { SolidData } from "math/polyhedra"
 
 // Join a list of lists with an inner and outer separator.
 function joinListOfLists<T>(list: T[][], outerSep: string, innerSep: string) {
@@ -10,7 +10,7 @@ function joinListOfLists<T>(list: T[][], outerSep: string, innerSep: string) {
 }
 
 const Coordinates = ({ points }: { points: Point[] }) => {
-  return <coordinate is="x3d" point={joinListOfLists(points, ', ', ' ')} />
+  return <coordinate is="x3d" point={joinListOfLists(points, ", ", " ")} />
 }
 
 /* Edges */
@@ -18,10 +18,10 @@ const Coordinates = ({ points }: { points: Point[] }) => {
 const Edges = ({
   edges = [],
   vertices = [],
-}: Pick<SolidData, 'edges' | 'vertices'>) => {
+}: Pick<SolidData, "edges" | "vertices">) => {
   return (
     <shape is="x3d">
-      <indexedlineset is="x3d" coordindex={joinListOfLists(edges, ' -1 ', ' ')}>
+      <indexedlineset is="x3d" coordindex={joinListOfLists(edges, " -1 ", " ")}>
         <Coordinates points={vertices} />
       </indexedlineset>
     </shape>
@@ -106,7 +106,7 @@ export default function X3dPolyhedron({
     }
   }, [listeners])
 
-  const colorStr = joinListOfLists(colors, ',', ' ')
+  const colorStr = joinListOfLists(colors, ",", " ")
   return (
     <>
       {showFaces && (
@@ -127,7 +127,7 @@ export default function X3dPolyhedron({
             is="x3d"
             solid={(!showInnerFaces).toString()}
             colorpervertex="false"
-            coordindex={joinListOfLists(faces, ' -1 ', ' ')}
+            coordindex={joinListOfLists(faces, " -1 ", " ")}
           >
             <Coordinates points={vertices} />
             <color is="x3d" color={colorStr} />

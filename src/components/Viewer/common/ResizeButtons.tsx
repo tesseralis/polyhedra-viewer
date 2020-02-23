@@ -1,18 +1,18 @@
-import React, { ButtonHTMLAttributes } from 'react'
-import { useStyle, scales } from 'styles'
+import React, { ButtonHTMLAttributes } from "react"
+import { useStyle, scales } from "styles"
 
-import { TransitionCtx, PolyhedronCtx } from 'components/Viewer/context'
+import { TransitionCtx, PolyhedronCtx } from "components/Viewer/context"
 
-import { Polyhedron } from 'math/polyhedra'
-import { andaleMono } from 'styles/fonts'
-import { hover } from 'styles/common'
+import { Polyhedron } from "math/polyhedra"
+import { andaleMono } from "styles/fonts"
+import { hover } from "styles/common"
 
 function ResetButton(props: ButtonHTMLAttributes<Element>) {
   const css = useStyle({
     ...hover,
-    alignSelf: 'flex-end',
-    backgroundColor: 'white',
-    border: '1px LightGray solid',
+    alignSelf: "flex-end",
+    backgroundColor: "white",
+    border: "1px LightGray solid",
     padding: scales.spacing[2],
     fontSize: scales.font[6],
     fontFamily: andaleMono,
@@ -22,11 +22,11 @@ function ResetButton(props: ButtonHTMLAttributes<Element>) {
 
 const buttons = [
   {
-    name: 'Recenter',
+    name: "Recenter",
     handler: (polyhedron: Polyhedron) => polyhedron.center(),
   },
   {
-    name: 'Resize',
+    name: "Resize",
     handler: (polyhedron: Polyhedron) => polyhedron.normalizeToVolume(5),
   },
 ]
@@ -37,8 +37,8 @@ export default function ResizeButtons() {
   const { isTransitioning } = TransitionCtx.useState()
 
   const css = useStyle({
-    display: 'grid',
-    gridTemplateColumns: '1fr 1fr',
+    display: "grid",
+    gridTemplateColumns: "1fr 1fr",
     columnGap: scales.spacing[2],
   })
   return (

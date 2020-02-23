@@ -1,11 +1,11 @@
-import React from 'react'
-import { Route, NavLink, NavLinkProps } from 'react-router-dom'
-import { useStyle, scales } from 'styles'
-import Icon from '@mdi/react'
+import React from "react"
+import { Route, NavLink, NavLinkProps } from "react-router-dom"
+import { useStyle, scales } from "styles"
+import Icon from "@mdi/react"
 
-import { media, fonts } from 'styles'
-import { SrOnly } from 'components/common'
-import { colorFill, flexColumn } from 'styles/common'
+import { media, fonts } from "styles"
+import { SrOnly } from "components/common"
+import { colorFill, flexColumn } from "styles/common"
 
 interface Props extends NavLinkProps {
   iconName: string
@@ -37,18 +37,18 @@ export default function IconLink({
   iconOnly = false,
 }: Props) {
   const css = useStyle({
-    ...flexColumn('center'),
-    ...colorFill('DimGray'),
-    textDecoration: 'none',
+    ...flexColumn("center"),
+    ...colorFill("DimGray"),
+    textDecoration: "none",
     padding: scales.spacing[2],
 
     [media.mobileLandscape]: {
       padding: 0,
-      flexDirection: 'row',
+      flexDirection: "row",
     },
   })
 
-  const activeCss = useStyle(colorFill('DarkSlateGray'))
+  const activeCss = useStyle(colorFill("DarkSlateGray"))
 
   return (
     <Route>
@@ -57,7 +57,7 @@ export default function IconLink({
         replace={replace}
         exact={exact}
         {...css()}
-        {...activeCss('activeClassName')}
+        {...activeCss("activeClassName")}
         onClick={onClick}
       >
         <Icon path={iconName} size={scales.size[2]} />

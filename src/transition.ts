@@ -1,6 +1,6 @@
-import _ from 'lodash'
-import * as d3 from 'd3-ease'
-import { interpolate } from 'd3-interpolate'
+import _ from "lodash"
+import * as d3 from "d3-ease"
+import { interpolate } from "d3-interpolate"
 
 export interface TransitionOptions<T> {
   startValue: T
