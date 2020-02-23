@@ -1,7 +1,1 @@
-[
-  "tetrahedron",
-  "cube",
-  "octahedron",
-  "dodecahedron",
-  "icosahedron"
-]
+["tetrahedron", "cube", "octahedron", "dodecahedron", "icosahedron"]

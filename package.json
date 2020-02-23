@@ -47,7 +47,7 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "prettier": "prettier 'src/**/*.{ts,tsx}'",
+    "prettier": "prettier 'src/**/*.{ts,tsx,json,css}'",
     "lint": "npm run prettier -- --check",
     "format": "npm run prettier -- --write"
   },
