@@ -61,7 +61,7 @@ export default function AugmentOptions() {
   const optionArgs: OptionType[] = [
     {
       name: "gyrate",
-      values: !!gyrate ? ["ortho", "gyro"] : [],
+      values: operation!.allOptions(polyhedron, "gyrate") ?? [],
       value: gyrate,
       description:
         "Some solids can be augmented so that opposite faces align (ortho) or not (gyro).",
