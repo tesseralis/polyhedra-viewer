@@ -43,7 +43,10 @@ interface BaseOperation<Options extends {}> {
   /**
    * @return all the options for the given option name.
    */
-  allOptions(polyhedron: Polyhedron, optionName: string): any[]
+  allOptions(
+    polyhedron: Polyhedron,
+    optionName: keyof Options,
+  ): Options[typeof optionName][]
 
   /**
    * Return the default selected apply options when an operation is

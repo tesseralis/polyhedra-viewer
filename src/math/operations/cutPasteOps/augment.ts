@@ -400,8 +400,8 @@ export const augment = makeOperation<Options>("augment", {
         return hasGyrateOpts(polyhedron) ? ["ortho", "gyro"] : []
       case "using":
         return getUsingOpts(polyhedron) ?? []
-      default:
-        return []
+      case "face":
+        return _.map(polyhedron.faces.filter(face => canAugment(face)))
     }
   },
 
