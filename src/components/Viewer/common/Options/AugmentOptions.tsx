@@ -45,34 +45,10 @@ function OptionButton({ optValue, selected, ...htmlProps }: BtnProps) {
   )
 }
 
-interface OptionType<T = any> {
-  name: string
-  description: string
-  values: T[]
-  value: T
-}
-
 export default function AugmentOptions() {
   const polyhedron = PolyhedronCtx.useState()
   const { operation, options } = OperationCtx.useState()
   const { setOption } = OperationCtx.useActions()
-
-  const { gyrate, using } = options!
-  const optionArgs: OptionType[] = [
-    {
-      name: "gyrate",
-      values: operation!.allOptions(polyhedron, "gyrate") ?? [],
-      value: gyrate,
-      description:
-        "Some solids can be augmented so that opposite faces align (ortho) or not (gyro).",
-    },
-    {
-      name: "using",
-      values: operation!.allOptions(polyhedron, "using") ?? [],
-      value: using,
-      description: "Some solids have more than one option to augment a face.",
-    },
-  ]
 
   const css = useStyle({
     ...flexRow("center", "space-between"),
@@ -87,19 +63,22 @@ export default function AugmentOptions() {
 
   return (
     <div {...css()}>
-      {optionArgs.map(({ name, values, value }) => (
-        <div key={name} {...optionCss()}>
-          {values.map(optValue => (
-            <OptionButton
-              key={optValue}
-              optValue={optValue}
-              onClick={() => setOption(name, optValue)}
-              disabled={!value}
-              selected={value === optValue}
-            />
-          ))}
-        </div>
-      ))}
+      {["gyrate", "using"].map(name => {
+        const value = options![name]
+        return (
+          <div key={name} {...optionCss()}>
+            {operation?.allOptions(polyhedron, name).map(optValue => (
+              <OptionButton
+                key={optValue}
+                optValue={optValue}
+                onClick={() => setOption(name, optValue)}
+                disabled={!value}
+                selected={value === optValue}
+              />
+            ))}
+          </div>
+        )
+      })}
     </div>
   )
 }
