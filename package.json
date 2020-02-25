@@ -43,7 +43,7 @@
     "toxiclibsjs": "^0.3.3",
     "typescript": "^3.7.5",
     "what-input": "^5.2.6",
-    "x3dom": "1.7.2"
+    "x3dom": "1.8.1"
   },
   "scripts": {
     "start": "react-scripts start",
