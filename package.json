@@ -10,7 +10,7 @@
     "husky": "^4.2.3",
     "lint-staged": "^10.0.8",
     "prettier": "^1.19.1",
-    "react-scripts": "^3.3.0"
+    "react-scripts": "^3.4.0"
   },
   "dependencies": {
     "@mdi/js": "^4.9.95",
