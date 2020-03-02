@@ -41,7 +41,7 @@
     "react-router-dom": "^5.1.2",
     "tinycolor2": "^1.4.1",
     "toxiclibsjs": "^0.3.3",
-    "typescript": "^3.8.2",
+    "typescript": "^3.8.3",
     "what-input": "^5.2.6",
     "x3dom": "1.7.2"
   },
