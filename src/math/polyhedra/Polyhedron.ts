@@ -14,10 +14,7 @@ import Builder from "./SolidBuilder"
 import { VertexArg, FaceArg } from "./SolidBuilder"
 
 function calculateEdges(faces: Face[]) {
-  return _(faces)
-    .flatMap(face => face.edges.map(e => e.undirected()))
-    .uniqWith((e1, e2) => e1.equals(e2))
-    .value()
+  return faces.flatMap(face => face.edges).filter(e => e.v1.index < e.v2.index)
 }
 
 export default class Polyhedron {
@@ -124,11 +121,7 @@ export default class Polyhedron {
 
   // The list of the type of faces this polyhedron has, ordered
   faceTypes() {
-    return _(this.faces)
-      .map("numSides")
-      .uniq()
-      .sortBy()
-      .value()
+    return _.sortBy(Object.keys(this.numFacesBySides()))
   }
 
   vertexConfiguration() {
@@ -151,9 +144,7 @@ export default class Polyhedron {
   }
 
   surfaceArea() {
-    return _(this.faces)
-      .map(face => face.area())
-      .sum()
+    return _.sum(this.faces.map(face => face.area()))
   }
 
   normalizedSurfaceArea() {
@@ -161,9 +152,9 @@ export default class Polyhedron {
   }
 
   volume() {
-    return _(this.faces)
-      .map(face => (face.area() * face.distanceToCenter()) / 3)
-      .sum()
+    return _.sum(
+      this.faces.map(face => (face.area() * face.distanceToCenter()) / 3),
+    )
   }
 
   normalizedVolume() {

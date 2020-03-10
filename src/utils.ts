@@ -22,10 +22,7 @@ export function mapObject<T, U>(
   arr: T[],
   iteratee: (item: T, i: number) => [string | number, U],
 ): { [key: string]: U } {
-  return _(arr)
-    .map(iteratee)
-    .fromPairs()
-    .value()
+  return Object.fromEntries(arr.map(iteratee))
 }
 
 export function flatMapUniq<T, U>(
@@ -33,10 +30,7 @@ export function flatMapUniq<T, U>(
   iteratee1: (key: T) => U[],
   iteratee2: ValueIteratee<U>,
 ) {
-  return _(arr)
-    .flatMap(iteratee1)
-    .uniqBy(iteratee2)
-    .value()
+  return _.uniqBy(arr.flatMap(iteratee1), iteratee2)
 }
 
 /**

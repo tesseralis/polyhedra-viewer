@@ -72,10 +72,11 @@ export const alternateNames: Record<string, string[]> = {
   "elongated square cupola": ["diminished rhombicuboctahedron"],
   "octagonal prism": ["bidiminished rhombicuboctahedron"],
 }
-const inverseAlternateNames = _(alternateNames)
-  .flatMap((alts, canonical) => _.map(alts, alt => [alt, canonical]))
-  .fromPairs()
-  .value()
+const inverseAlternateNames = Object.fromEntries(
+  Object.entries(alternateNames).flatMap(([canonical, alts]) =>
+    alts.map(alt => [alt, canonical]),
+  ),
+)
 
 export function getCanonicalName(name: string) {
   return inverseAlternateNames[unescapeName(name)] ?? name

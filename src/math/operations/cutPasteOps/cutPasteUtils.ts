@@ -5,12 +5,11 @@ import { isInverse } from "math/geom"
 
 type Relation = {}
 
-export const hasMultiple = (relations: Relation[], property: string) =>
-  _(relations)
-    .map(property)
-    .uniq()
-    .compact()
-    .value().length > 1
+// true if the relation has multiple values that have that property
+export const hasMultiple = (relations: Relation[], property: string) => {
+  const set = new Set(_.map(relations, property).filter(x => !!x))
+  return set.size > 1
+}
 
 export function getCapAlignment(polyhedron: Polyhedron, cap: Cap) {
   const isRhombicosidodecahedron = cap.type === "cupola"

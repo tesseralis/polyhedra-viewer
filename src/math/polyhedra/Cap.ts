@@ -13,9 +13,7 @@ type FaceConfiguration = { [key: string]: number }
 
 // Find the boundary of a connected set of faces
 function getBoundary(faces: Face[]) {
-  const e0 = _(faces)
-    .flatMap("edges")
-    .find(e => !e.twin().face.inSet(faces))
+  const e0 = faces.flatMap(f => f.edges).find(e => !e.twin().face.inSet(faces))!
 
   const result: Edge[] = []
   let e = e0

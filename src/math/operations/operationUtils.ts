@@ -2,7 +2,7 @@ import _ from "lodash"
 import { Twist } from "types"
 import { Polyhedron, Vertex, Edge, VertexList, VertexArg } from "math/polyhedra"
 import { Vec3D, Transform } from "math/geom"
-import { getCyclic } from "utils"
+import { mapObject, getCyclic } from "utils"
 /**
  * Remove vertices in the polyhedron that aren't connected to any faces,
  * and remap the faces to the smaller indices
@@ -15,18 +15,21 @@ export function removeExtraneousVertices(polyhedron: Polyhedron) {
 
   // Map the `numToRemove` last vertices of the polyhedron (that don't overlap)
   // to the first few removed vertices
-  const newToOld = _(polyhedron.vertices)
-    .takeRight(numToRemove)
-    .filter(v => !v.inSet(toRemove))
-    .map((v, i) => [v.index, toRemove[i].index])
-    .fromPairs()
-    .value()
+  const notToRemove = _.takeRight(polyhedron.vertices, numToRemove).filter(
+    v => !v.inSet(toRemove),
+  )
+  const newToOld = mapObject(notToRemove, (v, i) => [
+    v.index,
+    toRemove[i].index,
+  ])
   const oldToNew = _.invert(newToOld)
 
-  const newVertices = _(polyhedron.vertices)
-    .map(v => polyhedron.vertices[_.get(oldToNew, v.index, v.index) as any])
-    .dropRight(numToRemove)
-    .value()
+  const newVertices = _.dropRight(
+    polyhedron.vertices.map(
+      v => polyhedron.vertices[_.get(oldToNew, v.index, v.index) as any],
+    ),
+    numToRemove,
+  )
 
   return polyhedron.withChanges(solid =>
     solid

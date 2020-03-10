@@ -95,10 +95,7 @@ const setEquals = <T>(array1: T[], array2: T[]) =>
 
 function getBaseType(base: Face) {
   const adjacentFaces = base.adjacentFaces()
-  const adjacentFaceCounts = _(adjacentFaces)
-    .map("numSides")
-    .uniq()
-    .value()
+  const adjacentFaceCounts = _.uniq(adjacentFaces.map(f => f.numSides))
   if (setEquals(adjacentFaceCounts, [3, 4])) {
     return "cupola"
   } else if (setEquals(adjacentFaceCounts, [4])) {

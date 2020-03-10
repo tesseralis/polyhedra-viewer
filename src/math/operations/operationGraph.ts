@@ -32,14 +32,12 @@ function normalize(graph: Graph) {
 
 /** Remove nullish values from a graph */
 function compact(graph: Graph) {
-  return _.mapValues(graph, ops =>
-    _(ops)
-      .mapValues(options => {
-        return _.filter(options, option => !!option.value)
-      })
-      .pickBy("length")
-      .value(),
-  )
+  return _.mapValues(graph, operations => {
+    const mappedOps = _.mapValues(operations, opts =>
+      opts.filter((opt: any) => !!opt.value),
+    )
+    return _.pickBy(mappedOps, "length")
+  })
 }
 
 const customizer = (objValue: unknown, srcValue: unknown) => {
@@ -169,13 +167,12 @@ const getAugmentations = (using: string) => (
   rowName: string,
   colName: string,
 ) => {
-  return _([
-    getOrthoGyroAugment(capstoneMap[rowName][colName], using),
-    hasCupolaRotunda(rowName) && getCupolaRotunda(using, colName),
-  ] as any)
-    .flatten()
-    .compact()
-    .value()
+  return _.compact(
+    [
+      getOrthoGyroAugment(capstoneMap[rowName][colName], using),
+      hasCupolaRotunda(rowName) && getCupolaRotunda(using, colName),
+    ].flat(),
+  )
 }
 
 const getCapstoneFromPrism = (prismRow: string) => {

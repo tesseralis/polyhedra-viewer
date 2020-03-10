@@ -179,10 +179,9 @@ export function deduplicateVertices(polyhedron: Polyhedron) {
   if (_.isEmpty(oldToNew)) return polyhedron
 
   // replace vertices that are the same
-  let newFaces = _(polyhedron.faces)
+  let newFaces = polyhedron.faces
     .map(face => _.uniq(face.vertices.map(v => oldToNew[v.index])))
     .filter(vIndices => vIndices.length >= 3)
-    .value()
 
   // remove extraneous vertices
   return removeExtraneousVertices(polyhedron.withFaces(newFaces))

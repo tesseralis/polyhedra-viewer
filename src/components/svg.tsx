@@ -40,13 +40,10 @@ export function polygonPoints({
   cy = 0,
   a = 0,
 }: PolygonProps) {
-  return _(n)
-    .range()
-    .map<Point2D>(i => [
-      cx + r * cos(TAU * (a / 360 + i / n)),
-      cy + r * sin(TAU * (a / 360 + i / n)),
-    ])
-    .value()
+  return _.range(n).map<Point2D>(i => [
+    cx + r * cos(TAU * (a / 360 + i / n)),
+    cy + r * sin(TAU * (a / 360 + i / n)),
+  ])
 }
 
 // Regular polygon
