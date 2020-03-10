@@ -114,11 +114,11 @@ Thank you to the countless friends and unsuspecting strangers who helped test th
 
 Made with [React] and [X3DOM].
 
-[Source] on Github.
+Source on [GitHub].
 
 [Ko-fi]: https://ko-fi.com/tesseralis/
 [Virtual Polyhedra]: http://www.georgehart.com/virtual-polyhedra/vp.html
 [React]: https://reactjs.org/
 [X3DOM]: https://www.x3dom.org/
-[Source]: https://www.github.com/tesseralis/polyhedra-viewer
+[GitHub]: https://www.github.com/tesseralis/polyhedra-viewer
 `

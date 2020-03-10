@@ -1,6 +1,6 @@
 import React from "react"
 import Icon from "@mdi/react"
-import { mdiFacebookBox, mdiTumblrBox, mdiTwitter, mdiReddit } from "@mdi/js"
+import { mdiFacebook, mdiTwitter, mdiReddit } from "@mdi/js"
 
 import { useStyle, fonts, scales } from "styles"
 import { ExternalLink, SrOnly } from "components/common"
@@ -13,13 +13,8 @@ const caption = "Jinkies! Check out this cool polyhedral geometry app!"
 const links = [
   {
     url: `https://www.facebook.com/sharer.php?u=${url}`,
-    icon: mdiFacebookBox,
+    icon: mdiFacebook,
     name: "Facebook",
-  },
-  {
-    url: `https://www.tumblr.com/widgets/share/tool?canonicalUrl=${url}&title=${title}&caption=${caption}`,
-    icon: mdiTumblrBox,
-    name: "Tumblr",
   },
   {
     url: `https://twitter.com/intent/tweet?url=${url}&text=${caption}&via=${author}`,

@@ -3,7 +3,7 @@ import React from "react"
 import {
   mdiFormatListBulleted,
   mdiInformationOutline,
-  mdiSettings,
+  mdiCog,
   mdiMathCompass,
   mdiCubeOutline,
 } from "@mdi/js"
@@ -20,7 +20,7 @@ interface Props {
 const links = [
   { name: "list", icon: mdiFormatListBulleted },
   { name: "info", icon: mdiInformationOutline },
-  { name: "options", icon: mdiSettings },
+  { name: "options", icon: mdiCog },
   { name: "operations", icon: mdiMathCompass },
   { name: "full", title: "Fullscreen", icon: mdiCubeOutline },
 ]
