@@ -20,7 +20,7 @@ export default class ImageDownloader extends React.Component<any> {
 
     const images = zip.folder("images")
 
-    for (let solid of allSolidNames) {
+    for (const solid of allSolidNames) {
       await this.addImage(canvas, images, solid)
     }
     zip.generateAsync({ type: "blob" }).then(content => {

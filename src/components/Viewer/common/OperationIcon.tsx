@@ -1,4 +1,4 @@
-import _ from "lodash"
+import { range } from "lodash"
 
 import React, { memo, ComponentType } from "react"
 import { StyleSheet, css } from "aphrodite/no-important"
@@ -165,7 +165,7 @@ function ExpandIcon({
       hollow={hollow}
       render={({ cx, cy, r, ap, r1, ap1 }) => (
         <>
-          {_.range(3).map(i => (
+          {range(3).map(i => (
             <PolyLine
               key={i}
               className={styles(innerStyle)}
@@ -282,7 +282,7 @@ function drawIcon(name: OpName) {
           innerAngle={0}
           render={({ cx, cy, r, ap, ap1 }) => (
             <>
-              {_.range(3).map(i => (
+              {range(3).map(i => (
                 <PolyLine
                   key={i}
                   className={styles("added")}
@@ -310,7 +310,7 @@ function drawIcon(name: OpName) {
           innerStyle="invariant"
           render={({ cx, cy, r, ap, ap1 }) => (
             <>
-              {_.range(3).map(i => (
+              {range(3).map(i => (
                 <PolyLine
                   key={i}
                   className={styles("changed")}

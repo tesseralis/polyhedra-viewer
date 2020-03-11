@@ -64,20 +64,20 @@ function getIcosahedronContractFaces(polyhedron: Polyhedron) {
   while (toTest.length > 0) {
     const [next, ...rest] = toTest
     result.push(next)
-    toTest = _.filter(rest, face => getFaceDistance(face, next) === 3)
+    toTest = rest.filter(face => getFaceDistance(face, next) === 3)
   }
   return result
 }
 
 function getCuboctahedronContractFaces(polyhedron: Polyhedron) {
   const f0 = polyhedron.faceWithNumSides(3)
-  const rest = _.map(f0.edges, e => {
-    return e
+  const rest = f0.edges.map(e =>
+    e
       .twin()
       .next()
       .next()
-      .twinFace()
-  })
+      .twinFace(),
+  )
   return [f0, ...rest]
 }
 
@@ -107,7 +107,7 @@ export function getExpandedFaces(polyhedron: Polyhedron, faceType?: number) {
     case "truncated cuboctahedron":
       return polyhedron.faces.filter(f => f.numSides === faceType)
     default:
-      return _.filter(polyhedron.faces, face =>
+      return polyhedron.faces.filter(face =>
         isExpandedFace(polyhedron, face, faceType),
       )
   }

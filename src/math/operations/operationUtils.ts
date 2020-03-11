@@ -89,7 +89,7 @@ export function expandEdges(
 ) {
   // Collect the list of vertices that are connected to the extruding edges
   const vertsToDupe = polyhedron.vertices.map<Edge[]>(v => [])
-  for (let edge of edges) {
+  for (const edge of edges) {
     vertsToDupe[edge.v1.index].push(edge)
     vertsToDupe[edge.v2.index].push(edge.twin())
   }
@@ -111,7 +111,7 @@ export function expandEdges(
   // For each changed vertex:
   // 1. duplicate it some number of times
   // 2. keep track of the edges/faces that are mapped to it
-  _.forEach(vertsToDupe, edges => {
+  vertsToDupe.forEach(edges => {
     // If the vertex isn't associated with any edges, do nothing
     if (!edges.length) return
 
@@ -228,11 +228,11 @@ export function getTransformedVertices<T extends VertexList>(
   vertices: Vertex[] = vLists[0].polyhedron.vertices,
 ) {
   const result: VertexArg[] = [...vertices]
-  _.forEach(vLists, vList => {
-    _.forEach(vList.vertices, v => {
+  for (const vList of vLists) {
+    for (const v of vList.vertices) {
       const t = iteratee(vList)
       result[v.index] = typeof t === "function" ? t(v.vec) : t
-    })
-  })
+    }
+  }
   return result
 }

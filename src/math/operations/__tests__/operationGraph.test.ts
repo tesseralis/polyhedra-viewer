@@ -6,11 +6,11 @@ import { toConwayNotation } from "math/polyhedra/names"
 // Tests on the operation graph, mostly focusing on edge cases
 describe("operationGraph", () => {
   it("has an entry for every polyhedron", () => {
-    _.forEach(allSolidNames, name => {
+    for (const name of allSolidNames) {
       const symbol = toConwayNotation(name)
       expect(graph).toHaveProperty(symbol)
       expect(graph[symbol]).toBeDefined()
-    })
+    }
   })
 
   describe("archimedean", () => {

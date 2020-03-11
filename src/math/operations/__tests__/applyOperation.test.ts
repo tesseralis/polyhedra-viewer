@@ -13,7 +13,7 @@ describe("applyOperation", () => {
   const polyhedra = _.map(allSolidNames, name => Polyhedron.get(name))
   _.forEach(operations, (operation, opName) => {
     describe(opName, () => {
-      _.forEach(polyhedra, polyhedron => {
+      for (const polyhedron of polyhedra) {
         if (operation.canApplyTo(polyhedron)) {
           it(polyhedron.name, () => {
             const optsToTest = operation.allOptionCombos(polyhedron)
@@ -23,7 +23,7 @@ describe("applyOperation", () => {
             })
           })
         }
-      })
+      }
     })
   })
 })

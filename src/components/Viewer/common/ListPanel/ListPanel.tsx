@@ -1,4 +1,4 @@
-import _ from "lodash"
+import { capitalize } from "lodash"
 
 import React, { useState } from "react"
 import { NavLink, Route } from "react-router-dom"
@@ -62,7 +62,7 @@ function PolyhedronLink({ name }: { name: string }) {
         {...css()}
         {...activeCss("activeClassName")}
       >
-        {_.capitalize(name)}
+        {capitalize(name)}
       </NavLink>
     </Route>
   )
@@ -86,7 +86,7 @@ function SubgroupHeader({ name }: { name: string }) {
     fontFamily: fonts.times,
     fontSize: scales.font[5],
   })
-  return <h3 {...css()}>{_.capitalize(name)}</h3>
+  return <h3 {...css()}>{capitalize(name)}</h3>
 }
 
 const Subgroup = ({

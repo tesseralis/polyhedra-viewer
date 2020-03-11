@@ -44,14 +44,14 @@ function groupedVertexConfig(config: string) {
   const array = config.split(".")
   let current = { type: "", count: 0 }
   const result: typeof current[] = []
-  _.each(array, type => {
+  for (const type of array) {
     if (type === current.type) {
       current.count++
     } else {
       if (current.count) result.push(current)
       current = { type, count: 1 }
     }
-  })
+  }
   if (current.count) result.push(current)
 
   return result
@@ -59,7 +59,7 @@ function groupedVertexConfig(config: string) {
 
 function getShortVertexConfig(config: string) {
   const grouped = groupedVertexConfig(config)
-  const children = _.map(grouped, (typeCount, i) => {
+  const children = grouped.map((typeCount, i) => {
     const { type, count } = typeCount
     const val =
       count === 1 ? (
@@ -82,7 +82,7 @@ export interface RenderProps {
 
 export function displayVertexConfig({ polyhedron }: RenderProps) {
   const vConfig = polyhedron.vertexConfiguration()
-  const configKeys = _.keys(vConfig)
+  const configKeys = Object.keys(vConfig)
   // When there's only one type, just get it on its own
   if (configKeys.length === 1) return <>{configKeys[0]}</>
   return (

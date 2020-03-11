@@ -59,19 +59,19 @@ export default class Vertex {
   }
 
   adjacentVertices() {
-    return _.map(this.adjacentEdges(), "v2")
+    return this.adjacentEdges().map(e => e.v2)
   }
 
   adjacentFaces() {
-    return _.map(this.adjacentEdges(), "face")
+    return this.adjacentEdges().map(e => e.face)
   }
 
   configuration() {
-    const config = _.map(this.adjacentFaces(), "numSides")
+    const config = this.adjacentFaces().map(f => f.numSides)
     const allConfigs = getCycles(config).concat(
       getCycles(_.reverse([...config])),
     )
-    return _.reduce(allConfigs, arrayMin)!
+    return allConfigs.reduce(arrayMin)
   }
 
   /** Return adjacent faces counted by number of sides */

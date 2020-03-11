@@ -21,24 +21,24 @@ function getRectifiedMultiplier(result: string) {
 function duplicateVertices(polyhedron: Polyhedron) {
   const mapping: NestedRecord<number, number, number> = {}
   const count = polyhedron.getVertex().adjacentFaces().length
-  _.forEach(polyhedron.vertices, v => {
-    _.forEach(v.adjacentFaces(), (face, i) => {
+  polyhedron.vertices.forEach(v => {
+    v.adjacentFaces().forEach((face, i) => {
       _.set(mapping, [face.index, v.index], i)
     })
   })
 
   return polyhedron.withChanges(solid => {
     return solid
-      .withVertices(_.flatMap(polyhedron.vertices, v => repeat(v.value, count)))
+      .withVertices(polyhedron.vertices.flatMap(v => repeat(v.value, count)))
       .mapFaces(face => {
-        return _.flatMap(face.vertices, v => {
+        return face.vertices.flatMap(v => {
           const base = count * v.index
           const j = mapping[face.index][v.index]
           return [base + ((j + 1) % count), base + j]
         })
       })
       .addFaces(
-        _.map(polyhedron.vertices, v =>
+        polyhedron.vertices.map(v =>
           _.range(v.index * count, (v.index + 1) * count),
         ),
       )

@@ -69,11 +69,7 @@ export const configInputs: ConfigInput[] = [
   display: _.get(input, "display", _.startCase(input.key)),
 }))
 
-export const defaultConfig: Record<string, any> = _.reduce(
-  configInputs,
-  (obj, option) => {
-    _.set(obj, option.key, option.default)
-    return obj
-  },
+export const defaultConfig: Record<string, any> = configInputs.reduce(
+  (obj, option) => _.set(obj, option.key, option.default),
   {},
 )

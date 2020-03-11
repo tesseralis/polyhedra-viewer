@@ -13,8 +13,7 @@ export default class Face extends VEList {
   constructor(polyhedron: Polyhedron, index: FIndex) {
     const value = polyhedron._solidData.faces[index]
     const vertices = _.map(value, vIndex => polyhedron.vertices[vIndex])
-    const edges = _.map(
-      vertices,
+    const edges = vertices.map(
       (v, i) => new Edge(v, getCyclic(vertices, i + 1)),
     )
 

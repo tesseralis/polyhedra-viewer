@@ -41,11 +41,11 @@ export default class VEList implements VertexList {
   }
 
   adjacentFaces() {
-    return _.map(this.edges, edge => edge.twin().face)
+    return this.edges.map(edge => edge.twin().face)
   }
 
   numUniqueSides() {
-    return _.filter(this.edges, edge => edge.length() > PRECISION).length
+    return this.edges.filter(edge => edge.length() > PRECISION).length
   }
 
   sideLength() {

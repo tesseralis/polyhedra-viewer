@@ -1,6 +1,6 @@
 import React from "react"
 import { useStyle, scales, media } from "styles"
-import _ from "lodash"
+import { capitalize } from "lodash"
 
 import { fonts } from "styles"
 
@@ -19,7 +19,7 @@ function Heading({ polyhedron }: RenderProps) {
   })
   return (
     <h2 {...css()}>
-      {_.capitalize(polyhedron.name)} | {polyhedron.symbol()}
+      {capitalize(polyhedron.name)} | {polyhedron.symbol()}
     </h2>
   )
 }

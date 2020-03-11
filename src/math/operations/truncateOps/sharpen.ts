@@ -20,13 +20,13 @@ function getShiftedAdjacentFaces(vertex: Vertex, facesTosharpen: Face[]) {
 function duplicateVertices(polyhedron: Polyhedron, facesTosharpen: Face[]) {
   const offset = polyhedron.numVertices()
   const mapping: NestedRecord<number, number, any> = {}
-  _.forEach(polyhedron.vertices, vertex => {
+  polyhedron.vertices.forEach(vertex => {
     const v = vertex.index
     const v2 = v + offset
     const values = [v, [v2, v], v2, [v, v2]]
 
     const faces = getShiftedAdjacentFaces(vertex, facesTosharpen)
-    _.forEach(faces, (f, i) => {
+    faces.forEach((f, i) => {
       _.set(mapping, [f.index, v], values[i])
     })
   })
@@ -44,10 +44,10 @@ function getsharpenFaces(polyhedron: Polyhedron, faceType: number) {
   if (polyhedron.isRegular()) {
     const face0 = polyhedron.getFace()
     const adjacentFaces = face0.adjacentFaces()
-    return _.filter(face0.vertexAdjacentFaces(), f => !f.inSet(adjacentFaces))
+    return face0.vertexAdjacentFaces().filter(f => !f.inSet(adjacentFaces))
   }
 
-  return _.filter(polyhedron.faces, { numSides: faceType })
+  return polyhedron.faces.filter(f => f.numSides === faceType)
 }
 
 function calculatesharpenDist(face: Face, edge: Edge) {
@@ -142,9 +142,9 @@ export const sharpen = makeOperation<Options>("sharpen", {
     return n <= 5 ? { faceType: n } : {}
   },
 
-  faceSelectionStates(polyhedron, { faceType }) {
-    return _.map(polyhedron.faces, face => {
-      if (_.isNumber(faceType) && face.numSides === faceType) return "selected"
+  faceSelectionStates(polyhedron, { faceType = -1 }) {
+    return polyhedron.faces.map(face => {
+      if (face.numSides === faceType) return "selected"
       return "selectable"
     })
   },

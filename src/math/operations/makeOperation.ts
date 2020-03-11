@@ -164,7 +164,7 @@ export function deduplicateVertices(polyhedron: Polyhedron) {
   const unique: Vertex[] = []
   const oldToNew: Record<number, number> = {}
 
-  _.forEach(polyhedron.vertices, (v, vIndex: number) => {
+  polyhedron.vertices.forEach((v, vIndex) => {
     const match = _.find(unique, point =>
       v.vec.equalsWithTolerance(point.vec, PRECISION),
     )

@@ -1,4 +1,3 @@
-import _ from "lodash"
 import React from "react"
 
 import { OperationCtx } from "components/Viewer/context"
@@ -11,7 +10,7 @@ export default function Options() {
   if (!operation.optionTypes) return null
   return (
     <>
-      {_.includes(operation.optionTypes, "twist") && <TwistOptions />}
+      {operation.optionTypes.includes("twist") && <TwistOptions />}
       {operation.name === "augment" && <AugmentOptions />}
     </>
   )

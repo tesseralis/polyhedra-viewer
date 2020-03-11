@@ -1,4 +1,4 @@
-import _ from "lodash"
+import { capitalize } from "lodash"
 import React from "react"
 import {
   mdiFormatListBulleted,
@@ -14,7 +14,7 @@ import IconLink from "./IconLink"
 interface Props {
   solid: string
   compact?: boolean
-  onClick?: () => void
+  onClick(): void
 }
 
 const links = [
@@ -25,11 +25,7 @@ const links = [
   { name: "full", title: "Fullscreen", icon: mdiCubeOutline },
 ]
 
-export default function NavMenu({
-  solid,
-  compact = false,
-  onClick = _.noop,
-}: Props) {
+export default function NavMenu({ solid, compact = false, onClick }: Props) {
   const css = useStyle({
     // Using grid here bc it's easier to get evenly spaced than flex
     display: "grid",
@@ -45,7 +41,7 @@ export default function NavMenu({
           key={name}
           replace
           to={`/${solid}/${name}`}
-          title={_.capitalize(title)}
+          title={capitalize(title)}
           iconName={icon}
           iconOnly={compact}
           onClick={onClick}

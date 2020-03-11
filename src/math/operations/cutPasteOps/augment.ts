@@ -68,7 +68,7 @@ function canAugmentWith(base: Face, augmentee: Polyhedron, offset: number) {
 
 function canAugmentWithType(base: Face, augmentType: AugmentType) {
   const n = augmentType === "pyramid" ? base.numSides : base.numSides / 2
-  for (let offset of [0, 1]) {
+  for (const offset of [0, 1]) {
     if (canAugmentWith(base, augmentData[augmentType][n], offset)) {
       return true
     }
@@ -79,8 +79,8 @@ function canAugmentWithType(base: Face, augmentType: AugmentType) {
 function canAugment(base: Face) {
   const n = base.numSides
   const augmentees = getPossibleAugmentees(n)
-  for (let augmentee of augmentees) {
-    for (let offset of [0, 1]) {
+  for (const augmentee of augmentees) {
+    for (const offset of [0, 1]) {
       if (canAugmentWith(base, augmentee, offset)) {
         return true
       }
@@ -354,9 +354,9 @@ export const augment = makeOperation<Options>("augment", {
 
     const options: Options[] = []
 
-    for (let face of faceOpts) {
-      for (let gyrate of gyrateOpts) {
-        for (let using of usingOpts) {
+    for (const face of faceOpts) {
+      for (const gyrate of gyrateOpts) {
+        for (const using of usingOpts) {
           if (!using || canAugmentWithType(face, augmentTypes[using[0]])) {
             options.push({ gyrate, using, face })
           }

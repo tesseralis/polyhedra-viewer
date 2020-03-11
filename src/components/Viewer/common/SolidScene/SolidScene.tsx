@@ -1,4 +1,4 @@
-import _ from "lodash"
+import { pick } from "lodash"
 import React from "react"
 import X3dScene from "./X3dScene"
 import X3dPolyhedron from "./X3dPolyhedron"
@@ -17,7 +17,7 @@ export default ({ label }: { label: string }) => {
       <X3dPolyhedron
         value={solidData}
         colors={colors}
-        config={_.pick(config, [
+        config={pick(config, [
           "showFaces",
           "showEdges",
           "showInnerFaces",

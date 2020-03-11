@@ -11,8 +11,11 @@ export function getCyclic<T>(array: T[], index: number): T {
   return array[mod(index, array.length)]
 }
 
+/**
+ * Repeat a value n times
+ */
 export function repeat<T>(value: T, n: number) {
-  return _.times(n, _.constant(value))
+  return Array<T>(n).fill(value)
 }
 
 /**
@@ -66,8 +69,8 @@ export function choose<T>(choices: T[]): T {
 }
 
 export function pivot<T>(list: T[], value: T) {
-  const index = _.indexOf(list, value)
-  return [..._.slice(list, index), ..._.slice(list, 0, index)]
+  const index = list.indexOf(value)
+  return [...list.slice(index), ...list.slice(0, index)]
 }
 
 type Key = string | number | symbol

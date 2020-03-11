@@ -65,11 +65,11 @@ export default class Polyhedron {
   // Memoized mapping of edges to faces, used for quickly finding adjacency
   edgeToFaceGraph = _.once(() => {
     const edgesToFaces: NestedRecord<number, number, Face> = {}
-    _.forEach(this.faces, face => {
-      _.forEach(face.edges, ({ v1, v2 }) => {
+    for (const face of this.faces) {
+      for (const { v1, v2 } of face.edges) {
         _.set(edgesToFaces, [v1.index, v2.index], face)
-      })
-    })
+      }
+    }
     return edgesToFaces
   })
 
@@ -230,15 +230,16 @@ export default class Polyhedron {
   order = () => symmetry.getOrder(this.name)
 
   isUniform() {
-    return _.includes(
-      ["Platonic solid", "Archimedean solid", "Prism", "Antiprism"],
-      this.type(),
-    )
+    return [
+      "Platonic solid",
+      "Archimedean solid",
+      "Prism",
+      "Antiprism",
+    ].includes(this.type())
   }
 
   isQuasiRegular() {
-    return _.includes(
-      ["octahedron", "cuboctahedron", "icosidodecahedron"],
+    return ["octahedron", "cuboctahedron", "icosidodecahedron"].includes(
       this.name,
     )
   }
@@ -248,40 +249,34 @@ export default class Polyhedron {
   }
 
   isChiral() {
-    return _.includes(
-      [
-        "snub cube",
-        "snub dodecahedron",
-        "gyroelongated triangular bicupola",
-        "gyroelongated square bicupola",
-        "gyroelongated pentagonal bicupola",
-        "gyroelongated pentagonal cupolarotunda",
-        "gyroelongated pentagonal birotunda",
-      ],
-      this.name,
-    )
+    return [
+      "snub cube",
+      "snub dodecahedron",
+      "gyroelongated triangular bicupola",
+      "gyroelongated square bicupola",
+      "gyroelongated pentagonal bicupola",
+      "gyroelongated pentagonal cupolarotunda",
+      "gyroelongated pentagonal birotunda",
+    ].includes(this.name)
   }
 
   isHoneycomb() {
-    return _.includes(
-      [
-        "cube",
-        "truncated octahedron",
-        "triangular prism",
-        "hexagonal prism",
-        "gyrobifastigium",
-      ],
-      this.name,
-    )
+    return [
+      "cube",
+      "truncated octahedron",
+      "triangular prism",
+      "hexagonal prism",
+      "gyrobifastigium",
+    ].includes(this.name)
   }
 
   isDeltahedron() {
-    const facesBySides = _.keys(this.numFacesBySides())
+    const facesBySides = Object.keys(this.numFacesBySides())
     return facesBySides.length === 1 && +facesBySides[0] === 3
   }
 
   faceAdjacencyList() {
-    const faceAdjacencyCounts = _.map(this.faces, face => ({
+    const faceAdjacencyCounts = this.faces.map(face => ({
       n: face.numSides,
       adj: face.adjacentFaceCounts(),
     }))

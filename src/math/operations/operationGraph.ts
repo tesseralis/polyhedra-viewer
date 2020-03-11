@@ -84,9 +84,9 @@ const getInverseOperation = (operation: string) => {
  */
 function makeBidirectional(graph: FullGraph) {
   const result: FullGraph = {}
-  for (let [source, operations] of _.entries(graph)) {
-    for (let [operation, sinks] of _.entries(operations)) {
-      for (let sink of sinks) {
+  for (const [source, operations] of _.entries(graph)) {
+    for (const [operation, sinks] of _.entries(operations)) {
+      for (const sink of sinks) {
         const sinkValue = sink.value
         if (!sinkValue) {
           continue

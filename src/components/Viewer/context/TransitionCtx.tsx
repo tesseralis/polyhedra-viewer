@@ -15,10 +15,10 @@ import { PRECISION } from "math/geom"
 function getCoplanarFaces(polyhedron: Polyhedron) {
   const found: Face[] = []
   const pairs: [Face, Face][] = []
-  _.forEach(polyhedron.faces, f1 => {
+  polyhedron.faces.forEach(f1 => {
     if (f1.inSet(found) || !f1.isValid()) return
 
-    _.forEach(f1.adjacentFaces(), f2 => {
+    f1.adjacentFaces().forEach(f2 => {
       if (!f2 || !f2.isValid()) return
       if (f1.normal().equalsWithTolerance(f2.normal(), PRECISION)) {
         pairs.push([f1, f2])
@@ -34,20 +34,19 @@ function getCoplanarFaces(polyhedron: Polyhedron) {
 function getFaceColors(polyhedron: Polyhedron, colors: any) {
   const pairs = getCoplanarFaces(polyhedron)
   const mapping: { [fIndex: number]: number } = {}
-  _.forEach(pairs, ([f1, f2]) => {
+  for (const [f1, f2] of pairs) {
     const numSides = f1.numSides + f2.numSides - 2
     mapping[f1.index] = numSides
     mapping[f2.index] = numSides
-  })
+  }
 
   return polyhedron.faces.map(
-    face =>
-      colors[_.get(mapping, face.index.toString(), face.numUniqueSides())],
+    face => colors[mapping[face.index] ?? face.numUniqueSides()],
   )
 }
 
 function arrayDefaults<T>(first: T[], second: T[]) {
-  return _.map(first, (item, i) => (_.isNil(item) ? second[i] : item))
+  return first.map((item, i) => (_.isNil(item) ? second[i] : item))
 }
 
 const defaultState = {

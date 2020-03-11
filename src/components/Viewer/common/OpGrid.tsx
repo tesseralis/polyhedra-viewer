@@ -21,7 +21,7 @@ const opLayout: OpName[][] = [
   ["augment", "augment", "diminish", "gyrate"],
 ]
 
-const opList = _.flatMap(opLayout, line => _.uniq(line))
+const opList = opLayout.flatMap(line => _.uniq(line))
 
 interface Props {
   name: OpName

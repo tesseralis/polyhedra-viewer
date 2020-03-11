@@ -1,4 +1,3 @@
-import _ from "lodash"
 import { pivot } from "utils"
 import { Twist } from "types"
 import { Face, Polyhedron } from "math/polyhedra"
@@ -17,13 +16,13 @@ function bisectEdgeFaces(expandedFaces: Face[], twist: Twist) {
   let newFaces: any[] = []
   const found: Face[] = []
 
-  _.forEach(expandedFaces, face => {
-    _.forEach(face.edges, edge => {
+  expandedFaces.forEach(face => {
+    face.edges.forEach(edge => {
       const twinFace = edge.twinFace()
       if (twinFace.inSet(found)) return
 
       const [v1, v2, v3, v4] = pivot(
-        _.map(twinFace.vertices, "index"),
+        twinFace.vertices.map(v => v.index),
         edge.v2.index,
       )
 
@@ -50,8 +49,8 @@ function bisectEdgeFaces(expandedFaces: Face[], twist: Twist) {
 function joinEdgeFaces(twistFaces: Face[], twist: Twist) {
   const newFaces: any[] = []
   const found: Face[] = []
-  _.forEach(twistFaces, face => {
-    _.forEach(face.edges, edge => {
+  twistFaces.forEach(face => {
+    face.edges.forEach(edge => {
       const edgeFace = edge.twinFace()
       if (edgeFace.inSet(found)) return
 
@@ -96,7 +95,7 @@ function doTwist(
   const twistFaces = getExpandedFaces(polyhedron, n)
 
   const referenceFace =
-    _.find(reference.faces, face => isExpandedFace(reference, face, n)) ??
+    reference.faces.find(face => isExpandedFace(reference, face, n)) ??
     reference.getFace()
   const referenceLength =
     (referenceFace.distanceToCenter() / reference.edgeLength()) *
