@@ -15,6 +15,7 @@ export interface Relation {
   gyrate?: "ortho" | "gyro"
   align?: "meta" | "para"
   direction?: "forward" | "back"
+  chiral?: boolean
 }
 type Graph = NestedRecord<string, string, any>
 type FullGraph = NestedRecord<string, string, Relation[]>
