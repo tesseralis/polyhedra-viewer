@@ -1,4 +1,4 @@
-import _ from "lodash"
+import { startCase, set } from "lodash"
 import polygons, { polygonNames, PolygonMap } from "math/polygons"
 
 // Colors from d3-scale-chromatic:
@@ -12,17 +12,22 @@ const defaultColors: PolygonMap<string> = {
   10: "#984ea3",
 }
 
-export interface ConfigInput<T = any> {
+interface BaseConfigInput<T = any> {
   key: string
   type: string
   default: T
+  options?: number[]
+  display?: string
+}
+
+export interface ConfigInput<T = any> extends BaseConfigInput<T> {
   display: string
 }
 
 const colorOptionsList = polygons.map(n => {
   return {
     key: `colors[${n}]`,
-    display: `${_.startCase(polygonNames.get(n))} Color`,
+    display: `${startCase(polygonNames.get(n))} Color`,
     type: "color",
     default: defaultColors[n],
   }
@@ -64,12 +69,12 @@ export const configInputs: ConfigInput[] = [
     default: 1,
   },
   ...colorOptionsList,
-].map(input => ({
+].map((input: BaseConfigInput) => ({
   ...input,
-  display: _.get(input, "display", _.startCase(input.key)),
+  display: input?.display ?? startCase(input.key),
 }))
 
 export const defaultConfig: Record<string, any> = configInputs.reduce(
-  (obj, option) => _.set(obj, option.key, option.default),
+  (obj, option) => set(obj, option.key, option.default),
   {},
 )

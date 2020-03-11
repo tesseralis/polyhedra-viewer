@@ -1,5 +1,5 @@
 import React, { useMemo, useReducer, useContext } from "react"
-import _ from "lodash"
+import { isFunction, mapValues } from "lodash"
 
 type Args = any[]
 type Action<S> = (state: S) => S
@@ -21,7 +21,7 @@ export default function createHookedContext<S, A extends string>(
   actions: ActionCreators<S, A>,
   defaultStateCreator: S | ((props?: PropType) => S),
 ) {
-  const defaultState = _.isFunction(defaultStateCreator)
+  const defaultState = isFunction(defaultStateCreator)
     ? defaultStateCreator()
     : defaultStateCreator
   const StateContext = React.createContext<S>(defaultState)
@@ -30,7 +30,7 @@ export default function createHookedContext<S, A extends string>(
 
   return {
     Provider({ children, ...props }: PropType) {
-      const defaultState = _.isFunction(defaultStateCreator)
+      const defaultState = isFunction(defaultStateCreator)
         ? defaultStateCreator(props)
         : defaultStateCreator
       const [state, dispatch] = useReducer(
@@ -39,7 +39,7 @@ export default function createHookedContext<S, A extends string>(
       )
 
       const actionsValue = useMemo(() => {
-        return _.mapValues(
+        return mapValues(
           actions,
           (action: ActionCreator<S>) => (...args: Args) =>
             dispatch(action(...args)),
