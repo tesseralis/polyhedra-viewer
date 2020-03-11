@@ -6,7 +6,7 @@ import Polyhedron from "./Polyhedron"
 import Face from "./Face"
 import Vertex, { VertexList } from "./Vertex"
 import Edge from "./Edge"
-import VEList from "./VEList"
+import FaceLike from "./FaceLike"
 
 type CapType = "pyramid" | "cupola" | "rotunda" | "fastigium" | "prism"
 type FaceConfiguration = { [key: string]: number }
@@ -32,7 +32,7 @@ function getBoundary(faces: Face[]) {
       e = e.twin().next()
     }
   } while (!e.equals(e0))
-  return new VEList(
+  return new FaceLike(
     result.map(e => e.v1),
     result,
   )

@@ -13,8 +13,12 @@ import Polyhedron from "./Polyhedron"
 import Edge from "./Edge"
 import Vertex, { VertexList } from "./Vertex"
 
-// A list of vertices connected by edges
-export default class VEList implements VertexList {
+/**
+ * An abstract polyhedral Face. An entity of a polyhedron that can be treated as a Face:
+ * something containing vertices, edges and lying on a plane.
+ * Examples include the boundary of a cupola and a concrete Face.
+ */
+export default class FaceLike implements VertexList {
   polyhedron: Polyhedron
   vertices: Vertex[]
   edges: Edge[]

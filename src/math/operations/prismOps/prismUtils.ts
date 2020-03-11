@@ -1,6 +1,6 @@
 import { some, maxBy, isEqual, uniqBy, countBy } from "lodash-es"
 import { Twist } from "types"
-import { Polyhedron, Cap, VEList } from "math/polyhedra"
+import { Polyhedron, Cap, FaceLike } from "math/polyhedra"
 import { inRow, inColumn } from "math/polyhedra/tableUtils"
 import { withOrigin, isInverse } from "math/geom"
 import { getTwistSign, getTransformedVertices } from "../operationUtils"
@@ -109,7 +109,7 @@ export function getAdjustInformation(polyhedron: Polyhedron) {
 
 interface AdjustInfo {
   vertexSets: any
-  readonly boundary: VEList
+  readonly boundary: FaceLike
 }
 
 export function getScaledPrismVertices(
@@ -121,7 +121,7 @@ export function getScaledPrismVertices(
   const n = boundary.numSides
   const angle = (getTwistSign(twist) * Math.PI) / n
 
-  return getTransformedVertices<VEList>(vertexSets, set =>
+  return getTransformedVertices<FaceLike>(vertexSets, set =>
     withOrigin(set.normalRay(), v =>
       v
         .add(set.normal().scale((scale * 1) / 2))

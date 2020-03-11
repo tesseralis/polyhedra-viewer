@@ -3,7 +3,7 @@ import { VertexList as _VertexList } from "./Vertex"
 export { default as Polyhedron } from "./Polyhedron"
 export { default as Vertex } from "./Vertex"
 export type VertexList = _VertexList
-export { default as VEList } from "./VEList"
+export { default as FaceLike } from "./FaceLike"
 export { default as Face } from "./Face"
 export { default as Edge } from "./Edge"
 export { default as Cap } from "./Cap"

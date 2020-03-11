@@ -1,6 +1,6 @@
 import { pivot } from "utils"
 import { Twist } from "types"
-import { Polyhedron, VEList } from "math/polyhedra"
+import { Polyhedron, FaceLike } from "math/polyhedra"
 import makeOperation from "../makeOperation"
 import {
   getChirality,
@@ -12,7 +12,7 @@ import {
 
 function bisectPrismFaces(
   polyhedron: Polyhedron,
-  boundary: VEList,
+  boundary: FaceLike,
   twist?: Twist,
 ) {
   const prismFaces = boundary.edges.map(edge => edge.twinFace())
@@ -41,7 +41,7 @@ function bisectPrismFaces(
 
 function joinAntiprismFaces(
   polyhedron: Polyhedron,
-  boundary: VEList,
+  boundary: FaceLike,
   twist?: Twist,
 ) {
   const antiprismFaces = boundary.edges.flatMap(edge => {

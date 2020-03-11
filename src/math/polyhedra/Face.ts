@@ -3,10 +3,10 @@ import { some, countBy } from "lodash-es"
 import { getCyclic, flatMapUniq } from "utils"
 import { VIndex, FIndex } from "./solidTypes"
 import Polyhedron from "./Polyhedron"
-import VEList from "./VEList"
+import FaceLike from "./FaceLike"
 import Edge from "./Edge"
 
-export default class Face extends VEList {
+export default class Face extends FaceLike {
   index: FIndex
   value: VIndex[]
 
