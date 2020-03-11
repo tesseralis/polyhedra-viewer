@@ -1,6 +1,6 @@
 import React, { memo, useCallback, ButtonHTMLAttributes } from "react"
 import { useStyle, scales } from "styles"
-import { pick } from "lodash-es"
+import { get, pick } from "lodash-es"
 
 import Config from "components/ConfigCtx"
 import {
@@ -113,7 +113,7 @@ export default function ConfigForm() {
         <LabelledInput
           key={input.key}
           input={input}
-          value={config[input.key]}
+          value={get(config, input.key)}
           setValue={setValue}
         />
       ))}
