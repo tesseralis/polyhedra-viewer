@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, MouseEvent } from "react"
-import _ from "lodash"
+import { isEqual, forEach } from "lodash"
 
 import { Point } from "types"
 import { SolidData } from "math/polyhedra"
@@ -59,9 +59,9 @@ export default function X3dPolyhedron({
   value,
   colors,
   config = defaultConfig,
-  onHover = _.noop,
-  onMouseOut = _.noop,
-  onClick = _.noop,
+  onHover,
+  onMouseOut,
+  onClick,
 }: Props) {
   const shape = useRef<any>(null)
   const hitPnt = useRef<Point | null>(null)
@@ -74,27 +74,27 @@ export default function X3dPolyhedron({
       hitPnt.current = e.hitPnt
     },
     mouseup(e: X3dEvent) {
-      if (!_.isEqual(hitPnt.current, e.hitPnt)) return
-      onClick(e.hitPnt)
+      if (!isEqual(hitPnt.current, e.hitPnt)) return
+      onClick?.(e.hitPnt)
     },
     mousemove(e: X3dEvent) {
       hitPnt.current = e.hitPnt
-      onHover(e.hitPnt)
+      onHover?.(e.hitPnt)
     },
     mouseout() {
-      onMouseOut()
+      onMouseOut?.()
     },
   }
 
   useEffect(() => {
-    _.forEach(listeners, (fn, type) => {
+    forEach(listeners, (fn, type) => {
       if (shape.current !== null) {
         shape.current.addEventListener(type, fn)
       }
     })
 
     return () => {
-      _.forEach(listeners, (fn, type) => {
+      forEach(listeners, (fn, type) => {
         // The X3DOM node isn't managed by React so this rule doesn't apply
         // If we store this in a var this causes a type error
         // eslint-disable-next-line

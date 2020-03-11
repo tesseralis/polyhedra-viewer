@@ -1,4 +1,4 @@
-import _ from "lodash"
+import { set, range } from "lodash"
 
 import { repeat } from "utils"
 import { withOrigin, PRECISION, Vec3D } from "math/geom"
@@ -23,7 +23,7 @@ function duplicateVertices(polyhedron: Polyhedron) {
   const count = polyhedron.getVertex().adjacentFaces().length
   polyhedron.vertices.forEach(v => {
     v.adjacentFaces().forEach((face, i) => {
-      _.set(mapping, [face.index, v.index], i)
+      set(mapping, [face.index, v.index], i)
     })
   })
 
@@ -39,7 +39,7 @@ function duplicateVertices(polyhedron: Polyhedron) {
       })
       .addFaces(
         polyhedron.vertices.map(v =>
-          _.range(v.index * count, (v.index + 1) * count),
+          range(v.index * count, (v.index + 1) * count),
         ),
       )
   })

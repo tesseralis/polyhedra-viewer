@@ -1,4 +1,4 @@
-import _ from "lodash"
+import { once, set, countBy, maxBy, minBy, sortBy, sum, isEqual } from "lodash"
 
 import { isValidSolid, getSolidData } from "data"
 import { Vec3D, getCentroid } from "math/geom"
@@ -62,11 +62,11 @@ export default class Polyhedron {
   }
 
   // Memoized mapping of edges to faces, used for quickly finding adjacency
-  edgeToFaceGraph = _.once(() => {
+  edgeToFaceGraph = once(() => {
     const edgesToFaces: NestedRecord<number, number, Face> = {}
     for (const face of this.faces) {
       for (const { v1, v2 } of face.edges) {
-        _.set(edgesToFaces, [v1.index, v2.index], face)
+        set(edgesToFaces, [v1.index, v2.index], face)
       }
     }
     return edgesToFaces
@@ -88,7 +88,7 @@ export default class Polyhedron {
   }
 
   numFacesBySides() {
-    return _.countBy(this.faces, "numSides")
+    return countBy(this.faces, "numSides")
   }
 
   // Search functions
@@ -107,11 +107,11 @@ export default class Polyhedron {
   }
 
   largestFace() {
-    return _.maxBy(this.faces, "numSides")!
+    return maxBy(this.faces, "numSides")!
   }
 
   smallestFace() {
-    return _.minBy(this.faces, "numSides")!
+    return minBy(this.faces, "numSides")!
   }
 
   faceWithNumSides(n: number) {
@@ -122,11 +122,11 @@ export default class Polyhedron {
 
   // The list of the type of faces this polyhedron has, ordered
   faceTypes() {
-    return _.sortBy(Object.keys(this.numFacesBySides()))
+    return sortBy(Object.keys(this.numFacesBySides()))
   }
 
   vertexConfiguration() {
-    return _.countBy(
+    return countBy(
       this.vertices.map(v => v.configuration()),
       config => config.join("."),
     )
@@ -145,7 +145,7 @@ export default class Polyhedron {
   }
 
   surfaceArea() {
-    return _.sum(this.faces.map(face => face.area()))
+    return sum(this.faces.map(face => face.area()))
   }
 
   normalizedSurfaceArea() {
@@ -153,7 +153,7 @@ export default class Polyhedron {
   }
 
   volume() {
-    return _.sum(
+    return sum(
       this.faces.map(face => (face.area() * face.distanceToCenter()) / 3),
     )
   }
@@ -170,7 +170,7 @@ export default class Polyhedron {
 
   /** Get the face that is closest to the given point. */
   hitFace(point: Vec3D) {
-    return _.minBy(this.faces, face => face.plane().getDistanceToPoint(point))!
+    return minBy(this.faces, face => face.plane().getDistanceToPoint(point))!
   }
 
   // Mutations
@@ -224,9 +224,9 @@ export default class Polyhedron {
 
   symbol = () => meta.toConwayNotation(this.name)
 
-  symmetry = _.once(() => symmetry.getSymmetry(this.name))
+  symmetry = once(() => symmetry.getSymmetry(this.name))
 
-  symmetryName = _.once(() => symmetry.getSymmetryName(this.symmetry()))
+  symmetryName = once(() => symmetry.getSymmetryName(this.symmetry()))
 
   order = () => symmetry.getOrder(this.name)
 
@@ -281,13 +281,13 @@ export default class Polyhedron {
       n: face.numSides,
       adj: face.adjacentFaceCounts(),
     }))
-    return _.sortBy(
+    return sortBy(
       faceAdjacencyCounts,
       ["n", "adj.length"].concat([3, 4, 5, 6, 8, 10].map(n => `adj[${n}]`)),
     )
   }
 
   isSame(other: Polyhedron) {
-    return _.isEqual(this.faceAdjacencyList(), other.faceAdjacencyList())
+    return isEqual(this.faceAdjacencyList(), other.faceAdjacencyList())
   }
 }

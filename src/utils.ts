@@ -53,9 +53,20 @@ export function choose<T>(choices: T[]): T {
   return choices[index]
 }
 
+/**
+ * Split the list in two at index (exclusive)
+ */
+export function splitAt<T>(list: T[], index: number) {
+  return [list.slice(0, index), list.slice(index)]
+}
+
+/**
+ * Return the list "pivoted" so that the given value starts first
+ */
 export function pivot<T>(list: T[], value: T) {
   const index = list.indexOf(value)
-  return [...list.slice(index), ...list.slice(0, index)]
+  const [front, back] = splitAt(list, index)
+  return [...back, ...front]
 }
 
 type Key = string | number | symbol

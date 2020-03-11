@@ -1,4 +1,4 @@
-import _ from "lodash"
+import { takeRight, dropRight, invert, times } from "lodash"
 import { Twist } from "types"
 import { Polyhedron, Vertex, Edge, VertexList, VertexArg } from "math/polyhedra"
 import { Vec3D, Transform } from "math/geom"
@@ -15,18 +15,18 @@ export function removeExtraneousVertices(polyhedron: Polyhedron) {
 
   // Map the `numToRemove` last vertices of the polyhedron (that don't overlap)
   // to the first few removed vertices
-  const notToRemove = _.takeRight(polyhedron.vertices, numToRemove).filter(
+  const notToRemove = takeRight(polyhedron.vertices, numToRemove).filter(
     v => !v.inSet(toRemove),
   )
   const newToOld = mapObject(notToRemove, (v, i) => [
     v.index,
     toRemove[i].index,
   ])
-  const oldToNew = _.invert(newToOld)
+  const oldToNew = invert(newToOld)
 
-  const newVertices = _.dropRight(
+  const newVertices = dropRight(
     polyhedron.vertices.map(
-      v => polyhedron.vertices[_.get(oldToNew, v.index, v.index) as any],
+      v => polyhedron.vertices[(oldToNew[v.index] as any) ?? v.index],
     ),
     numToRemove,
   )
@@ -172,7 +172,7 @@ export function expandEdges(
         )
       }
 
-      const newIndices = _.times(edges.length - 1, () => newVertex(v))
+      const newIndices = times(edges.length - 1, () => newVertex(v))
       const vIndices = [v.index, ...newIndices]
       newFaces.push(vIndices)
 

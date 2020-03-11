@@ -1,4 +1,4 @@
-import _ from "lodash"
+import { mapValues, isEmpty, filter, uniq, pickBy } from "lodash"
 
 import { toConwayNotation } from "math/polyhedra/names"
 import operationGraph, { Relation } from "./operationGraph"
@@ -115,9 +115,9 @@ export function getOpResults(solid: Polyhedron, opName: string) {
 // TODO get this to return the correct type
 function fillDefaults<Options extends {}>(op: OperationArgs<Options>) {
   return {
-    ..._.mapValues(
+    ...mapValues(
       methodDefaults,
-      (fnDefault, fn: OperationArg) => op[fn] ?? _.constant(fnDefault),
+      (fnDefault, fn: OperationArg) => op[fn] ?? (() => fnDefault),
     ),
     ...op,
   }
@@ -129,10 +129,7 @@ function getNextPolyhedron<O>(
   filterOpts: O,
 ) {
   const results = getOpResults(solid, operation)
-  const next = _.filter(
-    results,
-    !_.isEmpty(filterOpts) ? filterOpts : _.stubTrue,
-  )
+  const next = isEmpty(filterOpts) ? results : filter(results, filterOpts)
   return fromConwayNotation((getSingle(next) as any).value)
 }
 
@@ -165,7 +162,7 @@ export function deduplicateVertices(polyhedron: Polyhedron) {
   const oldToNew: Record<number, number> = {}
 
   polyhedron.vertices.forEach((v, vIndex) => {
-    const match = _.find(unique, point =>
+    const match = unique.find(point =>
       v.vec.equalsWithTolerance(point.vec, PRECISION),
     )
     if (match === undefined) {
@@ -176,11 +173,11 @@ export function deduplicateVertices(polyhedron: Polyhedron) {
     }
   })
 
-  if (_.isEmpty(oldToNew)) return polyhedron
+  if (isEmpty(oldToNew)) return polyhedron
 
   // replace vertices that are the same
   let newFaces = polyhedron.faces
-    .map(face => _.uniq(face.vertices.map(v => oldToNew[v.index])))
+    .map(face => uniq(face.vertices.map(v => oldToNew[v.index])))
     .filter(vIndices => vIndices.length >= 3)
 
   // remove extraneous vertices
@@ -203,7 +200,7 @@ export default function makeOperation<Options extends {}>(
         options ?? {},
         results,
       )
-      const next = getNextPolyhedron(polyhedron, name, _.pickBy(searchOptions))
+      const next = getNextPolyhedron(polyhedron, name, pickBy(searchOptions))
 
       // Get the actual operation result
       const opResult = withDefaults.apply(polyhedron, options ?? {}, next)
@@ -217,17 +214,18 @@ export default function makeOperation<Options extends {}>(
     },
     hasOptions(polyhedron) {
       const relations = getOpResults(polyhedron, name)
-      if (_.isEmpty(relations)) return false
+      if (isEmpty(relations)) return false
+      const isChiral = relations.find(rel => rel.chiral)
       // TODO maybe split up among operations?
       // but I think that might just grow the code...
       switch (name) {
         case "turn":
-          return relations.length > 1 || !!_.find(relations, "chiral")
+          return relations.length > 1 || isChiral
         case "twist":
           return relations[0].value[0] === "s"
         case "snub":
         case "gyroelongate":
-          return !!_.find(relations, "chiral")
+          return !!isChiral
         case "sharpen":
         case "contract":
         case "shorten":

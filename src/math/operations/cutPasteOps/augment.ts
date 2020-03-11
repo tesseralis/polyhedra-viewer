@@ -141,7 +141,7 @@ function isAligned(
     return true
   }
 
-  if (baseType !== "truncated" && _.isNil(gyrate)) {
+  if (baseType !== "truncated" && !gyrate) {
     throw new Error(`Must define 'gyrate' for augmenting ${baseType} `)
   }
 

@@ -1,12 +1,16 @@
-import _ from "lodash"
+import { some, findKey, countBy } from "lodash"
 import { Point } from "types"
 import { vec, Vec3D } from "math/geom"
 import { VIndex } from "./solidTypes"
 import Polyhedron from "./Polyhedron"
 import Edge from "./Edge"
+import { splitAt } from "utils"
 
 function getCycles<T>(array: T[]) {
-  return array.map((val, i) => _.drop(array, i).concat(_.take(array, i)))
+  return array.map((val, i) => {
+    const [front, back] = splitAt(array, i)
+    return [...back, ...front]
+  })
 }
 
 function arrayMin<T>(a1: T[], a2: T[]): T[] {
@@ -37,14 +41,12 @@ export default class Vertex {
   }
 
   inSet(vertices: Vertex[]) {
-    return _.some(vertices, vertex => this.equals(vertex))
+    return some(vertices, vertex => this.equals(vertex))
   }
 
   adjacentEdges() {
     // find an edge with this as a source
-    const v2 = parseInt(
-      _.findKey(this.polyhedron.edgeToFaceGraph()[this.index])!,
-    )
+    const v2 = parseInt(findKey(this.polyhedron.edgeToFaceGraph()[this.index])!)
     const e0 = new Edge(this, this.polyhedron.vertices[v2])
     let e = e0
     const result = []
@@ -76,7 +78,7 @@ export default class Vertex {
 
   /** Return adjacent faces counted by number of sides */
   adjacentFaceCounts() {
-    return _.countBy(this.adjacentFaces(), "numSides")
+    return countBy(this.adjacentFaces(), "numSides")
   }
 }
 

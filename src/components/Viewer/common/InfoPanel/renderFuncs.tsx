@@ -1,5 +1,5 @@
 import React from "react"
-import _ from "lodash"
+import { capitalize, map } from "lodash"
 import { ChildrenProp } from "types"
 import { polygonNames } from "math/polygons"
 import { Polyhedron } from "math/polyhedra"
@@ -87,7 +87,7 @@ export function displayVertexConfig({ polyhedron }: RenderProps) {
   if (configKeys.length === 1) return <>{configKeys[0]}</>
   return (
     <ul>
-      {_.map(vConfig, (count, type) => (
+      {map(vConfig, (count, type) => (
         <li key={type}>
           {count}({getShortVertexConfig(type)})
         </li>
@@ -101,7 +101,7 @@ export function displayFaceTypes({ polyhedron }: RenderProps) {
   // TODO verify order by type of face
   return (
     <ul>
-      {_.map(faceCounts, (count, type) => (
+      {map(faceCounts, (count, type) => (
         <li key={type}>
           {count} {polygonNames.get(type as any)}
           {count !== 1 ? "s" : ""}
@@ -117,7 +117,7 @@ export function displaySymmetry({ polyhedron }: RenderProps) {
   const { group = "", sub } = symmetry
   return (
     <>
-      {_.capitalize(symName)}, {group}
+      {capitalize(symName)}, {group}
       {sub ? <Sub>{sub}</Sub> : undefined}
     </>
   )

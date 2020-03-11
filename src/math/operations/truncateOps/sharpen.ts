@@ -1,4 +1,4 @@
-import _ from "lodash"
+import { set, flatMapDeep, meanBy } from "lodash"
 
 import { Polyhedron, Vertex, Face, Edge } from "math/polyhedra"
 import makeOperation from "../makeOperation"
@@ -27,14 +27,14 @@ function duplicateVertices(polyhedron: Polyhedron, facesTosharpen: Face[]) {
 
     const faces = getShiftedAdjacentFaces(vertex, facesTosharpen)
     faces.forEach((f, i) => {
-      _.set(mapping, [f.index, v], values[i])
+      set(mapping, [f.index, v], values[i])
     })
   })
 
   // Double the amount of vertices
   return polyhedron.withChanges(solid =>
     solid.addVertices(polyhedron.vertices).mapFaces(f => {
-      return _.flatMapDeep(f.vertices, v => mapping[f.index][v.index])
+      return flatMapDeep(f.vertices, v => mapping[f.index][v.index])
     }),
   )
 }
@@ -58,7 +58,7 @@ function calculatesharpenDist(face: Face, edge: Edge) {
 
 function getsharpenDist(polyhedron: Polyhedron, face: Face) {
   if (!polyhedron.isRegular() && !polyhedron.isQuasiRegular()) {
-    return _.meanBy(face.edges, edge => calculatesharpenDist(face, edge))
+    return meanBy(face.edges, edge => calculatesharpenDist(face, edge))
   }
   return calculatesharpenDist(face, face.edges[0])
 }

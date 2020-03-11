@@ -1,4 +1,4 @@
-import _ from "lodash"
+import { isEmpty, isEqual } from "lodash"
 
 import { Point } from "types"
 import { Cap } from "math/polyhedra"
@@ -15,16 +15,16 @@ export default function useHitOptions() {
   const { operation, options = {} } = OperationCtx.useState()
   const { setOption } = OperationCtx.useActions()
   const applyOperation = useApplyOperation()
-  const { hitOption = "", getHitOption = _.constant({}) } = operation ?? {}
+  const { hitOption = "", getHitOption = () => ({}) } = operation ?? {}
 
   const setHitOption = (hitPnt: Point) => {
     if (!operation || isTransitioning) return
     const newHitOptions = getHitOption(polyhedron, hitPnt, options)
-    if (_.isEmpty(newHitOptions)) {
+    if (isEmpty(newHitOptions)) {
       return setOption(hitOption, undefined)
     }
     const newValue = newHitOptions[hitOption]
-    if (!_.isEqual(options[hitOption], newValue)) {
+    if (!isEqual(options[hitOption], newValue)) {
       setOption(hitOption, newValue)
     }
   }
