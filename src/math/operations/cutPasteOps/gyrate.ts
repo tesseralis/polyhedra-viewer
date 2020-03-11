@@ -1,4 +1,4 @@
-import _ from "lodash"
+import { some } from "lodash"
 
 import { withOrigin } from "math/geom"
 import { Polyhedron, Cap } from "math/polyhedra"
@@ -65,11 +65,10 @@ export const gyrate = makeOperation("gyrate", {
     if (!cap) {
       throw new Error("Invalid cap")
     }
-    if (_.some(relations, "direction")) {
+    if (some(relations, "direction")) {
       options.direction = getGyrateDirection(polyhedron, cap)
       if (
-        _.filter(
-          relations,
+        relations.filter(
           relation =>
             relation.direction === options.direction && !!relation.align,
         ).length > 1
@@ -91,10 +90,11 @@ export const gyrate = makeOperation("gyrate", {
   },
 
   faceSelectionStates(polyhedron, { cap }) {
-    const allCapFaces = _.flatMap(Cap.getAll(polyhedron), cap => cap.faces())
-    return _.map(polyhedron.faces, face => {
+    const allCapFaces = Cap.getAll(polyhedron).flatMap(cap => cap.faces())
+    return polyhedron.faces.map(face => {
       if (cap instanceof Cap && face.inSet(cap.faces())) return "selected"
       if (face.inSet(allCapFaces)) return "selectable"
+      return undefined
     })
   },
 })

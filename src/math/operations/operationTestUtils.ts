@@ -1,4 +1,4 @@
-import _ from "lodash"
+import { isNaN } from "lodash"
 import { PRECISION } from "math/geom"
 import { Polyhedron } from "math/polyhedra"
 
@@ -6,7 +6,7 @@ function isProperPolyhedron(polyhedron: Polyhedron) {
   const expectedSideLength = polyhedron.edgeLength()
   for (const edge of polyhedron.edges) {
     const sideLength: number = edge.length()
-    if (_.isNaN(sideLength)) {
+    if (isNaN(sideLength)) {
       console.log(`edge ${edge} has length NaN`)
       return false
     }

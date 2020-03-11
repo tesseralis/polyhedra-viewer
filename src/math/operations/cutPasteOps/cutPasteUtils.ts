@@ -14,8 +14,7 @@ export const hasMultiple = (relations: Relation[], property: string) => {
 export function getCapAlignment(polyhedron: Polyhedron, cap: Cap) {
   const isRhombicosidodecahedron = cap.type === "cupola"
   const orthoCaps = isRhombicosidodecahedron
-    ? _.filter(
-        Cap.getAll(polyhedron),
+    ? Cap.getAll(polyhedron).filter(
         cap => getCupolaGyrate(polyhedron, cap) === "ortho",
       )
     : []
@@ -32,7 +31,7 @@ export function getCapAlignment(polyhedron: Polyhedron, cap: Cap) {
 
 export function getCupolaGyrate(polyhedron: Polyhedron, cap: Cap) {
   const isOrtho = _.every(cap.boundary().edges, edge => {
-    const [n1, n2] = _.map(edge.adjacentFaces(), "numSides")
+    const [n1, n2] = edge.adjacentFaces().map(f => f.numSides)
     return (n1 === 4) === (n2 === 4)
   })
   return isOrtho ? "ortho" : "gyro"

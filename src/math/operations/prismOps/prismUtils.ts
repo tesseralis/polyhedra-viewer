@@ -43,7 +43,7 @@ export function isGyroelongatedBiCupola(polyhedron: Polyhedron) {
 function getOppositeCaps(polyhedron: Polyhedron) {
   const caps = Cap.getAll(polyhedron)
   for (const cap of caps) {
-    const cap2 = _.find(caps, cap2 => isInverse(cap.normal(), cap2.normal()))
+    const cap2 = caps.find(cap2 => isInverse(cap.normal(), cap2.normal()))
     if (cap2) return [cap, cap2]
   }
   return undefined
@@ -51,7 +51,7 @@ function getOppositeCaps(polyhedron: Polyhedron) {
 
 function getOppositePrismFaces(polyhedron: Polyhedron) {
   const face1 = _.maxBy(
-    _.filter(polyhedron.faces, face => {
+    polyhedron.faces.filter(face => {
       const faceCounts = _.countBy(
         face.vertexAdjacentFaces().filter(f => !f.equals(face)),
         "numSides",

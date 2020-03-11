@@ -1,4 +1,4 @@
-import _ from "lodash"
+import { range } from "lodash"
 
 import { mapObject } from "utils"
 import {
@@ -29,7 +29,7 @@ function removeCap(polyhedron: Polyhedron, cap: Cap) {
         })
       })
       .addFaces([
-        _.range(
+        range(
           polyhedron.numVertices(),
           polyhedron.numVertices() + boundary.numSides,
         ),
@@ -99,10 +99,11 @@ export const diminish = makeOperation<Options>("diminish", {
   },
 
   faceSelectionStates(polyhedron, { cap }) {
-    const allCapFaces = _.flatMap(Cap.getAll(polyhedron), cap => cap.faces())
-    return _.map(polyhedron.faces, face => {
+    const allCapFaces = Cap.getAll(polyhedron).flatMap(cap => cap.faces())
+    return polyhedron.faces.map(face => {
       if (cap instanceof Cap && face.inSet(cap.faces())) return "selected"
       if (face.inSet(allCapFaces)) return "selectable"
+      return undefined
     })
   },
 })

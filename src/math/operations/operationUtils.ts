@@ -9,8 +9,8 @@ import { mapObject, getCyclic } from "utils"
  */
 export function removeExtraneousVertices(polyhedron: Polyhedron) {
   // Vertex indices to remove
-  const vertsInFaces = _.flatMap(polyhedron.faces, "vertices")
-  const toRemove = _.filter(polyhedron.vertices, v => !v.inSet(vertsInFaces))
+  const vertsInFaces = polyhedron.faces.flatMap(f => f.vertices)
+  const toRemove = polyhedron.vertices.filter(v => !v.inSet(vertsInFaces))
   const numToRemove = toRemove.length
 
   // Map the `numToRemove` last vertices of the polyhedron (that don't overlap)
@@ -34,9 +34,7 @@ export function removeExtraneousVertices(polyhedron: Polyhedron) {
   return polyhedron.withChanges(solid =>
     solid
       .withVertices(newVertices)
-      .mapFaces(face =>
-        _.map(face.vertices, v => _.get(newToOld, v.index, v.index)),
-      ),
+      .mapFaces(face => face.vertices.map(v => newToOld[v.index] ?? v.index)),
   )
 }
 
@@ -197,10 +195,10 @@ export function expandEdges(
     solid
       .withVertices(newVertices)
       .mapFaces(f =>
-        _.flatMap(f.vertices, v => v2fMap[f.index][v.index] ?? v.index),
+        f.vertices.flatMap(v => v2fMap[f.index][v.index] ?? v.index),
       )
       .addFaces(
-        _.flatMap(edges, e => {
+        edges.flatMap(e => {
           const { v1, v2 } = e
           return getEdgeFaces(
             [...v2eMap[v1.index][v2.index], ...v2eMap[v2.index][v1.index]],
