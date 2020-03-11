@@ -26,11 +26,11 @@ export default class Edge implements VertexList {
   }
 
   prev() {
-    return this.face.prevEdge(this)
+    return this.face.edges.find(e => e.v2.equals(this.v1))!
   }
 
   next() {
-    return this.face.nextEdge(this)
+    return this.face.edges.find(e => e.v1.equals(this.v2))!
   }
 
   length() {

@@ -35,14 +35,6 @@ export default class FaceLike implements VertexList {
     return this.vertices.length
   }
 
-  nextEdge(e: Edge) {
-    return this.edges.find(e2 => e2.v1.equals(e.v2))!
-  }
-
-  prevEdge(e: Edge) {
-    return this.edges.find(e2 => e2.v2.equals(e.v1))!
-  }
-
   adjacentFaces() {
     return this.edges.map(edge => edge.twin().face)
   }
