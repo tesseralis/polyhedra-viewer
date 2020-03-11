@@ -1,4 +1,12 @@
-import _ from "lodash"
+import {
+  mapValues,
+  castArray,
+  isObject,
+  pickBy,
+  mergeWith,
+  compact,
+  range,
+} from "lodash"
 import { polygonPrefixes } from "math/polygons"
 import {
   Table,
@@ -22,37 +30,37 @@ type FullGraph = NestedRecord<string, string, Relation[]>
 
 // Make everything an array
 function normalize(graph: Graph) {
-  return _.mapValues(graph, ops =>
-    _.mapValues(ops, relations => {
-      return _.castArray(relations).map(relation =>
-        _.isObject(relation) ? relation : { value: relation },
+  return mapValues(graph, ops =>
+    mapValues(ops, relations => {
+      return castArray(relations).map(relation =>
+        isObject(relation) ? relation : { value: relation },
       )
     }),
   )
 }
 
 /** Remove nullish values from a graph */
-function compact(graph: Graph) {
-  return _.mapValues(graph, operations => {
-    const mappedOps = _.mapValues(operations, opts =>
+function compactGraph(graph: Graph) {
+  return mapValues(graph, operations => {
+    const mappedOps = mapValues(operations, opts =>
       opts.filter((opt: any) => !!opt.value),
     )
-    return _.pickBy(mappedOps, "length")
+    return pickBy(mappedOps, "length")
   })
 }
 
 const customizer = (objValue: unknown, srcValue: unknown) => {
-  if (_.isArray(objValue)) {
+  if (objValue instanceof Array) {
     return objValue.concat(srcValue)
   }
 }
 
 function graphMerge(object: Graph, other: Graph) {
-  return _.mergeWith(object, other, customizer)
+  return mergeWith(object, other, customizer)
 }
 
 function graphMergeAll(...objects: Graph[]) {
-  return _.reduce(objects, graphMerge)!
+  return objects.reduce(graphMerge)!
 }
 
 const getInverseOperation = (operation: string) => {
@@ -85,8 +93,8 @@ const getInverseOperation = (operation: string) => {
  */
 function makeBidirectional(graph: FullGraph) {
   const result: FullGraph = {}
-  for (const [source, operations] of _.entries(graph)) {
-    for (const [operation, sinks] of _.entries(operations)) {
+  for (const [source, operations] of Object.entries(graph)) {
+    for (const [operation, sinks] of Object.entries(operations)) {
       for (const sink of sinks) {
         const sinkValue = sink.value
         if (!sinkValue) {
@@ -129,7 +137,7 @@ const invalidNames = ["concave", "coplanar"]
 function convertTableNotation(notation: TableData): any {
   if (Array.isArray(notation)) return notation.map(convertTableNotation)
   if (notation[0] === "!") return notation.substring(1)
-  if (_.includes(invalidNames, notation)) return null
+  if (invalidNames.includes(notation)) return null
   return notation
 }
 
@@ -149,13 +157,13 @@ const hasCupolaRotunda = (name: string) =>
 const cupolaRotunda = capstoneMap["cupola-rotunda"]
 
 const getOrthoGyroAugment = (value: TableData, using: string) => {
-  if (!_.isArray(value)) {
-    return [{ using, value }]
-  } else {
+  if (value instanceof Array) {
     return [
       { using, value: value[0], gyrate: "ortho" },
       { using, value: value[1], gyrate: "gyro" },
     ]
+  } else {
+    return [{ using, value }]
   }
 }
 
@@ -168,7 +176,7 @@ const getAugmentations = (using: string) => (
   rowName: string,
   colName: string,
 ) => {
-  return _.compact(
+  return compact(
     [
       getOrthoGyroAugment(capstoneMap[rowName][colName], using),
       hasCupolaRotunda(rowName) && getCupolaRotunda(using, colName),
@@ -177,7 +185,7 @@ const getAugmentations = (using: string) => (
 }
 
 const getCapstoneFromPrism = (prismRow: string) => {
-  const isPyramid = _.includes(["triangular", "square", "pentagonal"], prismRow)
+  const isPyramid = ["triangular", "square", "pentagonal"].includes(prismRow)
   if (isPyramid) {
     return `${prismRow} pyramid`
   }
@@ -266,7 +274,7 @@ const archimedean = {
 const baseCapstones = (() => {
   let graph: Graph = {}
   // relation of prisms and antiprisms
-  _.forEach(prismMap, (row, name) => {
+  for (const [name, row] of Object.entries(prismMap)) {
     const { prism, antiprism } = row
     const hasRotunda = name.startsWith("decagonal")
     const capstoneRow = getCapstoneFromPrism(name)
@@ -288,11 +296,11 @@ const baseCapstones = (() => {
         ],
       },
     })
-  })
+  }
   // for diminished icosahedra
   graph["A5"]["augment"][0].align = "para"
 
-  _.forEach(capstoneMap, (row, name) => {
+  for (const [name, row] of Object.entries(capstoneMap)) {
     const {
       "--": base,
       elongated,
@@ -316,11 +324,11 @@ const baseCapstones = (() => {
         augment: augmentations(name, "gyroelongated bi-"),
       },
       [gyroelongatedBi]: {
-        gyrate: _.isArray(bi) ? { value: gyroelongatedBi } : null,
+        gyrate: bi instanceof Array ? { value: gyroelongatedBi } : null,
       },
     })
 
-    if (!_.isArray(bi)) {
+    if (!(bi instanceof Array)) {
       graph = graphMerge(graph, {
         [bi]: elongations(elongatedBi, gyroelongatedBi),
         [elongatedBi]: {
@@ -343,8 +351,8 @@ const baseCapstones = (() => {
     }
 
     // gyrate relationships
-    _.forEach(row, cell => {
-      if (_.isArray(cell)) {
+    for (const cell of Object.values(row)) {
+      if (cell instanceof Array) {
         const [ortho, gyro] = cell
         graph = graphMerge(graph, {
           [ortho]: {
@@ -352,8 +360,8 @@ const baseCapstones = (() => {
           },
         })
       }
-    })
-  })
+    }
+  }
 
   return graph
 })()
@@ -375,18 +383,18 @@ const getAugmentee = (name: string) => {
 }
 
 const getBiAugmented = (biaugmented: TableData, using: string) => {
-  if (!_.isArray(biaugmented)) {
-    return [{ using, value: biaugmented }]
+  if (biaugmented instanceof Array) {
+    return [
+      { using, value: biaugmented[0], align: "para" },
+      { using, value: biaugmented[1], align: "meta" },
+    ]
   }
-  return [
-    { using, value: biaugmented[0], align: "para" },
-    { using, value: biaugmented[1], align: "meta" },
-  ]
+  return [{ using, value: biaugmented }]
 }
 
 const baseAugmentations = (() => {
   let graph = {}
-  _.forEach(augmentationMap, (row, name) => {
+  for (const [name, row] of Object.entries(augmentationMap)) {
     const base = toConwayNotation(name)
     const { augmented, biaugmented, triaugmented } = row
     const augmentee = getAugmentee(name)
@@ -397,11 +405,11 @@ const baseAugmentations = (() => {
       [augmented]: {
         augment: getBiAugmented(biaugmented, augmentee!),
       },
-      [_.isArray(biaugmented) ? biaugmented[1] : biaugmented]: {
+      [biaugmented instanceof Array ? biaugmented[1] : biaugmented]: {
         augment: { using: augmentee, value: triaugmented },
       },
     })
-  })
+  }
   return graph
 })()
 
@@ -500,7 +508,7 @@ const rhombicosidodecahedra = (() => {
 })()
 
 const elementary = (() => {
-  const empty = mapObject(_.range(87, 93), j => [`J${j}`, {}])
+  const empty = mapObject(range(87, 93), j => [`J${j}`, {}])
   return {
     ...empty,
     // TODO semisnub to create snub antiprisms
@@ -530,6 +538,6 @@ const normalized = [
   elementary,
 ]
   .map(normalize)
-  .map(compact)
+  .map(compactGraph)
 
 export default makeBidirectional(graphMergeAll(...normalized)) as FullGraph
