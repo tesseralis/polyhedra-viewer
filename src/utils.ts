@@ -1,4 +1,4 @@
-import _, { ValueIteratee, ListIterateeCustom } from "lodash"
+import { uniqBy, invert, ValueIteratee } from "lodash"
 
 function mod(a: number, b: number) {
   return a >= 0 ? a % b : (a % b) + b
@@ -33,7 +33,7 @@ export function flatMapUniq<T, U>(
   iteratee1: (key: T) => U[],
   iteratee2: ValueIteratee<U>,
 ) {
-  return _.uniqBy(arr.flatMap(iteratee1), iteratee2)
+  return uniqBy(arr.flatMap(iteratee1), iteratee2)
 }
 
 /**
@@ -48,21 +48,6 @@ export function getSingle<T>(array: T[]): T {
   return array[0]
 }
 
-/**
- * Like _.find, but throws an error if no valid element found.
- */
-// TODO rename this to be something like "findAssert"
-export function find<T>(
-  array: T[],
-  predicate: ListIterateeCustom<T, boolean>,
-): T {
-  const result = _.find(array, predicate)
-  if (result === undefined) {
-    throw new Error(`Unable to find the predicate in ${array.toString()}`)
-  }
-  return result
-}
-
 export function choose<T>(choices: T[]): T {
   const index = Math.floor(Math.random() * choices.length)
   return choices[index]
@@ -75,7 +60,7 @@ export function pivot<T>(list: T[], value: T) {
 
 type Key = string | number | symbol
 export function bimap<K extends Key, V extends Key>(obj: Record<K, V>) {
-  const inverse = _.invert(obj) as Record<V, K>
+  const inverse = invert(obj) as Record<V, K>
   return {
     get(key: K): V {
       return obj[key] as V

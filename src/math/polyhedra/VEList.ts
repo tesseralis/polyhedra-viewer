@@ -9,7 +9,6 @@ import {
   getNormal,
   getNormalRay,
 } from "math/geom"
-import { find } from "utils"
 import Polyhedron from "./Polyhedron"
 import Edge from "./Edge"
 import Vertex, { VertexList } from "./Vertex"
@@ -33,11 +32,11 @@ export default class VEList implements VertexList {
   }
 
   nextEdge(e: Edge) {
-    return find(this.edges, e2 => e2.v1.equals(e.v2))
+    return this.edges.find(e2 => e2.v1.equals(e.v2))!
   }
 
   prevEdge(e: Edge) {
-    return find(this.edges, e2 => e2.v2.equals(e.v1))
+    return this.edges.find(e2 => e2.v2.equals(e.v1))!
   }
 
   adjacentFaces() {

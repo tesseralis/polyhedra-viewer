@@ -1,6 +1,6 @@
 import _ from "lodash"
 
-import { repeat, find } from "utils"
+import { repeat } from "utils"
 import { withOrigin, PRECISION, Vec3D } from "math/geom"
 import { Polyhedron, Vertex } from "math/polyhedra"
 import makeOperation from "../makeOperation"
@@ -75,9 +75,7 @@ function getTruncateTransform(polyhedron: Polyhedron, result = ""): Transform {
     polyhedron.smallestFace().distanceToCenter() / newSideLength
 
   return (vector, vertex) => {
-    const smallFace = find(vertex.adjacentFaces(), {
-      numSides: 6,
-    })
+    const smallFace = vertex.adjacentFaces().find(f => f.numSides === 6)!
     const normal = polyhedron.faces[smallFace.index].normal()
     const transform = withOrigin(smallFace.centroid(), v =>
       v
@@ -98,7 +96,7 @@ function doTruncate(polyhedron: Polyhedron, rectify = false, result?: string) {
   const truncatedVertices = duplicated.vertices.map(vertex => {
     const adjacentVertices = vertex.adjacentVertices()
     const v = vertex.vec
-    const v1 = find(adjacentVertices, adj => adj.vec.distanceTo(v) > PRECISION)
+    const v1 = adjacentVertices.find(adj => adj.vec.distanceTo(v) > PRECISION)!
     const truncated = v.interpolateTo(v1.vec, rectify ? 0.5 : truncateScale)
     return !!transform ? transform(truncated, vertex) : truncated
   })

@@ -1,6 +1,5 @@
 import _ from "lodash"
 
-import { find } from "utils"
 import { isValidSolid, getSolidData } from "data"
 import { Vec3D, getCentroid } from "math/geom"
 
@@ -116,7 +115,9 @@ export default class Polyhedron {
   }
 
   faceWithNumSides(n: number) {
-    return find(this.faces, { numSides: n })
+    const face = this.faces.find(f => f.numSides === n)
+    if (!face) throw new Error(`No face of ${n} sides exists`)
+    return face
   }
 
   // The list of the type of faces this polyhedron has, ordered

@@ -1,6 +1,5 @@
 import { some, maxBy, isEqual, uniqBy, countBy } from "lodash"
 import { Twist } from "types"
-import { find } from "utils"
 import { Polyhedron, Cap, VEList } from "math/polyhedra"
 import { inRow, inColumn } from "math/polyhedra/tableUtils"
 import { withOrigin, isInverse } from "math/geom"
@@ -18,7 +17,7 @@ export function getChirality(polyhedron: Polyhedron) {
   const boundary = cap1.boundary()
   const isCupolaRotunda = cap1.type !== cap2.type
 
-  const nonTriangleFace = find(boundary.edges, e => e.face.numSides !== 3)
+  const nonTriangleFace = boundary.edges.find(e => e.face.numSides !== 3)!
   const rightFaceAcross = nonTriangleFace
     .twin()
     .prev()
