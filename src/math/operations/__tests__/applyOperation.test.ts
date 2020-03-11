@@ -1,4 +1,4 @@
-import _ from "lodash"
+import { forEach } from "lodash-es"
 import { allSolidNames } from "data"
 import { getOperations } from "../operationUtils"
 import { operations } from ".."
@@ -10,10 +10,10 @@ setupOperations()
 const excludedOperations = {}
 
 describe("applyOperation", () => {
-  const polyhedra = _.map(allSolidNames, name => Polyhedron.get(name))
-  _.forEach(operations, (operation, opName) => {
+  const polyhedra = allSolidNames.map(name => Polyhedron.get(name))
+  forEach(operations, (operation, opName) => {
     describe(opName, () => {
-      _.forEach(polyhedra, polyhedron => {
+      for (const polyhedron of polyhedra) {
         if (operation.canApplyTo(polyhedron)) {
           it(polyhedron.name, () => {
             const optsToTest = operation.allOptionCombos(polyhedron)
@@ -23,7 +23,7 @@ describe("applyOperation", () => {
             })
           })
         }
-      })
+      }
     })
   })
 })

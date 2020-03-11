@@ -1,6 +1,14 @@
-import _ from "lodash"
+import {
+  once,
+  set,
+  countBy,
+  maxBy,
+  minBy,
+  sortBy,
+  sum,
+  isEqual,
+} from "lodash-es"
 
-import { find } from "utils"
 import { isValidSolid, getSolidData } from "data"
 import { Vec3D, getCentroid } from "math/geom"
 
@@ -14,10 +22,7 @@ import Builder from "./SolidBuilder"
 import { VertexArg, FaceArg } from "./SolidBuilder"
 
 function calculateEdges(faces: Face[]) {
-  return _(faces)
-    .flatMap(face => face.edges.map(e => e.undirected()))
-    .uniqWith((e1, e2) => e1.equals(e2))
-    .value()
+  return faces.flatMap(face => face.edges).filter(e => e.v1.index < e.v2.index)
 }
 
 export default class Polyhedron {
@@ -52,7 +57,7 @@ export default class Polyhedron {
 
   get solidData() {
     if (!this._solidData.edges) {
-      this._solidData.edges = _.map(this.edges, e => e.value)
+      this._solidData.edges = this.edges.map(e => e.value)
     }
     return this._solidData
   }
@@ -66,13 +71,13 @@ export default class Polyhedron {
   }
 
   // Memoized mapping of edges to faces, used for quickly finding adjacency
-  edgeToFaceGraph = _.once(() => {
+  edgeToFaceGraph = once(() => {
     const edgesToFaces: NestedRecord<number, number, Face> = {}
-    _.forEach(this.faces, face => {
-      _.forEach(face.edges, ({ v1, v2 }) => {
-        _.set(edgesToFaces, [v1.index, v2.index], face)
-      })
-    })
+    for (const face of this.faces) {
+      for (const { v1, v2 } of face.edges) {
+        set(edgesToFaces, [v1.index, v2.index], face)
+      }
+    }
     return edgesToFaces
   })
 
@@ -92,7 +97,7 @@ export default class Polyhedron {
   }
 
   numFacesBySides() {
-    return _.countBy(this.faces, "numSides")
+    return countBy(this.faces, "numSides")
   }
 
   // Search functions
@@ -111,28 +116,26 @@ export default class Polyhedron {
   }
 
   largestFace() {
-    return _.maxBy(this.faces, "numSides")!
+    return maxBy(this.faces, "numSides")!
   }
 
   smallestFace() {
-    return _.minBy(this.faces, "numSides")!
+    return minBy(this.faces, "numSides")!
   }
 
   faceWithNumSides(n: number) {
-    return find(this.faces, { numSides: n })
+    const face = this.faces.find(f => f.numSides === n)
+    if (!face) throw new Error(`No face of ${n} sides exists`)
+    return face
   }
 
   // The list of the type of faces this polyhedron has, ordered
   faceTypes() {
-    return _(this.faces)
-      .map("numSides")
-      .uniq()
-      .sortBy()
-      .value()
+    return sortBy(Object.keys(this.numFacesBySides()))
   }
 
   vertexConfiguration() {
-    return _.countBy(
+    return countBy(
       this.vertices.map(v => v.configuration()),
       config => config.join("."),
     )
@@ -147,13 +150,11 @@ export default class Polyhedron {
   }
 
   centroid() {
-    return getCentroid(_.map(this.vertices, "vec"))
+    return getCentroid(this.vertices.map(v => v.vec))
   }
 
   surfaceArea() {
-    return _(this.faces)
-      .map(face => face.area())
-      .sum()
+    return sum(this.faces.map(face => face.area()))
   }
 
   normalizedSurfaceArea() {
@@ -161,9 +162,9 @@ export default class Polyhedron {
   }
 
   volume() {
-    return _(this.faces)
-      .map(face => (face.area() * face.distanceToCenter()) / 3)
-      .sum()
+    return sum(
+      this.faces.map(face => (face.area() * face.distanceToCenter()) / 3),
+    )
   }
 
   normalizedVolume() {
@@ -178,7 +179,7 @@ export default class Polyhedron {
 
   /** Get the face that is closest to the given point. */
   hitFace(point: Vec3D) {
-    return _.minBy(this.faces, face => face.plane().getDistanceToPoint(point))!
+    return minBy(this.faces, face => face.plane().getDistanceToPoint(point))!
   }
 
   // Mutations
@@ -232,22 +233,23 @@ export default class Polyhedron {
 
   symbol = () => meta.toConwayNotation(this.name)
 
-  symmetry = _.once(() => symmetry.getSymmetry(this.name))
+  symmetry = once(() => symmetry.getSymmetry(this.name))
 
-  symmetryName = _.once(() => symmetry.getSymmetryName(this.symmetry()))
+  symmetryName = once(() => symmetry.getSymmetryName(this.symmetry()))
 
   order = () => symmetry.getOrder(this.name)
 
   isUniform() {
-    return _.includes(
-      ["Platonic solid", "Archimedean solid", "Prism", "Antiprism"],
-      this.type(),
-    )
+    return [
+      "Platonic solid",
+      "Archimedean solid",
+      "Prism",
+      "Antiprism",
+    ].includes(this.type())
   }
 
   isQuasiRegular() {
-    return _.includes(
-      ["octahedron", "cuboctahedron", "icosidodecahedron"],
+    return ["octahedron", "cuboctahedron", "icosidodecahedron"].includes(
       this.name,
     )
   }
@@ -257,50 +259,44 @@ export default class Polyhedron {
   }
 
   isChiral() {
-    return _.includes(
-      [
-        "snub cube",
-        "snub dodecahedron",
-        "gyroelongated triangular bicupola",
-        "gyroelongated square bicupola",
-        "gyroelongated pentagonal bicupola",
-        "gyroelongated pentagonal cupolarotunda",
-        "gyroelongated pentagonal birotunda",
-      ],
-      this.name,
-    )
+    return [
+      "snub cube",
+      "snub dodecahedron",
+      "gyroelongated triangular bicupola",
+      "gyroelongated square bicupola",
+      "gyroelongated pentagonal bicupola",
+      "gyroelongated pentagonal cupolarotunda",
+      "gyroelongated pentagonal birotunda",
+    ].includes(this.name)
   }
 
   isHoneycomb() {
-    return _.includes(
-      [
-        "cube",
-        "truncated octahedron",
-        "triangular prism",
-        "hexagonal prism",
-        "gyrobifastigium",
-      ],
-      this.name,
-    )
+    return [
+      "cube",
+      "truncated octahedron",
+      "triangular prism",
+      "hexagonal prism",
+      "gyrobifastigium",
+    ].includes(this.name)
   }
 
   isDeltahedron() {
-    const facesBySides = _.keys(this.numFacesBySides())
+    const facesBySides = Object.keys(this.numFacesBySides())
     return facesBySides.length === 1 && +facesBySides[0] === 3
   }
 
   faceAdjacencyList() {
-    const faceAdjacencyCounts = _.map(this.faces, face => ({
+    const faceAdjacencyCounts = this.faces.map(face => ({
       n: face.numSides,
       adj: face.adjacentFaceCounts(),
     }))
-    return _.sortBy(
+    return sortBy(
       faceAdjacencyCounts,
       ["n", "adj.length"].concat([3, 4, 5, 6, 8, 10].map(n => `adj[${n}]`)),
     )
   }
 
   isSame(other: Polyhedron) {
-    return _.isEqual(this.faceAdjacencyList(), other.faceAdjacencyList())
+    return isEqual(this.faceAdjacencyList(), other.faceAdjacencyList())
   }
 }

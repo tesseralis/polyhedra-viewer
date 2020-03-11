@@ -1,5 +1,5 @@
 import React from "react"
-import _ from "lodash"
+import { range } from "lodash-es"
 
 const { PI, sin, cos } = Math
 const TAU = 2 * PI
@@ -40,13 +40,10 @@ export function polygonPoints({
   cy = 0,
   a = 0,
 }: PolygonProps) {
-  return _(n)
-    .range()
-    .map<Point2D>(i => [
-      cx + r * cos(TAU * (a / 360 + i / n)),
-      cy + r * sin(TAU * (a / 360 + i / n)),
-    ])
-    .value()
+  return range(n).map<Point2D>(i => [
+    cx + r * cos(TAU * (a / 360 + i / n)),
+    cy + r * sin(TAU * (a / 360 + i / n)),
+  ])
 }
 
 // Regular polygon

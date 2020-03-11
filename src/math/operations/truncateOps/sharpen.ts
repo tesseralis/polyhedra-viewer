@@ -1,4 +1,4 @@
-import _ from "lodash"
+import { set, flatMapDeep, meanBy } from "lodash-es"
 
 import { Polyhedron, Vertex, Face, Edge } from "math/polyhedra"
 import makeOperation from "../makeOperation"
@@ -20,21 +20,21 @@ function getShiftedAdjacentFaces(vertex: Vertex, facesTosharpen: Face[]) {
 function duplicateVertices(polyhedron: Polyhedron, facesTosharpen: Face[]) {
   const offset = polyhedron.numVertices()
   const mapping: NestedRecord<number, number, any> = {}
-  _.forEach(polyhedron.vertices, vertex => {
+  polyhedron.vertices.forEach(vertex => {
     const v = vertex.index
     const v2 = v + offset
     const values = [v, [v2, v], v2, [v, v2]]
 
     const faces = getShiftedAdjacentFaces(vertex, facesTosharpen)
-    _.forEach(faces, (f, i) => {
-      _.set(mapping, [f.index, v], values[i])
+    faces.forEach((f, i) => {
+      set(mapping, [f.index, v], values[i])
     })
   })
 
   // Double the amount of vertices
   return polyhedron.withChanges(solid =>
     solid.addVertices(polyhedron.vertices).mapFaces(f => {
-      return _.flatMapDeep(f.vertices, v => mapping[f.index][v.index])
+      return flatMapDeep(f.vertices, v => mapping[f.index][v.index])
     }),
   )
 }
@@ -44,10 +44,10 @@ function getsharpenFaces(polyhedron: Polyhedron, faceType: number) {
   if (polyhedron.isRegular()) {
     const face0 = polyhedron.getFace()
     const adjacentFaces = face0.adjacentFaces()
-    return _.filter(face0.vertexAdjacentFaces(), f => !f.inSet(adjacentFaces))
+    return face0.vertexAdjacentFaces().filter(f => !f.inSet(adjacentFaces))
   }
 
-  return _.filter(polyhedron.faces, { numSides: faceType })
+  return polyhedron.faces.filter(f => f.numSides === faceType)
 }
 
 function calculatesharpenDist(face: Face, edge: Edge) {
@@ -58,7 +58,7 @@ function calculatesharpenDist(face: Face, edge: Edge) {
 
 function getsharpenDist(polyhedron: Polyhedron, face: Face) {
   if (!polyhedron.isRegular() && !polyhedron.isQuasiRegular()) {
-    return _.meanBy(face.edges, edge => calculatesharpenDist(face, edge))
+    return meanBy(face.edges, edge => calculatesharpenDist(face, edge))
   }
   return calculatesharpenDist(face, face.edges[0])
 }
@@ -92,10 +92,8 @@ function applySharpen(
     })
   })
 
-  const endVertices = mock.vertices.map((v, vIndex) =>
-    _.has(oldToNew, vIndex.toString())
-      ? verticesToAdd[oldToNew[vIndex]]
-      : v.vec,
+  const endVertices = mock.vertices.map(
+    (v, vIndex) => verticesToAdd[oldToNew[vIndex]] ?? v.vec,
   )
 
   return {
@@ -142,9 +140,9 @@ export const sharpen = makeOperation<Options>("sharpen", {
     return n <= 5 ? { faceType: n } : {}
   },
 
-  faceSelectionStates(polyhedron, { faceType }) {
-    return _.map(polyhedron.faces, face => {
-      if (_.isNumber(faceType) && face.numSides === faceType) return "selected"
+  faceSelectionStates(polyhedron, { faceType = -1 }) {
+    return polyhedron.faces.map(face => {
+      if (face.numSides === faceType) return "selected"
       return "selectable"
     })
   },

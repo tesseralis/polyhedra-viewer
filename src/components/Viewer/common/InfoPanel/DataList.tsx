@@ -1,5 +1,5 @@
 import React, { ComponentType } from "react"
-import _ from "lodash"
+import { round } from "lodash-es"
 import { useStyle, scales } from "styles"
 import { fonts } from "styles"
 
@@ -50,7 +50,7 @@ const infoRows: InfoRow[] = [
     area: "vol",
     render: ({ polyhedron: p }) => (
       <>
-        ≈{_.round(p.normalizedVolume(), 3)}s<Sup>{3}</Sup>
+        ≈{round(p.normalizedVolume(), 3)}s<Sup>{3}</Sup>
       </>
     ),
   },
@@ -59,14 +59,14 @@ const infoRows: InfoRow[] = [
     area: "sa",
     render: ({ polyhedron: p }) => (
       <>
-        ≈{_.round(p.normalizedSurfaceArea(), 3)}s<Sup>{2}</Sup>
+        ≈{round(p.normalizedSurfaceArea(), 3)}s<Sup>{2}</Sup>
       </>
     ),
   },
   {
     name: "Sphericity",
     area: "spher",
-    render: ({ polyhedron: p }) => <>≈{_.round(p.sphericity(), 3)}</>,
+    render: ({ polyhedron: p }) => <>≈{round(p.sphericity(), 3)}</>,
   },
 
   { name: "Symmetry", area: "sym", render: displaySymmetry },

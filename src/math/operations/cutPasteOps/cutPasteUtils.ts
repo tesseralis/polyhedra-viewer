@@ -1,22 +1,20 @@
-import _ from "lodash"
+import { every } from "lodash-es"
 import { getSingle } from "utils"
 import { Cap, Polyhedron } from "math/polyhedra"
 import { isInverse } from "math/geom"
 
-type Relation = {}
+type Relation = Record<string, any>
 
-export const hasMultiple = (relations: Relation[], property: string) =>
-  _(relations)
-    .map(property)
-    .uniq()
-    .compact()
-    .value().length > 1
+// true if the relation has multiple values that have that property
+export const hasMultiple = (relations: Relation[], property: string) => {
+  const set = new Set(relations.map(r => r[property]).filter(x => !!x))
+  return set.size > 1
+}
 
 export function getCapAlignment(polyhedron: Polyhedron, cap: Cap) {
   const isRhombicosidodecahedron = cap.type === "cupola"
   const orthoCaps = isRhombicosidodecahedron
-    ? _.filter(
-        Cap.getAll(polyhedron),
+    ? Cap.getAll(polyhedron).filter(
         cap => getCupolaGyrate(polyhedron, cap) === "ortho",
       )
     : []
@@ -32,8 +30,8 @@ export function getCapAlignment(polyhedron: Polyhedron, cap: Cap) {
 }
 
 export function getCupolaGyrate(polyhedron: Polyhedron, cap: Cap) {
-  const isOrtho = _.every(cap.boundary().edges, edge => {
-    const [n1, n2] = _.map(edge.adjacentFaces(), "numSides")
+  const isOrtho = every(cap.boundary().edges, edge => {
+    const [n1, n2] = edge.adjacentFaces().map(f => f.numSides)
     return (n1 === 4) === (n2 === 4)
   })
   return isOrtho ? "ortho" : "gyro"

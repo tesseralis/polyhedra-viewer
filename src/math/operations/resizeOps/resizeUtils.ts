@@ -1,4 +1,4 @@
-import _ from "lodash"
+import { every, minBy } from "lodash-es"
 
 import { flatMapUniq } from "utils"
 import { Polyhedron, Face } from "math/polyhedra"
@@ -41,7 +41,7 @@ export function isExpandedFace(
   const type = expansionType(polyhedron)
   if (typeof nSides === "number" && face.numSides !== nSides) return false
   if (!face.isValid()) return false
-  return _.every(face.adjacentFaces(), { numSides: edgeShape[type] })
+  return every(face.adjacentFaces(), { numSides: edgeShape[type] })
 }
 
 function getFaceDistance(face1: Face, face2: Face) {
@@ -64,20 +64,20 @@ function getIcosahedronContractFaces(polyhedron: Polyhedron) {
   while (toTest.length > 0) {
     const [next, ...rest] = toTest
     result.push(next)
-    toTest = _.filter(rest, face => getFaceDistance(face, next) === 3)
+    toTest = rest.filter(face => getFaceDistance(face, next) === 3)
   }
   return result
 }
 
 function getCuboctahedronContractFaces(polyhedron: Polyhedron) {
   const f0 = polyhedron.faceWithNumSides(3)
-  const rest = _.map(f0.edges, e => {
-    return e
+  const rest = f0.edges.map(e =>
+    e
       .twin()
       .next()
       .next()
-      .twinFace()
-  })
+      .twinFace(),
+  )
   return [f0, ...rest]
 }
 
@@ -107,7 +107,7 @@ export function getExpandedFaces(polyhedron: Polyhedron, faceType?: number) {
     case "truncated cuboctahedron":
       return polyhedron.faces.filter(f => f.numSides === faceType)
     default:
-      return _.filter(polyhedron.faces, face =>
+      return polyhedron.faces.filter(face =>
         isExpandedFace(polyhedron, face, faceType),
       )
   }
@@ -119,7 +119,7 @@ export function getSnubAngle(polyhedron: Polyhedron, faces: Face[]) {
   const faceNormal = face0.normal()
   const midpoint = face0.edges[0].midpoint()
 
-  const face1 = _.minBy(rest, face => midpoint.distanceTo(face.centroid()))!
+  const face1 = minBy(rest, face => midpoint.distanceTo(face.centroid()))!
 
   const plane = getPlane([
     faceCentroid,

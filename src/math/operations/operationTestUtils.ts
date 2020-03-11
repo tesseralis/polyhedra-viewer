@@ -1,12 +1,12 @@
-import _ from "lodash"
+import { isNaN } from "lodash-es"
 import { PRECISION } from "math/geom"
 import { Polyhedron } from "math/polyhedra"
 
 function isProperPolyhedron(polyhedron: Polyhedron) {
   const expectedSideLength = polyhedron.edgeLength()
-  for (let edge of polyhedron.edges) {
+  for (const edge of polyhedron.edges) {
     const sideLength: number = edge.length()
-    if (_.isNaN(sideLength)) {
+    if (isNaN(sideLength)) {
       console.log(`edge ${edge} has length NaN`)
       return false
     }
@@ -25,7 +25,7 @@ function isProperPolyhedron(polyhedron: Polyhedron) {
 
   // Make sure all faces are facing the right way
   const centroid = polyhedron.centroid()
-  for (let face of polyhedron.faces) {
+  for (const face of polyhedron.faces) {
     const faceCentroid = face.centroid()
     const normal = face.normal()
     const expectedNormal = faceCentroid.sub(centroid)

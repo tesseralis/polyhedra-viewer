@@ -1,4 +1,4 @@
-import _ from "lodash"
+import { trimEnd } from "lodash-es"
 
 import { polygonPrefixes } from "math/polygons"
 import { unescapeName, getType } from "./names"
@@ -67,7 +67,7 @@ export function getSymmetryName({ group, sub }: Symmetry) {
     if (sub === "2v") {
       return "biradial"
     }
-    const n = parseInt(_.trimEnd(sub, "v"), 10)
+    const n = parseInt(trimEnd(sub, "v"), 10)
     if (polygonPrefixes.hasKey(n)) {
       return polygonPrefixes.get(n) + " pyramidal"
     }
@@ -75,13 +75,13 @@ export function getSymmetryName({ group, sub }: Symmetry) {
   if (group === "D") {
     const last = sub.substr(sub.length - 1)
     if (last === "h") {
-      const n = parseInt(_.trimEnd(sub, "h"), 10)
+      const n = parseInt(trimEnd(sub, "h"), 10)
       if (polygonPrefixes.hasKey(n)) {
         return polygonPrefixes.get(n) + " prismatic"
       }
     }
     if (last === "d") {
-      const n = parseInt(_.trimEnd(sub, "d"), 10)
+      const n = parseInt(trimEnd(sub, "d"), 10)
       if (polygonPrefixes.hasKey(n)) {
         return polygonPrefixes.get(n) + " antiprismatic"
       }
@@ -118,17 +118,17 @@ export function getOrder(name: string) {
     if (sub === "s") {
       return 2
     }
-    const n = parseInt(_.trimEnd(sub, "v"), 10)
+    const n = parseInt(trimEnd(sub, "v"), 10)
     return 2 * n
   }
   if (group === "D") {
     const last = sub.substr(sub.length - 1)
     if (last === "h") {
-      const n = parseInt(_.trimEnd(sub, "h"), 10)
+      const n = parseInt(trimEnd(sub, "h"), 10)
       return 4 * n
     }
     if (last === "d") {
-      const n = parseInt(_.trimEnd(sub, "d"), 10)
+      const n = parseInt(trimEnd(sub, "d"), 10)
       return 4 * n
     }
 

@@ -80,10 +80,10 @@ describe("Polyhedron", () => {
       ],
     ]
 
-    testCases.forEach(([p1, p2]) => {
+    for (const [p1, p2] of testCases) {
       it(`differentiates between ${p1} and ${p2}`, () => {
         expect(Polyhedron.get(p1).isSame(Polyhedron.get(p2))).toBe(false)
       })
-    })
+    }
   })
 })

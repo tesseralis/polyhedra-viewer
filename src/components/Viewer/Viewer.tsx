@@ -1,4 +1,4 @@
-import _ from "lodash"
+import { capitalize } from "lodash-es"
 
 import React, { useEffect } from "react"
 import { Route, Redirect } from "react-router-dom"
@@ -20,7 +20,7 @@ interface InnerProps {
 function InnerViewer({ solid, panel, action }: InnerProps) {
   const { unsetOperation } = OperationCtx.useActions()
   const { setPolyhedron } = PolyhedronCtx.useActions()
-  usePageTitle(`${_.capitalize(unescapeName(solid))} - Polyhedra Viewer`)
+  usePageTitle(`${capitalize(unescapeName(solid))} - Polyhedra Viewer`)
 
   // TODO I wish we could make this less verbose...
 

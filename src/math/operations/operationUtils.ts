@@ -1,39 +1,40 @@
-import _ from "lodash"
+import { takeRight, dropRight, invert, times } from "lodash-es"
 import { Twist } from "types"
 import { Polyhedron, Vertex, Edge, VertexList, VertexArg } from "math/polyhedra"
 import { Vec3D, Transform } from "math/geom"
-import { getCyclic } from "utils"
+import { mapObject, getCyclic } from "utils"
 /**
  * Remove vertices in the polyhedron that aren't connected to any faces,
  * and remap the faces to the smaller indices
  */
 export function removeExtraneousVertices(polyhedron: Polyhedron) {
   // Vertex indices to remove
-  const vertsInFaces = _.flatMap(polyhedron.faces, "vertices")
-  const toRemove = _.filter(polyhedron.vertices, v => !v.inSet(vertsInFaces))
+  const vertsInFaces = polyhedron.faces.flatMap(f => f.vertices)
+  const toRemove = polyhedron.vertices.filter(v => !v.inSet(vertsInFaces))
   const numToRemove = toRemove.length
 
   // Map the `numToRemove` last vertices of the polyhedron (that don't overlap)
   // to the first few removed vertices
-  const newToOld = _(polyhedron.vertices)
-    .takeRight(numToRemove)
-    .filter(v => !v.inSet(toRemove))
-    .map((v, i) => [v.index, toRemove[i].index])
-    .fromPairs()
-    .value()
-  const oldToNew = _.invert(newToOld)
+  const notToRemove = takeRight(polyhedron.vertices, numToRemove).filter(
+    v => !v.inSet(toRemove),
+  )
+  const newToOld = mapObject(notToRemove, (v, i) => [
+    v.index,
+    toRemove[i].index,
+  ])
+  const oldToNew = invert(newToOld)
 
-  const newVertices = _(polyhedron.vertices)
-    .map(v => polyhedron.vertices[_.get(oldToNew, v.index, v.index) as any])
-    .dropRight(numToRemove)
-    .value()
+  const newVertices = dropRight(
+    polyhedron.vertices.map(
+      v => polyhedron.vertices[(oldToNew[v.index] as any) ?? v.index],
+    ),
+    numToRemove,
+  )
 
   return polyhedron.withChanges(solid =>
     solid
       .withVertices(newVertices)
-      .mapFaces(face =>
-        _.map(face.vertices, v => _.get(newToOld, v.index, v.index)),
-      ),
+      .mapFaces(face => face.vertices.map(v => newToOld[v.index] ?? v.index)),
   )
 }
 
@@ -86,7 +87,7 @@ export function expandEdges(
 ) {
   // Collect the list of vertices that are connected to the extruding edges
   const vertsToDupe = polyhedron.vertices.map<Edge[]>(v => [])
-  for (let edge of edges) {
+  for (const edge of edges) {
     vertsToDupe[edge.v1.index].push(edge)
     vertsToDupe[edge.v2.index].push(edge.twin())
   }
@@ -108,7 +109,7 @@ export function expandEdges(
   // For each changed vertex:
   // 1. duplicate it some number of times
   // 2. keep track of the edges/faces that are mapped to it
-  _.forEach(vertsToDupe, edges => {
+  vertsToDupe.forEach(edges => {
     // If the vertex isn't associated with any edges, do nothing
     if (!edges.length) return
 
@@ -171,7 +172,7 @@ export function expandEdges(
         )
       }
 
-      const newIndices = _.times(edges.length - 1, () => newVertex(v))
+      const newIndices = times(edges.length - 1, () => newVertex(v))
       const vIndices = [v.index, ...newIndices]
       newFaces.push(vIndices)
 
@@ -194,10 +195,10 @@ export function expandEdges(
     solid
       .withVertices(newVertices)
       .mapFaces(f =>
-        _.flatMap(f.vertices, v => v2fMap[f.index][v.index] ?? v.index),
+        f.vertices.flatMap(v => v2fMap[f.index][v.index] ?? v.index),
       )
       .addFaces(
-        _.flatMap(edges, e => {
+        edges.flatMap(e => {
           const { v1, v2 } = e
           return getEdgeFaces(
             [...v2eMap[v1.index][v2.index], ...v2eMap[v2.index][v1.index]],
@@ -225,11 +226,11 @@ export function getTransformedVertices<T extends VertexList>(
   vertices: Vertex[] = vLists[0].polyhedron.vertices,
 ) {
   const result: VertexArg[] = [...vertices]
-  _.forEach(vLists, vList => {
-    _.forEach(vList.vertices, v => {
+  for (const vList of vLists) {
+    for (const v of vList.vertices) {
       const t = iteratee(vList)
       result[v.index] = typeof t === "function" ? t(v.vec) : t
-    })
-  })
+    }
+  }
   return result
 }

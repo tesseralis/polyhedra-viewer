@@ -1,5 +1,5 @@
 import React from "react"
-import _ from "lodash"
+import { capitalize, map } from "lodash-es"
 import { ChildrenProp } from "types"
 import { polygonNames } from "math/polygons"
 import { Polyhedron } from "math/polyhedra"
@@ -44,14 +44,14 @@ function groupedVertexConfig(config: string) {
   const array = config.split(".")
   let current = { type: "", count: 0 }
   const result: typeof current[] = []
-  _.each(array, type => {
+  for (const type of array) {
     if (type === current.type) {
       current.count++
     } else {
       if (current.count) result.push(current)
       current = { type, count: 1 }
     }
-  })
+  }
   if (current.count) result.push(current)
 
   return result
@@ -59,7 +59,7 @@ function groupedVertexConfig(config: string) {
 
 function getShortVertexConfig(config: string) {
   const grouped = groupedVertexConfig(config)
-  const children = _.map(grouped, (typeCount, i) => {
+  const children = grouped.map((typeCount, i) => {
     const { type, count } = typeCount
     const val =
       count === 1 ? (
@@ -82,12 +82,12 @@ export interface RenderProps {
 
 export function displayVertexConfig({ polyhedron }: RenderProps) {
   const vConfig = polyhedron.vertexConfiguration()
-  const configKeys = _.keys(vConfig)
+  const configKeys = Object.keys(vConfig)
   // When there's only one type, just get it on its own
   if (configKeys.length === 1) return <>{configKeys[0]}</>
   return (
     <ul>
-      {_.map(vConfig, (count, type) => (
+      {map(vConfig, (count, type) => (
         <li key={type}>
           {count}({getShortVertexConfig(type)})
         </li>
@@ -101,7 +101,7 @@ export function displayFaceTypes({ polyhedron }: RenderProps) {
   // TODO verify order by type of face
   return (
     <ul>
-      {_.map(faceCounts, (count, type) => (
+      {map(faceCounts, (count, type) => (
         <li key={type}>
           {count} {polygonNames.get(type as any)}
           {count !== 1 ? "s" : ""}
@@ -117,7 +117,7 @@ export function displaySymmetry({ polyhedron }: RenderProps) {
   const { group = "", sub } = symmetry
   return (
     <>
-      {_.capitalize(symName)}, {group}
+      {capitalize(symName)}, {group}
       {sub ? <Sub>{sub}</Sub> : undefined}
     </>
   )

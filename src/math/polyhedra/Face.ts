@@ -1,4 +1,4 @@
-import _ from "lodash"
+import { some, countBy } from "lodash-es"
 
 import { getCyclic, flatMapUniq } from "utils"
 import { VIndex, FIndex } from "./solidTypes"
@@ -12,9 +12,8 @@ export default class Face extends VEList {
 
   constructor(polyhedron: Polyhedron, index: FIndex) {
     const value = polyhedron._solidData.faces[index]
-    const vertices = _.map(value, vIndex => polyhedron.vertices[vIndex])
-    const edges = _.map(
-      vertices,
+    const vertices = value.map(vIndex => polyhedron.vertices[vIndex])
+    const edges = vertices.map(
       (v, i) => new Edge(v, getCyclic(vertices, i + 1)),
     )
 
@@ -30,7 +29,7 @@ export default class Face extends VEList {
   }
 
   inSet(faces: Face[]) {
-    return _.some(faces, face => this.equals(face))
+    return some(faces, face => this.equals(face))
   }
 
   /** Return the set of faces that share a vertex to this face (including itself) */
@@ -40,6 +39,6 @@ export default class Face extends VEList {
 
   /** Return adjacent faces counted by number of sides */
   adjacentFaceCounts() {
-    return _.countBy(this.adjacentFaces(), "numSides")
+    return countBy(this.adjacentFaces(), "numSides")
   }
 }

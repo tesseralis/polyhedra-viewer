@@ -1,5 +1,4 @@
 import React, { ThHTMLAttributes } from "react"
-import _ from "lodash"
 
 import { fromConwayNotation } from "math/polyhedra/names"
 import { Table } from "math/polyhedra/tables"
@@ -45,7 +44,7 @@ const ColumnHeaders = ({ columns }: Pick<Table, "columns">) => {
       {/* Render the subcolumn headers first, where they exist. */}
       <tr>
         <th />
-        {_.flatMap(columns, (col, j) =>
+        {columns.flatMap((col, j) =>
           typeof col === "string"
             ? [<th key={j} />]
             : col.sub.map(subCol => <Th key={`${j}-${subCol}`}>{subCol}</Th>),
@@ -89,9 +88,9 @@ export default function PolyhedronTable({
           <tr key={i}>
             {/* Row header */}
             <Th>{rows[i]}</Th>
-            {_.flatMap(row, (cell, j) => {
+            {row.flatMap((cell, j) => {
               const col = columns[j]
-              if (_.isArray(cell)) {
+              if (cell instanceof Array) {
                 return cell.map((subcell, k) => (
                   <Cell key={`${j}-${k}`} cell={subcell} />
                 ))

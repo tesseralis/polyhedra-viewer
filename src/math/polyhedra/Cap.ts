@@ -1,4 +1,4 @@
-import _ from "lodash"
+import { minBy, once, every, countBy, isEqual } from "lodash-es"
 
 import { flatMapUniq } from "utils"
 import { Vec3D } from "math/geom"
@@ -13,9 +13,7 @@ type FaceConfiguration = { [key: string]: number }
 
 // Find the boundary of a connected set of faces
 function getBoundary(faces: Face[]) {
-  const e0 = _(faces)
-    .flatMap("edges")
-    .find(e => !e.twin().face.inSet(faces))
+  const e0 = faces.flatMap(f => f.edges).find(e => !e.twin().face.inSet(faces))!
 
   const result: Edge[] = []
   let e = e0
@@ -34,16 +32,19 @@ function getBoundary(faces: Face[]) {
       e = e.twin().next()
     }
   } while (!e.equals(e0))
-  return new VEList(_.map(result, "v1"), result)
+  return new VEList(
+    result.map(e => e.v1),
+    result,
+  )
 }
 
 interface Constructor<T> {
   new (polyhedron: Polyhedron, arg: T): Cap
 }
-function createMapper<T>(property: string, Base: Constructor<T>) {
+function createMapper<T>(mapper: (p: Polyhedron) => T[], Base: Constructor<T>) {
   return (polyhedron: Polyhedron) => {
-    const mapper = _.get(polyhedron, property)
-    const values: T[] = _.isFunction(mapper) ? mapper() : mapper
+    // const mapper = polyhedron[property]
+    const values: T[] = mapper(polyhedron)
     return values
       .map(arg => new Base(polyhedron, arg))
       .filter(cap => cap.isValid())
@@ -65,7 +66,7 @@ export default abstract class Cap implements VertexList {
     if (caps.length === 0) {
       return null
     }
-    return _.minBy(caps, cap => cap.topPoint.distanceTo(hitPoint))
+    return minBy(caps, cap => cap.topPoint.distanceTo(hitPoint))
   }
 
   static getAll(polyhedron: Polyhedron): Cap[] {
@@ -104,15 +105,15 @@ export default abstract class Cap implements VertexList {
     return this.allVertices()
   }
 
-  allVertices = _.once(() => {
-    return _.concat(this.innerVertices(), this.boundary().vertices)
+  allVertices = once(() => {
+    return this.innerVertices().concat(this.boundary().vertices)
   })
 
-  faces = _.once(() => {
+  faces = once(() => {
     return flatMapUniq(this.innerVertices(), v => v.adjacentFaces(), "index")
   })
 
-  boundary = _.once(() => {
+  boundary = once(() => {
     return getBoundary(this.faces())
   })
 
@@ -125,13 +126,13 @@ export default abstract class Cap implements VertexList {
   }
 
   isValid() {
-    const matchFaces = _.every(this.innerVertices(), vertex => {
-      const faceCount = _.countBy(vertex.adjacentFaces(), "numSides")
-      return _.isEqual(faceCount, this.faceConfiguration)
+    const matchFaces = every(this.innerVertices(), vertex => {
+      const faceCount = countBy(vertex.adjacentFaces(), "numSides")
+      return isEqual(faceCount, this.faceConfiguration)
     })
     return (
       matchFaces &&
-      _.every(this.faces(), face => face.isValid()) &&
+      every(this.faces(), face => face.isValid()) &&
       this.boundary().isPlanar()
     )
   }
@@ -143,7 +144,7 @@ class Pyramid extends Cap {
       "3": vertex.adjacentEdges().length,
     })
   }
-  static getAll = createMapper("vertices", Pyramid)
+  static getAll = createMapper(p => p.vertices, Pyramid)
 }
 
 class Fastigium extends Cap {
@@ -151,7 +152,7 @@ class Fastigium extends Cap {
     const config = { "3": 1, "4": 2 }
     super(polyhedron, edge.vertices, "fastigium", edge.midpoint(), config)
   }
-  static getAll = createMapper("edges", Fastigium)
+  static getAll = createMapper(p => p.edges, Fastigium)
 }
 
 class Cupola extends Cap {
@@ -161,10 +162,10 @@ class Cupola extends Cap {
       face.vertices,
       "cupola",
       face.centroid(),
-      _.countBy([3, 4, 4, face.numSides]),
+      countBy([3, 4, 4, face.numSides]),
     )
   }
-  static getAll = createMapper("faces", Cupola)
+  static getAll = createMapper(p => p.faces, Cupola)
 }
 
 class Rotunda extends Cap {
@@ -177,5 +178,5 @@ class Rotunda extends Cap {
       { "5": 2, "3": 2 },
     )
   }
-  static getAll = createMapper("faces", Rotunda)
+  static getAll = createMapper(p => p.faces, Rotunda)
 }

@@ -1,5 +1,4 @@
 import React, { memo } from "react"
-import _ from "lodash"
 import { CSSProperties } from "aphrodite"
 
 import { useStyle, media, scales } from "styles"
@@ -52,7 +51,7 @@ function Content({
   panel,
   header,
 }: Pick<Props, "panel"> & { header: JSX.Element }) {
-  const transparent = _.includes(["operations", "full"], panel)
+  const transparent = ["operations", "full"].includes(panel)
   const css = useStyle(
     {
       ...scroll("y"),

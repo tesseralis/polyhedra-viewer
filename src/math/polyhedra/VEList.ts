@@ -1,4 +1,4 @@
-import _ from "lodash"
+import { every } from "lodash-es"
 import { Vec3D } from "math/geom"
 
 import {
@@ -9,7 +9,6 @@ import {
   getNormal,
   getNormalRay,
 } from "math/geom"
-import { find } from "utils"
 import Polyhedron from "./Polyhedron"
 import Edge from "./Edge"
 import Vertex, { VertexList } from "./Vertex"
@@ -25,7 +24,7 @@ export default class VEList implements VertexList {
     this.polyhedron = vertices[0].polyhedron
     this.vertices = vertices
     this.edges = edges
-    this.vectors = _.map(this.vertices, "vec")
+    this.vectors = this.vertices.map(v => v.vec)
   }
 
   get numSides() {
@@ -33,19 +32,19 @@ export default class VEList implements VertexList {
   }
 
   nextEdge(e: Edge) {
-    return find(this.edges, e2 => e2.v1.equals(e.v2))
+    return this.edges.find(e2 => e2.v1.equals(e.v2))!
   }
 
   prevEdge(e: Edge) {
-    return find(this.edges, e2 => e2.v2.equals(e.v1))
+    return this.edges.find(e2 => e2.v2.equals(e.v1))!
   }
 
   adjacentFaces() {
-    return _.map(this.edges, edge => edge.twin().face)
+    return this.edges.map(edge => edge.twin().face)
   }
 
   numUniqueSides() {
-    return _.filter(this.edges, edge => edge.length() > PRECISION).length
+    return this.edges.filter(edge => edge.length() > PRECISION).length
   }
 
   sideLength() {
@@ -89,6 +88,6 @@ export default class VEList implements VertexList {
   }
 
   isValid() {
-    return _.every(this.edges, edge => edge.length() > PRECISION)
+    return every(this.edges, edge => edge.length() > PRECISION)
   }
 }

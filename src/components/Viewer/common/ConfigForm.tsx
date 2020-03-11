@@ -1,6 +1,6 @@
 import React, { memo, useCallback, ButtonHTMLAttributes } from "react"
 import { useStyle, scales } from "styles"
-import _ from "lodash"
+import { get, pick } from "lodash-es"
 
 import Config from "components/ConfigCtx"
 import {
@@ -25,7 +25,7 @@ function getInputProps<T>(input: InputType<T>, value: T) {
       return { checked: value }
     case "range":
       return {
-        ..._.pick(input, ["min", "max", "step"]),
+        ...pick(input, ["min", "max", "step"]),
         value,
       }
     default:
@@ -49,7 +49,7 @@ function ConfigInput({ input, value, setValue }: InputProps<any>) {
     case "select":
       return (
         <select onChange={onChange} {...inputProps}>
-          {_.map(_.get(input, "options"), option => (
+          {input.options?.map(option => (
             <option key={option} value={option}>
               {option}
             </option>
@@ -113,7 +113,7 @@ export default function ConfigForm() {
         <LabelledInput
           key={input.key}
           input={input}
-          value={_.get(config, input.key)}
+          value={get(config, input.key)}
           setValue={setValue}
         />
       ))}

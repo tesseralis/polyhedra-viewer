@@ -1,5 +1,3 @@
-import _ from "lodash"
-
 import { pivot } from "utils"
 import { Twist } from "types"
 import { Polyhedron, VEList } from "math/polyhedra"
@@ -17,11 +15,11 @@ function bisectPrismFaces(
   boundary: VEList,
   twist?: Twist,
 ) {
-  const prismFaces = _.map(boundary.edges, edge => edge.twinFace())
-  const newFaces = _.flatMap(boundary.edges, edge => {
+  const prismFaces = boundary.edges.map(edge => edge.twinFace())
+  const newFaces = boundary.edges.flatMap(edge => {
     const twinFace = edge.twinFace()
     const [v1, v2, v3, v4] = pivot(
-      _.map(twinFace.vertices, "index"),
+      twinFace.vertices.map(v => v.index),
       edge.v2.index,
     )
 
@@ -46,7 +44,7 @@ function joinAntiprismFaces(
   boundary: VEList,
   twist?: Twist,
 ) {
-  const antiprismFaces = _.flatMap(boundary.edges, edge => {
+  const antiprismFaces = boundary.edges.flatMap(edge => {
     return [
       edge.twinFace(),
       edge
@@ -56,7 +54,7 @@ function joinAntiprismFaces(
     ]
   })
 
-  const newFaces = _.map(boundary.edges, edge => {
+  const newFaces = boundary.edges.map(edge => {
     const [v1, v2] = edge.twin().vertices
     const [v3, v4] =
       twist === "left"

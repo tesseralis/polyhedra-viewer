@@ -1,4 +1,4 @@
-import _ from "lodash"
+import { pullAt } from "lodash-es"
 
 import { Point } from "types"
 import { Vec3D } from "math/geom"
@@ -9,7 +9,7 @@ import Polyhedron from "./Polyhedron"
 
 export type VertexArg = Point | Vec3D | Vertex
 
-export type FaceArg = VIndex[] | (VIndex | Vertex)[] | Face
+export type FaceArg = (VIndex | Vertex)[] | Face
 
 export function normalizeVertex(v: VertexArg) {
   // If it's a raw point
@@ -23,7 +23,7 @@ export function normalizeVertex(v: VertexArg) {
 
 function normalizeFace(face: FaceArg) {
   if (Array.isArray(face)) {
-    return _.map(face, v => {
+    return face.map(v => {
       if (typeof v === "number") return v
       return v.index
     })
@@ -46,17 +46,15 @@ export default class Builder {
 
   // return a new polyhedron with the given vertices
   withVertices(vertices: VertexArg[]) {
-    _.extend(this.solidData, { vertices: vertices.map(normalizeVertex) })
+    this.solidData.vertices = vertices.map(normalizeVertex)
     return this
   }
 
   // return a new polyhedron with the given faces
   withFaces(faces: FaceArg[]) {
+    this.solidData.faces = faces.map(normalizeFace)
     // reset edges, since faces might have changed
-    _.extend(this.solidData, {
-      faces: faces.map(normalizeFace),
-      edges: undefined,
-    })
+    delete this.solidData.edges
     return this
   }
 
@@ -72,12 +70,15 @@ export default class Builder {
 
   /** Map the faces of the *original* solid to new ones */
   mapFaces(iteratee: (f: Face) => FaceArg) {
-    return this.withFaces(_.map(this.polyhedron.faces, iteratee))
+    return this.withFaces(this.polyhedron.faces.map(iteratee))
   }
 
   withoutFaces(faces: Face[]) {
     const removed = [...this.solidData.faces]
-    _.pullAt(removed, _.map(faces, "index"))
+    pullAt(
+      removed,
+      faces.map(f => f.index),
+    )
     return this.withFaces(removed)
   }
 
