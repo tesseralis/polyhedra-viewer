@@ -171,7 +171,7 @@ function isAligned(
 }
 
 function getAugmentee(augmentType: AugmentType, numSides: number) {
-  const index = _.includes(["cupola", "rotunda"], augmentType)
+  const index = ["cupola", "rotunda"].includes(augmentType)
     ? numSides / 2
     : numSides
   return augmentData[augmentType][index]
@@ -265,7 +265,7 @@ const defaultAugmentees: Record<number, string> = {
 
 function getAugmenteeNumSides(using: string) {
   const prefix = using[0]
-  const index = _.toNumber(using.substring(1))
+  const index = parseInt(using.substring(1))
   return "RU".includes(prefix) ? index * 2 : index
 }
 
@@ -350,7 +350,7 @@ export const augment = makeOperation<Options>("augment", {
     const gyrateOpts = hasGyrateOpts(polyhedron) ? allGyrateOpts : [undefined]
 
     const usingOpts = getUsingOpts(polyhedron) ?? [undefined]
-    const faceOpts = _.map(polyhedron.faces.filter(face => canAugment(face)))
+    const faceOpts = polyhedron.faces.filter(face => canAugment(face))
 
     const options: Options[] = []
 
@@ -381,13 +381,14 @@ export const augment = makeOperation<Options>("augment", {
   },
 
   faceSelectionStates(polyhedron, { face, using }) {
-    return _.map(polyhedron.faces, f => {
+    return polyhedron.faces.map(f => {
       if (face && f.equals(face)) return "selected"
 
       if (!using && canAugment(f)) return "selectable"
 
       if (using && canAugmentWithType(f, augmentTypes[using[0]]))
         return "selectable"
+      return undefined
     })
   },
 
@@ -398,7 +399,7 @@ export const augment = makeOperation<Options>("augment", {
       case "using":
         return getUsingOpts(polyhedron) ?? []
       case "face":
-        return _.map(polyhedron.faces.filter(face => canAugment(face)))
+        return polyhedron.faces.filter(face => canAugment(face))
     }
   },
 

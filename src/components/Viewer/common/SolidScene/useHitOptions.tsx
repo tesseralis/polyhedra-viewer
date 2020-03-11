@@ -31,9 +31,7 @@ export default function useHitOptions() {
 
   const unsetHitOption = () => {
     if (!operation) return
-    if (_.get(options, hitOption) !== undefined) {
-      setOption(hitOption, undefined)
-    }
+    setOption(hitOption, undefined)
   }
 
   const applyWithHitOption = (hitPnt: Point) => {

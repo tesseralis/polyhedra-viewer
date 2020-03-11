@@ -1,4 +1,4 @@
-import _ from "lodash"
+import { some, maxBy, isEqual, uniqBy, countBy } from "lodash"
 import { Twist } from "types"
 import { find } from "utils"
 import { Polyhedron, Cap, VEList } from "math/polyhedra"
@@ -34,7 +34,7 @@ export function getChirality(polyhedron: Polyhedron) {
 
 export function isGyroelongatedBiCupola(polyhedron: Polyhedron) {
   const pyrRows = ["square pyramid", "pentagonal pyramid"]
-  if (_.some(pyrRows, row => inRow(polyhedron.name, "capstones", row))) {
+  if (some(pyrRows, row => inRow(polyhedron.name, "capstones", row))) {
     return false
   }
   return inColumn(polyhedron.name, "capstones", "gyroelongated bi-")
@@ -50,23 +50,22 @@ function getOppositeCaps(polyhedron: Polyhedron) {
 }
 
 function getOppositePrismFaces(polyhedron: Polyhedron) {
-  const face1 = _.maxBy(
+  const face1 = maxBy(
     polyhedron.faces.filter(face => {
-      const faceCounts = _.countBy(
+      const faceCounts = countBy(
         face.vertexAdjacentFaces().filter(f => !f.equals(face)),
         "numSides",
       )
       return (
-        _.isEqual(faceCounts, { "4": face.numSides }) ||
-        _.isEqual(faceCounts, { "3": 2 * face.numSides })
+        isEqual(faceCounts, { "4": face.numSides }) ||
+        isEqual(faceCounts, { "3": 2 * face.numSides })
       )
     }),
     "numSides",
   )
   if (!face1) return undefined
 
-  const face2 = _.find(
-    polyhedron.faces,
+  const face2 = polyhedron.faces.find(
     face2 =>
       face1.numSides === face2.numSides &&
       isInverse(face1.normal(), face2.normal()),
@@ -93,11 +92,13 @@ export function getAdjustInformation(polyhedron: Polyhedron) {
     }
   }
 
-  // Otherwise it's an elongated single cap
+  // Otherwise it's an elongated single cap.
+  // Find the face *first* (in case it's a diminished icosahedron)
+  // then find the cap that's opposite of it
   const faces = polyhedron.faces.filter(face => {
-    return _.uniqBy(face.adjacentFaces(), "numSides").length === 1
+    return uniqBy(face.adjacentFaces(), "numSides").length === 1
   })
-  const face = _.maxBy(faces, "numSides")!
+  const face = maxBy(faces, "numSides")!
   const cap = Cap.getAll(polyhedron).find(cap =>
     isInverse(cap.normal(), face.normal()),
   )

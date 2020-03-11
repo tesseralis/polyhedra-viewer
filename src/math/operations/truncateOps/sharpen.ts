@@ -92,10 +92,8 @@ function applySharpen(
     })
   })
 
-  const endVertices = mock.vertices.map((v, vIndex) =>
-    _.has(oldToNew, vIndex.toString())
-      ? verticesToAdd[oldToNew[vIndex]]
-      : v.vec,
+  const endVertices = mock.vertices.map(
+    (v, vIndex) => verticesToAdd[oldToNew[vIndex]] ?? v.vec,
   )
 
   return {

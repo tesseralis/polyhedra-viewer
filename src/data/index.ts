@@ -1,4 +1,3 @@
-import _ from "lodash"
 import johnsonSubgroups from "./johnsonSubgroups"
 import johnsonSymmetries from "./johnsonSymmetries"
 import groupData from "./groups"
@@ -32,7 +31,7 @@ export const groups = groupData.map(group => ({
   ...getNestedPolyhedra(group.name),
 }))
 
-export const allSolidNames: string[] = _.flatMap(flatGroups, "polyhedra")
+export const allSolidNames: string[] = flatGroups.flatMap(g => g.polyhedra)
 
 export const isValidSolid = (escapedSolidName: string) => {
   return allSolidNames.includes(escapedSolidName.replace(/-/g, " "))

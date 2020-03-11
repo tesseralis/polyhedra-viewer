@@ -49,7 +49,7 @@ export default class Polyhedron {
 
   get solidData() {
     if (!this._solidData.edges) {
-      this._solidData.edges = _.map(this.edges, e => e.value)
+      this._solidData.edges = this.edges.map(e => e.value)
     }
     return this._solidData
   }
@@ -140,7 +140,7 @@ export default class Polyhedron {
   }
 
   centroid() {
-    return getCentroid(_.map(this.vertices, "vec"))
+    return getCentroid(this.vertices.map(v => v.vec))
   }
 
   surfaceArea() {

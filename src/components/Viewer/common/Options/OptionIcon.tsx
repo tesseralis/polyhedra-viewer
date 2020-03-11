@@ -1,4 +1,4 @@
-import _ from "lodash"
+import { take } from "lodash"
 
 import React, { memo } from "react"
 
@@ -127,10 +127,7 @@ function InnerIcon({ name }: Props) {
       )
     }
     case "rotunda": {
-      const points = _.take(
-        polygonPoints({ n: 12, cx: 100, cy: 150, r: -90 }),
-        7,
-      )
+      const points = take(polygonPoints({ n: 12, cx: 100, cy: 150, r: -90 }), 7)
       const [p1, p2, p3, p4, p5, p6] = points
       const bottomY = p1[1]
       const q1: Point2D = [p3[0], p2[1]]

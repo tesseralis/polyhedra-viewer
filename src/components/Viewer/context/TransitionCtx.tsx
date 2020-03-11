@@ -1,4 +1,4 @@
-import _ from "lodash"
+import { noop } from "lodash"
 
 import React, { useRef, useEffect, useContext, useCallback } from "react"
 import { ChildrenProp } from "types"
@@ -46,7 +46,7 @@ function getFaceColors(polyhedron: Polyhedron, colors: any) {
 }
 
 function arrayDefaults<T>(first: T[], second: T[]) {
-  return first.map((item, i) => (_.isNil(item) ? second[i] : item))
+  return first.map((item, i) => item ?? second[i])
 }
 
 const defaultState = {
@@ -71,7 +71,7 @@ const InterpModel = createHookedContext<State, "set" | "reset">(
   defaultState,
 )
 
-const TransitionContext = React.createContext(_.noop)
+const TransitionContext = React.createContext(noop)
 
 function InnerProvider({ children }: ChildrenProp) {
   const transitionId = useRef<ReturnType<typeof transition> | null>(null)

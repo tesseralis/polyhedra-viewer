@@ -1,4 +1,4 @@
-import _ from "lodash"
+import { isEmpty } from "lodash"
 
 import { useCallback } from "react"
 import { useHistory } from "react-router-dom"
@@ -28,7 +28,7 @@ export default function useApplyOperation() {
       if (!operation) throw new Error("no operation defined")
 
       const { result, animationData } = operation.apply(polyhedron, options)
-      if (!operation.hasOptions(result) || _.isEmpty(options)) {
+      if (!operation.hasOptions(result) || isEmpty(options)) {
         unsetOperation()
       } else {
         setOperation(operation, result)
