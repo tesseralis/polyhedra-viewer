@@ -1,4 +1,4 @@
-import _ from "lodash"
+import { mapValues, compact, every, xor, some, uniq, pickBy } from "lodash"
 
 import { Polyhedron, Face, Cap } from "math/polyhedra"
 import { inRow, inColumn, inSection } from "math/polyhedra/tableUtils"
@@ -30,8 +30,8 @@ const augmentees: Record<AugmentType, Record<number, string>> = {
   },
 }
 
-const augmentData = _.mapValues(augmentees, type =>
-  _.mapValues(type, Polyhedron.get),
+const augmentData = mapValues(augmentees, type =>
+  mapValues(type, Polyhedron.get),
 )
 
 const augmentTypes: Record<string, AugmentType> = {
@@ -47,7 +47,7 @@ function getAugmentAlignment(polyhedron: Polyhedron, face: Face) {
 
 function getPossibleAugmentees(n: number) {
   const { pyramid, cupola, rotunda } = augmentData
-  return _.compact([pyramid[n], cupola[n / 2], rotunda[n / 2]])
+  return compact([pyramid[n], cupola[n / 2], rotunda[n / 2]])
 }
 
 // Checks to see if the polyhedron can be augmented at the base while remaining convex
@@ -56,7 +56,7 @@ function canAugmentWith(base: Face, augmentee: Polyhedron, offset: number) {
   if (!augmentee) return false
   const underside = augmentee.faceWithNumSides(n)
 
-  return _.every(base.edges, (edge, i: number) => {
+  return every(base.edges, (edge, i: number) => {
     const baseAngle = edge.dihedralAngle()
 
     const edge2 = getCyclic(underside.edges, i - 1 + offset)
@@ -91,17 +91,17 @@ function canAugment(base: Face) {
 
 // Computes the set equality of two arrays
 const setEquals = <T>(array1: T[], array2: T[]) =>
-  _.xor(array1, array2).length === 0
+  xor(array1, array2).length === 0
 
 function getBaseType(base: Face) {
   const adjacentFaces = base.adjacentFaces()
-  const adjacentFaceCounts = _.uniq(adjacentFaces.map(f => f.numSides))
+  const adjacentFaceCounts = uniq(adjacentFaces.map(f => f.numSides))
   if (setEquals(adjacentFaceCounts, [3, 4])) {
     return "cupola"
   } else if (setEquals(adjacentFaceCounts, [4])) {
     return "prism"
   } else if (setEquals(adjacentFaceCounts, [3])) {
-    return _.intersection(adjacentFaces).length > 0 ? "pyramid" : "antiprism"
+    return "pyramidOrAntiprism"
   } else if (setEquals(adjacentFaceCounts, [3, 5])) {
     return "rotunda"
   } else if (setEquals(adjacentFaceCounts, [4, 5])) {
@@ -123,6 +123,7 @@ function isCupolaRotunda(baseType: string, augmentType: string) {
   return setEquals(["cupola", "rotunda"], [baseType, augmentType])
 }
 
+// TODO redo this function to rely on tableUtils instead
 // Return true if the base and augmentee are aligned
 function isAligned(
   polyhedron: Polyhedron,
@@ -133,7 +134,7 @@ function isAligned(
 ) {
   if (augmentType === "pyramid") return true
   const baseType = getBaseType(base)
-  if (baseType === "pyramid" || baseType === "antiprism") {
+  if (baseType === "pyramidOrAntiprism") {
     return true
   }
 
@@ -283,7 +284,7 @@ const getUsingOpts = (polyhedron: Polyhedron) => {
     return ["U5", "R5"]
   }
   const rows = ["pentagonal cupola", "pentagonal rotunda"]
-  if (_.some(rows, row => inRow(polyhedron.name, "capstones", row))) {
+  if (some(rows, row => inRow(polyhedron.name, "capstones", row))) {
     return ["U5", "R5"]
   }
   return null
@@ -302,7 +303,7 @@ const hasGyrateOpts = (polyhedron: Polyhedron) => {
   if (inColumn(polyhedron.name, "capstones", "gyroelongated")) {
     return false
   }
-  if (_.some(cupolaRows, row => inRow(polyhedron.name, "capstones", row))) {
+  if (some(cupolaRows, row => inRow(polyhedron.name, "capstones", row))) {
     return true
   }
   return false
@@ -406,7 +407,7 @@ export const augment = makeOperation<Options>("augment", {
   defaultOptions(solid) {
     if (!solid) return {}
     const usingOpts = getUsingOpts(solid) ?? []
-    return _.pickBy({
+    return pickBy({
       gyrate: hasGyrateOpts(solid) && "gyro",
       using: usingOpts.length > 1 && usingOpts[0],
     })
