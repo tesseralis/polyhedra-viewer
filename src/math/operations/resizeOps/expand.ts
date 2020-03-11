@@ -1,6 +1,6 @@
-import _ from "lodash"
+import { every, take } from "lodash"
 import { Twist } from "types"
-import { Polyhedron, Face } from "math/polyhedra"
+import { Polyhedron } from "math/polyhedra"
 import { withOrigin } from "math/geom"
 import {
   getTwistSign,
@@ -39,7 +39,7 @@ function doSemiExpansion(polyhedron: Polyhedron, referenceName: string) {
   const duplicated = expandEdges(
     polyhedron,
     polyhedron.edges.filter(e =>
-      _.every(e.adjacentFaces(), f => f.numSides === largeFaceType),
+      every(e.adjacentFaces(), f => f.numSides === largeFaceType),
     ),
   )
   const expandFaces = duplicated.faces.filter(face =>
@@ -65,13 +65,13 @@ function doExpansion(
 
   // TODO precalculate this
   const referenceFace =
-    _.find<Face>(reference.faces, face => isExpandedFace(reference, face, n)) ??
+    reference.faces.find(face => isExpandedFace(reference, face, n)) ??
     reference.getFace()
   const referenceLength =
     (referenceFace.distanceToCenter() / reference.edgeLength()) *
     polyhedron.edgeLength()
 
-  const expandFaces = _.filter<Face>(duplicated.faces, face =>
+  const expandFaces = duplicated.faces.filter(face =>
     isExpandedFace(duplicated, face, n),
   )
   const refFaces = getExpandedFaces(reference, n)
@@ -121,7 +121,7 @@ export const dual = makeOperation("dual", {
       return (e * e) / (f * f)
     })()
     const duplicated = expandEdges(polyhedron, polyhedron.edges)
-    const faces = _.take(duplicated.faces, polyhedron.numFaces())
+    const faces = take(duplicated.faces, polyhedron.numFaces())
     const endVertices = getTransformedVertices(faces, f =>
       withOrigin(polyhedron.centroid(), v => v.scale(scale))(f.centroid()),
     )

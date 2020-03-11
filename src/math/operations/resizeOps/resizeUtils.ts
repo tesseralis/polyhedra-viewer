@@ -1,4 +1,4 @@
-import _ from "lodash"
+import { every, minBy } from "lodash"
 
 import { flatMapUniq } from "utils"
 import { Polyhedron, Face } from "math/polyhedra"
@@ -41,7 +41,7 @@ export function isExpandedFace(
   const type = expansionType(polyhedron)
   if (typeof nSides === "number" && face.numSides !== nSides) return false
   if (!face.isValid()) return false
-  return _.every(face.adjacentFaces(), { numSides: edgeShape[type] })
+  return every(face.adjacentFaces(), { numSides: edgeShape[type] })
 }
 
 function getFaceDistance(face1: Face, face2: Face) {
@@ -119,7 +119,7 @@ export function getSnubAngle(polyhedron: Polyhedron, faces: Face[]) {
   const faceNormal = face0.normal()
   const midpoint = face0.edges[0].midpoint()
 
-  const face1 = _.minBy(rest, face => midpoint.distanceTo(face.centroid()))!
+  const face1 = minBy(rest, face => midpoint.distanceTo(face.centroid()))!
 
   const plane = getPlane([
     faceCentroid,

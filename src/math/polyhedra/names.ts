@@ -1,8 +1,6 @@
-import _ from "lodash"
-
 import { johnsonSolids, allSolidNames } from "data"
 import { choose, bimap } from "utils"
-import polygons, { polygonPrefixes } from "../polygons"
+import { polygonPrefixes } from "../polygons"
 
 export const escapeName = (name: string) => name.replace(/ /g, "-")
 
@@ -77,6 +75,7 @@ const inverseAlternateNames = Object.fromEntries(
     alts.map(alt => [alt, canonical]),
   ),
 )
+const alternateNamesList = Object.keys(inverseAlternateNames)
 
 export function getCanonicalName(name: string) {
   return inverseAlternateNames[unescapeName(name)] ?? name
@@ -87,7 +86,7 @@ export function getAlternateNames(name: string) {
 }
 
 export function isAlternateName(name: string) {
-  return _.has(inverseAlternateNames, unescapeName(name))
+  return alternateNamesList.includes(unescapeName(name))
 }
 
 export function randomSolidName(): string {
@@ -103,7 +102,7 @@ export function isConwaySymbol(symbol: string) {
   if (prefix === "J" && number >= 0 && number <= 92) {
     return true
   }
-  if (_.includes(["P", "A"], prefix) && _.includes(polygons, number)) {
+  if (["P", "A"].includes(prefix) && polygonPrefixes.hasKey(number)) {
     return true
   }
   return false
@@ -119,7 +118,7 @@ export const fromConwayNotation = (notation: string) => {
     return archimedeanMapping.get(notation)
   }
   if (prefix === "J") {
-    return johnsonSolids[_.toNumber(number) - 1]
+    return johnsonSolids[number - 1]
   }
   if (prefix === "P" && polygonPrefixes.hasKey(number)) {
     return `${polygonPrefixes.get(number)} prism`
@@ -138,7 +137,7 @@ export const toConwayNotation = (solid: string) => {
   if (archimedeanMapping.hasValue(name)) {
     return archimedeanMapping.of(name)
   }
-  if (_.includes(johnsonSolids, name)) {
+  if (johnsonSolids.includes(name)) {
     return "J" + (johnsonSolids.indexOf(name) + 1)
   }
   const [prefix] = name.split(" ")
@@ -159,7 +158,7 @@ export function getType(solid: string) {
   if (archimedeanMapping.hasValue(name)) {
     return "Archimedean solid"
   }
-  if (_.includes(johnsonSolids, name)) {
+  if (johnsonSolids.includes(name)) {
     return "Johnson solid"
   }
   if (name.includes("antiprism")) {

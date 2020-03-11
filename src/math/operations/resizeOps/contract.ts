@@ -1,4 +1,3 @@
-import _ from "lodash"
 import { Polyhedron } from "math/polyhedra"
 import {
   getSnubAngle,
@@ -14,7 +13,7 @@ interface Options {
 
 // Return the symmetry group of an *expanded* polyhedron
 function getFamily(polyhedron: Polyhedron) {
-  if (_.includes(["cuboctahedron", "icosahedron"], polyhedron.name)) {
+  if (["cuboctahedron", "icosahedron"].includes(polyhedron.name)) {
     return "T"
   }
   return polyhedron.symmetry().group

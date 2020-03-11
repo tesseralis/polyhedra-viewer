@@ -32,7 +32,10 @@ function getBoundary(faces: Face[]) {
       e = e.twin().next()
     }
   } while (!e.equals(e0))
-  return new VEList(_.map(result, "v1"), result)
+  return new VEList(
+    result.map(e => e.v1),
+    result,
+  )
 }
 
 interface Constructor<T> {
@@ -41,7 +44,7 @@ interface Constructor<T> {
 function createMapper<T>(property: string, Base: Constructor<T>) {
   return (polyhedron: Polyhedron) => {
     const mapper = _.get(polyhedron, property)
-    const values: T[] = _.isFunction(mapper) ? mapper() : mapper
+    const values: T[] = typeof mapper === "function" ? mapper() : mapper
     return values
       .map(arg => new Base(polyhedron, arg))
       .filter(cap => cap.isValid())
@@ -103,7 +106,7 @@ export default abstract class Cap implements VertexList {
   }
 
   allVertices = _.once(() => {
-    return _.concat(this.innerVertices(), this.boundary().vertices)
+    return this.innerVertices().concat(this.boundary().vertices)
   })
 
   faces = _.once(() => {

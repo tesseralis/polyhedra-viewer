@@ -1,4 +1,4 @@
-import _ from "lodash"
+import { uniq } from "lodash"
 
 import React, { memo } from "react"
 
@@ -21,7 +21,7 @@ const opLayout: OpName[][] = [
   ["augment", "augment", "diminish", "gyrate"],
 ]
 
-const opList = opLayout.flatMap(line => _.uniq(line))
+const opList = uniq(opLayout.flat())
 
 interface Props {
   name: OpName

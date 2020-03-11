@@ -1,4 +1,4 @@
-import _ from "lodash"
+import { every } from "lodash"
 import { Vec3D } from "math/geom"
 
 import {
@@ -25,7 +25,7 @@ export default class VEList implements VertexList {
     this.polyhedron = vertices[0].polyhedron
     this.vertices = vertices
     this.edges = edges
-    this.vectors = _.map(this.vertices, "vec")
+    this.vectors = this.vertices.map(v => v.vec)
   }
 
   get numSides() {
@@ -89,6 +89,6 @@ export default class VEList implements VertexList {
   }
 
   isValid() {
-    return _.every(this.edges, edge => edge.length() > PRECISION)
+    return every(this.edges, edge => edge.length() > PRECISION)
   }
 }

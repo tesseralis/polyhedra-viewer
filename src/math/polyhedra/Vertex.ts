@@ -6,7 +6,7 @@ import Polyhedron from "./Polyhedron"
 import Edge from "./Edge"
 
 function getCycles<T>(array: T[]) {
-  return _.map(array, (val, i) => _.drop(array, i).concat(_.take(array, i)))
+  return array.map((val, i) => _.drop(array, i).concat(_.take(array, i)))
 }
 
 function arrayMin<T>(a1: T[], a2: T[]): T[] {
@@ -69,7 +69,7 @@ export default class Vertex {
   configuration() {
     const config = this.adjacentFaces().map(f => f.numSides)
     const allConfigs = getCycles(config).concat(
-      getCycles(_.reverse([...config])),
+      getCycles([...config].reverse()),
     )
     return allConfigs.reduce(arrayMin)
   }
