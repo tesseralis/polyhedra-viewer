@@ -1,4 +1,4 @@
-import { isEmpty, isEqual } from "lodash"
+import { isEmpty, isEqual } from "lodash-es"
 
 import { Point } from "types"
 import { Cap } from "math/polyhedra"

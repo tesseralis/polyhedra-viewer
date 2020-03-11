@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, MouseEvent } from "react"
-import { isEqual, forEach } from "lodash"
+import { isEqual, forEach } from "lodash-es"
 
 import { Point } from "types"
 import { SolidData } from "math/polyhedra"

@@ -1,6 +1,6 @@
 import React, { memo, useCallback, ButtonHTMLAttributes } from "react"
 import { useStyle, scales } from "styles"
-import { pick } from "lodash"
+import { pick } from "lodash-es"
 
 import Config from "components/ConfigCtx"
 import {

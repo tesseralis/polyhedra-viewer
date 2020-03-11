@@ -1,4 +1,4 @@
-import { some } from "lodash"
+import { some } from "lodash-es"
 
 import { withOrigin } from "math/geom"
 import { Polyhedron, Cap } from "math/polyhedra"

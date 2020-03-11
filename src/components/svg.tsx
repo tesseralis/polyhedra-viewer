@@ -1,5 +1,5 @@
 import React from "react"
-import { range } from "lodash"
+import { range } from "lodash-es"
 
 const { PI, sin, cos } = Math
 const TAU = 2 * PI

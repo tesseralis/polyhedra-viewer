@@ -1,4 +1,4 @@
-import { some, countBy } from "lodash"
+import { some, countBy } from "lodash-es"
 
 import { getCyclic, flatMapUniq } from "utils"
 import { VIndex, FIndex } from "./solidTypes"

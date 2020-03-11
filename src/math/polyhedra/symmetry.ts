@@ -1,4 +1,4 @@
-import { trimEnd } from "lodash"
+import { trimEnd } from "lodash-es"
 
 import { polygonPrefixes } from "math/polygons"
 import { unescapeName, getType } from "./names"

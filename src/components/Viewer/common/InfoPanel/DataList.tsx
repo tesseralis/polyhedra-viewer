@@ -1,5 +1,5 @@
 import React, { ComponentType } from "react"
-import { round } from "lodash"
+import { round } from "lodash-es"
 import { useStyle, scales } from "styles"
 import { fonts } from "styles"
 

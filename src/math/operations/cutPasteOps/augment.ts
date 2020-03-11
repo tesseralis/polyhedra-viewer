@@ -1,4 +1,4 @@
-import { mapValues, compact, every, xor, some, uniq, pickBy } from "lodash"
+import { mapValues, compact, every, xor, some, uniq, pickBy } from "lodash-es"
 
 import { Polyhedron, Face, Cap } from "math/polyhedra"
 import { inRow, inColumn, inSection } from "math/polyhedra/tableUtils"

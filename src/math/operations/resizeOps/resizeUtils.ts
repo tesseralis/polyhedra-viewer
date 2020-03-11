@@ -1,4 +1,4 @@
-import { every, minBy } from "lodash"
+import { every, minBy } from "lodash-es"
 
 import { flatMapUniq } from "utils"
 import { Polyhedron, Face } from "math/polyhedra"

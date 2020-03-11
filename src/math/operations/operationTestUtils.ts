@@ -1,4 +1,4 @@
-import { isNaN } from "lodash"
+import { isNaN } from "lodash-es"
 import { PRECISION } from "math/geom"
 import { Polyhedron } from "math/polyhedra"
 

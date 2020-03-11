@@ -1,4 +1,4 @@
-import { unzip } from "lodash"
+import { unzip } from "lodash-es"
 
 export type Column = { name: string; sub: string[] } | string
 export type Data = string | string[]

@@ -1,4 +1,4 @@
-import { some, findKey, countBy } from "lodash"
+import { some, findKey, countBy } from "lodash-es"
 import { Point } from "types"
 import { vec, Vec3D } from "math/geom"
 import { VIndex } from "./solidTypes"

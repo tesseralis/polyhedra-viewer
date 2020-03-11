@@ -1,5 +1,5 @@
 import React, { useMemo, useReducer, useContext } from "react"
-import { isFunction, mapValues } from "lodash"
+import { isFunction, mapValues } from "lodash-es"
 
 type Args = any[]
 type Action<S> = (state: S) => S

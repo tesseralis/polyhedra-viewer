@@ -1,4 +1,4 @@
-import { startCase, set } from "lodash"
+import { startCase, set } from "lodash-es"
 import polygons, { polygonNames, PolygonMap } from "math/polygons"
 
 // Colors from d3-scale-chromatic:

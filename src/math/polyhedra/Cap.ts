@@ -1,4 +1,4 @@
-import { minBy, once, every, countBy, isEqual } from "lodash"
+import { minBy, once, every, countBy, isEqual } from "lodash-es"
 
 import { flatMapUniq } from "utils"
 import { Vec3D } from "math/geom"

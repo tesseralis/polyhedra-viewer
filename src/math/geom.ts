@@ -1,4 +1,4 @@
-import { every } from "lodash"
+import { every } from "lodash-es"
 import { Vec3D, Ray3D, Triangle3D, Plane, Matrix4x4 } from "toxiclibsjs/geom"
 import { Point } from "types"
 

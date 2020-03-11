@@ -1,4 +1,4 @@
-import { range } from "lodash"
+import { range } from "lodash-es"
 
 import React, { memo, ComponentType } from "react"
 import { StyleSheet, css } from "aphrodite/no-important"

@@ -1,4 +1,4 @@
-import { take } from "lodash"
+import { take } from "lodash-es"
 
 import React, { memo } from "react"
 

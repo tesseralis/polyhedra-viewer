@@ -1,4 +1,4 @@
-import { every } from "lodash"
+import { every } from "lodash-es"
 import { getSingle } from "utils"
 import { Cap, Polyhedron } from "math/polyhedra"
 import { isInverse } from "math/geom"

@@ -6,7 +6,7 @@ import {
   mergeWith,
   compact,
   range,
-} from "lodash"
+} from "lodash-es"
 import { polygonPrefixes } from "math/polygons"
 import {
   Table,

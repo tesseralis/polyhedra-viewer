@@ -1,4 +1,4 @@
-import { every, take } from "lodash"
+import { every, take } from "lodash-es"
 import { Twist } from "types"
 import { Polyhedron } from "math/polyhedra"
 import { withOrigin } from "math/geom"

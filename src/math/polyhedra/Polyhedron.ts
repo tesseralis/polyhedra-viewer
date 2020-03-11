@@ -1,4 +1,13 @@
-import { once, set, countBy, maxBy, minBy, sortBy, sum, isEqual } from "lodash"
+import {
+  once,
+  set,
+  countBy,
+  maxBy,
+  minBy,
+  sortBy,
+  sum,
+  isEqual,
+} from "lodash-es"
 
 import { isValidSolid, getSolidData } from "data"
 import { Vec3D, getCentroid } from "math/geom"

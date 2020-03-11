@@ -1,4 +1,4 @@
-import { every } from "lodash"
+import { every } from "lodash-es"
 import { Vec3D } from "math/geom"
 
 import {

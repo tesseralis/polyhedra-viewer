@@ -1,4 +1,4 @@
-import { set, range } from "lodash"
+import { set, range } from "lodash-es"
 
 import { repeat } from "utils"
 import { withOrigin, PRECISION, Vec3D } from "math/geom"

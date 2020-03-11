@@ -1,4 +1,4 @@
-import { capitalize } from "lodash"
+import { capitalize } from "lodash-es"
 
 import React, { useEffect } from "react"
 import { Route, Redirect } from "react-router-dom"

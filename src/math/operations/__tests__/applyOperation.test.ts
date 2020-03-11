@@ -1,4 +1,4 @@
-import { forEach } from "lodash"
+import { forEach } from "lodash-es"
 import { allSolidNames } from "data"
 import { getOperations } from "../operationUtils"
 import { operations } from ".."

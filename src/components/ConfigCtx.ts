@@ -1,4 +1,4 @@
-import { set, cloneDeep } from "lodash"
+import { set, cloneDeep } from "lodash-es"
 import { createHookedContext } from "components/common"
 import { defaultConfig } from "./configOptions"
 

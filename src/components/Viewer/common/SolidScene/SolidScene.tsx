@@ -1,4 +1,4 @@
-import { pick } from "lodash"
+import { pick } from "lodash-es"
 import React from "react"
 import X3dScene from "./X3dScene"
 import X3dPolyhedron from "./X3dPolyhedron"

@@ -1,4 +1,4 @@
-import { set, flatMapDeep, meanBy } from "lodash"
+import { set, flatMapDeep, meanBy } from "lodash-es"
 
 import { Polyhedron, Vertex, Face, Edge } from "math/polyhedra"
 import makeOperation from "../makeOperation"

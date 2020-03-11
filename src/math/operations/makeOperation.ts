@@ -1,4 +1,4 @@
-import { mapValues, isEmpty, filter, uniq, pickBy } from "lodash"
+import { mapValues, isEmpty, filter, uniq, pickBy } from "lodash-es"
 
 import { toConwayNotation } from "math/polyhedra/names"
 import operationGraph, { Relation } from "./operationGraph"

@@ -1,4 +1,4 @@
-import { noop } from "lodash"
+import { noop } from "lodash-es"
 
 import React, { useRef, useEffect, useContext, useCallback } from "react"
 import { ChildrenProp } from "types"

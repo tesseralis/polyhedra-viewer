@@ -1,4 +1,4 @@
-import { some } from "lodash"
+import { some } from "lodash-es"
 import { sections } from "./tables"
 import { toConwayNotation } from "./names"
 

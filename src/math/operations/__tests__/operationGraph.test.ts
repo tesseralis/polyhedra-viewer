@@ -1,4 +1,4 @@
-import _ from "lodash"
+import _ from "lodash-es"
 import graph from "../operationGraph"
 import { allSolidNames } from "data"
 import { toConwayNotation } from "math/polyhedra/names"

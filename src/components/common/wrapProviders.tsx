@@ -1,5 +1,5 @@
 import React, { ReactType, ReactChild, FunctionComponent } from "react"
-import { reduceRight } from "lodash"
+import { reduceRight } from "lodash-es"
 
 function wrapProvider(Provider: ReactType, children: ReactChild) {
   return <Provider>{children}</Provider>

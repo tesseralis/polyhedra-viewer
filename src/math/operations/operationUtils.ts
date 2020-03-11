@@ -1,4 +1,4 @@
-import { takeRight, dropRight, invert, times } from "lodash"
+import { takeRight, dropRight, invert, times } from "lodash-es"
 import { Twist } from "types"
 import { Polyhedron, Vertex, Edge, VertexList, VertexArg } from "math/polyhedra"
 import { Vec3D, Transform } from "math/geom"

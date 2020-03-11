@@ -1,4 +1,4 @@
-import { pullAt } from "lodash"
+import { pullAt } from "lodash-es"
 
 import { Point } from "types"
 import { Vec3D } from "math/geom"

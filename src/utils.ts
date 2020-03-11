@@ -1,4 +1,5 @@
-import { uniqBy, invert, ValueIteratee } from "lodash"
+import { ValueIteratee } from "lodash"
+import { uniqBy, invert } from "lodash-es"
 
 function mod(a: number, b: number) {
   return a >= 0 ? a % b : (a % b) + b

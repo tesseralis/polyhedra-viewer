@@ -1,4 +1,4 @@
-import { some, maxBy, isEqual, uniqBy, countBy } from "lodash"
+import { some, maxBy, isEqual, uniqBy, countBy } from "lodash-es"
 import { Twist } from "types"
 import { Polyhedron, Cap, VEList } from "math/polyhedra"
 import { inRow, inColumn } from "math/polyhedra/tableUtils"

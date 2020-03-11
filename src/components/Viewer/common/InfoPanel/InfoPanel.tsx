@@ -1,6 +1,6 @@
 import React from "react"
 import { useStyle, scales, media } from "styles"
-import { capitalize } from "lodash"
+import { capitalize } from "lodash-es"
 
 import { fonts } from "styles"
 

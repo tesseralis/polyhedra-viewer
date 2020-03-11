@@ -1,4 +1,4 @@
-import { isEmpty } from "lodash"
+import { isEmpty } from "lodash-es"
 
 import { useCallback } from "react"
 import { useHistory } from "react-router-dom"
