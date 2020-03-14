@@ -41,7 +41,7 @@ function duplicateVertices(polyhedron: Polyhedron, facesTosharpen: Face[]) {
 
 function getsharpenFaces(polyhedron: Polyhedron, faceType: number) {
   // Special octahedron case
-  if (polyhedron.isRegular()) {
+  if (polyhedron.info.isRegular()) {
     const face0 = polyhedron.getFace()
     const adjacentFaces = face0.adjacentFaces()
     return face0.vertexAdjacentFaces().filter(f => !f.inSet(adjacentFaces))
@@ -57,7 +57,7 @@ function calculatesharpenDist(face: Face, edge: Edge) {
 }
 
 function getsharpenDist(polyhedron: Polyhedron, face: Face) {
-  if (!polyhedron.isRegular() && !polyhedron.isQuasiRegular()) {
+  if (!polyhedron.info.isRegular() && !polyhedron.info.isQuasiRegular()) {
     return meanBy(face.edges, edge => calculatesharpenDist(face, edge))
   }
   return calculatesharpenDist(face, face.edges[0])
@@ -76,7 +76,7 @@ function applySharpen(
   let sharpenFaces = getsharpenFaces(polyhedron, faceType)
 
   let mock: Polyhedron
-  if (polyhedron.isQuasiRegular()) {
+  if (polyhedron.info.isQuasiRegular()) {
     mock = duplicateVertices(polyhedron, sharpenFaces)
     sharpenFaces = sharpenFaces.map(face => mock.faces[face.index])
   } else {

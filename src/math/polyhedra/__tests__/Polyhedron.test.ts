@@ -57,19 +57,6 @@ describe("Polyhedron", () => {
     })
   })
 
-  describe("isUniform", () => {
-    it("counts prisms and antiprisms", () => {
-      expect(Polyhedron.get("decagonal-prism").isUniform()).toBe(true)
-      expect(Polyhedron.get("decagonal-antiprism").isUniform()).toBe(true)
-    })
-
-    it("doesn't count the pseudorhombicuboctaheron", () => {
-      expect(Polyhedron.get("elongated-square-gyrobicupola").isUniform()).toBe(
-        false,
-      )
-    })
-  })
-
   describe("isSame", () => {
     const testCases = [
       ["rhombicuboctahedron", "elongated-square-gyrobicupola"],

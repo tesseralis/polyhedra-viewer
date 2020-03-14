@@ -16,7 +16,7 @@ function getFamily(polyhedron: Polyhedron) {
   if (["cuboctahedron", "icosahedron"].includes(polyhedron.name)) {
     return "T"
   }
-  return polyhedron.symmetry().group
+  return polyhedron.info.symmetry().group
 }
 
 const familyMap: Record<string, number> = { T: 3, O: 4, I: 5 }
