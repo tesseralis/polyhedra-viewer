@@ -1,4 +1,4 @@
-import { filter } from "lodash"
+import { isMatch, filter } from "lodash"
 type NameFunc<T> = (item: T) => string
 
 export default class Category<T extends {}> {
@@ -9,12 +9,23 @@ export default class Category<T extends {}> {
     this.nameFunc = nameFunc
   }
 
-  contains(name: string, constraints: Partial<T>) {
+  /**
+   * Return `true` if the item name satisfies the given constraints.
+   */
+  contains(name: string, constraints?: Partial<T>) {
     const item = this.items.find(item => this.nameFunc(item) === name)
-    // TODO check for constraints
-    return !!item
+    if (!item) {
+      return false
+    }
+    if (!constraints) {
+      return true
+    }
+    return isMatch(item, constraints)
   }
 
+  /**
+   * Get all the items that satisfy the given constraints.
+   */
   getAll(constraints: Partial<T>) {
     // FIXME this ain't gonna typecheck correctly
     return filter(this.items, constraints)
