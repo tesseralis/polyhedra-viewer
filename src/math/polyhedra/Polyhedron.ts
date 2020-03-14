@@ -10,10 +10,9 @@ import {
 } from "lodash-es"
 
 import { isValidSolid, getSolidData } from "data"
+import SolidInfo from "data/SolidInfo"
 import { Vec3D, getCentroid } from "math/geom"
 
-import * as meta from "./names"
-import * as symmetry from "./symmetry"
 import { SolidData } from "./solidTypes"
 import Face from "./Face"
 import Vertex from "./Vertex"
@@ -30,6 +29,7 @@ export default class Polyhedron {
   name: string
   faces: Face[]
   vertices: Vertex[]
+  info: SolidInfo
   private _edges?: Edge[]
 
   static get(name: string) {
@@ -46,6 +46,7 @@ export default class Polyhedron {
     )
     this.faces = solidData.faces.map((face, fIndex) => new Face(this, fIndex))
     this.name = solidData.name ?? ""
+    this.info = new SolidInfo(this.name)
   }
 
   get edges() {
@@ -220,64 +221,6 @@ export default class Polyhedron {
   normalizeToVolume(volume: number) {
     const scale = Math.cbrt(volume / this.volume())
     return this.withVertices(this.vertices.map(v => v.vec.scale(scale)))
-  }
-
-  // Meta Properties
-  // ===============
-  //
-  // The following properties rely on the name of the polyhedron.
-
-  type = () => meta.getType(this.name)
-
-  alternateNames = () => meta.getAlternateNames(this.name)
-
-  symbol = () => meta.toConwayNotation(this.name)
-
-  symmetry = once(() => symmetry.getSymmetry(this.name))
-
-  symmetryName = once(() => symmetry.getSymmetryName(this.symmetry()))
-
-  order = () => symmetry.getOrder(this.name)
-
-  isUniform() {
-    return [
-      "Platonic solid",
-      "Archimedean solid",
-      "Prism",
-      "Antiprism",
-    ].includes(this.type())
-  }
-
-  isQuasiRegular() {
-    return ["octahedron", "cuboctahedron", "icosidodecahedron"].includes(
-      this.name,
-    )
-  }
-
-  isRegular() {
-    return this.type() === "Platonic solid"
-  }
-
-  isChiral() {
-    return [
-      "snub cube",
-      "snub dodecahedron",
-      "gyroelongated triangular bicupola",
-      "gyroelongated square bicupola",
-      "gyroelongated pentagonal bicupola",
-      "gyroelongated pentagonal cupolarotunda",
-      "gyroelongated pentagonal birotunda",
-    ].includes(this.name)
-  }
-
-  isHoneycomb() {
-    return [
-      "cube",
-      "truncated octahedron",
-      "triangular prism",
-      "hexagonal prism",
-      "gyrobifastigium",
-    ].includes(this.name)
   }
 
   isDeltahedron() {

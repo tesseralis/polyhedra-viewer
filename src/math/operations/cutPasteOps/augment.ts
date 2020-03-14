@@ -1,7 +1,7 @@
 import { mapValues, compact, every, xor, some, uniq, pickBy } from "lodash-es"
 
 import { Polyhedron, Face, Cap } from "math/polyhedra"
-import { inRow, inColumn, inSection } from "math/polyhedra/tableUtils"
+import { inRow, inColumn, inSection } from "data/tableUtils"
 import { isInverse, getOrthonormalTransform, PRECISION } from "math/geom"
 import { repeat, getCyclic, getSingle } from "utils"
 import { deduplicateVertices } from "../makeOperation"

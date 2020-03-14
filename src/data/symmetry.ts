@@ -1,8 +1,13 @@
 import { trimEnd } from "lodash-es"
 
-import { polygonPrefixes } from "math/polygons"
+import johnsonSolids from "./groups/johnson.json"
+import johnsonSymmetries from "./johnsonSymmetries"
+import { polygonPrefixes } from "./polygons"
 import { unescapeName, getType } from "./names"
-import { getJohnsonSymmetry } from "data"
+
+export function getJohnsonSymmetry(name: string) {
+  return johnsonSymmetries[johnsonSolids.indexOf(name)]
+}
 
 /**
  * Utilities to get symmetry information out of polyhedra names

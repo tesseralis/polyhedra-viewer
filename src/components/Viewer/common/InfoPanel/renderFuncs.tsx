@@ -1,7 +1,7 @@
 import React from "react"
 import { capitalize, map } from "lodash-es"
 import { ChildrenProp } from "types"
-import { polygonNames } from "math/polygons"
+import { polygonNames } from "data/polygons"
 import { Polyhedron } from "math/polyhedra"
 import { useStyle } from "styles"
 
@@ -112,8 +112,8 @@ export function displayFaceTypes({ polyhedron }: RenderProps) {
 }
 
 export function displaySymmetry({ polyhedron }: RenderProps) {
-  const symmetry = polyhedron.symmetry()
-  const symName = polyhedron.symmetryName()
+  const symmetry = polyhedron.info.symmetry()
+  const symName = polyhedron.info.symmetryName()
   const { group = "", sub } = symmetry
   return (
     <>
@@ -130,9 +130,9 @@ interface Properties {
 
 const properties: Properties[] = [
   { name: "deltahedron", check: p => p.isDeltahedron() },
-  { name: "chiral", check: p => p.isChiral() },
-  { name: "honeycomb", check: p => p.isHoneycomb() },
-  { name: "quasiregular", check: p => p.isQuasiRegular() },
+  { name: "chiral", check: p => p.info.isChiral() },
+  { name: "honeycomb", check: p => p.info.isHoneycomb() },
+  { name: "quasiregular", check: p => p.info.isQuasiRegular() },
 ]
 
 export function displayProperties({ polyhedron }: RenderProps) {

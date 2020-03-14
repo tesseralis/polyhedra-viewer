@@ -56,7 +56,7 @@ function getTruncateLength(polyhedron: Polyhedron) {
 type Transform = (vector: Vec3D, vertex: Vertex) => Vec3D
 
 function getTruncateTransform(polyhedron: Polyhedron, result = ""): Transform {
-  if (polyhedron.isRegular()) {
+  if (polyhedron.info.isRegular()) {
     return vector => vector
   }
 

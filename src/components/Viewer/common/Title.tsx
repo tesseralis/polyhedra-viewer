@@ -2,7 +2,7 @@ import { capitalize } from "lodash-es"
 import React from "react"
 import { useStyle, scales } from "styles"
 
-import { unescapeName } from "math/polyhedra/names"
+import { unescapeName } from "data/names"
 import { media, fonts } from "styles"
 
 function Title({ name }: { name: string }) {

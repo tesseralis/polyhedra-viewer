@@ -1,7 +1,7 @@
 import _ from "lodash-es"
 import graph from "../operationGraph"
 import { allSolidNames } from "data"
-import { toConwayNotation } from "math/polyhedra/names"
+import { toConwayNotation } from "data/names"
 
 // Tests on the operation graph, mostly focusing on edge cases
 describe("operationGraph", () => {

@@ -1,5 +1,5 @@
-import Polyhedron from "./Polyhedron"
-import { SolidData } from "./solidTypes"
+import Polyhedron from "../Polyhedron"
+import { SolidData } from "../solidTypes"
 
 describe("Polyhedron", () => {
   const solidData: SolidData = {
@@ -54,19 +54,6 @@ describe("Polyhedron", () => {
     })
     it("correctly calculates surface area", () => {
       expect(cube.sphericity()).toBeCloseTo(0.806, 3)
-    })
-  })
-
-  describe("isUniform", () => {
-    it("counts prisms and antiprisms", () => {
-      expect(Polyhedron.get("decagonal-prism").isUniform()).toBe(true)
-      expect(Polyhedron.get("decagonal-antiprism").isUniform()).toBe(true)
-    })
-
-    it("doesn't count the pseudorhombicuboctaheron", () => {
-      expect(Polyhedron.get("elongated-square-gyrobicupola").isUniform()).toBe(
-        false,
-      )
     })
   })
 

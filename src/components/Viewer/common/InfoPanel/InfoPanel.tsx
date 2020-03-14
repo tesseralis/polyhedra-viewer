@@ -19,7 +19,7 @@ function Heading({ polyhedron }: RenderProps) {
   })
   return (
     <h2 {...css()}>
-      {capitalize(polyhedron.name)} | {polyhedron.symbol()}
+      {capitalize(polyhedron.name)} | {polyhedron.info.symbol()}
     </h2>
   )
 }
@@ -52,7 +52,7 @@ export default function InfoPanel() {
   return (
     <div {...css()}>
       <Heading polyhedron={polyhedron} />
-      <p {...typeCss()}>{polyhedron.type()}</p>
+      <p {...typeCss()}>{polyhedron.info.type()}</p>
       <DataList polyhedron={polyhedron} />
       <div {...downloaderCss()}>
         <DataDownloader solid={polyhedron.solidData} />
