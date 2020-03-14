@@ -1,17 +1,17 @@
 import {
-  platonic,
+  classics,
   capstones,
   rhombicosidodecahedra,
 } from "../tables/solidTables"
 
 describe("solidTables", () => {
-  describe("platonic and archimedean solids", () => {
+  describe("Platonic and Archimedean solids", () => {
     it("has 18 items", () => {
-      expect(platonic.get()).toHaveLength(18)
+      expect(classics.get()).toHaveLength(18)
     })
 
     it("contains the proper entries for the tetrahedron row", () => {
-      expect(platonic.get({ n: 3 })).toEqual(
+      expect(classics.get({ n: 3 })).toEqual(
         expect.arrayContaining(["octahedron", "cuboctahedron", "icosahedron"]),
       )
     })

@@ -1,6 +1,6 @@
 import { getType, getAlternateNames, toConwayNotation } from "./names"
 import { getSymmetry, getSymmetryName, getOrder } from "./symmetry"
-import { platonic, prisms, capstones } from "./tables/solidTables"
+import { classics, prisms, capstones } from "./tables/solidTables"
 
 /**
  * Class containing miscellaneous information about a CRF polyhedron
@@ -8,6 +8,7 @@ import { platonic, prisms, capstones } from "./tables/solidTables"
  */
 export default class SolidInfo {
   name: string
+
   constructor(name: string) {
     this.name = name
   }
@@ -24,8 +25,20 @@ export default class SolidInfo {
 
   order = () => getOrder(this.name)
 
+  inClassicTable(filter?: Parameters<typeof classics.contains>[1]) {
+    return classics.contains(this.name, filter)
+  }
+
+  inPrismTable(filter?: Parameters<typeof prisms.contains>[1]) {
+    return prisms.contains(this.name, filter)
+  }
+
+  inCapstoneTable(filter?: Parameters<typeof capstones.contains>[1]) {
+    return capstones.contains(this.name, filter)
+  }
+
   isRegular() {
-    return platonic.contains(this.name, { operation: "regular" })
+    return this.inClassicTable({ operation: "regular" })
   }
 
   /**
@@ -33,21 +46,19 @@ export default class SolidInfo {
    * which alternate around each vertex.
    */
   isQuasiRegular() {
-    return platonic.contains(this.name, { operation: "rectified" })
+    return this.inClassicTable({ operation: "rectified" })
   }
 
   isUniform() {
-    return platonic.contains(this.name) || prisms.contains(this.name)
+    return this.inClassicTable() || this.inPrismTable()
   }
 
   isChiral() {
     return (
-      platonic.contains(
-        this.name,
+      this.inClassicTable(
         ({ n, operation }) => operation === "snub" && n !== 3,
       ) ||
-      capstones.contains(
-        this.name,
+      this.inCapstoneTable(
         ({ elongation, count, base }) =>
           elongation === "antiprism" && count === 2 && base !== "pyramid",
       )

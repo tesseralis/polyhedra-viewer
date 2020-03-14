@@ -18,7 +18,10 @@ function countStr(count: 1 | 2 | 3) {
   }
 }
 
-export const platonic = (() => {
+/**
+ * "Classical" Polyhedra refers to Platonic and Archimedean solids.
+ */
+export const classics = (() => {
   interface Item {
     n: 3 | 4 | 5
     type?: "face" | "vertex"
