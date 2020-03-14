@@ -1,6 +1,10 @@
 import { getType, getAlternateNames, toConwayNotation } from "./names"
 import { getSymmetry, getSymmetryName, getOrder } from "./symmetry"
 
+/**
+ * Class containing miscellaneous information about a CRF polyhedron
+ * that can be gleaned outside of its geometry.
+ */
 export default class SolidInfo {
   name: string
   constructor(name: string) {
@@ -28,6 +32,10 @@ export default class SolidInfo {
     ].includes(this.type())
   }
 
+  /**
+   * A polyhedron is quasiregular if it has exactly two types of regular faces,
+   * which alternate around each vertex.
+   */
   isQuasiRegular() {
     return ["octahedron", "cuboctahedron", "icosidodecahedron"].includes(
       this.name,
@@ -50,6 +58,9 @@ export default class SolidInfo {
     ].includes(this.name)
   }
 
+  /**
+   * Returns `true` if the polyhedron can tile space.
+   */
   isHoneycomb() {
     return [
       "cube",
