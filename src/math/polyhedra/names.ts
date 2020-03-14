@@ -33,11 +33,7 @@ const archimedeanMapping = bimap({
 export const alternateNames: Record<string, string[]> = {
   tetrahedron: ["triangular pyramid", "digonal antiprism", "disphenoid"],
   cube: ["square prism"],
-  octahedron: [
-    "tetratetrahedron", // hehe
-    "triangular antiprism",
-    "square bipyramid",
-  ],
+  octahedron: ["tetratetrahedron", "triangular antiprism", "square bipyramid"],
   icosahedron: [
     "snub tetrahedron",
     "gyroelongated pentagonal bipyramid",
@@ -48,8 +44,11 @@ export const alternateNames: Record<string, string[]> = {
   rhombicuboctahedron: ["elongated square orthobicupola"],
   "snub cube": ["snub cuboctahedron"],
   icosidodecahedron: ["pentagonal gyrobirotunda"],
-  "triangular prism": ["fastigium", "digonal cupola"],
   "snub dodecahedron": ["snub icosidodecahedron"],
+
+  // fastigium
+  "triangular prism": ["fastigium", "digonal cupola"],
+  gyrobifastigium: ["digonal gyrobicupola"],
 
   // related to augmented/diminished/gyrate solids
   "pentagonal antiprism": ["parabidiminished icosahedron"],
