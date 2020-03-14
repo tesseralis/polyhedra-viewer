@@ -5,7 +5,7 @@ import { NavLink, Route } from "react-router-dom"
 import { fonts, useStyle, scales } from "styles"
 
 import { groups } from "data"
-import { escapeName } from "math/polyhedra/names"
+import { escapeName } from "data/names"
 import { hover, padding, paddingVert, margin, marginVert } from "styles/common"
 
 import SearchBar from "./SearchBar"

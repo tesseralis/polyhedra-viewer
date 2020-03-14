@@ -9,7 +9,7 @@ import { OperationCtx, TransitionCtx, PolyhedronCtx } from "./context"
 import DesktopViewer from "./DesktopViewer"
 import MobileViewer from "./MobileViewer"
 import useMediaInfo from "components/useMediaInfo"
-import { unescapeName } from "math/polyhedra/names"
+import { unescapeName } from "data/names"
 
 interface InnerProps {
   solid: string

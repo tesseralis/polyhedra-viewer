@@ -9,7 +9,7 @@ import {
   fromConwayNotation,
   isAlternateName,
   getCanonicalName,
-} from "math/polyhedra/names"
+} from "data/names"
 
 import ErrorPage from "./ErrorPage"
 import Loading from "./Loading"

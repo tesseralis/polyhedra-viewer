@@ -7,15 +7,15 @@ import {
   compact,
   range,
 } from "lodash-es"
-import { polygonPrefixes } from "math/polygons"
+import { polygonPrefixes } from "./polygons"
 import {
   Table,
   Data as TableData,
   prisms,
   capstones,
   augmented,
-} from "math/polyhedra/tables"
-import { toConwayNotation } from "../math/polyhedra/names"
+} from "./tables"
+import { toConwayNotation } from "./names"
 import { mapObject } from "utils"
 
 export interface Relation {

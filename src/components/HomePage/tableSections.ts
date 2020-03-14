@@ -15,7 +15,7 @@ import {
   others,
   othersTwoRows,
   Table,
-} from "math/polyhedra/tables"
+} from "data/tables"
 
 export interface TableSection {
   header: string

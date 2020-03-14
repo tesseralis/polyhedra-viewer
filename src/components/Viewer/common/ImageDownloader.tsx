@@ -2,7 +2,7 @@ import * as React from "react"
 import JSZip from "jszip"
 import FileSaver from "file-saver"
 
-import { escapeName } from "math/polyhedra/names"
+import { escapeName } from "data/names"
 import { allSolidNames } from "data"
 
 /**
