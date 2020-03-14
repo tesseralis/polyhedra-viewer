@@ -1,5 +1,5 @@
 import { allSolidNames } from "data"
-import * as names from "../../../data/names"
+import * as names from "../names"
 
 describe("polyhedra names", () => {
   describe("alternate names", () => {

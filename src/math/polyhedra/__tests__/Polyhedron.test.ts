@@ -1,5 +1,5 @@
-import Polyhedron from "./Polyhedron"
-import { SolidData } from "./solidTypes"
+import Polyhedron from "../Polyhedron"
+import { SolidData } from "../solidTypes"
 
 describe("Polyhedron", () => {
   const solidData: SolidData = {

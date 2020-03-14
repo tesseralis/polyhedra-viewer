@@ -7,7 +7,7 @@ import {
   compact,
   range,
 } from "lodash-es"
-import { polygonPrefixes } from "data/polygons"
+import { polygonPrefixes } from "./polygons"
 import {
   Table,
   Data as TableData,

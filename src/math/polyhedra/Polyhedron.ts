@@ -12,8 +12,8 @@ import {
 import { isValidSolid, getSolidData } from "data"
 import { Vec3D, getCentroid } from "math/geom"
 
-import * as meta from "../../data/names"
-import * as symmetry from "../../data/symmetry"
+import * as meta from "data/names"
+import * as symmetry from "data/symmetry"
 import { SolidData } from "./solidTypes"
 import Face from "./Face"
 import Vertex from "./Vertex"
