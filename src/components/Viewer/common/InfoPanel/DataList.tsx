@@ -73,7 +73,7 @@ const infoRows: InfoRow[] = [
   {
     name: "Order",
     area: "order",
-    render: ({ polyhedron: p }) => <>{p.order()}</>,
+    render: ({ polyhedron: p }) => <>{p.info.order()}</>,
   },
   {
     name: "Properties",
@@ -84,7 +84,7 @@ const infoRows: InfoRow[] = [
     name: "Also known as",
     area: "alt",
     render: ({ polyhedron }: RenderProps) => {
-      const alts = polyhedron.alternateNames()
+      const alts = polyhedron.info.alternateNames()
       if (alts.length === 0) return <>--</>
       return (
         <ul>
