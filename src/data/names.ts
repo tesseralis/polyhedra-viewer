@@ -1,6 +1,6 @@
 import { johnsonSolids, allSolidNames } from "data"
 import { choose, bimap } from "utils"
-import { polygonPrefixes } from "../polygons"
+import { polygonPrefixes } from "../math/polygons"
 
 export const escapeName = (name: string) => name.replace(/ /g, "-")
 

@@ -1,7 +1,7 @@
 import React from "react"
 import { Link } from "react-router-dom"
 
-import { escapeName } from "math/polyhedra/names"
+import { escapeName } from "data/names"
 import { square, hover, flexRow } from "styles/common"
 import { useStyle, media } from "styles"
 

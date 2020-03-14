@@ -1,7 +1,7 @@
 import { some, maxBy, isEqual, uniqBy, countBy } from "lodash-es"
 import { Twist } from "types"
 import { Polyhedron, Cap, FaceLike } from "math/polyhedra"
-import { inRow, inColumn } from "math/polyhedra/tableUtils"
+import { inRow, inColumn } from "data/tableUtils"
 import { withOrigin, isInverse } from "math/geom"
 import { getTwistSign, getTransformedVertices } from "../operationUtils"
 

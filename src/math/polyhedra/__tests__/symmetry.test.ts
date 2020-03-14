@@ -1,4 +1,4 @@
-import * as sym from "../symmetry"
+import * as sym from "../../../data/symmetry"
 
 describe("symmetry", () => {
   describe("getSymmetryName", () => {

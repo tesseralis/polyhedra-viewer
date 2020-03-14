@@ -14,8 +14,8 @@ import {
   prisms,
   capstones,
   augmented,
-} from "math/polyhedra/tables"
-import { toConwayNotation } from "../math/polyhedra/names"
+} from "data/tables"
+import { toConwayNotation } from "./names"
 import { mapObject } from "utils"
 
 export interface Relation {
