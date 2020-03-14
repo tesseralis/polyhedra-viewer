@@ -1,7 +1,7 @@
 import { mapValues, isEmpty, filter, uniq, pickBy } from "lodash-es"
 
 import { toConwayNotation } from "math/polyhedra/names"
-import operationGraph, { Relation } from "./operationGraph"
+import operationGraph, { Relation } from "data/operationGraph"
 import { getSingle } from "utils"
 import { fromConwayNotation } from "math/polyhedra/names"
 import { Vec3D, vec, PRECISION } from "math/geom"

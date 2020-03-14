@@ -15,7 +15,7 @@ import {
   capstones,
   augmented,
 } from "math/polyhedra/tables"
-import { toConwayNotation } from "../polyhedra/names"
+import { toConwayNotation } from "../math/polyhedra/names"
 import { mapObject } from "utils"
 
 export interface Relation {
