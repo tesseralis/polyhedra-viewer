@@ -7,14 +7,14 @@ import {
   compact,
   range,
 } from "lodash-es"
-import { polygonPrefixes } from "math/polygons"
+import { polygonPrefixes } from "data/polygons"
 import {
   Table,
   Data as TableData,
   prisms,
   capstones,
   augmented,
-} from "data/tables"
+} from "./tables"
 import { toConwayNotation } from "./names"
 import { mapObject } from "utils"
 

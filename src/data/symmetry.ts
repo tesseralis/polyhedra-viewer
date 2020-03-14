@@ -1,6 +1,6 @@
 import { trimEnd } from "lodash-es"
 
-import { polygonPrefixes } from "math/polygons"
+import { polygonPrefixes } from "data/polygons"
 import { unescapeName, getType } from "./names"
 import { getJohnsonSymmetry } from "data"
 
