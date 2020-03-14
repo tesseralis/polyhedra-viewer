@@ -1,5 +1,6 @@
 import { getType, getAlternateNames, toConwayNotation } from "./names"
 import { getSymmetry, getSymmetryName, getOrder } from "./symmetry"
+import { platonic, prisms, capstones } from "./tables/solidTables"
 
 /**
  * Class containing miscellaneous information about a CRF polyhedron
@@ -23,13 +24,8 @@ export default class SolidInfo {
 
   order = () => getOrder(this.name)
 
-  isUniform() {
-    return [
-      "Platonic solid",
-      "Archimedean solid",
-      "Prism",
-      "Antiprism",
-    ].includes(this.type())
+  isRegular() {
+    return platonic.contains(this.name, { operation: "regular" })
   }
 
   /**
@@ -37,25 +33,25 @@ export default class SolidInfo {
    * which alternate around each vertex.
    */
   isQuasiRegular() {
-    return ["octahedron", "cuboctahedron", "icosidodecahedron"].includes(
-      this.name,
-    )
+    return platonic.contains(this.name, { operation: "rectified" })
   }
 
-  isRegular() {
-    return this.type() === "Platonic solid"
+  isUniform() {
+    return platonic.contains(this.name) || prisms.contains(this.name)
   }
 
   isChiral() {
-    return [
-      "snub cube",
-      "snub dodecahedron",
-      "gyroelongated triangular bicupola",
-      "gyroelongated square bicupola",
-      "gyroelongated pentagonal bicupola",
-      "gyroelongated pentagonal cupolarotunda",
-      "gyroelongated pentagonal birotunda",
-    ].includes(this.name)
+    return (
+      platonic.contains(
+        this.name,
+        ({ n, operation }) => operation === "snub" && n !== 3,
+      ) ||
+      capstones.contains(
+        this.name,
+        ({ elongation, count, base }) =>
+          elongation === "antiprism" && count === 2 && base !== "pyramid",
+      )
+    )
   }
 
   /**

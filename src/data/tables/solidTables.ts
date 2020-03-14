@@ -1,5 +1,5 @@
 import { range } from "lodash-es"
-import Category from "./Category"
+import Category from "./Table"
 import { polygonPrefixes } from "../polygons"
 import { getCanonicalName } from "../names"
 
@@ -124,16 +124,16 @@ export const prisms = (() => {
 export const capstones = (() => {
   interface CapstoneItem {
     n: 2 | 3 | 4 | 5
-    base: "pyramid" | "cupola" | "rotunda" | "cupola-rotunda"
+    base: "pyramid" | "cupola" | "rotunda" | "cupolarotunda"
     elongation: "" | "prism" | "antiprism"
     gyrate?: "ortho" | "gyro"
     count: 1 | 2
   }
   const capstoneItems: CapstoneItem[] = []
   for (const n of [3, 4, 5]) {
-    for (const base of ["pyramid", "cupola", "rotunda", "cupola-rotunda"]) {
+    for (const base of ["pyramid", "cupola", "rotunda", "cupolarotunda"]) {
       // Only pentagonal rotundae exist
-      if (base === "rotunda" && n !== 5) {
+      if (["rotunda", "cupolarotunda"].includes(base) && n !== 5) {
         continue
       }
       for (const elongation of ["", "prism", "antiprism"]) {
@@ -143,11 +143,11 @@ export const capstones = (() => {
         }
         for (const count of [1, 2]) {
           // Cupola-rotundae only exist if there are two of them
-          if (base === "cupola-rotunda" && count !== 2) {
+          if (base === "cupolarotunda" && count !== 2) {
             continue
           }
           // Only cupolae, rotundae can be ortho or gyro
-          if (count === 2 && base !== "pyramid") {
+          if (count === 2 && base !== "pyramid" && elongation !== "antiprism") {
             for (const gyrate of ["ortho", "gyro"]) {
               capstoneItems.push({
                 n,
@@ -184,8 +184,9 @@ export const capstones = (() => {
           return ""
       }
     })()
+    const countString = base === "cupolarotunda" ? "" : countStr(count)
     return getCanonicalName(
-      `${prefix} ${elongStr}${gyrate ?? ""}${countStr(count)}${base}`,
+      `${elongStr}${prefix} ${gyrate ?? ""}${countString}${base}`,
     )
   }
 
