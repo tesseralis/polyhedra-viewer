@@ -1,7 +1,11 @@
 import { range } from "lodash-es"
 import Category from "./Category"
-import { polygonPrefixes } from "math/polygons"
-import { getCanonicalName } from "math/polyhedra/names"
+import { polygonPrefixes } from "../polygons"
+import { getCanonicalName } from "../names"
+
+// TODO this is definitely repeated
+type AlignOpts = "meta" | "para"
+const alignOpts: AlignOpts[] = ["meta", "para"]
 
 function countStr(count: 1 | 2 | 3) {
   switch (count) {
@@ -19,7 +23,7 @@ export const platonic = (() => {
     n: 3 | 4 | 5
     type?: "face" | "vertex"
     operation:
-      | ""
+      | "regular"
       | "truncated"
       | "rectified"
       | "bevelled"
@@ -28,16 +32,16 @@ export const platonic = (() => {
   }
 
   const items: Item[] = []
-  for (const n of [3, 4, 5]) {
-    for (const operation of [
-      "",
-      "truncated",
-      "rectified",
-      "bevelled",
-      "cantellated",
-      "snub",
-    ]) {
-      if (n !== 3 && ["", "truncated"].includes(operation)) {
+  for (const operation of [
+    "regular",
+    "truncated",
+    "rectified",
+    "bevelled",
+    "cantellated",
+    "snub",
+  ]) {
+    for (const n of [3, 4, 5]) {
+      if (n !== 3 && ["regular", "truncated"].includes(operation)) {
         for (const type of ["face", "vertex"]) {
           items.push({ n, operation, type } as Item)
         }
@@ -50,7 +54,13 @@ export const platonic = (() => {
     const base = (() => {
       switch (n) {
         case 3:
-          return "tetrahedron"
+          // TODO this is kind of inelegant since we duplicate this logic above
+          // I think we can think of a better way to think about this...
+          if (["regular", "truncated"].includes(operation)) {
+            return "tetrahedron"
+          } else {
+            return "tetratetrahedron"
+          }
         case 4: {
           switch (type) {
             case "face":
@@ -73,8 +83,21 @@ export const platonic = (() => {
         }
       }
     })()
-    const opStr = operation === "" ? "" : `${operation} `
-    return `${opStr}${base}`
+    const value = (() => {
+      switch (operation) {
+        case "regular":
+        case "rectified":
+          return base
+        case "cantellated":
+          return base.startsWith("i") ? `rhomb${base}` : `rhombi${base}`
+        case "snub":
+          return `snub ${base}`
+        case "bevelled":
+        case "truncated":
+          return `truncated ${base}`
+      }
+    })()
+    return getCanonicalName(value)
   }
   return new Category(items, name)
 })()
@@ -107,7 +130,7 @@ export const capstones = (() => {
     count: 1 | 2
   }
   const capstoneItems: CapstoneItem[] = []
-  for (const n of [2, 3, 4, 5]) {
+  for (const n of [3, 4, 5]) {
     for (const base of ["pyramid", "cupola", "rotunda", "cupola-rotunda"]) {
       // Only pentagonal rotundae exist
       if (base === "rotunda" && n !== 5) {
@@ -126,16 +149,6 @@ export const capstones = (() => {
           // Only cupolae, rotundae can be ortho or gyro
           if (count === 2 && base !== "pyramid") {
             for (const gyrate of ["ortho", "gyro"]) {
-              // Only the gyrobifastigium exists for these constraints
-              if (
-                n === 2 &&
-                (base !== "cupola" ||
-                  elongation !== "" ||
-                  count !== 2 ||
-                  gyrate !== "gyro")
-              ) {
-                continue
-              }
               capstoneItems.push({
                 n,
                 base,
@@ -151,20 +164,28 @@ export const capstones = (() => {
       }
     }
   }
+  capstoneItems.push({ n: 2, base: "cupola", elongation: "", count: 1 })
+  capstoneItems.push({
+    n: 2,
+    base: "cupola",
+    elongation: "",
+    count: 2,
+    gyrate: "gyro",
+  })
   function capstoneName({ n, base, elongation, count, gyrate }: CapstoneItem) {
     const prefix = polygonPrefixes.get(n)
     const elongStr = (() => {
       switch (elongation) {
         case "prism":
-          return "elongated"
+          return "elongated "
         case "antiprism":
-          return "gyroelongated"
+          return "gyroelongated "
         default:
           return ""
       }
     })()
     return getCanonicalName(
-      `${prefix} ${elongStr} ${gyrate ?? ""}${countStr(count)}${base}`,
+      `${prefix} ${elongStr}${gyrate ?? ""}${countStr(count)}${base}`,
     )
   }
 
@@ -175,13 +196,13 @@ export const augmentedPrisms = (() => {
   interface Item {
     n: 3 | 4 | 5 | 6
     count: 1 | 2 | 3
-    align?: "meta" | "para"
+    align?: AlignOpts
   }
   const items: Item[] = []
   for (const n of [3, 4, 5, 6]) {
     for (const count of range(1, [3, 6].includes(n) ? 4 : 3)) {
       if (n === 6 && count === 2) {
-        for (const align in ["meta", "para"]) {
+        for (const align in alignOpts) {
           items.push({ n, count, align } as Item)
         }
       } else {
@@ -204,7 +225,7 @@ export const augmentedPlatonic = (() => {
     base: "tetrahedron" | "cube" | "dodecahedron"
     truncation: "" | "truncated"
     count: 1 | 2 | 3
-    align?: "meta" | "para"
+    align?: AlignOpts
   }
   function countFor(base: Item["base"]) {
     switch (base) {
@@ -221,7 +242,7 @@ export const augmentedPlatonic = (() => {
     for (const truncation of ["", "truncated"]) {
       for (const count of range(1, countFor(base as any) + 1)) {
         if (base === "dodecahedron" && count === 2) {
-          for (const align of ["meta", "para"]) {
+          for (const align of alignOpts) {
             items.push({ base, truncation, count, align } as Item)
           }
         } else {
@@ -240,17 +261,17 @@ export const augmentedPlatonic = (() => {
   return new Category(items, name)
 })()
 
-export const icosidodecahedra = (() => {
+export const rhombicosidodecahedra = (() => {
   interface Item {
     gyrate: 0 | 1 | 2 | 3
     diminished: 0 | 1 | 2 | 3
-    align?: "meta" | "para"
+    align?: AlignOpts
   }
   const items: Item[] = []
   for (const gyrate of range(4)) {
     for (const diminished of range(4 - gyrate)) {
       if (gyrate + diminished === 2) {
-        for (const align of ["meta", "para"]) {
+        for (const align of alignOpts) {
           items.push({ gyrate, diminished, align } as Item)
         }
       } else {

@@ -1,4 +1,4 @@
-import { isMatch, filter } from "lodash"
+import { uniq, isMatch } from "lodash-es"
 type NameFunc<T> = (item: T) => string
 
 export default class Category<T extends {}> {
@@ -26,8 +26,13 @@ export default class Category<T extends {}> {
   /**
    * Get all the items that satisfy the given constraints.
    */
-  getAll(constraints: Partial<T>) {
-    // FIXME this ain't gonna typecheck correctly
-    return filter(this.items, constraints)
+  // TODO figure out how to specify more than one constraint
+  getAll(constraints?: Partial<T>) {
+    const filtered = constraints
+      ? this.items.filter(item => isMatch(item, constraints))
+      : this.items
+
+    // TODO should we make this uniq here?
+    return uniq(filtered.map(item => this.nameFunc(item)))
   }
 }
