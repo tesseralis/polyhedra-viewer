@@ -10,6 +10,7 @@ import {
 } from "lodash-es"
 
 import { isValidSolid, getSolidData } from "data"
+import { polygons } from "data/polygons"
 import SolidInfo from "data/SolidInfo"
 import { Vec3D, getCentroid } from "math/geom"
 
@@ -235,7 +236,7 @@ export default class Polyhedron {
     }))
     return sortBy(
       faceAdjacencyCounts,
-      ["n", "adj.length"].concat([3, 4, 5, 6, 8, 10].map(n => `adj[${n}]`)),
+      ["n", "adj.length"].concat(polygons.map(n => `adj[${n}]`)),
     )
   }
 
