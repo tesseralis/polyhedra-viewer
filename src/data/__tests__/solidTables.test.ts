@@ -1,8 +1,4 @@
-import {
-  classics,
-  capstones,
-  rhombicosidodecahedra,
-} from "../tables/solidTables"
+import { classics, capstones, rhombicosidodecahedra } from "../tables"
 
 describe("solidTables", () => {
   describe("Platonic and Archimedean solids", () => {

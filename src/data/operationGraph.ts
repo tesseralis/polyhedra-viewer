@@ -14,7 +14,7 @@ import {
   prisms,
   capstones,
   augmented,
-} from "./tables"
+} from "./oldTables"
 import { toConwayNotation } from "./names"
 import { mapObject } from "utils"
 

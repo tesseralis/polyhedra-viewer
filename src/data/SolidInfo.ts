@@ -1,11 +1,6 @@
 import { getType, getAlternateNames, toConwayNotation } from "./names"
 import { getSymmetry, getSymmetryName, getOrder } from "./symmetry"
-import {
-  classics,
-  prisms,
-  capstones,
-  rhombicosidodecahedra,
-} from "./tables/solidTables"
+import { classics, prisms, capstones, rhombicosidodecahedra } from "./tables"
 
 /**
  * Class containing miscellaneous information about a CRF polyhedron

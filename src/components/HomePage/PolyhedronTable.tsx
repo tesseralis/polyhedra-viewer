@@ -1,7 +1,7 @@
 import React, { ThHTMLAttributes } from "react"
 
 import { fromConwayNotation } from "data/names"
-import { Table } from "data/tables"
+import { Table } from "data/oldTables"
 import PolyhedronLink from "./PolyhedronLink"
 import { media, fonts, useStyle, scales } from "styles"
 
