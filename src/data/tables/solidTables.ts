@@ -3,7 +3,7 @@ import Category from "./Table"
 import { polygonPrefixes } from "../polygons"
 import { getCanonicalName } from "../names"
 
-// TODO this is definitely repeated
+// FIXME this and gyrate opts are definitely repeated
 type AlignOpts = "meta" | "para"
 const alignOpts: AlignOpts[] = ["meta", "para"]
 
@@ -114,7 +114,7 @@ export const prisms = (() => {
   const items: Item[] = []
   for (const n of [3, 4, 5, 6, 8, 10]) {
     for (const type of ["prism", "antiprism"]) {
-      // TODO how to get around this?
+      // TODO how to get around the explicit cast?
       items.push({ n, type } as Item)
     }
   }

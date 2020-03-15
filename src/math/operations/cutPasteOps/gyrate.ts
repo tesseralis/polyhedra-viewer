@@ -66,7 +66,7 @@ export const gyrate = makeOperation("gyrate", {
       throw new Error("Invalid cap")
     }
     if (some(relations, "direction")) {
-      options.direction = getGyrateDirection(polyhedron, cap)
+      options.direction = getGyrateDirection(cap)
       if (
         relations.filter(
           relation =>
