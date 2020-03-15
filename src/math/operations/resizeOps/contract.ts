@@ -78,7 +78,7 @@ export function applyContract(
 }
 
 function isBevelled(polyhedron: Polyhedron) {
-  return polyhedron.name.includes("truncated")
+  return polyhedron.info.inClassicTable({ operation: "bevelled" })
 }
 
 // NOTE: We are using the same operation for contracting both expanded and snub solids.
