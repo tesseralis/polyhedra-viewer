@@ -3,7 +3,7 @@ import Table from "./Table"
 interface Item {
   n: 3 | 4 | 5
   type?: "face" | "vertex"
-  // FIXME I wonder if there is a more elegant way to split this up
+  // TODO I wonder if there is a more elegant way to split this up
   operation:
     | "regular"
     | "truncated"
@@ -38,7 +38,7 @@ function name({ n, operation, type }: Item) {
   const base = (() => {
     switch (n) {
       case 3:
-        // FIXME this is kind of inelegant since we duplicate this logic above
+        // TODO this is kind of inelegant since we duplicate this logic above
         // I think we can think of a better way to think about this...
         if (["regular", "truncated"].includes(operation)) {
           return "tetrahedron"
