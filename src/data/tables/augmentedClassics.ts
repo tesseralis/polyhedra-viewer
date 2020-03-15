@@ -1,7 +1,7 @@
 import { range } from "lodash-es"
 import Table from "./Table"
 import {
-  Count,
+  ZeroCount,
   AlignOpts,
   alignOpts,
   countString,
@@ -15,18 +15,18 @@ const bases: Base[] = ["tetrahedron", "cube", "dodecahedron"]
 interface Item {
   base: Base
   truncated: boolean
-  count: Count
+  count: ZeroCount
   align?: AlignOpts
 }
 
-const countMapping: Record<Base, Count> = {
+const countMapping: Record<Base, ZeroCount> = {
   tetrahedron: 1,
   cube: 2,
   dodecahedron: 3,
 }
 
 function getCounts(base: Base) {
-  return range(1, countMapping[base] + 1) as Count[]
+  return range(countMapping[base] + 1) as ZeroCount[]
 }
 
 function* getItems() {

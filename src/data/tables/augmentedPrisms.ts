@@ -3,7 +3,7 @@ import { range } from "lodash-es"
 import { polygonPrefixes } from "../polygons"
 import Table from "./Table"
 import {
-  Count,
+  ZeroCount,
   AlignOpts,
   alignOpts,
   prefix,
@@ -16,13 +16,13 @@ const faceTypes: FaceType[] = [3, 4, 5, 6]
 
 interface Item {
   n: FaceType
-  count: Count
+  count: ZeroCount
   align?: AlignOpts
 }
 
 function getCounts(n: FaceType) {
   const limit = [3, 6].includes(n) ? 3 : 2
-  return range(1, limit + 1) as Count[]
+  return range(limit + 1) as ZeroCount[]
 }
 
 function* getItems() {
