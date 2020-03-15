@@ -25,15 +25,16 @@ function getCounts(n: FaceType) {
   return range(1, limit + 1) as Count[]
 }
 
-const items: Item[] = []
-for (const n of faceTypes) {
-  for (const count of getCounts(n)) {
-    if (n === 6 && count === 2) {
-      for (const align of alignOpts) {
-        items.push({ n, count, align })
+function* getItems() {
+  for (const n of faceTypes) {
+    for (const count of getCounts(n)) {
+      if (n === 6 && count === 2) {
+        for (const align of alignOpts) {
+          yield { n, count, align }
+        }
+      } else {
+        yield { n, count }
       }
-    } else {
-      items.push({ n, count })
     }
   }
 }
@@ -45,4 +46,4 @@ function name({ n, count, align }: Item) {
   )
 }
 
-export default new Table(items, name)
+export default new Table([...getItems()], name)

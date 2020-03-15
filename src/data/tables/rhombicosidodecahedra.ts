@@ -23,14 +23,15 @@ function* getCounts() {
   }
 }
 
-const items: Item[] = []
-for (const [gyrate, diminished] of getCounts()) {
-  if (gyrate + diminished === 2) {
-    for (const align of alignOpts) {
-      items.push({ gyrate, diminished, align })
+function* getItems() {
+  for (const [gyrate, diminished] of getCounts()) {
+    if (gyrate + diminished === 2) {
+      for (const align of alignOpts) {
+        yield { gyrate, diminished, align }
+      }
+    } else {
+      yield { gyrate, diminished }
     }
-  } else {
-    items.push({ gyrate, diminished })
   }
 }
 
@@ -44,4 +45,4 @@ function name({ gyrate, diminished, align }: Item) {
     ),
   )
 }
-export default new Table(items, name)
+export default new Table([...getItems()], name)

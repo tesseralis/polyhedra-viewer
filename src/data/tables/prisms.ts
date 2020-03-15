@@ -7,13 +7,16 @@ interface Item {
   type: PrismType
 }
 
-const items: Item[] = []
-for (const n of polygons) {
-  for (const type of prismTypes) {
-    items.push({ n, type })
+function* getItems() {
+  for (const n of polygons) {
+    for (const type of prismTypes) {
+      yield { n, type }
+    }
   }
 }
+
 function name({ n, type }: Item) {
   return `${polygonPrefixes.get(n)} ${type}`
 }
-export default new Table(items, name)
+
+export default new Table([...getItems()], name)

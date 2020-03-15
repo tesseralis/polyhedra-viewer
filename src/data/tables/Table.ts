@@ -15,8 +15,13 @@ function applyFilter<Item extends {}>(item: Item, filter?: Filter<Item>) {
   return isMatch(item, filter)
 }
 
+/**
+ * A relational table of named polyhedra. Allows querying for containment
+ * and selecting based on filters.
+ */
 export default class Table<Item extends {}> {
   items: NamedItem<Item>[]
+
   constructor(items: Item[], nameFunc: NameFunc<Item>) {
     // TODO possibly do something more robust than just storing everything in a list
     this.items = items.map(item => ({

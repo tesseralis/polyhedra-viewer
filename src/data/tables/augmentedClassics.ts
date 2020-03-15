@@ -29,16 +29,17 @@ function getCounts(base: Base) {
   return range(1, countMapping[base] + 1) as Count[]
 }
 
-const items: Item[] = []
-for (const base of bases) {
-  for (const truncated of [false, true]) {
-    for (const count of getCounts(base)) {
-      if (base === "dodecahedron" && count === 2) {
-        for (const align of alignOpts) {
-          items.push({ base, truncated, count, align })
+function* getItems() {
+  for (const base of bases) {
+    for (const truncated of [false, true]) {
+      for (const count of getCounts(base)) {
+        if (base === "dodecahedron" && count === 2) {
+          for (const align of alignOpts) {
+            yield { base, truncated, count, align }
+          }
+        } else {
+          yield { base, truncated, count }
         }
-      } else {
-        items.push({ base, truncated, count })
       }
     }
   }
@@ -55,4 +56,4 @@ function name({ base, truncated, count, align }: Item) {
   )
 }
 
-export default new Table(items, name)
+export default new Table([...getItems()], name)

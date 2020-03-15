@@ -31,49 +31,51 @@ interface Item {
   count: CapCount
   gyrate?: GyrateOpt
 }
-const items: Item[] = []
-for (const n of faceTypes) {
-  for (const base of bases) {
-    // Only pentagonal rotundae exist
-    if (["rotunda", "cupolarotunda"].includes(base) && n !== 5) {
-      continue
-    }
-    for (const elongation of elongations) {
-      // Gyroelongated pyramids are concave
-      if (n === 3 && base === "pyramid" && elongation === "antiprism") {
+
+function* getItems(): Generator<Item> {
+  for (const n of faceTypes) {
+    for (const base of bases) {
+      // Only pentagonal rotundae exist
+      if (["rotunda", "cupolarotunda"].includes(base) && n !== 5) {
         continue
       }
-      for (const count of counts) {
-        // Cupola-rotundae only exist if there are two of them
-        if (base === "cupolarotunda" && count !== 2) {
+      for (const elongation of elongations) {
+        // Gyroelongated pyramids are concave
+        if (n === 3 && base === "pyramid" && elongation === "antiprism") {
           continue
         }
-        // Only cupolae, rotundae can be ortho or gyro
-        if (count === 2 && base !== "pyramid" && elongation !== "antiprism") {
-          for (const gyrate of gyrateOpts) {
-            items.push({
-              n,
-              base,
-              elongation,
-              count,
-              gyrate,
-            })
+        for (const count of counts) {
+          // Cupola-rotundae only exist if there are two of them
+          if (base === "cupolarotunda" && count !== 2) {
+            continue
           }
-        } else {
-          items.push({ n, base, elongation, count })
+          // Only cupolae, rotundae can be ortho or gyro
+          if (count === 2 && base !== "pyramid" && elongation !== "antiprism") {
+            for (const gyrate of gyrateOpts) {
+              yield {
+                n,
+                base,
+                elongation,
+                count,
+                gyrate,
+              }
+            }
+          } else {
+            yield { n, base, elongation, count }
+          }
         }
       }
     }
   }
+  yield { n: 2, base: "cupola", elongation: "", count: 1 }
+  yield {
+    n: 2,
+    base: "cupola",
+    elongation: "",
+    count: 2,
+    gyrate: "gyro",
+  }
 }
-items.push({ n: 2, base: "cupola", elongation: "", count: 1 })
-items.push({
-  n: 2,
-  base: "cupola",
-  elongation: "",
-  count: 2,
-  gyrate: "gyro",
-})
 
 const elongStr = {
   prism: "elongated",
@@ -90,4 +92,4 @@ function capstoneName({ n, base, elongation, count, gyrate }: Item) {
   )
 }
 
-export default new Table(items, capstoneName)
+export default new Table([...getItems()], capstoneName)

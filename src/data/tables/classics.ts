@@ -13,25 +13,27 @@ interface Item {
     | "snub"
 }
 
-const items: Item[] = []
-for (const operation of [
-  "regular",
-  "truncated",
-  "rectified",
-  "bevelled",
-  "cantellated",
-  "snub",
-]) {
-  for (const n of [3, 4, 5]) {
-    if (n !== 3 && ["regular", "truncated"].includes(operation)) {
-      for (const type of ["face", "vertex"]) {
-        items.push({ n, operation, type } as Item)
+function* getItems() {
+  for (const operation of [
+    "regular",
+    "truncated",
+    "rectified",
+    "bevelled",
+    "cantellated",
+    "snub",
+  ]) {
+    for (const n of [3, 4, 5]) {
+      if (n !== 3 && ["regular", "truncated"].includes(operation)) {
+        for (const type of ["face", "vertex"]) {
+          yield { n, operation, type } as Item
+        }
+      } else {
+        yield { n, operation } as Item
       }
-    } else {
-      items.push({ n, operation } as Item)
     }
   }
 }
+
 function name({ n, operation, type }: Item) {
   const base = (() => {
     switch (n) {
@@ -78,4 +80,4 @@ function name({ n, operation, type }: Item) {
       return `truncated ${base}`
   }
 }
-export default new Table(items, name)
+export default new Table([...getItems()], name)
