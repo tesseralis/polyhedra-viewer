@@ -1,6 +1,11 @@
 import { getType, getAlternateNames, toConwayNotation } from "./names"
 import { getSymmetry, getSymmetryName, getOrder } from "./symmetry"
-import { classics, prisms, capstones } from "./tables/solidTables"
+import {
+  classics,
+  prisms,
+  capstones,
+  rhombicosidodecahedra,
+} from "./tables/solidTables"
 
 /**
  * Class containing miscellaneous information about a CRF polyhedron
@@ -35,6 +40,12 @@ export default class SolidInfo {
 
   inCapstoneTable(filter?: Parameters<typeof capstones.contains>[1]) {
     return capstones.contains(this.name, filter)
+  }
+
+  inRhombicosidodecahedronTable(
+    filter?: Parameters<typeof rhombicosidodecahedra.contains>[1],
+  ) {
+    return rhombicosidodecahedra.contains(this.name, filter)
   }
 
   isRegular() {
