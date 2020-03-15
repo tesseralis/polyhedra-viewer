@@ -1,11 +1,14 @@
-import { range } from "lodash-es"
+import { compact, range } from "lodash-es"
 import Category from "./Table"
 import { polygonPrefixes, polygons, Polygon } from "../polygons"
-import { getCanonicalName } from "../names"
 
 // FIXME put this and gyrate opts, and other stuff in a common location
 type AlignOpts = "meta" | "para"
 const alignOpts: AlignOpts[] = ["meta", "para"]
+
+function wordJoin(...array: (string | undefined)[]) {
+  return compact(array).join(" ")
+}
 
 function countStr(count: 1 | 2 | 3) {
   switch (count) {
@@ -16,6 +19,11 @@ function countStr(count: 1 | 2 | 3) {
     case 3:
       return "tri"
   }
+}
+
+function countStr0(count: 0 | 1 | 2 | 3, base: string) {
+  if (count === 0) return ""
+  return countStr(count) + base
 }
 
 // FIXME should I split everything into different files?
@@ -88,21 +96,18 @@ export const classics = (() => {
         }
       }
     })()
-    const value = (() => {
-      switch (operation) {
-        case "regular":
-        case "rectified":
-          return base
-        case "cantellated":
-          return base.startsWith("i") ? `rhomb${base}` : `rhombi${base}`
-        case "snub":
-          return `snub ${base}`
-        case "bevelled":
-        case "truncated":
-          return `truncated ${base}`
-      }
-    })()
-    return getCanonicalName(value)
+    switch (operation) {
+      case "regular":
+      case "rectified":
+        return base
+      case "cantellated":
+        return base.startsWith("i") ? `rhomb${base}` : `rhombi${base}`
+      case "snub":
+        return `snub ${base}`
+      case "bevelled":
+      case "truncated":
+        return `truncated ${base}`
+    }
   }
   return new Category(items, name)
 })()
@@ -121,8 +126,7 @@ export const prisms = (() => {
     }
   }
   function name({ n, type }: Item) {
-    // FIXME do we always want to get canonical name here?
-    return getCanonicalName(`${polygonPrefixes.get(n)} ${type}`)
+    return `${polygonPrefixes.get(n)} ${type}`
   }
   return new Category(items, name)
 })()
@@ -179,20 +183,21 @@ export const capstones = (() => {
     gyrate: "gyro",
   })
   function capstoneName({ n, base, elongation, count, gyrate }: CapstoneItem) {
-    const prefix = polygonPrefixes.get(n)
     const elongStr = (() => {
       switch (elongation) {
         case "prism":
-          return "elongated "
+          return "elongated"
         case "antiprism":
-          return "gyroelongated "
+          return "gyroelongated"
         default:
           return ""
       }
     })()
     const countString = base === "cupolarotunda" ? "" : countStr(count)
-    return getCanonicalName(
-      `${elongStr}${prefix} ${gyrate ?? ""}${countString}${base}`,
+    return wordJoin(
+      elongStr,
+      polygonPrefixes.get(n),
+      `${gyrate ?? ""}${countString}${base}`,
     )
   }
 
@@ -209,7 +214,7 @@ export const augmentedPrisms = (() => {
   for (const n of [3, 4, 5, 6]) {
     for (const count of range(1, [3, 6].includes(n) ? 4 : 3)) {
       if (n === 6 && count === 2) {
-        for (const align in alignOpts) {
+        for (const align of alignOpts) {
           items.push({ n, count, align } as Item)
         }
       } else {
@@ -218,10 +223,10 @@ export const augmentedPrisms = (() => {
     }
   }
   function name({ n, count, align }: Item) {
-    return getCanonicalName(
-      `${align ?? ""}${countStr(count)}augmented ${polygonPrefixes.get(
-        n,
-      )} prism`,
+    return wordJoin(
+      `${align ?? ""}${countStr(count)}augmented`,
+      polygonPrefixes.get(n),
+      "prism",
     )
   }
   return new Category(items, name)
@@ -259,10 +264,10 @@ export const augmentedPlatonic = (() => {
     }
   }
   function name({ base, truncation, count, align }: Item) {
-    return getCanonicalName(
-      `${align ?? ""}${countStr(count)}augmented ${
-        truncation ? truncation + " " : ""
-      }${base}`,
+    return wordJoin(
+      `${align ?? ""}${countStr(count)}augmented`,
+      truncation,
+      base,
     )
   }
   return new Category(items, name)
@@ -287,11 +292,13 @@ export const rhombicosidodecahedra = (() => {
     }
   }
   function name({ gyrate, diminished, align }: Item) {
-    const gyrateStr = gyrate !== 0 ? `${countStr(gyrate)}gyrate ` : ""
-    const diminishedStr =
-      diminished !== 0 ? `${countStr(diminished)}diminished ` : ""
-    return getCanonicalName(
-      `${align ?? ""}${gyrateStr}${diminishedStr}rhombicosidodecahedron`,
+    return (
+      (align ?? "") +
+      wordJoin(
+        countStr0(gyrate, "gyrate"),
+        countStr0(diminished, "diminished"),
+        "rhombicosidodecahedron",
+      )
     )
   }
   return new Category(items, name)

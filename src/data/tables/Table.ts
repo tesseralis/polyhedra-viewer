@@ -1,7 +1,9 @@
 import { uniq, some, isMatch, isFunction } from "lodash-es"
-type NameFunc<Item> = (item: Item) => string
+import { getCanonicalName } from "../names"
 
+type NameFunc<Item> = (item: Item) => string
 type Filter<Item> = Partial<Item> | ((item: Item) => boolean)
+type NamedItem<Item> = Item & { name: string }
 
 function applyFilter<Item extends {}>(item: Item, filter?: Filter<Item>) {
   if (!filter) {
@@ -13,23 +15,15 @@ function applyFilter<Item extends {}>(item: Item, filter?: Filter<Item>) {
   return isMatch(item, filter)
 }
 
-type ItemOptions<Item extends {}> = { [K in keyof Item]: Item[K][] }
-
 export default class Table<Item extends {}> {
-  items: Item[]
-  nameFunc: NameFunc<Item>
+  items: NamedItem<Item>[]
   constructor(items: Item[], nameFunc: NameFunc<Item>) {
     // TODO possibly do something more robust than just storing everything in a list
-    this.items = items
-    this.nameFunc = nameFunc
-  }
-
-  static create<Item>(
-    options: ItemOptions<Item>,
-    generator: (options: ItemOptions<Item>) => Item[],
-    nameFunc: NameFunc<Item>,
-  ) {
-    return new Table(generator(options), nameFunc)
+    this.items = items.map(item => ({
+      ...item,
+      // TODO possibly separate out name and canonical name
+      name: getCanonicalName(nameFunc(item)),
+    }))
   }
 
   /**
@@ -38,7 +32,7 @@ export default class Table<Item extends {}> {
   contains(name: string, filter?: Filter<Item>) {
     return some(
       this.items,
-      item => this.nameFunc(item) === name && applyFilter(item, filter),
+      item => item.name === name && applyFilter(item, filter),
     )
   }
 
@@ -48,7 +42,7 @@ export default class Table<Item extends {}> {
   get(filter?: Filter<Item>) {
     const filtered = this.items.filter(item => applyFilter(item, filter))
 
-    // FIXME should we make this uniq here?
-    return uniq(filtered.map(item => this.nameFunc(item)))
+    // TODO we may need to not make this 'uniq'
+    return uniq(filtered.map(item => item.name))
   }
 }
