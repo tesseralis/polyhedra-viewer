@@ -13,12 +13,22 @@ function applyFilter<Item extends {}>(item: Item, filter?: Filter<Item>) {
   return isMatch(item, filter)
 }
 
-export default class Category<Item extends {}> {
+type ItemOptions<Item extends {}> = { [K in keyof Item]: Item[K][] }
+
+export default class Table<Item extends {}> {
   items: Item[]
   nameFunc: NameFunc<Item>
   constructor(items: Item[], nameFunc: NameFunc<Item>) {
     this.items = items
     this.nameFunc = nameFunc
+  }
+
+  static create<Item>(
+    options: ItemOptions<Item>,
+    generator: (options: ItemOptions<Item>) => Item[],
+    nameFunc: NameFunc<Item>,
+  ) {
+    return new Table(generator(options), nameFunc)
   }
 
   /**

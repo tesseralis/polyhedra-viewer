@@ -7,18 +7,20 @@ import {
 } from "./resizeUtils"
 import makeOperation from "../makeOperation"
 
+type PlatonicFaceType = 3 | 4 | 5
+type FaceType = PlatonicFaceType | 6 | 8 | 10
+
 interface Options {
-  faceType?: number
+  faceType?: FaceType
 }
 
 // Return the family of an *expanded* polyhedron
 function getFamily(polyhedron: Polyhedron) {
-  // FIXME extract this out somewhere
-  const nums: (3 | 4 | 5)[] = [3, 4, 5]
+  const nums: PlatonicFaceType[] = [3, 4, 5]
   return nums.find(n => polyhedron.info.inClassicTable({ n }))!
 }
 
-const coxeterNum: Record<number, number> = { 3: 4, 4: 6, 5: 10 }
+const coxeterNum: Record<PlatonicFaceType, number> = { 3: 4, 4: 6, 5: 10 }
 
 function getContractLength(polyhedron: Polyhedron, faceType: number) {
   // Calculate dihedral angle
@@ -109,12 +111,13 @@ export const contract = makeOperation<Options>("contract", {
   hitOption: "faceType",
   getHitOption(polyhedron, hitPoint) {
     const hitFace = polyhedron.hitFace(hitPoint)
+    const faceType = hitFace.numSides as FaceType // TODO unsure if always valid
     if (isBevelled(polyhedron)) {
       const isValid = hitFace.numSides > 4
-      return isValid ? { faceType: hitFace.numSides } : {}
+      return isValid ? { faceType } : {}
     }
     const isValid = isExpandedFace(polyhedron, hitFace)
-    return isValid ? { faceType: hitFace.numSides } : {}
+    return isValid ? { faceType } : {}
   },
 
   allOptionCombos(polyhedron) {
