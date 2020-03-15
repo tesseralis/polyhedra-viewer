@@ -25,7 +25,7 @@ export default class SolidInfo {
 
   order = () => getOrder(this.name)
 
-  inClassicTable(filter?: Parameters<typeof classics.contains>[1]) {
+  inClassicalTable(filter?: Parameters<typeof classics.contains>[1]) {
     return classics.contains(this.name, filter)
   }
 
@@ -44,7 +44,7 @@ export default class SolidInfo {
   }
 
   isRegular() {
-    return this.inClassicTable({ operation: "regular" })
+    return this.inClassicalTable({ operation: "regular" })
   }
 
   /**
@@ -52,16 +52,16 @@ export default class SolidInfo {
    * which alternate around each vertex.
    */
   isQuasiRegular() {
-    return this.inClassicTable({ operation: "rectified" })
+    return this.inClassicalTable({ operation: "rectified" })
   }
 
   isUniform() {
-    return this.inClassicTable() || this.inPrismTable()
+    return this.inClassicalTable() || this.inPrismTable()
   }
 
   isChiral() {
     return (
-      this.inClassicTable(
+      this.inClassicalTable(
         ({ n, operation }) => operation === "snub" && n !== 3,
       ) ||
       this.inCapstoneTable(

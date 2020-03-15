@@ -1,6 +1,6 @@
-export { default as classics } from "./classics"
+export { default as classics } from "./classicals"
 export { default as prisms } from "./prisms"
 export { default as capstones } from "./capstones"
 export { default as augmentedPrisms } from "./augmentedPrisms"
-export { default as augmentedClassics } from "./augmentedClassics"
+export { default as augmentedClassics } from "./augmentedClassicals"
 export { default as rhombicosidodecahedra } from "./rhombicosidodecahedra"

@@ -18,7 +18,7 @@ interface Options {
 // Return the family of an *expanded* polyhedron
 function getFamily(polyhedron: Polyhedron) {
   const nums: Family[] = [3, 4, 5]
-  return nums.find(n => polyhedron.info.inClassicTable({ n }))!
+  return nums.find(n => polyhedron.info.inClassicalTable({ n }))!
 }
 
 const coxeterNum: Record<Family, number> = { 3: 4, 4: 6, 5: 10 }
@@ -79,7 +79,7 @@ export function applyContract(
 }
 
 function isBevelled(polyhedron: Polyhedron) {
-  return polyhedron.info.inClassicTable({ operation: "bevelled" })
+  return polyhedron.info.inClassicalTable({ operation: "bevelled" })
 }
 
 // NOTE: We are using the same operation for contracting both expanded and snub solids.
