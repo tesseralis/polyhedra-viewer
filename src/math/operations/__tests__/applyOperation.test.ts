@@ -1,6 +1,5 @@
 import { forEach } from "lodash-es"
 import { allSolidNames } from "data"
-import { getOperations } from "../operationUtils"
 import { operations } from ".."
 import { Polyhedron } from "math/polyhedra"
 import { setupOperations } from "../operationTestUtils"
