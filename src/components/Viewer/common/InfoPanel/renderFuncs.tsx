@@ -40,25 +40,22 @@ export function Sup({ children }: ChildrenProp<number>) {
   return <sup {...css()}>{value}</sup>
 }
 
-function groupedVertexConfig(config: string) {
+function* groupedVertexConfig(config: string) {
   const array = config.split(".")
   let current = { type: "", count: 0 }
-  const result: typeof current[] = []
   for (const type of array) {
     if (type === current.type) {
       current.count++
     } else {
-      if (current.count) result.push(current)
+      if (current.count) yield current
       current = { type, count: 1 }
     }
   }
-  if (current.count) result.push(current)
-
-  return result
+  if (current.count) yield current
 }
 
 function getShortVertexConfig(config: string) {
-  const grouped = groupedVertexConfig(config)
+  const grouped = [...groupedVertexConfig(config)]
   const children = grouped.map((typeCount, i) => {
     const { type, count } = typeCount
     const val =

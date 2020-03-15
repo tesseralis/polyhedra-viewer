@@ -44,20 +44,21 @@ export default class Vertex {
     return some(vertices, vertex => this.equals(vertex))
   }
 
-  adjacentEdges() {
-    // find an edge with this as a source
+  private *adjacentEdgesIter() {
     const v2 = parseInt(findKey(this.polyhedron.edgeToFaceGraph()[this.index])!)
     const e0 = new Edge(this, this.polyhedron.vertices[v2])
     let e = e0
-    const result = []
     let count = 0
     do {
       count++
-      result.push(e)
+      yield e
       e = e.prev().twin()
       if (count > 10) throw new Error("we done messed up")
     } while (!e.equals(e0))
-    return result
+  }
+
+  adjacentEdges() {
+    return [...this.adjacentEdgesIter()]
   }
 
   adjacentVertices() {
