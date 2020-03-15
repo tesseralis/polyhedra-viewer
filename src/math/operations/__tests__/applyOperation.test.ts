@@ -5,8 +5,6 @@ import { Polyhedron } from "math/polyhedra"
 import { setupOperations } from "../operationTestUtils"
 
 setupOperations()
-// map from polyhedron to excluded operations
-const excludedOperations = {}
 
 describe("applyOperation", () => {
   const polyhedra = allSolidNames.map(name => Polyhedron.get(name))
@@ -17,7 +15,7 @@ describe("applyOperation", () => {
           it(polyhedron.name, () => {
             const optsToTest = operation.allOptionCombos(polyhedron)
             optsToTest.forEach(options => {
-              const result = operation.apply(polyhedron, options)
+              const result = operation.apply(polyhedron, options as any)
               expect(result).toBeValidPolyhedron()
             })
           })
