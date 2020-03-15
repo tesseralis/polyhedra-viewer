@@ -1,7 +1,6 @@
-import { mapValues, compact, every, xor, some, uniq, pickBy } from "lodash-es"
+import { mapValues, compact, every, xor, uniq, pickBy } from "lodash-es"
 
 import { Polyhedron, Face, Cap } from "math/polyhedra"
-import { inRow, inColumn, inSection } from "data/tableUtils"
 import { isInverse, getOrthonormalTransform, PRECISION } from "math/geom"
 import { repeat, getCyclic, getSingle } from "utils"
 import { deduplicateVertices } from "../makeOperation"
@@ -277,33 +276,35 @@ function getUsingOpt(using: string, numSides: number) {
 }
 
 const getUsingOpts = (polyhedron: Polyhedron) => {
+  // Triangular prism or fastigium
   if (polyhedron.name === "triangular prism") {
     return ["Y4", "U2"]
   }
-  if (inRow(polyhedron.name, "prisms", "decagonal")) {
-    return ["U5", "R5"]
-  }
-  const rows = ["pentagonal cupola", "pentagonal rotunda"]
-  if (some(rows, row => inRow(polyhedron.name, "capstones", row))) {
+
+  if (
+    polyhedron.info.inPrismTable({ n: 10 }) ||
+    polyhedron.info.inCapstoneTable(
+      ({ base, n, count }) =>
+        count === 1 && n === 5 && ["cupola", "rotunda"].includes(base),
+    )
+  ) {
     return ["U5", "R5"]
   }
   return null
 }
 
 const hasGyrateOpts = (polyhedron: Polyhedron) => {
-  if (inSection(polyhedron.name, "rhombicosidodecahedra")) {
+  if (polyhedron.info.inRhombicosidodecahedronTable()) {
     return true
   }
-  const cupolaRows = [
-    "triangular cupola",
-    "square cupola",
-    "pentagonal cupola",
-    "pentagonal rotunda",
-  ]
-  if (inColumn(polyhedron.name, "capstones", "gyroelongated")) {
+  if (polyhedron.info.inCapstoneTable({ elongation: "antiprism" })) {
     return false
   }
-  if (some(cupolaRows, row => inRow(polyhedron.name, "capstones", row))) {
+  if (
+    polyhedron.info.inCapstoneTable(
+      ({ n, base }) => base !== "pyramid" && n !== 2,
+    )
+  ) {
     return true
   }
   return false
@@ -396,7 +397,7 @@ export const augment = makeOperation<Options>("augment", {
   allOptions(polyhedron, optionName) {
     switch (optionName) {
       case "gyrate":
-        return hasGyrateOpts(polyhedron) ? ["ortho", "gyro"] : []
+        return hasGyrateOpts(polyhedron) ? allGyrateOpts : []
       case "using":
         return getUsingOpts(polyhedron) ?? []
       case "face":

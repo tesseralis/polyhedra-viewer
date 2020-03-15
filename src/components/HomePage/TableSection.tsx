@@ -2,7 +2,7 @@ import React from "react"
 import { CSSProperties } from "aphrodite"
 import { useStyle, scales } from "styles"
 
-import { Table } from "data/tables"
+import { Table } from "data/oldTables"
 import { media, fonts } from "styles"
 import Description from "./Description"
 import PolyhedronTable from "./PolyhedronTable"

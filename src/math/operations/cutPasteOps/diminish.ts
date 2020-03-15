@@ -79,7 +79,7 @@ export const diminish = makeOperation<Options>("diminish", {
     }
 
     if (hasMultiple(relations, "gyrate")) {
-      options.gyrate = getCupolaGyrate(polyhedron, cap)
+      options.gyrate = getCupolaGyrate(cap)
     }
 
     if (options.gyrate !== "ortho" && hasMultiple(relations, "align")) {

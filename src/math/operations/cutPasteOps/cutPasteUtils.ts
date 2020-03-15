@@ -14,9 +14,7 @@ export const hasMultiple = (relations: Relation[], property: string) => {
 export function getCapAlignment(polyhedron: Polyhedron, cap: Cap) {
   const isRhombicosidodecahedron = cap.type === "cupola"
   const orthoCaps = isRhombicosidodecahedron
-    ? Cap.getAll(polyhedron).filter(
-        cap => getCupolaGyrate(polyhedron, cap) === "ortho",
-      )
+    ? Cap.getAll(polyhedron).filter(cap => getCupolaGyrate(cap) === "ortho")
     : []
 
   const otherNormal =
@@ -29,7 +27,7 @@ export function getCapAlignment(polyhedron: Polyhedron, cap: Cap) {
   return isInverse(cap.normal(), otherNormal) ? "para" : "meta"
 }
 
-export function getCupolaGyrate(polyhedron: Polyhedron, cap: Cap) {
+export function getCupolaGyrate(cap: Cap) {
   const isOrtho = every(cap.boundary().edges, edge => {
     const [n1, n2] = edge.adjacentFaces().map(f => f.numSides)
     return (n1 === 4) === (n2 === 4)
@@ -37,6 +35,6 @@ export function getCupolaGyrate(polyhedron: Polyhedron, cap: Cap) {
   return isOrtho ? "ortho" : "gyro"
 }
 
-export function getGyrateDirection(polyhedron: Polyhedron, cap: Cap) {
-  return getCupolaGyrate(polyhedron, cap) === "ortho" ? "back" : "forward"
+export function getGyrateDirection(cap: Cap) {
+  return getCupolaGyrate(cap) === "ortho" ? "back" : "forward"
 }

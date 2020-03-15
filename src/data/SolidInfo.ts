@@ -1,5 +1,6 @@
 import { getType, getAlternateNames, toConwayNotation } from "./names"
 import { getSymmetry, getSymmetryName, getOrder } from "./symmetry"
+import { classics, prisms, capstones, rhombicosidodecahedra } from "./tables"
 
 /**
  * Class containing miscellaneous information about a CRF polyhedron
@@ -7,6 +8,7 @@ import { getSymmetry, getSymmetryName, getOrder } from "./symmetry"
  */
 export default class SolidInfo {
   name: string
+
   constructor(name: string) {
     this.name = name
   }
@@ -23,13 +25,26 @@ export default class SolidInfo {
 
   order = () => getOrder(this.name)
 
-  isUniform() {
-    return [
-      "Platonic solid",
-      "Archimedean solid",
-      "Prism",
-      "Antiprism",
-    ].includes(this.type())
+  inClassicTable(filter?: Parameters<typeof classics.contains>[1]) {
+    return classics.contains(this.name, filter)
+  }
+
+  inPrismTable(filter?: Parameters<typeof prisms.contains>[1]) {
+    return prisms.contains(this.name, filter)
+  }
+
+  inCapstoneTable(filter?: Parameters<typeof capstones.contains>[1]) {
+    return capstones.contains(this.name, filter)
+  }
+
+  inRhombicosidodecahedronTable(
+    filter?: Parameters<typeof rhombicosidodecahedra.contains>[1],
+  ) {
+    return rhombicosidodecahedra.contains(this.name, filter)
+  }
+
+  isRegular() {
+    return this.inClassicTable({ operation: "regular" })
   }
 
   /**
@@ -37,25 +52,23 @@ export default class SolidInfo {
    * which alternate around each vertex.
    */
   isQuasiRegular() {
-    return ["octahedron", "cuboctahedron", "icosidodecahedron"].includes(
-      this.name,
-    )
+    return this.inClassicTable({ operation: "rectified" })
   }
 
-  isRegular() {
-    return this.type() === "Platonic solid"
+  isUniform() {
+    return this.inClassicTable() || this.inPrismTable()
   }
 
   isChiral() {
-    return [
-      "snub cube",
-      "snub dodecahedron",
-      "gyroelongated triangular bicupola",
-      "gyroelongated square bicupola",
-      "gyroelongated pentagonal bicupola",
-      "gyroelongated pentagonal cupolarotunda",
-      "gyroelongated pentagonal birotunda",
-    ].includes(this.name)
+    return (
+      this.inClassicTable(
+        ({ n, operation }) => operation === "snub" && n !== 3,
+      ) ||
+      this.inCapstoneTable(
+        ({ elongation, count, base }) =>
+          elongation === "antiprism" && count === 2 && base !== "pyramid",
+      )
+    )
   }
 
   /**

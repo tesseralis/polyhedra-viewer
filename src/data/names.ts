@@ -36,6 +36,7 @@ export const alternateNames: Record<string, string[]> = {
   octahedron: ["tetratetrahedron", "triangular antiprism", "square bipyramid"],
   icosahedron: [
     "snub tetrahedron",
+    "snub tetratetrahedron",
     "gyroelongated pentagonal bipyramid",
     "snub triangular antiprism",
   ],
@@ -77,7 +78,12 @@ const inverseAlternateNames = Object.fromEntries(
 const alternateNamesList = Object.keys(inverseAlternateNames)
 
 export function getCanonicalName(name: string) {
-  return inverseAlternateNames[unescapeName(name)] ?? name
+  if (allSolidNames.includes(name)) {
+    return name
+  }
+  const canonical = inverseAlternateNames[unescapeName(name)]
+  if (!canonical) throw new Error(`Cannot find canonical name for ${name}`)
+  return canonical
 }
 
 export function getAlternateNames(name: string) {

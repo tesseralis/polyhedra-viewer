@@ -15,7 +15,7 @@ import {
   others,
   othersTwoRows,
   Table,
-} from "data/tables"
+} from "data/oldTables"
 
 export interface TableSection {
   header: string

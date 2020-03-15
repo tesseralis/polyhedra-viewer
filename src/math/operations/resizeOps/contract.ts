@@ -1,3 +1,4 @@
+import { Polygon } from "data/polygons"
 import { Polyhedron } from "math/polyhedra"
 import {
   getSnubAngle,
@@ -7,29 +8,29 @@ import {
 } from "./resizeUtils"
 import makeOperation from "../makeOperation"
 
+type Family = 3 | 4 | 5
+type FaceType = Polygon
+
 interface Options {
-  faceType?: number
+  faceType?: FaceType
 }
 
-// Return the symmetry group of an *expanded* polyhedron
+// Return the family of an *expanded* polyhedron
 function getFamily(polyhedron: Polyhedron) {
-  if (["cuboctahedron", "icosahedron"].includes(polyhedron.name)) {
-    return "T"
-  }
-  return polyhedron.info.symmetry().group
+  const nums: Family[] = [3, 4, 5]
+  return nums.find(n => polyhedron.info.inClassicTable({ n }))!
 }
 
-const familyMap: Record<string, number> = { T: 3, O: 4, I: 5 }
-const coxeterNum: Record<string, number> = { T: 4, O: 6, I: 10 }
+const coxeterNum: Record<Family, number> = { 3: 4, 4: 6, 5: 10 }
 
-function getContractLength(polyhedron: Polyhedron, faceType: number) {
+function getContractLength(polyhedron: Polyhedron, faceType: FaceType) {
   // Calculate dihedral angle
   // https://en.wikipedia.org/wiki/Platonic_solid#Angles
-  const family = getFamily(polyhedron)
+  const n = getFamily(polyhedron)
   const s = polyhedron.edgeLength()
   const p = faceType
-  const q = 3 + familyMap[family] - p
-  const h = coxeterNum[family]
+  const q = 3 + n - p
+  const h = coxeterNum[n]
   const tanTheta2 = Math.cos(Math.PI / q) / Math.sin(Math.PI / h)
 
   // Calculate the inradius
@@ -41,7 +42,7 @@ function getContractLength(polyhedron: Polyhedron, faceType: number) {
 // TODO calculate this without a reference
 function getContractLengthSemi(
   polyhedron: Polyhedron,
-  faceType: number,
+  faceType: FaceType,
   result: string,
 ) {
   const reference = Polyhedron.get(result)
@@ -78,7 +79,7 @@ export function applyContract(
 }
 
 function isBevelled(polyhedron: Polyhedron) {
-  return polyhedron.name.includes("truncated")
+  return polyhedron.info.inClassicTable({ operation: "bevelled" })
 }
 
 // NOTE: We are using the same operation for contracting both expanded and snub solids.
@@ -99,9 +100,9 @@ export const contract = makeOperation<Options>("contract", {
       }
     }
     switch (getFamily(polyhedron)) {
-      case "O":
+      case 4:
         return { value: faceType === 3 ? "O" : "C" }
-      case "I":
+      case 5:
         return { value: faceType === 3 ? "I" : "D" }
       default:
         return
@@ -111,12 +112,13 @@ export const contract = makeOperation<Options>("contract", {
   hitOption: "faceType",
   getHitOption(polyhedron, hitPoint) {
     const hitFace = polyhedron.hitFace(hitPoint)
+    const faceType = hitFace.numSides as FaceType // TODO unsure if always valid
     if (isBevelled(polyhedron)) {
       const isValid = hitFace.numSides > 4
-      return isValid ? { faceType: hitFace.numSides } : {}
+      return isValid ? { faceType } : {}
     }
     const isValid = isExpandedFace(polyhedron, hitFace)
-    return isValid ? { faceType: hitFace.numSides } : {}
+    return isValid ? { faceType } : {}
   },
 
   allOptionCombos(polyhedron) {
@@ -131,9 +133,9 @@ export const contract = makeOperation<Options>("contract", {
       }
     }
     switch (getFamily(polyhedron)) {
-      case "O":
+      case 4:
         return [{ faceType: 3 }, { faceType: 4 }]
-      case "I":
+      case 5:
         return [{ faceType: 3 }, { faceType: 5 }]
       default:
         return [{}]

@@ -1,7 +1,6 @@
-import { some, maxBy, isEqual, uniqBy, countBy } from "lodash-es"
+import { maxBy, isEqual, uniqBy, countBy } from "lodash-es"
 import { Twist } from "types"
 import { Polyhedron, Cap, FaceLike } from "math/polyhedra"
-import { inRow, inColumn } from "data/tableUtils"
 import { withOrigin, isInverse } from "math/geom"
 import { getTwistSign, getTransformedVertices } from "../operationUtils"
 
@@ -31,12 +30,13 @@ export function getChirality(polyhedron: Polyhedron) {
   return rightFaceAcross.numSides !== 3 ? "left" : "right"
 }
 
+/**
+ * Return true if the polyhedron a gyroelongated bicupola, cupolarotunda, or birotunda
+ */
 export function isGyroelongatedBiCupola(polyhedron: Polyhedron) {
-  const pyrRows = ["square pyramid", "pentagonal pyramid"]
-  if (some(pyrRows, row => inRow(polyhedron.name, "capstones", row))) {
-    return false
-  }
-  return inColumn(polyhedron.name, "capstones", "gyroelongated bi-")
+  return polyhedron.info.inCapstoneTable(({ count, elongation, base }) => {
+    return count === 2 && elongation === "antiprism" && base !== "pyramid"
+  })
 }
 
 function getOppositeCaps(polyhedron: Polyhedron) {
