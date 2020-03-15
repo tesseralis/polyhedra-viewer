@@ -1,9 +1,9 @@
 import { range } from "lodash-es"
 import Category from "./Table"
-import { polygonPrefixes } from "../polygons"
+import { polygonPrefixes, polygons, Polygon } from "../polygons"
 import { getCanonicalName } from "../names"
 
-// FIXME this and gyrate opts are definitely repeated
+// FIXME put this and gyrate opts, and other stuff in a common location
 type AlignOpts = "meta" | "para"
 const alignOpts: AlignOpts[] = ["meta", "para"]
 
@@ -18,6 +18,7 @@ function countStr(count: 1 | 2 | 3) {
   }
 }
 
+// FIXME should I split everything into different files?
 /**
  * "Classical" Polyhedra refers to Platonic and Archimedean solids.
  */
@@ -25,6 +26,7 @@ export const classics = (() => {
   interface Item {
     n: 3 | 4 | 5
     type?: "face" | "vertex"
+    // FIXME I wonder if there is a more elegant way to split this up
     operation:
       | "regular"
       | "truncated"
@@ -57,7 +59,7 @@ export const classics = (() => {
     const base = (() => {
       switch (n) {
         case 3:
-          // TODO this is kind of inelegant since we duplicate this logic above
+          // FIXME this is kind of inelegant since we duplicate this logic above
           // I think we can think of a better way to think about this...
           if (["regular", "truncated"].includes(operation)) {
             return "tetrahedron"
@@ -107,18 +109,19 @@ export const classics = (() => {
 
 export const prisms = (() => {
   interface Item {
-    n: 3 | 4 | 5 | 6 | 8 | 10
+    n: Polygon
     type: "prism" | "antiprism"
   }
 
   const items: Item[] = []
-  for (const n of [3, 4, 5, 6, 8, 10]) {
+  for (const n of polygons) {
     for (const type of ["prism", "antiprism"]) {
-      // TODO how to get around the explicit cast?
+      // FIXME how to get around the explicit cast?
       items.push({ n, type } as Item)
     }
   }
   function name({ n, type }: Item) {
+    // FIXME do we always want to get canonical name here?
     return getCanonicalName(`${polygonPrefixes.get(n)} ${type}`)
   }
   return new Category(items, name)

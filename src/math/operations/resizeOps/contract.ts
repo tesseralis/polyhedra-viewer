@@ -1,3 +1,4 @@
+import { Polygon } from "data/polygons"
 import { Polyhedron } from "math/polyhedra"
 import {
   getSnubAngle,
@@ -7,8 +8,8 @@ import {
 } from "./resizeUtils"
 import makeOperation from "../makeOperation"
 
-type PlatonicFaceType = 3 | 4 | 5
-type FaceType = PlatonicFaceType | 6 | 8 | 10
+type Family = 3 | 4 | 5
+type FaceType = Polygon
 
 interface Options {
   faceType?: FaceType
@@ -16,13 +17,13 @@ interface Options {
 
 // Return the family of an *expanded* polyhedron
 function getFamily(polyhedron: Polyhedron) {
-  const nums: PlatonicFaceType[] = [3, 4, 5]
+  const nums: Family[] = [3, 4, 5]
   return nums.find(n => polyhedron.info.inClassicTable({ n }))!
 }
 
-const coxeterNum: Record<PlatonicFaceType, number> = { 3: 4, 4: 6, 5: 10 }
+const coxeterNum: Record<Family, number> = { 3: 4, 4: 6, 5: 10 }
 
-function getContractLength(polyhedron: Polyhedron, faceType: number) {
+function getContractLength(polyhedron: Polyhedron, faceType: FaceType) {
   // Calculate dihedral angle
   // https://en.wikipedia.org/wiki/Platonic_solid#Angles
   const n = getFamily(polyhedron)
@@ -41,7 +42,7 @@ function getContractLength(polyhedron: Polyhedron, faceType: number) {
 // TODO calculate this without a reference
 function getContractLengthSemi(
   polyhedron: Polyhedron,
-  faceType: number,
+  faceType: FaceType,
   result: string,
 ) {
   const reference = Polyhedron.get(result)

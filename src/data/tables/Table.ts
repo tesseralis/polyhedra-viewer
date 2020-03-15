@@ -19,6 +19,7 @@ export default class Table<Item extends {}> {
   items: Item[]
   nameFunc: NameFunc<Item>
   constructor(items: Item[], nameFunc: NameFunc<Item>) {
+    // TODO possibly do something more robust than just storing everything in a list
     this.items = items
     this.nameFunc = nameFunc
   }
@@ -47,7 +48,7 @@ export default class Table<Item extends {}> {
   get(filter?: Filter<Item>) {
     const filtered = this.items.filter(item => applyFilter(item, filter))
 
-    // TODO should we make this uniq here?
+    // FIXME should we make this uniq here?
     return uniq(filtered.map(item => this.nameFunc(item)))
   }
 }
