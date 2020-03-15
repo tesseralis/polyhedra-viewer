@@ -11,25 +11,23 @@ interface Options {
   faceType?: number
 }
 
-// Return the symmetry group of an *expanded* polyhedron
+// Return the family of an *expanded* polyhedron
 function getFamily(polyhedron: Polyhedron) {
-  if (["cuboctahedron", "icosahedron"].includes(polyhedron.name)) {
-    return "T"
-  }
-  return polyhedron.info.symmetry().group
+  // FIXME extract this out somewhere
+  const nums: (3 | 4 | 5)[] = [3, 4, 5]
+  return nums.find(n => polyhedron.info.inClassicTable({ n }))!
 }
 
-const familyMap: Record<string, number> = { T: 3, O: 4, I: 5 }
-const coxeterNum: Record<string, number> = { T: 4, O: 6, I: 10 }
+const coxeterNum: Record<number, number> = { 3: 4, 4: 6, 5: 10 }
 
 function getContractLength(polyhedron: Polyhedron, faceType: number) {
   // Calculate dihedral angle
   // https://en.wikipedia.org/wiki/Platonic_solid#Angles
-  const family = getFamily(polyhedron)
+  const n = getFamily(polyhedron)
   const s = polyhedron.edgeLength()
   const p = faceType
-  const q = 3 + familyMap[family] - p
-  const h = coxeterNum[family]
+  const q = 3 + n - p
+  const h = coxeterNum[n]
   const tanTheta2 = Math.cos(Math.PI / q) / Math.sin(Math.PI / h)
 
   // Calculate the inradius
@@ -99,9 +97,9 @@ export const contract = makeOperation<Options>("contract", {
       }
     }
     switch (getFamily(polyhedron)) {
-      case "O":
+      case 4:
         return { value: faceType === 3 ? "O" : "C" }
-      case "I":
+      case 5:
         return { value: faceType === 3 ? "I" : "D" }
       default:
         return
@@ -131,9 +129,9 @@ export const contract = makeOperation<Options>("contract", {
       }
     }
     switch (getFamily(polyhedron)) {
-      case "O":
+      case 4:
         return [{ faceType: 3 }, { faceType: 4 }]
-      case "I":
+      case 5:
         return [{ faceType: 3 }, { faceType: 5 }]
       default:
         return [{}]
