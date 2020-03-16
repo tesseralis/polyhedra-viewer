@@ -56,4 +56,4 @@ function name({ base, truncated, count, align }: Item) {
   )
 }
 
-export default new Table([...getItems()], name)
+export default new Table(getItems(), name)

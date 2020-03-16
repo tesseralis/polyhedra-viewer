@@ -45,4 +45,4 @@ function name({ gyrate, diminished, align }: Item) {
     ),
   )
 }
-export default new Table([...getItems()], name)
+export default new Table(getItems(), name)

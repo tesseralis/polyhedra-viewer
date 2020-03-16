@@ -19,4 +19,4 @@ function name({ n, type }: Item) {
   return `${polygonPrefixes.get(n)} ${type}`
 }
 
-export default new Table([...getItems()], name)
+export default new Table(getItems(), name)

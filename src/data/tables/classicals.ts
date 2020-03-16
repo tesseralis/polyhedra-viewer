@@ -76,4 +76,4 @@ function name({ family, operation, facet }: Item) {
     getExpandedString(base, operation),
   )
 }
-export default new Table([...getItems()], name)
+export default new Table(getItems(), name)

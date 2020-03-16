@@ -46,4 +46,4 @@ function name({ n, count, align }: Item) {
   )
 }
 
-export default new Table([...getItems()], name)
+export default new Table(getItems(), name)

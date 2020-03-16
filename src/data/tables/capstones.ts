@@ -92,4 +92,4 @@ function capstoneName({ n, base, elongation, count, gyrate }: Item) {
   )
 }
 
-export default new Table([...getItems()], capstoneName)
+export default new Table(getItems(), capstoneName)
