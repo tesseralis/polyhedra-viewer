@@ -1,9 +1,11 @@
 import { range } from "lodash-es"
 import Table from "./Table"
 import {
+  FieldOptions,
   ZeroCount,
   AlignOpts,
   alignOpts,
+  zeroCounts,
   prefix,
   wordJoin,
   countString,
@@ -13,6 +15,12 @@ interface Item {
   gyrate: ZeroCount
   diminished: ZeroCount
   align?: AlignOpts
+}
+
+const options: FieldOptions<Item> = {
+  gyrate: zeroCounts,
+  diminished: zeroCounts,
+  align: alignOpts,
 }
 
 function* getCounts() {
@@ -26,7 +34,7 @@ function* getCounts() {
 function* getItems() {
   for (const [gyrate, diminished] of getCounts()) {
     if (gyrate + diminished === 2) {
-      for (const align of alignOpts) {
+      for (const align of options.align) {
         yield { gyrate, diminished, align }
       }
     } else {
@@ -35,14 +43,17 @@ function* getItems() {
   }
 }
 
-function name({ gyrate, diminished, align }: Item) {
-  return prefix(
-    align,
-    wordJoin(
-      countString(gyrate, "gyrate"),
-      countString(diminished, "diminished"),
-      "rhombicosidodecahedron",
-    ),
-  )
-}
-export default new Table(getItems(), name)
+export default new Table<Item>({
+  items: getItems(),
+  options,
+  getName({ gyrate, diminished, align }) {
+    return prefix(
+      align,
+      wordJoin(
+        countString(gyrate, "gyrate"),
+        countString(diminished, "diminished"),
+        "rhombicosidodecahedron",
+      ),
+    )
+  },
+})
