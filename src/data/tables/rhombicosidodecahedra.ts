@@ -1,9 +1,11 @@
-import { range } from "lodash-es"
 import Table from "./Table"
 import {
+  FieldOptions,
   ZeroCount,
   AlignOpts,
   alignOpts,
+  zeroCounts,
+  limitCount,
   prefix,
   wordJoin,
   countString,
@@ -15,34 +17,37 @@ interface Item {
   align?: AlignOpts
 }
 
-function* getCounts() {
-  for (const gyrate of range(4)) {
-    for (const diminished of range(4 - gyrate)) {
-      yield [gyrate, diminished] as [ZeroCount, ZeroCount]
-    }
-  }
+const options: FieldOptions<Item> = {
+  gyrate: zeroCounts,
+  diminished: zeroCounts,
+  align: alignOpts,
 }
 
 function* getItems() {
-  for (const [gyrate, diminished] of getCounts()) {
-    if (gyrate + diminished === 2) {
-      for (const align of alignOpts) {
-        yield { gyrate, diminished, align }
+  for (const gyrate of options.gyrate) {
+    for (const diminished of limitCount(options.diminished, 3 - gyrate)) {
+      if (gyrate + diminished === 2) {
+        for (const align of options.align) {
+          yield { gyrate, diminished, align }
+        }
+      } else {
+        yield { gyrate, diminished }
       }
-    } else {
-      yield { gyrate, diminished }
     }
   }
 }
 
-function name({ gyrate, diminished, align }: Item) {
-  return prefix(
-    align,
-    wordJoin(
-      countString(gyrate, "gyrate"),
-      countString(diminished, "diminished"),
-      "rhombicosidodecahedron",
-    ),
-  )
-}
-export default new Table(getItems(), name)
+export default new Table<Item>({
+  items: getItems(),
+  options,
+  getName({ gyrate, diminished, align }) {
+    return prefix(
+      align,
+      wordJoin(
+        countString(gyrate, "gyrate"),
+        countString(diminished, "diminished"),
+        "rhombicosidodecahedron",
+      ),
+    )
+  },
+})

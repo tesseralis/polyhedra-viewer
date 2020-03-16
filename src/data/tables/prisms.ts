@@ -1,22 +1,27 @@
 import Table from "./Table"
 import { polygonPrefixes, polygons, Polygon } from "../polygons"
-import { PrismType, prismTypes } from "./tableHelpers"
+import { FieldOptions, PrismType, prismTypes } from "./tableHelpers"
 
 interface Item {
-  n: Polygon
+  base: Polygon
   type: PrismType
 }
 
+const options: FieldOptions<Item> = {
+  base: polygons,
+  type: prismTypes,
+}
+
 function* getItems() {
-  for (const n of polygons) {
-    for (const type of prismTypes) {
-      yield { n, type }
+  for (const base of options.base) {
+    for (const type of options.type) {
+      yield { base, type }
     }
   }
 }
 
-function name({ n, type }: Item) {
-  return `${polygonPrefixes.get(n)} ${type}`
-}
-
-export default new Table(getItems(), name)
+export default new Table({
+  items: getItems(),
+  options,
+  getName: ({ base, type }) => `${polygonPrefixes.get(base)} ${type}`,
+})

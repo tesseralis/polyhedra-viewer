@@ -8,7 +8,7 @@ import Vertex, { VertexList } from "./Vertex"
 import Edge from "./Edge"
 import FaceLike from "./FaceLike"
 
-type CapType = "pyramid" | "cupola" | "rotunda" | "fastigium" | "prism"
+type CapType = "pyramid" | "cupola" | "rotunda" | "fastigium"
 type FaceConfiguration = { [key: string]: number }
 
 // Find the boundary of a connected set of faces

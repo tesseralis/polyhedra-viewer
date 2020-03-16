@@ -1,17 +1,18 @@
-import { range } from "lodash-es"
 import Table from "./Table"
 import {
+  FieldOptions,
   ZeroCount,
   AlignOpts,
+  bools,
+  zeroCounts,
   alignOpts,
+  limitCount,
   countString,
   wordJoin,
   prefix,
 } from "./tableHelpers"
 
 type Base = "tetrahedron" | "cube" | "dodecahedron"
-const bases: Base[] = ["tetrahedron", "cube", "dodecahedron"]
-
 interface Item {
   base: Base
   truncated: boolean
@@ -19,20 +20,23 @@ interface Item {
   align?: AlignOpts
 }
 
-const countMapping: Record<Base, ZeroCount> = {
+const options: FieldOptions<Item> = {
+  base: ["tetrahedron", "cube", "dodecahedron"],
+  truncated: bools,
+  count: zeroCounts,
+  align: alignOpts,
+}
+
+const countLimit: Record<Base, ZeroCount> = {
   tetrahedron: 1,
   cube: 2,
   dodecahedron: 3,
 }
 
-function getCounts(base: Base) {
-  return range(countMapping[base] + 1) as ZeroCount[]
-}
-
 function* getItems() {
-  for (const base of bases) {
-    for (const truncated of [false, true]) {
-      for (const count of getCounts(base)) {
+  for (const base of options.base) {
+    for (const truncated of options.truncated) {
+      for (const count of limitCount(options.count, countLimit[base])) {
         if (base === "dodecahedron" && count === 2) {
           for (const align of alignOpts) {
             yield { base, truncated, count, align }
@@ -45,15 +49,17 @@ function* getItems() {
   }
 }
 
-function name({ base, truncated, count, align }: Item) {
-  return prefix(
-    align,
-    wordJoin(
-      countString(count, "augmented"),
-      truncated ? "truncated" : "",
-      base,
-    ),
-  )
-}
-
-export default new Table(getItems(), name)
+export default new Table({
+  items: getItems(),
+  options,
+  getName({ base, truncated, count, align }) {
+    return prefix(
+      align,
+      wordJoin(
+        countString(count, "augmented"),
+        truncated ? "truncated" : "",
+        base,
+      ),
+    )
+  },
+})

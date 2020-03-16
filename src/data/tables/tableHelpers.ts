@@ -1,5 +1,9 @@
 import { compact } from "lodash-es"
 
+export type FieldOptions<Item extends {}> = {
+  [Field in keyof Required<Item>]: Required<Item>[Field][]
+}
+
 // TODO put this and gyrate opts, and other stuff in a common location
 export type AlignOpts = "meta" | "para"
 export const alignOpts: AlignOpts[] = ["meta", "para"]
@@ -20,10 +24,17 @@ export const prismTypes: PrismType[] = ["prism", "antiprism"]
 export type Count = 1 | 2 | 3
 export type ZeroCount = 0 | Count
 
+export const bools = [false, true]
+export const zeroCounts: ZeroCount[] = [0, 1, 2, 3]
+
 const countPrefixes: Record<Count, string> = {
   1: "",
   2: "bi",
   3: "tri",
+}
+
+export function limitCount<N extends number>(counts: N[], limit: number) {
+  return counts.filter(n => n <= limit)
 }
 
 export function countString(count: ZeroCount, base: string) {

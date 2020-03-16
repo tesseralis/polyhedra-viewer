@@ -1,12 +1,8 @@
 import Table from "./Table"
-import { wordJoin, prefix } from "./tableHelpers"
+import { FieldOptions, wordJoin, prefix } from "./tableHelpers"
 
 type Family = 3 | 4 | 5
-const families: Family[] = [3, 4, 5]
-
 type Facet = "face" | "vertex"
-const facets: Facet[] = ["face", "vertex"]
-
 type Operation =
   | "regular"
   | "truncated"
@@ -14,14 +10,6 @@ type Operation =
   | "bevelled"
   | "cantellated"
   | "snub"
-const operations: Operation[] = [
-  "regular",
-  "truncated",
-  "rectified",
-  "bevelled",
-  "cantellated",
-  "snub",
-]
 
 interface Item {
   family: Family
@@ -29,11 +17,24 @@ interface Item {
   operation: Operation
 }
 
+const options: FieldOptions<Item> = {
+  family: [3, 4, 5],
+  facet: ["face", "vertex"],
+  operation: [
+    "regular",
+    "truncated",
+    "rectified",
+    "bevelled",
+    "cantellated",
+    "snub",
+  ],
+}
+
 function* getItems() {
-  for (const operation of operations) {
-    for (const family of families) {
+  for (const operation of options.operation) {
+    for (const family of options.family) {
       if (family !== 3 && ["regular", "truncated"].includes(operation)) {
-        for (const facet of facets) {
+        for (const facet of options.facet) {
           yield { family, operation, facet }
         }
       } else {
@@ -68,12 +69,15 @@ function getExpandedString(base: string, operation: Operation) {
   return str.replace("ii", "i")
 }
 
-function name({ family, operation, facet }: Item) {
-  const base = getBase({ family, operation, facet })
-  return wordJoin(
-    operation === "snub" ? operation : "",
-    ["truncated", "bevelled"].includes(operation) ? "truncated" : "",
-    getExpandedString(base, operation),
-  )
-}
-export default new Table(getItems(), name)
+export default new Table<Item>({
+  items: getItems(),
+  options,
+  getName({ family, operation, facet }) {
+    const base = getBase({ family, operation, facet })
+    return wordJoin(
+      operation === "snub" ? operation : "",
+      ["truncated", "bevelled"].includes(operation) ? "truncated" : "",
+      getExpandedString(base, operation),
+    )
+  },
+})
