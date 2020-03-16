@@ -1,83 +1,79 @@
 import Table from "./Table"
+import { wordJoin, prefix } from "./tableHelpers"
+
+type Family = 3 | 4 | 5
+const families: Family[] = [3, 4, 5]
+
+type Facet = "face" | "vertex"
+const facets: Facet[] = ["face", "vertex"]
+
+type Operation =
+  | "regular"
+  | "truncated"
+  | "rectified"
+  | "bevelled"
+  | "cantellated"
+  | "snub"
+const operations: Operation[] = [
+  "regular",
+  "truncated",
+  "rectified",
+  "bevelled",
+  "cantellated",
+  "snub",
+]
 
 interface Item {
-  n: 3 | 4 | 5
-  type?: "face" | "vertex"
-  // TODO I wonder if there is a more elegant way to split this up
-  operation:
-    | "regular"
-    | "truncated"
-    | "rectified"
-    | "bevelled"
-    | "cantellated"
-    | "snub"
+  family: Family
+  facet?: Facet
+  operation: Operation
 }
 
 function* getItems() {
-  for (const operation of [
-    "regular",
-    "truncated",
-    "rectified",
-    "bevelled",
-    "cantellated",
-    "snub",
-  ]) {
-    for (const n of [3, 4, 5]) {
-      if (n !== 3 && ["regular", "truncated"].includes(operation)) {
-        for (const type of ["face", "vertex"]) {
-          yield { n, operation, type } as Item
+  for (const operation of operations) {
+    for (const family of families) {
+      if (family !== 3 && ["regular", "truncated"].includes(operation)) {
+        for (const facet of facets) {
+          yield { family, operation, facet }
         }
       } else {
-        yield { n, operation } as Item
+        yield { family, operation }
       }
     }
   }
 }
 
-function name({ n, operation, type }: Item) {
-  const base = (() => {
-    switch (n) {
-      case 3:
-        // TODO this is kind of inelegant since we duplicate this logic above
-        // I think we can think of a better way to think about this...
-        if (["regular", "truncated"].includes(operation)) {
-          return "tetrahedron"
-        } else {
-          return "tetratetrahedron"
-        }
-      case 4: {
-        switch (type) {
-          case "face":
-            return "cube"
-          case "vertex":
-            return "octahedron"
-          default:
-            return "cuboctahedron"
-        }
-      }
-      case 5: {
-        switch (type) {
-          case "face":
-            return "dodecahedron"
-          case "vertex":
-            return "icosahedron"
-          default:
-            return "icosidodecahedron"
-        }
-      }
-    }
-  })()
-  switch (operation) {
-    case "regular":
-    case "rectified":
-      return base
-    case "cantellated":
-      return base.startsWith("i") ? `rhomb${base}` : `rhombi${base}`
-    case "snub":
-      return `snub ${base}`
-    case "bevelled":
-    case "truncated":
-      return `truncated ${base}`
+const rectifiedNames: Record<Family, string> = {
+  3: "tetratetrahedron",
+  4: "cuboctahedron",
+  5: "icosidodecahedron",
+}
+
+const regularNames: Record<Family, (facet?: Facet) => string> = {
+  3: () => "tetrahedron",
+  4: facet => (facet === "face" ? "cube" : "octahedron"),
+  5: facet => (facet === "face" ? "dodecahedron" : "icosahedron"),
+}
+
+function getBase({ family, operation, facet }: Item) {
+  if (["regular", "truncated"].includes(operation)) {
+    return regularNames[family](facet)
+  } else {
+    return rectifiedNames[family]
   }
+}
+
+function getExpandedString(base: string, operation: Operation) {
+  const str = prefix(operation === "cantellated" ? "rhombi" : "", base)
+  return str.replace("ii", "i")
+}
+
+function name({ family, operation, facet }: Item) {
+  const base = getBase({ family, operation, facet })
+  return wordJoin(
+    operation === "snub" ? operation : "",
+    ["truncated", "bevelled"].includes(operation) ? "truncated" : "",
+    getExpandedString(base, operation),
+  )
 }
 export default new Table([...getItems()], name)

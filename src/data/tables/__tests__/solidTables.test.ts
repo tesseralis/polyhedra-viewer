@@ -7,7 +7,7 @@ describe("solidTables", () => {
     })
 
     it("contains the proper entries for the tetrahedron row", () => {
-      expect(classics.get({ n: 3 })).toEqual(
+      expect(classics.get({ family: 3 })).toEqual(
         expect.arrayContaining(["octahedron", "cuboctahedron", "icosahedron"]),
       )
     })

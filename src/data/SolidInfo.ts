@@ -62,7 +62,7 @@ export default class SolidInfo {
   isChiral() {
     return (
       this.inClassicalTable(
-        ({ n, operation }) => operation === "snub" && n !== 3,
+        ({ family, operation }) => operation === "snub" && family !== 3,
       ) ||
       this.inCapstoneTable(
         ({ elongation, count, base }) =>
