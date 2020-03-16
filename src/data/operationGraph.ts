@@ -15,7 +15,7 @@ import {
   capstones,
   augmented,
 } from "./oldTables"
-import { toConwayNotation } from "./names"
+import { toConwayNotation } from "./conway"
 import { mapObject } from "utils"
 
 export interface Relation {

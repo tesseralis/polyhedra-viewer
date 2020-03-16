@@ -1,9 +1,8 @@
 import { mapValues, isEmpty, filter, uniq, pickBy } from "lodash-es"
 
-import { toConwayNotation } from "data/names"
+import { toConwayNotation, fromConwayNotation } from "data/conway"
 import operationGraph, { Relation } from "data/operationGraph"
 import { getSingle } from "utils"
-import { fromConwayNotation } from "data/names"
 import { Vec3D, vec, PRECISION } from "math/geom"
 import { Polyhedron, Vertex, VertexArg, normalizeVertex } from "math/polyhedra"
 import { removeExtraneousVertices } from "./operationUtils"

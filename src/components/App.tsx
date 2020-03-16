@@ -3,13 +3,8 @@ import { Route, Redirect, Switch } from "react-router-dom"
 
 import { isValidSolid } from "data"
 import { isAlternateName, getCanonicalName } from "data/alternates"
-import {
-  escapeName,
-  unescapeName,
-  randomSolidName,
-  isConwaySymbol,
-  fromConwayNotation,
-} from "data/names"
+import { isConwaySymbol, fromConwayNotation } from "data/conway"
+import { escapeName, unescapeName, randomSolidName } from "data/names"
 
 import ErrorPage from "./ErrorPage"
 import Loading from "./Loading"

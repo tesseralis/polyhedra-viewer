@@ -1,4 +1,4 @@
-import { toConwayNotation } from "./names"
+import { toConwayNotation } from "./conway"
 import { getAlternateNames } from "./alternates"
 import { getSymmetry, getSymmetryName, getOrder } from "./symmetry"
 import { classicals, prisms, capstones, rhombicosidodecahedra } from "./tables"
