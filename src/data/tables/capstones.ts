@@ -11,7 +11,7 @@ import {
 
 interface Item {
   n: 2 | 3 | 4 | 5
-  base: "pyramid" | "cupola" | "rotunda" | "cupolarotunda"
+  type: "pyramid" | "cupola" | "rotunda" | "cupolarotunda"
   elongation: "" | PrismType
   count: 1 | 2
   gyrate?: "ortho" | "gyro"
@@ -19,7 +19,7 @@ interface Item {
 
 const options: FieldOptions<Item> = {
   n: [2, 3, 4, 5],
-  base: ["pyramid", "cupola", "rotunda", "cupolarotunda"],
+  type: ["pyramid", "cupola", "rotunda", "cupolarotunda"],
   elongation: ["", ...prismTypes],
   count: [1, 2],
   gyrate: ["ortho", "gyro"],
@@ -27,43 +27,43 @@ const options: FieldOptions<Item> = {
 
 function* getItems(): Generator<Item> {
   for (const n of options.n.slice(1)) {
-    for (const base of options.base) {
+    for (const type of options.type) {
       // Only pentagonal rotundae exist
-      if (["rotunda", "cupolarotunda"].includes(base) && n !== 5) {
+      if (["rotunda", "cupolarotunda"].includes(type) && n !== 5) {
         continue
       }
       for (const elongation of options.elongation) {
         // Gyroelongated pyramids are concave
-        if (n === 3 && base === "pyramid" && elongation === "antiprism") {
+        if (n === 3 && type === "pyramid" && elongation === "antiprism") {
           continue
         }
         for (const count of options.count) {
           // Cupola-rotundae only exist if there are two of them
-          if (base === "cupolarotunda" && count !== 2) {
+          if (type === "cupolarotunda" && count !== 2) {
             continue
           }
           // Only cupolae, rotundae can be ortho or gyro
-          if (count === 2 && base !== "pyramid" && elongation !== "antiprism") {
+          if (count === 2 && type !== "pyramid" && elongation !== "antiprism") {
             for (const gyrate of options.gyrate) {
               yield {
                 n,
-                base,
+                type,
                 elongation,
                 count,
                 gyrate,
               }
             }
           } else {
-            yield { n, base, elongation, count }
+            yield { n, type, elongation, count }
           }
         }
       }
     }
   }
-  yield { n: 2, base: "cupola", elongation: "", count: 1 }
+  yield { n: 2, type: "cupola", elongation: "", count: 1 }
   yield {
     n: 2,
-    base: "cupola",
+    type: "cupola",
     elongation: "",
     count: 2,
     gyrate: "gyro",
@@ -79,8 +79,8 @@ const elongStr = {
 export default new Table({
   items: getItems(),
   options,
-  getName({ n, base, elongation, count, gyrate }) {
-    const baseStr = base === "cupolarotunda" ? base : countString(count, base)
+  getName({ n, type, elongation, count, gyrate }) {
+    const baseStr = type === "cupolarotunda" ? type : countString(count, type)
     return wordJoin(
       elongStr[elongation],
       polygonPrefixes.get(n),

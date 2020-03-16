@@ -1,4 +1,5 @@
 import { Polygon } from "data/polygons"
+import { classicals } from "data/tables"
 import { Polyhedron } from "math/polyhedra"
 import {
   getSnubAngle,
@@ -8,7 +9,8 @@ import {
 } from "./resizeUtils"
 import makeOperation from "../makeOperation"
 
-type Family = 3 | 4 | 5
+// TODO hopefully there's a better way to do this once we make the new opGraph
+type Family = typeof classicals.options.family[0]
 type FaceType = Polygon
 
 interface Options {
@@ -17,8 +19,9 @@ interface Options {
 
 // Return the family of an *expanded* polyhedron
 function getFamily(polyhedron: Polyhedron) {
-  const nums: Family[] = [3, 4, 5]
-  return nums.find(family => polyhedron.info.inClassicalTable({ family }))!
+  return classicals.options.family.find(family =>
+    polyhedron.info.inClassicalTable({ family }),
+  )!
 }
 
 const coxeterNum: Record<Family, number> = { 3: 4, 4: 6, 5: 10 }

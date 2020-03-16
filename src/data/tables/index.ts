@@ -1,4 +1,4 @@
-export { default as classics } from "./classicals"
+export { default as classicals } from "./classicals"
 export { default as prisms } from "./prisms"
 export { default as capstones } from "./capstones"
 export { default as augmentedPrisms } from "./augmentedPrisms"

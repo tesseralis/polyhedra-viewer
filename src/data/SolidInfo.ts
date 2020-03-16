@@ -1,6 +1,6 @@
 import { getType, getAlternateNames, toConwayNotation } from "./names"
 import { getSymmetry, getSymmetryName, getOrder } from "./symmetry"
-import { classics, prisms, capstones, rhombicosidodecahedra } from "./tables"
+import { classicals, prisms, capstones, rhombicosidodecahedra } from "./tables"
 
 /**
  * Class containing miscellaneous information about a CRF polyhedron
@@ -25,8 +25,8 @@ export default class SolidInfo {
 
   order = () => getOrder(this.name)
 
-  inClassicalTable(filter?: Parameters<typeof classics.contains>[1]) {
-    return classics.contains(this.name, filter)
+  inClassicalTable(filter?: Parameters<typeof classicals.contains>[1]) {
+    return classicals.contains(this.name, filter)
   }
 
   inPrismTable(filter?: Parameters<typeof prisms.contains>[1]) {
@@ -65,8 +65,8 @@ export default class SolidInfo {
         ({ family, operation }) => operation === "snub" && family !== 3,
       ) ||
       this.inCapstoneTable(
-        ({ elongation, count, base }) =>
-          elongation === "antiprism" && count === 2 && base !== "pyramid",
+        ({ elongation, count, type }) =>
+          elongation === "antiprism" && count === 2 && type !== "pyramid",
       )
     )
   }

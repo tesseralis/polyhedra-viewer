@@ -282,10 +282,10 @@ const getUsingOpts = (polyhedron: Polyhedron) => {
   }
 
   if (
-    polyhedron.info.inPrismTable({ n: 10 }) ||
+    polyhedron.info.inPrismTable({ base: 10 }) ||
     polyhedron.info.inCapstoneTable(
-      ({ base, n, count }) =>
-        count === 1 && n === 5 && ["cupola", "rotunda"].includes(base),
+      ({ type, n, count }) =>
+        count === 1 && n === 5 && ["cupola", "rotunda"].includes(type),
     )
   ) {
     return ["U5", "R5"]
@@ -302,7 +302,7 @@ const hasGyrateOpts = (polyhedron: Polyhedron) => {
   }
   if (
     polyhedron.info.inCapstoneTable(
-      ({ n, base }) => base !== "pyramid" && n !== 2,
+      ({ n, type }) => type !== "pyramid" && n !== 2,
     )
   ) {
     return true

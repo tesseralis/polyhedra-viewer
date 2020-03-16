@@ -3,19 +3,19 @@ import { polygonPrefixes, polygons, Polygon } from "../polygons"
 import { FieldOptions, PrismType, prismTypes } from "./tableHelpers"
 
 interface Item {
-  n: Polygon
+  base: Polygon
   type: PrismType
 }
 
 const options: FieldOptions<Item> = {
-  n: polygons,
+  base: polygons,
   type: prismTypes,
 }
 
 function* getItems() {
-  for (const n of options.n) {
+  for (const base of options.base) {
     for (const type of options.type) {
-      yield { n, type }
+      yield { base, type }
     }
   }
 }
@@ -23,5 +23,5 @@ function* getItems() {
 export default new Table({
   items: getItems(),
   options,
-  getName: ({ n, type }) => `${polygonPrefixes.get(n)} ${type}`,
+  getName: ({ base, type }) => `${polygonPrefixes.get(base)} ${type}`,
 })
