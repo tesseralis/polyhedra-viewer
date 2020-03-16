@@ -46,13 +46,6 @@ export default class Table<Item extends {}> {
   }
 
   /**
-   * Return `true` if the item name satisfies the given constraints.
-   */
-  contains(name: string, filter?: Filter<Item>) {
-    return some(this.getNames(filter), n => n === name)
-  }
-
-  /**
    * Get all the items that satisfy the given constraints.
    */
   get(filter?: Filter<Item>) {
@@ -64,5 +57,12 @@ export default class Table<Item extends {}> {
    */
   getNames(filter?: Filter<Item>) {
     return uniq(this.get(filter).map(item => item.name))
+  }
+
+  /**
+   * Return `true` if the item name satisfies the given constraints.
+   */
+  contains(name: string, filter?: Filter<Item>) {
+    return some(this.getNames(filter), n => n === name)
   }
 }
