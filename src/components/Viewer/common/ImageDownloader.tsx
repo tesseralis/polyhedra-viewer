@@ -2,7 +2,7 @@ import * as React from "react"
 import JSZip from "jszip"
 import FileSaver from "file-saver"
 
-import { escapeName } from "data/names"
+import { escape } from "utils"
 import { allSolidNames } from "data"
 
 /**
@@ -34,7 +34,7 @@ export default class ImageDownloader extends React.Component<any> {
       setPolyhedron(solid, () => {
         setTimeout(() => {
           canvas[0].toBlob((v: any) => {
-            folder.file(`${escapeName(solid)}.png`, v, { base64: true })
+            folder.file(`${escape(solid)}.png`, v, { base64: true })
             resolve()
           })
         }, 100)

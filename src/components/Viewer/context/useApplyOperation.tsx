@@ -4,7 +4,7 @@ import { useCallback } from "react"
 import { useHistory } from "react-router-dom"
 import { Operation } from "math/operations"
 import { Polyhedron } from "math/polyhedra"
-import { escapeName } from "data/names"
+import { escape } from "utils"
 import PolyhedronCtx from "./PolyhedronCtx"
 import OperationCtx from "./OperationCtx"
 import TransitionCtx from "./TransitionCtx"
@@ -35,7 +35,7 @@ export default function useApplyOperation() {
       }
 
       transition(result, animationData)
-      history.push(`/${escapeName(result.name)}/operations`)
+      history.push(`/${escape(result.name)}/operations`)
       if (typeof callback === "function") {
         callback(result)
       }

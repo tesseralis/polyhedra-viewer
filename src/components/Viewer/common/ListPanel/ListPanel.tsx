@@ -5,7 +5,7 @@ import { NavLink, Route } from "react-router-dom"
 import { fonts, useStyle, scales } from "styles"
 
 import { groups } from "data"
-import { escapeName } from "data/names"
+import { escape } from "utils"
 import { hover, padding, paddingVert, margin, marginVert } from "styles/common"
 
 import SearchBar from "./SearchBar"
@@ -58,7 +58,7 @@ function PolyhedronLink({ name }: { name: string }) {
   return (
     <Route>
       <NavLink
-        to={`/${escapeName(name)}/list`}
+        to={`/${escape(name)}/list`}
         {...css()}
         {...activeCss("activeClassName")}
       >

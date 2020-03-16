@@ -1,16 +1,19 @@
 import React, { Suspense } from "react"
 import { Route, Redirect, Switch } from "react-router-dom"
 
-import { isValidSolid } from "data"
+import { choose } from "utils"
+import { isValidSolid, allSolidNames } from "data"
 import { isAlternateName, getCanonicalName } from "data/alternates"
 import { isConwaySymbol, fromConwayNotation } from "data/conway"
-import { escapeName, unescapeName, randomSolidName } from "data/names"
+import { escape } from "utils"
 
 import ErrorPage from "./ErrorPage"
 import Loading from "./Loading"
 
 const HomePage = React.lazy(() => import("./HomePage"))
 const Viewer = React.lazy(() => import("./Viewer"))
+
+const unescapeName = (name: string) => name.replace(/-/g, " ")
 
 export default () => (
   <Suspense fallback={<Loading />}>
@@ -25,14 +28,14 @@ export default () => (
       <Route
         exact
         path="/random"
-        render={() => <Redirect to={escapeName(randomSolidName())} />}
+        render={() => <Redirect to={escape(choose(allSolidNames))} />}
       />
       <Route
         path="/:solid"
         render={({ match, history }) => {
           const solid = unescapeName(match.params.solid)
           if (isConwaySymbol(solid)) {
-            const fullName = escapeName(fromConwayNotation(solid))
+            const fullName = escape(fromConwayNotation(solid))
             const newPath = history.location.pathname.replace(
               match.params.solid,
               fullName,
@@ -42,7 +45,7 @@ export default () => (
           if (isAlternateName(solid)) {
             const newPath = history.location.pathname.replace(
               match.params.solid,
-              escapeName(getCanonicalName(solid)),
+              escape(getCanonicalName(solid)),
             )
             return <Redirect to={newPath} />
           }

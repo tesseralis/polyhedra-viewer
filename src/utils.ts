@@ -94,3 +94,5 @@ export function bimap<K extends Key, V extends Key>(obj: Record<K, V>) {
     },
   }
 }
+
+export const escape = (str: string) => str.replace(/ /g, "-")

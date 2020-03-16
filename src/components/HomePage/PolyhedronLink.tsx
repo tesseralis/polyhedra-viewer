@@ -1,7 +1,7 @@
 import React from "react"
 import { Link } from "react-router-dom"
 
-import { escapeName } from "data/names"
+import { escape } from "utils"
 import { square, hover, flexRow } from "styles/common"
 import { useStyle, media } from "styles"
 
@@ -24,7 +24,7 @@ function Image({ name }: Pick<Props, "name">) {
       height: mobThumbnailSize,
     },
   })
-  const escapedName = escapeName(name)
+  const escapedName = escape(name)
   return (
     <img
       {...css()}
@@ -35,7 +35,7 @@ function Image({ name }: Pick<Props, "name">) {
 }
 
 export default function PolyhedronLink({ name, isFake }: Props) {
-  const escapedName = escapeName(name)
+  const escapedName = escape(name)
 
   const css = useStyle(
     {
