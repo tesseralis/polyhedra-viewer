@@ -4,6 +4,7 @@ import { Route, Redirect, Switch } from "react-router-dom"
 import { isValidSolid } from "data"
 import {
   escapeName,
+  unescapeName,
   randomSolidName,
   isConwaySymbol,
   fromConwayNotation,
@@ -30,20 +31,25 @@ export default () => (
       <Route
         exact
         path="/random"
-        render={() => <Redirect to={randomSolidName()} />}
+        render={() => <Redirect to={escapeName(randomSolidName())} />}
       />
       <Route
         path="/:solid"
         render={({ match, history }) => {
-          const solid = match.params.solid ?? ""
+          const solid = unescapeName(match.params.solid)
           if (isConwaySymbol(solid)) {
             const fullName = escapeName(fromConwayNotation(solid))
-            const newPath = history.location.pathname.replace(solid, fullName)
+            const newPath = history.location.pathname.replace(
+              match.params.solid,
+              fullName,
+            )
             return <Redirect to={newPath} />
           }
           if (isAlternateName(solid)) {
-            const fullName = escapeName(getCanonicalName(solid))
-            const newPath = history.location.pathname.replace(solid, fullName)
+            const newPath = history.location.pathname.replace(
+              match.params.solid,
+              escapeName(getCanonicalName(solid)),
+            )
             return <Redirect to={newPath} />
           }
           if (isValidSolid(solid)) {

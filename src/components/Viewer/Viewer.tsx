@@ -9,7 +9,6 @@ import { OperationCtx, TransitionCtx, PolyhedronCtx } from "./context"
 import DesktopViewer from "./DesktopViewer"
 import MobileViewer from "./MobileViewer"
 import useMediaInfo from "components/useMediaInfo"
-import { unescapeName } from "data/names"
 
 interface InnerProps {
   solid: string
@@ -20,7 +19,7 @@ interface InnerProps {
 function InnerViewer({ solid, panel, action }: InnerProps) {
   const { unsetOperation } = OperationCtx.useActions()
   const { setPolyhedron } = PolyhedronCtx.useActions()
-  usePageTitle(`${capitalize(unescapeName(solid))} - Polyhedra Viewer`)
+  usePageTitle(`${capitalize(solid)} - Polyhedra Viewer`)
 
   // TODO I wish we could make this less verbose...
 

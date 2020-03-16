@@ -2,7 +2,6 @@ import { capitalize } from "lodash-es"
 import React from "react"
 import { useStyle, scales } from "styles"
 
-import { unescapeName } from "data/names"
 import { media, fonts } from "styles"
 
 function Title({ name }: { name: string }) {
@@ -28,7 +27,7 @@ function Title({ name }: { name: string }) {
       textAlign: "center",
     },
   })
-  return <h1 {...css()}>{capitalize(unescapeName(name))}</h1>
+  return <h1 {...css()}>{capitalize(name)}</h1>
 }
 
 export default Title

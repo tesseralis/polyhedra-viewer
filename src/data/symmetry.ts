@@ -3,9 +3,9 @@ import { trimEnd } from "lodash-es"
 import johnsonSolids from "./groups/johnson.json"
 import johnsonSymmetries from "./johnsonSymmetries"
 import { polygonPrefixes } from "./polygons"
-import { unescapeName } from "./names"
 import { classicals, prisms } from "./tables"
 
+// TODO replace the Johnson symmetries list to rely on tables
 export function getJohnsonSymmetry(name: string) {
   return johnsonSymmetries[johnsonSolids.indexOf(name)]
 }
@@ -19,11 +19,7 @@ interface Symmetry {
   sub: string
 }
 
-const groupNames = {
-  3: "T",
-  4: "O",
-  5: "I",
-}
+const groupNames = { 3: "T", 4: "O", 5: "I" }
 
 function getClassicalSymmetry(name: string) {
   // Don't want to count it in the tetrahedron group
@@ -51,7 +47,7 @@ export function getSymmetry(name: string): Symmetry {
   if (prisms.contains(name)) {
     return getPrismSymmetry(name)
   }
-  return getJohnsonSymmetry(unescapeName(name))
+  return getJohnsonSymmetry(name)
 }
 
 export function getSymmetryName({ group, sub }: Symmetry) {

@@ -1,5 +1,6 @@
 import React from "react"
 import { mdiChevronLeft } from "@mdi/js"
+import { escapeName } from "data/names"
 
 import IconLink from "./IconLink"
 
@@ -15,7 +16,7 @@ export default function BackLink({ solid }: Props) {
       title="Back"
       to={{
         pathname: "/",
-        hash: solid,
+        hash: escapeName(solid),
       }}
     />
   )

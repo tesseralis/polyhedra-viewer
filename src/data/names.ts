@@ -2,8 +2,8 @@ import { johnsonSolids, allSolidNames } from "data"
 import { choose, bimap } from "utils"
 import { polygonPrefixes } from "./polygons"
 
+// TODO move this to the /components directory
 export const escapeName = (name: string) => name.replace(/ /g, "-")
-
 export const unescapeName = (name: string) => name.replace(/-/g, " ")
 
 const platonicMapping = bimap({
@@ -81,21 +81,21 @@ export function getCanonicalName(name: string) {
   if (allSolidNames.includes(name)) {
     return name
   }
-  const canonical = inverseAlternateNames[unescapeName(name)]
+  const canonical = inverseAlternateNames[name]
   if (!canonical) throw new Error(`Cannot find canonical name for ${name}`)
   return canonical
 }
 
 export function getAlternateNames(name: string) {
-  return alternateNames[unescapeName(name)] ?? []
+  return alternateNames[name] ?? []
 }
 
 export function isAlternateName(name: string) {
-  return alternateNamesList.includes(unescapeName(name))
+  return alternateNamesList.includes(name)
 }
 
 export function randomSolidName(): string {
-  return escapeName(choose(allSolidNames))
+  return choose(allSolidNames)
 }
 
 export function isConwaySymbol(symbol: string) {
