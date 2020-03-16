@@ -8,7 +8,7 @@ type NamedItem<Item> = Item & { name: string }
 
 function applyFilter<Item extends {}>(item: Item, filter?: Filter<Item>) {
   if (!filter) {
-    return item
+    return true
   }
   if (isFunction(filter)) {
     return filter(item)
@@ -49,19 +49,20 @@ export default class Table<Item extends {}> {
    * Return `true` if the item name satisfies the given constraints.
    */
   contains(name: string, filter?: Filter<Item>) {
-    return some(
-      this.items,
-      item => item.name === name && applyFilter(item, filter),
-    )
+    return some(this.getNames(filter), n => n === name)
   }
 
   /**
    * Get all the items that satisfy the given constraints.
    */
   get(filter?: Filter<Item>) {
-    const filtered = this.items.filter(item => applyFilter(item, filter))
+    return this.items.filter(item => applyFilter(item, filter))
+  }
 
-    // TODO we may need to not make this 'uniq'
-    return uniq(filtered.map(item => item.name))
+  /**
+   * Get the names of all items that satisfy the given filter.
+   */
+  getNames(filter?: Filter<Item>) {
+    return uniq(this.get(filter).map(item => item.name))
   }
 }

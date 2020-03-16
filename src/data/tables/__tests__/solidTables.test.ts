@@ -3,11 +3,11 @@ import { classicals, capstones, rhombicosidodecahedra } from ".."
 describe("solidTables", () => {
   describe("Platonic and Archimedean solids", () => {
     it("has 18 items", () => {
-      expect(classicals.get()).toHaveLength(18)
+      expect(classicals.getNames()).toHaveLength(18)
     })
 
     it("contains the proper entries for the tetrahedron row", () => {
-      expect(classicals.get({ family: 3 })).toEqual(
+      expect(classicals.getNames({ family: 3 })).toEqual(
         expect.arrayContaining(["octahedron", "cuboctahedron", "icosahedron"]),
       )
     })
@@ -16,19 +16,25 @@ describe("solidTables", () => {
   describe("capstones", () => {
     it("does not have entries for gyroelongated triangular pyramids", () => {
       expect(
-        capstones.get({ base: 3, type: "pyramid", elongation: "antiprism" }),
+        capstones.getNames({
+          base: 3,
+          type: "pyramid",
+          elongation: "antiprism",
+        }),
       ).toHaveLength(0)
     })
 
     it("only has two entries for gyrobifastigium", () => {
-      expect(capstones.get({ base: 2 })).toEqual([
+      expect(capstones.getNames({ base: 2 })).toEqual([
         "triangular prism",
         "gyrobifastigium",
       ])
     })
 
     it("does not have single-count entries for copula-rotunda", () => {
-      expect(capstones.get({ type: "cupolarotunda", count: 1 })).toHaveLength(0)
+      expect(
+        capstones.getNames({ type: "cupolarotunda", count: 1 }),
+      ).toHaveLength(0)
     })
   })
 
@@ -40,7 +46,7 @@ describe("solidTables", () => {
     })
 
     it("has 13 members", () => {
-      expect(rhombicosidodecahedra.get()).toHaveLength(13)
+      expect(rhombicosidodecahedra.getNames()).toHaveLength(13)
     })
   })
 })
