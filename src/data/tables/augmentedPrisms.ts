@@ -1,5 +1,3 @@
-import { range } from "lodash-es"
-
 import { polygonPrefixes } from "../polygons"
 import Table from "./Table"
 import {
@@ -8,6 +6,7 @@ import {
   AlignOpts,
   alignOpts,
   zeroCounts,
+  limitCount,
   prefix,
   wordJoin,
   countString,
@@ -26,14 +25,16 @@ const options: FieldOptions<Item> = {
   align: alignOpts,
 }
 
-function getCounts(n: FaceType) {
-  const limit = [3, 6].includes(n) ? 3 : 2
-  return range(limit + 1) as ZeroCount[]
+const countLimit: Record<FaceType, ZeroCount> = {
+  3: 3,
+  4: 2,
+  5: 2,
+  6: 3,
 }
 
 function* getItems() {
   for (const base of options.base) {
-    for (const count of getCounts(base)) {
+    for (const count of limitCount(options.count, countLimit[base])) {
       if (base === 6 && count === 2) {
         for (const align of options.align) {
           yield { base, count, align }

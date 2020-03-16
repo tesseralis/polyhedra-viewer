@@ -1,4 +1,3 @@
-import { range } from "lodash-es"
 import Table from "./Table"
 import {
   FieldOptions,
@@ -6,6 +5,7 @@ import {
   AlignOpts,
   alignOpts,
   zeroCounts,
+  limitCount,
   prefix,
   wordJoin,
   countString,
@@ -23,22 +23,16 @@ const options: FieldOptions<Item> = {
   align: alignOpts,
 }
 
-function* getCounts() {
-  for (const gyrate of range(4)) {
-    for (const diminished of range(4 - gyrate)) {
-      yield [gyrate, diminished] as [ZeroCount, ZeroCount]
-    }
-  }
-}
-
 function* getItems() {
-  for (const [gyrate, diminished] of getCounts()) {
-    if (gyrate + diminished === 2) {
-      for (const align of options.align) {
-        yield { gyrate, diminished, align }
+  for (const gyrate of options.gyrate) {
+    for (const diminished of limitCount(options.diminished, 3 - gyrate)) {
+      if (gyrate + diminished === 2) {
+        for (const align of options.align) {
+          yield { gyrate, diminished, align }
+        }
+      } else {
+        yield { gyrate, diminished }
       }
-    } else {
-      yield { gyrate, diminished }
     }
   }
 }

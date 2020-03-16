@@ -33,6 +33,10 @@ const countPrefixes: Record<Count, string> = {
   3: "tri",
 }
 
+export function limitCount<N extends number>(counts: N[], limit: number) {
+  return counts.filter(n => n <= limit)
+}
+
 export function countString(count: ZeroCount, base: string) {
   if (count === 0) return ""
   return countPrefixes[count] + base

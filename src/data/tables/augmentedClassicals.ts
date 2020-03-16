@@ -1,4 +1,3 @@
-import { range } from "lodash-es"
 import Table from "./Table"
 import {
   FieldOptions,
@@ -7,6 +6,7 @@ import {
   bools,
   zeroCounts,
   alignOpts,
+  limitCount,
   countString,
   wordJoin,
   prefix,
@@ -27,20 +27,16 @@ const options: FieldOptions<Item> = {
   align: alignOpts,
 }
 
-const countMapping: Record<Base, ZeroCount> = {
+const countLimit: Record<Base, ZeroCount> = {
   tetrahedron: 1,
   cube: 2,
   dodecahedron: 3,
 }
 
-function getCounts(base: Base) {
-  return range(countMapping[base] + 1) as ZeroCount[]
-}
-
 function* getItems() {
   for (const base of options.base) {
     for (const truncated of options.truncated) {
-      for (const count of getCounts(base)) {
+      for (const count of limitCount(options.count, countLimit[base])) {
         if (base === "dodecahedron" && count === 2) {
           for (const align of alignOpts) {
             yield { base, truncated, count, align }
