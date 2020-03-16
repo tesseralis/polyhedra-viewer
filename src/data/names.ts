@@ -154,23 +154,3 @@ export const toConwayNotation = (solid: string) => {
   }
   throw new Error(`Invalid solid name ${solid}`)
 }
-
-export function getType(solid: string) {
-  const name = unescapeName(solid)
-  if (platonicMapping.hasValue(name)) {
-    return "Platonic solid"
-  }
-  if (archimedeanMapping.hasValue(name)) {
-    return "Archimedean solid"
-  }
-  if (johnsonSolids.includes(name)) {
-    return "Johnson solid"
-  }
-  if (name.includes("antiprism")) {
-    return "Antiprism"
-  }
-  if (name.includes("prism")) {
-    return "Prism"
-  }
-  throw new Error(`Invalid solid name ${solid}`)
-}

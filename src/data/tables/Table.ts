@@ -59,6 +59,10 @@ export default class Table<Item extends {}> {
     return uniq(this.get(filter).map(item => item.name))
   }
 
+  getItem(name: string, filter?: Filter<Item>) {
+    return this.get(filter).find(item => item.name === name)
+  }
+
   /**
    * Return `true` if the item name satisfies the given constraints.
    */

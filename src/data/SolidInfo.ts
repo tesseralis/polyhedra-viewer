@@ -1,4 +1,4 @@
-import { getType, getAlternateNames, toConwayNotation } from "./names"
+import { getAlternateNames, toConwayNotation } from "./names"
 import { getSymmetry, getSymmetryName, getOrder } from "./symmetry"
 import { classicals, prisms, capstones, rhombicosidodecahedra } from "./tables"
 
@@ -12,8 +12,6 @@ export default class SolidInfo {
   constructor(name: string) {
     this.name = name
   }
-
-  type = () => getType(this.name)
 
   alternateNames = () => getAlternateNames(this.name)
 
@@ -41,6 +39,22 @@ export default class SolidInfo {
     filter?: Parameters<typeof rhombicosidodecahedra.contains>[1],
   ) {
     return rhombicosidodecahedra.contains(this.name, filter)
+  }
+
+  type() {
+    if (this.inClassicalTable({ operation: "regular" })) {
+      return "Platonic solid"
+    }
+    if (this.inClassicalTable()) {
+      return "Archimedean solid"
+    }
+    if (this.inPrismTable({ type: "prism" })) {
+      return "Prism"
+    }
+    if (this.inPrismTable({ type: "antiprism" })) {
+      return "Antiprism"
+    }
+    return "Johnson solid"
   }
 
   isRegular() {
