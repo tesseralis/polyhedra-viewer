@@ -6,6 +6,12 @@ type NameFunc<Item> = (item: Item) => string
 type Filter<Item> = Partial<Item> | ((item: Item) => boolean)
 type NamedItem<Item> = Item & { name: string }
 
+interface ConstructorArgs<Item> {
+  items: Iterable<Item>
+  getName: NameFunc<Item>
+  options: FieldOptions<Item>
+}
+
 function applyFilter<Item extends {}>(item: Item, filter?: Filter<Item>) {
   if (!filter) {
     return true
@@ -23,12 +29,6 @@ function* getNamedItems<Item>(items: Iterable<Item>, nameFunc: NameFunc<Item>) {
       name: getCanonicalName(nameFunc(item)),
     }
   }
-}
-
-interface ConstructorArgs<Item> {
-  items: Iterable<Item>
-  getName: NameFunc<Item>
-  options: FieldOptions<Item>
 }
 
 /**
