@@ -16,12 +16,12 @@ describe("solidTables", () => {
   describe("capstones", () => {
     it("does not have entries for gyroelongated triangular pyramids", () => {
       expect(
-        capstones.get({ n: 3, type: "pyramid", elongation: "antiprism" }),
+        capstones.get({ base: 3, type: "pyramid", elongation: "antiprism" }),
       ).toHaveLength(0)
     })
 
     it("only has two entries for gyrobifastigium", () => {
-      expect(capstones.get({ n: 2 })).toEqual([
+      expect(capstones.get({ base: 2 })).toEqual([
         "triangular prism",
         "gyrobifastigium",
       ])

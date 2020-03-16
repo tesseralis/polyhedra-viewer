@@ -10,7 +10,7 @@ import {
 } from "./tableHelpers"
 
 interface Item {
-  n: 2 | 3 | 4 | 5
+  base: 2 | 3 | 4 | 5
   type: "pyramid" | "cupola" | "rotunda" | "cupolarotunda"
   elongation: "" | PrismType
   count: 1 | 2
@@ -18,7 +18,7 @@ interface Item {
 }
 
 const options: FieldOptions<Item> = {
-  n: [2, 3, 4, 5],
+  base: [2, 3, 4, 5],
   type: ["pyramid", "cupola", "rotunda", "cupolarotunda"],
   elongation: ["", ...prismTypes],
   count: [1, 2],
@@ -26,15 +26,15 @@ const options: FieldOptions<Item> = {
 }
 
 function* getItems(): Generator<Item> {
-  for (const n of options.n.slice(1)) {
+  for (const base of options.base.slice(1)) {
     for (const type of options.type) {
       // Only pentagonal rotundae exist
-      if (["rotunda", "cupolarotunda"].includes(type) && n !== 5) {
+      if (["rotunda", "cupolarotunda"].includes(type) && base !== 5) {
         continue
       }
       for (const elongation of options.elongation) {
         // Gyroelongated pyramids are concave
-        if (n === 3 && type === "pyramid" && elongation === "antiprism") {
+        if (base === 3 && type === "pyramid" && elongation === "antiprism") {
           continue
         }
         for (const count of options.count) {
@@ -46,7 +46,7 @@ function* getItems(): Generator<Item> {
           if (count === 2 && type !== "pyramid" && elongation !== "antiprism") {
             for (const gyrate of options.gyrate) {
               yield {
-                n,
+                base,
                 type,
                 elongation,
                 count,
@@ -54,15 +54,15 @@ function* getItems(): Generator<Item> {
               }
             }
           } else {
-            yield { n, type, elongation, count }
+            yield { base, type, elongation, count }
           }
         }
       }
     }
   }
-  yield { n: 2, type: "cupola", elongation: "", count: 1 }
+  yield { base: 2, type: "cupola", elongation: "", count: 1 }
   yield {
-    n: 2,
+    base: 2,
     type: "cupola",
     elongation: "",
     count: 2,
@@ -79,11 +79,11 @@ const elongStr = {
 export default new Table({
   items: getItems(),
   options,
-  getName({ n, type, elongation, count, gyrate }) {
+  getName({ base, type, elongation, count, gyrate }) {
     const baseStr = type === "cupolarotunda" ? type : countString(count, type)
     return wordJoin(
       elongStr[elongation],
-      polygonPrefixes.get(n),
+      polygonPrefixes.get(base),
       prefix(gyrate, baseStr),
     )
   },
