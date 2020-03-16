@@ -1,5 +1,5 @@
 import { uniq, some, isMatch, isFunction } from "lodash-es"
-import { getCanonicalName } from "../names"
+import { getCanonicalName } from "../alternates"
 import { FieldOptions } from "./tableHelpers"
 
 type NameFunc<Item> = (item: Item) => string

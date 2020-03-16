@@ -2,14 +2,13 @@ import React, { Suspense } from "react"
 import { Route, Redirect, Switch } from "react-router-dom"
 
 import { isValidSolid } from "data"
+import { isAlternateName, getCanonicalName } from "data/alternates"
 import {
   escapeName,
   unescapeName,
   randomSolidName,
   isConwaySymbol,
   fromConwayNotation,
-  isAlternateName,
-  getCanonicalName,
 } from "data/names"
 
 import ErrorPage from "./ErrorPage"
