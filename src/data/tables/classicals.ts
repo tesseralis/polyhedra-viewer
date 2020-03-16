@@ -5,10 +5,10 @@ type Family = 3 | 4 | 5
 type Facet = "face" | "vertex"
 type Operation =
   | "regular"
-  | "truncated"
-  | "rectified"
-  | "bevelled"
-  | "cantellated"
+  | "truncate"
+  | "rectify"
+  | "bevel"
+  | "cantellate"
   | "snub"
 
 interface Item {
@@ -20,20 +20,13 @@ interface Item {
 const options: FieldOptions<Item> = {
   family: [3, 4, 5],
   facet: ["face", "vertex"],
-  operation: [
-    "regular",
-    "truncated",
-    "rectified",
-    "bevelled",
-    "cantellated",
-    "snub",
-  ],
+  operation: ["regular", "truncate", "rectify", "bevel", "cantellate", "snub"],
 }
 
 function* getItems() {
   for (const operation of options.operation) {
     for (const family of options.family) {
-      if (family !== 3 && ["regular", "truncated"].includes(operation)) {
+      if (family !== 3 && ["regular", "truncate"].includes(operation)) {
         for (const facet of options.facet) {
           yield { family, operation, facet }
         }
@@ -57,7 +50,7 @@ const regularNames: Record<Family, (facet?: Facet) => string> = {
 }
 
 function getBase({ family, operation, facet }: Item) {
-  if (["regular", "truncated"].includes(operation)) {
+  if (["regular", "truncate"].includes(operation)) {
     return regularNames[family](facet)
   } else {
     return rectifiedNames[family]
@@ -65,7 +58,7 @@ function getBase({ family, operation, facet }: Item) {
 }
 
 function getExpandedString(base: string, operation: Operation) {
-  const str = prefix(operation === "cantellated" ? "rhombi" : "", base)
+  const str = prefix(operation === "cantellate" ? "rhombi" : "", base)
   return str.replace("ii", "i")
 }
 
@@ -76,7 +69,7 @@ export default new Table<Item>({
     const base = getBase({ family, operation, facet })
     return wordJoin(
       operation === "snub" ? operation : "",
-      ["truncated", "bevelled"].includes(operation) ? "truncated" : "",
+      ["truncate", "bevel"].includes(operation) ? "truncated" : "",
       getExpandedString(base, operation),
     )
   },

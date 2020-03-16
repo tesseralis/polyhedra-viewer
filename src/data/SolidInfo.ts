@@ -67,7 +67,7 @@ export default class SolidInfo {
    * which alternate around each vertex.
    */
   isQuasiRegular() {
-    return this.inClassicalTable({ operation: "rectified" })
+    return this.inClassicalTable({ operation: "rectify" })
   }
 
   isUniform() {
