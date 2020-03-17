@@ -9,6 +9,7 @@ import {
   capstones,
   augmentedPrisms,
   augmentedClassicals,
+  rhombicosidodecahedra,
 } from "./tables"
 import { isValidSolid } from "."
 
@@ -85,6 +86,39 @@ function getAugmentedClassicalSymmetry(name: string) {
   }
 }
 
+// TODO there's only three of these so we just put them here right now
+const diminishedIcosahedraMapping: Record<string, Symmetry> = {
+  "metabidiminished icosahedron": { group: "C", sub: "2v" },
+  "tridiminished icosahedron": { group: "C", sub: "3v" },
+  "augmented tridiminished icosahedron": { group: "C", sub: "3v" },
+}
+
+function getRhombicosidodecahedraSymmetry(name: string) {
+  const { gyrate, diminished, align } = rhombicosidodecahedra.get(name)
+  // only gyrations or only diminishes
+  const pure = !gyrate || !diminished
+  switch (gyrate + diminished) {
+    case 0:
+      // normal rhombicosidodecahedron
+      return getClassicalSymmetry(name)
+    case 1:
+      // pentagonal pyramidal
+      return { group: "C", sub: "5v" }
+    case 2:
+      if (align === "para") {
+        return pure ? { group: "D", sub: "5d" } : { group: "C", sub: "5v" }
+      }
+      return pure ? { group: "C", sub: "2v" } : { group: "C", sub: "s" }
+    //
+    case 3:
+      return pure ? { group: "C", sub: "3v" } : { group: "C", sub: "s" }
+    default:
+      throw new Error(
+        `Way too many changes to this polyhedron: gyrate=${gyrate}, diminished=${diminished}`,
+      )
+  }
+}
+
 // TODO replace the Johnson symmetries list to rely on tables
 function getJohnsonSymmetry(name: string) {
   if (capstones.hasName(name)) {
@@ -95,6 +129,12 @@ function getJohnsonSymmetry(name: string) {
   }
   if (augmentedClassicals.hasName(name)) {
     return getAugmentedClassicalSymmetry(name)
+  }
+  if (!!diminishedIcosahedraMapping[name]) {
+    return diminishedIcosahedraMapping[name]
+  }
+  if (rhombicosidodecahedra.hasName(name)) {
+    return getRhombicosidodecahedraSymmetry(name)
   }
   return johnsonSymmetries[johnsonSolids.indexOf(name)]
 }
