@@ -9,6 +9,29 @@ import {
 import { isValidSolid } from ".."
 import { Family, Symmetry, Polyhedral, Cyclic, Dihedral } from "./Symmetry"
 
+const groupNames: Record<3 | 4 | 5, Family> = {
+  3: "tetrahedral",
+  4: "octahedral",
+  5: "icosahedral",
+}
+
+function getClassicalSymmetry(name: string) {
+  // Don't want to count it in the tetrahedron group
+  const families = [...classicals.options.family].reverse()
+  const family = families.find(family => classicals.hasName(name, { family }))!
+  // TODO replace with isChiral
+  const chiral = classicals.hasName(
+    name,
+    ({ operation, family }) => operation === "snub" && family !== 3,
+  )
+  return Polyhedral.get(groupNames[family], chiral)
+}
+
+function getPrismSymmetry(name: string) {
+  const { base, type } = prisms.get(name)!
+  return Dihedral.get(base, type)
+}
+
 function getCapstoneSymmetry(name: string) {
   const { base, type, count, elongation, gyrate } = capstones.get(name)
   // Single-count capstones all have pyramidal symmetry
@@ -122,8 +145,19 @@ const elementaryMapping: Record<string, Symmetry> = {
   "triangular hebesphenorotunda": Cyclic.get(3),
 }
 
-// TODO replace the Johnson symmetries list to rely on tables
-function getJohnsonSymmetry(name: string) {
+/**
+ * Return the Symmetry of the given polyhedron name
+ */
+export default function getSymmetry(name: string): Symmetry {
+  if (!isValidSolid(name)) {
+    throw new Error(`Unable to get symmetry for invalid polyhedron ${name}`)
+  }
+  if (classicals.hasName(name)) {
+    return getClassicalSymmetry(name)
+  }
+  if (prisms.hasName(name)) {
+    return getPrismSymmetry(name)
+  }
   if (capstones.hasName(name)) {
     return getCapstoneSymmetry(name)
   }
@@ -140,44 +174,4 @@ function getJohnsonSymmetry(name: string) {
     return getRhombicosidodecahedraSymmetry(name)
   }
   return elementaryMapping[name]
-}
-
-/**
- * Utilities to get symmetry information out of polyhedra names
- */
-
-const groupNames: Record<3 | 4 | 5, Family> = {
-  3: "tetrahedral",
-  4: "octahedral",
-  5: "icosahedral",
-}
-
-function getClassicalSymmetry(name: string) {
-  // Don't want to count it in the tetrahedron group
-  const families = [...classicals.options.family].reverse()
-  const family = families.find(family => classicals.hasName(name, { family }))!
-  // TODO replace with isChiral
-  const chiral = classicals.hasName(
-    name,
-    ({ operation, family }) => operation === "snub" && family !== 3,
-  )
-  return Polyhedral.get(groupNames[family], chiral)
-}
-
-function getPrismSymmetry(name: string) {
-  const { base, type } = prisms.get(name)!
-  return Dihedral.get(base, type)
-}
-
-export default function getSymmetry(name: string): Symmetry {
-  if (!isValidSolid(name)) {
-    throw new Error(`Unable to get symmetry for invalid polyhedron ${name}`)
-  }
-  if (classicals.hasName(name)) {
-    return getClassicalSymmetry(name)
-  }
-  if (prisms.hasName(name)) {
-    return getPrismSymmetry(name)
-  }
-  return getJohnsonSymmetry(name)
 }

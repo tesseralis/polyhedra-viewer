@@ -103,7 +103,6 @@ export class Cyclic extends Symmetry {
 
   symbolSub() {
     const { n, chiral } = this.data
-    if (n === 1 && !chiral) return "s"
     return `${n}${chiral ? "" : "v"}`
   }
 
