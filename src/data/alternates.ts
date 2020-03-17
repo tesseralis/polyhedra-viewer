@@ -1,4 +1,4 @@
-import { assertValidSolid } from "data"
+import { assertValidSolid } from "data/common"
 
 export const alternateNamesMapping: Record<string, string[]> = {
   tetrahedron: ["triangular pyramid", "digonal antiprism", "disphenoid"],

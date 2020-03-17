@@ -1,4 +1,4 @@
-import { getPolyhedraNames } from "."
+import { getPolyhedraNames } from "./common"
 
 const uniformData = [
   { name: "platonic", display: "Platonic Solids" },

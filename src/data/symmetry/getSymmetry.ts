@@ -6,7 +6,7 @@ import {
   augmentedClassicals,
   rhombicosidodecahedra,
 } from "../tables"
-import { assertValidSolid } from ".."
+import { assertValidSolid } from "../common"
 import { Family, Symmetry, Polyhedral, Cyclic, Dihedral } from "./Symmetry"
 
 const groupNames: Record<3 | 4 | 5, Family> = {

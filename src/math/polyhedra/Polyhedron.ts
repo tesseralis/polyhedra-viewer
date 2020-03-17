@@ -9,7 +9,7 @@ import {
   isEqual,
 } from "lodash-es"
 
-import { getSolidData } from "data"
+import { getSolidData } from "data/common"
 import { polygons } from "data/polygons"
 import SolidInfo from "data/SolidInfo"
 import { Vec3D, getCentroid } from "math/geom"

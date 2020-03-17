@@ -1,4 +1,4 @@
-import { allSolidNames } from "data"
+import { allSolidNames } from "data/common"
 import { alternateNamesMapping } from "../alternates"
 
 describe("alternate names", () => {

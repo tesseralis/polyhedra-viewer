@@ -2,7 +2,7 @@ import React, { Suspense } from "react"
 import { Route, Redirect, Switch } from "react-router-dom"
 
 import { choose } from "utils"
-import { isValidSolid, allSolidNames } from "data"
+import { isValidSolid, allSolidNames } from "data/common"
 import { isAlternateName, getCanonicalName } from "data/alternates"
 import { isConwaySymbol, fromConwayNotation } from "data/conway"
 import { escape } from "utils"
