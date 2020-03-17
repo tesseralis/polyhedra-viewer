@@ -20,7 +20,7 @@ describe("viewer", () => {
     setup("tetrahedron", "operations", { device: "mobile" })
     page
       .clickButtonWithText("truncate")
-      .expectTransitionTo("truncated-tetrahedron")
+      .expectTransitionTo("truncated tetrahedron")
   })
 
   it("resets the operation when unset", () => {
@@ -68,7 +68,7 @@ describe("viewer", () => {
     page
       .clickButtonWithText("augment")
       .clickAnyFace()
-      .expectTransitionTo("triangular-bipyramid")
+      .expectTransitionTo("triangular bipyramid")
       .clickButtonWithText("diminish")
       .clickAnyFace()
       .expectTransitionTo("tetrahedron")
@@ -82,27 +82,27 @@ describe("viewer", () => {
       .expectTransitionTo("icosahedron")
       .clickButtonWithText("snub")
       .clickButtonWithText("left")
-      .expectTransitionTo("snub-dodecahedron")
+      .expectTransitionTo("snub dodecahedron")
   })
 
   it("twists things left and right correctly", () => {
-    setup("gyroelongated-pentagonal-bicupola")
+    setup("gyroelongated pentagonal bicupola")
 
     page
       .clickButtonWithText("shorten")
       .clickButtonWithText("right")
-      .expectTransitionTo("pentagonal-gyrobicupola")
+      .expectTransitionTo("pentagonal gyrobicupola")
 
-    setup("gyroelongated-pentagonal-bicupola")
+    setup("gyroelongated pentagonal bicupola")
 
     page
       .clickButtonWithText("shorten")
       .clickButtonWithText("left")
-      .expectTransitionTo("pentagonal-orthobicupola")
+      .expectTransitionTo("pentagonal orthobicupola")
   })
 
   it("can transition through a pyramid series", () => {
-    setup("square-pyramid")
+    setup("square pyramid")
 
     page
       .clickButtonWithText("augment")
@@ -110,9 +110,9 @@ describe("viewer", () => {
       .expectTransitionTo("octahedron")
       .clickButtonWithText("diminish")
       .clickFaceWithNumSides(3)
-      .expectTransitionTo("square-pyramid")
+      .expectTransitionTo("square pyramid")
       .clickButtonWithText("elongate")
-      .expectTransitionTo("elongated-square-pyramid")
+      .expectTransitionTo("elongated square pyramid")
       .clickButtonWithText("augment")
   })
 
@@ -126,16 +126,16 @@ describe("viewer", () => {
       .expectTransitionTo("gyrobifastigium")
       .clickButtonWithText("diminish")
       .clickFaceWithNumSides(4)
-      .expectTransitionTo("triangular-prism")
+      .expectTransitionTo("triangular prism")
       // augmented with pyramids
       .clickButtonWithText("augment")
       .clickButtonWithText("pyramid")
       .clickFaceWithNumSides(4)
-      .expectTransitionTo("augmented-triangular-prism")
+      .expectTransitionTo("augmented triangular prism")
       .clickFaceWithNumSides(4)
-      .expectTransitionTo("biaugmented-triangular-prism")
+      .expectTransitionTo("biaugmented triangular prism")
       .clickFaceWithNumSides(4)
-      .expectTransitionTo("triaugmented-triangular-prism")
+      .expectTransitionTo("triaugmented triangular prism")
   })
 
   it("can go through a simple rhombicosadodecahedron workflow", () => {
@@ -145,13 +145,13 @@ describe("viewer", () => {
       .clickButtonWithText("augment")
       .clickButtonWithText("ortho")
       .clickFaceWithNumSides(10)
-      .expectTransitionTo("gyrate-bidiminished-rhombicosidodecahedron")
+      .expectTransitionTo("gyrate bidiminished rhombicosidodecahedron")
       .clickButtonWithText("ortho")
       .clickFaceWithNumSides(10)
-      .expectTransitionTo("bigyrate-diminished-rhombicosidodecahedron")
+      .expectTransitionTo("bigyrate diminished rhombicosidodecahedron")
       .clickButtonWithText("ortho")
       .clickFaceWithNumSides(10)
-      .expectTransitionTo("trigyrate-rhombicosidodecahedron")
+      .expectTransitionTo("trigyrate rhombicosidodecahedron")
   })
 
   it("can go through an expansion workflow", () => {
@@ -161,7 +161,7 @@ describe("viewer", () => {
       .expectTransitionTo("rhombicosidodecahedron")
       .clickButtonWithText("diminish")
       .clickAnyFace()
-      .expectTransitionTo("diminished-rhombicosidodecahedron")
+      .expectTransitionTo("diminished rhombicosidodecahedron")
   })
 
   // TODO the test is broken most likely due to history being mutable.
@@ -171,10 +171,10 @@ describe("viewer", () => {
     setup("tetrahedron")
     page
       .clickButtonWithText("truncate")
-      .expectTransitionTo("truncated-tetrahedron")
+      .expectTransitionTo("truncated tetrahedron")
       .goBack()
       .expectTransitionTo("tetrahedron")
       .clickButtonWithText("truncate")
-      .expectTransitionTo("truncated-tetrahedron")
+      .expectTransitionTo("truncated tetrahedron")
   })
 })
