@@ -49,6 +49,11 @@ describe("symmetry", () => {
 
       it("works on augmented Platonic and Archimedean solids", () => {
         expectSymmetryName("triaugmented dodecahedron", "triangular pyramidal")
+        expectSymmetryName(
+          "augmented truncated tetrahedron",
+          "triangular pyramidal",
+        )
+        expectSymmetryName("biaugmented truncated cube", "square prismatic")
       })
 
       it("works on rhombicosidodecahedra", () => {

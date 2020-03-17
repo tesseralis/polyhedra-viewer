@@ -3,7 +3,13 @@ import { trimEnd } from "lodash-es"
 import johnsonSolids from "./groups/johnson.json"
 import johnsonSymmetries from "./johnsonSymmetries"
 import { polygonPrefixes } from "./polygons"
-import { classicals, prisms, capstones, augmentedPrisms } from "./tables"
+import {
+  classicals,
+  prisms,
+  capstones,
+  augmentedPrisms,
+  augmentedClassicals,
+} from "./tables"
 import { isValidSolid } from "."
 
 function getCapstoneSymmetry(name: string) {
@@ -55,6 +61,30 @@ function getAugmentedPrismSymmetry(name: string) {
   }
 }
 
+function getAugmentedClassicalSymmetry(name: string) {
+  const { count, base, align } = augmentedClassicals.get(name)
+  switch (count) {
+    case 1: {
+      return { group: "C", sub: `${base}v` }
+    }
+    case 2: {
+      if (base === 4) {
+        return { group: "D", sub: "4h" }
+      }
+      if (align === "para") {
+        return { group: "D", sub: "5d" }
+      }
+      return { group: "C", sub: "2v" }
+    }
+    case 3: {
+      return { group: "C", sub: "3v" }
+    }
+    default: {
+      return getClassicalSymmetry(name)
+    }
+  }
+}
+
 // TODO replace the Johnson symmetries list to rely on tables
 function getJohnsonSymmetry(name: string) {
   if (capstones.hasName(name)) {
@@ -62,6 +92,9 @@ function getJohnsonSymmetry(name: string) {
   }
   if (augmentedPrisms.hasName(name)) {
     return getAugmentedPrismSymmetry(name)
+  }
+  if (augmentedClassicals.hasName(name)) {
+    return getAugmentedClassicalSymmetry(name)
   }
   return johnsonSymmetries[johnsonSolids.indexOf(name)]
 }
