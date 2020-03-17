@@ -1,4 +1,4 @@
-import { Cyclic, Dihedral, Polyhedral } from "./Symmetry"
+import { Cyclic, Dihedral, Polyhedral } from "../Symmetry"
 
 describe("Polyhedral Symmetry", () => {
   describe(".name()", () => {

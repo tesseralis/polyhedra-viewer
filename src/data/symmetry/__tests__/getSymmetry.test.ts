@@ -1,4 +1,4 @@
-import getSymmetry from "./getSymmetry"
+import getSymmetry from "../getSymmetry"
 
 describe("getSymmetry", () => {
   function expectSymmetry(solid: string, expected: string) {
