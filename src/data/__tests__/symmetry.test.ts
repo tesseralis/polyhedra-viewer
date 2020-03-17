@@ -15,11 +15,58 @@ describe("symmetry", () => {
       expectSymmetryName("octagonal antiprism", "octagonal antiprismatic")
     })
 
-    it("works on johnson solids", () => {
-      expectSymmetryName("augmented sphenocorona", "bilateral")
-      expectSymmetryName("sphenocorona", "biradial")
-      expectSymmetryName("square pyramid", "square pyramidal")
-      expectSymmetryName("triaugmented dodecahedron", "triangular pyramidal")
+    describe("johnson solids", () => {
+      it("works on capstones", () => {
+        expectSymmetryName("pentagonal pyramid", "pentagonal pyramidal")
+        expectSymmetryName(
+          "elongated triangular bipyramid",
+          "triangular prismatic",
+        )
+        expectSymmetryName(
+          "gyroelongated square bipyramid",
+          "square antiprismatic",
+        )
+        expectSymmetryName("gyrobifastigium", "digonal antiprismatic")
+        // TODO can test all cupolarotundae
+        expectSymmetryName(
+          "pentagonal orthocupolarotunda",
+          "pentagonal pyramidal",
+        )
+      })
+
+      it("works on augmented prisms", () => {
+        expectSymmetryName("augmented triangular prism", "biradial")
+        expectSymmetryName("biaugmented pentagonal prism", "biradial")
+        expectSymmetryName(
+          "parabiaugmented hexagonal prism",
+          "digonal prismatic",
+        )
+        expectSymmetryName(
+          "triaugmented hexagonal prism",
+          "triangular prismatic",
+        )
+      })
+
+      it("works on augmented Platonic and Archimedean solids", () => {
+        expectSymmetryName("triaugmented dodecahedron", "triangular pyramidal")
+        expectSymmetryName(
+          "augmented truncated tetrahedron",
+          "triangular pyramidal",
+        )
+        expectSymmetryName("biaugmented truncated cube", "square prismatic")
+      })
+
+      it("works on rhombicosidodecahedra", () => {
+        expectSymmetryName(
+          "paragyrate diminished rhombicosidodecahedron",
+          "pentagonal pyramidal",
+        )
+      })
+
+      it("works on elementary solids", () => {
+        expectSymmetryName("augmented sphenocorona", "bilateral")
+        expectSymmetryName("sphenocorona", "biradial")
+      })
     })
   })
 

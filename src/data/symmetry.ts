@@ -1,13 +1,152 @@
 import { trimEnd } from "lodash-es"
 
-import johnsonSolids from "./groups/johnson.json"
-import johnsonSymmetries from "./johnsonSymmetries"
 import { polygonPrefixes } from "./polygons"
-import { classicals, prisms } from "./tables"
+import {
+  classicals,
+  prisms,
+  capstones,
+  augmentedPrisms,
+  augmentedClassicals,
+  rhombicosidodecahedra,
+} from "./tables"
+import { isValidSolid } from "."
+
+function getCapstoneSymmetry(name: string) {
+  const { base, type, count, elongation, gyrate } = capstones.get(name)
+  // Single-count capstones all have pyramidal symmetry
+  if (count === 1) {
+    return { group: "C", sub: `${base}v` }
+  }
+  const gyroelongated = elongation === "antiprism"
+
+  if (type === "pyramid") {
+    const notation = gyroelongated ? "d" : "h"
+    return { group: "D", sub: `${base}${notation}` }
+  } else if (type === "cupolarotunda") {
+    const notation = gyroelongated ? "" : "v"
+    return { group: "C", sub: `${base}${notation}` }
+  } else {
+    // cupolae and rotundae
+    const notation = gyroelongated ? "" : gyrate === "gyro" ? "d" : "h"
+    return { group: "D", sub: `${base}${notation}` }
+  }
+}
+
+function getAugmentedPrismSymmetry(name: string) {
+  const { count, align } = augmentedPrisms.get(name)
+  switch (count) {
+    case 1: {
+      // mono-augmented prisms all have biradial symmetry
+      return { group: "C", sub: "2v" }
+    }
+    case 2: {
+      if (align === "para") {
+        // para-augmented stuff have digonal prismatic symmetry
+        // TODO this doesn't count a square prism (cube)
+        return { group: "D", sub: "2h" }
+      } else {
+        // meta-augmented stuff has biradial symmetry
+        return { group: "C", sub: "2v" }
+      }
+    }
+    case 3: {
+      // Triaugmented triangular/hexagonal prism has triangular prismatic symmetry
+      return { group: "D", sub: "3h" }
+    }
+    default: {
+      // for zero-counts, return the usual prism symmetry
+      return getPrismSymmetry(name)
+    }
+  }
+}
+
+function getAugmentedClassicalSymmetry(name: string) {
+  const { count, base, align } = augmentedClassicals.get(name)
+  switch (count) {
+    case 1: {
+      return { group: "C", sub: `${base}v` }
+    }
+    case 2: {
+      if (base === 4) {
+        return { group: "D", sub: "4h" }
+      }
+      if (align === "para") {
+        return { group: "D", sub: "5d" }
+      }
+      return { group: "C", sub: "2v" }
+    }
+    case 3: {
+      return { group: "C", sub: "3v" }
+    }
+    default: {
+      return getClassicalSymmetry(name)
+    }
+  }
+}
+
+// TODO there's only three of these so we just put them here right now
+const diminishedIcosahedraMapping: Record<string, Symmetry> = {
+  "metabidiminished icosahedron": { group: "C", sub: "2v" },
+  "tridiminished icosahedron": { group: "C", sub: "3v" },
+  "augmented tridiminished icosahedron": { group: "C", sub: "3v" },
+}
+
+function getRhombicosidodecahedraSymmetry(name: string) {
+  const { gyrate, diminished, align } = rhombicosidodecahedra.get(name)
+  // only gyrations or only diminishes
+  const pure = !gyrate || !diminished
+  switch (gyrate + diminished) {
+    case 0:
+      // normal rhombicosidodecahedron
+      return getClassicalSymmetry(name)
+    case 1:
+      // pentagonal pyramidal
+      return { group: "C", sub: "5v" }
+    case 2:
+      if (align === "para") {
+        return pure ? { group: "D", sub: "5d" } : { group: "C", sub: "5v" }
+      }
+      return pure ? { group: "C", sub: "2v" } : { group: "C", sub: "s" }
+    //
+    case 3:
+      return pure ? { group: "C", sub: "3v" } : { group: "C", sub: "s" }
+    default:
+      throw new Error(
+        `Way too many changes to this polyhedron: gyrate=${gyrate}, diminished=${diminished}`,
+      )
+  }
+}
+
+const elementaryMapping: Record<string, Symmetry> = {
+  "snub disphenoid": { group: "D", sub: "2d" },
+  "snub square antiprism": { group: "D", sub: "4d" },
+  sphenocorona: { group: "C", sub: "2v" },
+  "augmented sphenocorona": { group: "C", sub: "s" },
+  sphenomegacorona: { group: "C", sub: "2v" },
+  hebesphenomegacorona: { group: "C", sub: "2v" },
+  disphenocingulum: { group: "D", sub: "2d" },
+  bilunabirotunda: { group: "D", sub: "2h" },
+  "triangular hebesphenorotunda": { group: "C", sub: "3v" },
+}
 
 // TODO replace the Johnson symmetries list to rely on tables
-export function getJohnsonSymmetry(name: string) {
-  return johnsonSymmetries[johnsonSolids.indexOf(name)]
+function getJohnsonSymmetry(name: string) {
+  if (capstones.hasName(name)) {
+    return getCapstoneSymmetry(name)
+  }
+  if (augmentedPrisms.hasName(name)) {
+    return getAugmentedPrismSymmetry(name)
+  }
+  if (augmentedClassicals.hasName(name)) {
+    return getAugmentedClassicalSymmetry(name)
+  }
+  if (!!diminishedIcosahedraMapping[name]) {
+    return diminishedIcosahedraMapping[name]
+  }
+  if (rhombicosidodecahedra.hasName(name)) {
+    return getRhombicosidodecahedraSymmetry(name)
+  }
+  return elementaryMapping[name]
 }
 
 /**
@@ -41,6 +180,9 @@ function getPrismSymmetry(name: string) {
 }
 
 export function getSymmetry(name: string): Symmetry {
+  if (!isValidSolid(name)) {
+    throw new Error(`Unable to get symmetry for invalid polyhedron ${name}`)
+  }
   if (classicals.hasName(name)) {
     return getClassicalSymmetry(name)
   }
