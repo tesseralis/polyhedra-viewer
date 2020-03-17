@@ -1,7 +1,5 @@
 import { trimEnd } from "lodash-es"
 
-import johnsonSolids from "./groups/johnson.json"
-import johnsonSymmetries from "./johnsonSymmetries"
 import { polygonPrefixes } from "./polygons"
 import {
   classicals,
@@ -119,6 +117,18 @@ function getRhombicosidodecahedraSymmetry(name: string) {
   }
 }
 
+const elementaryMapping: Record<string, Symmetry> = {
+  "snub disphenoid": { group: "D", sub: "2d" },
+  "snub square antiprism": { group: "D", sub: "4d" },
+  sphenocorona: { group: "C", sub: "2v" },
+  "augmented sphenocorona": { group: "C", sub: "s" },
+  sphenomegacorona: { group: "C", sub: "2v" },
+  hebesphenomegacorona: { group: "C", sub: "2v" },
+  disphenocingulum: { group: "D", sub: "2d" },
+  bilunabirotunda: { group: "D", sub: "2h" },
+  "triangular hebesphenorotunda": { group: "C", sub: "3v" },
+}
+
 // TODO replace the Johnson symmetries list to rely on tables
 function getJohnsonSymmetry(name: string) {
   if (capstones.hasName(name)) {
@@ -136,7 +146,7 @@ function getJohnsonSymmetry(name: string) {
   if (rhombicosidodecahedra.hasName(name)) {
     return getRhombicosidodecahedraSymmetry(name)
   }
-  return johnsonSymmetries[johnsonSolids.indexOf(name)]
+  return elementaryMapping[name]
 }
 
 /**
