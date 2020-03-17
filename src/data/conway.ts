@@ -1,6 +1,8 @@
 import { bimap } from "utils"
-import { johnsonSolids } from "data"
+import { getPolyhedraNames } from "data"
 import { polygonPrefixes } from "./polygons"
+
+const johnsonSolids = getPolyhedraNames("johnson")
 
 const platonicMapping = bimap({
   T: "tetrahedron",

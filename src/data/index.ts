@@ -1,15 +1,8 @@
-export const getPolyhedra = (groupName: string): string[] =>
-  require(`./groups/${groupName}.json`)
+export const getPolyhedraNames = (groupName: string): string[] =>
+  require(`./names/${groupName}.json`)
 
-/* Johnson Solid Subgroups */
-export const johnsonSolids = getPolyhedra("johnson")
-export const allSolidNames: string[] = [
-  ...getPolyhedra("platonic"),
-  ...getPolyhedra("archimedean"),
-  ...getPolyhedra("prisms"),
-  ...getPolyhedra("antiprisms"),
-  ...getPolyhedra("johnson"),
-]
+const groups = ["platonic", "archimedean", "prisms", "antiprisms", "johnson"]
+export const allSolidNames = groups.flatMap(getPolyhedraNames)
 
 export const isValidSolid = (solidName: string) => {
   return allSolidNames.includes(solidName)
