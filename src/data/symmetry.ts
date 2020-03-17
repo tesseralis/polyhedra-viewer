@@ -24,9 +24,9 @@ const groupNames = { 3: "T", 4: "O", 5: "I" }
 function getClassicalSymmetry(name: string) {
   // Don't want to count it in the tetrahedron group
   const families = [...classicals.options.family].reverse()
-  const family = families.find(family => classicals.contains(name, { family }))!
+  const family = families.find(family => classicals.hasName(name, { family }))!
   // TODO replace with isChiral
-  const chiral = classicals.contains(
+  const chiral = classicals.hasName(
     name,
     ({ operation, family }) => operation === "snub" && family !== 3,
   )
@@ -36,15 +36,15 @@ function getClassicalSymmetry(name: string) {
 const prismSub = { prism: "h", antiprism: "d" }
 
 function getPrismSymmetry(name: string) {
-  const { base, type } = prisms.getItem(name)!
+  const { base, type } = prisms.get(name)!
   return { group: "D", sub: `${base}${prismSub[type]}` }
 }
 
 export function getSymmetry(name: string): Symmetry {
-  if (classicals.contains(name)) {
+  if (classicals.hasName(name)) {
     return getClassicalSymmetry(name)
   }
-  if (prisms.contains(name)) {
+  if (prisms.hasName(name)) {
     return getPrismSymmetry(name)
   }
   return getJohnsonSymmetry(name)

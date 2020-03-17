@@ -24,22 +24,22 @@ export default class SolidInfo {
 
   order = () => getOrder(this.name)
 
-  inClassicalTable(filter?: Parameters<typeof classicals.contains>[1]) {
-    return classicals.contains(this.name, filter)
+  inClassicalTable(filter?: Parameters<typeof classicals.hasName>[1]) {
+    return classicals.hasName(this.name, filter)
   }
 
-  inPrismTable(filter?: Parameters<typeof prisms.contains>[1]) {
-    return prisms.contains(this.name, filter)
+  inPrismTable(filter?: Parameters<typeof prisms.hasName>[1]) {
+    return prisms.hasName(this.name, filter)
   }
 
-  inCapstoneTable(filter?: Parameters<typeof capstones.contains>[1]) {
-    return capstones.contains(this.name, filter)
+  inCapstoneTable(filter?: Parameters<typeof capstones.hasName>[1]) {
+    return capstones.hasName(this.name, filter)
   }
 
   inRhombicosidodecahedronTable(
-    filter?: Parameters<typeof rhombicosidodecahedra.contains>[1],
+    filter?: Parameters<typeof rhombicosidodecahedra.hasName>[1],
   ) {
-    return rhombicosidodecahedra.contains(this.name, filter)
+    return rhombicosidodecahedra.hasName(this.name, filter)
   }
 
   type() {

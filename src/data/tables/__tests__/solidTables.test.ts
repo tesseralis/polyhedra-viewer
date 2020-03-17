@@ -3,11 +3,11 @@ import { classicals, capstones, rhombicosidodecahedra } from ".."
 describe("solidTables", () => {
   describe("Platonic and Archimedean solids", () => {
     it("has 18 items", () => {
-      expect(classicals.getNames()).toHaveLength(18)
+      expect(classicals.getAllNames()).toHaveLength(18)
     })
 
     it("contains the proper entries for the tetrahedron row", () => {
-      expect(classicals.getNames({ family: 3 })).toEqual(
+      expect(classicals.getAllNames({ family: 3 })).toEqual(
         expect.arrayContaining(["octahedron", "cuboctahedron", "icosahedron"]),
       )
     })
@@ -16,7 +16,7 @@ describe("solidTables", () => {
   describe("capstones", () => {
     it("does not have entries for gyroelongated triangular pyramids", () => {
       expect(
-        capstones.getNames({
+        capstones.getAllNames({
           base: 3,
           type: "pyramid",
           elongation: "antiprism",
@@ -25,7 +25,7 @@ describe("solidTables", () => {
     })
 
     it("only has two entries for gyrobifastigium", () => {
-      expect(capstones.getNames({ base: 2 })).toEqual([
+      expect(capstones.getAllNames({ base: 2 })).toEqual([
         "triangular prism",
         "gyrobifastigium",
       ])
@@ -33,7 +33,7 @@ describe("solidTables", () => {
 
     it("does not have single-count entries for copula-rotunda", () => {
       expect(
-        capstones.getNames({ type: "cupolarotunda", count: 1 }),
+        capstones.getAllNames({ type: "cupolarotunda", count: 1 }),
       ).toHaveLength(0)
     })
   })
@@ -41,12 +41,12 @@ describe("solidTables", () => {
   describe("rhombicosidodecahedra", () => {
     it("contains the normal rhombicosidodecahedron", () => {
       expect(
-        rhombicosidodecahedra.contains("rhombicosidodecahedron"),
+        rhombicosidodecahedra.hasName("rhombicosidodecahedron"),
       ).toBeTruthy()
     })
 
     it("has 13 members", () => {
-      expect(rhombicosidodecahedra.getNames()).toHaveLength(13)
+      expect(rhombicosidodecahedra.getAllNames()).toHaveLength(13)
     })
   })
 })
