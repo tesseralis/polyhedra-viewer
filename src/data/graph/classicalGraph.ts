@@ -7,29 +7,29 @@ function oppositeFacet(facet: "vertex" | "face") {
 
 export default function classicalGraph(g: Graph) {
   // operations on regular polyhedra
-  for (const { name, family, facet } of classicals.get({
+  for (const { name, family, facet } of classicals.getAll({
     operation: "regular",
   })) {
-    const dual = classicals.getNames({
+    const dual = classicals.getName({
       family,
       facet: facet && oppositeFacet(facet),
       operation: "regular",
-    })[0]
+    })
     g.addEdge({ operation: "dual", from: name, to: dual })
 
     // FIXME be able to get just a single item with the name
-    const truncated = classicals.getNames({
+    const truncated = classicals.getName({
       family,
       facet,
-      operation: "truncated",
-    })[0]
+      operation: "truncate",
+    })
     g.addEdge({ operation: "truncate", from: name, to: truncated })
 
     // FIXME should be able to iterate instead
-    const rectified = classicals.getNames({
+    const rectified = classicals.getName({
       family,
-      operation: "rectified",
-    })[0]
+      operation: "rectify",
+    })
     g.addEdge({
       operation: "rectify",
       from: name,
@@ -37,10 +37,10 @@ export default function classicalGraph(g: Graph) {
       options: { facet },
     })
 
-    const cantellated = classicals.getNames({
+    const cantellated = classicals.getName({
       family,
-      operation: "cantellated",
-    })[0]
+      operation: "cantellate",
+    })
     g.addEdge({
       operation: "expand",
       from: name,
@@ -48,10 +48,10 @@ export default function classicalGraph(g: Graph) {
       options: { facet },
     })
 
-    const snub = classicals.getNames({
+    const snub = classicals.getName({
       family,
       operation: "snub",
-    })[0]
+    })
     g.addEdge({
       operation: "snub",
       from: name,
@@ -61,13 +61,13 @@ export default function classicalGraph(g: Graph) {
   }
 
   // Expand truncated polyhedra to bevelled ones
-  for (const { name, family, facet } of classicals.get({
-    operation: "truncated",
+  for (const { name, family, facet } of classicals.getAll({
+    operation: "truncate",
   })) {
-    const bevelled = classicals.getNames({
+    const bevelled = classicals.getName({
       family,
-      operation: "bevelled",
-    })[0]
+      operation: "bevel",
+    })
     g.addEdge({
       operation: "expand",
       from: name,
@@ -76,19 +76,21 @@ export default function classicalGraph(g: Graph) {
     })
   }
 
-  for (const { name, family } of classicals.get({
-    operation: "rectified",
+  for (const { name, family } of classicals.getAll({
+    operation: "rectify",
   })) {
-    const bevelled = classicals.getNames({
+    const bevelled = classicals.getName({
       family,
-      operation: "bevelled",
-    })[0]
+      operation: "bevel",
+    })
     g.addEdge({ operation: "truncate", from: name, to: bevelled })
     // TODO rectify and snub operations
   }
 
-  for (const { name, family } of classicals.get({ operation: "cantellated" })) {
-    const snub = classicals.getNames({ family, operation: "snub" })[0]
+  for (const { name, family } of classicals.getAll({
+    operation: "cantellate",
+  })) {
+    const snub = classicals.getName({ family, operation: "snub" })
     g.addEdge({
       operation: "twist",
       from: name,
