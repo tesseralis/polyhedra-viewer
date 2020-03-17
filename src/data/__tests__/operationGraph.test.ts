@@ -1,6 +1,6 @@
 import _ from "lodash-es"
 import graph from "../operationGraph"
-import { allSolidNames } from "data/common"
+import { allSolidNames } from "../common"
 import { toConwayNotation } from "data/conway"
 
 // Tests on the operation graph, mostly focusing on edge cases

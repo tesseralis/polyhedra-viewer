@@ -1,5 +1,5 @@
 import { bimap } from "utils"
-import { getPolyhedraNames } from "data/common"
+import { getPolyhedraNames } from "./common"
 import { polygonPrefixes } from "./polygons"
 
 const johnsonSolids = getPolyhedraNames("johnson")
