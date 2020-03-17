@@ -1,11 +1,24 @@
-import { polygonPrefixes } from "../polygons"
+import { Polygon, polygonPrefixes } from "../polygons"
+
+type SymPolygon = 1 | 2 | Polygon
 
 interface Metadata {
+  /** True if the polyhedron is chiral */
   chiral: boolean
-  groupSymbol: string
+  /** The group notation of the symmetry group */
+  group: string
+  /** The base of the symmetry group */
+  n?: SymPolygon
+  /** The subscript to append when achiral */
+  achiralSub: string
+  /** The order of the rotation group */
   rotationalOrder: number
 }
 
+/**
+ * A class containing symmetry information of a Polyhedron that can be expressed
+ * as a string or a shorthand symbol, as well as the order of the symmetry group.
+ */
 export abstract class Symmetry {
   meta: Metadata
 
@@ -13,21 +26,32 @@ export abstract class Symmetry {
     this.meta = meta
   }
 
-  // Get the "symbol" of the symmetry
+  /**
+   * Returns the name of this symmetry group.
+   */
   abstract name(): string
-  // Get the subscript of the symbol
-  abstract symbolSub(): string
 
+  /**
+   * Returns a symbol as a { base, sub } object.
+   */
   symbol() {
-    return { base: this.meta.groupSymbol, sub: this.symbolSub() }
+    const { n, achiralSub, chiral } = this.meta
+    const sub = `${n ?? ""}${chiral ? "" : achiralSub}`
+    return { base: this.meta.group, sub }
   }
 
+  /**
+   * Returns a symbol as a string in the form {base}_{sub}.
+   */
   symbolStr() {
     const { base, sub } = this.symbol()
     if (!sub) return base
     return `${base}_${sub}`
   }
 
+  /**
+   * Returns the order of this symmetry group.
+   */
   order() {
     return this.meta.rotationalOrder * (this.meta.chiral ? 1 : 2)
   }
@@ -51,7 +75,8 @@ export class Polyhedral extends Symmetry {
   constructor(data: PolyhedralData) {
     const { family, chiral } = data
     super({
-      groupSymbol: family[0].toUpperCase(),
+      group: family[0].toUpperCase(),
+      achiralSub: family === "tetrahedral" ? "d" : "h",
       chiral: !!chiral,
       rotationalOrder: polyhedralOrders[family],
     })
@@ -63,19 +88,13 @@ export class Polyhedral extends Symmetry {
     return `${chiral ? "chiral" : "full"} ${family}`
   }
 
-  symbolSub() {
-    const { family, chiral } = this.data
-    if (chiral) return ""
-    return family === "tetrahedral" ? "d" : "h"
-  }
-
   static get(family: Family, chiral?: boolean) {
     return new Polyhedral({ family, chiral })
   }
 }
 
 interface CyclicData {
-  n: number
+  n: SymPolygon
   chiral?: boolean
 }
 
@@ -83,7 +102,13 @@ export class Cyclic extends Symmetry {
   private data: CyclicData
   constructor(data: CyclicData) {
     const { chiral, n } = data
-    super({ groupSymbol: "C", chiral: !!chiral, rotationalOrder: n })
+    super({
+      group: "C",
+      n,
+      achiralSub: "v",
+      chiral: !!chiral,
+      rotationalOrder: n,
+    })
     this.data = data
   }
 
@@ -91,17 +116,11 @@ export class Cyclic extends Symmetry {
     const { n, chiral } = this.data
     if (n === 1 && !chiral) return "bilateral"
     if (n === 2 && !chiral) return "biradial"
-    // FIXME type n correctly
-    const prefix = polygonPrefixes.get(n as any)
+    const prefix = polygonPrefixes.get(n)
     return chiral ? prefix : `${prefix} pyramidal`
   }
 
-  symbolSub() {
-    const { n, chiral } = this.data
-    return `${n}${chiral ? "" : "v"}`
-  }
-
-  static get(n: number, chiral?: boolean) {
+  static get(n: SymPolygon, chiral?: boolean) {
     return new Cyclic({ n, chiral })
   }
 
@@ -111,7 +130,7 @@ export class Cyclic extends Symmetry {
 }
 
 interface DihedralData {
-  n: number
+  n: SymPolygon
   reflection?: "prism" | "antiprism"
 }
 
@@ -120,7 +139,9 @@ export class Dihedral extends Symmetry {
   constructor(data: DihedralData) {
     const { reflection, n } = data
     super({
-      groupSymbol: "D",
+      group: "D",
+      n,
+      achiralSub: reflection === "prism" ? "h" : "d",
       chiral: !reflection,
       rotationalOrder: n * 2,
     })
@@ -130,16 +151,10 @@ export class Dihedral extends Symmetry {
   name() {
     const { n, reflection } = this.data
     const base = !!reflection ? `${reflection}atic` : "dihedral"
-    return `${polygonPrefixes.get(n as any)} ${base}`
+    return `${polygonPrefixes.get(n)} ${base}`
   }
 
-  symbolSub() {
-    const { n, reflection } = this.data
-    if (!reflection) return `${n}`
-    return n + (reflection === "prism" ? "h" : "d")
-  }
-
-  static get(n: number, reflection?: "prism" | "antiprism") {
+  static get(n: SymPolygon, reflection?: "prism" | "antiprism") {
     return new Dihedral({ n, reflection })
   }
 }

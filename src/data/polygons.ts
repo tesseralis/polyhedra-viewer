@@ -12,6 +12,7 @@ export const polygonNames = bimap({
 })
 
 export const polygonPrefixes = bimap({
+  1: "monogonal",
   2: "digonal",
   3: "triangular",
   4: "square",
