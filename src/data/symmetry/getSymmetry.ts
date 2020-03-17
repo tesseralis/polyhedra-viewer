@@ -6,7 +6,7 @@ import {
   augmentedClassicals,
   rhombicosidodecahedra,
 } from "../tables"
-import { isValidSolid } from ".."
+import { assertValidSolid } from ".."
 import { Family, Symmetry, Polyhedral, Cyclic, Dihedral } from "./Symmetry"
 
 const groupNames: Record<3 | 4 | 5, Family> = {
@@ -149,9 +149,8 @@ const elementaryMapping: Record<string, Symmetry> = {
  * Return the Symmetry of the given polyhedron name
  */
 export default function getSymmetry(name: string): Symmetry {
-  if (!isValidSolid(name)) {
-    throw new Error(`Unable to get symmetry for invalid polyhedron ${name}`)
-  }
+  assertValidSolid(name)
+
   // TODO this is a lot of repeated patterns that may benefit from some sort of visitor pattern
   if (classicals.hasName(name)) {
     return getClassicalSymmetry(name)
