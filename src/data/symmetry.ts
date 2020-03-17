@@ -3,10 +3,66 @@ import { trimEnd } from "lodash-es"
 import johnsonSolids from "./groups/johnson.json"
 import johnsonSymmetries from "./johnsonSymmetries"
 import { polygonPrefixes } from "./polygons"
-import { classicals, prisms } from "./tables"
+import { classicals, prisms, capstones, augmentedPrisms } from "./tables"
+import { isValidSolid } from "."
+
+function getCapstoneSymmetry(name: string) {
+  const { base, type, count, elongation, gyrate } = capstones.get(name)
+  // Single-count capstones all have pyramidal symmetry
+  if (count === 1) {
+    return { group: "C", sub: `${base}v` }
+  }
+  const gyroelongated = elongation === "antiprism"
+
+  if (type === "pyramid") {
+    const notation = gyroelongated ? "d" : "h"
+    return { group: "D", sub: `${base}${notation}` }
+  } else if (type === "cupolarotunda") {
+    const notation = gyroelongated ? "" : "v"
+    return { group: "C", sub: `${base}${notation}` }
+  } else {
+    // cupolae and rotundae
+    const notation = gyroelongated ? "" : gyrate === "gyro" ? "d" : "h"
+    return { group: "D", sub: `${base}${notation}` }
+  }
+}
+
+function getAugmentedPrismSymmetry(name: string) {
+  const { count, align } = augmentedPrisms.get(name)
+  switch (count) {
+    case 1: {
+      // mono-augmented prisms all have biradial symmetry
+      return { group: "C", sub: "2v" }
+    }
+    case 2: {
+      if (align === "para") {
+        // para-augmented stuff have digonal prismatic symmetry
+        // TODO this doesn't count a square prism (cube)
+        return { group: "D", sub: "2h" }
+      } else {
+        // meta-augmented stuff has biradial symmetry
+        return { group: "C", sub: "2v" }
+      }
+    }
+    case 3: {
+      // Triaugmented triangular/hexagonal prism has triangular prismatic symmetry
+      return { group: "D", sub: "3h" }
+    }
+    default: {
+      // for zero-counts, return the usual prism symmetry
+      return getPrismSymmetry(name)
+    }
+  }
+}
 
 // TODO replace the Johnson symmetries list to rely on tables
-export function getJohnsonSymmetry(name: string) {
+function getJohnsonSymmetry(name: string) {
+  if (capstones.hasName(name)) {
+    return getCapstoneSymmetry(name)
+  }
+  if (augmentedPrisms.hasName(name)) {
+    return getAugmentedPrismSymmetry(name)
+  }
   return johnsonSymmetries[johnsonSolids.indexOf(name)]
 }
 
@@ -41,6 +97,9 @@ function getPrismSymmetry(name: string) {
 }
 
 export function getSymmetry(name: string): Symmetry {
+  if (!isValidSolid(name)) {
+    throw new Error(`Unable to get symmetry for invalid polyhedron ${name}`)
+  }
   if (classicals.hasName(name)) {
     return getClassicalSymmetry(name)
   }
