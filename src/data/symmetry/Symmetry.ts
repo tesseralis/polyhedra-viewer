@@ -1,22 +1,5 @@
 import { polygonPrefixes } from "../polygons"
 
-export type Family = "tetrahedral" | "octahedral" | "icosahedral"
-
-interface PolyhedralSymmetry {
-  family: Family
-  chiral?: boolean
-}
-
-interface CyclicSymmetry {
-  n: number
-  chiral?: boolean
-}
-
-interface DihedralSymmetry {
-  n: number
-  reflection?: "prism" | "antiprism"
-}
-
 interface Metadata {
   chiral: boolean
   groupSymbol: string
@@ -50,15 +33,22 @@ export abstract class Symmetry {
   }
 }
 
+export type Family = "tetrahedral" | "octahedral" | "icosahedral"
+
 const polyhedralOrders: Record<Family, number> = {
   tetrahedral: 12,
   octahedral: 24,
   icosahedral: 60,
 }
 
+interface PolyhedralData {
+  family: Family
+  chiral?: boolean
+}
+
 export class Polyhedral extends Symmetry {
-  private data: PolyhedralSymmetry
-  constructor(data: PolyhedralSymmetry) {
+  private data: PolyhedralData
+  constructor(data: PolyhedralData) {
     const { family, chiral } = data
     super({
       groupSymbol: family[0].toUpperCase(),
@@ -84,9 +74,14 @@ export class Polyhedral extends Symmetry {
   }
 }
 
+interface CyclicData {
+  n: number
+  chiral?: boolean
+}
+
 export class Cyclic extends Symmetry {
-  private data: CyclicSymmetry
-  constructor(data: CyclicSymmetry) {
+  private data: CyclicData
+  constructor(data: CyclicData) {
     const { chiral, n } = data
     super({ groupSymbol: "C", chiral: !!chiral, rotationalOrder: n })
     this.data = data
@@ -115,9 +110,14 @@ export class Cyclic extends Symmetry {
   static biradial = Cyclic.get(2)
 }
 
+interface DihedralData {
+  n: number
+  reflection?: "prism" | "antiprism"
+}
+
 export class Dihedral extends Symmetry {
-  private data: DihedralSymmetry
-  constructor(data: DihedralSymmetry) {
+  private data: DihedralData
+  constructor(data: DihedralData) {
     const { reflection, n } = data
     super({
       groupSymbol: "D",
