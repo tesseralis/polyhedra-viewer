@@ -1,5 +1,6 @@
 import { Polyhedron, Face } from "math/polyhedra"
 import AppPage, { PageOptions } from "./AppPage"
+import { escape } from "utils"
 
 function splitListOfLists(listStr: string, outerSep: string, innerSep: string) {
   return listStr
@@ -13,7 +14,7 @@ export default class ViewerPage extends AppPage {
     panel: string = "operations",
     options: PageOptions = {},
   ) {
-    super(`/${solid}/${panel}`, options)
+    super(`/${escape(solid)}/${panel}`, options)
   }
 
   getPolyhedron() {
@@ -67,7 +68,7 @@ export default class ViewerPage extends AppPage {
 
   expectTransitionTo(expected: string) {
     this.wrapper.update()
-    this.expectPath(`/${expected}/operations`)
+    this.expectPath(`/${escape(expected)}/operations`)
     expect(this.getPolyhedron().isSame(Polyhedron.get(expected))).toBe(true)
     return this
   }

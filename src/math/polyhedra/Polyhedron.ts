@@ -9,7 +9,7 @@ import {
   isEqual,
 } from "lodash-es"
 
-import { isValidSolid, getSolidData } from "data"
+import { getSolidData } from "data/common"
 import { polygons } from "data/polygons"
 import SolidInfo from "data/SolidInfo"
 import { Vec3D, getCentroid } from "math/geom"
@@ -34,9 +34,6 @@ export default class Polyhedron {
   private _edges?: Edge[]
 
   static get(name: string) {
-    if (!isValidSolid(name)) {
-      throw new Error(`Invalid solid name: ${name}`)
-    }
     return new Polyhedron(getSolidData(name))
   }
 
