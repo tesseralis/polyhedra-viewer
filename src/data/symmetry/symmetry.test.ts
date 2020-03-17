@@ -1,9 +1,9 @@
-import * as sym from "../symmetry"
+import getSymmetry from "./getSymmetry"
 
 describe("symmetry", () => {
   describe("getSymmetryName", () => {
     function expectSymmetryName(solid: string, expected: string) {
-      expect(sym.getSymmetryName(sym.getSymmetry(solid))).toEqual(expected)
+      expect(getSymmetry(solid).name()).toEqual(expected)
     }
     it("works on platonic and archimedean solids", () => {
       expectSymmetryName("snub cube", "chiral octahedral")
@@ -75,7 +75,7 @@ describe("symmetry", () => {
 
   describe("getSymmetrySymbol", () => {
     function expectSymbol(solid: string, expected: string) {
-      expect(sym.getSymmetrySymbol(sym.getSymmetry(solid))).toEqual(expected)
+      expect(getSymmetry(solid).symbolStr()).toEqual(expected)
     }
 
     it("works on most polyhedra", () => {
@@ -97,7 +97,7 @@ describe("symmetry", () => {
 
   describe("getOrder", () => {
     function expectOrder(solid: string, expected: number) {
-      expect(sym.getOrder(sym.getSymmetry(solid))).toEqual(expected)
+      expect(getSymmetry(solid).order()).toEqual(expected)
     }
 
     it("works on platonic and archimedean solids", () => {
