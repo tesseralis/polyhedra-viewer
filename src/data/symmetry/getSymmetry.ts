@@ -152,6 +152,7 @@ export default function getSymmetry(name: string): Symmetry {
   if (!isValidSolid(name)) {
     throw new Error(`Unable to get symmetry for invalid polyhedron ${name}`)
   }
+  // TODO this is a lot of repeated patterns that may benefit from some sort of visitor pattern
   if (classicals.hasName(name)) {
     return getClassicalSymmetry(name)
   }
