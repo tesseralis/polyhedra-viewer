@@ -27,10 +27,13 @@ describe("symmetry", () => {
           "square antiprismatic",
         )
         expectSymmetryName("gyrobifastigium", "digonal antiprismatic")
-        // TODO can test all cupolarotundae
         expectSymmetryName(
           "pentagonal orthocupolarotunda",
           "pentagonal pyramidal",
+        )
+        expectSymmetryName(
+          "gyroelongated pentagonal cupolarotunda",
+          "pentagonal",
         )
       })
 
@@ -70,9 +73,31 @@ describe("symmetry", () => {
     })
   })
 
+  describe("getSymmetrySymbol", () => {
+    function expectSymbol(solid: string, expected: string) {
+      expect(sym.getSymmetrySymbol(sym.getSymmetry(solid))).toEqual(expected)
+    }
+
+    it("works on most polyhedra", () => {
+      expectSymbol("cube", "O_h")
+      expectSymbol("rhombicosidodecahedron", "I_h")
+      expectSymbol("pentagonal prism", "D_5h")
+      expectSymbol("hexagonal antiprism", "D_6d")
+      expectSymbol("gyroelongated pentagonal cupolarotunda", "C_5")
+    })
+
+    it("assigns the correct symbol to tetrahedron", () => {
+      expectSymbol("tetrahedron", "T_d")
+    })
+
+    it("assigns a special symbol to bilateral symmetry", () => {
+      expectSymbol("augmented sphenocorona", "C_s")
+    })
+  })
+
   describe("getOrder", () => {
     function expectOrder(solid: string, expected: number) {
-      expect(sym.getOrder(solid)).toEqual(expected)
+      expect(sym.getOrder(sym.getSymmetry(solid))).toEqual(expected)
     }
 
     it("works on platonic and archimedean solids", () => {
