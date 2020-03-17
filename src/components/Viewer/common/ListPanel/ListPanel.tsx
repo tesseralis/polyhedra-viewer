@@ -4,7 +4,7 @@ import React, { useState } from "react"
 import { NavLink, Route } from "react-router-dom"
 import { fonts, useStyle, scales } from "styles"
 
-import { groups } from "data"
+import { groups } from "data/list"
 import { escape } from "utils"
 import { hover, padding, paddingVert, margin, marginVert } from "styles/common"
 

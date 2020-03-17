@@ -33,7 +33,7 @@ describe("Polyhedron", () => {
         },
       )
       expect(
-        Polyhedron.get("triangular-hebesphenorotunda").vertexConfiguration(),
+        Polyhedron.get("triangular hebesphenorotunda").vertexConfiguration(),
       ).toEqual({
         "3.3.3.5": 3,
         "3.4.3.5": 6,
@@ -59,11 +59,11 @@ describe("Polyhedron", () => {
 
   describe("isSame", () => {
     const testCases = [
-      ["rhombicuboctahedron", "elongated-square-gyrobicupola"],
-      ["metabiaugmented-hexagonal-prism", "parabiaugmented-hexagonal-prism"],
+      ["rhombicuboctahedron", "elongated square gyrobicupola"],
+      ["metabiaugmented hexagonal prism", "parabiaugmented hexagonal prism"],
       [
-        "parabigyrate-rhombicosidodecahedron",
-        "metabigyrate-rhombicosidodecahedron",
+        "parabigyrate rhombicosidodecahedron",
+        "metabigyrate rhombicosidodecahedron",
       ],
     ]
 

@@ -1,4 +1,4 @@
-import { allSolidNames } from "data"
+import { assertValidSolid } from "./common"
 
 export const alternateNamesMapping: Record<string, string[]> = {
   tetrahedron: ["triangular pyramid", "digonal antiprism", "disphenoid"],
@@ -52,12 +52,9 @@ const canonicalMapping = Object.fromEntries(getCanonicalMapping())
 const alternateNames = Object.keys(canonicalMapping)
 
 export function getCanonicalName(name: string) {
-  if (allSolidNames.includes(name)) {
-    return name
-  }
   const canonical = canonicalMapping[name]
-  if (!canonical) throw new Error(`Cannot find canonical name for ${name}`)
-  return canonical
+  if (!!canonical) return canonical
+  return assertValidSolid(name)
 }
 
 export function getAlternateNames(name: string) {
