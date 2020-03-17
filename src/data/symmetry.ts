@@ -29,41 +29,145 @@ interface DihedralSymmetry {
   reflection?: "prism" | "antiprism"
 }
 
-type Symmetry = PolyhedralSymmetry | CyclicSymmetry | DihedralSymmetry
+type SymmetryData = PolyhedralSymmetry | CyclicSymmetry | DihedralSymmetry
 
-function cyclic(n: number, chiral?: boolean): CyclicSymmetry {
-  return { type: "cyclic", n, chiral }
-}
-const biradial = cyclic(2)
-const bilateral = cyclic(1)
+abstract class Symmetry {
+  chiral: boolean
+  groupSymbol: string
 
-function dihedral(
-  n: number,
-  reflection?: "prism" | "antiprism",
-): DihedralSymmetry {
-  return {
-    type: "dihedral",
-    n,
-    reflection,
+  constructor(groupSymbol: string, chiral: boolean) {
+    this.groupSymbol = groupSymbol
+    this.chiral = chiral
+  }
+
+  // Get the "symbol" of the symmetry
+  abstract name(): string
+  // Get the subscript of the symbol
+  abstract symbolSub(): string
+
+  symbol() {
+    return { base: this.groupSymbol, sub: this.symbolSub() }
+  }
+
+  // Get the order of the symmetry NOT including chirality
+  abstract rotationalOrder(): number
+  order() {
+    return this.rotationalOrder() * (this.chiral ? 1 : 2)
   }
 }
 
-function polyhedral(family: Family, chiral?: boolean): PolyhedralSymmetry {
-  return { type: "polyhedral", family, chiral }
+const polyhedralOrders: Record<Family, number> = {
+  tetrahedral: 12,
+  octahedral: 24,
+  icosahedral: 60,
+}
+
+class Polyhedral extends Symmetry {
+  private data: PolyhedralSymmetry
+  constructor(data: PolyhedralSymmetry) {
+    super(data.family[0].toUpperCase(), !!data.chiral)
+    this.data = data
+  }
+
+  name() {
+    const { family, chiral } = this.data
+    return `${chiral ? "chiral" : "full"} ${family}`
+  }
+
+  symbolSub() {
+    const { family, chiral } = this.data
+    if (!chiral) return ""
+    return family === "tetrahedral" ? "d" : "h"
+  }
+
+  rotationalOrder() {
+    return polyhedralOrders[this.data.family]
+  }
+
+  static get(family: Family, chiral?: boolean) {
+    return new Polyhedral({ type: "polyhedral", family, chiral })
+  }
+}
+
+class Cyclic extends Symmetry {
+  private data: CyclicSymmetry
+  constructor(data: CyclicSymmetry) {
+    super("C", !!data.chiral)
+    this.data = data
+  }
+
+  name() {
+    const { n, chiral } = this.data
+    if (n === 1 && !chiral) return "bilateral"
+    if (n === 2 && !chiral) return "biradial"
+    // FIXME type n correctly
+    const prefix = polygonPrefixes.get(n as any)
+    return chiral ? prefix : `${prefix} pyramidal`
+  }
+
+  symbolSub() {
+    const { n, chiral } = this.data
+    if (n === 1 && !chiral) return "s"
+    return `${n}${chiral ? "" : "v"}`
+  }
+
+  rotationalOrder() {
+    return this.data.n
+  }
+
+  static get(n: number, chiral?: boolean) {
+    return new Cyclic({ type: "cyclic", n, chiral })
+  }
+
+  static bilateral() {
+    return this.get(1)
+  }
+
+  static biradial() {
+    return this.get(2)
+  }
+}
+
+class Dihedral extends Symmetry {
+  private data: DihedralSymmetry
+  constructor(data: DihedralSymmetry) {
+    super("C", !data.reflection)
+    this.data = data
+  }
+
+  name() {
+    const { n, reflection } = this.data
+    const base = !!reflection ? `${reflection}atic` : "dihedral"
+    return `${polygonPrefixes.get(n as any)} ${base}`
+  }
+
+  symbolSub() {
+    const { reflection } = this.data
+    if (!reflection) return ""
+    return reflection === "prism" ? "h" : "d"
+  }
+
+  rotationalOrder() {
+    return 2 * this.data.n
+  }
+
+  static get(n: number, reflection?: "prism" | "antiprism") {
+    return new Dihedral({ type: "dihedral", n, reflection })
+  }
 }
 
 function getCapstoneSymmetry(name: string) {
   const { base, type, count, elongation, gyrate } = capstones.get(name)
   // Single-count capstones all have pyramidal symmetry
   if (count === 1) {
-    return cyclic(base)
+    return Cyclic.get(base)
   }
   const gyroelongated = elongation === "antiprism"
 
   if (type === "pyramid") {
-    return dihedral(base, gyroelongated ? "antiprism" : "prism")
+    return Dihedral.get(base, gyroelongated ? "antiprism" : "prism")
   } else if (type === "cupolarotunda") {
-    return cyclic(base, !!gyroelongated)
+    return Cyclic.get(base, !!gyroelongated)
   } else {
     // cupolae and rotundae
     const reflection = gyroelongated
@@ -71,7 +175,7 @@ function getCapstoneSymmetry(name: string) {
       : gyrate === "gyro"
       ? "antiprism"
       : "prism"
-    return dihedral(base, reflection)
+    return Dihedral.get(base, reflection)
   }
 }
 
@@ -80,21 +184,21 @@ function getAugmentedPrismSymmetry(name: string) {
   switch (count) {
     case 1: {
       // mono-augmented prisms all have biradial symmetry
-      return biradial
+      return Cyclic.biradial()
     }
     case 2: {
       if (align === "para") {
         // para-augmented stuff have digonal prismatic symmetry
         // TODO this doesn't count a square prism (cube)
-        return dihedral(2, "prism")
+        return Dihedral.get(2, "prism")
       } else {
         // meta-augmented stuff has biradial symmetry
-        return biradial
+        return Cyclic.biradial()
       }
     }
     case 3: {
       // Triaugmented triangular/hexagonal prism has triangular prismatic symmetry
-      return dihedral(3, "prism")
+      return Dihedral.get(3, "prism")
     }
     default: {
       // for zero-counts, return the usual prism symmetry
@@ -107,14 +211,14 @@ function getAugmentedClassicalSymmetry(name: string) {
   const { count, base, align } = augmentedClassicals.get(name)
   switch (count) {
     case 1:
-      return cyclic(base)
+      return Cyclic.get(base)
     case 2:
       if (base === 4) {
-        return dihedral(4, "prism")
+        return Dihedral.get(4, "prism")
       }
-      return align === "para" ? dihedral(5, "antiprism") : biradial
+      return align === "para" ? Dihedral.get(5, "antiprism") : Cyclic.biradial()
     case 3:
-      return cyclic(3)
+      return Cyclic.get(3)
     default:
       return getClassicalSymmetry(name)
   }
@@ -122,9 +226,9 @@ function getAugmentedClassicalSymmetry(name: string) {
 
 // TODO there's only three of these so we just put them here right now
 const diminishedIcosahedraMapping: Record<string, Symmetry> = {
-  "metabidiminished icosahedron": biradial,
-  "tridiminished icosahedron": cyclic(3),
-  "augmented tridiminished icosahedron": cyclic(3),
+  "metabidiminished icosahedron": Cyclic.biradial(),
+  "tridiminished icosahedron": Cyclic.get(3),
+  "augmented tridiminished icosahedron": Cyclic.get(3),
 }
 
 function getRhombicosidodecahedraSymmetry(name: string) {
@@ -137,15 +241,15 @@ function getRhombicosidodecahedraSymmetry(name: string) {
       return getClassicalSymmetry(name)
     case 1:
       // pentagonal pyramidal
-      return cyclic(5)
+      return Cyclic.get(5)
     case 2:
       if (align === "para") {
-        return pure ? dihedral(5, "antiprism") : cyclic(5)
+        return pure ? Dihedral.get(5, "antiprism") : Cyclic.get(5)
       }
-      return pure ? biradial : bilateral
+      return pure ? Cyclic.biradial() : Cyclic.bilateral()
     //
     case 3:
-      return pure ? cyclic(3) : bilateral
+      return pure ? Cyclic.get(3) : Cyclic.bilateral()
     default:
       throw new Error(
         `Way too many changes to this polyhedron: gyrate=${gyrate}, diminished=${diminished}`,
@@ -154,15 +258,15 @@ function getRhombicosidodecahedraSymmetry(name: string) {
 }
 
 const elementaryMapping: Record<string, Symmetry> = {
-  "snub disphenoid": dihedral(2, "antiprism"),
-  "snub square antiprism": dihedral(4, "antiprism"),
-  sphenocorona: biradial,
-  "augmented sphenocorona": bilateral,
-  sphenomegacorona: biradial,
-  hebesphenomegacorona: biradial,
-  disphenocingulum: dihedral(2, "antiprism"),
-  bilunabirotunda: dihedral(2, "prism"),
-  "triangular hebesphenorotunda": cyclic(3),
+  "snub disphenoid": Dihedral.get(2, "antiprism"),
+  "snub square antiprism": Dihedral.get(4, "antiprism"),
+  sphenocorona: Cyclic.biradial(),
+  "augmented sphenocorona": Cyclic.bilateral(),
+  sphenomegacorona: Cyclic.biradial(),
+  hebesphenomegacorona: Cyclic.biradial(),
+  disphenocingulum: Dihedral.get(2, "antiprism"),
+  bilunabirotunda: Dihedral.get(2, "prism"),
+  "triangular hebesphenorotunda": Cyclic.get(3),
 }
 
 // TODO replace the Johnson symmetries list to rely on tables
@@ -204,12 +308,12 @@ function getClassicalSymmetry(name: string) {
     name,
     ({ operation, family }) => operation === "snub" && family !== 3,
   )
-  return polyhedral(groupNames[family], chiral)
+  return Polyhedral.get(groupNames[family], chiral)
 }
 
 function getPrismSymmetry(name: string) {
   const { base, type } = prisms.get(name)!
-  return dihedral(base, type)
+  return Dihedral.get(base, type)
 }
 
 export function getSymmetry(name: string): Symmetry {
@@ -223,80 +327,4 @@ export function getSymmetry(name: string): Symmetry {
     return getPrismSymmetry(name)
   }
   return getJohnsonSymmetry(name)
-}
-
-export function getSymmetryName(symmetry: Symmetry) {
-  switch (symmetry.type) {
-    case "polyhedral": {
-      const { family, chiral } = symmetry
-      return `${chiral ? "chiral" : "full"} ${family}`
-    }
-    case "cyclic": {
-      const { n, chiral } = symmetry
-      if (n === 1 && !chiral) return "bilateral"
-      if (n === 2 && !chiral) return "biradial"
-      // FIXME type n correctly
-      const prefix = polygonPrefixes.get(n as any)
-      return chiral ? prefix : `${prefix} pyramidal`
-    }
-    case "dihedral": {
-      const { n, reflection } = symmetry
-      const base = !!reflection ? `${reflection}atic` : "dihedral"
-      return `${polygonPrefixes.get(n as any)} ${base}`
-    }
-  }
-}
-
-function symbolJoin(base: string, sub?: string) {
-  if (sub) {
-    return `${base}_${sub}`
-  }
-  return base
-}
-
-export function getSymmetrySymbol(symmetry: Symmetry) {
-  switch (symmetry.type) {
-    case "polyhedral": {
-      const { family, chiral } = symmetry
-      const sub = !chiral ? (family === "tetrahedral" ? "d" : "h") : ""
-      return symbolJoin(family[0].toUpperCase(), sub)
-    }
-    case "cyclic": {
-      const { n, chiral } = symmetry
-      const sub = n === 1 && !chiral ? "s" : `${n}${chiral ? "" : "v"}`
-      return symbolJoin("C", sub)
-    }
-    case "dihedral": {
-      const { n, reflection } = symmetry
-      const sub = !!reflection ? (reflection === "prism" ? "h" : "d") : ""
-      return symbolJoin("D", `${n}${sub}`)
-    }
-  }
-}
-
-const polyhedralOrders: Record<Family, number> = {
-  tetrahedral: 12,
-  octahedral: 24,
-  icosahedral: 60,
-}
-
-function chiralMult(n: number, chiral?: boolean) {
-  return n * (!!chiral ? 1 : 2)
-}
-
-export function getOrder(symmetry: Symmetry) {
-  switch (symmetry.type) {
-    case "polyhedral": {
-      const { family, chiral } = symmetry
-      return chiralMult(polyhedralOrders[family], chiral)
-    }
-    case "cyclic": {
-      const { n, chiral } = symmetry
-      return chiralMult(n, chiral)
-    }
-    case "dihedral": {
-      const { n, reflection } = symmetry
-      return chiralMult(2 * n, !reflection)
-    }
-  }
 }

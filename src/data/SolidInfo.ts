@@ -1,11 +1,6 @@
 import { toConwayNotation } from "./conway"
 import { getAlternateNames } from "./alternates"
-import {
-  getSymmetry,
-  getSymmetryName,
-  getSymmetrySymbol,
-  getOrder,
-} from "./symmetry"
+import { getSymmetry } from "./symmetry"
 import { classicals, prisms, capstones, rhombicosidodecahedra } from "./tables"
 
 /**
@@ -24,12 +19,6 @@ export default class SolidInfo {
   symbol = () => toConwayNotation(this.name)
 
   symmetry = () => getSymmetry(this.name)
-
-  symmetryName = () => getSymmetryName(this.symmetry())
-
-  symmetrySymbol = () => getSymmetrySymbol(this.symmetry())
-
-  order = () => getOrder(this.symmetry())
 
   inClassicalTable(filter?: Parameters<typeof classicals.hasName>[1]) {
     return classicals.hasName(this.name, filter)
