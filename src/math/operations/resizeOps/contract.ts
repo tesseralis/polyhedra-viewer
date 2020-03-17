@@ -82,7 +82,7 @@ export function applyContract(
 }
 
 function isBevelled(polyhedron: Polyhedron) {
-  return polyhedron.info.inClassicalTable({ operation: "bevelled" })
+  return polyhedron.info.inClassicalTable({ operation: "bevel" })
 }
 
 // NOTE: We are using the same operation for contracting both expanded and snub solids.

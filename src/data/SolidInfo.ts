@@ -1,6 +1,6 @@
 import { toConwayNotation } from "./conway"
 import { getAlternateNames } from "./alternates"
-import { getSymmetry, getSymmetryName, getOrder } from "./symmetry"
+import { getSymmetry } from "./symmetry"
 import { classicals, prisms, capstones, rhombicosidodecahedra } from "./tables"
 
 /**
@@ -20,26 +20,22 @@ export default class SolidInfo {
 
   symmetry = () => getSymmetry(this.name)
 
-  symmetryName = () => getSymmetryName(this.symmetry())
-
-  order = () => getOrder(this.name)
-
-  inClassicalTable(filter?: Parameters<typeof classicals.contains>[1]) {
-    return classicals.contains(this.name, filter)
+  inClassicalTable(filter?: Parameters<typeof classicals.hasName>[1]) {
+    return classicals.hasName(this.name, filter)
   }
 
-  inPrismTable(filter?: Parameters<typeof prisms.contains>[1]) {
-    return prisms.contains(this.name, filter)
+  inPrismTable(filter?: Parameters<typeof prisms.hasName>[1]) {
+    return prisms.hasName(this.name, filter)
   }
 
-  inCapstoneTable(filter?: Parameters<typeof capstones.contains>[1]) {
-    return capstones.contains(this.name, filter)
+  inCapstoneTable(filter?: Parameters<typeof capstones.hasName>[1]) {
+    return capstones.hasName(this.name, filter)
   }
 
   inRhombicosidodecahedronTable(
-    filter?: Parameters<typeof rhombicosidodecahedra.contains>[1],
+    filter?: Parameters<typeof rhombicosidodecahedra.hasName>[1],
   ) {
-    return rhombicosidodecahedra.contains(this.name, filter)
+    return rhombicosidodecahedra.hasName(this.name, filter)
   }
 
   type() {
@@ -67,7 +63,7 @@ export default class SolidInfo {
    * which alternate around each vertex.
    */
   isQuasiRegular() {
-    return this.inClassicalTable({ operation: "rectified" })
+    return this.inClassicalTable({ operation: "rectify" })
   }
 
   isUniform() {

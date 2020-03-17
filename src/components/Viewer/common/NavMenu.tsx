@@ -8,6 +8,7 @@ import {
   mdiCubeOutline,
 } from "@mdi/js"
 
+import { escape } from "utils"
 import { useStyle } from "styles"
 import IconLink from "./IconLink"
 
@@ -40,7 +41,7 @@ export default function NavMenu({ solid, compact = false, onClick }: Props) {
         <IconLink
           key={name}
           replace
-          to={`/${solid}/${name}`}
+          to={`/${escape(solid)}/${name}`}
           title={capitalize(title)}
           iconName={icon}
           iconOnly={compact}

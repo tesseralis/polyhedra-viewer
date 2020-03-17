@@ -12,7 +12,7 @@ import {
   prefix,
 } from "./tableHelpers"
 
-type Base = "tetrahedron" | "cube" | "dodecahedron"
+type Base = 3 | 4 | 5
 interface Item {
   base: Base
   truncated: boolean
@@ -21,23 +21,17 @@ interface Item {
 }
 
 const options: FieldOptions<Item> = {
-  base: ["tetrahedron", "cube", "dodecahedron"],
+  base: [3, 4, 5],
   truncated: bools,
   count: zeroCounts,
   align: alignOpts,
 }
 
-const countLimit: Record<Base, ZeroCount> = {
-  tetrahedron: 1,
-  cube: 2,
-  dodecahedron: 3,
-}
-
 function* getItems() {
   for (const base of options.base) {
     for (const truncated of options.truncated) {
-      for (const count of limitCount(options.count, countLimit[base])) {
-        if (base === "dodecahedron" && count === 2) {
+      for (const count of limitCount(options.count, base - 2)) {
+        if (base === 5 && count === 2) {
           for (const align of alignOpts) {
             yield { base, truncated, count, align }
           }
@@ -49,6 +43,12 @@ function* getItems() {
   }
 }
 
+const baseNames: Record<Base, string> = {
+  3: "tetrahedron",
+  4: "cube",
+  5: "dodecahedron",
+}
+
 export default new Table({
   items: getItems(),
   options,
@@ -58,7 +58,7 @@ export default new Table({
       wordJoin(
         countString(count, "augmented"),
         truncated ? "truncated" : "",
-        base,
+        baseNames[base],
       ),
     )
   },

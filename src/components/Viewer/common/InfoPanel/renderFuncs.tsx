@@ -109,12 +109,11 @@ export function displayFaceTypes({ polyhedron }: RenderProps) {
 }
 
 export function displaySymmetry({ polyhedron }: RenderProps) {
-  const symmetry = polyhedron.info.symmetry()
-  const symName = polyhedron.info.symmetryName()
-  const { group = "", sub } = symmetry
+  const { base, sub } = polyhedron.info.symmetry().symbol()
+  const symName = polyhedron.info.symmetry().name()
   return (
     <>
-      {capitalize(symName)}, {group}
+      {capitalize(symName)}, {base}
       {sub ? <Sub>{sub}</Sub> : undefined}
     </>
   )

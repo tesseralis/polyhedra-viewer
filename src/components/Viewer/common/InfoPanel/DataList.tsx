@@ -73,7 +73,7 @@ const infoRows: InfoRow[] = [
   {
     name: "Order",
     area: "order",
-    render: ({ polyhedron: p }) => <>{p.info.order()}</>,
+    render: ({ polyhedron: p }) => <>{p.info.symmetry().order()}</>,
   },
   {
     name: "Properties",

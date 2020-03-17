@@ -1,10 +1,11 @@
 import { uniq, some, isMatch, isFunction } from "lodash-es"
+import { getSingle } from "utils"
 import { getCanonicalName } from "../alternates"
 import { FieldOptions } from "./tableHelpers"
 
 type NameFunc<Item> = (item: Item) => string
 type Filter<Item> = Partial<Item> | ((item: Item) => boolean)
-type NamedItem<Item> = Item & { name: string }
+type Named<Item> = Item & { name: string }
 
 interface ConstructorArgs<Item> {
   items: Iterable<Item>
@@ -36,7 +37,7 @@ function* getNamedItems<Item>(items: Iterable<Item>, nameFunc: NameFunc<Item>) {
  * and selecting based on filters.
  */
 export default class Table<Item extends {}> {
-  items: NamedItem<Item>[]
+  items: Named<Item>[]
   options: FieldOptions<Item>
 
   constructor({ items, getName, options }: ConstructorArgs<Item>) {
@@ -48,25 +49,47 @@ export default class Table<Item extends {}> {
   /**
    * Get all the items that satisfy the given constraints.
    */
-  get(filter?: Filter<Item>) {
+  getAll(filter?: Filter<Item>) {
     return this.items.filter(item => applyFilter(item, filter))
   }
 
   /**
    * Get the names of all items that satisfy the given filter.
    */
-  getNames(filter?: Filter<Item>) {
-    return uniq(this.get(filter).map(item => item.name))
+  getAllNames(filter?: Filter<Item>) {
+    return uniq(this.getAll(filter).map(item => item.name))
   }
 
-  getItem(name: string, filter?: Filter<Item>) {
-    return this.get(filter).find(item => item.name === name)
+  /**
+   * Get the item with the given name that satisfies the given filters.
+   * @throws Error if no such item exists or multiple items exist.
+   */
+  get(name: string, filter?: Filter<Item>) {
+    return getSingle(this.getAll(filter).filter(item => item.name === name))
+  }
+
+  /**
+   * Get the name of the item that satisfies the given filters.
+   * @throws Error if multiple items exist or no such item exists.
+   */
+  getName(filter?: Filter<Item>) {
+    return getSingle(this.getAll(filter)).name
+  }
+
+  /**
+   * Return `true` if the table has the item that satisfies the given filter.
+   */
+  has(filter?: Filter<Item>) {
+    return some(this.items, item => applyFilter(item, filter))
   }
 
   /**
    * Return `true` if the item name satisfies the given constraints.
    */
-  contains(name: string, filter?: Filter<Item>) {
-    return some(this.getNames(filter), n => n === name)
+  hasName(name: string, filter?: Filter<Item>) {
+    return some(
+      this.items,
+      item => applyFilter(item, filter) && item.name === name,
+    )
   }
 }
