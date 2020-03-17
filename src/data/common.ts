@@ -17,5 +17,7 @@ export function assertValidSolid(solidName: string) {
 }
 
 export function getSolidData(solidName: string) {
-  return require(`data/polyhedra/${escape(assertValidSolid(solidName))}.json`)
+  // We can't inline this because it messes up Webpack
+  const escapedName = escape(assertValidSolid(solidName))
+  return require(`data/polyhedra/${escapedName}.json`)
 }
