@@ -17,7 +17,6 @@ export default function classicalGraph(g: Graph) {
     })
     g.addEdge({ operation: "dual", from: name, to: dual })
 
-    // FIXME be able to get just a single item with the name
     const truncated = classicals.getName({
       family,
       facet,
