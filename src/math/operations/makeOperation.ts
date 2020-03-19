@@ -20,8 +20,6 @@ export interface OperationResult {
   animationData?: AnimationData
 }
 
-// export type Options = { [key: string]: any };
-
 interface BaseOperation<Options extends {}> {
   optionTypes: (keyof Options)[]
 
@@ -108,7 +106,7 @@ const methodDefaults = {
 }
 
 export function getOpResults(solid: Polyhedron, opName: string) {
-  return operationGraph[toConwayNotation(solid.name)!][opName]
+  return operationGraph[toConwayNotation(solid.name)][opName]
 }
 
 // TODO get this to return the correct type
@@ -129,7 +127,7 @@ function getNextPolyhedron<O>(
 ) {
   const results = getOpResults(solid, operation)
   const next = isEmpty(filterOpts) ? results : filter(results, filterOpts)
-  return fromConwayNotation((getSingle(next) as any).value)!
+  return fromConwayNotation((getSingle(next) as any).value)
 }
 
 function normalizeOpResult(

@@ -18,6 +18,7 @@ const elementaryMapping: Record<string, Symmetry> = {
   "triangular hebesphenorotunda": Cyclic.get(3),
 }
 
+// FIXME I don't wanna just throw an error...
 function getClassicalSymmetry(name: string): Symmetry {
   throw new Error("Invalid polyhedron")
 }
