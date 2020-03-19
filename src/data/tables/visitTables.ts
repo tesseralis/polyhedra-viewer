@@ -23,7 +23,6 @@ export default function visitTables<Result>(
   visitor: TableVisitor<Result>,
 ) {
   for (const tableName of tableList) {
-    // FIXME try to type this better?
     if (isFunction(visitor[tableName]) && !!tables[tableName].hasName(name)) {
       return visitor[tableName]!(tables[tableName].get(name) as any)
     }
