@@ -20,8 +20,6 @@ export interface OperationResult {
   animationData?: AnimationData
 }
 
-// export type Options = { [key: string]: any };
-
 interface BaseOperation<Options extends {}> {
   optionTypes: (keyof Options)[]
 

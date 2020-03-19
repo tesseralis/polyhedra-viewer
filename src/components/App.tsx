@@ -4,7 +4,7 @@ import { Route, Redirect, Switch } from "react-router-dom"
 import { choose } from "utils"
 import { isValidSolid, allSolidNames } from "data/common"
 import { isAlternateName, getCanonicalName } from "data/alternates"
-import { isConwaySymbol, fromConwayNotation } from "data/conway"
+import { isConwayNotation, fromConwayNotation } from "data/conway"
 import { escape } from "utils"
 
 import ErrorPage from "./ErrorPage"
@@ -34,11 +34,10 @@ export default () => (
         path="/:solid"
         render={({ match, history }) => {
           const solid = unescapeName(match.params.solid)
-          if (isConwaySymbol(solid)) {
-            const fullName = escape(fromConwayNotation(solid))
+          if (isConwayNotation(solid)) {
             const newPath = history.location.pathname.replace(
               match.params.solid,
-              fullName,
+              escape(fromConwayNotation(solid)),
             )
             return <Redirect to={newPath} />
           }

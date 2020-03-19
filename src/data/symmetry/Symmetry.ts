@@ -57,12 +57,18 @@ export abstract class Symmetry {
   }
 }
 
-export type Family = "tetrahedral" | "octahedral" | "icosahedral"
+type Family = 3 | 4 | 5
 
 const polyhedralOrders: Record<Family, number> = {
-  tetrahedral: 12,
-  octahedral: 24,
-  icosahedral: 60,
+  3: 12,
+  4: 24,
+  5: 60,
+}
+
+const groupNames: Record<Family, string> = {
+  3: "tetrahedral",
+  4: "octahedral",
+  5: "icosahedral",
 }
 
 interface PolyhedralData {
@@ -75,8 +81,8 @@ export class Polyhedral extends Symmetry {
   constructor(data: PolyhedralData) {
     const { family, chiral } = data
     super({
-      group: family[0].toUpperCase(),
-      achiralSub: family === "tetrahedral" ? "d" : "h",
+      group: groupNames[family][0].toUpperCase(),
+      achiralSub: family === 3 ? "d" : "h",
       chiral: !!chiral,
       rotationalOrder: polyhedralOrders[family],
     })
@@ -85,7 +91,7 @@ export class Polyhedral extends Symmetry {
 
   name() {
     const { family, chiral } = this.data
-    return `${chiral ? "chiral" : "full"} ${family}`
+    return `${chiral ? "chiral" : "full"} ${groupNames[family]}`
   }
 
   static get(family: Family, chiral?: boolean) {
