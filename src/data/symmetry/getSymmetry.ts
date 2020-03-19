@@ -4,6 +4,7 @@ import {
   capstones,
   augmentedPrisms,
   augmentedClassicals,
+  diminishedIcosahedra,
   rhombicosidodecahedra,
 } from "../tables"
 import { assertValidSolid } from "../common"
@@ -100,11 +101,18 @@ function getAugmentedClassicalSymmetry(name: string) {
   }
 }
 
-// TODO there's only three of these so we just put them here right now
-const diminishedIcosahedraMapping: Record<string, Symmetry> = {
-  "metabidiminished icosahedron": Cyclic.biradial,
-  "tridiminished icosahedron": Cyclic.get(3),
-  "augmented tridiminished icosahedron": Cyclic.get(3),
+function getDiminishedIcosahedronSymmetry(name: string) {
+  const { count, align } = diminishedIcosahedra.get(name)
+  switch (count) {
+    case 3:
+      return Cyclic.get(3)
+    case 2:
+      return align === "meta" ? Cyclic.biradial : Dihedral.get(5, "antiprism")
+    case 1:
+      return Cyclic.get(5)
+    default:
+      return getClassicalSymmetry(name)
+  }
 }
 
 function getRhombicosidodecahedraSymmetry(name: string) {
@@ -167,8 +175,8 @@ export default function getSymmetry(name: string): Symmetry {
   if (augmentedClassicals.hasName(name)) {
     return getAugmentedClassicalSymmetry(name)
   }
-  if (!!diminishedIcosahedraMapping[name]) {
-    return diminishedIcosahedraMapping[name]
+  if (diminishedIcosahedra.hasName(name)) {
+    return getDiminishedIcosahedronSymmetry(name)
   }
   if (rhombicosidodecahedra.hasName(name)) {
     return getRhombicosidodecahedraSymmetry(name)
