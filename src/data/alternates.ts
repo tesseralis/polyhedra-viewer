@@ -39,6 +39,9 @@ export const alternateNamesMapping: Record<string, string[]> = {
   ],
   "elongated square cupola": ["diminished rhombicuboctahedron"],
   "octagonal prism": ["bidiminished rhombicuboctahedron"],
+
+  // Snub antiprisms
+  "snub disphenoid": ["snub digonal antiprism"],
 }
 function* getCanonicalMapping() {
   for (const [canonical, alts] of Object.entries(alternateNamesMapping)) {

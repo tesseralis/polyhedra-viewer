@@ -6,6 +6,7 @@ import {
   augmentedClassicals,
   diminishedIcosahedra,
   rhombicosidodecahedra,
+  snubAntiprisms,
 } from "../tables"
 import { assertValidSolid } from "../common"
 import { Family, Symmetry, Polyhedral, Cyclic, Dihedral } from "./Symmetry"
@@ -141,9 +142,12 @@ function getRhombicosidodecahedraSymmetry(name: string) {
   }
 }
 
+function getSnubAntiprismSymmetry(name: string) {
+  const { base } = snubAntiprisms.get(name)
+  return Dihedral.get(base, "antiprism")
+}
+
 const elementaryMapping: Record<string, Symmetry> = {
-  "snub disphenoid": Dihedral.get(2, "antiprism"),
-  "snub square antiprism": Dihedral.get(4, "antiprism"),
   sphenocorona: Cyclic.biradial,
   "augmented sphenocorona": Cyclic.bilateral,
   sphenomegacorona: Cyclic.biradial,
@@ -180,6 +184,9 @@ export default function getSymmetry(name: string): Symmetry {
   }
   if (rhombicosidodecahedra.hasName(name)) {
     return getRhombicosidodecahedraSymmetry(name)
+  }
+  if (snubAntiprisms.hasName(name)) {
+    return getSnubAntiprismSymmetry(name)
   }
   return elementaryMapping[name]
 }
