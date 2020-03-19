@@ -65,7 +65,12 @@ export default class Table<Item extends {}> {
    * @throws Error if no such item exists or multiple items exist.
    */
   get(name: string, filter?: Filter<Item>) {
-    return getSingle(this.getAll(filter).filter(item => item.name === name))
+    const result = this.items.find(
+      item => item.name === name && applyFilter(item, filter),
+    )
+    if (!result)
+      throw new Error(`Could not find ${name} with the given filters`)
+    return result
   }
 
   /**

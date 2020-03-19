@@ -50,13 +50,10 @@ export default new Table({
   items: getItems(),
   options,
   getName({ base, count, align }) {
-    return prefix(
-      align,
-      wordJoin(
-        countString(count, "augmented"),
-        polygonPrefixes.get(base),
-        "prism",
-      ),
+    return wordJoin(
+      prefix(align, countString(count, "augmented")),
+      polygonPrefixes.get(base),
+      "prism",
     )
   },
 })
