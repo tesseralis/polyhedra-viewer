@@ -1,12 +1,6 @@
 import visitTables from "../tables/visitTables"
 import { assertValidSolid } from "../common"
-import { Family, Symmetry, Polyhedral, Cyclic, Dihedral } from "./Symmetry"
-
-const groupNames: Record<3 | 4 | 5, Family> = {
-  3: "tetrahedral",
-  4: "octahedral",
-  5: "icosahedral",
-}
+import { Symmetry, Polyhedral, Cyclic, Dihedral } from "./Symmetry"
 
 const elementaryMapping: Record<string, Symmetry> = {
   sphenocorona: Cyclic.biradial,
@@ -18,11 +12,6 @@ const elementaryMapping: Record<string, Symmetry> = {
   "triangular hebesphenorotunda": Cyclic.get(3),
 }
 
-// FIXME I don't wanna just throw an error...
-function getClassicalSymmetry(name: string): Symmetry {
-  throw new Error("Invalid polyhedron")
-}
-
 /**
  * Return the Symmetry of the given polyhedron name
  */
@@ -31,7 +20,7 @@ export default function getSymmetry(name: string): Symmetry {
 
   return visitTables(name, {
     classicals({ family, operation }) {
-      return Polyhedral.get(groupNames[family], operation === "snub")
+      return Polyhedral.get(family, operation === "snub")
     },
     prisms({ base, type }) {
       return Dihedral.get(base, type)
@@ -57,8 +46,10 @@ export default function getSymmetry(name: string): Symmetry {
         return Dihedral.get(base, reflection)
       }
     },
-    augmentedPrisms({ count, align }) {
+    augmentedPrisms({ base, count, align }) {
       switch (count) {
+        case 0:
+          return Dihedral.get(base)
         case 1:
           // mono-augmented prisms all have biradial symmetry
           return Cyclic.biradial
@@ -69,13 +60,12 @@ export default function getSymmetry(name: string): Symmetry {
         case 3:
           // Triaugmented triangular/hexagonal prism has triangular prismatic symmetry
           return Dihedral.get(3, "prism")
-        default:
-          // for zero-counts, return the usual prism symmetry
-          throw new Error("reached invalid code")
       }
     },
     augmentedClassicals({ count, base, align }) {
       switch (count) {
+        case 0:
+          return Polyhedral.get(base)
         case 1:
           return Cyclic.get(base)
         case 2:
@@ -87,8 +77,6 @@ export default function getSymmetry(name: string): Symmetry {
             : Cyclic.biradial
         case 3:
           return Cyclic.get(3)
-        default:
-          throw new Error("reached invalid code")
       }
     },
     diminishedIcosahedra({ count, align }) {
@@ -101,8 +89,8 @@ export default function getSymmetry(name: string): Symmetry {
             : Dihedral.get(5, "antiprism")
         case 1:
           return Cyclic.get(5)
-        default:
-          throw new Error("Reached invalid code")
+        case 0:
+          return Polyhedral.get(5)
       }
     },
     rhombicosidodecahedra({ gyrate, diminished, align }) {
@@ -110,8 +98,7 @@ export default function getSymmetry(name: string): Symmetry {
       const pure = !gyrate || !diminished
       switch (gyrate + diminished) {
         case 0:
-          // normal rhombicosidodecahedron
-          return getClassicalSymmetry(name)
+          return Polyhedral.get(5)
         case 1:
           // pentagonal pyramidal
           return Cyclic.get(5)
