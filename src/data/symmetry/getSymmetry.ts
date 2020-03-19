@@ -18,15 +18,8 @@ const groupNames: Record<3 | 4 | 5, Family> = {
 }
 
 function getClassicalSymmetry(name: string) {
-  // Don't want to count it in the tetrahedron group
-  const families = [...classicals.options.family].reverse()
-  const family = families.find(family => classicals.hasName(name, { family }))!
-  // TODO replace with isChiral
-  const chiral = classicals.hasName(
-    name,
-    ({ operation, family }) => operation === "snub" && family !== 3,
-  )
-  return Polyhedral.get(groupNames[family], chiral)
+  const { family, operation } = classicals.get(name)
+  return Polyhedral.get(groupNames[family], operation === "snub")
 }
 
 function getPrismSymmetry(name: string) {
