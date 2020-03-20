@@ -37,13 +37,15 @@ export default function capstonesGraph(g: Graph) {
 
       g.addEdge("augment", prism, elongated)
       g.addEdge("augment", antiprism, gyroelongated)
+      g.addEdge("turn", prism, antiprism)
 
       g.addEdge("elongate", cap, elongated)
       g.addEdge("gyroelongate", cap, gyroelongated)
+      g.addEdge("turn", elongated, gyroelongated)
 
       g.addEdge("augment", gyroelongated, gyroelongatedBi)
 
-      // FIXME figure out a way to handle this
+      // FIXME figure out a way to list the two options only if they have them
       for (const gyrate of capstones.options.gyrate) {
         const bi = capstones.getAll({
           base,
@@ -64,6 +66,7 @@ export default function capstonesGraph(g: Graph) {
         g.addEdge("augment", elongated, elongatedBi)
         g.addEdge("elongate", bi, elongatedBi)
         g.addEdge("gyroelongate", bi, gyroelongatedBi)
+        g.addEdge("turn", elongatedBi, gyroelongatedBi)
       }
     }
   }
