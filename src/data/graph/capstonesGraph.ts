@@ -4,52 +4,53 @@ import { prisms, capstones } from "../tables"
 
 export default function capstonesGraph(g: Graph) {
   // prisms can be augmented with a capstone
-  for (const { name, base, type } of prisms.getAll()) {
-    if (base <= 5) {
+  for (const prism of prisms.getAll()) {
+    if (prism.base <= 5) {
       // 3/4/5 prisms can be augmented with a pyramid
-      const augmented = capstones.getName({
-        elongation: type,
+      const augmented = capstones.getAll({
+        elongation: prism.type,
         type: "pyramid",
         count: 1,
       })
-      g.addEdge({
-        operation: "augment",
-        from: name,
-        to: augmented,
-        options: { capType: "pyramid", base: base as any },
-      })
+
+      g.addEdge("augment", prism, augmented[0])
     } else {
       // 6/8/10-prisms can be augmented with a cupola or rotunda
       const allAugmented = capstones.getAll(
         ({ elongation, type: capType, count }) =>
-          capType !== "pyramid" && elongation === type && count === 1,
+          capType !== "pyramid" && elongation === prism.type && count === 1,
       )
-      for (const { name: augName, type: capType } of allAugmented) {
-        g.addEdge({
-          operation: "augment",
-          from: name,
-          to: augName,
-          options: { capType: capType as any, base: base as any },
-        })
+      for (const augmented of allAugmented) {
+        g.addEdge("augment", prism, augmented)
       }
     }
   }
 
-  for (const { name, base, type } of capstones.getAll({
+  for (const cap of capstones.getAll({
     count: 1,
     elongation: "",
   })) {
     // single capstones can be elongated and gyroelongated
-    g.addEdge({
-      operation: "elongate",
-      from: name,
-      to: capstones.getName({ base, type, count: 1, elongation: "prism" }),
-    })
-    g.addEdge({
-      operation: "gyroelongate",
-      from: name,
-      to: capstones.getName({ base, type, count: 1, elongation: "antiprism" }),
-    })
+    g.addEdge(
+      "elongate",
+      cap,
+      capstones.getAll({
+        base: cap.base,
+        type: cap.type,
+        count: 1,
+        elongation: "prism",
+      })[0],
+    )
+    g.addEdge(
+      "gyroelongate",
+      cap,
+      capstones.getAll({
+        base: cap.base,
+        type: cap.type,
+        count: 1,
+        elongation: "antiprism",
+      })[0],
+    )
 
     // // can be augmented
     // for (const augmented of capstones.getAll({ base, type, count: 2, elongation: '' })) {
