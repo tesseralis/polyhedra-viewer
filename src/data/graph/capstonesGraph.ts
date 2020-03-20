@@ -2,67 +2,69 @@ import { Graph } from "./Graph"
 
 import { prisms, capstones } from "../tables"
 
+// FIXME handle cupolarotundae
 export default function capstonesGraph(g: Graph) {
-  // prisms can be augmented with a capstone
-  for (const prism of prisms.getAll()) {
-    if (prism.base <= 5) {
-      // 3/4/5 prisms can be augmented with a pyramid
-      const augmented = capstones.getAll({
-        elongation: prism.type,
-        type: "pyramid",
-        count: 1,
-      })
-
-      g.addEdge("augment", prism, augmented[0])
-    } else {
-      // 6/8/10-prisms can be augmented with a cupola or rotunda
-      const allAugmented = capstones.getAll(
-        ({ elongation, type: capType, count }) =>
-          capType !== "pyramid" && elongation === prism.type && count === 1,
-      )
-      for (const augmented of allAugmented) {
-        g.addEdge("augment", prism, augmented)
+  for (const base of capstones.options.base) {
+    for (const type of capstones.options.type) {
+      if (type === "rotunda" && base !== 5) {
+        continue
       }
-    }
-  }
-
-  for (const cap of capstones.getAll({
-    count: 1,
-    elongation: "",
-  })) {
-    // single capstones can be elongated and gyroelongated
-    g.addEdge(
-      "elongate",
-      cap,
-      capstones.getAll({
-        base: cap.base,
-        type: cap.type,
+      const prismBase = type === "pyramid" ? base : base / 2
+      const prism = prisms.getAll({ base: prismBase as any, type: "prism" })[0]
+      const antiprism = prisms.getAll({
+        base: prismBase as any,
+        type: "antiprism",
+      })[0]
+      const cap = capstones.getAll({ base, type, count: 1, elongation: "" })[0]
+      const elongated = capstones.getAll({
+        base,
+        type,
         count: 1,
         elongation: "prism",
-      })[0],
-    )
-    g.addEdge(
-      "gyroelongate",
-      cap,
-      capstones.getAll({
-        base: cap.base,
-        type: cap.type,
+      })[0]
+      const gyroelongated = capstones.getAll({
+        base,
+        type,
         count: 1,
         elongation: "antiprism",
-      })[0],
-    )
+      })[0]
+      const gyroelongatedBi = capstones.getAll({
+        base,
+        type,
+        count: 2,
+        elongation: "antiprism",
+      })[0]
 
-    // // can be augmented
-    // for (const augmented of capstones.getAll({ base, type, count: 2, elongation: '' })) {
-    // g.addEdge({
-    //   operation: 'augment',
-    //   from: name,
-    //   to: augmented.name,
-    //   options: {
-    //     capType: type,
-    //   }
-    // })
+      g.addEdge("augment", prism, elongated)
+      g.addEdge("augment", antiprism, gyroelongated)
 
-    // }
+      g.addEdge("elongate", cap, elongated)
+      g.addEdge("gyroelongate", cap, gyroelongated)
+
+      g.addEdge("augment", gyroelongated, gyroelongatedBi)
+
+      // FIXME figure out a way to handle this
+      for (const gyrate of capstones.options.gyrate) {
+        const bi = capstones.getAll({
+          base,
+          type,
+          gyrate,
+          count: 2,
+          elongation: "",
+        })[0]
+        const elongatedBi = capstones.getAll({
+          base,
+          type,
+          gyrate,
+          count: 2,
+          elongation: "prism",
+        })[0]
+
+        g.addEdge("augment", cap, bi)
+        g.addEdge("augment", elongated, elongatedBi)
+        g.addEdge("elongate", bi, elongatedBi)
+        g.addEdge("gyroelongate", bi, gyroelongatedBi)
+      }
+    }
   }
 }
