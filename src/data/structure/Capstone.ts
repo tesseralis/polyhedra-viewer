@@ -17,11 +17,8 @@ interface Data {
  * A capstone polyhedron is a pyramid, cupola or rotunda that has been elongated
  * or doubled.
  */
-export default class Capstone extends Structure {
-  data: Data
-
+export default class Capstone extends Structure<Data> {
   constructor(data: Data) {
-    super("capstone")
-    this.data = data
+    super("capstone", data)
   }
 }

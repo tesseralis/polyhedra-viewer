@@ -2,22 +2,19 @@ import Structure from "./Structure"
 
 type ElementaryBase =
   | "sphenocorona"
+  | "augmented sphenocorona"
   | "sphenomegacorona"
   | "hebesphenomegacoron"
   | "disphenocingulum"
   | "bilunabirotunda"
   | "triangular hebesphenorotunda"
 
-interface Data {
+interface ElementaryData {
   base: ElementaryBase
-  augmented?: boolean
 }
 
-export default class Elementary extends Structure {
-  data: Data
-
-  constructor(data: Data) {
-    super("elementary")
-    this.data = data
+export default class Elementary extends Structure<ElementaryData> {
+  constructor(data: ElementaryData) {
+    super("elementary", data)
   }
 }

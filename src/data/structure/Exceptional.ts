@@ -11,7 +11,7 @@ type Operation =
   | "cantellate"
   | "snub"
 
-interface Data {
+interface ExceptionalData {
   family: Family
   facet?: Facet
   operation: Operation
@@ -23,11 +23,8 @@ interface Data {
  * The name "exceptional" is taken from Wikipedia:
  * https://en.wikipedia.org/wiki/Uniform_polyhedron
  */
-export default class Exceptional extends Structure {
-  data: Data
-
-  constructor(data: Data) {
-    super("exceptional")
-    this.data = data
+export default class Exceptional extends Structure<ExceptionalData> {
+  constructor(data: ExceptionalData) {
+    super("exceptional", data)
   }
 }
