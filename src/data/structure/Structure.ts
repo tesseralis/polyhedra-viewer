@@ -70,6 +70,8 @@ export default abstract class Structure<Data extends {} = {}> {
   }
 
   isQuasiRegular() {
+    // FIXME kludge used to make `sharpen` work
+    if (this.canonicalName() === "octahedron") return true
     return this.visit({
       exceptional: ({ operation }) => operation === "rectify",
       default: () => false,

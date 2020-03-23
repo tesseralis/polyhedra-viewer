@@ -13,16 +13,20 @@ import makeOperation from "../makeOperation"
 type FaceType = Polygon
 type Family = 3 | 4 | 5
 
+const familyOpts: Family[] = [3, 4, 5]
+
 interface Options {
   faceType?: FaceType
 }
 
 // Return the family of an *expanded* polyhedron
 function getFamily(polyhedron: Polyhedron) {
-  if (!polyhedron.info.isExceptional()) {
-    throw new Error("Wrong polyhedron type!")
-  }
-  return polyhedron.info.data.family
+  return familyOpts.find((family) => {
+    return Exceptional.query.hasNameWhere(
+      polyhedron.name,
+      (data) => data.family === family,
+    )
+  })!
 }
 
 const coxeterNum: Record<Family, number> = { 3: 4, 4: 6, 5: 10 }
