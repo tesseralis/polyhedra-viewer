@@ -1,5 +1,4 @@
 import { Polygon } from "data/polygons"
-import { classicals } from "data/tables"
 import { Polyhedron } from "math/polyhedra"
 import {
   getSnubAngle,
@@ -10,8 +9,8 @@ import {
 import makeOperation from "../makeOperation"
 
 // TODO hopefully there's a better way to do this once we make the new opGraph
-type Family = typeof classicals.options.family[0]
 type FaceType = Polygon
+type Family = 3 | 4 | 5
 
 interface Options {
   faceType?: FaceType
@@ -19,9 +18,10 @@ interface Options {
 
 // Return the family of an *expanded* polyhedron
 function getFamily(polyhedron: Polyhedron) {
-  return classicals.options.family.find((family) =>
-    polyhedron.info.inClassicalTable({ family }),
-  )!
+  if (!polyhedron.info.isExceptional()) {
+    throw new Error("Wrong polyhedron type!")
+  }
+  return polyhedron.info.data.family
 }
 
 const coxeterNum: Record<Family, number> = { 3: 4, 4: 6, 5: 10 }
@@ -82,7 +82,10 @@ export function applyContract(
 }
 
 function isBevelled(polyhedron: Polyhedron) {
-  return polyhedron.info.inClassicalTable({ operation: "bevel" })
+  if (!polyhedron.info.isExceptional()) {
+    throw new Error("Invalid polyhedron")
+  }
+  return polyhedron.info.data.operation === "bevel"
 }
 
 // NOTE: We are using the same operation for contracting both expanded and snub solids.

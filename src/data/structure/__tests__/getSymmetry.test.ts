@@ -1,13 +1,10 @@
+import Structure from "../Structure"
 import getSymmetry from "../getSymmetry"
 
 describe("getSymmetry", () => {
   function expectSymmetry(solid: string, expected: string) {
-    expect(getSymmetry(solid).symbolStr()).toEqual(expected)
+    expect(getSymmetry(Structure.withName(solid)).symbolStr()).toEqual(expected)
   }
-
-  it("errors on invalid polyhedra names", () => {
-    expect(() => getSymmetry("scutoid")).toThrowError()
-  })
 
   describe("Platonic and Archimedean solids", () => {
     it("returns chiral on snub polyhedra", () => {

@@ -26,7 +26,7 @@ export default function getConwaySymbol(structure: Structure) {
       return type[0].toUpperCase() + base
     },
     default() {
-      const index = johnsonSolids.indexOf(name)
+      const index = johnsonSolids.indexOf(structure.canonicalName())
       return "J" + (index + 1)
     },
   })

@@ -8,7 +8,7 @@ import getSymmetry from "./getSymmetry"
 import getName from "./getName"
 import getConwaySymbol from "./getConwaySymbol"
 import type { Symmetry } from "../symmetry/Symmetry"
-import { getCanonicalName } from "../alternates"
+import { getAlternateNames, getCanonicalName } from "../alternates"
 
 const subclasses = [
   Exceptional,
@@ -55,6 +55,10 @@ export default abstract class Structure<Data extends {} = {}> {
     return getCanonicalName(this.name())
   }
 
+  alternateNames() {
+    return getAlternateNames(this.canonicalName())
+  }
+
   symmetry(): Symmetry {
     return getSymmetry(this)
   }
@@ -98,7 +102,7 @@ export default abstract class Structure<Data extends {} = {}> {
     return this.visit({
       exceptional: ({ operation }) => operation === "snub",
       capstone: ({ elongation, count, type }) =>
-        elongation === "antiprism" && count == 2 && type !== "pyramid",
+        elongation === "antiprism" && count === 2 && type !== "pyramid",
       default: () => false,
     })
   }

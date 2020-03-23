@@ -273,39 +273,37 @@ function getUsingOpt(using: string, numSides: number) {
     : defaultAugmentees[numSides]
 }
 
+function hasRotunda(polyhedron: Polyhedron) {
+  return polyhedron.info.visit({
+    prismatic: ({ base }) => base === 10,
+    capstone: ({ type, base, count }) =>
+      count === 1 && base === 5 && ["cupola", "rotunda"].includes(type),
+    default: () => false,
+  })
+}
+
 const getUsingOpts = (polyhedron: Polyhedron) => {
   // Triangular prism or fastigium
   if (polyhedron.name === "triangular prism") {
     return ["Y4", "U2"]
   }
 
-  if (
-    polyhedron.info.inPrismTable({ base: 10 }) ||
-    polyhedron.info.inCapstoneTable(
-      ({ type, base, count }) =>
-        count === 1 && base === 5 && ["cupola", "rotunda"].includes(type),
-    )
-  ) {
+  if (hasRotunda(polyhedron)) {
     return ["U5", "R5"]
   }
   return null
 }
 
-const hasGyrateOpts = (polyhedron: Polyhedron) => {
-  if (polyhedron.info.inRhombicosidodecahedronTable()) {
-    return true
-  }
-  if (polyhedron.info.inCapstoneTable({ elongation: "antiprism" })) {
-    return false
-  }
-  if (
-    polyhedron.info.inCapstoneTable(
-      ({ base, type }) => type !== "pyramid" && base !== 2,
-    )
-  ) {
-    return true
-  }
-  return false
+function hasGyrateOpts(polyhedron: Polyhedron) {
+  return polyhedron.info.visit({
+    capstone({ base, type, elongation }) {
+      if (elongation === "antiprism") return false
+      if (base !== 2 && type !== "pyramid") return true
+      return false
+    },
+    composite: ({ base }) => base.canonicalName() === "rhombicosidodecahedron",
+    default: () => false,
+  })
 }
 
 type GyrateOpts = "ortho" | "gyro"
