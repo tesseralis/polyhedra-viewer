@@ -2,7 +2,7 @@ import { some, countBy } from "lodash-es"
 
 import { getCyclic, flatMapUniq } from "utils"
 import { VIndex, FIndex } from "./solidTypes"
-import Polyhedron from "./Polyhedron"
+import type Polyhedron from "./Polyhedron"
 import FaceLike from "./FaceLike"
 import Edge from "./Edge"
 

@@ -2,7 +2,7 @@ import { some, findKey, countBy } from "lodash-es"
 import { Point } from "types"
 import { vec, Vec3D } from "math/geom"
 import { VIndex } from "./solidTypes"
-import Polyhedron from "./Polyhedron"
+import type Polyhedron from "./Polyhedron"
 import Edge from "./Edge"
 import { splitAt } from "utils"
 

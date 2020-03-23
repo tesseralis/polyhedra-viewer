@@ -9,9 +9,10 @@ import {
   getNormal,
   getNormalRay,
 } from "math/geom"
-import Polyhedron from "./Polyhedron"
-import Edge from "./Edge"
-import Vertex, { VertexList } from "./Vertex"
+import type Polyhedron from "./Polyhedron"
+import type Edge from "./Edge"
+import type Vertex from "./Vertex"
+import type { VertexList } from "./Vertex"
 
 /**
  * An abstract polyhedral Face. An entity of a polyhedron that can be treated as a Face:
