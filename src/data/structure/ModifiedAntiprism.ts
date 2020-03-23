@@ -1,4 +1,5 @@
 import Structure from "./Structure"
+import Queries from "./Queries"
 import Prismatic from "./Prismatic"
 import { DataOptions } from "./common"
 
@@ -32,4 +33,6 @@ export default class ModifiedAntiprism extends Structure<
       }
     }
   }
+
+  static query = new Queries(ModifiedAntiprism.getAll())
 }

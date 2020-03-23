@@ -2,6 +2,7 @@
 import { DataOptions, Count, counts } from "./common"
 
 import Structure from "./Structure"
+import Queries from "./Queries"
 import Exceptional from "./Exceptional"
 import Prismatic from "./Prismatic"
 
@@ -122,4 +123,6 @@ export default class Composite extends Structure<CompositeData> {
       }
     }
   }
+
+  static query = new Queries(Composite.getAll())
 }

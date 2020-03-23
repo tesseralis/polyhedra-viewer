@@ -1,4 +1,5 @@
 import Structure from "./Structure"
+import Queries from "./Queries"
 import { DataOptions, PrismaticType, prismaticTypes } from "./common"
 
 type CapstoneType = "pyramid" | "cupola" | "rotunda" | "cupolarotunda"
@@ -78,4 +79,6 @@ export default class Capstone extends Structure<CapstoneData> {
       gyrate: "gyro",
     })
   }
+
+  static query = new Queries(Capstone.getAll())
 }

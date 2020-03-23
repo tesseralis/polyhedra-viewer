@@ -1,9 +1,14 @@
+import { some } from "lodash-es"
 import type Structure from "./Structure"
 
 export default class Queries<S extends Structure> {
   entries: S[]
   constructor(entries: Iterable<S>) {
     this.entries = [...entries]
+  }
+
+  hasName(name: string) {
+    return some(this.entries, (entry) => entry.canonicalName() === name)
   }
 
   /**

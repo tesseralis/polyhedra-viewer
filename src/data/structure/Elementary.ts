@@ -1,4 +1,5 @@
 import Structure from "./Structure"
+import Queries from "./Queries"
 import { DataOptions } from "./common"
 
 type ElementaryBase =
@@ -36,4 +37,6 @@ export default class Elementary extends Structure<ElementaryData> {
       yield new Elementary({ base })
     }
   }
+
+  static query = new Queries(Elementary.getAll())
 }
