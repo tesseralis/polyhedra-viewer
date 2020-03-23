@@ -56,6 +56,7 @@ export default abstract class Structure<Data extends {} = {}> {
     return this.visit({
       exceptional: ({ operation }) =>
         operation === "regular" ? "Platonic solid" : "Archimedean solid",
+      // FIXME capitalize correctly
       prismatic: ({ type }) => type,
       default: () => "Johnson solid",
     })

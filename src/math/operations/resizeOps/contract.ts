@@ -1,4 +1,5 @@
 import { Polygon } from "data/polygons"
+import Exceptional from "data/structure/Exceptional"
 import { Polyhedron } from "math/polyhedra"
 import {
   getSnubAngle,
@@ -82,10 +83,10 @@ export function applyContract(
 }
 
 function isBevelled(polyhedron: Polyhedron) {
-  if (!polyhedron.info.isExceptional()) {
-    throw new Error("Invalid polyhedron")
-  }
-  return polyhedron.info.data.operation === "bevel"
+  return Exceptional.query.hasNameWhere(
+    polyhedron.name,
+    ({ operation }) => operation === "bevel",
+  )
 }
 
 // NOTE: We are using the same operation for contracting both expanded and snub solids.

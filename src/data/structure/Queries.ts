@@ -1,6 +1,7 @@
 import { some } from "lodash-es"
 import type Structure from "./Structure"
 
+// TODO create a mapping and use it when filtering for names
 export default class Queries<S extends Structure> {
   entries: S[]
   constructor(entries: Iterable<S>) {
@@ -24,5 +25,12 @@ export default class Queries<S extends Structure> {
 
   where(filter: (data: S["data"]) => boolean) {
     return this.entries.filter((entry) => filter(entry.data))
+  }
+
+  hasNameWhere(name: string, filter: (data: S["data"]) => boolean) {
+    return some(
+      this.entries,
+      (entry) => entry.canonicalName() === name && filter(entry.data),
+    )
   }
 }
