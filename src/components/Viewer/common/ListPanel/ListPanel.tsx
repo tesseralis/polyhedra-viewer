@@ -11,12 +11,12 @@ import { hover, padding, paddingVert, margin, marginVert } from "styles/common"
 import SearchBar from "./SearchBar"
 
 function getFilteredPolyhedra(polyhedra: string[], filter: string) {
-  return polyhedra.filter(solid => solid.includes(filter.toLowerCase()))
+  return polyhedra.filter((solid) => solid.includes(filter.toLowerCase()))
 }
 
 function filterGroups(groups: any[], filterText: string): any {
   return groups
-    .map(group => {
+    .map((group) => {
       if (group.groups) {
         return {
           ...group,
@@ -71,7 +71,7 @@ function PolyhedronLink({ name }: { name: string }) {
 function SubList({ polyhedra }: { polyhedra: string[] }) {
   return (
     <ul>
-      {polyhedra.map(name => (
+      {polyhedra.map((name) => (
         <li key={name}>
           <PolyhedronLink name={name} />
         </li>

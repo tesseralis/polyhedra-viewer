@@ -9,9 +9,10 @@ import {
   getNormal,
   getNormalRay,
 } from "math/geom"
-import Polyhedron from "./Polyhedron"
-import Edge from "./Edge"
-import Vertex, { VertexList } from "./Vertex"
+import type Polyhedron from "./Polyhedron"
+import type Edge from "./Edge"
+import type Vertex from "./Vertex"
+import type { VertexList } from "./Vertex"
 
 /**
  * An abstract polyhedral Face. An entity of a polyhedron that can be treated as a Face:
@@ -28,7 +29,7 @@ export default class FaceLike implements VertexList {
     this.polyhedron = vertices[0].polyhedron
     this.vertices = vertices
     this.edges = edges
-    this.vectors = this.vertices.map(v => v.vec)
+    this.vectors = this.vertices.map((v) => v.vec)
   }
 
   get numSides() {
@@ -36,11 +37,11 @@ export default class FaceLike implements VertexList {
   }
 
   adjacentFaces() {
-    return this.edges.map(edge => edge.twin().face)
+    return this.edges.map((edge) => edge.twin().face)
   }
 
   numUniqueSides() {
-    return this.edges.filter(edge => edge.length() > PRECISION).length
+    return this.edges.filter((edge) => edge.length() > PRECISION).length
   }
 
   sideLength() {
@@ -84,6 +85,6 @@ export default class FaceLike implements VertexList {
   }
 
   isValid() {
-    return every(this.edges, edge => edge.length() > PRECISION)
+    return every(this.edges, (edge) => edge.length() > PRECISION)
   }
 }

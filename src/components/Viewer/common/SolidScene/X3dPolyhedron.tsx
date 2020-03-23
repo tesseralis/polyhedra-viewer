@@ -6,7 +6,7 @@ import { SolidData } from "math/polyhedra"
 
 // Join a list of lists with an inner and outer separator.
 function joinListOfLists<T>(list: T[][], outerSep: string, innerSep: string) {
-  return list.map(elem => elem.join(innerSep)).join(outerSep)
+  return list.map((elem) => elem.join(innerSep)).join(outerSep)
 }
 
 const Coordinates = ({ points }: { points: Point[] }) => {

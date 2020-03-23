@@ -34,7 +34,7 @@ const countPrefixes: Record<Count, string> = {
 }
 
 export function limitCount<N extends number>(counts: N[], limit: number) {
-  return counts.filter(n => n <= limit)
+  return counts.filter((n) => n <= limit)
 }
 
 export function countString(count: ZeroCount, base: string) {

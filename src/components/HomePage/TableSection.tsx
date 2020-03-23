@@ -109,7 +109,7 @@ const TableGrid = ({
   )
   return (
     <div {...css()}>
-      {tables!.map(table => {
+      {tables!.map((table) => {
         const area = gridAreaMapping[table.caption]
         return <GridArea key={area} area={area} data={table} />
       })}
@@ -176,7 +176,7 @@ export default function TableSection({
         />
       )}
       {subsections &&
-        subsections.map(subsection => (
+        subsections.map((subsection) => (
           <TableSection
             key={subsection.header}
             narrow={narrow}

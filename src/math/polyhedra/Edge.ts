@@ -1,6 +1,7 @@
 import { getMidpoint } from "math/geom"
-import Polyhedron from "./Polyhedron"
-import Vertex, { VertexList } from "./Vertex"
+import type Polyhedron from "./Polyhedron"
+import type Vertex from "./Vertex"
+import type { VertexList } from "./Vertex"
 
 export default class Edge implements VertexList {
   polyhedron: Polyhedron
@@ -26,11 +27,11 @@ export default class Edge implements VertexList {
   }
 
   prev() {
-    return this.face.edges.find(e => e.v2.equals(this.v1))!
+    return this.face.edges.find((e) => e.v2.equals(this.v1))!
   }
 
   next() {
-    return this.face.edges.find(e => e.v1.equals(this.v2))!
+    return this.face.edges.find((e) => e.v1.equals(this.v2))!
   }
 
   length() {
@@ -67,7 +68,7 @@ export default class Edge implements VertexList {
 
   dihedralAngle() {
     const midpoint = this.midpoint()
-    const [c1, c2] = this.adjacentFaces().map(face =>
+    const [c1, c2] = this.adjacentFaces().map((face) =>
       face.centroid().sub(midpoint),
     )
 

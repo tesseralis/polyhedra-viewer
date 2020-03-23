@@ -16,13 +16,13 @@ function bisectEdgeFaces(expandedFaces: Face[], twist: Twist) {
   let newFaces: any[] = []
   const found: Face[] = []
 
-  expandedFaces.forEach(face => {
-    face.edges.forEach(edge => {
+  expandedFaces.forEach((face) => {
+    face.edges.forEach((edge) => {
       const twinFace = edge.twinFace()
       if (twinFace.inSet(found)) return
 
       const [v1, v2, v3, v4] = pivot(
-        twinFace.vertices.map(v => v.index),
+        twinFace.vertices.map((v) => v.index),
         edge.v2.index,
       )
 
@@ -41,7 +41,7 @@ function bisectEdgeFaces(expandedFaces: Face[], twist: Twist) {
     })
   })
 
-  return expandedFaces[0].polyhedron.withChanges(solid =>
+  return expandedFaces[0].polyhedron.withChanges((solid) =>
     solid.withoutFaces(found).addFaces(newFaces),
   )
 }
@@ -49,24 +49,16 @@ function bisectEdgeFaces(expandedFaces: Face[], twist: Twist) {
 function joinEdgeFaces(twistFaces: Face[], twist: Twist) {
   const newFaces: any[] = []
   const found: Face[] = []
-  twistFaces.forEach(face => {
-    face.edges.forEach(edge => {
+  twistFaces.forEach((face) => {
+    face.edges.forEach((edge) => {
       const edgeFace = edge.twinFace()
       if (edgeFace.inSet(found)) return
 
       const [v1, v2] = edge.twin().vertices
       const [v3, v4] =
         twist === "left"
-          ? edge
-              .twin()
-              .prev()
-              .twin()
-              .next().vertices
-          : edge
-              .twin()
-              .next()
-              .twin()
-              .prev().vertices
+          ? edge.twin().prev().twin().next().vertices
+          : edge.twin().next().twin().prev().vertices
 
       newFaces.push([v1, v2, v3, v4])
       const otherFace = (twist === "left"
@@ -77,7 +69,7 @@ function joinEdgeFaces(twistFaces: Face[], twist: Twist) {
     })
   })
 
-  return twistFaces[0].polyhedron.withChanges(solid =>
+  return twistFaces[0].polyhedron.withChanges((solid) =>
     solid.withoutFaces(found).addFaces(newFaces),
   )
 }
@@ -95,7 +87,7 @@ function doTwist(
   const twistFaces = getExpandedFaces(polyhedron, n)
 
   const referenceFace =
-    reference.faces.find(face => isExpandedFace(reference, face, n)) ??
+    reference.faces.find((face) => isExpandedFace(reference, face, n)) ??
     reference.getFace()
   const referenceLength =
     (referenceFace.distanceToCenter() / reference.edgeLength()) *

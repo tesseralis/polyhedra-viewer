@@ -159,7 +159,7 @@ export function deduplicateVertices(polyhedron: Polyhedron) {
   const oldToNew: Record<number, number> = {}
 
   polyhedron.vertices.forEach((v, vIndex) => {
-    const match = unique.find(point =>
+    const match = unique.find((point) =>
       v.vec.equalsWithTolerance(point.vec, PRECISION),
     )
     if (match === undefined) {
@@ -174,8 +174,8 @@ export function deduplicateVertices(polyhedron: Polyhedron) {
 
   // replace vertices that are the same
   let newFaces = polyhedron.faces
-    .map(face => uniq(face.vertices.map(v => oldToNew[v.index])))
-    .filter(vIndices => vIndices.length >= 3)
+    .map((face) => uniq(face.vertices.map((v) => oldToNew[v.index])))
+    .filter((vIndices) => vIndices.length >= 3)
 
   // remove extraneous vertices
   return removeExtraneousVertices(polyhedron.withFaces(newFaces))
@@ -212,7 +212,7 @@ export default function makeOperation<Options extends {}>(
     hasOptions(polyhedron) {
       const relations = getOpResults(polyhedron, name)
       if (isEmpty(relations)) return false
-      const isChiral = relations.find(rel => rel.chiral)
+      const isChiral = relations.find((rel) => rel.chiral)
       // TODO maybe split up among operations?
       // but I think that might just grow the code...
       switch (name) {

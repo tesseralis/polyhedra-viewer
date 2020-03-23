@@ -25,12 +25,12 @@ function applyGyrate(polyhedron: Polyhedron, { cap }: Options) {
     i,
   ])
 
-  const mockPolyhedron = polyhedron.withChanges(solid =>
-    solid.addVertices(boundary.vertices).mapFaces(face => {
+  const mockPolyhedron = polyhedron.withChanges((solid) =>
+    solid.addVertices(boundary.vertices).mapFaces((face) => {
       if (face.inSet(cap.faces())) {
         return face
       }
-      return face.vertices.map(v => {
+      return face.vertices.map((v) => {
         return v.inSet(boundary.vertices)
           ? polyhedron.numVertices() + oldToNew[v.index]
           : v.index
@@ -40,8 +40,10 @@ function applyGyrate(polyhedron: Polyhedron, { cap }: Options) {
 
   const endVertices = getTransformedVertices(
     [cap],
-    p =>
-      withOrigin(p.normalRay(), v => v.getRotatedAroundAxis(p.normal(), theta)),
+    (p) =>
+      withOrigin(p.normalRay(), (v) =>
+        v.getRotatedAroundAxis(p.normal(), theta),
+      ),
     mockPolyhedron.vertices,
   )
 
@@ -69,7 +71,7 @@ export const gyrate = makeOperation("gyrate", {
       options.direction = getGyrateDirection(cap)
       if (
         relations.filter(
-          relation =>
+          (relation) =>
             relation.direction === options.direction && !!relation.align,
         ).length > 1
       ) {
@@ -80,7 +82,7 @@ export const gyrate = makeOperation("gyrate", {
   },
 
   allOptionCombos(polyhedron) {
-    return Cap.getAll(polyhedron).map(cap => ({ cap }))
+    return Cap.getAll(polyhedron).map((cap) => ({ cap }))
   },
 
   hitOption: "cap",
@@ -90,8 +92,8 @@ export const gyrate = makeOperation("gyrate", {
   },
 
   faceSelectionStates(polyhedron, { cap }) {
-    const allCapFaces = Cap.getAll(polyhedron).flatMap(cap => cap.faces())
-    return polyhedron.faces.map(face => {
+    const allCapFaces = Cap.getAll(polyhedron).flatMap((cap) => cap.faces())
+    return polyhedron.faces.map((face) => {
       if (cap instanceof Cap && face.inSet(cap.faces())) return "selected"
       if (face.inSet(allCapFaces)) return "selectable"
       return undefined

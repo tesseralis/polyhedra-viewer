@@ -74,7 +74,7 @@ export default memo(function SearchBar({ value, onChange }: Props) {
     <label {...css()}>
       <SearchInput
         value={value}
-        onChange={e => onChange(e.target.value)}
+        onChange={(e) => onChange(e.target.value)}
         onFocus={() => setFocus(true)}
         onBlur={() => setFocus(false)}
       />

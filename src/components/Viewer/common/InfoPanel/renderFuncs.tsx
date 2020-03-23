@@ -125,16 +125,16 @@ interface Properties {
 }
 
 const properties: Properties[] = [
-  { name: "deltahedron", check: p => p.isDeltahedron() },
-  { name: "chiral", check: p => p.info.isChiral() },
-  { name: "honeycomb", check: p => p.info.isHoneycomb() },
-  { name: "quasiregular", check: p => p.info.isQuasiRegular() },
+  { name: "deltahedron", check: (p) => p.isDeltahedron() },
+  { name: "chiral", check: (p) => p.info.isChiral() },
+  { name: "honeycomb", check: (p) => p.info.isHoneycomb() },
+  { name: "quasiregular", check: (p) => p.info.isQuasiRegular() },
 ]
 
 export function displayProperties({ polyhedron }: RenderProps) {
-  const filteredProps = properties.filter(property =>
+  const filteredProps = properties.filter((property) =>
     property.check(polyhedron),
   )
 
-  return <>{filteredProps.map(prop => prop.name).join(", ") || "--"}</>
+  return <>{filteredProps.map((prop) => prop.name).join(", ") || "--"}</>
 }

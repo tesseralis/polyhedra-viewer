@@ -9,14 +9,14 @@ import { mapObject, getCyclic } from "utils"
  */
 export function removeExtraneousVertices(polyhedron: Polyhedron) {
   // Vertex indices to remove
-  const vertsInFaces = polyhedron.faces.flatMap(f => f.vertices)
-  const toRemove = polyhedron.vertices.filter(v => !v.inSet(vertsInFaces))
+  const vertsInFaces = polyhedron.faces.flatMap((f) => f.vertices)
+  const toRemove = polyhedron.vertices.filter((v) => !v.inSet(vertsInFaces))
   const numToRemove = toRemove.length
 
   // Map the `numToRemove` last vertices of the polyhedron (that don't overlap)
   // to the first few removed vertices
   const notToRemove = takeRight(polyhedron.vertices, numToRemove).filter(
-    v => !v.inSet(toRemove),
+    (v) => !v.inSet(toRemove),
   )
   const newToOld = mapObject(notToRemove, (v, i) => [
     v.index,
@@ -26,15 +26,17 @@ export function removeExtraneousVertices(polyhedron: Polyhedron) {
 
   const newVertices = dropRight(
     polyhedron.vertices.map(
-      v => polyhedron.vertices[(oldToNew[v.index] as any) ?? v.index],
+      (v) => polyhedron.vertices[(oldToNew[v.index] as any) ?? v.index],
     ),
     numToRemove,
   )
 
-  return polyhedron.withChanges(solid =>
+  return polyhedron.withChanges((solid) =>
     solid
       .withVertices(newVertices)
-      .mapFaces(face => face.vertices.map(v => newToOld[v.index] ?? v.index)),
+      .mapFaces((face) =>
+        face.vertices.map((v) => newToOld[v.index] ?? v.index),
+      ),
   )
 }
 
@@ -86,7 +88,7 @@ export function expandEdges(
   twist?: Twist,
 ) {
   // Collect the list of vertices that are connected to the extruding edges
-  const vertsToDupe = polyhedron.vertices.map<Edge[]>(v => [])
+  const vertsToDupe = polyhedron.vertices.map<Edge[]>((v) => [])
   for (const edge of edges) {
     vertsToDupe[edge.v1.index].push(edge)
     vertsToDupe[edge.v2.index].push(edge.twin())
@@ -96,10 +98,10 @@ export function expandEdges(
   const newFaces: number[][] = []
 
   // Keep track of the new vIndices that each face and edge should be mapped to
-  const v2fMap = polyhedron.faces.map<number[][]>(f => [])
-  const v2eMap = polyhedron.vertices.map<[number, number][]>(v => [])
+  const v2fMap = polyhedron.faces.map<number[][]>((f) => [])
+  const v2eMap = polyhedron.vertices.map<[number, number][]>((v) => [])
 
-  const newVertices = polyhedron.vertices.map(v => v.vec)
+  const newVertices = polyhedron.vertices.map((v) => v.vec)
   // create a new vertex and return its index
   function newVertex(value: Vertex) {
     newVertices.push(value.vec)
@@ -109,7 +111,7 @@ export function expandEdges(
   // For each changed vertex:
   // 1. duplicate it some number of times
   // 2. keep track of the edges/faces that are mapped to it
-  vertsToDupe.forEach(edges => {
+  vertsToDupe.forEach((edges) => {
     // If the vertex isn't associated with any edges, do nothing
     if (!edges.length) return
 
@@ -191,14 +193,14 @@ export function expandEdges(
     }
   })
 
-  return polyhedron.withChanges(solid =>
+  return polyhedron.withChanges((solid) =>
     solid
       .withVertices(newVertices)
-      .mapFaces(f =>
-        f.vertices.flatMap(v => v2fMap[f.index][v.index] ?? v.index),
+      .mapFaces((f) =>
+        f.vertices.flatMap((v) => v2fMap[f.index][v.index] ?? v.index),
       )
       .addFaces(
-        edges.flatMap(e => {
+        edges.flatMap((e) => {
           const { v1, v2 } = e
           return getEdgeFaces(
             [...v2eMap[v1.index][v2.index], ...v2eMap[v2.index][v1.index]],
