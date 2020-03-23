@@ -91,6 +91,7 @@ export default function getSymmetry(structure: Structure): Symmetry {
           return Cyclic.get(3)
         }
       }
+      // FIXME
       throw new Error("laksdjfaskdjf")
     },
     modifiedAntiprism({ base, operation }) {
@@ -108,6 +109,7 @@ export default function getSymmetry(structure: Structure): Symmetry {
       return elementaryMapping[base]
     },
     default() {
+      // FIXME
       throw new Error("unsupported")
     },
   })
