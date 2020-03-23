@@ -5,7 +5,8 @@ import type Composite from "./Composite"
 import type ModifiedAntiprism from "./ModifiedAntiprism"
 import Elementary from "./Elementary"
 import getSymmetry from "./getSymmetry"
-import { Symmetry } from "../symmetry/Symmetry"
+import getName from "./getName"
+import type { Symmetry } from "../symmetry/Symmetry"
 
 interface StructureVisitor<Result> {
   exceptional?(data: Exceptional["data"]): Result
@@ -24,6 +25,10 @@ export default abstract class Structure<Data extends {} = {}> {
   constructor(type: string, data: Data) {
     this.type = type
     this.data = data
+  }
+
+  name(): string {
+    return getName(this)
   }
 
   symmetry(): Symmetry {

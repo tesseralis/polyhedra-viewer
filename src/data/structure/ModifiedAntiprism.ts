@@ -3,7 +3,7 @@ import Prismatic from "./Prismatic"
 
 interface ModifiedAntiprismData {
   base: Prismatic
-  operation: null | "rectify" | "snub"
+  operation: null | "rectified" | "snub"
 }
 
 export default class ModifiedAntiprism extends Structure<
