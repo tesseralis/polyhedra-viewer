@@ -1,9 +1,9 @@
-import Structure from "../Structure"
+import getStructure from "../getStructure"
 import getSymmetry from "../getSymmetry"
 
 describe("getSymmetry", () => {
   function expectSymmetry(solid: string, expected: string) {
-    expect(getSymmetry(Structure.withName(solid)).symbolStr()).toEqual(expected)
+    expect(getSymmetry(getStructure(solid)).symbolStr()).toEqual(expected)
   }
 
   describe("Platonic and Archimedean solids", () => {
@@ -67,7 +67,7 @@ describe("getSymmetry", () => {
       expectSymmetry("augmented pentagonal prism", "C_2v")
     })
 
-    it("works on biaugmanted", () => {
+    it("works on biaugmented", () => {
       expectSymmetry("biaugmented pentagonal prism", "C_2v")
       expectSymmetry("parabiaugmented hexagonal prism", "D_2h")
     })

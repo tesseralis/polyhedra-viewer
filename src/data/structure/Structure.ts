@@ -1,23 +1,14 @@
-import Exceptional from "./Exceptional"
-import Prismatic from "./Prismatic"
-import Capstone from "./Capstone"
-import Composite from "./Composite"
-import ModifiedAntiprism from "./ModifiedAntiprism"
-import Elementary from "./Elementary"
+import type Exceptional from "./Exceptional"
+import type Prismatic from "./Prismatic"
+import type Capstone from "./Capstone"
+import type Composite from "./Composite"
+import type ModifiedAntiprism from "./ModifiedAntiprism"
+import type Elementary from "./Elementary"
 import getSymmetry from "./getSymmetry"
 import getName from "./getName"
 import getConwaySymbol from "./getConwaySymbol"
 import type { Symmetry } from "../symmetry/Symmetry"
 import { getAlternateNames, getCanonicalName } from "../alternates"
-
-const subclasses = [
-  Exceptional,
-  Prismatic,
-  Capstone,
-  Composite,
-  ModifiedAntiprism,
-  Elementary,
-]
 
 interface StructureVisitor<Result> {
   exceptional?(data: Exceptional["data"]): Result
@@ -36,15 +27,6 @@ export default abstract class Structure<Data extends {} = {}> {
   constructor(type: string, data: Data) {
     this.type = type
     this.data = data
-  }
-
-  static withName(name: string) {
-    for (const Subclass of subclasses) {
-      if (Subclass.query.hasName(name)) {
-        return Subclass.query.withName(name)
-      }
-    }
-    throw new Error(`Could not find structure with canonical name ${name}`)
   }
 
   name(): string {
@@ -161,7 +143,7 @@ export default abstract class Structure<Data extends {} = {}> {
       return visitor.elementary(this.data)
     }
     if (!visitor.default) {
-      throw new Error("Incorrect case")
+      throw new Error("No default provided")
     }
     return visitor.default()
   }

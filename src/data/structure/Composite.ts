@@ -51,7 +51,7 @@ function limitCount<N extends number>(counts: N[], limit: number) {
  */
 export default class Composite extends Structure<CompositeData> {
   constructor(data: CompositeData) {
-    super("modified", data)
+    super("composite", data)
   }
 
   static *getAll() {
