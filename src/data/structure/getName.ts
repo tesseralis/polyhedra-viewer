@@ -8,6 +8,7 @@ const countPrefixes: Record<Exclude<Count, 0>, string> = {
   2: "bi",
   3: "tri",
 }
+
 export function countString(count: Count, base: string) {
   if (count === 0) return ""
   return countPrefixes[count] + base
@@ -21,6 +22,7 @@ export function prefix(prefix: string = "", rest: string) {
   return `${prefix}${rest}`
 }
 
+// FIXME inherit from the ./common
 const rectifiedNames: Record<3 | 4 | 5, string> = {
   3: "tetratetrahedron",
   4: "cuboctahedron",
