@@ -97,7 +97,7 @@ export default function getSymmetry(structure: Structure): Symmetry {
     modifiedAntiprism({ base, operation }) {
       const { base: basePolygon } = base.data
       switch (operation) {
-        case "rectify":
+        case "rectified":
           return Dihedral.get(basePolygon, "prism")
         case "snub":
           return Dihedral.get(basePolygon, "antiprism")
