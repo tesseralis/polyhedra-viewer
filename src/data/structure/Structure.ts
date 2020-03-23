@@ -6,6 +6,7 @@ import type ModifiedAntiprism from "./ModifiedAntiprism"
 import Elementary from "./Elementary"
 import getSymmetry from "./getSymmetry"
 import getName from "./getName"
+import getConwaySymbol from "./getConwaySymbol"
 import type { Symmetry } from "../symmetry/Symmetry"
 import { getCanonicalName } from "../alternates"
 
@@ -38,6 +39,60 @@ export default abstract class Structure<Data extends {} = {}> {
 
   symmetry(): Symmetry {
     return getSymmetry(this)
+  }
+
+  conwaySymbol(): string {
+    return getConwaySymbol(this)
+  }
+
+  group() {
+    return this.visit({
+      exceptional: ({ operation }) =>
+        operation === "regular" ? "Platonic solid" : "Archimedean solid",
+      prismatic: ({ type }) => type,
+      default: () => "Johnson solid",
+    })
+  }
+
+  isRegular() {
+    return this.visit({
+      exceptional: ({ operation }) => operation === "regular",
+      default: () => false,
+    })
+  }
+
+  isQuasiRegular() {
+    return this.visit({
+      exceptional: ({ operation }) => operation === "rectify",
+      default: () => false,
+    })
+  }
+
+  isUniform() {
+    return this.visit({
+      exceptional: () => true,
+      prismatic: () => true,
+      default: () => false,
+    })
+  }
+
+  isChiral() {
+    return this.visit({
+      exceptional: ({ operation }) => operation === "snub",
+      capstone: ({ elongation, count, type }) =>
+        elongation === "antiprism" && count == 2 && type !== "pyramid",
+      default: () => false,
+    })
+  }
+
+  isHoneycomb() {
+    return [
+      "cube",
+      "truncated octahedron",
+      "triangular prism",
+      "hexagonal prism",
+      "gyrobifastigium",
+    ].includes(this.canonicalName())
   }
 
   isExceptional(): this is Exceptional {
