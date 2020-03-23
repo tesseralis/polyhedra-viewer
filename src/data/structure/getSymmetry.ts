@@ -1,4 +1,4 @@
-import { Symmetry, Polyhedral, Cyclic, Dihedral } from "../symmetry/Symmetry"
+import { Symmetry, Polyhedral, Cyclic, Dihedral } from "../symmetry"
 import type Structure from "./Structure"
 
 const elementaryMapping: Record<string, Symmetry> = {
