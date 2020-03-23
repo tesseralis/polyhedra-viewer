@@ -1,9 +1,10 @@
 import Structure from "./Structure"
+import Queries from "./Queries"
 import { polygons, Polygon } from "../polygons"
 import { prismaticTypes, PrismaticType, DataOptions } from "./common"
 
 interface PrismaticData {
-  base: Polygon
+  base: 2 | Polygon
   type: PrismaticType
 }
 
@@ -24,8 +25,12 @@ export default class Prismatic extends Structure<PrismaticData> {
   static *getAll() {
     for (const base of options.base) {
       for (const type of options.type) {
+        // The digonal prism is just a square, so skip
+        if (base === 2 && type === "prism") continue
         yield new Prismatic({ base, type })
       }
     }
   }
+
+  static query = new Queries(Prismatic.getAll())
 }

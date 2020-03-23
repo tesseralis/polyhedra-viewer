@@ -40,7 +40,7 @@ export default function getSymmetry(structure: Structure): Symmetry {
         return Dihedral.get(base, reflection)
       }
     },
-    composite({ augmented, gyrate, diminished, base, align }) {
+    composite({ augmented = 0, gyrate = 0, diminished = 0, base, align }) {
       const count = augmented + gyrate + diminished
       const pure =
         count === augmented || count === diminished || count === gyrate

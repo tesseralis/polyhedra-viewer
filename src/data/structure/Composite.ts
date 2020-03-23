@@ -15,13 +15,33 @@ interface CompositeData {
   align?: "meta" | "para"
 }
 
+const prismaticBases = Prismatic.query.where(
+  ({ type, base }) => type === "prism" && base <= 6,
+)
+const augmentedExceptionalBases = Exceptional.query.where(
+  ({ operation, facet }) =>
+    ["regular", "truncated"].includes(operation) && facet !== "vertex",
+)
+const icosahedron = Exceptional.query.withName("icosahedron")
+const rhombicosidodecahedron = Exceptional.query.withName(
+  "rhombicosidodecahedron",
+)
+
 const options: DataOptions<CompositeData> = {
-  // FIXME only allow the bases that are valid
-  base: [...Exceptional.getAll(), ...Prismatic.getAll()],
+  base: [
+    ...prismaticBases,
+    ...augmentedExceptionalBases,
+    icosahedron,
+    rhombicosidodecahedron,
+  ],
   augmented: counts,
   diminished: counts,
   gyrate: counts,
   align: ["meta", "para"],
+}
+
+function limitCount<N extends number>(counts: N[], limit: number) {
+  return counts.filter((n) => n <= limit)
 }
 
 /**
@@ -34,10 +54,72 @@ export default class Composite extends Structure<CompositeData> {
   }
 
   static *getAll() {
-    // FIXME fill in with more stuff
-    for (const base of options.base) {
-      yield new Composite({ base })
+    // Augmented prisms
+    for (const base of prismaticBases) {
+      for (const augmented of limitCount(
+        options.augmented,
+        base.data.base % 3 === 0 ? 3 : 2,
+      )) {
+        if (base.data.base === 6 && augmented === 2) {
+          for (const align of options.align) {
+            yield new Composite({ base, augmented, align })
+          }
+        } else {
+          yield new Composite({ base, augmented })
+        }
+      }
     }
-    // probably handle augment, diminish and rhombicos seperately
+
+    // Augmented exceptional polyhedra
+    for (const base of augmentedExceptionalBases) {
+      for (const augmented of limitCount(
+        options.augmented,
+        base.data.family - 2,
+      )) {
+        if (base.data.family === 5 && augmented === 2) {
+          for (const align of options.align) {
+            yield new Composite({ base, augmented, align })
+          }
+        } else {
+          yield new Composite({ base, augmented })
+        }
+      }
+    }
+
+    // TODO add more diminished and gyrate polyhedra
+
+    // diminished icosahedra
+    for (const diminished of options.diminished) {
+      if (diminished === 2) {
+        for (const align of options.align) {
+          yield new Composite({ base: icosahedron, diminished, align })
+        }
+      } else {
+        yield new Composite({ base: icosahedron, diminished })
+      }
+    }
+    yield new Composite({ base: icosahedron, diminished: 3, augmented: 1 })
+
+    // rhombicosidodecahedra
+    for (const gyrate of options.gyrate) {
+      for (const diminished of limitCount(options.diminished, 3 - gyrate)) {
+        if (gyrate + diminished === 2) {
+          for (const align of options.align) {
+            yield new Composite({
+              base: rhombicosidodecahedron,
+              gyrate,
+              diminished,
+              align,
+            })
+          }
+        } else {
+          yield new Composite({
+            base: rhombicosidodecahedron,
+            gyrate,
+            diminished,
+          })
+        }
+      }
+    }
   }
 }

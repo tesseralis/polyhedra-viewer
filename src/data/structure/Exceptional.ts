@@ -1,5 +1,6 @@
 import Structure from "./Structure"
 import { DataOptions } from "./common"
+import Queries from "./Queries"
 
 // FIXME type this with polygon
 type Family = 3 | 4 | 5
@@ -49,13 +50,5 @@ export default class Exceptional extends Structure<ExceptionalData> {
     }
   }
 
-  // FIXME this should be the same method on all the subclasses
-  static fromCanonicalName(name: string) {
-    for (const item of this.getAll()) {
-      if (item.canonicalName() === name) {
-        return item
-      }
-    }
-    throw new Error(`Unable to find member with name ${name}`)
-  }
+  static query = new Queries(Exceptional.getAll())
 }

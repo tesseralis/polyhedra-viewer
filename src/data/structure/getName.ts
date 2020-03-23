@@ -72,9 +72,9 @@ export default function getName(structure: Structure): string {
       return prefix(
         align,
         wordJoin(
-          countString(augmented, "augmented"),
-          countString(gyrate, "gyrate"),
-          countString(diminished, "diminished"),
+          countString(augmented ?? 0, "augmented"),
+          countString(gyrate ?? 0, "gyrate"),
+          countString(diminished ?? 0, "diminished"),
           base.name(),
         ),
       )

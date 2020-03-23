@@ -8,8 +8,9 @@ interface ModifiedAntiprismData {
 }
 
 const options: DataOptions<ModifiedAntiprismData> = {
-  // FIXME we only want to filter it so that only antiprisms n<5 are counted
-  base: [...Prismatic.getAll()],
+  base: Prismatic.query.where(
+    ({ base, type }) => type === "antiprism" && base <= 5,
+  ),
   operation: [null, "rectified", "snub"],
 }
 
