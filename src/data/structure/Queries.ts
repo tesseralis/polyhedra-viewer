@@ -4,23 +4,31 @@ import type Structure from "./Structure"
 // TODO create a mapping and use it when filtering for names
 export default class Queries<S extends Structure> {
   entries: S[]
+  nameMapping: Map<string, S[]>
   constructor(entries: Iterable<S>) {
     this.entries = [...entries]
+    this.nameMapping = new Map()
+    for (const entry of this.entries) {
+      const name = entry.canonicalName()
+      if (!this.nameMapping.has(name)) {
+        this.nameMapping.set(name, [])
+      }
+      this.nameMapping.set(name, [...this.nameMapping.get(name)!, entry])
+    }
   }
 
   hasName(name: string) {
-    return some(this.entries, (entry) => entry.canonicalName() === name)
+    return this.nameMapping.has(name)
   }
 
   /**
    * Get the entry with the given canonical name.
    */
   withName(name: string) {
-    const entry = this.entries.find((entry) => entry.canonicalName() === name)
-    if (!entry) {
+    if (!this.nameMapping.has(name)) {
       throw new Error(`Could not find entry with canonical name ${name}`)
     }
-    return entry
+    return this.nameMapping.get(name)![0]
   }
 
   where(filter: (data: S["data"]) => boolean) {
@@ -29,7 +37,7 @@ export default class Queries<S extends Structure> {
 
   hasNameWhere(name: string, filter: (data: S["data"]) => boolean) {
     return some(
-      this.entries,
+      this.nameMapping.get(name)!,
       (entry) => entry.canonicalName() === name && filter(entry.data),
     )
   }
