@@ -6,7 +6,7 @@ type ElementaryBase =
   | "sphenocorona"
   | "augmented sphenocorona"
   | "sphenomegacorona"
-  | "hebesphenomegacoron"
+  | "hebesphenomegacorona"
   | "disphenocingulum"
   | "bilunabirotunda"
   | "triangular hebesphenorotunda"
@@ -20,7 +20,7 @@ const options: DataOptions<ElementaryData> = {
     "sphenocorona",
     "augmented sphenocorona",
     "sphenomegacorona",
-    "hebesphenomegacoron",
+    "hebesphenomegacorona",
     "disphenocingulum",
     "bilunabirotunda",
     "triangular hebesphenorotunda",

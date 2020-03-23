@@ -59,13 +59,12 @@ export default function getSymmetry(structure: Structure): Symmetry {
         }
 
         case 2: {
-          // FIXME support all the nonessential types of augmented/diminished/gyrate solids
           if (base.type === "prismatic") {
             // para-augmented prisms have digonal prismatic symmetry
             // meta-augmented prisms have biradial symmetry
             return align === "para" ? Dihedral.get(2, "prism") : Cyclic.biradial
           } else {
-            const basePolygon = (base.data as any).base
+            const basePolygon = (base.data as any).family
             if (basePolygon === 4) {
               return Dihedral.get(4, "prism")
             }
@@ -97,8 +96,8 @@ export default function getSymmetry(structure: Structure): Symmetry {
     modifiedAntiprism({ base, operation }) {
       const { base: basePolygon } = base.data
       switch (operation) {
-        case "rectified":
-          return Dihedral.get(basePolygon, "prism")
+        // case "rectified":
+        //   return Dihedral.get(basePolygon, "prism")
         case "snub":
           return Dihedral.get(basePolygon, "antiprism")
         default:

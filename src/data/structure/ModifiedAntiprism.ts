@@ -5,14 +5,15 @@ import { DataOptions } from "./common"
 
 interface ModifiedAntiprismData {
   base: Prismatic
-  operation: null | "rectified" | "snub"
+  // operation: null | "rectified" | "snub"
+  operation: null | "snub"
 }
 
 const options: DataOptions<ModifiedAntiprismData> = {
   base: Prismatic.query.where(
     ({ base, type }) => type === "antiprism" && base <= 5,
   ),
-  operation: [null, "rectified", "snub"],
+  operation: [null, "snub"],
 }
 
 export default class ModifiedAntiprism extends Structure<

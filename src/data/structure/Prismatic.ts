@@ -9,7 +9,7 @@ interface PrismaticData {
 }
 
 const options: DataOptions<PrismaticData> = {
-  base: polygons,
+  base: [2, ...polygons],
   type: prismaticTypes,
 }
 

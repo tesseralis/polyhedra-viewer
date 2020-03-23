@@ -30,6 +30,9 @@ export default abstract class Structure<Data extends {} = {}> {
   }
 
   name(): string {
+    if (getName(this) === "biaugmented hexagonal prism") {
+      console.log(this.data, getName(this))
+    }
     return getName(this)
   }
 

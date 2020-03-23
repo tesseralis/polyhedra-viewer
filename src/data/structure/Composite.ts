@@ -21,7 +21,7 @@ const prismaticBases = Prismatic.query.where(
 )
 const augmentedExceptionalBases = Exceptional.query.where(
   ({ operation, facet }) =>
-    ["regular", "truncated"].includes(operation) && facet !== "vertex",
+    ["regular", "truncate"].includes(operation) && facet !== "vertex",
 )
 const icosahedron = Exceptional.query.withName("icosahedron")
 const rhombicosidodecahedron = Exceptional.query.withName(

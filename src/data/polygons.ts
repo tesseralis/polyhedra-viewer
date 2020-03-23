@@ -22,5 +22,5 @@ export const polygonPrefixes = bimap({
   10: "decagonal",
 })
 
-export const polygons = polygonNames.keys()
-export type Polygon = typeof polygons[0]
+export type Polygon = 3 | 4 | 5 | 6 | 8 | 10
+export const polygons: Polygon[] = [3, 4, 5, 6, 8, 10]
