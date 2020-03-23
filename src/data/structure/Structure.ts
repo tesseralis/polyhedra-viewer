@@ -7,6 +7,7 @@ import Elementary from "./Elementary"
 import getSymmetry from "./getSymmetry"
 import getName from "./getName"
 import type { Symmetry } from "../symmetry/Symmetry"
+import { getCanonicalName } from "../alternates"
 
 interface StructureVisitor<Result> {
   exceptional?(data: Exceptional["data"]): Result
@@ -29,6 +30,10 @@ export default abstract class Structure<Data extends {} = {}> {
 
   name(): string {
     return getName(this)
+  }
+
+  canonicalName() {
+    return getCanonicalName(this.name())
   }
 
   symmetry(): Symmetry {
