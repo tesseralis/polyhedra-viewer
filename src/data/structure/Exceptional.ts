@@ -1,4 +1,5 @@
 import Structure from "./Structure"
+import { DataOptions } from "./common"
 
 // FIXME type this with polygon
 type Family = 3 | 4 | 5
@@ -17,6 +18,12 @@ interface ExceptionalData {
   operation: Operation
 }
 
+const options: DataOptions<ExceptionalData> = {
+  family: [3, 4, 5],
+  facet: ["face", "vertex"],
+  operation: ["regular", "truncate", "rectify", "bevel", "cantellate", "snub"],
+}
+
 /**
  * An exceptional uniform polyhedron is a Platonic or Archimedean solid.
  *
@@ -26,5 +33,29 @@ interface ExceptionalData {
 export default class Exceptional extends Structure<ExceptionalData> {
   constructor(data: ExceptionalData) {
     super("exceptional", data)
+  }
+
+  static *getAll() {
+    for (const operation of options.operation) {
+      for (const family of options.family) {
+        if (family !== 3 && ["regular", "truncate"].includes(operation)) {
+          for (const facet of options.facet) {
+            yield new Exceptional({ family, operation, facet })
+          }
+        } else {
+          yield new Exceptional({ family, operation })
+        }
+      }
+    }
+  }
+
+  // FIXME this should be the same method on all the subclasses
+  static fromCanonicalName(name: string) {
+    for (const item of this.getAll()) {
+      if (item.canonicalName() === name) {
+        return item
+      }
+    }
+    throw new Error(`Unable to find member with name ${name}`)
   }
 }

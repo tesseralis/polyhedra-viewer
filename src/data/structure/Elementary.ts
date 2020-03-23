@@ -1,4 +1,5 @@
 import Structure from "./Structure"
+import { DataOptions } from "./common"
 
 type ElementaryBase =
   | "sphenocorona"
@@ -13,8 +14,26 @@ interface ElementaryData {
   base: ElementaryBase
 }
 
+const options: DataOptions<ElementaryData> = {
+  base: [
+    "sphenocorona",
+    "augmented sphenocorona",
+    "sphenomegacorona",
+    "hebesphenomegacoron",
+    "disphenocingulum",
+    "bilunabirotunda",
+    "triangular hebesphenorotunda",
+  ],
+}
+
 export default class Elementary extends Structure<ElementaryData> {
   constructor(data: ElementaryData) {
     super("elementary", data)
+  }
+
+  static *getAll() {
+    for (const base of options.base) {
+      yield new Elementary({ base })
+    }
   }
 }
