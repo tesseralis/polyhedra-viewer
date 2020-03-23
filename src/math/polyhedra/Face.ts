@@ -12,7 +12,7 @@ export default class Face extends FaceLike {
 
   constructor(polyhedron: Polyhedron, index: FIndex) {
     const value = polyhedron._solidData.faces[index]
-    const vertices = value.map(vIndex => polyhedron.vertices[vIndex])
+    const vertices = value.map((vIndex) => polyhedron.vertices[vIndex])
     const edges = vertices.map(
       (v, i) => new Edge(v, getCyclic(vertices, i + 1)),
     )
@@ -29,12 +29,16 @@ export default class Face extends FaceLike {
   }
 
   inSet(faces: Face[]) {
-    return some(faces, face => this.equals(face))
+    return some(faces, (face) => this.equals(face))
   }
 
   /** Return the set of faces that share a vertex to this face (including itself) */
   vertexAdjacentFaces() {
-    return flatMapUniq(this.vertices, vertex => vertex.adjacentFaces(), "index")
+    return flatMapUniq(
+      this.vertices,
+      (vertex) => vertex.adjacentFaces(),
+      "index",
+    )
   }
 
   /** Return adjacent faces counted by number of sides */

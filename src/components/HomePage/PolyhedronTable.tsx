@@ -47,7 +47,7 @@ const ColumnHeaders = ({ columns }: Pick<Table, "columns">) => {
         {columns.flatMap((col, j) =>
           typeof col === "string"
             ? [<th key={j} />]
-            : col.sub.map(subCol => <Th key={`${j}-${subCol}`}>{subCol}</Th>),
+            : col.sub.map((subCol) => <Th key={`${j}-${subCol}`}>{subCol}</Th>),
         )}
       </tr>
       {/* Render the main column headers, making sure to span more than one column for those with subcolumns */}

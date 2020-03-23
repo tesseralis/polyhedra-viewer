@@ -9,7 +9,7 @@
     "file-loader": "^6.0.0",
     "husky": "^4.2.3",
     "lint-staged": "^10.0.8",
-    "prettier": "^1.19.1",
+    "prettier": "^2.0.1",
     "react-scripts": "^3.4.1"
   },
   "dependencies": {

@@ -23,7 +23,7 @@ export function normalizeVertex(v: VertexArg) {
 
 function normalizeFace(face: FaceArg) {
   if (Array.isArray(face)) {
-    return face.map(v => {
+    return face.map((v) => {
       if (typeof v === "number") return v
       return v.index
     })
@@ -77,15 +77,15 @@ export default class Builder {
     const removed = [...this.solidData.faces]
     pullAt(
       removed,
-      faces.map(f => f.index),
+      faces.map((f) => f.index),
     )
     return this.withFaces(removed)
   }
 
   addPolyhedron(other: Polyhedron) {
     return this.addVertices(other.vertices).addFaces(
-      other.faces.map(face =>
-        face.vertices.map(v => v.index + this.polyhedron.numVertices()),
+      other.faces.map((face) =>
+        face.vertices.map((v) => v.index + this.polyhedron.numVertices()),
       ),
     )
   }

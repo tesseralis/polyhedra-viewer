@@ -22,7 +22,9 @@ import Builder from "./SolidBuilder"
 import { VertexArg, FaceArg } from "./SolidBuilder"
 
 function calculateEdges(faces: Face[]) {
-  return faces.flatMap(face => face.edges).filter(e => e.v1.index < e.v2.index)
+  return faces
+    .flatMap((face) => face.edges)
+    .filter((e) => e.v1.index < e.v2.index)
 }
 
 export default class Polyhedron {
@@ -56,7 +58,7 @@ export default class Polyhedron {
 
   get solidData() {
     if (!this._solidData.edges) {
-      this._solidData.edges = this.edges.map(e => e.value)
+      this._solidData.edges = this.edges.map((e) => e.value)
     }
     return this._solidData
   }
@@ -123,7 +125,7 @@ export default class Polyhedron {
   }
 
   faceWithNumSides(n: number) {
-    const face = this.faces.find(f => f.numSides === n)
+    const face = this.faces.find((f) => f.numSides === n)
     if (!face) throw new Error(`No face of ${n} sides exists`)
     return face
   }
@@ -135,8 +137,8 @@ export default class Polyhedron {
 
   vertexConfiguration() {
     return countBy(
-      this.vertices.map(v => v.configuration()),
-      config => config.join("."),
+      this.vertices.map((v) => v.configuration()),
+      (config) => config.join("."),
     )
   }
 
@@ -149,11 +151,11 @@ export default class Polyhedron {
   }
 
   centroid() {
-    return getCentroid(this.vertices.map(v => v.vec))
+    return getCentroid(this.vertices.map((v) => v.vec))
   }
 
   surfaceArea() {
-    return sum(this.faces.map(face => face.area()))
+    return sum(this.faces.map((face) => face.area()))
   }
 
   normalizedSurfaceArea() {
@@ -162,7 +164,7 @@ export default class Polyhedron {
 
   volume() {
     return sum(
-      this.faces.map(face => (face.area() * face.distanceToCenter()) / 3),
+      this.faces.map((face) => (face.area() * face.distanceToCenter()) / 3),
     )
   }
 
@@ -178,7 +180,7 @@ export default class Polyhedron {
 
   /** Get the face that is closest to the given point. */
   hitFace(point: Vec3D) {
-    return minBy(this.faces, face => face.plane().getDistanceToPoint(point))!
+    return minBy(this.faces, (face) => face.plane().getDistanceToPoint(point))!
   }
 
   // Mutations
@@ -195,30 +197,30 @@ export default class Polyhedron {
   // TODO support all the solid builder functions
   // return a new polyhedron with the given vertices
   withVertices(vertices: VertexArg[]) {
-    return this.withChanges(s => s.withVertices(vertices))
+    return this.withChanges((s) => s.withVertices(vertices))
   }
 
   withFaces(faces: FaceArg[]) {
-    return this.withChanges(s => s.withFaces(faces))
+    return this.withChanges((s) => s.withFaces(faces))
   }
 
   withoutFaces(faces: Face[]) {
-    return this.withChanges(s => s.withoutFaces(faces))
+    return this.withChanges((s) => s.withoutFaces(faces))
   }
 
   addPolyhedron(other: Polyhedron) {
-    return this.withChanges(s => s.addPolyhedron(other))
+    return this.withChanges((s) => s.addPolyhedron(other))
   }
 
   /** Center the polyhedron on its centroid. */
   center() {
     const centroid = this.centroid()
-    return this.withVertices(this.vertices.map(v => v.vec.sub(centroid)))
+    return this.withVertices(this.vertices.map((v) => v.vec.sub(centroid)))
   }
 
   normalizeToVolume(volume: number) {
     const scale = Math.cbrt(volume / this.volume())
-    return this.withVertices(this.vertices.map(v => v.vec.scale(scale)))
+    return this.withVertices(this.vertices.map((v) => v.vec.scale(scale)))
   }
 
   isDeltahedron() {
@@ -227,13 +229,13 @@ export default class Polyhedron {
   }
 
   faceAdjacencyList() {
-    const faceAdjacencyCounts = this.faces.map(face => ({
+    const faceAdjacencyCounts = this.faces.map((face) => ({
       n: face.numSides,
       adj: face.adjacentFaceCounts(),
     }))
     return sortBy(
       faceAdjacencyCounts,
-      ["n", "adj.length"].concat(polygons.map(n => `adj[${n}]`)),
+      ["n", "adj.length"].concat(polygons.map((n) => `adj[${n}]`)),
     )
   }
 

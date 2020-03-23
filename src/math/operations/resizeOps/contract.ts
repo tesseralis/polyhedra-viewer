@@ -19,7 +19,7 @@ interface Options {
 
 // Return the family of an *expanded* polyhedron
 function getFamily(polyhedron: Polyhedron) {
-  return classicals.options.family.find(family =>
+  return classicals.options.family.find((family) =>
     polyhedron.info.inClassicalTable({ family }),
   )!
 }
@@ -147,7 +147,7 @@ export const contract = makeOperation<Options>("contract", {
 
   faceSelectionStates(polyhedron, { faceType }) {
     if (isBevelled(polyhedron)) {
-      return polyhedron.faces.map(face => {
+      return polyhedron.faces.map((face) => {
         if (faceType && face.numSides === faceType) {
           return "selected"
         }
@@ -155,7 +155,7 @@ export const contract = makeOperation<Options>("contract", {
         return undefined
       })
     }
-    return polyhedron.faces.map(face => {
+    return polyhedron.faces.map((face) => {
       if (faceType && isExpandedFace(polyhedron, face, faceType))
         return "selected"
       if (isExpandedFace(polyhedron, face)) return "selectable"

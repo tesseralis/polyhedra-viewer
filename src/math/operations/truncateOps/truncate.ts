@@ -21,24 +21,24 @@ function getRectifiedMultiplier(result: string) {
 function duplicateVertices(polyhedron: Polyhedron) {
   const mapping: NestedRecord<number, number, number> = {}
   const count = polyhedron.getVertex().adjacentFaces().length
-  polyhedron.vertices.forEach(v => {
+  polyhedron.vertices.forEach((v) => {
     v.adjacentFaces().forEach((face, i) => {
       set(mapping, [face.index, v.index], i)
     })
   })
 
-  return polyhedron.withChanges(solid => {
+  return polyhedron.withChanges((solid) => {
     return solid
-      .withVertices(polyhedron.vertices.flatMap(v => repeat(v.value, count)))
-      .mapFaces(face => {
-        return face.vertices.flatMap(v => {
+      .withVertices(polyhedron.vertices.flatMap((v) => repeat(v.value, count)))
+      .mapFaces((face) => {
+        return face.vertices.flatMap((v) => {
           const base = count * v.index
           const j = mapping[face.index][v.index]
           return [base + ((j + 1) % count), base + j]
         })
       })
       .addFaces(
-        polyhedron.vertices.map(v =>
+        polyhedron.vertices.map((v) =>
           range(v.index * count, (v.index + 1) * count),
         ),
       )
@@ -57,7 +57,7 @@ type Transform = (vector: Vec3D, vertex: Vertex) => Vec3D
 
 function getTruncateTransform(polyhedron: Polyhedron, result = ""): Transform {
   if (polyhedron.info.isRegular()) {
-    return vector => vector
+    return (vector) => vector
   }
 
   // If we're doing a bevel, we need to do some fidgeting to make sure the created
@@ -75,9 +75,9 @@ function getTruncateTransform(polyhedron: Polyhedron, result = ""): Transform {
     polyhedron.smallestFace().distanceToCenter() / newSideLength
 
   return (vector, vertex) => {
-    const smallFace = vertex.adjacentFaces().find(f => f.numSides === 6)!
+    const smallFace = vertex.adjacentFaces().find((f) => f.numSides === 6)!
     const normal = polyhedron.faces[smallFace.index].normal()
-    const transform = withOrigin(smallFace.centroid(), v =>
+    const transform = withOrigin(smallFace.centroid(), (v) =>
       v
         .scale(faceResizeScale)
         .add(normal.scale(normalizedResizeAmount * newSideLength)),
@@ -93,10 +93,12 @@ function doTruncate(polyhedron: Polyhedron, rectify = false, result?: string) {
   const duplicated = duplicateVertices(polyhedron)
   const transform = getTruncateTransform(polyhedron, result)
 
-  const truncatedVertices = duplicated.vertices.map(vertex => {
+  const truncatedVertices = duplicated.vertices.map((vertex) => {
     const adjacentVertices = vertex.adjacentVertices()
     const v = vertex.vec
-    const v1 = adjacentVertices.find(adj => adj.vec.distanceTo(v) > PRECISION)!
+    const v1 = adjacentVertices.find(
+      (adj) => adj.vec.distanceTo(v) > PRECISION,
+    )!
     const truncated = v.interpolateTo(v1.vec, rectify ? 0.5 : truncateScale)
     return !!transform ? transform(truncated, vertex) : truncated
   })

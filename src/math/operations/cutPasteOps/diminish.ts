@@ -15,14 +15,14 @@ function removeCap(polyhedron: Polyhedron, cap: Cap) {
     vertex.index,
     i,
   ])
-  const mockPolyhedron = polyhedron.withChanges(s =>
+  const mockPolyhedron = polyhedron.withChanges((s) =>
     s
       .addVertices(boundary.vertices)
-      .mapFaces(face => {
+      .mapFaces((face) => {
         if (face.inSet(cap.faces())) {
           return face
         }
-        return face.vertices.map(v => {
+        return face.vertices.map((v) => {
           return v.inSet(boundary.vertices)
             ? polyhedron.numVertices() + oldToNew[v.index]
             : v.index
@@ -38,7 +38,7 @@ function removeCap(polyhedron: Polyhedron, cap: Cap) {
 
   const endVertices = getTransformedVertices(
     [cap],
-    p => boundary.centroid(),
+    (p) => boundary.centroid(),
     mockPolyhedron.vertices,
   )
 
@@ -48,7 +48,7 @@ function removeCap(polyhedron: Polyhedron, cap: Cap) {
       endVertices,
     },
     result: removeExtraneousVertices(
-      polyhedron.withChanges(s =>
+      polyhedron.withChanges((s) =>
         s.withoutFaces(cap.faces()).addFaces([cap.boundary().vertices]),
       ),
     ),
@@ -89,7 +89,7 @@ export const diminish = makeOperation<Options>("diminish", {
   },
 
   allOptionCombos(polyhedron) {
-    return Cap.getAll(polyhedron).map(cap => ({ cap }))
+    return Cap.getAll(polyhedron).map((cap) => ({ cap }))
   },
 
   hitOption: "cap",
@@ -99,8 +99,8 @@ export const diminish = makeOperation<Options>("diminish", {
   },
 
   faceSelectionStates(polyhedron, { cap }) {
-    const allCapFaces = Cap.getAll(polyhedron).flatMap(cap => cap.faces())
-    return polyhedron.faces.map(face => {
+    const allCapFaces = Cap.getAll(polyhedron).flatMap((cap) => cap.faces())
+    return polyhedron.faces.map((face) => {
       if (cap instanceof Cap && face.inSet(cap.faces())) return "selected"
       if (face.inSet(allCapFaces)) return "selectable"
       return undefined

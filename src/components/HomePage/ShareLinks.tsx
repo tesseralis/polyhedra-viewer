@@ -64,7 +64,7 @@ export default function ShareLinks() {
   return (
     <div {...css()}>
       <ShareText />
-      {links.map(link => (
+      {links.map((link) => (
         <ShareLink key={link.name} {...link} />
       ))}
     </div>

@@ -5,7 +5,7 @@ import { defaultConfig } from "./configOptions"
 type Actions = "setValue" | "reset"
 export default createHookedContext<typeof defaultConfig, Actions>(
   {
-    setValue: <T>(key: string, value: T) => state =>
+    setValue: <T>(key: string, value: T) => (state) =>
       set(cloneDeep(state), key, value),
     reset: () => () => defaultConfig,
   },

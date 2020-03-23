@@ -33,7 +33,7 @@ describe("X3dPolyhedron", () => {
     setup()
     const shape = wrapper
       .find("shape")
-      .filterWhere(n => !!n.prop("onMouseMove"))
+      .filterWhere((n) => !!n.prop("onMouseMove"))
 
     shape.simulate("mousedown", { hitPnt: [0, 0, 0] })
     shape.simulate("mouseup", { hitPnt: [0, 0, 1] })

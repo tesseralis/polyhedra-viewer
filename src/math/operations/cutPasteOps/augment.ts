@@ -29,7 +29,7 @@ const augmentees: Record<AugmentType, Record<number, string>> = {
   },
 }
 
-const augmentData = mapValues(augmentees, type =>
+const augmentData = mapValues(augmentees, (type) =>
   mapValues(type, Polyhedron.get),
 )
 
@@ -94,7 +94,7 @@ const setEquals = <T>(array1: T[], array2: T[]) =>
 
 function getBaseType(base: Face) {
   const adjacentFaces = base.adjacentFaces()
-  const adjacentFaceCounts = uniq(adjacentFaces.map(f => f.numSides))
+  const adjacentFaceCounts = uniq(adjacentFaces.map((f) => f.numSides))
   if (setEquals(adjacentFaceCounts, [3, 4])) {
     return "cupola"
   } else if (setEquals(adjacentFaceCounts, [4])) {
@@ -111,11 +111,7 @@ function getBaseType(base: Face) {
 }
 
 function getOppositePrismFace(base: Face) {
-  return base.edges[0]
-    .twin()
-    .next()
-    .next()
-    .twinFace()
+  return base.edges[0].twin().next().next().twinFace()
 }
 
 function isCupolaRotunda(baseType: string, augmentType: string) {
@@ -218,10 +214,12 @@ function doAugment(
     baseRadius,
     base.normal(),
   )
-  const transform = withOrigin(base.centroid(), u => transformMatrix.applyTo(u))
+  const transform = withOrigin(base.centroid(), (u) =>
+    transformMatrix.applyTo(u),
+  )
 
   // Scale and position the augmentee so that it lines up with the base
-  const alignedVertices = augmentee.vertices.map(v => {
+  const alignedVertices = augmentee.vertices.map((v) => {
     return v.vec
       .sub(underside.centroid())
       .scale(base.sideLength() / augmentee.edgeLength())
@@ -229,9 +227,9 @@ function doAugment(
   })
 
   // Rotate the vertices so that they align with the base
-  const rotatedVertices = alignedVertices.map(v => transform(v))
+  const rotatedVertices = alignedVertices.map((v) => transform(v))
 
-  const newAugmentee = augmentee.withChanges(s =>
+  const newAugmentee = augmentee.withChanges((s) =>
     s.withVertices(rotatedVertices).withoutFaces([underside]),
   )
 
@@ -352,7 +350,7 @@ export const augment = makeOperation<Options>("augment", {
     const gyrateOpts = hasGyrateOpts(polyhedron) ? allGyrateOpts : [undefined]
 
     const usingOpts = getUsingOpts(polyhedron) ?? [undefined]
-    const faceOpts = polyhedron.faces.filter(face => canAugment(face))
+    const faceOpts = polyhedron.faces.filter((face) => canAugment(face))
 
     const options: Options[] = []
 
@@ -383,7 +381,7 @@ export const augment = makeOperation<Options>("augment", {
   },
 
   faceSelectionStates(polyhedron, { face, using }) {
-    return polyhedron.faces.map(f => {
+    return polyhedron.faces.map((f) => {
       if (face && f.equals(face)) return "selected"
 
       if (!using && canAugment(f)) return "selectable"
@@ -401,7 +399,7 @@ export const augment = makeOperation<Options>("augment", {
       case "using":
         return getUsingOpts(polyhedron) ?? []
       case "face":
-        return polyhedron.faces.filter(face => canAugment(face))
+        return polyhedron.faces.filter((face) => canAugment(face))
     }
   },
 

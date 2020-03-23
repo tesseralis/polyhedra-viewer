@@ -24,7 +24,7 @@ export interface ConfigInput<T = any> extends BaseConfigInput<T> {
   display: string
 }
 
-const colorOptionsList = polygons.map(n => {
+const colorOptionsList = polygons.map((n) => {
   return {
     key: `colors[${n}]`,
     display: `${startCase(polygonNames.get(n))} Color`,

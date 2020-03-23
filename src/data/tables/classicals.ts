@@ -45,8 +45,8 @@ const rectifiedNames: Record<Family, string> = {
 
 const regularNames: Record<Family, (facet?: Facet) => string> = {
   3: () => "tetrahedron",
-  4: facet => (facet === "face" ? "cube" : "octahedron"),
-  5: facet => (facet === "face" ? "dodecahedron" : "icosahedron"),
+  4: (facet) => (facet === "face" ? "cube" : "octahedron"),
+  5: (facet) => (facet === "face" ? "dodecahedron" : "icosahedron"),
 }
 
 function getBase({ family, operation, facet }: Item) {

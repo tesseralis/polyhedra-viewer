@@ -7,29 +7,27 @@ type Relation = Record<string, any>
 
 // true if the relation has multiple values that have that property
 export const hasMultiple = (relations: Relation[], property: string) => {
-  const set = new Set(relations.map(r => r[property]).filter(x => !!x))
+  const set = new Set(relations.map((r) => r[property]).filter((x) => !!x))
   return set.size > 1
 }
 
 export function getCapAlignment(polyhedron: Polyhedron, cap: Cap) {
   const isRhombicosidodecahedron = cap.type === "cupola"
   const orthoCaps = isRhombicosidodecahedron
-    ? Cap.getAll(polyhedron).filter(cap => getCupolaGyrate(cap) === "ortho")
+    ? Cap.getAll(polyhedron).filter((cap) => getCupolaGyrate(cap) === "ortho")
     : []
 
   const otherNormal =
     orthoCaps.length > 0
-      ? getSingle(orthoCaps)
-          .boundary()
-          .normal()
+      ? getSingle(orthoCaps).boundary().normal()
       : polyhedron.largestFace().normal()
 
   return isInverse(cap.normal(), otherNormal) ? "para" : "meta"
 }
 
 export function getCupolaGyrate(cap: Cap) {
-  const isOrtho = every(cap.boundary().edges, edge => {
-    const [n1, n2] = edge.adjacentFaces().map(f => f.numSides)
+  const isOrtho = every(cap.boundary().edges, (edge) => {
+    const [n1, n2] = edge.adjacentFaces().map((f) => f.numSides)
     return (n1 === 4) === (n2 === 4)
   })
   return isOrtho ? "ortho" : "gyro"

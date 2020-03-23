@@ -15,10 +15,10 @@ import { PRECISION } from "math/geom"
 function getCoplanarFaces(polyhedron: Polyhedron) {
   const found: Face[] = []
   const pairs: [Face, Face][] = []
-  polyhedron.faces.forEach(f1 => {
+  polyhedron.faces.forEach((f1) => {
     if (f1.inSet(found) || !f1.isValid()) return
 
-    f1.adjacentFaces().forEach(f2 => {
+    f1.adjacentFaces().forEach((f2) => {
       if (!f2 || !f2.isValid()) return
       if (f1.normal().equalsWithTolerance(f2.normal(), PRECISION)) {
         pairs.push([f1, f2])
@@ -41,7 +41,7 @@ function getFaceColors(polyhedron: Polyhedron, colors: any) {
   }
 
   return polyhedron.faces.map(
-    face => colors[mapping[face.index] ?? face.numUniqueSides()],
+    (face) => colors[mapping[face.index] ?? face.numUniqueSides()],
   )
 }
 

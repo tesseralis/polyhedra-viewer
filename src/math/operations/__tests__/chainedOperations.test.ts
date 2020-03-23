@@ -83,12 +83,12 @@ describe("chained tests", () => {
     }
   }
 
-  tests.forEach(test => {
+  tests.forEach((test) => {
     const { start, description, operations } = test
     let polyhedron = Polyhedron.get(start)
     let solidName = start
     it(description, () => {
-      operations.forEach(opInfo => {
+      operations.forEach((opInfo) => {
         const { op, args, expected } = getOpInfo(opInfo, polyhedron)
         const result = op.apply(polyhedron, args)
         expect(result).toBeValidPolyhedron()

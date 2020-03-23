@@ -63,11 +63,11 @@ export default function AugmentOptions() {
 
   return (
     <div {...css()}>
-      {["gyrate", "using"].map(name => {
+      {["gyrate", "using"].map((name) => {
         const value = options![name]
         return (
           <div key={name} {...optionCss()}>
-            {operation?.allOptions(polyhedron, name).map(optValue => (
+            {operation?.allOptions(polyhedron, name).map((optValue) => (
               <OptionButton
                 key={optValue}
                 optValue={optValue}

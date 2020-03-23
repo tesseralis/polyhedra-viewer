@@ -28,7 +28,7 @@ export function getPlane(points: Vec3D[]) {
 // Return whether the set of points lie on a plane
 export function isPlanar(points: Vec3D[]) {
   const plane = getPlane(points)
-  return every(points, vec => plane.getDistanceToPoint(vec) < PRECISION)
+  return every(points, (vec) => plane.getDistanceToPoint(vec) < PRECISION)
 }
 
 export function getCentroid(vectors: Vec3D[]) {
@@ -38,10 +38,7 @@ export function getCentroid(vectors: Vec3D[]) {
 // Get the normal of a polygon given its ordered vertices
 export function getNormal(vertices: Vec3D[]) {
   const [v0, v1, v2] = vertices
-  return v0
-    .sub(v1)
-    .cross(v1.sub(v2))
-    .getNormalized()
+  return v0.sub(v1).cross(v1.sub(v2)).getNormalized()
 }
 
 export function getNormalRay(vertices: Vec3D[]) {
@@ -51,7 +48,7 @@ export function getNormalRay(vertices: Vec3D[]) {
 export type Transform = (v: Vec3D) => Vec3D
 
 export function withOrigin(o: Vec3D, t: Transform): Transform {
-  return v => t(v.sub(o)).add(o)
+  return (v) => t(v.sub(o)).add(o)
 }
 
 /**

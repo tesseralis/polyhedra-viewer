@@ -5,7 +5,7 @@ import { escape } from "utils"
 function splitListOfLists(listStr: string, outerSep: string, innerSep: string) {
   return listStr
     .split(outerSep)
-    .map(inner => inner.split(innerSep).map(parseFloat))
+    .map((inner) => inner.split(innerSep).map(parseFloat))
 }
 
 export default class ViewerPage extends AppPage {
@@ -29,10 +29,7 @@ export default class ViewerPage extends AppPage {
       .prop<string>("coordindex")
     const faces = splitListOfLists(faceStr, " -1 ", " ")
 
-    const name = this.wrapper
-      .find("Title")
-      .text()
-      .toLowerCase()
+    const name = this.wrapper.find("Title").text().toLowerCase()
 
     return new Polyhedron({ name, vertices, faces })
   }
@@ -41,7 +38,7 @@ export default class ViewerPage extends AppPage {
     const hitPnt = face.centroid().toArray()
     const shape = this.wrapper
       .find("shape")
-      .filterWhere(n => !!n.prop("onMouseMove"))
+      .filterWhere((n) => !!n.prop("onMouseMove"))
     shape.simulate("mousemove", { hitPnt })
     shape.simulate("mousedown", { hitPnt })
     shape.simulate("mouseup", { hitPnt })
@@ -60,7 +57,7 @@ export default class ViewerPage extends AppPage {
     const button = this.wrapper
       .find("OpGrid")
       .find("OpButton")
-      .filterWhere(n => !!n.prop("highlighted"))
+      .filterWhere((n) => !!n.prop("highlighted"))
     const actual = button.length ? button.prop("name") : ""
     expect(actual).toEqual(operation)
     return this

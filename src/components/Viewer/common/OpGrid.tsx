@@ -27,7 +27,7 @@ interface Props {
   name: OpName
   disabled: boolean
 }
-const OpButton = memo(function({ name, disabled }: Props) {
+const OpButton = memo(function ({ name, disabled }: Props) {
   const polyhedron = PolyhedronCtx.useState()
   const { operation: currentOp } = OperationCtx.useState()
   const { setOperation, unsetOperation } = OperationCtx.useActions()
@@ -88,7 +88,9 @@ export default function OpGrid() {
       justifyContent: "space-between",
       gridColumnGap: scales.spacing[1],
       gridRowGap: scales.spacing[2],
-      gridTemplateAreas: opLayout.map(line => `"${line.join(" ")}"`).join("\n"),
+      gridTemplateAreas: opLayout
+        .map((line) => `"${line.join(" ")}"`)
+        .join("\n"),
     },
     [media.mobile]: {
       ...flexRow(),
@@ -98,7 +100,7 @@ export default function OpGrid() {
   })
   return (
     <div {...css()}>
-      {opList.map(name => (
+      {opList.map((name) => (
         <OpButton key={name} name={name} disabled={isTransitioning} />
       ))}
     </div>

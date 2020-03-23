@@ -23,14 +23,14 @@ export default class ImageDownloader extends React.Component<any> {
     for (const solid of allSolidNames) {
       await this.addImage(canvas, images, solid)
     }
-    zip.generateAsync({ type: "blob" }).then(content => {
+    zip.generateAsync({ type: "blob" }).then((content) => {
       FileSaver.saveAs(content, "images.zip")
     })
   }
 
   addImage = async (canvas: any, folder: any, solid: any) => {
     const { setPolyhedron } = this.props
-    return await new Promise(resolve => {
+    return await new Promise((resolve) => {
       setPolyhedron(solid, () => {
         setTimeout(() => {
           canvas[0].toBlob((v: any) => {

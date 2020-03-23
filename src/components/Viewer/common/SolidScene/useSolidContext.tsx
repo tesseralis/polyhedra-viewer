@@ -51,7 +51,7 @@ export default function useSolidContext() {
     const rawColors =
       transitionColors ||
       operationColors ||
-      polyhedron.faces.map(f => colors[f.numSides])
+      polyhedron.faces.map((f) => colors[f.numSides])
     return rawColors.map(toRgb)
   }, [transitionColors, operationColors, polyhedron, colors])
 

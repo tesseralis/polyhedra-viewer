@@ -88,7 +88,7 @@ const infoRows: InfoRow[] = [
       if (alts.length === 0) return <>--</>
       return (
         <ul>
-          {alts.map(alt => (
+          {alts.map((alt) => (
             <li key={alt}>{alt}</li>
           ))}
         </ul>
@@ -139,7 +139,7 @@ export default function DataList({ polyhedron }: RenderProps) {
 
   return (
     <dl {...css()}>
-      {infoRows.map(props => (
+      {infoRows.map((props) => (
         <Datum key={props.name} {...props} polyhedron={polyhedron} />
       ))}
     </dl>

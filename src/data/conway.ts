@@ -36,7 +36,7 @@ function getConwayNotation(name: string) {
 
 const conwayMapping = bimap<string, string>(
   Object.fromEntries(
-    allSolidNames.map(name => [name, getConwayNotation(name)]),
+    allSolidNames.map((name) => [name, getConwayNotation(name)]),
   ),
 )
 

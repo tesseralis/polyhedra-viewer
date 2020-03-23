@@ -50,14 +50,14 @@ export default class Table<Item extends {}> {
    * Get all the items that satisfy the given constraints.
    */
   getAll(filter?: Filter<Item>) {
-    return this.items.filter(item => applyFilter(item, filter))
+    return this.items.filter((item) => applyFilter(item, filter))
   }
 
   /**
    * Get the names of all items that satisfy the given filter.
    */
   getAllNames(filter?: Filter<Item>) {
-    return uniq(this.getAll(filter).map(item => item.name))
+    return uniq(this.getAll(filter).map((item) => item.name))
   }
 
   /**
@@ -66,7 +66,7 @@ export default class Table<Item extends {}> {
    */
   get(name: string, filter?: Filter<Item>) {
     const result = this.items.find(
-      item => item.name === name && applyFilter(item, filter),
+      (item) => item.name === name && applyFilter(item, filter),
     )
     if (!result)
       throw new Error(`Could not find ${name} with the given filters`)
@@ -85,7 +85,7 @@ export default class Table<Item extends {}> {
    * Return `true` if the table has the item that satisfies the given filter.
    */
   has(filter?: Filter<Item>) {
-    return some(this.items, item => applyFilter(item, filter))
+    return some(this.items, (item) => applyFilter(item, filter))
   }
 
   /**
@@ -94,7 +94,7 @@ export default class Table<Item extends {}> {
   hasName(name: string, filter?: Filter<Item>) {
     return some(
       this.items,
-      item => applyFilter(item, filter) && item.name === name,
+      (item) => applyFilter(item, filter) && item.name === name,
     )
   }
 }

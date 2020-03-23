@@ -18,7 +18,7 @@ function vToObj(vertex: number[]) {
 }
 
 function fToObj(face: number[]) {
-  return "f " + face.map(i => i + 1).join(" ")
+  return "f " + face.map((i) => i + 1).join(" ")
 }
 
 function toObj({ vertices, faces }: SolidData) {
@@ -90,7 +90,7 @@ export default function DataDownloader({ solid }: Props) {
     <div>
       <h2 {...heading()}>Download model</h2>
       <div>
-        {fileFormats.map(format => (
+        {fileFormats.map((format) => (
           <DownloadLink {...format} solid={solid} />
         ))}
       </div>
