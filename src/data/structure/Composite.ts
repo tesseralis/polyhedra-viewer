@@ -1,9 +1,12 @@
-import { DataOptions, Count, counts } from "./common"
+import { DataOptions } from "./common"
 
 import Structure from "./Structure"
 import Queries from "./Queries"
 import Exceptional from "./Exceptional"
 import Prismatic from "./Prismatic"
+
+export type Count = 0 | 1 | 2 | 3
+export const counts: Count[] = [0, 1, 2, 3]
 
 interface CompositeData {
   base: Exceptional | Prismatic

@@ -1,17 +1,16 @@
 import { compact } from "lodash-es"
 import type Structure from "./Structure"
-import { Count } from "./common"
 import { PrimaryPolygon, polygonPrefixes } from "../polygons"
 
-const countPrefixes: Record<1 | 2 | 3, string> = {
+const countPrefixes: Record<number, string> = {
   1: "",
   2: "bi",
   3: "tri",
 }
 
-export function countString(count: Count, base: string) {
+export function countString(count: number, base: string) {
   if (count === 0) return ""
-  return countPrefixes[count] + base
+  return `${countPrefixes[count]}${base}`
 }
 
 export function wordJoin(...array: (string | undefined)[]) {
