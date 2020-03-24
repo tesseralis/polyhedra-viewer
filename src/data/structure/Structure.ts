@@ -51,10 +51,7 @@ export default abstract class Structure<Data extends {} = {}> {
   }
 
   isRegular() {
-    if (this.isExceptional()) {
-      return this.data.operation === "regular"
-    }
-    return false
+    return this.isExceptional() && this.data.operation === "regular"
   }
 
   isQuasiRegular() {
