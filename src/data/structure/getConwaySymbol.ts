@@ -22,6 +22,7 @@ export default function getConwaySymbol(structure: Structure) {
     const { family, facet, operation } = structure.data
     return operationMapping[operation] + familyMapping[family](facet)
   }
+
   if (structure.isPrismatic()) {
     const { type, base } = structure.data
     return `${type[0].toUpperCase()}${base}`

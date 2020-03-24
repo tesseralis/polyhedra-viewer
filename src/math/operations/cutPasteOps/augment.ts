@@ -300,11 +300,10 @@ const getUsingOpts = (polyhedron: Polyhedron) => {
 function hasGyrateOpts(polyhedron: Polyhedron) {
   const info = polyhedron.info
   if (info.isCapstone()) {
-    const { elongation, base, type } = info.data
     // Gyroelongated capstones are always gyro
-    if (elongation === "antiprism") return false
+    if (info.isGyroelongated()) return false
     // Cupolae and rotundae (that are not the gyrobifastigium) always have gyrate opts
-    if (base !== 2 && type !== "pyramid") return true
+    if (info.data.base !== 2 && !info.isPyramid()) return true
     return false
   }
   if (info.isComposite()) {

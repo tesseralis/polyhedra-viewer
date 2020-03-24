@@ -72,8 +72,7 @@ export default abstract class Structure<Data extends {} = {}> {
       return this.data.operation === "snub"
     }
     if (this.isCapstone()) {
-      const { elongation, count, type } = this.data
-      return elongation === "antiprism" && count === 2 && type !== "pyramid"
+      return this.isGyroelongated() && this.isBi() && !this.isPyramid()
     }
     return false
   }

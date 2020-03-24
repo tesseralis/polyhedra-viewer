@@ -13,24 +13,19 @@ const elementaryMapping: Record<string, Symmetry> = {
   "triangular hebesphenorotunda": Cyclic.get(3),
 }
 
-function getCapstoneSymmetry({
-  base,
-  type,
-  count,
-  elongation,
-  gyrate,
-}: Capstone["data"]) {
+function getCapstoneSymmetry(capstone: Capstone) {
   // mono-capstones always have cyclic symmetry
-  if (count === 1) {
+  const { gyrate, base } = capstone.data
+  if (capstone.isMono()) {
     return Cyclic.get(base)
   }
-  const isGyroelongated = elongation === "antiprism"
+  const isGyroelongated = capstone.isGyroelongated()
 
-  if (type === "pyramid") {
+  if (capstone.isPyramid()) {
     return Dihedral.get(base, isGyroelongated ? "antiprism" : "prism")
   }
   // Cupolarotundae are always cyclic, and have reflective symmetry if it is not chiral
-  if (type === "cupolarotunda") {
+  if (capstone.isCupolaRotunda()) {
     return Cyclic.get(base, !!isGyroelongated)
   }
   // Bicupolae and birotundae
@@ -41,13 +36,14 @@ function getCapstoneSymmetry({
   return Dihedral.get(base, gyrate === "gyro" ? "antiprism" : "prism")
 }
 
-function getCompositeSymmetry({
-  augmented = 0,
-  gyrate = 0,
-  diminished = 0,
-  base,
-  align,
-}: Composite["data"]) {
+function getCompositeSymmetry(composite: Composite) {
+  const {
+    augmented = 0,
+    gyrate = 0,
+    diminished = 0,
+    base,
+    align,
+  } = composite.data
   const count = augmented + gyrate + diminished
   // A composite is "pure" only if it has one type of modification
   const pure = count === augmented || count === diminished || count === gyrate
@@ -109,10 +105,10 @@ export default function getSymmetry(solid: Structure): Symmetry {
     return Dihedral.get(base, type)
   }
   if (solid.isCapstone()) {
-    return getCapstoneSymmetry(solid.data)
+    return getCapstoneSymmetry(solid)
   }
   if (solid.isComposite()) {
-    return getCompositeSymmetry(solid.data)
+    return getCompositeSymmetry(solid)
   }
   if (solid.isModifiedAntiprism()) {
     const { base, operation } = solid.data

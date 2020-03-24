@@ -30,6 +30,17 @@ export default class Capstone extends Structure<CapstoneData> {
     super("capstone", data)
   }
 
+  isPyramid = () => this.data.type === "pyramid"
+  isCupola = () => this.data.type === "cupola"
+  isRotunda = () => this.data.type === "rotunda"
+  isCupolaRotunda = () => this.data.type === "cupolarotunda"
+
+  isMono = () => this.data.count === 1
+  isBi = () => this.data.count === 2
+
+  isElongated = () => this.data.elongation === "prism"
+  isGyroelongated = () => this.data.elongation === "antiprism"
+
   static *getAll() {
     for (const base of options.base.slice(1)) {
       for (const type of options.type) {
