@@ -1,9 +1,9 @@
+import { PrimaryPolygon, primaryPolygons } from "../polygons"
 import Structure from "./Structure"
 import { DataOptions } from "./common"
 import Queries from "./Queries"
 
-// FIXME type this with polygon
-type Family = 3 | 4 | 5
+type Family = PrimaryPolygon
 type Facet = "face" | "vertex"
 type Operation =
   | "regular"
@@ -20,7 +20,7 @@ interface ExceptionalData {
 }
 
 const options: DataOptions<ExceptionalData> = {
-  family: [3, 4, 5],
+  family: primaryPolygons,
   facet: ["face", "vertex"],
   operation: ["regular", "truncate", "rectify", "bevel", "cantellate", "snub"],
 }

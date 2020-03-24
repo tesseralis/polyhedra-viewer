@@ -22,5 +22,11 @@ export const polygonPrefixes = bimap({
   10: "decagonal",
 })
 
-export type Polygon = 3 | 4 | 5 | 6 | 8 | 10
-export const polygons: Polygon[] = [3, 4, 5, 6, 8, 10]
+export type PrimaryPolygon = 3 | 4 | 5
+export const primaryPolygons: PrimaryPolygon[] = [3, 4, 5]
+
+export type SecondaryPolygon = 6 | 8 | 10
+export const secondaryPolygons: SecondaryPolygon[] = [6, 8, 10]
+
+export type Polygon = PrimaryPolygon | SecondaryPolygon
+export const polygons: Polygon[] = [...primaryPolygons, ...secondaryPolygons]

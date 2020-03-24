@@ -1,4 +1,3 @@
-// FIXME I think counts might just go here
 import { DataOptions, Count, counts } from "./common"
 
 import Structure from "./Structure"
@@ -7,12 +6,10 @@ import Exceptional from "./Exceptional"
 import Prismatic from "./Prismatic"
 
 interface CompositeData {
-  // FIXME have a "Uniform" type
   base: Exceptional | Prismatic
   augmented?: Count
   diminished?: Count
   gyrate?: Count
-  // FIXME rename to "positioning"?
   align?: "meta" | "para"
 }
 

@@ -49,22 +49,21 @@ export default function getSymmetry(structure: Structure): Symmetry {
           return base.symmetry()
         }
         case 1: {
-          if (base.type === "prismatic") {
+          if (base.isPrismatic()) {
             // Mono-augmented prisms all have biradial symmetry
             return Cyclic.biradial
           } else {
-            // FIXME make sure we type this correctly using a visitor
-            return Cyclic.get((base.data as any).family)
+            return Cyclic.get(base.data.family)
           }
         }
 
         case 2: {
-          if (base.type === "prismatic") {
+          if (base.isPrismatic()) {
             // para-augmented prisms have digonal prismatic symmetry
             // meta-augmented prisms have biradial symmetry
             return align === "para" ? Dihedral.get(2, "prism") : Cyclic.biradial
           } else {
-            const basePolygon = (base.data as any).family
+            const basePolygon = base.data.family
             if (basePolygon === 4) {
               return Dihedral.get(4, "prism")
             }
@@ -78,7 +77,7 @@ export default function getSymmetry(structure: Structure): Symmetry {
           }
         }
         case 3: {
-          if (base.type === "prismatic") {
+          if (base.isPrismatic()) {
             return Dihedral.get(3, "prism")
           } else {
             return pure ? Cyclic.get(3) : Cyclic.bilateral
@@ -91,14 +90,11 @@ export default function getSymmetry(structure: Structure): Symmetry {
           return Cyclic.get(3)
         }
       }
-      // FIXME
-      throw new Error("laksdjfaskdjf")
+      throw new Error("The polyhedron has way too many modifications")
     },
     modifiedAntiprism({ base, operation }) {
       const { base: basePolygon } = base.data
       switch (operation) {
-        // case "rectified":
-        //   return Dihedral.get(basePolygon, "prism")
         case "snub":
           return Dihedral.get(basePolygon, "antiprism")
         default:
@@ -107,10 +103,6 @@ export default function getSymmetry(structure: Structure): Symmetry {
     },
     elementary({ base }) {
       return elementaryMapping[base]
-    },
-    default() {
-      // FIXME
-      throw new Error("unsupported")
     },
   })
 }

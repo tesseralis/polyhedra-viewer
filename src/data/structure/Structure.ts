@@ -1,3 +1,4 @@
+import { capitalize } from "lodash-es"
 import type Exceptional from "./Exceptional"
 import type Prismatic from "./Prismatic"
 import type Capstone from "./Capstone"
@@ -56,8 +57,7 @@ export default abstract class Structure<Data extends {} = {}> {
     return this.visit({
       exceptional: ({ operation }) =>
         operation === "regular" ? "Platonic solid" : "Archimedean solid",
-      // FIXME capitalize correctly
-      prismatic: ({ type }) => type,
+      prismatic: ({ type }) => capitalize(type),
       default: () => "Johnson solid",
     })
   }

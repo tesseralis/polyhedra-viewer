@@ -1,3 +1,4 @@
+import { PrimaryPolygon, primaryPolygons } from "../polygons"
 import Structure from "./Structure"
 import Queries from "./Queries"
 import { DataOptions, PrismaticType, prismaticTypes } from "./common"
@@ -5,17 +6,15 @@ import { DataOptions, PrismaticType, prismaticTypes } from "./common"
 type CapstoneType = "pyramid" | "cupola" | "rotunda" | "cupolarotunda"
 
 interface CapstoneData {
-  // FIXME type this with polygon
-  base: 2 | 3 | 4 | 5
+  base: 2 | PrimaryPolygon
   type: CapstoneType
   elongation: null | PrismaticType
   count: 1 | 2
-  // FIXME rename to "alignment?"
   gyrate?: "ortho" | "gyro"
 }
 
 const options: DataOptions<CapstoneData> = {
-  base: [2, 3, 4, 5],
+  base: [2, ...primaryPolygons],
   type: ["pyramid", "cupola", "rotunda", "cupolarotunda"],
   elongation: [null, ...prismaticTypes],
   count: [1, 2],

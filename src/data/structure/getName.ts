@@ -1,9 +1,9 @@
 import { compact } from "lodash-es"
 import type Structure from "./Structure"
 import { Count } from "./common"
-import { polygonPrefixes } from "../polygons"
+import { PrimaryPolygon, polygonPrefixes } from "../polygons"
 
-const countPrefixes: Record<Exclude<Count, 0>, string> = {
+const countPrefixes: Record<1 | 2 | 3, string> = {
   1: "",
   2: "bi",
   3: "tri",
@@ -22,14 +22,16 @@ export function prefix(prefix: string = "", rest: string) {
   return `${prefix}${rest}`
 }
 
-// FIXME inherit from the ./common
-const rectifiedNames: Record<3 | 4 | 5, string> = {
+const rectifiedNames: Record<PrimaryPolygon, string> = {
   3: "tetratetrahedron",
   4: "cuboctahedron",
   5: "icosidodecahedron",
 }
 
-const regularNames: Record<3 | 4 | 5, (facet?: "face" | "vertex") => string> = {
+const regularNames: Record<
+  PrimaryPolygon,
+  (facet?: "face" | "vertex") => string
+> = {
   3: () => "tetrahedron",
   4: (facet) => (facet === "face" ? "cube" : "octahedron"),
   5: (facet) => (facet === "face" ? "dodecahedron" : "icosahedron"),
