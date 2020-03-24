@@ -303,7 +303,7 @@ function hasGyrateOpts(polyhedron: Polyhedron) {
     const { elongation, base, type } = info.data
     // Gyroelongated capstones are always gyro
     if (elongation === "antiprism") return false
-    // The gyrobifastigium always has a gyrate option
+    // Cupolae and rotundae (that are not the gyrobifastigium) always have gyrate opts
     if (base !== 2 && type !== "pyramid") return true
     return false
   }
