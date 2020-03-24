@@ -2,11 +2,7 @@ import { compact } from "lodash-es"
 import type Structure from "./Structure"
 import { PrimaryPolygon, polygonPrefixes } from "../polygons"
 
-const countPrefixes: Record<number, string> = {
-  1: "",
-  2: "bi",
-  3: "tri",
-}
+const countPrefixes: Record<number, string> = { 1: "", 2: "bi", 3: "tri" }
 
 export function countString(count: number, base: string) {
   if (count === 0) return ""
@@ -41,50 +37,66 @@ function getExpandedString(base: string, operation: string) {
   return str.replace("ii", "i")
 }
 
-export default function getName(structure: Structure): string {
-  return structure.visit({
-    exceptional({ operation, family, facet }) {
-      const base = ["regular", "truncate"].includes(operation)
-        ? regularNames[family](facet)
-        : rectifiedNames[family]
-      return wordJoin(
-        operation === "snub" ? operation : "",
-        ["truncate", "bevel"].includes(operation) ? "truncated" : "",
-        getExpandedString(base, operation),
-      )
-    },
-    prismatic({ base, type }) {
-      return `${polygonPrefixes.get(base)} ${type}`
-    },
-    capstone({ base, type, elongation, count, gyrate }) {
-      const elongStr = {
-        prism: "elongated",
-        antiprism: "gyroelongated",
-        "": "",
-      }
-      const baseStr = type === "cupolarotunda" ? type : countString(count, type)
-      return wordJoin(
-        elongStr[elongation ?? ""],
-        polygonPrefixes.get(base),
-        prefix(gyrate, baseStr),
-      )
-    },
-    composite({ augmented, gyrate, diminished, align, base }) {
-      return prefix(
-        align,
-        wordJoin(
-          countString(augmented ?? 0, "augmented"),
-          countString(gyrate ?? 0, "gyrate"),
-          countString(diminished ?? 0, "diminished"),
-          base.name(),
-        ),
-      )
-    },
-    modifiedAntiprism({ operation, base }) {
-      return wordJoin(operation ?? "", base.name())
-    },
-    elementary({ base }) {
-      return base
-    },
-  })
+export default function getName(solid: Structure): string {
+  if (solid.isExceptional()) {
+    const { operation, family, facet } = solid.data
+    const base = ["regular", "truncate"].includes(operation)
+      ? regularNames[family](facet)
+      : rectifiedNames[family]
+    return wordJoin(
+      operation === "snub" ? operation : "",
+      ["truncate", "bevel"].includes(operation) ? "truncated" : "",
+      getExpandedString(base, operation),
+    )
+  }
+
+  if (solid.isPrismatic()) {
+    const { base, type } = solid.data
+    return `${polygonPrefixes.get(base)} ${type}`
+  }
+
+  if (solid.isCapstone()) {
+    const { base, type, elongation, count, gyrate } = solid.data
+    const elongStr = {
+      prism: "elongated",
+      antiprism: "gyroelongated",
+      "": "",
+    }
+    const baseStr = type === "cupolarotunda" ? type : countString(count, type)
+    return wordJoin(
+      elongStr[elongation ?? ""],
+      polygonPrefixes.get(base),
+      prefix(gyrate, baseStr),
+    )
+  }
+
+  if (solid.isComposite()) {
+    const {
+      augmented = 0,
+      gyrate = 0,
+      diminished = 0,
+      align,
+      base,
+    } = solid.data
+    return prefix(
+      align,
+      wordJoin(
+        countString(augmented, "augmented"),
+        countString(gyrate, "gyrate"),
+        countString(diminished, "diminished"),
+        base.name(),
+      ),
+    )
+  }
+
+  if (solid.isModifiedAntiprism()) {
+    const { operation, base } = solid.data
+    return wordJoin(operation ?? "", base.name())
+  }
+
+  if (solid.isElementary()) {
+    return solid.data.base
+  }
+
+  throw new Error(`Invalid solid of type ${solid.type}`)
 }

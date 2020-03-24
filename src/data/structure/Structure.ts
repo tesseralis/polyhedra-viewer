@@ -11,16 +11,6 @@ import getConwaySymbol from "./getConwaySymbol"
 import type { Symmetry } from "../symmetry"
 import { getAlternateNames, getCanonicalName } from "../alternates"
 
-interface StructureVisitor<Result> {
-  exceptional?(data: Exceptional["data"]): Result
-  prismatic?(data: Prismatic["data"]): Result
-  capstone?(data: Capstone["data"]): Result
-  composite?(data: Composite["data"]): Result
-  modifiedAntiprism?(data: ModifiedAntiprism["data"]): Result
-  elementary?(data: Elementary["data"]): Result
-  default?(): Result
-}
-
 export default abstract class Structure<Data extends {} = {}> {
   type: string
   data: Data
@@ -123,30 +113,5 @@ export default abstract class Structure<Data extends {} = {}> {
 
   isElementary(): this is Elementary {
     return this.type === "elementary"
-  }
-
-  visit<Result>(visitor: StructureVisitor<Result>): Result {
-    if (this.isExceptional() && !!visitor.exceptional) {
-      return visitor.exceptional(this.data)
-    }
-    if (this.isPrismatic() && !!visitor.prismatic) {
-      return visitor.prismatic(this.data)
-    }
-    if (this.isCapstone() && !!visitor.capstone) {
-      return visitor.capstone(this.data)
-    }
-    if (this.isComposite() && !!visitor.composite) {
-      return visitor.composite(this.data)
-    }
-    if (this.isModifiedAntiprism() && !!visitor.modifiedAntiprism) {
-      return visitor.modifiedAntiprism(this.data)
-    }
-    if (this.isElementary() && !!visitor.elementary) {
-      return visitor.elementary(this.data)
-    }
-    if (!visitor.default) {
-      throw new Error("No default provided")
-    }
-    return visitor.default()
   }
 }
