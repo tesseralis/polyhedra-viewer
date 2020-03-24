@@ -274,12 +274,15 @@ function getUsingOpt(using: string, numSides: number) {
 }
 
 function hasRotunda(polyhedron: Polyhedron) {
-  return polyhedron.info.visit({
-    prismatic: ({ base }) => base === 10,
-    capstone: ({ type, base, count }) =>
-      count === 1 && base === 5 && ["cupola", "rotunda"].includes(type),
-    default: () => false,
-  })
+  const info = polyhedron.info
+  if (info.isPrismatic()) {
+    return info.data.base === 10
+  }
+  if (info.isCapstone()) {
+    const { type, base, count } = info.data
+    return count === 1 && base === 5 && ["cupola", "rotunda"].includes(type)
+  }
+  return false
 }
 
 const getUsingOpts = (polyhedron: Polyhedron) => {
@@ -295,15 +298,19 @@ const getUsingOpts = (polyhedron: Polyhedron) => {
 }
 
 function hasGyrateOpts(polyhedron: Polyhedron) {
-  return polyhedron.info.visit({
-    capstone({ base, type, elongation }) {
-      if (elongation === "antiprism") return false
-      if (base !== 2 && type !== "pyramid") return true
-      return false
-    },
-    composite: ({ base }) => base.canonicalName() === "rhombicosidodecahedron",
-    default: () => false,
-  })
+  const info = polyhedron.info
+  if (info.isCapstone()) {
+    const { elongation, base, type } = info.data
+    // Gyroelongated capstones are always gyro
+    if (elongation === "antiprism") return false
+    // The gyrobifastigium always has a gyrate option
+    if (base !== 2 && type !== "pyramid") return true
+    return false
+  }
+  if (info.isComposite()) {
+    return info.data.base.canonicalName() === "rhombicosidodecahedron"
+  }
+  return false
 }
 
 type GyrateOpts = "ortho" | "gyro"

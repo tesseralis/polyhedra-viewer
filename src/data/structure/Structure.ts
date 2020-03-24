@@ -51,45 +51,44 @@ export default abstract class Structure<Data extends {} = {}> {
   }
 
   group() {
-    return this.visit({
-      exceptional: ({ operation }) =>
-        operation === "regular" ? "Platonic solid" : "Archimedean solid",
-      prismatic: ({ type }) => capitalize(type),
-      default: () => "Johnson solid",
-    })
+    if (this.isExceptional()) {
+      return this.isRegular() ? "Platonic solid" : "Archimedean solid"
+    }
+    if (this.isPrismatic()) {
+      return capitalize(this.data.type)
+    }
+    return "Johnson solid"
   }
 
   isRegular() {
-    return this.visit({
-      exceptional: ({ operation }) => operation === "regular",
-      default: () => false,
-    })
+    if (this.isExceptional()) {
+      return this.data.operation === "regular"
+    }
+    return false
   }
 
   isQuasiRegular() {
     // FIXME kludge used to make `sharpen` work
     if (this.canonicalName() === "octahedron") return true
-    return this.visit({
-      exceptional: ({ operation }) => operation === "rectify",
-      default: () => false,
-    })
+    if (this.isExceptional()) {
+      return this.data.operation === "rectify"
+    }
+    return false
   }
 
   isUniform() {
-    return this.visit({
-      exceptional: () => true,
-      prismatic: () => true,
-      default: () => false,
-    })
+    return this.isExceptional() || this.isPrismatic()
   }
 
   isChiral() {
-    return this.visit({
-      exceptional: ({ operation }) => operation === "snub",
-      capstone: ({ elongation, count, type }) =>
-        elongation === "antiprism" && count === 2 && type !== "pyramid",
-      default: () => false,
-    })
+    if (this.isExceptional()) {
+      return this.data.operation === "snub"
+    }
+    if (this.isCapstone()) {
+      const { elongation, count, type } = this.data
+      return elongation === "antiprism" && count === 2 && type !== "pyramid"
+    }
+    return false
   }
 
   isHoneycomb() {
