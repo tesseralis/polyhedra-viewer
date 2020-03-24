@@ -18,16 +18,15 @@ const familyMapping = {
 }
 
 export default function getConwaySymbol(structure: Structure) {
-  return structure.visit({
-    exceptional({ family, facet, operation }) {
-      return operationMapping[operation] + familyMapping[family](facet)
-    },
-    prismatic({ base, type }) {
-      return type[0].toUpperCase() + base
-    },
-    default() {
-      const index = johnsonSolids.indexOf(structure.canonicalName())
-      return "J" + (index + 1)
-    },
-  })
+  if (structure.isExceptional()) {
+    const { family, facet, operation } = structure.data
+    return operationMapping[operation] + familyMapping[family](facet)
+  }
+  if (structure.isPrismatic()) {
+    const { type, base } = structure.data
+    return `${type[0].toUpperCase()}${base}`
+  }
+
+  const index = johnsonSolids.indexOf(structure.canonicalName())
+  return `J${index + 1}`
 }
