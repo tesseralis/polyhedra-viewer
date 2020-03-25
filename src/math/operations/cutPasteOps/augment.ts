@@ -279,8 +279,7 @@ function hasRotunda(polyhedron: Polyhedron) {
     return info.data.base === 10
   }
   if (info.isCapstone()) {
-    const { type, base, count } = info.data
-    return count === 1 && base === 5 && ["cupola", "rotunda"].includes(type)
+    return info.isMono() && !info.isPyramid() && info.data.base === 5
   }
   return false
 }
