@@ -13,27 +13,24 @@ type Operation =
   | "cantellate"
   | "snub"
 
-interface ExceptionalData {
+interface ClassicalData {
   family: Family
   facet?: Facet
   operation: Operation
 }
 
-const options: DataOptions<ExceptionalData> = {
+const options: DataOptions<ClassicalData> = {
   family: primaryPolygons,
   facet: ["face", "vertex"],
   operation: ["regular", "truncate", "rectify", "bevel", "cantellate", "snub"],
 }
 
 /**
- * An exceptional uniform polyhedron is a Platonic or Archimedean solid.
- *
- * The name "exceptional" is taken from Wikipedia:
- * https://en.wikipedia.org/wiki/Uniform_polyhedron
+ * An classical uniform polyhedron is a Platonic or Archimedean solid.
  */
-export default class Exceptional extends Specs<ExceptionalData> {
-  constructor(data: ExceptionalData) {
-    super("exceptional", data)
+export default class Classical extends Specs<ClassicalData> {
+  constructor(data: ClassicalData) {
+    super("classical", data)
   }
 
   static *getAll() {
@@ -41,14 +38,14 @@ export default class Exceptional extends Specs<ExceptionalData> {
       for (const family of options.family) {
         if (family !== 3 && ["regular", "truncate"].includes(operation)) {
           for (const facet of options.facet) {
-            yield new Exceptional({ family, operation, facet })
+            yield new Classical({ family, operation, facet })
           }
         } else {
-          yield new Exceptional({ family, operation })
+          yield new Classical({ family, operation })
         }
       }
     }
   }
 
-  static query = new Queries(Exceptional.getAll())
+  static query = new Queries(Classical.getAll())
 }

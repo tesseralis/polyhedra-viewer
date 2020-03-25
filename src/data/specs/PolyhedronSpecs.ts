@@ -1,5 +1,5 @@
 import { capitalize } from "lodash-es"
-import type Exceptional from "./Exceptional"
+import type Classical from "./Classical"
 import type Prismatic from "./Prismatic"
 import type Capstone from "./Capstone"
 import type Composite from "./Composite"
@@ -12,7 +12,7 @@ import type { Symmetry } from "../symmetry"
 import { getAlternateNames, getCanonicalName } from "../alternates"
 
 type PolyhedronType =
-  | "exceptional"
+  | "classical"
   | "prismatic"
   | "capstone"
   | "composite"
@@ -49,7 +49,7 @@ export default abstract class PolyhedronSpecs<Data extends {} = {}> {
   }
 
   group() {
-    if (this.isExceptional()) {
+    if (this.isClassical()) {
       return this.isRegular() ? "Platonic solid" : "Archimedean solid"
     }
     if (this.isPrismatic()) {
@@ -59,24 +59,24 @@ export default abstract class PolyhedronSpecs<Data extends {} = {}> {
   }
 
   isRegular() {
-    return this.isExceptional() && this.data.operation === "regular"
+    return this.isClassical() && this.data.operation === "regular"
   }
 
   isQuasiRegular() {
     // FIXME kludge used to make `sharpen` work
     if (this.canonicalName() === "octahedron") return true
-    if (this.isExceptional()) {
+    if (this.isClassical()) {
       return this.data.operation === "rectify"
     }
     return false
   }
 
   isUniform() {
-    return this.isExceptional() || this.isPrismatic()
+    return this.isClassical() || this.isPrismatic()
   }
 
   isChiral() {
-    if (this.isExceptional()) {
+    if (this.isClassical()) {
       return this.data.operation === "snub"
     }
     if (this.isCapstone()) {
@@ -95,8 +95,8 @@ export default abstract class PolyhedronSpecs<Data extends {} = {}> {
     ].includes(this.canonicalName())
   }
 
-  isExceptional(): this is Exceptional {
-    return this.type === "exceptional"
+  isClassical(): this is Classical {
+    return this.type === "classical"
   }
 
   isPrismatic(): this is Prismatic {

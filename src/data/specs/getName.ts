@@ -38,7 +38,7 @@ function getExpandedString(base: string, operation: string) {
 }
 
 export default function getName(solid: Specs): string {
-  if (solid.isExceptional()) {
+  if (solid.isClassical()) {
     const { operation, family, facet } = solid.data
     const base = ["regular", "truncate"].includes(operation)
       ? regularNames[family](facet)

@@ -85,7 +85,7 @@ function getCompositeSymmetry(composite: Composite) {
         return Dihedral.get(3, "prism")
       }
 
-      // The only exceptional bases that can be tri-modified are
+      // The only classical sources that can be tri-modified are
       // diminished icosahedra and modified rhombicosidodecahedra
       return pure ? Cyclic.get(3) : Cyclic.bilateral
 
@@ -98,7 +98,7 @@ function getCompositeSymmetry(composite: Composite) {
 }
 
 export default function getSymmetry(solid: Specs): Symmetry {
-  if (solid.isExceptional()) {
+  if (solid.isClassical()) {
     const { family, operation } = solid.data
     return Polyhedral.get(family, operation === "snub")
   }

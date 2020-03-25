@@ -18,7 +18,7 @@ const familyMapping = {
 }
 
 export default function getConwaySymbol(structure: Specs) {
-  if (structure.isExceptional()) {
+  if (structure.isClassical()) {
     const { family, facet, operation } = structure.data
     return operationMapping[operation] + familyMapping[family](facet)
   }

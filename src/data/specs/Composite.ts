@@ -2,14 +2,14 @@ import { DataOptions } from "./common"
 
 import Specs from "./PolyhedronSpecs"
 import Queries from "./Queries"
-import Exceptional from "./Exceptional"
+import Classical from "./Classical"
 import Prismatic from "./Prismatic"
 
 export type Count = 0 | 1 | 2 | 3
 export const counts: Count[] = [0, 1, 2, 3]
 
 interface CompositeData {
-  source: Exceptional | Prismatic
+  source: Classical | Prismatic
   augmented?: Count
   diminished?: Count
   gyrate?: Count
@@ -19,19 +19,19 @@ interface CompositeData {
 const prismaticBases = Prismatic.query.where(
   ({ type, base }) => type === "prism" && base <= 6,
 )
-const augmentedExceptionalBases = Exceptional.query.where(
+const augmentedClassicalBases = Classical.query.where(
   ({ operation, facet }) =>
     ["regular", "truncate"].includes(operation) && facet !== "vertex",
 )
-const icosahedron = Exceptional.query.withName("icosahedron")
-const rhombicosidodecahedron = Exceptional.query.withName(
+const icosahedron = Classical.query.withName("icosahedron")
+const rhombicosidodecahedron = Classical.query.withName(
   "rhombicosidodecahedron",
 )
 
 const options: DataOptions<CompositeData> = {
   source: [
     ...prismaticBases,
-    ...augmentedExceptionalBases,
+    ...augmentedClassicalBases,
     icosahedron,
     rhombicosidodecahedron,
   ],
@@ -71,8 +71,8 @@ export default class Composite extends Specs<CompositeData> {
       }
     }
 
-    // Augmented exceptional polyhedra
-    for (const source of augmentedExceptionalBases) {
+    // Augmented classical polyhedra
+    for (const source of augmentedClassicalBases) {
       for (const augmented of limitCount(
         options.augmented,
         source.data.family - 2,

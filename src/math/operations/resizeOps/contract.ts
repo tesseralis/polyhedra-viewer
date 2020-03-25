@@ -1,5 +1,5 @@
 import { Polygon } from "data/polygons"
-import Exceptional from "data/specs/Exceptional"
+import Classical from "data/specs/Classical"
 import { Polyhedron } from "math/polyhedra"
 import {
   getSnubAngle,
@@ -22,7 +22,7 @@ interface Options {
 // Return the family of an *expanded* polyhedron
 function getFamily(polyhedron: Polyhedron) {
   return familyOpts.find((family) => {
-    return Exceptional.query.hasNameWhere(
+    return Classical.query.hasNameWhere(
       polyhedron.name,
       (data) => data.family === family,
     )
@@ -87,7 +87,7 @@ export function applyContract(
 }
 
 function isBevelled(polyhedron: Polyhedron) {
-  return Exceptional.query.hasNameWhere(
+  return Classical.query.hasNameWhere(
     polyhedron.name,
     ({ operation }) => operation === "bevel",
   )

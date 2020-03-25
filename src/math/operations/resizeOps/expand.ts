@@ -20,7 +20,7 @@ import {
  */
 
 function isTruncated(polyhedron: Polyhedron) {
-  if (!polyhedron.info.isExceptional()) {
+  if (!polyhedron.info.isClassical()) {
     throw new Error("Invalid polyhedron")
   }
   return polyhedron.info.data.operation === "truncate"
