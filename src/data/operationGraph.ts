@@ -30,9 +30,9 @@ type FullGraph = NestedRecord<string, string, Relation[]>
 
 // Make everything an array
 function normalize(graph: Graph) {
-  return mapValues(graph, ops =>
-    mapValues(ops, relations => {
-      return castArray(relations).map(relation =>
+  return mapValues(graph, (ops) =>
+    mapValues(ops, (relations) => {
+      return castArray(relations).map((relation) =>
         isObject(relation) ? relation : { value: relation },
       )
     }),
@@ -41,8 +41,8 @@ function normalize(graph: Graph) {
 
 /** Remove nullish values from a graph */
 function compactGraph(graph: Graph) {
-  return mapValues(graph, operations => {
-    const mappedOps = mapValues(operations, opts =>
+  return mapValues(graph, (operations) => {
+    const mappedOps = mapValues(operations, (opts) =>
       opts.filter((opt: any) => !!opt.value),
     )
     return pickBy(mappedOps, "length")
@@ -144,7 +144,7 @@ function convertTableNotation(notation: TableData): any {
 function convertTable(table: Table) {
   return {
     ...table,
-    data: table.data.map(row => row.map(convertTableNotation)),
+    data: table.data.map((row) => row.map(convertTableNotation)),
   }
 }
 
@@ -429,9 +429,9 @@ const diminishedIcosahedra = (() => {
 
 const rhombicosidodecahedra = (() => {
   const getAugment = (relations: Relation[]) =>
-    relations.map(relation => ({ ...relation, using: "U5" }))
+    relations.map((relation) => ({ ...relation, using: "U5" }))
   const getGyrate = (relations: Relation[]) =>
-    relations.map(relation => ({ ...relation, direction: "forward" }))
+    relations.map((relation) => ({ ...relation, direction: "forward" }))
   return {
     // tridiminished
     J83: {
@@ -508,7 +508,7 @@ const rhombicosidodecahedra = (() => {
 })()
 
 const elementary = (() => {
-  const empty = mapObject(range(87, 93), j => [`J${j}`, {}])
+  const empty = mapObject(range(87, 93), (j) => [`J${j}`, {}])
   return {
     ...empty,
     // TODO semisnub to create snub antiprisms

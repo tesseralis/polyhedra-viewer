@@ -81,13 +81,13 @@ export default memo(function MobileViewer({ panel, solid }: Props) {
     height: "100vh",
     display: "grid",
     gridTemplateAreas: '"title" "content" "nav"',
-    ...mobile(navH => ({
+    ...mobile((navH) => ({
       gridTemplateRows: `${titleHeight} 1fr ${navH}`,
     })),
   })
 
   const sceneCss = useStyle({
-    ...mobile(navH => ({
+    ...mobile((navH) => ({
       height: `calc(100vh - ${navH} - ${titleHeight})`,
     })),
     zIndex: 0,
@@ -96,7 +96,7 @@ export default memo(function MobileViewer({ panel, solid }: Props) {
   })
 
   const navCss = useStyle({
-    ...mobile(navH => ({
+    ...mobile((navH) => ({
       height: navH,
     })),
     ...flexRow("center"),

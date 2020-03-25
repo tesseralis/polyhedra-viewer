@@ -12,7 +12,7 @@ interface PointsProps {
 }
 
 function joinPoints(points: Point2D[]) {
-  return points.map(point => point.join(",")).join(" ")
+  return points.map((point) => point.join(",")).join(" ")
 }
 
 // Irregular polygon
@@ -40,7 +40,7 @@ export function polygonPoints({
   cy = 0,
   a = 0,
 }: PolygonProps) {
-  return range(n).map<Point2D>(i => [
+  return range(n).map<Point2D>((i) => [
     cx + r * cos(TAU * (a / 360 + i / n)),
     cy + r * sin(TAU * (a / 360 + i / n)),
   ])

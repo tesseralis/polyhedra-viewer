@@ -20,7 +20,10 @@ import {
  */
 
 function isTruncated(polyhedron: Polyhedron) {
-  return polyhedron.info.inClassicalTable({ operation: "truncate" })
+  if (!polyhedron.info.isClassical()) {
+    throw new Error("Invalid polyhedron")
+  }
+  return polyhedron.info.data.operation === "truncate"
 }
 
 // TODO figure out a way to deduplicate these functions?
@@ -33,16 +36,16 @@ function doSemiExpansion(polyhedron: Polyhedron, referenceName: string) {
     (referenceFace.distanceToCenter() / reference.edgeLength()) *
     polyhedron.edgeLength()
   const largeFaceIndices = polyhedron.faces
-    .filter(face => face.numSides === largeFaceType)
-    .map(face => face.index)
+    .filter((face) => face.numSides === largeFaceType)
+    .map((face) => face.index)
 
   const duplicated = expandEdges(
     polyhedron,
-    polyhedron.edges.filter(e =>
-      every(e.adjacentFaces(), f => f.numSides === largeFaceType),
+    polyhedron.edges.filter((e) =>
+      every(e.adjacentFaces(), (f) => f.numSides === largeFaceType),
     ),
   )
-  const expandFaces = duplicated.faces.filter(face =>
+  const expandFaces = duplicated.faces.filter((face) =>
     largeFaceIndices.includes(face.index),
   )
   const endVertices = getResizedVertices(expandFaces, referenceLength)
@@ -65,13 +68,13 @@ function doExpansion(
 
   // TODO precalculate this
   const referenceFace =
-    reference.faces.find(face => isExpandedFace(reference, face, n)) ??
+    reference.faces.find((face) => isExpandedFace(reference, face, n)) ??
     reference.getFace()
   const referenceLength =
     (referenceFace.distanceToCenter() / reference.edgeLength()) *
     polyhedron.edgeLength()
 
-  const expandFaces = duplicated.faces.filter(face =>
+  const expandFaces = duplicated.faces.filter((face) =>
     isExpandedFace(duplicated, face, n),
   )
   const refFaces = getExpandedFaces(reference, n)
@@ -122,8 +125,8 @@ export const dual = makeOperation("dual", {
     })()
     const duplicated = expandEdges(polyhedron, polyhedron.edges)
     const faces = take(duplicated.faces, polyhedron.numFaces())
-    const endVertices = getTransformedVertices(faces, f =>
-      withOrigin(polyhedron.centroid(), v => v.scale(scale))(f.centroid()),
+    const endVertices = getTransformedVertices(faces, (f) =>
+      withOrigin(polyhedron.centroid(), (v) => v.scale(scale))(f.centroid()),
     )
 
     return {

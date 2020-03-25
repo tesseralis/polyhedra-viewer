@@ -41,7 +41,7 @@ interface Props {
 
 export default function Description({ title, content, collapsed }: Props) {
   const [isCollapsed, setCollapsed] = useState(collapsed)
-  const toggle = () => setCollapsed(collapsed => !collapsed)
+  const toggle = () => setCollapsed((collapsed) => !collapsed)
   const brief = content.split("\n\n")[0]
 
   const css = useStyle(flexColumn("center"))

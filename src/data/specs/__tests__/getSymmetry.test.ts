@@ -1,13 +1,9 @@
-import getSymmetry from "../getSymmetry"
+import getSpecs from "../getSpecs"
 
 describe("getSymmetry", () => {
   function expectSymmetry(solid: string, expected: string) {
-    expect(getSymmetry(solid).symbolStr()).toEqual(expected)
+    expect(getSpecs(solid).symmetry().symbolStr()).toEqual(expected)
   }
-
-  it("errors on invalid polyhedra names", () => {
-    expect(() => getSymmetry("scutoid")).toThrowError()
-  })
 
   describe("Platonic and Archimedean solids", () => {
     it("returns chiral on snub polyhedra", () => {
@@ -70,7 +66,7 @@ describe("getSymmetry", () => {
       expectSymmetry("augmented pentagonal prism", "C_2v")
     })
 
-    it("works on biaugmanted", () => {
+    it("works on biaugmented", () => {
       expectSymmetry("biaugmented pentagonal prism", "C_2v")
       expectSymmetry("parabiaugmented hexagonal prism", "D_2h")
     })

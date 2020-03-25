@@ -16,13 +16,9 @@ export function getChirality(polyhedron: Polyhedron) {
   const boundary = cap1.boundary()
   const isCupolaRotunda = cap1.type !== cap2.type
 
-  const nonTriangleFace = boundary.edges.find(e => e.face.numSides !== 3)!
-  const rightFaceAcross = nonTriangleFace
-    .twin()
-    .prev()
-    .twin()
-    .next()
-    .twin().face
+  const nonTriangleFace = boundary.edges.find((e) => e.face.numSides !== 3)!
+  const rightFaceAcross = nonTriangleFace.twin().prev().twin().next().twin()
+    .face
   // I'm pretty sure this is the same logic as in augment
   if (isCupolaRotunda) {
     return rightFaceAcross.numSides !== 3 ? "right" : "left"
@@ -34,15 +30,15 @@ export function getChirality(polyhedron: Polyhedron) {
  * Return true if the polyhedron a gyroelongated bicupola, cupolarotunda, or birotunda
  */
 export function isGyroelongatedBiCupola(polyhedron: Polyhedron) {
-  return polyhedron.info.inCapstoneTable(({ count, elongation, type }) => {
-    return count === 2 && elongation === "antiprism" && type !== "pyramid"
-  })
+  const info = polyhedron.info
+  if (!info.isCapstone()) return false
+  return info.isGyroelongated() && info.isBi() && !info.isPyramid()
 }
 
 function getOppositeCaps(polyhedron: Polyhedron) {
   const caps = Cap.getAll(polyhedron)
   for (const cap of caps) {
-    const cap2 = caps.find(cap2 => isInverse(cap.normal(), cap2.normal()))
+    const cap2 = caps.find((cap2) => isInverse(cap.normal(), cap2.normal()))
     if (cap2) return [cap, cap2]
   }
   return undefined
@@ -50,9 +46,9 @@ function getOppositeCaps(polyhedron: Polyhedron) {
 
 function getOppositePrismFaces(polyhedron: Polyhedron) {
   const face1 = maxBy(
-    polyhedron.faces.filter(face => {
+    polyhedron.faces.filter((face) => {
       const faceCounts = countBy(
-        face.vertexAdjacentFaces().filter(f => !f.equals(face)),
+        face.vertexAdjacentFaces().filter((f) => !f.equals(face)),
         "numSides",
       )
       return (
@@ -65,7 +61,7 @@ function getOppositePrismFaces(polyhedron: Polyhedron) {
   if (!face1) return undefined
 
   const face2 = polyhedron.faces.find(
-    face2 =>
+    (face2) =>
       face1.numSides === face2.numSides &&
       isInverse(face1.normal(), face2.normal()),
   )
@@ -94,11 +90,11 @@ export function getAdjustInformation(polyhedron: Polyhedron) {
   // Otherwise it's an elongated single cap.
   // Find the face *first* (in case it's a diminished icosahedron)
   // then find the cap that's opposite of it
-  const faces = polyhedron.faces.filter(face => {
+  const faces = polyhedron.faces.filter((face) => {
     return uniqBy(face.adjacentFaces(), "numSides").length === 1
   })
   const face = maxBy(faces, "numSides")!
-  const cap = Cap.getAll(polyhedron).find(cap =>
+  const cap = Cap.getAll(polyhedron).find((cap) =>
     isInverse(cap.normal(), face.normal()),
   )
   return {
@@ -121,8 +117,8 @@ export function getScaledPrismVertices(
   const n = boundary.numSides
   const angle = (getTwistSign(twist) * Math.PI) / n
 
-  return getTransformedVertices<FaceLike>(vertexSets, set =>
-    withOrigin(set.normalRay(), v =>
+  return getTransformedVertices<FaceLike>(vertexSets, (set) =>
+    withOrigin(set.normalRay(), (v) =>
       v
         .add(set.normal().scale((scale * 1) / 2))
         .getRotatedAroundAxis(set.normal(), (angle * 1) / 2),

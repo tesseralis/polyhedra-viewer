@@ -22,7 +22,7 @@ function Main() {
     <main {...css()}>
       <Masthead />
       <div {...sections()}>
-        {tableSections.map(sectionData => (
+        {tableSections.map((sectionData) => (
           <TableSection
             narrow={narrow}
             key={sectionData.header}

@@ -2,7 +2,7 @@ import { some, findKey, countBy } from "lodash-es"
 import { Point } from "types"
 import { vec, Vec3D } from "math/geom"
 import { VIndex } from "./solidTypes"
-import Polyhedron from "./Polyhedron"
+import type Polyhedron from "./Polyhedron"
 import Edge from "./Edge"
 import { splitAt } from "utils"
 
@@ -41,7 +41,7 @@ export default class Vertex {
   }
 
   inSet(vertices: Vertex[]) {
-    return some(vertices, vertex => this.equals(vertex))
+    return some(vertices, (vertex) => this.equals(vertex))
   }
 
   private *adjacentEdgesIter() {
@@ -62,15 +62,15 @@ export default class Vertex {
   }
 
   adjacentVertices() {
-    return this.adjacentEdges().map(e => e.v2)
+    return this.adjacentEdges().map((e) => e.v2)
   }
 
   adjacentFaces() {
-    return this.adjacentEdges().map(e => e.face)
+    return this.adjacentEdges().map((e) => e.face)
   }
 
   configuration() {
-    const config = this.adjacentFaces().map(f => f.numSides)
+    const config = this.adjacentFaces().map((f) => f.numSides)
     const allConfigs = getCycles(config).concat(
       getCycles([...config].reverse()),
     )

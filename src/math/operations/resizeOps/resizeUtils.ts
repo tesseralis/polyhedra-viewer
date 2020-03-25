@@ -13,8 +13,8 @@ export function getResizedVertices(
   // Update the vertices with the expanded-out version
   const f0 = faces[0]
   const scale = resizedLength - f0.distanceToCenter()
-  return getTransformedVertices(faces, f =>
-    withOrigin(f.centroid(), v =>
+  return getTransformedVertices(faces, (f) =>
+    withOrigin(f.centroid(), (v) =>
       v.getRotatedAroundAxis(f.normal(), angle).add(f.normal().scale(scale)),
     ),
   )
@@ -49,7 +49,7 @@ function getFaceDistance(face1: Face, face2: Face) {
   let current = [face1]
   while (!face2.inSet(current)) {
     dist++
-    current = flatMapUniq(current, face => face.adjacentFaces(), "index")
+    current = flatMapUniq(current, (face) => face.adjacentFaces(), "index")
 
     if (dist > 10) {
       throw new Error("we went toooooo far")
@@ -64,34 +64,22 @@ function getIcosahedronContractFaces(polyhedron: Polyhedron) {
   while (toTest.length > 0) {
     const [next, ...rest] = toTest
     result.push(next)
-    toTest = rest.filter(face => getFaceDistance(face, next) === 3)
+    toTest = rest.filter((face) => getFaceDistance(face, next) === 3)
   }
   return result
 }
 
 function getCuboctahedronContractFaces(polyhedron: Polyhedron) {
   const f0 = polyhedron.faceWithNumSides(3)
-  const rest = f0.edges.map(e =>
-    e
-      .twin()
-      .next()
-      .next()
-      .twinFace(),
-  )
+  const rest = f0.edges.map((e) => e.twin().next().next().twinFace())
   return [f0, ...rest]
 }
 
 function getTruncatedOctahedronContractFaces(polyhedron: Polyhedron) {
   const f0 = polyhedron.faceWithNumSides(6)
   const rest = f0.edges
-    .filter(e => e.twinFace().numSides === 4)
-    .map(e =>
-      e
-        .twin()
-        .next()
-        .next()
-        .twinFace(),
-    )
+    .filter((e) => e.twinFace().numSides === 4)
+    .map((e) => e.twin().next().next().twinFace())
   return [f0, ...rest]
 }
 
@@ -105,9 +93,9 @@ export function getExpandedFaces(polyhedron: Polyhedron, faceType?: number) {
       return getTruncatedOctahedronContractFaces(polyhedron)
     case "truncated icosidodecahedron":
     case "truncated cuboctahedron":
-      return polyhedron.faces.filter(f => f.numSides === faceType)
+      return polyhedron.faces.filter((f) => f.numSides === faceType)
     default:
-      return polyhedron.faces.filter(face =>
+      return polyhedron.faces.filter((face) =>
         isExpandedFace(polyhedron, face, faceType),
       )
   }
@@ -119,7 +107,7 @@ export function getSnubAngle(polyhedron: Polyhedron, faces: Face[]) {
   const faceNormal = face0.normal()
   const midpoint = face0.edges[0].midpoint()
 
-  const face1 = minBy(rest, face => midpoint.distanceTo(face.centroid()))!
+  const face1 = minBy(rest, (face) => midpoint.distanceTo(face.centroid()))!
 
   const plane = getPlane([
     faceCentroid,

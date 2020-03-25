@@ -46,7 +46,9 @@ export default class AppPage {
   }
 
   findElementWithText(element: string, text: string) {
-    return this.wrapper.find(element).filterWhere(n => n.text().includes(text))
+    return this.wrapper
+      .find(element)
+      .filterWhere((n) => n.text().includes(text))
   }
 
   expectElementWithText(element: string, text: string) {
@@ -63,7 +65,7 @@ export default class AppPage {
   findButtonWithText(text: string) {
     return this.wrapper
       .find("button")
-      .filterWhere(n => n.text() === text && !n.prop("disabled"))
+      .filterWhere((n) => n.text() === text && !n.prop("disabled"))
   }
 
   clickButtonWithText(text: string): this {
@@ -77,7 +79,7 @@ export default class AppPage {
   }
 
   findLinkWithText(text: string) {
-    return this.wrapper.find("a").filterWhere(n => n.text() === text)
+    return this.wrapper.find("a").filterWhere((n) => n.text() === text)
   }
 
   clickLinkWithText(text: string): this {

@@ -15,11 +15,11 @@ function bisectPrismFaces(
   boundary: FaceLike,
   twist?: Twist,
 ) {
-  const prismFaces = boundary.edges.map(edge => edge.twinFace())
-  const newFaces = boundary.edges.flatMap(edge => {
+  const prismFaces = boundary.edges.map((edge) => edge.twinFace())
+  const newFaces = boundary.edges.flatMap((edge) => {
     const twinFace = edge.twinFace()
     const [v1, v2, v3, v4] = pivot(
-      twinFace.vertices.map(v => v.index),
+      twinFace.vertices.map((v) => v.index),
       edge.v2.index,
     )
 
@@ -34,7 +34,7 @@ function bisectPrismFaces(
         ]
   })
 
-  return polyhedron.withChanges(solid =>
+  return polyhedron.withChanges((solid) =>
     solid.withoutFaces(prismFaces).addFaces(newFaces),
   )
 }
@@ -44,35 +44,21 @@ function joinAntiprismFaces(
   boundary: FaceLike,
   twist?: Twist,
 ) {
-  const antiprismFaces = boundary.edges.flatMap(edge => {
-    return [
-      edge.twinFace(),
-      edge
-        .twin()
-        .prev()
-        .twinFace(),
-    ]
+  const antiprismFaces = boundary.edges.flatMap((edge) => {
+    return [edge.twinFace(), edge.twin().prev().twinFace()]
   })
 
-  const newFaces = boundary.edges.map(edge => {
+  const newFaces = boundary.edges.map((edge) => {
     const [v1, v2] = edge.twin().vertices
     const [v3, v4] =
       twist === "left"
-        ? edge
-            .twin()
-            .prev()
-            .twin()
-            .next().vertices
-        : edge
-            .twin()
-            .next()
-            .twin()
-            .prev().vertices
+        ? edge.twin().prev().twin().next().vertices
+        : edge.twin().next().twin().prev().vertices
 
     return [v1, v2, v3, v4]
   })
 
-  return polyhedron.withChanges(solid =>
+  return polyhedron.withChanges((solid) =>
     solid.withoutFaces(antiprismFaces).addFaces(newFaces),
   )
 }

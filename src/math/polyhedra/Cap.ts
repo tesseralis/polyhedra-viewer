@@ -2,10 +2,11 @@ import { minBy, once, every, countBy, isEqual } from "lodash-es"
 
 import { flatMapUniq } from "utils"
 import { Vec3D } from "math/geom"
-import Polyhedron from "./Polyhedron"
-import Face from "./Face"
-import Vertex, { VertexList } from "./Vertex"
-import Edge from "./Edge"
+import type Polyhedron from "./Polyhedron"
+import type Face from "./Face"
+import type Vertex from "./Vertex"
+import type { VertexList } from "./Vertex"
+import type Edge from "./Edge"
 import FaceLike from "./FaceLike"
 
 type CapType = "pyramid" | "cupola" | "rotunda" | "fastigium"
@@ -13,7 +14,9 @@ type FaceConfiguration = { [key: string]: number }
 
 // Find the boundary of a connected set of faces
 function getBoundary(faces: Face[]) {
-  const e0 = faces.flatMap(f => f.edges).find(e => !e.twin().face.inSet(faces))!
+  const e0 = faces
+    .flatMap((f) => f.edges)
+    .find((e) => !e.twin().face.inSet(faces))!
 
   const result: Edge[] = []
   let e = e0
@@ -33,7 +36,7 @@ function getBoundary(faces: Face[]) {
     }
   } while (!e.equals(e0))
   return new FaceLike(
-    result.map(e => e.v1),
+    result.map((e) => e.v1),
     result,
   )
 }
@@ -46,8 +49,8 @@ function createMapper<T>(mapper: (p: Polyhedron) => T[], Base: Constructor<T>) {
     // const mapper = polyhedron[property]
     const values: T[] = mapper(polyhedron)
     return values
-      .map(arg => new Base(polyhedron, arg))
-      .filter(cap => cap.isValid())
+      .map((arg) => new Base(polyhedron, arg))
+      .filter((cap) => cap.isValid())
   }
 }
 
@@ -60,13 +63,13 @@ export default abstract class Cap implements VertexList {
 
   static find(polyhedron: Polyhedron, hitPoint: Vec3D) {
     const hitFace = polyhedron.hitFace(hitPoint)
-    const caps = Cap.getAll(polyhedron).filter(cap =>
+    const caps = Cap.getAll(polyhedron).filter((cap) =>
       hitFace.inSet(cap.faces()),
     )
     if (caps.length === 0) {
       return null
     }
-    return minBy(caps, cap => cap.topPoint.distanceTo(hitPoint))
+    return minBy(caps, (cap) => cap.topPoint.distanceTo(hitPoint))
   }
 
   static getAll(polyhedron: Polyhedron): Cap[] {
@@ -110,7 +113,7 @@ export default abstract class Cap implements VertexList {
   })
 
   faces = once(() => {
-    return flatMapUniq(this.innerVertices(), v => v.adjacentFaces(), "index")
+    return flatMapUniq(this.innerVertices(), (v) => v.adjacentFaces(), "index")
   })
 
   boundary = once(() => {
@@ -126,13 +129,13 @@ export default abstract class Cap implements VertexList {
   }
 
   isValid() {
-    const matchFaces = every(this.innerVertices(), vertex => {
+    const matchFaces = every(this.innerVertices(), (vertex) => {
       const faceCount = countBy(vertex.adjacentFaces(), "numSides")
       return isEqual(faceCount, this.faceConfiguration)
     })
     return (
       matchFaces &&
-      every(this.faces(), face => face.isValid()) &&
+      every(this.faces(), (face) => face.isValid()) &&
       this.boundary().isPlanar()
     )
   }
@@ -144,7 +147,7 @@ class Pyramid extends Cap {
       "3": vertex.adjacentEdges().length,
     })
   }
-  static getAll = createMapper(p => p.vertices, Pyramid)
+  static getAll = createMapper((p) => p.vertices, Pyramid)
 }
 
 class Fastigium extends Cap {
@@ -152,7 +155,7 @@ class Fastigium extends Cap {
     const config = { "3": 1, "4": 2 }
     super(polyhedron, edge.vertices, "fastigium", edge.midpoint(), config)
   }
-  static getAll = createMapper(p => p.edges, Fastigium)
+  static getAll = createMapper((p) => p.edges, Fastigium)
 }
 
 class Cupola extends Cap {
@@ -165,18 +168,18 @@ class Cupola extends Cap {
       countBy([3, 4, 4, face.numSides]),
     )
   }
-  static getAll = createMapper(p => p.faces, Cupola)
+  static getAll = createMapper((p) => p.faces, Cupola)
 }
 
 class Rotunda extends Cap {
   constructor(polyhedron: Polyhedron, face: Face) {
     super(
       polyhedron,
-      flatMapUniq(face.vertices, v => v.adjacentVertices(), "index"),
+      flatMapUniq(face.vertices, (v) => v.adjacentVertices(), "index"),
       "rotunda",
       face.centroid(),
       { "5": 2, "3": 2 },
     )
   }
-  static getAll = createMapper(p => p.faces, Rotunda)
+  static getAll = createMapper((p) => p.faces, Rotunda)
 }

@@ -17,8 +17,8 @@ describe("operationGraph", () => {
     it("has all archimedean operations to the platonic solids", () => {
       const platonic = ["T", "C", "O", "D", "I"]
       const ops = ["dual", "truncate", "rectify", "expand", "snub"]
-      platonic.forEach(solid => {
-        ops.forEach(op => {
+      platonic.forEach((solid) => {
+        ops.forEach((op) => {
           expect(graph).toHaveProperty(`${solid}.${op}`, expect.anything())
         })
       })
@@ -30,14 +30,14 @@ describe("operationGraph", () => {
 
     it("has truncate operation on the rectification", () => {
       const rectified = ["O", "aC", "aD"]
-      rectified.forEach(solid => {
+      rectified.forEach((solid) => {
         expect(graph).toHaveProperty(`${solid}.truncate`, expect.anything())
       })
     })
 
     it("has twist operator on the expansion", () => {
       const rectified = ["aC", "eC", "eD"]
-      rectified.forEach(solid => {
+      rectified.forEach((solid) => {
         expect(graph).toHaveProperty(`${solid}.twist`, expect.anything())
       })
     })

@@ -43,7 +43,7 @@ export default function useHitOptions() {
       applyOperation(
         operation,
         { ...options, [hitOption]: newValue },
-        result => {
+        (result) => {
           // If we're still on a cap, select it
           if (hitOption === "cap" && options[hitOption]) {
             setOption("cap", Cap.find(result, options[hitOption].topPoint))

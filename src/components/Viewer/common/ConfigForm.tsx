@@ -42,14 +42,14 @@ interface InputProps<T> {
 function ConfigInput({ input, value, setValue }: InputProps<any>) {
   const inputProps = getInputProps(input, value)
   const onChange = useCallback(
-    e => setValue(input.key, getInputValue(input, e.target)),
+    (e) => setValue(input.key, getInputValue(input, e.target)),
     [input, setValue],
   )
   switch (input.type) {
     case "select":
       return (
         <select onChange={onChange} {...inputProps}>
-          {input.options?.map(option => (
+          {input.options?.map((option) => (
             <option key={option} value={option}>
               {option}
             </option>
@@ -109,7 +109,7 @@ export default function ConfigForm() {
   })
   return (
     <form {...css()}>
-      {configInputs.map(input => (
+      {configInputs.map((input) => (
         <LabelledInput
           key={input.key}
           input={input}
