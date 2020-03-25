@@ -20,7 +20,10 @@ import {
  */
 
 function isTruncated(polyhedron: Polyhedron) {
-  return polyhedron.info.inClassicalTable({ operation: "truncate" })
+  if (!polyhedron.info.isClassical()) {
+    throw new Error("Invalid polyhedron")
+  }
+  return polyhedron.info.data.operation === "truncate"
 }
 
 // TODO figure out a way to deduplicate these functions?

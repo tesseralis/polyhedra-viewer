@@ -30,9 +30,9 @@ export function getChirality(polyhedron: Polyhedron) {
  * Return true if the polyhedron a gyroelongated bicupola, cupolarotunda, or birotunda
  */
 export function isGyroelongatedBiCupola(polyhedron: Polyhedron) {
-  return polyhedron.info.inCapstoneTable(({ count, elongation, type }) => {
-    return count === 2 && elongation === "antiprism" && type !== "pyramid"
-  })
+  const info = polyhedron.info
+  if (!info.isCapstone()) return false
+  return info.isGyroelongated() && info.isBi() && !info.isPyramid()
 }
 
 function getOppositeCaps(polyhedron: Polyhedron) {

@@ -39,7 +39,7 @@ function duplicateVertices(polyhedron: Polyhedron, facesTosharpen: Face[]) {
   )
 }
 
-function getsharpenFaces(polyhedron: Polyhedron, faceType: number) {
+function getSharpenFaces(polyhedron: Polyhedron, faceType: number) {
   // Special octahedron case
   if (polyhedron.info.isRegular()) {
     const face0 = polyhedron.getFace()
@@ -50,21 +50,21 @@ function getsharpenFaces(polyhedron: Polyhedron, faceType: number) {
   return polyhedron.faces.filter((f) => f.numSides === faceType)
 }
 
-function calculatesharpenDist(face: Face, edge: Edge) {
+function calculateSharpenDist(face: Face, edge: Edge) {
   const apothem = face.apothem()
   const theta = Math.PI - edge.dihedralAngle()
   return apothem * Math.tan(theta)
 }
 
-function getsharpenDist(polyhedron: Polyhedron, face: Face) {
+function getSharpenDist(polyhedron: Polyhedron, face: Face) {
   if (!polyhedron.info.isRegular() && !polyhedron.info.isQuasiRegular()) {
-    return meanBy(face.edges, (edge) => calculatesharpenDist(face, edge))
+    return meanBy(face.edges, (edge) => calculateSharpenDist(face, edge))
   }
-  return calculatesharpenDist(face, face.edges[0])
+  return calculateSharpenDist(face, face.edges[0])
 }
 
 function getVertexToAdd(polyhedron: Polyhedron, face: Face) {
-  const dist = getsharpenDist(polyhedron, face)
+  const dist = getSharpenDist(polyhedron, face)
   return face.normalRay().getPointAtDistance(dist)
 }
 
@@ -73,7 +73,7 @@ function applySharpen(
   { faceType = polyhedron.smallestFace().numSides }: SharpenOptions = {},
 ) {
   // face indices with the right number of sides
-  let sharpenFaces = getsharpenFaces(polyhedron, faceType)
+  let sharpenFaces = getSharpenFaces(polyhedron, faceType)
 
   let mock: Polyhedron
   if (polyhedron.info.isQuasiRegular()) {

@@ -1,37 +1,9 @@
 import { bimap } from "utils"
-import { allSolidNames, getPolyhedraNames } from "./common"
-import visitTables from "./tables/visitTables"
-
-const johnsonSolids = getPolyhedraNames("johnson")
-
-const operationMapping = {
-  regular: "",
-  truncate: "t",
-  rectify: "a",
-  bevel: "b",
-  cantellate: "e",
-  snub: "s",
-}
-
-const familyMapping = {
-  3: () => "T",
-  4: (facet: any) => (facet === "vertex" ? "O" : "C"),
-  5: (facet: any) => (facet === "vertex" ? "I" : "D"),
-}
+import { allSolidNames } from "./common"
+import getSpecs from "./specs/getSpecs"
 
 function getConwayNotation(name: string) {
-  return visitTables(name, {
-    classicals({ family, facet, operation }) {
-      return operationMapping[operation] + familyMapping[family](facet)
-    },
-    prisms({ base, type }) {
-      return type[0].toUpperCase() + base
-    },
-    default() {
-      const index = johnsonSolids.indexOf(name)
-      return "J" + (index + 1)
-    },
-  })
+  return getSpecs(name).conwaySymbol()
 }
 
 const conwayMapping = bimap<string, string>(

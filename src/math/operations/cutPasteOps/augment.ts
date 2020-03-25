@@ -273,37 +273,40 @@ function getUsingOpt(using: string, numSides: number) {
     : defaultAugmentees[numSides]
 }
 
+function hasRotunda(polyhedron: Polyhedron) {
+  const info = polyhedron.info
+  if (info.isPrismatic()) {
+    return info.data.base === 10
+  }
+  if (info.isCapstone()) {
+    return info.isMono() && !info.isPyramid() && info.data.base === 5
+  }
+  return false
+}
+
 const getUsingOpts = (polyhedron: Polyhedron) => {
   // Triangular prism or fastigium
   if (polyhedron.name === "triangular prism") {
     return ["Y4", "U2"]
   }
 
-  if (
-    polyhedron.info.inPrismTable({ base: 10 }) ||
-    polyhedron.info.inCapstoneTable(
-      ({ type, base, count }) =>
-        count === 1 && base === 5 && ["cupola", "rotunda"].includes(type),
-    )
-  ) {
+  if (hasRotunda(polyhedron)) {
     return ["U5", "R5"]
   }
   return null
 }
 
-const hasGyrateOpts = (polyhedron: Polyhedron) => {
-  if (polyhedron.info.inRhombicosidodecahedronTable()) {
-    return true
-  }
-  if (polyhedron.info.inCapstoneTable({ elongation: "antiprism" })) {
+function hasGyrateOpts(polyhedron: Polyhedron) {
+  const info = polyhedron.info
+  if (info.isCapstone()) {
+    // Gyroelongated capstones are always gyro
+    if (info.isGyroelongated()) return false
+    // Cupolae and rotundae (that are not the gyrobifastigium) always have gyrate opts
+    if (info.data.base !== 2 && !info.isPyramid()) return true
     return false
   }
-  if (
-    polyhedron.info.inCapstoneTable(
-      ({ base, type }) => type !== "pyramid" && base !== 2,
-    )
-  ) {
-    return true
+  if (info.isComposite()) {
+    return info.data.source.canonicalName() === "rhombicosidodecahedron"
   }
   return false
 }

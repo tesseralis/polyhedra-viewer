@@ -11,7 +11,8 @@ import {
 
 import { getSolidData } from "data/common"
 import { polygons } from "data/polygons"
-import SolidInfo from "data/SolidInfo"
+import getSpecs from "data/specs/getSpecs"
+import type Specs from "data/specs/PolyhedronSpecs"
 import { Vec3D, getCentroid } from "math/geom"
 
 import { SolidData } from "./solidTypes"
@@ -32,7 +33,7 @@ export default class Polyhedron {
   name: string
   faces: Face[]
   vertices: Vertex[]
-  info: SolidInfo
+  info: Specs
   private _edges?: Edge[]
 
   static get(name: string) {
@@ -46,7 +47,7 @@ export default class Polyhedron {
     )
     this.faces = solidData.faces.map((face, fIndex) => new Face(this, fIndex))
     this.name = solidData.name ?? ""
-    this.info = new SolidInfo(this.name)
+    this.info = getSpecs(this.name)
   }
 
   get edges() {
