@@ -91,4 +91,5 @@ export default class Capstone extends Specs<CapstoneData> {
   }
 
   static query = new Queries(Capstone.getAll())
+  static options = options
 }

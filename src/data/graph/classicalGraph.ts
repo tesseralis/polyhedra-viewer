@@ -1,45 +1,38 @@
+import { mapValues } from "lodash-es"
 import { Graph } from "./Graph"
-import { classicals } from "../tables"
+import Classical from "../specs/Classical"
 
 function oppositeFacet(facet: "vertex" | "face") {
   return facet === "vertex" ? "face" : "vertex"
 }
 
+const mapping: Record<string, Classical["data"]["operation"]> = {
+  rectified: "rectify",
+  bevelled: "bevel",
+  cantellated: "cantellate",
+  snub: "snub",
+}
+
 export default function classicalGraph(g: Graph) {
   // operations on regular polyhedra
-  for (const family of classicals.options.family) {
-    const regulars = classicals.getAll({ family, operation: "regular" })
+  for (const family of Classical.options.family) {
+    const regulars = Classical.query.where({ family, operation: "regular" })
 
-    const rectified = classicals.getAll({
-      family,
-      operation: "rectify",
-    })[0]
-
-    const bevelled = classicals.getAll({
-      family,
-      operation: "bevel",
-    })[0]
-
-    const cantellated = classicals.getAll({
-      family,
-      operation: "cantellate",
-    })[0]
-
-    const snub = classicals.getAll({
-      family,
-      operation: "snub",
-    })[0]
+    const { rectified, bevelled, cantellated, snub } = mapValues(
+      mapping,
+      (operation) => Classical.query.where({ family, operation })[0],
+    )
 
     for (const regular of regulars) {
-      const dual = classicals.getAll({
+      const dual = Classical.query.where({
         family,
-        facet: regular.facet && oppositeFacet(regular.facet),
+        facet: regular.data.facet && oppositeFacet(regular.data.facet),
         operation: "regular",
       })[0]
 
-      const truncated = classicals.getAll({
+      const truncated = Classical.query.where({
         family,
-        facet: regular.facet,
+        facet: regular.data.facet,
         operation: "truncate",
       })[0]
 

@@ -125,4 +125,5 @@ export default class Composite extends Specs<CompositeData> {
   }
 
   static query = new Queries(Composite.getAll())
+  static options = options
 }

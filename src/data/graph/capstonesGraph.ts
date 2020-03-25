@@ -1,39 +1,43 @@
+import { mapValues } from "lodash-es"
 import { Graph } from "./Graph"
 
-import { prisms, capstones } from "../tables"
+import Prismatic from "../specs/Prismatic"
+import Capstone from "../specs/Capstone"
+
+const prismMapping: Record<string, Prismatic["data"]["type"]> = {
+  prism: "prism",
+  antiprism: "antiprism",
+}
+
+const nonGyrateMapping: Record<string, Partial<Capstone["data"]>> = {
+  cap: { count: 1, elongation: null },
+  elongated: { count: 1, elongation: "prism" },
+  gyroelongated: { count: 1, elongation: "antiprism" },
+  gyroeongatedBi: { count: 2, elongation: "antiprism" },
+}
+
+const gyrateMapping: Record<string, Partial<Capstone["data"]>> = {
+  bi: { count: 2, elongation: null },
+  elongatedBi: { count: 2, elongation: "prism" },
+}
 
 // FIXME handle cupolarotundae
 export default function capstonesGraph(g: Graph) {
-  for (const base of capstones.options.base) {
-    for (const type of capstones.options.type) {
+  for (const base of Capstone.options.base) {
+    for (const type of Capstone.options.type) {
       if (type === "rotunda" && base !== 5) {
         continue
       }
-      const prismBase = type === "pyramid" ? base : base / 2
-      const prism = prisms.getAll({ base: prismBase as any, type: "prism" })[0]
-      const antiprism = prisms.getAll({
-        base: prismBase as any,
-        type: "antiprism",
-      })[0]
-      const cap = capstones.getAll({ base, type, count: 1, elongation: "" })[0]
-      const elongated = capstones.getAll({
-        base,
-        type,
-        count: 1,
-        elongation: "prism",
-      })[0]
-      const gyroelongated = capstones.getAll({
-        base,
-        type,
-        count: 1,
-        elongation: "antiprism",
-      })[0]
-      const gyroelongatedBi = capstones.getAll({
-        base,
-        type,
-        count: 2,
-        elongation: "antiprism",
-      })[0]
+      const prismBase = type === "pyramid" ? base : base * 2
+      const { prism, antiprism } = mapValues(
+        prismMapping,
+        (type) => Prismatic.query.where({ type, base: prismBase as any })[0],
+      )
+
+      const { cap, elongated, gyroelongated, gyroelongatedBi } = mapValues(
+        nonGyrateMapping,
+        (filter) => Capstone.query.where({ base, type, ...filter })[0],
+      )
 
       g.addEdge("augment", prism, elongated)
       g.addEdge("augment", antiprism, gyroelongated)
@@ -46,22 +50,13 @@ export default function capstonesGraph(g: Graph) {
       g.addEdge("augment", gyroelongated, gyroelongatedBi)
 
       // FIXME figure out a way to list the two options only if they have them
-      for (const gyrate of capstones.options.gyrate) {
-        const bi = capstones.getAll({
-          base,
-          type,
-          gyrate,
-          count: 2,
-          elongation: "",
-        })[0]
-        const elongatedBi = capstones.getAll({
-          base,
-          type,
-          gyrate,
-          count: 2,
-          elongation: "prism",
-        })[0]
-
+      // TODO gyrate ortho to gyro
+      for (const gyrate of Capstone.options.gyrate) {
+        const { bi, elongatedBi } = mapValues(
+          gyrateMapping,
+          (filter) =>
+            Capstone.query.where({ base, type, gyrate, ...filter })[0],
+        )
         g.addEdge("augment", cap, bi)
         g.addEdge("augment", elongated, elongatedBi)
         g.addEdge("elongate", bi, elongatedBi)

@@ -1,9 +1,8 @@
+import Solid from "../specs/PolyhedronSpecs"
 type Operation = string
 type SolidName = string
 
-type Item = {}
-
 export interface Graph {
-  addEdge(operation: Operation, from: Item, to: Item): void
+  addEdge(operation: Operation, from: Solid, to: Solid): void
   getResult(name: SolidName, operation: Operation): SolidName
 }

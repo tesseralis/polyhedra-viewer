@@ -48,4 +48,5 @@ export default class Classical extends Specs<ClassicalData> {
   }
 
   static query = new Queries(Classical.getAll())
+  static options = options
 }
