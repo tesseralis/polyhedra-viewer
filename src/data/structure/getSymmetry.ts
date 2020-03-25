@@ -41,7 +41,7 @@ function getCompositeSymmetry(composite: Composite) {
     augmented = 0,
     gyrate = 0,
     diminished = 0,
-    base,
+    source,
     align,
   } = composite.data
   const count = augmented + gyrate + diminished
@@ -49,21 +49,23 @@ function getCompositeSymmetry(composite: Composite) {
   const pure = count === augmented || count === diminished || count === gyrate
   switch (count) {
     case 0:
-      return base.symmetry()
+      return source.symmetry()
 
     case 1:
       // Mono-augmented prisms all have biradial symmetry,
       // everything else has the symmetry of their base polygon
-      return base.isPrismatic() ? Cyclic.biradial : Cyclic.get(base.data.family)
+      return source.isPrismatic()
+        ? Cyclic.biradial
+        : Cyclic.get(source.data.family)
 
     case 2:
-      if (base.isPrismatic()) {
+      if (source.isPrismatic()) {
         // para-augmented prisms have digonal prismatic symmetry
         // meta-augmented prisms have biradial symmetry
         return align === "para" ? Dihedral.get(2, "prism") : Cyclic.biradial
       }
 
-      const basePolygon = base.data.family
+      const basePolygon = source.data.family
       // Augmented cubes are always para- and thus have prismatic symmetry
       if (basePolygon === 4) {
         return Dihedral.get(4, "prism")
@@ -79,7 +81,7 @@ function getCompositeSymmetry(composite: Composite) {
 
     case 3:
       // The only tri-augmented prisms are triangular and hexagonal
-      if (base.isPrismatic()) {
+      if (source.isPrismatic()) {
         return Dihedral.get(3, "prism")
       }
 
@@ -111,12 +113,12 @@ export default function getSymmetry(solid: Structure): Symmetry {
     return getCompositeSymmetry(solid)
   }
   if (solid.isModifiedAntiprism()) {
-    const { base, operation } = solid.data
+    const { source, operation } = solid.data
     switch (operation) {
       case "snub":
-        return Dihedral.get(base.data.base, "antiprism")
+        return Dihedral.get(source.data.base, "antiprism")
       default:
-        return base.symmetry()
+        return source.symmetry()
     }
   }
   if (solid.isElementary()) {

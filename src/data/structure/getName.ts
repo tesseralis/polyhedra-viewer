@@ -76,7 +76,7 @@ export default function getName(solid: Structure): string {
       gyrate = 0,
       diminished = 0,
       align,
-      base,
+      source,
     } = solid.data
     return prefix(
       align,
@@ -84,14 +84,14 @@ export default function getName(solid: Structure): string {
         countString(augmented, "augmented"),
         countString(gyrate, "gyrate"),
         countString(diminished, "diminished"),
-        base.name(),
+        source.name(),
       ),
     )
   }
 
   if (solid.isModifiedAntiprism()) {
-    const { operation, base } = solid.data
-    return wordJoin(operation ?? "", base.name())
+    const { operation, source } = solid.data
+    return wordJoin(operation ?? "", source.name())
   }
 
   if (solid.isElementary()) {

@@ -307,7 +307,7 @@ function hasGyrateOpts(polyhedron: Polyhedron) {
     return false
   }
   if (info.isComposite()) {
-    return info.data.base.canonicalName() === "rhombicosidodecahedron"
+    return info.data.source.canonicalName() === "rhombicosidodecahedron"
   }
   return false
 }

@@ -4,13 +4,13 @@ import Prismatic from "./Prismatic"
 import { DataOptions } from "./common"
 
 interface ModifiedAntiprismData {
-  base: Prismatic
+  source: Prismatic
   // operation: null | "rectified" | "snub"
   operation: null | "snub"
 }
 
 const options: DataOptions<ModifiedAntiprismData> = {
-  base: Prismatic.query.where(
+  source: Prismatic.query.where(
     ({ base, type }) => type === "antiprism" && base <= 5,
   ),
   operation: [null, "snub"],
@@ -24,13 +24,13 @@ export default class ModifiedAntiprism extends Structure<
   }
 
   static *getAll() {
-    for (const base of options.base) {
+    for (const source of options.source) {
       for (const operation of options.operation) {
         // The snub pentagonal antiprism is non-CRF
-        if (base.data.base === 5 && operation === "snub") {
+        if (source.data.base === 5 && operation === "snub") {
           continue
         }
-        yield new ModifiedAntiprism({ base, operation })
+        yield new ModifiedAntiprism({ source, operation })
       }
     }
   }

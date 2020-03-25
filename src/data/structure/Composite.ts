@@ -9,7 +9,7 @@ export type Count = 0 | 1 | 2 | 3
 export const counts: Count[] = [0, 1, 2, 3]
 
 interface CompositeData {
-  base: Exceptional | Prismatic
+  source: Exceptional | Prismatic
   augmented?: Count
   diminished?: Count
   gyrate?: Count
@@ -29,7 +29,7 @@ const rhombicosidodecahedron = Exceptional.query.withName(
 )
 
 const options: DataOptions<CompositeData> = {
-  base: [
+  source: [
     ...prismaticBases,
     ...augmentedExceptionalBases,
     icosahedron,
@@ -56,33 +56,33 @@ export default class Composite extends Structure<CompositeData> {
 
   static *getAll() {
     // Augmented prisms
-    for (const base of prismaticBases) {
+    for (const source of prismaticBases) {
       for (const augmented of limitCount(
         options.augmented,
-        base.data.base % 3 === 0 ? 3 : 2,
+        source.data.base % 3 === 0 ? 3 : 2,
       )) {
-        if (base.data.base === 6 && augmented === 2) {
+        if (source.data.base === 6 && augmented === 2) {
           for (const align of options.align) {
-            yield new Composite({ base, augmented, align })
+            yield new Composite({ source, augmented, align })
           }
         } else {
-          yield new Composite({ base, augmented })
+          yield new Composite({ source, augmented })
         }
       }
     }
 
     // Augmented exceptional polyhedra
-    for (const base of augmentedExceptionalBases) {
+    for (const source of augmentedExceptionalBases) {
       for (const augmented of limitCount(
         options.augmented,
-        base.data.family - 2,
+        source.data.family - 2,
       )) {
-        if (base.data.family === 5 && augmented === 2) {
+        if (source.data.family === 5 && augmented === 2) {
           for (const align of options.align) {
-            yield new Composite({ base, augmented, align })
+            yield new Composite({ source, augmented, align })
           }
         } else {
-          yield new Composite({ base, augmented })
+          yield new Composite({ source, augmented })
         }
       }
     }
@@ -93,13 +93,13 @@ export default class Composite extends Structure<CompositeData> {
     for (const diminished of options.diminished) {
       if (diminished === 2) {
         for (const align of options.align) {
-          yield new Composite({ base: icosahedron, diminished, align })
+          yield new Composite({ source: icosahedron, diminished, align })
         }
       } else {
-        yield new Composite({ base: icosahedron, diminished })
+        yield new Composite({ source: icosahedron, diminished })
       }
     }
-    yield new Composite({ base: icosahedron, diminished: 3, augmented: 1 })
+    yield new Composite({ source: icosahedron, diminished: 3, augmented: 1 })
 
     // rhombicosidodecahedra
     for (const gyrate of options.gyrate) {
@@ -107,7 +107,7 @@ export default class Composite extends Structure<CompositeData> {
         if (gyrate + diminished === 2) {
           for (const align of options.align) {
             yield new Composite({
-              base: rhombicosidodecahedron,
+              source: rhombicosidodecahedron,
               gyrate,
               diminished,
               align,
@@ -115,7 +115,7 @@ export default class Composite extends Structure<CompositeData> {
           }
         } else {
           yield new Composite({
-            base: rhombicosidodecahedron,
+            source: rhombicosidodecahedron,
             gyrate,
             diminished,
           })
