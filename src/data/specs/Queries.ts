@@ -1,7 +1,6 @@
 import { some } from "lodash-es"
 import type Specs from "./PolyhedronSpecs"
 
-// TODO create a mapping and use it when filtering for names
 export default class Queries<S extends Specs> {
   entries: S[]
   nameMapping: Map<string, S[]>
