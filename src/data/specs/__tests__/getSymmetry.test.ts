@@ -1,9 +1,8 @@
 import getSpecs from "../getSpecs"
-import getSymmetry from "../getSymmetry"
 
 describe("getSymmetry", () => {
   function expectSymmetry(solid: string, expected: string) {
-    expect(getSymmetry(getSpecs(solid)).symbolStr()).toEqual(expected)
+    expect(getSpecs(solid).symmetry().symbolStr()).toEqual(expected)
   }
 
   describe("Platonic and Archimedean solids", () => {
