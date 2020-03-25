@@ -1,5 +1,5 @@
 import { Polygon } from "data/polygons"
-import Exceptional from "data/structure/Exceptional"
+import Exceptional from "data/specs/Exceptional"
 import { Polyhedron } from "math/polyhedra"
 import {
   getSnubAngle,

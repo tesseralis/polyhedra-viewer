@@ -1,9 +1,9 @@
 import { bimap } from "utils"
 import { allSolidNames } from "./common"
-import getStructure from "./structure/getStructure"
+import getSpecs from "./specs/getSpecs"
 
 function getConwayNotation(name: string) {
-  return getStructure(name).conwaySymbol()
+  return getSpecs(name).conwaySymbol()
 }
 
 const conwayMapping = bimap<string, string>(
