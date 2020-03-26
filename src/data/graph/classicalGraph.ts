@@ -2,8 +2,14 @@ import { mapValues } from "lodash-es"
 import { Graph } from "./Graph"
 import Classical from "../specs/Classical"
 
-function oppositeFacet(facet: "vertex" | "face") {
-  return facet === "vertex" ? "face" : "vertex"
+function getPair<T>(array: T[]) {
+  if (array.length > 2) {
+    throw new Error("Invalid array")
+  }
+  if (array.length === 2) {
+    return array
+  }
+  return [array[0], array[0]]
 }
 
 const mapping: Record<string, Classical["data"]["operation"]> = {
@@ -23,20 +29,16 @@ export default function classicalGraph(g: Graph) {
       (operation) => Classical.query.withData({ family, operation }),
     )
 
-    for (const regular of regulars) {
-      const dual = Classical.query.withData({
-        family,
-        facet: regular.data.facet && oppositeFacet(regular.data.facet),
-        operation: "regular",
-      })
+    const [faceReg, vertexReg] = getPair(regulars)
+    g.addEdge("dual", faceReg, vertexReg)
 
+    for (const regular of regulars) {
       const truncated = Classical.query.withData({
         family,
         facet: regular.data.facet,
         operation: "truncate",
       })
 
-      g.addEdge("dual", regular, dual)
       g.addEdge("truncate", regular, truncated)
       g.addEdge("rectify", regular, rectified)
       g.addEdge("expand", regular, cantellated)
