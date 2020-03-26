@@ -20,21 +20,21 @@ export default function classicalGraph(g: Graph) {
 
     const { rectified, bevelled, cantellated, snub } = mapValues(
       mapping,
-      (operation) => Classical.query.where({ family, operation })[0],
+      (operation) => Classical.query.withData({ family, operation }),
     )
 
     for (const regular of regulars) {
-      const dual = Classical.query.where({
+      const dual = Classical.query.withData({
         family,
         facet: regular.data.facet && oppositeFacet(regular.data.facet),
         operation: "regular",
-      })[0]
+      })
 
-      const truncated = Classical.query.where({
+      const truncated = Classical.query.withData({
         family,
         facet: regular.data.facet,
         operation: "truncate",
-      })[0]
+      })
 
       g.addEdge("dual", regular, dual)
       g.addEdge("truncate", regular, truncated)

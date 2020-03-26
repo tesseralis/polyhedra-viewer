@@ -29,14 +29,17 @@ export default function capstonesGraph(g: Graph) {
         continue
       }
       const prismBase = type === "pyramid" ? base : base * 2
-      const { prism, antiprism } = mapValues(
-        prismMapping,
-        (type) => Prismatic.query.where({ type, base: prismBase as any })[0],
+      const { prism, antiprism } = mapValues(prismMapping, (type) =>
+        Prismatic.query.withData({ type, base: prismBase as any }),
       )
 
-      const { cap, elongated, gyroelongated, gyroelongatedBi } = mapValues(
-        nonGyrateMapping,
-        (filter) => Capstone.query.where({ base, type, ...filter })[0],
+      const {
+        cap,
+        elongated,
+        gyroelongated,
+        gyroelongatedBi,
+      } = mapValues(nonGyrateMapping, (filter) =>
+        Capstone.query.withData({ base, type, ...(filter as any) }),
       )
 
       g.addEdge("augment", prism, elongated)
@@ -52,16 +55,15 @@ export default function capstonesGraph(g: Graph) {
       // FIXME figure out a way to list the two options only if they have them
       // TODO gyrate ortho to gyro
       for (const gyrate of Capstone.options.gyrate) {
-        const { bi, elongatedBi } = mapValues(
-          gyrateMapping,
-          (filter) =>
-            Capstone.query.where({ base, type, gyrate, ...filter })[0],
+        const { bi, elongatedBi } = mapValues(gyrateMapping, (filter) =>
+          Capstone.query.withData({ base, type, gyrate, ...(filter as any) }),
         )
         g.addEdge("augment", cap, bi)
         g.addEdge("augment", elongated, elongatedBi)
         g.addEdge("elongate", bi, elongatedBi)
         g.addEdge("gyroelongate", bi, gyroelongatedBi)
         g.addEdge("turn", elongatedBi, gyroelongatedBi)
+        g.addEdge("gyrate", gyroelongatedBi, gyroelongatedBi)
       }
     }
   }

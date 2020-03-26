@@ -6,6 +6,7 @@ export default function compositeGraph(g: Graph) {
   for (const source of Composite.options.source) {
     if (source.canonicalName() === "rhombicosidodecahedron") {
       // gyrate and diminished rhombicosidodecahedra
+      // FIXME decide if we're using raw source or not
       const composites = Composite.query.where({ source })
       for (const composite of composites) {
         const { gyrate = 0, diminished = 0 } = composite.data
@@ -14,49 +15,49 @@ export default function compositeGraph(g: Graph) {
           g.addEdge(
             "gyrate",
             composite,
-            Composite.query.where({
+            Composite.query.withData({
               source,
               gyrate: (gyrate - 1) as any,
               diminished,
-            })[0],
+            }),
           )
         }
         if (diminished > 0) {
           g.addEdge(
             "augment",
             composite,
-            Composite.query.where({
+            Composite.query.withData({
               source,
               gyrate,
               diminished: (diminished - 1) as any,
               align: count === 3 ? "meta" : undefined,
-            })[0],
+            }),
           )
           g.addEdge(
             "augment",
             composite,
-            Composite.query.where({
+            Composite.query.withData({
               source,
               gyrate: (gyrate - 1) as any,
               diminished: (diminished + 1) as any,
-            })[0],
+            }),
           )
         }
       }
     } else if (source.canonicalName() === "icosahedron") {
       // diminished icosahedra
-      const mono = Composite.query.where({ source, diminished: 1 })[0]
+      const mono = Composite.query.withData({ source, diminished: 1 })
       const bis = Composite.query.where({ source, diminished: 2 })
-      const tri = Composite.query.where({
+      const tri = Composite.query.withData({
         source,
         diminished: 3,
         augmented: 0,
-      })[0]
-      const augmentedTri = Composite.query.where({
+      })
+      const augmentedTri = Composite.query.withData({
         source,
         diminished: 3,
         augmented: 1,
-      })[0]
+      })
 
       g.addEdge("augment", mono, source)
       for (const bi of bis) {
@@ -67,9 +68,9 @@ export default function compositeGraph(g: Graph) {
       g.addEdge("augment", tri, augmentedTri)
     } else {
       // Augmented solids
-      const mono = Composite.query.where({ source, augmented: 1 })[0]
+      const mono = Composite.query.withData({ source, augmented: 1 })
       const bis = Composite.query.where({ source, augmented: 2 })
-      const tri = Composite.query.where({ source, augmented: 3 })[0]
+      const tri = Composite.query.withData({ source, augmented: 3 })
 
       g.addEdge("augment", source, mono)
       for (const bi of bis) {
