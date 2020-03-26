@@ -1,4 +1,3 @@
-import { mapValues } from "lodash-es"
 import { Graph } from "./Graph"
 
 import Prismatic from "../specs/Prismatic"
@@ -47,10 +46,31 @@ export default function capstoneGraph(g: Graph) {
   for (const capstone of Capstone.query.where(() => true)) {
     const { base, type, count, elongation, gyrate } = capstone.data
     if (capstone.isMono()) {
-      const bis = Capstone.query.where({ base, type, elongation, count: 2 })
-      for (const bi of bis) {
-        // TODO handle cupola-rotunda
-        g.addEdge("augment", capstone, bi)
+      if (capstone.isPyramid()) {
+        g.addEdge(
+          "augment",
+          capstone,
+          Capstone.query.withData({
+            base,
+            type,
+            count: 2,
+            elongation,
+          }),
+        )
+      } else {
+        const bis = Capstone.query.where((data) => {
+          return (
+            [type, "cupolarotunda"].includes(data.type) &&
+            base === data.base &&
+            elongation === data.elongation &&
+            count === 2
+          )
+        })
+        // const bis = Capstone.query.where({ base, type, elongation, count: 2 })
+        for (const bi of bis) {
+          // TODO handle cupola-rotunda
+          g.addEdge("augment", capstone, bi)
+        }
       }
     }
 
