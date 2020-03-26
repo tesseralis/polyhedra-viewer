@@ -38,6 +38,7 @@ export default class Capstone extends Specs<CapstoneData> {
   isMono = () => this.data.count === 1
   isBi = () => this.data.count === 2
 
+  isShortened = () => !!this.data.elongation
   isElongated = () => this.data.elongation === "prism"
   isGyroelongated = () => this.data.elongation === "antiprism"
 
