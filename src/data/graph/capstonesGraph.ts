@@ -42,10 +42,12 @@ export default function capstonesGraph(g: Graph) {
         Capstone.query.withData({ base, type, ...(filter as any) }),
       )
 
+      // Operations on prisms
       g.addEdge("augment", prism, elongated)
       g.addEdge("augment", antiprism, gyroelongated)
       g.addEdge("turn", prism, antiprism)
 
+      // Prism opts
       g.addEdge("elongate", cap, elongated)
       g.addEdge("gyroelongate", cap, gyroelongated)
       g.addEdge("turn", elongated, gyroelongated)
