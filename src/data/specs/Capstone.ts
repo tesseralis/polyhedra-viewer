@@ -30,6 +30,10 @@ export default class Capstone extends Specs<CapstoneData> {
     super("capstone", data)
   }
 
+  withData(data: Partial<CapstoneData>) {
+    return new Capstone({ ...this.data, ...data })
+  }
+
   isPyramid = () => this.data.type === "pyramid"
   isCupola = () => this.data.type === "cupola"
   isRotunda = () => this.data.type === "rotunda"

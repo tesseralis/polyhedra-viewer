@@ -54,6 +54,10 @@ export default class Composite extends Specs<CompositeData> {
     super("composite", data)
   }
 
+  withData(data: Partial<CompositeData>) {
+    return new Composite({ ...this.data, ...data })
+  }
+
   static *getAll() {
     // Augmented prisms
     for (const source of prismaticBases) {

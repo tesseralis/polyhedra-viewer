@@ -3,17 +3,20 @@ import { Graph } from "./Graph"
 import Prismatic from "../specs/Prismatic"
 import Capstone from "../specs/Capstone"
 
+function getCapTypes(base: 3 | 4 | 5): Capstone["data"]["type"][] {
+  if (base === 5) {
+    return ["cupola", "rotunda"]
+  }
+  return ["cupola"]
+}
+
 export default function capstoneGraph(g: Graph) {
   for (const prismatic of Prismatic.getAll()) {
     const { base, type } = prismatic.data
 
     // Prisms can be turned into antiprisms
     if (prismatic.isPrism()) {
-      g.addEdge(
-        "turn",
-        prismatic,
-        Prismatic.query.withData({ base, type: "antiprism" }),
-      )
+      g.addEdge("turn", prismatic, prismatic.withData({ type: "antiprism" }))
     }
     if (base <= 5) {
       g.addEdge(
@@ -27,12 +30,12 @@ export default function capstoneGraph(g: Graph) {
         }),
       )
     } else {
-      for (const capType of ["cupola", "rotunda"]) {
+      for (const capType of getCapTypes((base / 2) as any)) {
         g.addEdge(
           "augment",
           prismatic,
           Capstone.query.withData({
-            type: capType as any,
+            type: capType,
             count: 1,
             elongation: type,
             base: (base / 2) as any,
@@ -41,22 +44,12 @@ export default function capstoneGraph(g: Graph) {
       }
     }
   }
-  // FIXME can't use getAll because it generates new objects
   // TODO handle cases where the item doesn't exist
-  for (const capstone of Capstone.query.where(() => true)) {
-    const { base, type, count, elongation, gyrate } = capstone.data
-    if (capstone.isMono()) {
-      if (capstone.isPyramid()) {
-        g.addEdge(
-          "augment",
-          capstone,
-          Capstone.query.withData({
-            base,
-            type,
-            count: 2,
-            elongation,
-          }),
-        )
+  for (const cap of Capstone.getAll()) {
+    const { base, type, count, elongation } = cap.data
+    if (cap.isMono()) {
+      if (cap.isPyramid()) {
+        g.addEdge("augment", cap, cap.withData({ count: 2 }))
       } else {
         const bis = Capstone.query.where((data) => {
           return (
@@ -69,72 +62,30 @@ export default function capstoneGraph(g: Graph) {
         // const bis = Capstone.query.where({ base, type, elongation, count: 2 })
         for (const bi of bis) {
           // TODO handle cupola-rotunda
-          g.addEdge("augment", capstone, bi)
+          g.addEdge("augment", cap, bi)
         }
       }
     }
 
     // Elongate/gyroelongate if not already elongated
-    if (capstone.isShortened()) {
-      g.addEdge(
-        "elongate",
-        capstone,
-        Capstone.query.withData({
-          base,
-          type,
-          count,
-          gyrate,
-          elongation: "prism",
-        }),
-      )
+    if (cap.isShortened()) {
+      g.addEdge("elongate", cap, cap.withData({ elongation: "prism" }))
 
-      g.addEdge(
-        "gyroelongate",
-        capstone,
-        Capstone.query.withData({
-          base,
-          type,
-          count,
-          elongation: "antiprism",
-        }),
-      )
+      g.addEdge("gyroelongate", cap, cap.withData({ elongation: "antiprism" }))
     }
     // Elongated caps can be *twisted* to gyroelongated caps
-    if (capstone.isElongated()) {
-      g.addEdge(
-        "twist",
-        capstone,
-        Capstone.query.withData({
-          base,
-          type,
-          count,
-          elongation: "antiprism",
-        }),
-      )
+    if (cap.isElongated()) {
+      g.addEdge("twist", cap, cap.withData({ elongation: "antiprism" }))
     }
 
     // Gyrate between ortho and gyro cupolae
-    if (
-      capstone.isBi() &&
-      !capstone.isPyramid() &&
-      capstone.data.gyrate !== "gyro"
-    ) {
-      if (capstone.isGyroelongated()) {
+    if (cap.isBi() && !cap.isPyramid() && cap.data.gyrate !== "gyro") {
+      if (cap.isGyroelongated()) {
         // Gyroelongated capstones gyrate to themselves
-        g.addEdge("gyrate", capstone, capstone)
+        g.addEdge("gyrate", cap, cap)
       } else {
         // Ortho-capstones gyrate to gyro-capstones
-        g.addEdge(
-          "gyrate",
-          capstone,
-          Capstone.query.withData({
-            base,
-            type,
-            count,
-            elongation,
-            gyrate: "gyro",
-          }),
-        )
+        g.addEdge("gyrate", cap, cap.withData({ gyrate: "gyro" }))
       }
     }
   }

@@ -2,83 +2,69 @@ import { Graph } from "./Graph"
 
 import Composite from "../specs/Composite"
 
+// FIXME type this as a Count
+function dec(item: number): any {
+  return item - 1
+}
+
+function inc(item: number): any {
+  return item + 1
+}
+
 export default function compositeGraph(g: Graph) {
-  for (const source of Composite.options.source) {
+  for (const composite of Composite.getAll()) {
+    const { gyrate = 0, diminished = 0, augmented = 0, source } = composite.data
     if (source.canonicalName() === "rhombicosidodecahedron") {
-      // gyrate and diminished rhombicosidodecahedra
-      // FIXME decide if we're using raw source or not
-      const composites = Composite.query.where({ source })
-      for (const composite of composites) {
-        const { gyrate = 0, diminished = 0 } = composite.data
-        const count = gyrate + diminished
-        if (gyrate > 0) {
-          g.addEdge(
-            "gyrate",
-            composite,
-            Composite.query.withData({
-              source,
-              gyrate: (gyrate - 1) as any,
-              diminished,
-            }),
-          )
-        }
-        if (diminished > 0) {
-          g.addEdge(
-            "augment",
-            composite,
-            Composite.query.withData({
-              source,
-              gyrate,
-              diminished: (diminished - 1) as any,
-              align: count === 3 ? "meta" : undefined,
-            }),
-          )
-          g.addEdge(
-            "augment",
-            composite,
-            Composite.query.withData({
-              source,
-              gyrate: (gyrate - 1) as any,
-              diminished: (diminished + 1) as any,
-            }),
-          )
-        }
+      const count = gyrate + diminished
+      if (gyrate > 0) {
+        g.addEdge(
+          "gyrate",
+          composite,
+          composite.withData({ gyrate: dec(gyrate) }),
+        )
+      }
+      if (diminished > 0) {
+        g.addEdge(
+          "augment",
+          composite,
+          composite.withData({
+            diminished: dec(diminished),
+            align: count === 3 ? "meta" : undefined,
+          }),
+        )
+        g.addEdge(
+          "augment",
+          composite,
+          composite.withData({
+            gyrate: dec(diminished),
+            diminished: inc(gyrate),
+          }),
+        )
       }
     } else if (source.canonicalName() === "icosahedron") {
-      // diminished icosahedra
-      const mono = Composite.query.withData({ source, diminished: 1 })
-      const bis = Composite.query.where({ source, diminished: 2 })
-      const tri = Composite.query.withData({
-        source,
-        diminished: 3,
-        augmented: 0,
-      })
-      const augmentedTri = Composite.query.withData({
-        source,
-        diminished: 3,
-        augmented: 1,
-      })
-
-      g.addEdge("augment", mono, source)
-      for (const bi of bis) {
-        g.addEdge("augment", bi, mono)
+      if (diminished > 0) {
+        g.addEdge(
+          "augment",
+          composite,
+          composite.withData({
+            diminished: dec(diminished),
+            align: diminished === 3 ? "meta" : undefined,
+          }),
+        )
       }
-      const metaBi = bis.find((bi) => bi.data.align === "meta")!
-      g.addEdge("augment", tri, metaBi)
-      g.addEdge("augment", tri, augmentedTri)
+      if (diminished === 3 && augmented === 0) {
+        g.addEdge("augment", composite, composite.withData({ augmented: 1 }))
+      }
     } else {
-      // Augmented solids
-      const mono = Composite.query.withData({ source, augmented: 1 })
-      const bis = Composite.query.where({ source, augmented: 2 })
-      const tri = Composite.query.withData({ source, augmented: 3 })
-
-      g.addEdge("augment", source, mono)
-      for (const bi of bis) {
-        g.addEdge("augment", mono, bi)
-      }
-      const metaBi = bis.find((bi) => bi.data.align === "meta")
-      if (!!tri && !!metaBi) {
-        g.addEdge("augment", metaBi, tri)
+      if (augmented > 0) {
+        g.addEdge(
+          "augment",
+          composite.withData({
+            augmented: dec(augmented),
+            align: augmented === 3 ? "meta" : undefined,
+          }),
+          composite,
+        )
       }
     }
   }

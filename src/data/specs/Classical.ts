@@ -33,6 +33,10 @@ export default class Classical extends Specs<ClassicalData> {
     super("classical", data)
   }
 
+  withData(data: Partial<ClassicalData>) {
+    return new Classical({ ...this.data, ...data })
+  }
+
   static *getAll() {
     for (const operation of options.operation) {
       for (const family of options.family) {

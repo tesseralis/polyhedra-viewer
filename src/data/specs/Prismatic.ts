@@ -22,6 +22,10 @@ export default class Prismatic extends Specs<PrismaticData> {
     super("prismatic", data)
   }
 
+  withData(data: Partial<PrismaticData>) {
+    return new Prismatic({ ...this.data, ...data })
+  }
+
   isPrism() {
     return this.data.type === "prism"
   }
