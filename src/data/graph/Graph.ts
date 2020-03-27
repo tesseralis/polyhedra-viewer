@@ -35,8 +35,6 @@ export default class Graph {
       opMap.set(operation, [])
     }
     opMap.get(operation)!.push(to)
-
-    throw new Error("Not implemented yet")
   }
 
   addEdge(operation: Operation, from: Solid, to: Solid) {
