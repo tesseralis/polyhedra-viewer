@@ -328,7 +328,7 @@ export const augment = makeOperation<Options>("augment", {
   },
   optionTypes: ["face", "gyrate", "using"],
 
-  resultsFilter(polyhedron, { face }, relations) {
+  resultsFilter(polyhedron, { face }, resultSpecs) {
     // FIXME
     if (!face) {
       throw new Error("Invalid face")
