@@ -1,5 +1,5 @@
 import { mapValues } from "lodash-es"
-import { Graph } from "./Graph"
+import type Graph from "./Graph"
 import Classical from "../specs/Classical"
 
 function getPair<T>(array: T[]) {

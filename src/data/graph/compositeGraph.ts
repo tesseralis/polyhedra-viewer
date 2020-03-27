@@ -1,4 +1,4 @@
-import { Graph } from "./Graph"
+import type Graph from "./Graph"
 
 import Composite from "../specs/Composite"
 

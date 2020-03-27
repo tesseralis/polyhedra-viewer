@@ -1,4 +1,4 @@
-import { Graph } from "./Graph"
+import type Graph from "./Graph"
 import Elementary from "../specs/Elementary"
 
 export default function elementaryGraph(g: Graph) {
