@@ -34,12 +34,14 @@ interface Options {
 export const shorten = makeOperation<Options>("shorten", {
   apply: doShorten,
   optionTypes: ["twist"],
-  resultsFilter(polyhedron, options) {
-    if (!isGyroelongatedBiCupola(polyhedron)) return
-    const { twist } = options
+  resultsFilter(polyhedron, { twist }, resultSpecs) {
+    if (!resultSpecs.isCapstone()) {
+      throw new Error()
+    }
+    if (!isGyroelongatedBiCupola(polyhedron)) return true
     const chirality = getChirality(polyhedron)
     const gyrate = twist === chirality ? "ortho" : "gyro"
-    return { gyrate }
+    return resultSpecs.data.gyrate === gyrate
   },
 
   allOptionCombos(polyhedron) {

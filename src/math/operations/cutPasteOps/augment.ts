@@ -328,25 +328,25 @@ export const augment = makeOperation<Options>("augment", {
   },
   optionTypes: ["face", "gyrate", "using"],
 
-  resultsFilter(polyhedron, config, relations) {
-    const { face } = config
-
+  resultsFilter(polyhedron, { face }, relations) {
+    // FIXME
     if (!face) {
       throw new Error("Invalid face")
     }
-    const n = face.numSides
-    const using = getUsingOpt(config.using!, n)
+    return true
+    // const n = face.numSides
+    // const using = getUsingOpt(config.using!, n)
 
-    const baseConfig = {
-      using,
-      gyrate: using === "U2" ? "gyro" : config.gyrate,
-    }
-    return {
-      ...baseConfig,
-      align: hasMultiple(relations, "align")
-        ? getAugmentAlignment(polyhedron, face)
-        : undefined,
-    }
+    // const baseConfig = {
+    //   using,
+    //   gyrate: using === "U2" ? "gyro" : config.gyrate,
+    // }
+    // return {
+    //   ...baseConfig,
+    //   align: hasMultiple(relations, "align")
+    //     ? getAugmentAlignment(polyhedron, face)
+    //     : undefined,
+    // }
   },
 
   allOptionCombos(polyhedron) {

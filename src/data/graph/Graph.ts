@@ -48,9 +48,13 @@ export default class Graph {
     }
   }
 
-  apply(fn: (graph: Graph) => void) {
+  mergeWith(fn: (graph: Graph) => void) {
     fn(this)
     return this
+  }
+
+  canApply(name: SolidName, operation: Operation) {
+    return !!this.graph.get(name)?.get(operation)?.length
   }
 
   getResult(

@@ -111,16 +111,16 @@ export const sharpen = makeOperation<Options>("sharpen", {
   apply: applySharpen,
   optionTypes: ["faceType"],
 
-  resultsFilter(polyhedron, config) {
-    const { faceType } = config
-    switch (polyhedron.name) {
-      case "cuboctahedron":
-        return { value: faceType === 3 ? "C" : "O" }
-      case "icosidodecahedron":
-        return { value: faceType === 3 ? "D" : "I" }
-      default:
-        return {}
+  resultsFilter(polyhedron, { faceType }, resultSpecs) {
+    if (!polyhedron.info.isClassical() || !resultSpecs.isClassical()) {
+      throw new Error("invalid polyhedron")
     }
+    // FIXME make sure this works for tetrahedron
+    if (polyhedron.info.data.operation === "rectify") {
+      const isFace = faceType === 3
+      return resultSpecs.data.facet === (isFace ? "face" : "vertex")
+    }
+    return true
   },
 
   allOptionCombos(polyhedron) {

@@ -61,24 +61,24 @@ export const gyrate = makeOperation("gyrate", {
   apply: applyGyrate,
   optionTypes: ["cap"],
 
-  resultsFilter(polyhedron, config, relations) {
-    const options: any = {}
-    const { cap } = config
+  resultsFilter(polyhedron, { cap }, resultsSpec) {
     if (!cap) {
       throw new Error("Invalid cap")
     }
-    if (some(relations, "direction")) {
-      options.direction = getGyrateDirection(cap)
-      if (
-        relations.filter(
-          (relation) =>
-            relation.direction === options.direction && !!relation.align,
-        ).length > 1
-      ) {
-        options.align = getCapAlignment(polyhedron, cap)
-      }
-    }
-    return options
+    // FIXME
+    return true
+    // if (some(relations, "direction")) {
+    //   options.direction = getGyrateDirection(cap)
+    //   if (
+    //     relations.filter(
+    //       (relation) =>
+    //         relation.direction === options.direction && !!relation.align,
+    //     ).length > 1
+    //   ) {
+    //     options.align = getCapAlignment(polyhedron, cap)
+    //   }
+    // }
+    // return options
   },
 
   allOptionCombos(polyhedron) {

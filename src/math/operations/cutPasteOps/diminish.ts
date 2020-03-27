@@ -64,28 +64,42 @@ export const diminish = makeOperation<Options>("diminish", {
   },
   optionTypes: ["cap"],
 
-  resultsFilter(polyhedron, config, relations) {
-    const options: Record<string, string> = {}
-    const { cap } = config
+  resultsFilter(polyhedron, { cap }, resultSpecs) {
     if (!cap) {
       throw new Error("Invalid cap")
     }
-    const vertices = cap.innerVertices()
-    // If diminishing a pentagonal cupola/rotunda, check which one it is
-    if (vertices.length === 5) {
-      options.using = "U5"
-    } else if (vertices.length === 10) {
-      options.using = "R5"
+    const info = polyhedron.info
+
+    if (info.isCapstone()) {
+      if (!resultSpecs.isCapstone()) {
+        throw new Error("Invalid result")
+      }
+      if (!info.isCupolaRotunda()) {
+        return true
+      }
+      const vertices = cap.innerVertices()
+      const type = vertices.length === 5 ? "cupola" : "rotunda"
+      return resultSpecs.data.type !== type
     }
 
-    if (hasMultiple(relations, "gyrate")) {
-      options.gyrate = getCupolaGyrate(cap)
+    if (info.isComposite()) {
+      if (info.data.source.canonicalName() === "rhombicosidodecahedron") {
+        // FIXME implement
+      }
+
+      // FIXME deal with alignment
     }
 
-    if (options.gyrate !== "ortho" && hasMultiple(relations, "align")) {
-      options.align = getCapAlignment(polyhedron, cap)
-    }
-    return options
+    return true
+
+    // if (hasMultiple(relations, "gyrate")) {
+    //   options.gyrate = getCupolaGyrate(cap)
+    // }
+
+    // if (options.gyrate !== "ortho" && hasMultiple(relations, "align")) {
+    //   options.align = getCapAlignment(polyhedron, cap)
+    // }
+    // return options
   },
 
   allOptionCombos(polyhedron) {
