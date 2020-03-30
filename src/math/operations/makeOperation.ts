@@ -200,7 +200,7 @@ export default function makeOperation<Options extends {}>(
       return withDefaults.getHitOption!(polyhedron, vec(hitPnt), options)
     },
     canApplyTo(polyhedron) {
-      return !!getOpResults(polyhedron, name)
+      return operationGraph.canApply(polyhedron.name, name)
     },
     hasOptions(polyhedron) {
       const relations = getOpResults(polyhedron, name)

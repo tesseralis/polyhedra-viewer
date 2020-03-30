@@ -1,4 +1,4 @@
-import { isMatch } from "lodash-es"
+import { uniqBy, isMatch } from "lodash-es"
 import { getSingle } from "utils"
 import Solid from "../specs/PolyhedronSpecs"
 type Operation = string
@@ -78,7 +78,9 @@ export default class Graph {
   }
 
   getPossibleResults(name: SolidName, operation: Operation) {
-    return this.graph.get(name)?.get(operation) ?? []
+    const results = this.graph.get(name)?.get(operation) ?? []
+    // FIXME switch to a Map implementation of the results so we don't have to do this
+    return uniqBy(results, (result) => result.value)
   }
 
   canApply(name: SolidName, operation: Operation) {
@@ -93,7 +95,7 @@ export default class Graph {
     const results = this.getPossibleResults(name, operation)
     if (results.length === 0) {
       throw new Error(
-        `Could not find any results for appyling ${operation} to ${name}`,
+        `Could not find any results for applying ${operation} to ${name}`,
       )
     }
     return getSingle(results.filter((entry) => isMatch(entry, filter))).value

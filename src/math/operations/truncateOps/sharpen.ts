@@ -111,15 +111,9 @@ export const sharpen = makeOperation<Options>("sharpen", {
   apply: applySharpen,
   optionTypes: ["faceType"],
 
-  resultsFilter(polyhedron, config) {
-    const { faceType } = config
-    switch (polyhedron.name) {
-      case "cuboctahedron":
-        return { value: faceType === 3 ? "C" : "O" }
-      case "icosidodecahedron":
-        return { value: faceType === 3 ? "D" : "I" }
-      default:
-        return {}
+  resultsFilter(polyhedron, { faceType }) {
+    if (polyhedron.info.isQuasiRegular() && !polyhedron.info.isRegular()) {
+      return { facet: faceType === 3 ? "face" : "vertex" }
     }
   },
 
