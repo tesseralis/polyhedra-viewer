@@ -1,6 +1,5 @@
 import { mapValues, isEmpty, uniq } from "lodash-es"
 
-// import operationGraph, { Relation } from "data/operationGraph"
 import operationGraph from "data/graph/operationGraph"
 import { Vec3D, vec, PRECISION } from "math/geom"
 import { Polyhedron, Vertex, VertexArg, normalizeVertex } from "math/polyhedra"

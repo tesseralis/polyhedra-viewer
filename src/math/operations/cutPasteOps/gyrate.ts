@@ -61,9 +61,8 @@ export const gyrate = makeOperation("gyrate", {
   apply: applyGyrate,
   optionTypes: ["cap"],
 
-  resultsFilter(polyhedron, config, relations) {
+  resultsFilter(polyhedron, { cap }, relations) {
     const options: any = {}
-    const { cap } = config
     if (!cap) {
       throw new Error("Invalid cap")
     }

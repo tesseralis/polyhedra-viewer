@@ -96,9 +96,8 @@ function doTurn(polyhedron: Polyhedron, { twist = "left" }: Options) {
 export const turn = makeOperation<Options>("turn", {
   apply: doTurn,
   optionTypes: ["twist"],
-  resultsFilter(polyhedron, options) {
+  resultsFilter(polyhedron, { twist }) {
     if (!isGyroelongatedBiCupola(polyhedron)) return
-    const { twist } = options
     const chirality = getChirality(polyhedron)
     const gyrate = twist === chirality ? "ortho" : "gyro"
     return { gyrate }
