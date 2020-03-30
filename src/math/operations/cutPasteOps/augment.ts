@@ -333,22 +333,17 @@ export const augment = makeOperation<Options>("augment", {
   },
   optionTypes: ["face", "gyrate", "using"],
 
-  resultsFilter(polyhedron, config, relations) {
-    const { face } = config
-
+  resultsFilter(polyhedron, { face, using, gyrate }, relations) {
     if (!face) {
       throw new Error("Invalid face")
     }
     const n = face.numSides
-    const { type, base } = getGraphArgs(getUsingOpt(config.using!, n))
+    const { type, base } = getGraphArgs(getUsingOpt(using!, n))
 
-    const baseConfig = {
+    return {
       type,
       base,
-      gyrate: base === 2 ? "gyro" : config.gyrate,
-    }
-    return {
-      ...baseConfig,
+      gyrate: base === 2 ? "gyro" : gyrate,
       align: hasMultiple(relations, "align")
         ? getAugmentAlignment(polyhedron, face)
         : undefined,

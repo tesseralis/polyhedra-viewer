@@ -1,4 +1,3 @@
-import { every } from "lodash-es"
 import { getSingle } from "utils"
 import { Cap, Polyhedron } from "math/polyhedra"
 import { isInverse } from "math/geom"
@@ -9,6 +8,14 @@ type Relation = Record<string, any>
 export const hasMultiple = (relations: Relation[], property: string) => {
   const set = new Set(relations.map((r) => r[property]).filter((x) => !!x))
   return set.size > 1
+}
+
+export function getCupolaGyrate(cap: Cap) {
+  const isOrtho = cap.boundary().edges.every((edge) => {
+    const [n1, n2] = edge.adjacentFaces().map((f) => f.numSides)
+    return (n1 === 4) === (n2 === 4)
+  })
+  return isOrtho ? "ortho" : "gyro"
 }
 
 export function getCapAlignment(polyhedron: Polyhedron, cap: Cap) {
@@ -23,14 +30,6 @@ export function getCapAlignment(polyhedron: Polyhedron, cap: Cap) {
       : polyhedron.largestFace().normal()
 
   return isInverse(cap.normal(), otherNormal) ? "para" : "meta"
-}
-
-export function getCupolaGyrate(cap: Cap) {
-  const isOrtho = every(cap.boundary().edges, (edge) => {
-    const [n1, n2] = edge.adjacentFaces().map((f) => f.numSides)
-    return (n1 === 4) === (n2 === 4)
-  })
-  return isOrtho ? "ortho" : "gyro"
 }
 
 export function getGyrateDirection(cap: Cap) {

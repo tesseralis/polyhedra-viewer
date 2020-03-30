@@ -60,7 +60,7 @@ export interface Operation<Options extends {}> extends BaseOperation<Options> {
   getHitOption(polyhedron: Polyhedron, hitPnt: Point, options: Options): Options
 
   /**
-   * @return whether this operation has results for the given polyhedron.
+   * @return whether this operation has multiple options for the given polyhedron.
    */
   hasOptions(polyhedron: Polyhedron): boolean
 }
@@ -81,6 +81,8 @@ interface OperationArgs<Options extends {}>
     resultName: string,
   ): PartialOpResult | Polyhedron
 
+  hasOptions?(polyhedron: Polyhedron): boolean
+
   resultsFilter?(
     polyhedron: Polyhedron,
     options: Partial<Options>,
@@ -97,6 +99,7 @@ interface OperationArgs<Options extends {}>
 type OperationArg = keyof OperationArgs<any>
 const methodDefaults = {
   getHitOption: {},
+  hasOptions: false,
   allOptionCombos: [null],
   resultsFilter: undefined,
   faceSelectionStates: [],
@@ -203,18 +206,17 @@ export default function makeOperation<Options extends {}>(
     },
     hasOptions(polyhedron) {
       const relations = getOpResults(polyhedron, name)
-      if (isEmpty(relations)) return false
-      const isChiral = relations.find((rel) => rel.chiral)
+      const isChiral = relations.some((rel) => rel.chiral)
       // TODO maybe split up among operations?
       // but I think that might just grow the code...
       switch (name) {
         case "turn":
           return relations.length > 1 || isChiral
         case "twist":
-          return relations[0].value[0] === "s"
+          return relations[0].value.includes("snub")
         case "snub":
         case "gyroelongate":
-          return !!isChiral
+          return isChiral
         case "sharpen":
         case "contract":
         case "shorten":
