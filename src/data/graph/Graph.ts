@@ -61,7 +61,6 @@ export default class Graph {
       const newEntry = { ...resultEntries.get(toName), ...options }
       resultEntries.set(toName, newEntry)
     }
-    // opMap.get(operation)!.push({ value: to.canonicalName(), ...options })
   }
 
   addEdge(
@@ -73,7 +72,6 @@ export default class Graph {
     this.addDirectedEdge(operation, from, to, options)
     // TODO make more robust, even though we're guaranteed equality for our use case
     if (from !== to) {
-      // TODO gyrate should switch a "forward" argument to "back"
       const inverseOperation = getInverseOperation(operation)
       if (operation === "gyrate" && options?.direction === "back") {
         options.direction = "forward"
