@@ -64,9 +64,8 @@ export const diminish = makeOperation<Options>("diminish", {
   },
   optionTypes: ["cap"],
 
-  resultsFilter(polyhedron, config, relations) {
+  resultsFilter(polyhedron, { cap }, relations) {
     const options: Record<string, string> = {}
-    const { cap } = config
     if (!cap) {
       throw new Error("Invalid cap")
     }
