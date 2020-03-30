@@ -24,8 +24,8 @@ function getInverseOperation(operation: string) {
   if (["expand", "snub"].includes(operation)) {
     return "contract"
   }
-  if (["elongate", "gyroelongate".includes(operation)]) {
-    return "contract"
+  if (["elongate", "gyroelongate"].includes(operation)) {
+    return "shorten"
   }
   if (operation === "augment") return "diminish"
   throw new Error(`Invalid operation name: ${operation}`)

@@ -100,24 +100,12 @@ export const contract = makeOperation<Options>("contract", {
 
   resultsFilter(polyhedron, config) {
     const { faceType } = config
-    if (isBevelled(polyhedron)) {
-      switch (polyhedron.name) {
-        case "truncated cuboctahedron":
-          return { value: faceType === 6 ? "tO" : "tC" }
-        case "truncated icosidodecahedron":
-          return { value: faceType === 6 ? "tI" : "tD" }
-        default:
-          return
-      }
+    if (getFamily(polyhedron) === 3) {
+      return
     }
-    switch (getFamily(polyhedron)) {
-      case 4:
-        return { value: faceType === 3 ? "O" : "C" }
-      case 5:
-        return { value: faceType === 3 ? "I" : "D" }
-      default:
-        return
-    }
+
+    const isVertex = faceType === (isBevelled(polyhedron) ? 6 : 3)
+    return { facet: isVertex ? "vertex" : "face" }
   },
 
   hitOption: "faceType",

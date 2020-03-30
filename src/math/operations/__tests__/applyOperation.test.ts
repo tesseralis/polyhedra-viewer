@@ -10,7 +10,7 @@ describe("applyOperation", () => {
   const polyhedra = allSolidNames.map((name) => Polyhedron.get(name))
   forEach(operations, (operation, opName) => {
     describe(opName, () => {
-      if (!["truncate", "rectify", "sharpen"].includes(opName)) {
+      if (["augment", "diminish", "gyrate"].includes(opName)) {
         return
       }
       for (const polyhedron of polyhedra) {

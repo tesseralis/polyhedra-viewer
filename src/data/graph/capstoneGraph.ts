@@ -96,6 +96,7 @@ export default function capstoneGraph(g: Graph) {
           "gyroelongate",
           cap,
           cap.withData({ elongation: "antiprism" }),
+          { gyrate: cap.data.gyrate },
         )
       }
     }
@@ -103,6 +104,7 @@ export default function capstoneGraph(g: Graph) {
     if (cap.isElongated()) {
       if (!(type === "pyramid" && base === 3)) {
         g.addEdge("turn", cap, cap.withData({ elongation: "antiprism" }), {
+          gyrate: cap.data.gyrate,
           chiral: true,
         })
       }
