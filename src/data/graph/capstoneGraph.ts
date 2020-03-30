@@ -117,7 +117,6 @@ export default function capstoneGraph(g: Graph) {
       if (!(type === "pyramid" && base === 3)) {
         g.addEdge("turn", cap, cap.withData({ elongation: "antiprism" }), {
           gyrate: cap.data.gyrate,
-          chiral: !cap.isPyramid(),
         })
       }
     }

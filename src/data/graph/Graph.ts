@@ -11,7 +11,6 @@ interface GraphOptions {
   gyrate?: "ortho" | "gyro"
   align?: "meta" | "para"
   direction?: "forward" | "back"
-  chiral?: boolean
 }
 
 function getInverseOperation(operation: string) {

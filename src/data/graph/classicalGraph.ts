@@ -32,8 +32,6 @@ export default function classicalGraph(g: Graph) {
     const [faceReg, vertexReg] = getPair(regulars)
     g.addEdge("dual", faceReg, vertexReg)
 
-    const chiralOpts = { chiral: family !== 3 }
-
     for (const regular of regulars) {
       const truncated = Classical.query.withData({
         family,
@@ -46,12 +44,12 @@ export default function classicalGraph(g: Graph) {
       g.addEdge("truncate", regular, truncated)
       g.addEdge("rectify", regular, rectified, facetOpts)
       g.addEdge("expand", regular, cantellated, facetOpts)
-      g.addEdge("snub", regular, snub, { ...facetOpts, ...chiralOpts })
+      g.addEdge("snub", regular, snub, facetOpts)
 
       g.addEdge("expand", truncated, bevelled, facetOpts)
     }
 
     g.addEdge("truncate", rectified, bevelled)
-    g.addEdge("twist", cantellated, snub, chiralOpts)
+    g.addEdge("twist", cantellated, snub)
   }
 }
