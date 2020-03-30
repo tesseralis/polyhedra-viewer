@@ -6,7 +6,6 @@ import { repeat, getCyclic, getSingle } from "utils"
 import { deduplicateVertices } from "../makeOperation"
 
 import makeOperation from "../makeOperation"
-import { hasMultiple } from "./cutPasteUtils"
 import { withOrigin } from "../../geom"
 
 type AugmentType = "pyramid" | "cupola" | "rotunda"
@@ -39,7 +38,17 @@ const augmentTypes: Record<string, AugmentType> = {
   R: "rotunda",
 }
 
+function hasAugmentAlignment(polyhedron: Polyhedron) {
+  const info = polyhedron.info
+  if (!info.isComposite()) return false
+  const { source, augmented = 0 } = info.data
+  if (augmented !== 1) return false
+  if (source.isPrismatic()) return source.data.base === 6
+  return source.data.family === 5
+}
+
 function getAugmentAlignment(polyhedron: Polyhedron, face: Face) {
+  if (!hasAugmentAlignment(polyhedron)) return
   const boundary = getSingle(Cap.getAll(polyhedron)).boundary()
   return isInverse(boundary.normal(), face.normal()) ? "para" : "meta"
 }
@@ -333,7 +342,7 @@ export const augment = makeOperation<Options>("augment", {
   },
   optionTypes: ["face", "gyrate", "using"],
 
-  resultsFilter(polyhedron, { face, using, gyrate }, relations) {
+  resultsFilter(polyhedron, { face, using, gyrate }) {
     if (!face) {
       throw new Error("Invalid face")
     }
@@ -344,9 +353,7 @@ export const augment = makeOperation<Options>("augment", {
       type,
       base,
       gyrate: base === 2 ? "gyro" : gyrate,
-      align: hasMultiple(relations, "align")
-        ? getAugmentAlignment(polyhedron, face)
-        : undefined,
+      align: getAugmentAlignment(polyhedron, face),
     }
   },
 
