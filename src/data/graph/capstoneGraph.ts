@@ -57,8 +57,15 @@ export default function capstoneGraph(g: Graph) {
   for (const cap of Capstone.getAll()) {
     const { base, type, count, elongation } = cap.data
 
-    // FIXME add back the gyrobifastigium augment
     if (base === 2) {
+      if (cap.isMono()) {
+        g.addEdge("augment", cap, cap.withData({ count: 2, gyrate: "gyro" }), {
+          gyrate: "gyro",
+          base: 2,
+          type: "cupola",
+        })
+      }
+      // short-circuit the other operations for gyrobifastigium
       continue
     }
     if (cap.isMono()) {

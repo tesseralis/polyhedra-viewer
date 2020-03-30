@@ -30,7 +30,7 @@ export default function compositeGraph(g: Graph) {
             gyrate: dec(gyrate),
             align: count === 3 ? "meta" : undefined,
           }),
-          { direction: "back" },
+          { direction: "back", align },
         )
       }
       if (diminished > 0) {
@@ -41,7 +41,7 @@ export default function compositeGraph(g: Graph) {
             diminished: dec(diminished),
             align: count === 3 ? "meta" : undefined,
           }),
-          { type: "cupola", base: 5, gyrate: "gyro" },
+          { type: "cupola", base: 5, gyrate: "gyro", align },
         )
         g.addEdge(
           "augment",
@@ -50,7 +50,7 @@ export default function compositeGraph(g: Graph) {
             diminished: dec(diminished),
             gyrate: inc(gyrate),
           }),
-          { type: "cupola", base: 5, gyrate: "ortho" },
+          { type: "cupola", base: 5, gyrate: "ortho", align },
         )
       }
     } else if (source.canonicalName() === "icosahedron") {

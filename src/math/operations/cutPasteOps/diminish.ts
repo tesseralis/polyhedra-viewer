@@ -73,9 +73,9 @@ export const diminish = makeOperation<Options>("diminish", {
     const vertices = cap.innerVertices()
     // If diminishing a pentagonal cupola/rotunda, check which one it is
     if (vertices.length === 5) {
-      options.using = "U5"
+      options.type = "cupola"
     } else if (vertices.length === 10) {
-      options.using = "R5"
+      options.type = "rotunda"
     }
 
     if (hasMultiple(relations, "gyrate")) {

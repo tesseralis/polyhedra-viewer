@@ -1,4 +1,4 @@
-import { uniqBy, isMatch } from "lodash-es"
+import { pickBy, isMatch } from "lodash-es"
 import { getSingle } from "utils"
 import Solid from "../specs/PolyhedronSpecs"
 type Operation = string
@@ -31,11 +31,9 @@ function getInverseOperation(operation: string) {
   throw new Error(`Invalid operation name: ${operation}`)
 }
 
-interface ResultEntry extends GraphOptions {
-  value: SolidName
-}
+type ResultEntries = Map<string, GraphOptions>
 
-type OperationMap = Map<string, ResultEntry[]>
+type OperationMap = Map<string, ResultEntries>
 
 export default class Graph {
   graph = new Map<string, OperationMap>()
@@ -46,15 +44,24 @@ export default class Graph {
     to: Solid,
     options?: GraphOptions,
   ) {
-    const key = from.canonicalName()
-    if (!this.graph.has(key)) {
-      this.graph.set(key, new Map())
+    const fromName = from.canonicalName()
+    const toName = to.canonicalName()
+
+    if (!this.graph.has(fromName)) {
+      this.graph.set(fromName, new Map())
     }
-    const opMap = this.graph.get(key)!
+    const opMap = this.graph.get(fromName)!
     if (!opMap.has(operation)) {
-      opMap.set(operation, [])
+      opMap.set(operation, new Map())
     }
-    opMap.get(operation)!.push({ value: to.canonicalName(), ...options })
+    const resultEntries = opMap.get(operation)!
+    if (resultEntries.has(toName)) {
+      resultEntries.set(toName, options ?? {})
+    } else {
+      const newEntry = { ...resultEntries.get(toName), ...options }
+      resultEntries.set(toName, newEntry)
+    }
+    // opMap.get(operation)!.push({ value: to.canonicalName(), ...options })
   }
 
   addEdge(
@@ -63,11 +70,14 @@ export default class Graph {
     to: Solid,
     options?: GraphOptions,
   ) {
-    this.addDirectedEdge(operation, from, to)
+    this.addDirectedEdge(operation, from, to, options)
     // TODO make more robust, even though we're guaranteed equality for our use case
     if (from !== to) {
       // TODO gyrate should switch a "forward" argument to "back"
       const inverseOperation = getInverseOperation(operation)
+      if (operation === "gyrate" && options?.direction === "back") {
+        options.direction = "forward"
+      }
       this.addDirectedEdge(inverseOperation, to, from, options)
     }
   }
@@ -78,9 +88,8 @@ export default class Graph {
   }
 
   getPossibleResults(name: SolidName, operation: Operation) {
-    const results = this.graph.get(name)?.get(operation) ?? []
-    // FIXME switch to a Map implementation of the results so we don't have to do this
-    return uniqBy(results, (result) => result.value)
+    const results = this.graph.get(name)?.get(operation) ?? new Map()
+    return [...results].map(([value, options]) => ({ value, ...options }))
   }
 
   canApply(name: SolidName, operation: Operation) {
@@ -98,6 +107,7 @@ export default class Graph {
         `Could not find any results for applying ${operation} to ${name}`,
       )
     }
-    return getSingle(results.filter((entry) => isMatch(entry, filter))).value
+    return getSingle(results.filter((entry) => isMatch(entry, pickBy(filter))))
+      .value
   }
 }

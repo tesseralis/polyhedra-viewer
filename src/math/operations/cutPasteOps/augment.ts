@@ -284,6 +284,11 @@ function hasRotunda(polyhedron: Polyhedron) {
   return false
 }
 
+function getGraphArgs(using: string) {
+  const [prefix, baseStr] = using
+  return { type: augmentTypes[prefix], base: parseInt(baseStr) }
+}
+
 const getUsingOpts = (polyhedron: Polyhedron) => {
   // Triangular prism or fastigium
   if (polyhedron.name === "triangular prism") {
@@ -335,11 +340,12 @@ export const augment = makeOperation<Options>("augment", {
       throw new Error("Invalid face")
     }
     const n = face.numSides
-    const using = getUsingOpt(config.using!, n)
+    const { type, base } = getGraphArgs(getUsingOpt(config.using!, n))
 
     const baseConfig = {
-      using,
-      gyrate: using === "U2" ? "gyro" : config.gyrate,
+      type,
+      base,
+      gyrate: base === 2 ? "gyro" : config.gyrate,
     }
     return {
       ...baseConfig,
