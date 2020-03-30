@@ -31,7 +31,11 @@ export default class Capstone extends Specs<CapstoneData> {
   }
 
   withData(data: Partial<CapstoneData>) {
-    return new Capstone({ ...this.data, ...data })
+    const newData = { ...this.data, ...data }
+    if (newData.elongation === "antiprism") {
+      delete newData.gyrate
+    }
+    return new Capstone(newData)
   }
 
   isPyramid = () => this.data.type === "pyramid"
@@ -42,7 +46,7 @@ export default class Capstone extends Specs<CapstoneData> {
   isMono = () => this.data.count === 1
   isBi = () => this.data.count === 2
 
-  isShortened = () => !!this.data.elongation
+  isShortened = () => !this.data.elongation
   isElongated = () => this.data.elongation === "prism"
   isGyroelongated = () => this.data.elongation === "antiprism"
 

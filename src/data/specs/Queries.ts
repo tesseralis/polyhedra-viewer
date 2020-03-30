@@ -1,4 +1,4 @@
-import { isFunction, isMatch, some } from "lodash-es"
+import { pickBy, isFunction, isMatch, some } from "lodash-es"
 import { getSingle } from "utils"
 import type Specs from "./PolyhedronSpecs"
 
@@ -31,7 +31,9 @@ export default class Queries<S extends Specs> {
   }
 
   withData(data: S["data"]) {
-    return getSingle(this.entries.filter((item) => isMatch(item.data, data)))
+    // Remove nullish elements from the filter
+    const compact = pickBy(data)
+    return getSingle(this.entries.filter((item) => isMatch(item.data, compact)))
   }
 
   /**

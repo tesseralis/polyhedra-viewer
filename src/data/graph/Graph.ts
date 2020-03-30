@@ -88,7 +88,7 @@ export default class Graph {
   getResult(
     name: SolidName,
     operation: Operation,
-    filter: Partial<GraphOptions>,
+    filter: Partial<GraphOptions> = {},
   ): SolidName {
     const results = this.getPossibleResults(name, operation)
     if (results.length === 0) {

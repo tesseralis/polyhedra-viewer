@@ -55,7 +55,12 @@ export default class Composite extends Specs<CompositeData> {
   }
 
   withData(data: Partial<CompositeData>) {
-    return new Composite({ ...this.data, ...data })
+    const newData = { ...this.data, ...data }
+    const { augmented = 0, diminished = 0, gyrate = 0 } = newData
+    if (augmented + diminished + gyrate !== 2) {
+      delete newData.align
+    }
+    return new Composite(newData)
   }
 
   static *getAll() {

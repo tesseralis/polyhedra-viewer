@@ -18,8 +18,14 @@ export default function capstoneGraph(g: Graph) {
     if (prismatic.isPrism()) {
       g.addEdge("turn", prismatic, prismatic.withData({ type: "antiprism" }))
     }
+    if (base === 2) {
+      continue
+    }
     if (base <= 5) {
       // Prisms of with a base <= 5 can be augmented with a pyramid
+      if (type === "antiprism" && base === 3) {
+        continue
+      }
       g.addEdge(
         "augment",
         prismatic,
@@ -50,6 +56,11 @@ export default function capstoneGraph(g: Graph) {
   // TODO handle cases where the item doesn't exist
   for (const cap of Capstone.getAll()) {
     const { base, type, count, elongation } = cap.data
+
+    // FIXME add back the gyrobifastigium augment
+    if (base === 2) {
+      continue
+    }
     if (cap.isMono()) {
       if (cap.isPyramid()) {
         g.addEdge("augment", cap, cap.withData({ count: 2 }), {
@@ -80,13 +91,21 @@ export default function capstoneGraph(g: Graph) {
     if (cap.isShortened()) {
       g.addEdge("elongate", cap, cap.withData({ elongation: "prism" }))
 
-      g.addEdge("gyroelongate", cap, cap.withData({ elongation: "antiprism" }))
+      if (!(type === "pyramid" && base === 3)) {
+        g.addEdge(
+          "gyroelongate",
+          cap,
+          cap.withData({ elongation: "antiprism" }),
+        )
+      }
     }
     // Elongated caps can be *turned* to gyroelongated caps
     if (cap.isElongated()) {
-      g.addEdge("turn", cap, cap.withData({ elongation: "antiprism" }), {
-        chiral: true,
-      })
+      if (!(type === "pyramid" && base === 3)) {
+        g.addEdge("turn", cap, cap.withData({ elongation: "antiprism" }), {
+          chiral: true,
+        })
+      }
     }
 
     // Gyrate between ortho and gyro cupolae

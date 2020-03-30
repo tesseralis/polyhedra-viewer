@@ -1,8 +1,7 @@
-import { mapValues, isEmpty, filter, uniq, pickBy } from "lodash-es"
+import { mapValues, isEmpty, uniq } from "lodash-es"
 
-import { toConwayNotation, fromConwayNotation } from "data/conway"
-import operationGraph, { Relation } from "data/operationGraph"
-import { getSingle } from "utils"
+// import operationGraph, { Relation } from "data/operationGraph"
+import operationGraph from "data/graph/operationGraph"
 import { Vec3D, vec, PRECISION } from "math/geom"
 import { Polyhedron, Vertex, VertexArg, normalizeVertex } from "math/polyhedra"
 import { removeExtraneousVertices } from "./operationUtils"
@@ -86,7 +85,7 @@ interface OperationArgs<Options extends {}>
   resultsFilter?(
     polyhedron: Polyhedron,
     options: Partial<Options>,
-    results: Relation[],
+    results: any[],
   ): object | undefined
 
   getHitOption?(
@@ -106,7 +105,7 @@ const methodDefaults = {
 }
 
 export function getOpResults(solid: Polyhedron, opName: string) {
-  return operationGraph[toConwayNotation(solid.name)][opName]
+  return operationGraph.getPossibleResults(solid.name, opName)
 }
 
 // TODO get this to return the correct type
@@ -118,16 +117,6 @@ function fillDefaults<Options extends {}>(op: OperationArgs<Options>) {
     ),
     ...op,
   }
-}
-// Get the polyhedron name as a result of applying the operation to the given polyhedron
-function getNextPolyhedron<O>(
-  solid: Polyhedron,
-  operation: string,
-  filterOpts: O,
-) {
-  const results = getOpResults(solid, operation)
-  const next = isEmpty(filterOpts) ? results : filter(results, filterOpts)
-  return fromConwayNotation((getSingle(next) as any).value)
 }
 
 function normalizeOpResult(
@@ -197,7 +186,11 @@ export default function makeOperation<Options extends {}>(
         options ?? {},
         results,
       )
-      const next = getNextPolyhedron(polyhedron, name, pickBy(searchOptions))
+      const next = operationGraph.getResult(
+        polyhedron.name,
+        name,
+        searchOptions,
+      )
 
       // Get the actual operation result
       const opResult = withDefaults.apply(polyhedron, options ?? {}, next)

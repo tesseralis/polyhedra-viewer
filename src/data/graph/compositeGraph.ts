@@ -26,7 +26,10 @@ export default function compositeGraph(g: Graph) {
         g.addEdge(
           "gyrate",
           composite,
-          composite.withData({ gyrate: dec(gyrate) }),
+          composite.withData({
+            gyrate: dec(gyrate),
+            align: count === 3 ? "meta" : undefined,
+          }),
           { direction: "back" },
         )
       }
@@ -51,7 +54,7 @@ export default function compositeGraph(g: Graph) {
         )
       }
     } else if (source.canonicalName() === "icosahedron") {
-      if (diminished > 0) {
+      if (diminished > 0 && augmented === 0) {
         g.addEdge(
           "augment",
           composite,
@@ -75,11 +78,14 @@ export default function compositeGraph(g: Graph) {
             ? "cupola"
             : "pyramid"
         const baseOption = source.isClassical() ? source.data.family : 4
+        const hasAlign =
+          (source.isClassical() && source.data.family === 5) ||
+          (source.isPrismatic() && source.data.base === 6)
         g.addEdge(
           "augment",
           composite.withData({
             augmented: dec(augmented),
-            align: augmented === 3 ? "meta" : undefined,
+            align: hasAlign && augmented === 3 ? "meta" : undefined,
           }),
           composite,
           { align, type: typeOption, base: baseOption },
