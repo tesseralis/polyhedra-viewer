@@ -32,7 +32,7 @@ export default function classicalGraph(g: Graph) {
     const [faceReg, vertexReg] = getPair(regulars)
     g.addEdge("dual", faceReg, vertexReg)
 
-    const chiralOpts = { chiral: true }
+    const chiralOpts = { chiral: family !== 3 }
 
     for (const regular of regulars) {
       const truncated = Classical.query.withData({
@@ -45,7 +45,6 @@ export default function classicalGraph(g: Graph) {
 
       g.addEdge("truncate", regular, truncated)
       g.addEdge("rectify", regular, rectified, facetOpts)
-      // FIXME this generates two different contract args that go to the same thing
       g.addEdge("expand", regular, cantellated, facetOpts)
       g.addEdge("snub", regular, snub, { ...facetOpts, ...chiralOpts })
 

@@ -55,7 +55,7 @@ export default function capstoneGraph(g: Graph) {
   }
   // TODO handle cases where the item doesn't exist
   for (const cap of Capstone.getAll()) {
-    const { base, type, count, elongation } = cap.data
+    const { base, type, elongation } = cap.data
 
     if (base === 2) {
       if (cap.isMono()) {
@@ -76,19 +76,24 @@ export default function capstoneGraph(g: Graph) {
         })
       } else {
         const bis = Capstone.query.where((data) => {
-          return (
+          const result =
             [type, "cupolarotunda"].includes(data.type) &&
             base === data.base &&
             elongation === data.elongation &&
-            count === 2
-          )
+            data.count === 2
+          return result
         })
         for (const bi of bis) {
-          // TODO handle cupola-rotunda
+          const typeOpt =
+            bi.data.type === "cupolarotunda"
+              ? type === "cupola"
+                ? "rotunda"
+                : "cupola"
+              : (type as any)
           g.addEdge("augment", cap, bi, {
             gyrate: bi.data.gyrate,
             base,
-            type: bi.data.type as any,
+            type: typeOpt,
           })
         }
       }

@@ -10,6 +10,9 @@ describe("applyOperation", () => {
   const polyhedra = allSolidNames.map((name) => Polyhedron.get(name))
   forEach(operations, (operation, opName) => {
     describe(opName, () => {
+      // if (opName !== "diminish") {
+      //   return
+      // }
       for (const polyhedron of polyhedra) {
         if (operation.canApplyTo(polyhedron)) {
           it(polyhedron.name, () => {
