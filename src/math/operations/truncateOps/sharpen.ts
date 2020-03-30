@@ -117,6 +117,15 @@ export const sharpen = makeOperation<Options>("sharpen", {
     }
   },
 
+  hasOptions(polyhedron) {
+    const info = polyhedron.info
+    return (
+      info.isClassical() &&
+      info.data.family !== 3 &&
+      info.data.operation === "rectify"
+    )
+  },
+
   allOptionCombos(polyhedron) {
     const info = polyhedron.info
     if (!info.isClassical()) throw new Error("Invalid polyhedron")

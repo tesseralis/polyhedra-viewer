@@ -41,6 +41,10 @@ export const shorten = makeOperation<Options>("shorten", {
     return { gyrate }
   },
 
+  hasOptions(polyhedron) {
+    return isGyroelongatedBiCupola(polyhedron)
+  },
+
   allOptionCombos(polyhedron) {
     if (isGyroelongatedBiCupola(polyhedron)) {
       return [{ twist: "left" }, { twist: "right" }]

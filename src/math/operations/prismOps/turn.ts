@@ -97,7 +97,8 @@ export const turn = makeOperation<Options>("turn", {
   apply: doTurn,
   optionTypes: ["twist"],
   hasOptions(polyhedron) {
-    return polyhedron.info.isCapstone() && !polyhedron.info.isPyramid()
+    const info = polyhedron.info
+    return info.isCapstone() && !info.isPyramid() && info.isBi()
   },
 
   resultsFilter(polyhedron, { twist }) {

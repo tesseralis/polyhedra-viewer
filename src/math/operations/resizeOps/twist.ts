@@ -123,6 +123,14 @@ export const twist = makeOperation<Options>("twist", {
     return doTwist(polyhedron, result, twistOpt)
   },
   optionTypes: ["twist"],
+  hasOptions(polyhedron) {
+    const info = polyhedron.info
+    return (
+      info.isClassical() &&
+      info.data.family !== 3 &&
+      info.data.operation !== "snub"
+    )
+  },
   allOptionCombos(polyhedron) {
     if (expansionType(polyhedron) !== "snub") {
       return [{ twist: "left" }, { twist: "right" }]

@@ -350,6 +350,10 @@ export const augment = makeOperation<Options>("augment", {
     }
   },
 
+  hasOptions() {
+    return true
+  },
+
   allOptionCombos(polyhedron) {
     const gyrateOpts = hasGyrateOpts(polyhedron) ? allGyrateOpts : [undefined]
 

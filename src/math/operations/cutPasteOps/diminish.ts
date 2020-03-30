@@ -87,6 +87,10 @@ export const diminish = makeOperation<Options>("diminish", {
     return options
   },
 
+  hasOptions() {
+    return true
+  },
+
   allOptionCombos(polyhedron) {
     return Cap.getAll(polyhedron).map((cap) => ({ cap }))
   },

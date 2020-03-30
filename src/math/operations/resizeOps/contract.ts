@@ -105,6 +105,10 @@ export const contract = makeOperation<Options>("contract", {
     return { facet: isVertex ? "vertex" : "face" }
   },
 
+  hasOptions(polyhedron) {
+    return getFamily(polyhedron) !== 3
+  },
+
   allOptionCombos(polyhedron) {
     if (getFamily(polyhedron) === 3) return [{}]
     const multiplier = isBevelled(polyhedron) ? 2 : 1

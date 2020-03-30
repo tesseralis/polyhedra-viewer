@@ -204,30 +204,5 @@ export default function makeOperation<Options extends {}>(
     canApplyTo(polyhedron) {
       return operationGraph.canApply(polyhedron.name, name)
     },
-    hasOptions(polyhedron) {
-      const relations = getOpResults(polyhedron, name)
-      const isChiral = relations.some((rel) => rel.chiral)
-      // TODO maybe split up among operations?
-      // but I think that might just grow the code...
-      switch (name) {
-        case "turn":
-          return relations.length > 1 || isChiral
-        case "twist":
-          return relations[0].value.includes("snub")
-        case "snub":
-        case "gyroelongate":
-          return isChiral
-        case "sharpen":
-        case "contract":
-        case "shorten":
-          return relations.length > 1
-        case "augment":
-        case "diminish":
-        case "gyrate":
-          return true
-        default:
-          return false
-      }
-    },
   }
 }

@@ -110,6 +110,9 @@ export const snub = makeOperation<SnubOpts>("snub", {
     return doExpansion(polyhedron, result, twist)
   },
   optionTypes: ["twist"],
+  hasOptions(polyhedron) {
+    return polyhedron.info.isClassical() && polyhedron.info.data.family !== 3
+  },
   allOptionCombos() {
     return [{ twist: "left" }, { twist: "right" }]
   },

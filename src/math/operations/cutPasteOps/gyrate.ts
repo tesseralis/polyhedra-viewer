@@ -80,6 +80,10 @@ export const gyrate = makeOperation("gyrate", {
     return options
   },
 
+  hasOptions() {
+    return true
+  },
+
   allOptionCombos(polyhedron) {
     return Cap.getAll(polyhedron).map((cap) => ({ cap }))
   },
