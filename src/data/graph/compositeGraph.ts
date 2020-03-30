@@ -13,7 +13,13 @@ function inc(item: number): any {
 
 export default function compositeGraph(g: Graph) {
   for (const composite of Composite.getAll()) {
-    const { gyrate = 0, diminished = 0, augmented = 0, source } = composite.data
+    const {
+      gyrate = 0,
+      diminished = 0,
+      augmented = 0,
+      align,
+      source,
+    } = composite.data
     if (source.canonicalName() === "rhombicosidodecahedron") {
       const count = gyrate + diminished
       if (gyrate > 0) {
@@ -21,6 +27,7 @@ export default function compositeGraph(g: Graph) {
           "gyrate",
           composite,
           composite.withData({ gyrate: dec(gyrate) }),
+          { direction: "back" },
         )
       }
       if (diminished > 0) {
@@ -31,14 +38,16 @@ export default function compositeGraph(g: Graph) {
             diminished: dec(diminished),
             align: count === 3 ? "meta" : undefined,
           }),
+          { type: "cupola", base: 5, gyrate: "gyro" },
         )
         g.addEdge(
           "augment",
           composite,
           composite.withData({
-            gyrate: dec(diminished),
-            diminished: inc(gyrate),
+            diminished: dec(diminished),
+            gyrate: inc(gyrate),
           }),
+          { type: "cupola", base: 5, gyrate: "ortho" },
         )
       }
     } else if (source.canonicalName() === "icosahedron") {
@@ -50,13 +59,22 @@ export default function compositeGraph(g: Graph) {
             diminished: dec(diminished),
             align: diminished === 3 ? "meta" : undefined,
           }),
+          { align, type: "pyramid", base: 5 },
         )
       }
       if (diminished === 3 && augmented === 0) {
-        g.addEdge("augment", composite, composite.withData({ augmented: 1 }))
+        g.addEdge("augment", composite, composite.withData({ augmented: 1 }), {
+          type: "pyramid",
+          base: 3,
+        })
       }
     } else {
       if (augmented > 0) {
+        const typeOption =
+          source.isClassical() && source.data.operation === "truncate"
+            ? "cupola"
+            : "pyramid"
+        const baseOption = source.isClassical() ? source.data.family : 4
         g.addEdge(
           "augment",
           composite.withData({
@@ -64,6 +82,7 @@ export default function compositeGraph(g: Graph) {
             align: augmented === 3 ? "meta" : undefined,
           }),
           composite,
+          { align, type: typeOption, base: baseOption },
         )
       }
     }

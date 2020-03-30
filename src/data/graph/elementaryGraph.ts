@@ -7,5 +7,5 @@ export default function elementaryGraph(g: Graph) {
   const sphenocorona = Elementary.query.withName("sphenocorona")
   const augmented = Elementary.query.withName("augmented sphenocorona")
 
-  g.addEdge("augment", sphenocorona, augmented)
+  g.addEdge("augment", sphenocorona, augmented, { base: 4, type: "pyramid" })
 }

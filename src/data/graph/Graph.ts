@@ -1,7 +1,18 @@
+import { isMatch } from "lodash-es"
 import { getSingle } from "utils"
 import Solid from "../specs/PolyhedronSpecs"
 type Operation = string
 type SolidName = string
+
+interface GraphOptions {
+  facet?: "face" | "vertex"
+  base?: 2 | 3 | 4 | 5
+  type?: "pyramid" | "cupola" | "rotunda"
+  gyrate?: "ortho" | "gyro"
+  align?: "meta" | "para"
+  direction?: "forward" | "back"
+  chiral?: boolean
+}
 
 function getInverseOperation(operation: string) {
   if (["dual", "gyrate", "twist", "turn"].includes(operation)) {
@@ -20,12 +31,21 @@ function getInverseOperation(operation: string) {
   throw new Error(`Invalid operation name: ${operation}`)
 }
 
-type OperationMap = Map<string, Solid[]>
+interface ResultEntry extends GraphOptions {
+  value: SolidName
+}
+
+type OperationMap = Map<string, ResultEntry[]>
 
 export default class Graph {
   graph = new Map<string, OperationMap>()
 
-  addDirectedEdge(operation: Operation, from: Solid, to: Solid) {
+  addDirectedEdge(
+    operation: Operation,
+    from: Solid,
+    to: Solid,
+    options?: GraphOptions,
+  ) {
     const key = from.canonicalName()
     if (!this.graph.has(key)) {
       this.graph.set(key, new Map())
@@ -34,15 +54,21 @@ export default class Graph {
     if (!opMap.has(operation)) {
       opMap.set(operation, [])
     }
-    opMap.get(operation)!.push(to)
+    opMap.get(operation)!.push({ value: to.canonicalName(), ...options })
   }
 
-  addEdge(operation: Operation, from: Solid, to: Solid) {
+  addEdge(
+    operation: Operation,
+    from: Solid,
+    to: Solid,
+    options?: GraphOptions,
+  ) {
     this.addDirectedEdge(operation, from, to)
     // TODO make more robust, even though we're guaranteed equality for our use case
     if (from !== to) {
+      // TODO gyrate should switch a "forward" argument to "back"
       const inverseOperation = getInverseOperation(operation)
-      this.addDirectedEdge(inverseOperation, to, from)
+      this.addDirectedEdge(inverseOperation, to, from, options)
     }
   }
 
@@ -51,21 +77,25 @@ export default class Graph {
     return this
   }
 
+  getPossibleResults(name: SolidName, operation: Operation) {
+    return this.graph.get(name)?.get(operation) ?? []
+  }
+
   canApply(name: SolidName, operation: Operation) {
-    return !!this.graph.get(name)?.get(operation)?.length
+    return this.getPossibleResults(name, operation).length > 0
   }
 
   getResult(
     name: SolidName,
     operation: Operation,
-    filter: (result: Solid) => boolean,
+    filter: Partial<GraphOptions>,
   ): SolidName {
-    const results = this.graph.get(name)?.get(operation)
-    if (!results) {
+    const results = this.getPossibleResults(name, operation)
+    if (results.length === 0) {
       throw new Error(
         `Could not find any results for appyling ${operation} to ${name}`,
       )
     }
-    return getSingle(results.filter(filter)).canonicalName()
+    return getSingle(results.filter((entry) => isMatch(entry, filter))).value
   }
 }

@@ -3,7 +3,7 @@ import type Graph from "./Graph"
 import Prismatic from "../specs/Prismatic"
 import Capstone from "../specs/Capstone"
 
-function getCapTypes(base: 3 | 4 | 5): Capstone["data"]["type"][] {
+function getCapTypes(base: 3 | 4 | 5): ("cupola" | "rotunda")[] {
   if (base === 5) {
     return ["cupola", "rotunda"]
   }
@@ -19,6 +19,7 @@ export default function capstoneGraph(g: Graph) {
       g.addEdge("turn", prismatic, prismatic.withData({ type: "antiprism" }))
     }
     if (base <= 5) {
+      // Prisms of with a base <= 5 can be augmented with a pyramid
       g.addEdge(
         "augment",
         prismatic,
@@ -28,6 +29,7 @@ export default function capstoneGraph(g: Graph) {
           elongation: type,
           base: base as any,
         }),
+        { type: "pyramid", base: base as any },
       )
     } else {
       for (const capType of getCapTypes((base / 2) as any)) {
@@ -40,6 +42,7 @@ export default function capstoneGraph(g: Graph) {
             elongation: type,
             base: (base / 2) as any,
           }),
+          { type: capType, base: (base / 2) as any },
         )
       }
     }
@@ -49,7 +52,10 @@ export default function capstoneGraph(g: Graph) {
     const { base, type, count, elongation } = cap.data
     if (cap.isMono()) {
       if (cap.isPyramid()) {
-        g.addEdge("augment", cap, cap.withData({ count: 2 }))
+        g.addEdge("augment", cap, cap.withData({ count: 2 }), {
+          base,
+          type: "pyramid",
+        })
       } else {
         const bis = Capstone.query.where((data) => {
           return (
@@ -59,10 +65,13 @@ export default function capstoneGraph(g: Graph) {
             count === 2
           )
         })
-        // const bis = Capstone.query.where({ base, type, elongation, count: 2 })
         for (const bi of bis) {
           // TODO handle cupola-rotunda
-          g.addEdge("augment", cap, bi)
+          g.addEdge("augment", cap, bi, {
+            gyrate: bi.data.gyrate,
+            base,
+            type: bi.data.type as any,
+          })
         }
       }
     }
@@ -73,9 +82,11 @@ export default function capstoneGraph(g: Graph) {
 
       g.addEdge("gyroelongate", cap, cap.withData({ elongation: "antiprism" }))
     }
-    // Elongated caps can be *twisted* to gyroelongated caps
+    // Elongated caps can be *turned* to gyroelongated caps
     if (cap.isElongated()) {
-      g.addEdge("twist", cap, cap.withData({ elongation: "antiprism" }))
+      g.addEdge("turn", cap, cap.withData({ elongation: "antiprism" }), {
+        chiral: true,
+      })
     }
 
     // Gyrate between ortho and gyro cupolae
