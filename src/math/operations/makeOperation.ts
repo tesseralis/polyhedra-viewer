@@ -1,7 +1,8 @@
-import { mapValues, isEmpty, uniq } from "lodash-es"
+import { mapValues, isEmpty, filter, uniq, pickBy } from "lodash-es"
 
-import PolyhedronSpecs from "data/specs/PolyhedronSpecs"
-import operationGraph from "data/graph/operationGraph"
+import { toConwayNotation, fromConwayNotation } from "data/conway"
+import operationGraph, { Relation } from "data/operationGraph"
+import { getSingle } from "utils"
 import { Vec3D, vec, PRECISION } from "math/geom"
 import { Polyhedron, Vertex, VertexArg, normalizeVertex } from "math/polyhedra"
 import { removeExtraneousVertices } from "./operationUtils"
@@ -85,8 +86,8 @@ interface OperationArgs<Options extends {}>
   resultsFilter?(
     polyhedron: Polyhedron,
     options: Partial<Options>,
-    resultSpecs: PolyhedronSpecs,
-  ): boolean
+    results: Relation[],
+  ): object | undefined
 
   getHitOption?(
     polyhedron: Polyhedron,
@@ -104,9 +105,9 @@ const methodDefaults = {
   defaultOptions: {},
 }
 
-// export function getOpResults(solid: Polyhedron, opName: string) {
-//   return operationGraph[toConwayNotation(solid.name)][opName]
-// }
+export function getOpResults(solid: Polyhedron, opName: string) {
+  return operationGraph[toConwayNotation(solid.name)][opName]
+}
 
 // TODO get this to return the correct type
 function fillDefaults<Options extends {}>(op: OperationArgs<Options>) {
@@ -118,16 +119,16 @@ function fillDefaults<Options extends {}>(op: OperationArgs<Options>) {
     ...op,
   }
 }
-// // Get the polyhedron name as a result of applying the operation to the given polyhedron
-// function getNextPolyhedron<O>(
-//   solid: Polyhedron,
-//   operation: string,
-//   filterOpts: O,
-// ) {
-//   const results = getOpResults(solid, operation)
-//   const next = isEmpty(filterOpts) ? results : filter(results, filterOpts)
-//   return fromConwayNotation((getSingle(next) as any).value)
-// }
+// Get the polyhedron name as a result of applying the operation to the given polyhedron
+function getNextPolyhedron<O>(
+  solid: Polyhedron,
+  operation: string,
+  filterOpts: O,
+) {
+  const results = getOpResults(solid, operation)
+  const next = isEmpty(filterOpts) ? results : filter(results, filterOpts)
+  return fromConwayNotation((getSingle(next) as any).value)
+}
 
 function normalizeOpResult(
   opResult: PartialOpResult | Polyhedron,
@@ -190,9 +191,13 @@ export default function makeOperation<Options extends {}>(
     name,
     apply(polyhedron, options) {
       // get the next polyhedron name
-      const next = operationGraph.getResult(polyhedron.name, name, (solid) =>
-        withDefaults.resultsFilter!(polyhedron, options ?? {}, solid),
+      const results = getOpResults(polyhedron, name)
+      const searchOptions = withDefaults.resultsFilter!(
+        polyhedron,
+        options ?? {},
+        results,
       )
+      const next = getNextPolyhedron(polyhedron, name, pickBy(searchOptions))
 
       // Get the actual operation result
       const opResult = withDefaults.apply(polyhedron, options ?? {}, next)
@@ -202,12 +207,10 @@ export default function makeOperation<Options extends {}>(
       return withDefaults.getHitOption!(polyhedron, vec(hitPnt), options)
     },
     canApplyTo(polyhedron) {
-      return operationGraph.canApply(polyhedron.name, name)
+      return !!getOpResults(polyhedron, name)
     },
     hasOptions(polyhedron) {
-      return true
-      // const relations = getOpResults(polyhedron, name)
-      const relations = []
+      const relations = getOpResults(polyhedron, name)
       if (isEmpty(relations)) return false
       const isChiral = relations.find((rel) => rel.chiral)
       // TODO maybe split up among operations?

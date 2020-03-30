@@ -98,13 +98,26 @@ export const contract = makeOperation<Options>("contract", {
   apply: applyContract,
   optionTypes: ["faceType"],
 
-  resultsFilter(polyhedron, { faceType }, resultSpecs) {
-    if (!polyhedron.info.isClassical() || !resultSpecs.isClassical()) {
-      throw new Error("This is annoying")
+  resultsFilter(polyhedron, config) {
+    const { faceType } = config
+    if (isBevelled(polyhedron)) {
+      switch (polyhedron.name) {
+        case "truncated cuboctahedron":
+          return { value: faceType === 6 ? "tO" : "tC" }
+        case "truncated icosidodecahedron":
+          return { value: faceType === 6 ? "tI" : "tD" }
+        default:
+          return
+      }
     }
-    const isVertexFacet = faceType === (isBevelled(polyhedron) ? 6 : 3)
-    // FIXME does this work for tetrahedral family?
-    return resultSpecs.data.facet === (isVertexFacet ? "vertex" : "face")
+    switch (getFamily(polyhedron)) {
+      case 4:
+        return { value: faceType === 3 ? "O" : "C" }
+      case 5:
+        return { value: faceType === 3 ? "I" : "D" }
+      default:
+        return
+    }
   },
 
   hitOption: "faceType",
