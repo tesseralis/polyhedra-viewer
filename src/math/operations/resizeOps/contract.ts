@@ -98,14 +98,22 @@ export const contract = makeOperation<Options>("contract", {
   apply: applyContract,
   optionTypes: ["faceType"],
 
-  resultsFilter(polyhedron, config) {
-    const { faceType } = config
-    if (getFamily(polyhedron) === 3) {
-      return
-    }
+  resultsFilter(polyhedron, { faceType }) {
+    if (getFamily(polyhedron) === 3) return
 
     const isVertex = faceType === (isBevelled(polyhedron) ? 6 : 3)
     return { facet: isVertex ? "vertex" : "face" }
+  },
+
+  allOptionCombos(polyhedron) {
+    if (getFamily(polyhedron) === 3) return [{}]
+    const multiplier = isBevelled(polyhedron) ? 2 : 1
+    const info = polyhedron.info
+    if (!info.isClassical()) throw new Error("Invalid polyhedron")
+    return [
+      { faceType: (3 * multiplier) as any },
+      { faceType: (info.data.family * multiplier) as any },
+    ]
   },
 
   hitOption: "faceType",
@@ -118,27 +126,6 @@ export const contract = makeOperation<Options>("contract", {
     }
     const isValid = isExpandedFace(polyhedron, hitFace)
     return isValid ? { faceType } : {}
-  },
-
-  allOptionCombos(polyhedron) {
-    if (isBevelled(polyhedron)) {
-      switch (polyhedron.name) {
-        case "truncated cuboctahedron":
-          return [{ faceType: 6 }, { faceType: 8 }]
-        case "truncated icosidodecahedron":
-          return [{ faceType: 6 }, { faceType: 10 }]
-        default:
-          return [{}]
-      }
-    }
-    switch (getFamily(polyhedron)) {
-      case 4:
-        return [{ faceType: 3 }, { faceType: 4 }]
-      case 5:
-        return [{ faceType: 3 }, { faceType: 5 }]
-      default:
-        return [{}]
-    }
   },
 
   faceSelectionStates(polyhedron, { faceType }) {

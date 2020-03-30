@@ -118,14 +118,12 @@ export const sharpen = makeOperation<Options>("sharpen", {
   },
 
   allOptionCombos(polyhedron) {
-    switch (polyhedron.name) {
-      case "cuboctahedron":
-        return [{ faceType: 3 }, { faceType: 4 }]
-      case "icosidodecahedron":
-        return [{ faceType: 3 }, { faceType: 5 }]
-      default:
-        return [{}]
+    const info = polyhedron.info
+    if (!info.isClassical()) throw new Error("Invalid polyhedron")
+    if (info.isQuasiRegular() && !info.isRegular()) {
+      return [{ faceType: 3 }, { faceType: info.data.family }]
     }
+    return [{}]
   },
 
   hitOption: "faceType",
