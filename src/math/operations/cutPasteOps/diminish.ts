@@ -105,6 +105,13 @@ export const diminish = makeOperation<Options>("diminish", {
     return false
   },
 
+  isPreferredSpec(info) {
+    if (info.canonicalName() === "gyroelongated pentagonal pyramid") {
+      return info.isComposite()
+    }
+    return true
+  },
+
   getResult(info, { cap }, polyhedron) {
     if (info.isCapstone()) {
       const { count, elongation, base, type } = info.data
@@ -148,14 +155,17 @@ export const diminish = makeOperation<Options>("diminish", {
       if (source.canonicalName() === "icosahedron") {
         if (augmented === 1) return info.withData({ augmented: 0 })
         return info.withData({
-          diminished: (diminished - 1) as any,
+          diminished: (diminished + 1) as any,
           align:
             diminished === 1 ? getCapAlignment(polyhedron, cap) : undefined,
         })
       }
       return info.withData({
         augmented: (augmented - 1) as any,
-        align: augmented === 3 ? "meta" : undefined,
+        align:
+          augmented === 3 && source.canonicalName() !== "triangular prism"
+            ? "meta"
+            : undefined,
       })
     }
     if (info.isElementary()) {

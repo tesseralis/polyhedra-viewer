@@ -46,6 +46,13 @@ export default class Queries<S extends Specs> {
     return this.nameMapping.get(name)![0]
   }
 
+  allWithName(name: string) {
+    if (!this.nameMapping.has(name)) {
+      throw new Error(`Could not find entry with canonical name ${name}`)
+    }
+    return this.nameMapping.get(name)!
+  }
+
   where(filter: QueryFilter<S["data"]>) {
     return this.entries.filter((entry) => applyFilter(entry.data, filter))
   }

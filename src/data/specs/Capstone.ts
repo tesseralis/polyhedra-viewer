@@ -35,6 +35,9 @@ export default class Capstone extends Specs<CapstoneData> {
     if (newData.elongation === "antiprism") {
       delete newData.gyrate
     }
+    if (newData.count === 1) {
+      delete newData.gyrate
+    }
     return new Capstone(newData)
   }
 

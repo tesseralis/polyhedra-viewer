@@ -374,6 +374,20 @@ export const augment = makeOperation<Options>("augment", {
     return false
   },
 
+  isPreferredSpec(info, { face, using }) {
+    const n = face.numSides
+    const { type, base } = getGraphArgs(getUsingOpt(using!, n))
+    if (base === 4 && type === "pyramid") {
+      if (info.isPrismatic() && info.isPrism()) return false
+    }
+    // for the fastigium, depend on what the using option is
+    if (info.canonicalName() === "triangular prism") {
+      if (type === "cupola") return info.isCapstone()
+      return base === 3 ? info.isPrismatic() : info.isComposite()
+    }
+    return true
+  },
+
   getResult(info, { face, using, gyrate }, polyhedron) {
     const n = face.numSides
     const { type, base } = getGraphArgs(getUsingOpt(using!, n))
@@ -388,7 +402,7 @@ export const augment = makeOperation<Options>("augment", {
     if (info.isCapstone()) {
       return info.withData({
         count: 2,
-        gyrate,
+        gyrate: base === 2 ? "gyro" : gyrate,
         type: type === info.data.type ? type : "cupolarotunda",
       })
     }
@@ -417,7 +431,10 @@ export const augment = makeOperation<Options>("augment", {
         if (base === 3) {
           return info.withData({ augmented: 1 })
         }
-        return info.withData({ diminished: (diminished - 1) as any })
+        return info.withData({
+          diminished: (diminished - 1) as any,
+          align: diminished === 3 ? "meta" : undefined,
+        })
       }
       return info.withData({
         augmented: (augmented + 1) as any,

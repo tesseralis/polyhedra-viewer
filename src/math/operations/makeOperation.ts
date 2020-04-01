@@ -1,6 +1,6 @@
 import { mapValues, isEmpty, uniq } from "lodash-es"
 
-import operationGraph from "data/graph/operationGraph"
+import { getAllSpecs } from "data/specs/getSpecs"
 import { Vec3D, vec, PRECISION } from "math/geom"
 import { Polyhedron, Vertex, VertexArg, normalizeVertex } from "math/polyhedra"
 import { removeExtraneousVertices } from "./operationUtils"
@@ -82,7 +82,7 @@ interface OperationArgs<Options extends {}>
     resultName: string,
   ): PartialOpResult | Polyhedron
 
-  canApplyTo?(polyhedron: PolyhedronSpecs): boolean
+  canApplyTo(info: PolyhedronSpecs): boolean
 
   hasOptions?(polyhedron: Polyhedron): boolean
 
@@ -91,6 +91,8 @@ interface OperationArgs<Options extends {}>
     options: Options,
     polyhedron: Polyhedron,
   ): PolyhedronSpecs
+
+  isPreferredSpec?(info: PolyhedronSpecs, options: Options): boolean
 
   resultsFilter?(
     polyhedron: Polyhedron,
@@ -109,6 +111,7 @@ const methodDefaults = {
   getHitOption: {},
   hasOptions: false,
   allOptionCombos: [null],
+  isPreferredSpec: true,
   resultsFilter: undefined,
   faceSelectionStates: [],
   defaultOptions: {},
@@ -185,12 +188,18 @@ export default function makeOperation<Options extends {}>(
     ...(withDefaults as any),
     name,
     apply(polyhedron, options) {
+      const info = [...getAllSpecs(polyhedron.name)].filter(
+        (info) =>
+          withDefaults.canApplyTo(info) &&
+          withDefaults.isPreferredSpec!(info, options),
+      )[0]
+
       // get the next polyhedron name
-      const next = operationGraph.getResult(
-        polyhedron.name,
-        name,
-        withDefaults.resultsFilter!(polyhedron, options ?? {}),
-      )
+      const next = withDefaults.getResult!(
+        info,
+        options,
+        polyhedron,
+      ).canonicalName()
 
       // Get the actual operation result
       const opResult = withDefaults.apply(polyhedron, options ?? {}, next)
@@ -200,7 +209,13 @@ export default function makeOperation<Options extends {}>(
       return withDefaults.getHitOption!(polyhedron, vec(hitPnt), options)
     },
     canApplyTo(polyhedron) {
-      return operationGraph.canApply(polyhedron.name, name)
+      // FIXME we're missing two operation applications so there's a bug somewhere
+      for (const specs of getAllSpecs(polyhedron.name)) {
+        if (withDefaults.canApplyTo(specs)) {
+          return true
+        }
+      }
+      return false
     },
   }
 }

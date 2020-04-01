@@ -43,7 +43,7 @@ export const shorten = makeOperation<Options>("shorten", {
   getResult(info, { twist }, polyhedron) {
     if (!info.isCapstone()) throw new Error()
     const gyrate = (() => {
-      if (!isGyroelongatedBiCupola(polyhedron)) return undefined
+      if (!isGyroelongatedBiCupola(polyhedron)) return info.data.gyrate
       const chirality = getChirality(polyhedron)
       return twist === chirality ? "ortho" : "gyro"
     })()
