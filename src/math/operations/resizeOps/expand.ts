@@ -100,6 +100,19 @@ export const expand = makeOperation("expand", {
     }
     return doExpansion(polyhedron, result)
   },
+
+  canApplyTo(info) {
+    if (!info.isClassical()) return false
+    return ["regular", "truncate"].includes(info.data.operation)
+  },
+
+  getResult(info) {
+    if (!info.isClassical()) throw new Error()
+    const { operation } = info.data
+    return info.withData({
+      operation: operation === "regular" ? "cantellate" : "bevel",
+    })
+  },
 })
 
 interface SnubOpts {
@@ -109,10 +122,22 @@ export const snub = makeOperation<SnubOpts>("snub", {
   apply(polyhedron, { twist = "left" }, result) {
     return doExpansion(polyhedron, result, twist)
   },
+
+  canApplyTo(info) {
+    return info.isRegular()
+  },
+
+  getResult(info) {
+    if (!info.isClassical()) throw new Error()
+    return info.withData({ operation: "snub" })
+  },
+
   optionTypes: ["twist"],
+
   hasOptions(polyhedron) {
     return polyhedron.info.isClassical() && polyhedron.info.data.family !== 3
   },
+
   allOptionCombos() {
     return [{ twist: "left" }, { twist: "right" }]
   },
@@ -138,5 +163,16 @@ export const dual = makeOperation("dual", {
         endVertices,
       },
     }
+  },
+
+  canApplyTo(info) {
+    return info.isRegular()
+  },
+
+  getResult(info) {
+    if (!info.isClassical()) throw new Error()
+    const { family, facet } = info.data
+    if (family === 3) return info
+    return info.withData({ facet: facet === "face" ? "vertex" : "face" })
   },
 })

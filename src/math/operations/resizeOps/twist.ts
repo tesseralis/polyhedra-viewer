@@ -122,7 +122,22 @@ export const twist = makeOperation<Options>("twist", {
   apply(polyhedron, { twist: twistOpt }, result) {
     return doTwist(polyhedron, result, twistOpt)
   },
+
   optionTypes: ["twist"],
+
+  canApplyTo(info) {
+    return (
+      info.isClassical() && ["cantellate", "snub"].includes(info.data.operation)
+    )
+  },
+
+  getResult(info) {
+    if (!info.isClassical()) throw new Error()
+    return info.withData({
+      operation: info.data.operation === "cantellate" ? "snub" : "cantellate",
+    })
+  },
+
   hasOptions(polyhedron) {
     const info = polyhedron.info
     return (
@@ -131,6 +146,7 @@ export const twist = makeOperation<Options>("twist", {
       info.data.operation !== "snub"
     )
   },
+
   allOptionCombos(polyhedron) {
     if (expansionType(polyhedron) !== "snub") {
       return [{ twist: "left" }, { twist: "right" }]

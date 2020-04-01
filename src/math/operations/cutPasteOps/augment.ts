@@ -1,5 +1,7 @@
 import { mapValues, compact, every, xor, uniq, pickBy } from "lodash-es"
 
+import Capstone from "data/specs/Capstone"
+import Elementary from "data/specs/Elementary"
 import { Polyhedron, Face, Cap } from "math/polyhedra"
 import { isInverse, getOrthonormalTransform, PRECISION } from "math/geom"
 import { repeat, getCyclic, getSingle } from "utils"
@@ -341,6 +343,93 @@ export const augment = makeOperation<Options>("augment", {
     return doAugment(polyhedron, face, augmentType, gyrate)
   },
   optionTypes: ["face", "gyrate", "using"],
+
+  canApplyTo(info) {
+    if (info.isPrismatic()) {
+      const { base } = info.data
+      if (info.isAntiprism() && base === 3) return false
+      return base > 2
+    }
+    if (info.isCapstone()) {
+      return info.isMono()
+    }
+    if (info.isComposite()) {
+      const { source, diminished = 0, augmented = 0 } = info.data
+      if (source.canonicalName() === "rhombicosidodecahedron") {
+        return diminished > 0
+      }
+      if (source.canonicalName() === "icosahedron") {
+        return diminished > 0 && augmented === 0
+      }
+      if (source.isPrismatic()) {
+        return augmented < (source.data.base % 3 === 0 ? 3 : 2)
+      }
+      if (source.isClassical()) {
+        return augmented < source.data.family - 2
+      }
+    }
+    if (info.isElementary()) {
+      return info.canonicalName() === "sphenocorona"
+    }
+    return false
+  },
+
+  getResult(info, { face, using, gyrate }, polyhedron) {
+    const n = face.numSides
+    const { type, base } = getGraphArgs(getUsingOpt(using!, n))
+    if (info.isPrismatic()) {
+      return Capstone.query.withData({
+        count: 1,
+        elongation: info.data.type,
+        type,
+        base: base as any,
+      })
+    }
+    if (info.isCapstone()) {
+      return info.withData({
+        count: 2,
+        gyrate,
+        type: type === info.data.type ? type : "cupolarotunda",
+      })
+    }
+    if (info.isComposite()) {
+      const {
+        source,
+        augmented = 0,
+        diminished = 0,
+        gyrate: gyrated = 0,
+      } = info.data
+      if (source.canonicalName() === "rhombicosidodecahedron") {
+        const totalCount = diminished + gyrated
+        if (gyrate === "ortho") {
+          return info.withData({
+            gyrate: (gyrated + 1) as any,
+            diminished: (diminished - 1) as any,
+          })
+        } else {
+          return info.withData({
+            diminished: (diminished - 1) as any,
+            align: totalCount === 3 ? "meta" : undefined,
+          })
+        }
+      }
+      if (source.canonicalName() === "icosahedron") {
+        if (base === 3) {
+          return info.withData({ augmented: 1 })
+        }
+        return info.withData({ diminished: (diminished - 1) as any })
+      }
+      return info.withData({
+        augmented: (augmented + 1) as any,
+        align:
+          augmented === 1 ? getAugmentAlignment(polyhedron, face) : undefined,
+      })
+    }
+    if (info.isElementary()) {
+      return Elementary.query.withName("augmented sphenocorona")
+    }
+    throw new Error()
+  },
 
   resultsFilter(polyhedron, { face, using, gyrate }) {
     if (!face) {

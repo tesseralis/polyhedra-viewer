@@ -38,6 +38,16 @@ export const elongate = makeOperation("elongate", {
   apply(polyhedron) {
     return doElongate(polyhedron)
   },
+
+  canApplyTo(info) {
+    if (!info.isCapstone()) return false
+    return info.isShortened() && info.data.base > 2
+  },
+
+  getResult(info) {
+    if (!info.isCapstone()) throw new Error()
+    return info.withData({ elongation: "prism" })
+  },
 })
 
 interface Options {
@@ -47,10 +57,24 @@ export const gyroelongate = makeOperation<Options>("gyroelongate", {
   apply(polyhedron: Polyhedron, { twist = "left" }) {
     return doElongate(polyhedron, twist)
   },
+
   optionTypes: ["twist"],
+
+  canApplyTo(info) {
+    if (!info.isCapstone()) return false
+    // Cannot gyroelongate fastigium or triangular pyramid
+    return info.isShortened() && info.data.base > 3
+  },
+
+  getResult(info) {
+    if (!info.isCapstone()) throw new Error()
+    return info.withData({ elongation: "antiprism" })
+  },
+
   hasOptions(polyhedron) {
     return polyhedron.info.isCapstone() && !polyhedron.info.isPyramid()
   },
+
   allOptionCombos() {
     return [{ twist: "left" }, { twist: "right" }]
   },

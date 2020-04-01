@@ -5,6 +5,7 @@ import { Vec3D, vec, PRECISION } from "math/geom"
 import { Polyhedron, Vertex, VertexArg, normalizeVertex } from "math/polyhedra"
 import { removeExtraneousVertices } from "./operationUtils"
 import { Point } from "types"
+import PolyhedronSpecs from "data/specs/PolyhedronSpecs"
 
 type SelectState = "selected" | "selectable" | undefined
 
@@ -81,7 +82,15 @@ interface OperationArgs<Options extends {}>
     resultName: string,
   ): PartialOpResult | Polyhedron
 
+  canApplyTo?(polyhedron: PolyhedronSpecs): boolean
+
   hasOptions?(polyhedron: Polyhedron): boolean
+
+  getResult?(
+    info: PolyhedronSpecs,
+    options: Options,
+    polyhedron: Polyhedron,
+  ): PolyhedronSpecs
 
   resultsFilter?(
     polyhedron: Polyhedron,

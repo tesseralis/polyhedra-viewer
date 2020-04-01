@@ -59,6 +59,44 @@ export const gyrate = makeOperation("gyrate", {
   apply: applyGyrate,
   optionTypes: ["cap"],
 
+  canApplyTo(info) {
+    if (info.isCapstone()) {
+      return info.isBi() && !info.isPyramid() && info.data.base > 2
+    }
+    if (info.isComposite()) {
+      const { source, diminished = 0 } = info.data
+      return (
+        source.canonicalName() === "rhombicosidodecahedron" && diminished < 3
+      )
+    }
+    return false
+  },
+
+  getResult(info, { cap }, polyhedron) {
+    if (info.isCapstone()) {
+      const { gyrate } = info.data
+      return info.withData({ gyrate: gyrate === "ortho" ? "gyro" : "ortho" })
+    }
+    if (info.isComposite()) {
+      const { gyrate = 0, diminished = 0 } = info.data
+      const totalCount = gyrate + diminished
+      const direction = getGyrateDirection(cap)
+      if (direction === "back") {
+        return info.withData({
+          gyrate: (gyrate - 1) as any,
+          align: totalCount === 3 ? "meta" : undefined,
+        })
+      } else {
+        return info.withData({
+          gyrate: (gyrate + 1) as any,
+          align:
+            totalCount === 1 ? getCapAlignment(polyhedron, cap) : undefined,
+        })
+      }
+    }
+    throw new Error()
+  },
+
   resultsFilter(polyhedron, { cap }) {
     if (!cap) {
       throw new Error("Invalid cap")

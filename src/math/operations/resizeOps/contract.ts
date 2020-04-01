@@ -98,6 +98,21 @@ export const contract = makeOperation<Options>("contract", {
   apply: applyContract,
   optionTypes: ["faceType"],
 
+  canApplyTo(info) {
+    if (!info.isClassical()) return false
+    return ["bevel", "cantellate", "snub"].includes(info.data.operation)
+  },
+
+  getResult(info, { faceType }) {
+    if (!info.isClassical()) throw new Error()
+    const { family, operation } = info.data
+    const isVertex = faceType === (operation === "bevel" ? 6 : 3)
+    return info.withData({
+      operation: operation === "bevel" ? "truncate" : "regular",
+      facet: family === 3 ? undefined : isVertex ? "vertex" : "face",
+    })
+  },
+
   resultsFilter(polyhedron, { faceType }) {
     if (getFamily(polyhedron) === 3) return
 

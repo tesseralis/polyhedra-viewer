@@ -114,10 +114,33 @@ export const truncate = makeOperation("truncate", {
   apply(polyhedron, $, result) {
     return doTruncate(polyhedron, false, result)
   },
+
+  canApplyTo(info) {
+    if (!info.isClassical()) return false
+    return ["regular", "rectify"].includes(info.data.operation)
+  },
+
+  getResult(info) {
+    if (!info.isClassical()) throw new Error()
+    const { operation } = info.data
+    return info.withData({
+      operation: operation === "regular" ? "truncate" : "bevel",
+    })
+  },
 })
 
 export const rectify = makeOperation("rectify", {
   apply(polyhedron) {
     return doTruncate(polyhedron, true)
+  },
+
+  canApplyTo(info) {
+    if (!info.isClassical()) return false
+    return ["regular"].includes(info.data.operation)
+  },
+
+  getResult(info) {
+    if (!info.isClassical()) throw new Error()
+    return info.withData({ operation: "rectify" })
   },
 })

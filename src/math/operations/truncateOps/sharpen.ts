@@ -111,6 +111,22 @@ export const sharpen = makeOperation<Options>("sharpen", {
   apply: applySharpen,
   optionTypes: ["faceType"],
 
+  canApplyTo(info) {
+    if (!info.isClassical()) return false
+    return ["truncate", "rectify", "bevel"].includes(info.data.operation)
+  },
+
+  getResult(info, { faceType }) {
+    if (!info.isClassical()) throw new Error()
+    const { family, operation } = info.data
+    if (operation === "truncate") return info.withData({ operation: "regular" })
+    if (operation === "bevel") return info.withData({ operation: "rectify" })
+
+    // if rectified, we have to figure out the facet from the faceType
+    const facet = family === 3 ? undefined : faceType === 3 ? "face" : "vertex"
+    return info.withData({ operation: "regular", facet })
+  },
+
   resultsFilter(polyhedron, { faceType }) {
     if (polyhedron.info.isQuasiRegular() && !polyhedron.info.isRegular()) {
       return { facet: faceType === 3 ? "face" : "vertex" }

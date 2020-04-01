@@ -95,7 +95,37 @@ function doTurn(polyhedron: Polyhedron, { twist = "left" }: Options) {
 
 export const turn = makeOperation<Options>("turn", {
   apply: doTurn,
+
   optionTypes: ["twist"],
+
+  canApplyTo(info) {
+    if (info.isPrismatic()) return info.data.base > 2
+    if (!info.isCapstone()) return false
+    return !info.isShortened() && info.data.base > 3
+  },
+
+  getResult(info, { twist }, polyhedron) {
+    if (info.isPrismatic()) {
+      return info.withData({
+        type: info.data.type === "prism" ? "antiprism" : "prism",
+      })
+    }
+
+    if (info.isCapstone()) {
+      const gyrate = (() => {
+        if (!isGyroelongatedBiCupola(polyhedron)) return undefined
+        const chirality = getChirality(polyhedron)
+        return twist === chirality ? "ortho" : "gyro"
+      })()
+      return info.withData({
+        elongation: info.data.elongation === "prism" ? "antiprism" : "prism",
+        gyrate,
+      })
+    }
+
+    throw new Error()
+  },
+
   hasOptions(polyhedron) {
     const info = polyhedron.info
     return info.isCapstone() && !info.isPyramid() && info.isBi()
