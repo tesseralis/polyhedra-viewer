@@ -55,6 +55,15 @@ function removeCap(polyhedron: Polyhedron, cap: Cap) {
   }
 }
 
+function hasGyrateOpt(polyhedron: Polyhedron) {
+  // polyhedron has a gyrate opt if it is a rhombicosidodecahedron
+  // with at least one gyrate
+  const info = polyhedron.info
+  if (!info.isComposite()) return false
+  const { source, gyrate = 0 } = info.data
+  return source.canonicalName() === "rhombicosidodecahedron" && gyrate > 0
+}
+
 interface Options {
   cap: Cap
 }
@@ -77,7 +86,7 @@ export const diminish = makeOperation<Options>("diminish", {
       options.type = "rotunda"
     }
 
-    if (hasMultiple(relations, "gyrate")) {
+    if (hasGyrateOpt(polyhedron)) {
       options.gyrate = getCupolaGyrate(cap)
     }
 
