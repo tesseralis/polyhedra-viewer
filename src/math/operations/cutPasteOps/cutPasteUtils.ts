@@ -4,12 +4,6 @@ import { isInverse } from "math/geom"
 
 type Relation = Record<string, any>
 
-// true if the relation has multiple values that have that property
-export const hasMultiple = (relations: Relation[], property: string) => {
-  const set = new Set(relations.map((r) => r[property]).filter((x) => !!x))
-  return set.size > 1
-}
-
 export function getCupolaGyrate(cap: Cap) {
   const isOrtho = cap.boundary().edges.every((edge) => {
     const [n1, n2] = edge.adjacentFaces().map((f) => f.numSides)
