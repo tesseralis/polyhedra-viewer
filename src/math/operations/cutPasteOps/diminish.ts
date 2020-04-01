@@ -1,5 +1,6 @@
 import { range } from "lodash-es"
 
+import Composite from "data/specs/Composite"
 import { mapObject } from "utils"
 import {
   getTransformedVertices,
@@ -7,7 +8,7 @@ import {
 } from "../operationUtils"
 import makeOperation from "../makeOperation"
 import { Polyhedron, Cap } from "math/polyhedra"
-import { hasMultiple, getCapAlignment, getCupolaGyrate } from "./cutPasteUtils"
+import { getCapAlignment, getCupolaGyrate } from "./cutPasteUtils"
 
 function removeCap(polyhedron: Polyhedron, cap: Cap) {
   const boundary = cap.boundary()
@@ -64,6 +65,14 @@ function hasGyrateOpt(polyhedron: Polyhedron) {
   return source.canonicalName() === "rhombicosidodecahedron" && gyrate > 0
 }
 
+function hasAlignOpt(polyhedron: Polyhedron) {
+  if (!Composite.query.hasName(polyhedron.name)) return false
+  // Get the polyhedron data as a Composite if possible
+  const info = Composite.query.withName(polyhedron.name)
+  const { diminished = 0, gyrate = 0 } = info.data
+  return diminished + gyrate === 1
+}
+
 interface Options {
   cap: Cap
 }
@@ -73,7 +82,7 @@ export const diminish = makeOperation<Options>("diminish", {
   },
   optionTypes: ["cap"],
 
-  resultsFilter(polyhedron, { cap }, relations) {
+  resultsFilter(polyhedron, { cap }) {
     const options: Record<string, string> = {}
     if (!cap) {
       throw new Error("Invalid cap")
@@ -90,7 +99,7 @@ export const diminish = makeOperation<Options>("diminish", {
       options.gyrate = getCupolaGyrate(cap)
     }
 
-    if (options.gyrate !== "ortho" && hasMultiple(relations, "align")) {
+    if (options.gyrate !== "ortho" && hasAlignOpt(polyhedron)) {
       options.align = getCapAlignment(polyhedron, cap)
     }
     return options
