@@ -1,5 +1,3 @@
-import { some } from "lodash-es"
-
 import { withOrigin } from "math/geom"
 import { Polyhedron, Cap } from "math/polyhedra"
 import { mapObject } from "utils"
@@ -61,23 +59,20 @@ export const gyrate = makeOperation("gyrate", {
   apply: applyGyrate,
   optionTypes: ["cap"],
 
-  resultsFilter(polyhedron, { cap }, relations) {
-    const options: any = {}
+  resultsFilter(polyhedron, { cap }) {
     if (!cap) {
       throw new Error("Invalid cap")
     }
-    if (some(relations, "direction")) {
-      options.direction = getGyrateDirection(cap)
-      if (
-        relations.filter(
-          (relation) =>
-            relation.direction === options.direction && !!relation.align,
-        ).length > 1
-      ) {
-        options.align = getCapAlignment(polyhedron, cap)
-      }
+    const info = polyhedron.info
+    if (!info.isComposite()) return {}
+    const { source, gyrate = 0, diminished = 0 } = info.data
+    if (source.canonicalName() !== "rhombicosidodecahedron") return {}
+    const direction = getGyrateDirection(cap)
+    const totalCount = gyrate + diminished
+    if (direction === "forward" && totalCount === 1) {
+      return { direction, align: getCapAlignment(polyhedron, cap) }
     }
-    return options
+    return { direction }
   },
 
   hasOptions() {

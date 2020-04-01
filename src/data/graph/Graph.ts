@@ -84,7 +84,7 @@ export default class Graph {
     return this
   }
 
-  getPossibleResults(name: SolidName, operation: Operation) {
+  private getPossibleResults(name: SolidName, operation: Operation) {
     const results = this.graph.get(name)?.get(operation) ?? new Map()
     return [...results].map(([value, options]) => ({ value, ...options }))
   }

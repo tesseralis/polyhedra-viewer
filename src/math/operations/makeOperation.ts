@@ -86,7 +86,6 @@ interface OperationArgs<Options extends {}>
   resultsFilter?(
     polyhedron: Polyhedron,
     options: Partial<Options>,
-    results: any[],
   ): object | undefined
 
   getHitOption?(
@@ -104,10 +103,6 @@ const methodDefaults = {
   resultsFilter: undefined,
   faceSelectionStates: [],
   defaultOptions: {},
-}
-
-export function getOpResults(solid: Polyhedron, opName: string) {
-  return operationGraph.getPossibleResults(solid.name, opName)
 }
 
 // TODO get this to return the correct type
@@ -182,11 +177,9 @@ export default function makeOperation<Options extends {}>(
     name,
     apply(polyhedron, options) {
       // get the next polyhedron name
-      const results = getOpResults(polyhedron, name)
       const searchOptions = withDefaults.resultsFilter!(
         polyhedron,
         options ?? {},
-        results,
       )
       const next = operationGraph.getResult(
         polyhedron.name,
