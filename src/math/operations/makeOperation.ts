@@ -177,14 +177,10 @@ export default function makeOperation<Options extends {}>(
     name,
     apply(polyhedron, options) {
       // get the next polyhedron name
-      const searchOptions = withDefaults.resultsFilter!(
-        polyhedron,
-        options ?? {},
-      )
       const next = operationGraph.getResult(
         polyhedron.name,
         name,
-        searchOptions,
+        withDefaults.resultsFilter!(polyhedron, options ?? {}),
       )
 
       // Get the actual operation result
