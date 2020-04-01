@@ -86,7 +86,7 @@ interface OperationArgs<Options extends {}>
 
   hasOptions?(polyhedron: Polyhedron): boolean
 
-  getResult?(
+  getResult(
     info: PolyhedronSpecs,
     options: Options,
     polyhedron: Polyhedron,
@@ -191,7 +191,7 @@ export default function makeOperation<Options extends {}>(
       // get the next polyhedron name
       const next = withDefaults.getResult!(
         info,
-        options,
+        options ?? {},
         polyhedron,
       ).canonicalName()
 

@@ -143,7 +143,7 @@ export const twist = makeOperation<Options>("twist", {
     return (
       info.isClassical() &&
       info.data.family !== 3 &&
-      info.data.operation !== "snub"
+      info.data.operation === "cantellate"
     )
   },
 
