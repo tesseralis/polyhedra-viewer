@@ -2,7 +2,6 @@ import { range } from "lodash-es"
 
 import Prismatic from "data/specs/Prismatic"
 import Elementary from "data/specs/Elementary"
-import Composite from "data/specs/Composite"
 import { mapObject } from "utils"
 import {
   getTransformedVertices,
@@ -56,23 +55,6 @@ function removeCap(polyhedron: Polyhedron, cap: Cap) {
       ),
     ),
   }
-}
-
-function hasGyrateOpt(polyhedron: Polyhedron) {
-  // polyhedron has a gyrate opt if it is a rhombicosidodecahedron
-  // with at least one gyrate
-  const info = polyhedron.info
-  if (!info.isComposite()) return false
-  const { source, gyrate = 0 } = info.data
-  return source.canonicalName() === "rhombicosidodecahedron" && gyrate > 0
-}
-
-function hasAlignOpt(polyhedron: Polyhedron) {
-  if (!Composite.query.hasName(polyhedron.name)) return false
-  // Get the polyhedron data as a Composite if possible
-  const info = Composite.query.withName(polyhedron.name)
-  const { diminished = 0, gyrate = 0 } = info.data
-  return diminished + gyrate === 1
 }
 
 interface Options {
@@ -172,29 +154,6 @@ export const diminish = makeOperation<Options>("diminish", {
       return Elementary.query.withName("sphenocorona")
     }
     throw new Error()
-  },
-
-  resultsFilter(polyhedron, { cap }) {
-    const options: Record<string, string> = {}
-    if (!cap) {
-      throw new Error("Invalid cap")
-    }
-    const vertices = cap.innerVertices()
-    // If diminishing a pentagonal cupola/rotunda, check which one it is
-    if (vertices.length === 5) {
-      options.type = "cupola"
-    } else if (vertices.length === 10) {
-      options.type = "rotunda"
-    }
-
-    if (hasGyrateOpt(polyhedron)) {
-      options.gyrate = getCupolaGyrate(cap)
-    }
-
-    if (options.gyrate !== "ortho" && hasAlignOpt(polyhedron)) {
-      options.align = getCapAlignment(polyhedron, cap)
-    }
-    return options
   },
 
   hasOptions() {

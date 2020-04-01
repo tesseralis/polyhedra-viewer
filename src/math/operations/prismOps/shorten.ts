@@ -50,13 +50,6 @@ export const shorten = makeOperation<Options>("shorten", {
     return info.withData({ elongation: null, gyrate })
   },
 
-  resultsFilter(polyhedron, { twist }) {
-    if (!isGyroelongatedBiCupola(polyhedron)) return
-    const chirality = getChirality(polyhedron)
-    const gyrate = twist === chirality ? "ortho" : "gyro"
-    return { gyrate }
-  },
-
   hasOptions(polyhedron) {
     return isGyroelongatedBiCupola(polyhedron)
   },

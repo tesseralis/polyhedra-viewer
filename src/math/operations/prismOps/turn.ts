@@ -131,13 +131,6 @@ export const turn = makeOperation<Options>("turn", {
     return info.isCapstone() && !info.isPyramid() && info.isBi()
   },
 
-  resultsFilter(polyhedron, { twist }) {
-    if (!isGyroelongatedBiCupola(polyhedron)) return
-    const chirality = getChirality(polyhedron)
-    const gyrate = twist === chirality ? "ortho" : "gyro"
-    return { gyrate }
-  },
-
   allOptionCombos(polyhedron) {
     if (isGyroelongatedBiCupola(polyhedron)) {
       return [{ twist: "left" }, { twist: "right" }]

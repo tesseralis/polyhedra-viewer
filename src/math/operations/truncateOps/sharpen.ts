@@ -127,12 +127,6 @@ export const sharpen = makeOperation<Options>("sharpen", {
     return info.withData({ operation: "regular", facet })
   },
 
-  resultsFilter(polyhedron, { faceType }) {
-    if (polyhedron.info.isQuasiRegular() && !polyhedron.info.isRegular()) {
-      return { facet: faceType === 3 ? "face" : "vertex" }
-    }
-  },
-
   hasOptions(polyhedron) {
     const info = polyhedron.info
     return (

@@ -113,13 +113,6 @@ export const contract = makeOperation<Options>("contract", {
     })
   },
 
-  resultsFilter(polyhedron, { faceType }) {
-    if (getFamily(polyhedron) === 3) return
-
-    const isVertex = faceType === (isBevelled(polyhedron) ? 6 : 3)
-    return { facet: isVertex ? "vertex" : "face" }
-  },
-
   hasOptions(polyhedron) {
     return getFamily(polyhedron) !== 3
   },

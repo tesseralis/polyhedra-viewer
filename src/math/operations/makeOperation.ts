@@ -94,11 +94,6 @@ interface OperationArgs<Options extends {}>
 
   isPreferredSpec?(info: PolyhedronSpecs, options: Options): boolean
 
-  resultsFilter?(
-    polyhedron: Polyhedron,
-    options: Partial<Options>,
-  ): object | undefined
-
   getHitOption?(
     polyhedron: Polyhedron,
     hitPnt: Vec3D,
@@ -112,7 +107,6 @@ const methodDefaults = {
   hasOptions: false,
   allOptionCombos: [null],
   isPreferredSpec: true,
-  resultsFilter: undefined,
   faceSelectionStates: [],
   defaultOptions: {},
 }

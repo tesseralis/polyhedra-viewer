@@ -448,21 +448,6 @@ export const augment = makeOperation<Options>("augment", {
     throw new Error()
   },
 
-  resultsFilter(polyhedron, { face, using, gyrate }) {
-    if (!face) {
-      throw new Error("Invalid face")
-    }
-    const n = face.numSides
-    const { type, base } = getGraphArgs(getUsingOpt(using!, n))
-
-    return {
-      type,
-      base,
-      gyrate: base === 2 ? "gyro" : gyrate,
-      align: getAugmentAlignment(polyhedron, face),
-    }
-  },
-
   hasOptions() {
     return true
   },

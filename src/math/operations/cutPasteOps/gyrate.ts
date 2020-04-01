@@ -97,22 +97,6 @@ export const gyrate = makeOperation("gyrate", {
     throw new Error()
   },
 
-  resultsFilter(polyhedron, { cap }) {
-    if (!cap) {
-      throw new Error("Invalid cap")
-    }
-    const info = polyhedron.info
-    if (!info.isComposite()) return {}
-    const { source, gyrate = 0, diminished = 0 } = info.data
-    if (source.canonicalName() !== "rhombicosidodecahedron") return {}
-    const direction = getGyrateDirection(cap)
-    const totalCount = gyrate + diminished
-    if (direction === "forward" && totalCount === 1) {
-      return { direction, align: getCapAlignment(polyhedron, cap) }
-    }
-    return { direction }
-  },
-
   hasOptions() {
     return true
   },
