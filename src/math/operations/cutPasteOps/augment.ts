@@ -43,7 +43,7 @@ const augmentTypes: Record<string, AugmentType> = {
 function hasAugmentAlignment(polyhedron: Polyhedron) {
   const info = polyhedron.info
   if (!info.isComposite()) return false
-  const { source, augmented = 0 } = info.data
+  const { source, augmented } = info.data
   if (augmented !== 1) return false
   if (source.isPrismatic()) return source.data.base === 6
   return source.data.family === 5
@@ -354,7 +354,7 @@ export const augment = makeOperation<Options>("augment", {
       return info.isMono()
     }
     if (info.isComposite()) {
-      const { source, diminished = 0, augmented = 0 } = info.data
+      const { source, diminished, augmented } = info.data
       if (source.canonicalName() === "rhombicosidodecahedron") {
         return diminished > 0
       }
@@ -407,14 +407,8 @@ export const augment = makeOperation<Options>("augment", {
       })
     }
     if (info.isComposite()) {
-      const {
-        source,
-        augmented = 0,
-        diminished = 0,
-        gyrate: gyrated = 0,
-      } = info.data
+      const { source, augmented, diminished, gyrate: gyrated } = info.data
       if (source.canonicalName() === "rhombicosidodecahedron") {
-        const totalCount = diminished + gyrated
         if (gyrate === "ortho") {
           return info.withData({
             gyrate: (gyrated + 1) as any,
@@ -423,7 +417,7 @@ export const augment = makeOperation<Options>("augment", {
         } else {
           return info.withData({
             diminished: (diminished - 1) as any,
-            align: totalCount === 3 ? "meta" : undefined,
+            align: info.totalCount() === 3 ? "meta" : undefined,
           })
         }
       }

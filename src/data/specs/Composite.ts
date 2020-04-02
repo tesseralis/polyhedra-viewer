@@ -10,9 +10,9 @@ export const counts: Count[] = [0, 1, 2, 3]
 
 interface CompositeData {
   source: Classical | Prismatic
-  augmented?: Count
-  diminished?: Count
-  gyrate?: Count
+  augmented: Count
+  diminished: Count
+  gyrate: Count
   align?: "meta" | "para"
 }
 
@@ -50,17 +50,29 @@ function limitCount<N extends number>(counts: N[], limit: number) {
  * with pyramids or cupolae added, removed, or gyrated from it.
  */
 export default class Composite extends Specs<CompositeData> {
-  constructor(data: CompositeData) {
-    super("composite", data)
+  constructor({
+    augmented = 0,
+    diminished = 0,
+    gyrate = 0,
+    source,
+    align,
+  }: Partial<CompositeData>) {
+    if (!source) throw new Error("Source not provided in constructor")
+    super("composite", { source, align, augmented, diminished, gyrate })
   }
 
   withData(data: Partial<CompositeData>) {
     const newData = { ...this.data, ...data }
-    const { augmented = 0, diminished = 0, gyrate = 0 } = newData
+    const { augmented, diminished, gyrate } = newData
     if (augmented + diminished + gyrate !== 2) {
       delete newData.align
     }
     return new Composite(newData)
+  }
+
+  totalCount() {
+    const { augmented, diminished, gyrate } = this.data
+    return augmented + diminished + gyrate
   }
 
   static *getAll() {

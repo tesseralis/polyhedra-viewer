@@ -68,7 +68,7 @@ export const gyrate = makeOperation("gyrate", {
       return info.isBi() && !info.isPyramid() && info.data.base > 2
     }
     if (info.isComposite()) {
-      const { source, diminished = 0 } = info.data
+      const { source, diminished } = info.data
       return (
         source.canonicalName() === "rhombicosidodecahedron" && diminished < 3
       )
@@ -82,18 +82,19 @@ export const gyrate = makeOperation("gyrate", {
       return info.withData({ gyrate: gyrate === "ortho" ? "gyro" : "ortho" })
     }
     if (info.isComposite()) {
-      const { gyrate = 0, diminished = 0 } = info.data
-      const totalCount = gyrate + diminished
+      const { gyrate } = info.data
       if (isGyrated(cap)) {
         return info.withData({
           gyrate: (gyrate - 1) as any,
-          align: totalCount === 3 ? "meta" : undefined,
+          align: info.totalCount() === 3 ? "meta" : undefined,
         })
       } else {
         return info.withData({
           gyrate: (gyrate + 1) as any,
           align:
-            totalCount === 1 ? getCapAlignment(polyhedron, cap) : undefined,
+            info.totalCount() === 1
+              ? getCapAlignment(polyhedron, cap)
+              : undefined,
         })
       }
     }

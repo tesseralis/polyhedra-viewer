@@ -72,7 +72,7 @@ export const diminish = makeOperation<Options>("diminish", {
       return !(info.isMono() && info.isShortened())
     }
     if (info.isComposite()) {
-      const { source, augmented = 0, diminished = 0 } = info.data
+      const { source, augmented, diminished } = info.data
       if (source.canonicalName() === "rhombicosidodecahedron") {
         return diminished < 3
       }
@@ -116,9 +116,8 @@ export const diminish = makeOperation<Options>("diminish", {
       }
     }
     if (info.isComposite()) {
-      const { source, augmented = 0, diminished = 0, gyrate = 0 } = info.data
+      const { source, augmented, diminished, gyrate } = info.data
       if (source.canonicalName() === "rhombicosidodecahedron") {
-        const totalCount = diminished + gyrate
         const gyration = getCupolaGyrate(cap)
         if (gyration === "ortho") {
           // we're just removing a gyrated cap in this case
@@ -130,7 +129,9 @@ export const diminish = makeOperation<Options>("diminish", {
           return info.withData({
             diminished: (diminished + 1) as any,
             align:
-              totalCount === 1 ? getCapAlignment(polyhedron, cap) : undefined,
+              info.totalCount() === 1
+                ? getCapAlignment(polyhedron, cap)
+                : undefined,
           })
         }
       }

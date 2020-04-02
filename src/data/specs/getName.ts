@@ -71,13 +71,7 @@ export default function getName(solid: Specs): string {
   }
 
   if (solid.isComposite()) {
-    const {
-      augmented = 0,
-      gyrate = 0,
-      diminished = 0,
-      align,
-      source,
-    } = solid.data
+    const { augmented, gyrate, diminished, align, source } = solid.data
     return prefix(
       align,
       wordJoin(

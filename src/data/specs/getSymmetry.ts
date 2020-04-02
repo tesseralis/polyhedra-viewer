@@ -37,13 +37,7 @@ function getCapstoneSymmetry(capstone: Capstone) {
 }
 
 function getCompositeSymmetry(composite: Composite) {
-  const {
-    augmented = 0,
-    gyrate = 0,
-    diminished = 0,
-    source,
-    align,
-  } = composite.data
+  const { augmented, gyrate, diminished, source, align } = composite.data
   const count = augmented + gyrate + diminished
   // A composite is "pure" only if it has one type of modification
   const pure = count === augmented || count === diminished || count === gyrate
