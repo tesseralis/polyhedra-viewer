@@ -19,7 +19,7 @@ export interface OperationResult {
   animationData?: AnimationData
 }
 
-interface BaseOperation<Options extends {}, Specs extends PolyhedronSpecs> {
+interface BaseOperation<Options extends {}> {
   hitOption?: keyof Options
 
   /**
@@ -29,8 +29,7 @@ interface BaseOperation<Options extends {}, Specs extends PolyhedronSpecs> {
   faceSelectionStates(polyhedron: Polyhedron, options: Options): SelectState[]
 }
 
-export interface Operation<Options extends {}, Specs extends PolyhedronSpecs>
-  extends BaseOperation<Options, Specs> {
+export interface Operation<Options extends {}> extends BaseOperation<Options> {
   name: string
 
   apply(polyhedron: Polyhedron, options: Options): OperationResult
@@ -70,7 +69,7 @@ interface PartialOpResult {
 }
 
 interface OperationArgs<Options extends {}, Specs extends PolyhedronSpecs>
-  extends Partial<BaseOperation<Options, Specs>> {
+  extends Partial<BaseOperation<Options>> {
   apply(
     info: Specs,
     polyhedron: Polyhedron,
@@ -184,7 +183,7 @@ export function deduplicateVertices(polyhedron: Polyhedron) {
 export default function makeOperation<
   Specs extends PolyhedronSpecs,
   Options extends {} = {}
->(name: string, op: OperationArgs<Options, Specs>): Operation<Options, Specs> {
+>(name: string, op: OperationArgs<Options, Specs>): Operation<Options> {
   const withDefaults = fillDefaults(op)
 
   // TODO we have to calculate this with every operation...
