@@ -493,22 +493,21 @@ export const augment = makeOperation<Options>("augment", {
     })
   },
 
-  allOptions(polyhedron, optionName) {
+  allOptions(info, polyhedron, optionName) {
     switch (optionName) {
       case "gyrate":
-        return hasGyrateOpts(polyhedron.info) ? allGyrateOpts : []
+        return hasGyrateOpts(info) ? allGyrateOpts : []
       case "using":
-        return getUsingOpts(polyhedron.info) ?? []
+        return getUsingOpts(info) ?? []
       case "face":
         return polyhedron.faces.filter((face) => canAugment(face))
     }
   },
 
-  defaultOptions(solid) {
-    if (!solid) return {}
-    const usingOpts = getUsingOpts(solid.info) ?? []
+  defaultOptions(info) {
+    const usingOpts = getUsingOpts(info) ?? []
     return pickBy({
-      gyrate: hasGyrateOpts(solid.info) && "gyro",
+      gyrate: hasGyrateOpts(info) && "gyro",
       using: usingOpts.length > 1 && usingOpts[0],
     })
   },

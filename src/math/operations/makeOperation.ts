@@ -29,20 +29,6 @@ interface BaseOperation<Options extends {}> {
    * @return an array mapping face indices to selection states (selectable, selected, or none).
    */
   faceSelectionStates(polyhedron: Polyhedron, options: Options): SelectState[]
-
-  /**
-   * @return all the options for the given option name.
-   */
-  allOptions(
-    polyhedron: Polyhedron,
-    optionName: keyof Options,
-  ): Options[typeof optionName][]
-
-  /**
-   * Return the default selected apply options when an operation is
-   * selected on a polyhedron.
-   */
-  defaultOptions(polyhedron: Polyhedron): Partial<Options>
 }
 
 export interface Operation<Options extends {}> extends BaseOperation<Options> {
@@ -59,7 +45,21 @@ export interface Operation<Options extends {}> extends BaseOperation<Options> {
    */
   hasOptions(polyhedron: Polyhedron): boolean
 
+  /**
+   * @return all the options for the given option name.
+   */
+  allOptions(
+    polyhedron: Polyhedron,
+    optionName: keyof Options,
+  ): Options[typeof optionName][]
+
   allOptionCombos(polyhedron: Polyhedron): Generator<Options>
+
+  /**
+   * Return the default selected apply options when an operation is
+   * selected on a polyhedron.
+   */
+  defaultOptions(polyhedron: Polyhedron): Partial<Options>
 }
 
 interface PartialOpResult {
@@ -83,6 +83,12 @@ interface OperationArgs<Options extends {}>
 
   hasOptions?(info: PolyhedronSpecs): boolean
 
+  allOptions?(
+    info: PolyhedronSpecs,
+    polyhedron: Polyhedron,
+    optionName: keyof Options,
+  ): Options[typeof optionName][]
+
   allOptionCombos?(info: PolyhedronSpecs, solid: Polyhedron): Generator<Options>
 
   getResult(
@@ -98,6 +104,8 @@ interface OperationArgs<Options extends {}>
     hitPnt: Vec3D,
     options: Options,
   ): Partial<Options>
+
+  defaultOptions?(info: PolyhedronSpecs): Partial<Options>
 }
 
 type OperationArg = keyof OperationArgs<any>
@@ -218,12 +226,24 @@ export default function makeOperation<Options extends {}>(
       }
       return false
     },
+    allOptions(polyhedron, optionName) {
+      const info = [...getAllSpecs(polyhedron.name)].filter((info) =>
+        withDefaults.canApplyTo(info),
+      )[0]
+      return withDefaults.allOptions!(info, polyhedron, optionName)
+    },
     *allOptionCombos(polyhedron) {
       for (const specs of getAllSpecs(polyhedron.name)) {
         if (withDefaults.canApplyTo(specs) && withDefaults.hasOptions!(specs)) {
           yield* withDefaults.allOptionCombos!(specs, polyhedron)
         }
       }
+    },
+    defaultOptions(polyhedron) {
+      const info = [...getAllSpecs(polyhedron.name)].filter((info) =>
+        withDefaults.canApplyTo(info),
+      )[0]
+      return withDefaults.defaultOptions!(info)
     },
   }
 }

@@ -1,3 +1,4 @@
+import PolyhedronSpecs from "data/specs/PolyhedronSpecs"
 import { Polygon } from "data/polygons"
 import Classical from "data/specs/Classical"
 import { Polyhedron } from "math/polyhedra"
@@ -13,28 +14,21 @@ import makeOperation from "../makeOperation"
 type FaceType = Polygon
 type Family = 3 | 4 | 5
 
-const familyOpts: Family[] = [3, 4, 5]
-
 interface Options {
   faceType?: FaceType
 }
 
-// Return the family of an *expanded* polyhedron
-function getFamily(polyhedron: Polyhedron) {
-  return familyOpts.find((family) => {
-    return Classical.query.hasNameWhere(
-      polyhedron.name,
-      (data) => data.family === family,
-    )
-  })!
-}
-
 const coxeterNum: Record<Family, number> = { 3: 4, 4: 6, 5: 10 }
 
-function getContractLength(polyhedron: Polyhedron, faceType: FaceType) {
+function getContractLength(
+  info: PolyhedronSpecs,
+  polyhedron: Polyhedron,
+  faceType: FaceType,
+) {
+  if (!info.isClassical()) throw new Error()
   // Calculate dihedral angle
   // https://en.wikipedia.org/wiki/Platonic_solid#Angles
-  const n = getFamily(polyhedron)
+  const n = info.data.family
   const s = polyhedron.edgeLength()
   const p = faceType
   const q = 3 + n - p
@@ -62,13 +56,14 @@ function getContractLengthSemi(
 }
 
 export function applyContract(
+  info: PolyhedronSpecs,
   polyhedron: Polyhedron,
   { faceType = isBevelled(polyhedron) ? 6 : 3 }: Options,
   result: string,
 ) {
   const resultLength = isBevelled(polyhedron)
     ? getContractLengthSemi(polyhedron, faceType, result)
-    : getContractLength(polyhedron, faceType)
+    : getContractLength(info, polyhedron, faceType)
 
   // Take all the stuff and push it inwards
   const contractFaces = getExpandedFaces(polyhedron, faceType)
@@ -96,7 +91,7 @@ function isBevelled(polyhedron: Polyhedron) {
 // NOTE: We are using the same operation for contracting both expanded and snub solids.
 export const contract = makeOperation<Options>("contract", {
   apply(info, polyhedron, options, result) {
-    return applyContract(polyhedron, options, result)
+    return applyContract(info, polyhedron, options, result)
   },
 
   optionTypes: ["faceType"],
