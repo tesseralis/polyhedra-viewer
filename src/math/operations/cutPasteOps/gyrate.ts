@@ -1,7 +1,7 @@
 import { withOrigin } from "math/geom"
 import { Polyhedron, Cap } from "math/polyhedra"
 import { mapObject } from "utils"
-import { getCapAlignment, getGyrateDirection } from "./cutPasteUtils"
+import { getCapAlignment, getCupolaGyrate } from "./cutPasteUtils"
 import { getTransformedVertices } from "../operationUtils"
 import makeOperation from "../makeOperation"
 
@@ -9,6 +9,10 @@ const TAU = 2 * Math.PI
 
 interface Options {
   cap: Cap
+}
+
+export function isGyrated(cap: Cap) {
+  return getCupolaGyrate(cap) === "ortho"
 }
 
 function applyGyrate(polyhedron: Polyhedron, { cap }: Options) {
@@ -80,8 +84,7 @@ export const gyrate = makeOperation("gyrate", {
     if (info.isComposite()) {
       const { gyrate = 0, diminished = 0 } = info.data
       const totalCount = gyrate + diminished
-      const direction = getGyrateDirection(cap)
-      if (direction === "back") {
+      if (isGyrated(cap)) {
         return info.withData({
           gyrate: (gyrate - 1) as any,
           align: totalCount === 3 ? "meta" : undefined,

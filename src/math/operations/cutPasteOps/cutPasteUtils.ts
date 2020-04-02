@@ -2,8 +2,6 @@ import { getSingle } from "utils"
 import { Cap, Polyhedron } from "math/polyhedra"
 import { isInverse } from "math/geom"
 
-type Relation = Record<string, any>
-
 export function getCupolaGyrate(cap: Cap) {
   const isOrtho = cap.boundary().edges.every((edge) => {
     const [n1, n2] = edge.adjacentFaces().map((f) => f.numSides)
@@ -24,8 +22,4 @@ export function getCapAlignment(polyhedron: Polyhedron, cap: Cap) {
       : polyhedron.largestFace().normal()
 
   return isInverse(cap.normal(), otherNormal) ? "para" : "meta"
-}
-
-export function getGyrateDirection(cap: Cap) {
-  return getCupolaGyrate(cap) === "ortho" ? "back" : "forward"
 }
