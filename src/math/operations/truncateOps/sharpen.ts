@@ -118,12 +118,12 @@ export const sharpen = makeOperation<Options>("sharpen", {
 
   getResult(info, { faceType }) {
     if (!info.isClassical()) throw new Error()
-    const { family, operation } = info.data
+    const { operation } = info.data
     if (operation === "truncate") return info.withData({ operation: "regular" })
     if (operation === "bevel") return info.withData({ operation: "rectify" })
 
     // if rectified, we have to figure out the facet from the faceType
-    const facet = family === 3 ? undefined : faceType === 3 ? "face" : "vertex"
+    const facet = faceType === 3 ? "face" : "vertex"
     return info.withData({ operation: "regular", facet })
   },
 

@@ -105,11 +105,11 @@ export const contract = makeOperation<Options>("contract", {
 
   getResult(info, { faceType }) {
     if (!info.isClassical()) throw new Error()
-    const { family, operation } = info.data
+    const { operation } = info.data
     const isVertex = faceType === (operation === "bevel" ? 6 : 3)
     return info.withData({
       operation: operation === "bevel" ? "truncate" : "regular",
-      facet: family === 3 ? undefined : isVertex ? "vertex" : "face",
+      facet: isVertex ? "vertex" : "face",
     })
   },
 

@@ -171,8 +171,8 @@ export const dual = makeOperation("dual", {
 
   getResult(info) {
     if (!info.isClassical()) throw new Error()
-    const { family, facet } = info.data
-    if (family === 3) return info
+    const { facet } = info.data
+    if (info.isTetrahedral()) return info
     return info.withData({ facet: facet === "face" ? "vertex" : "face" })
   },
 })

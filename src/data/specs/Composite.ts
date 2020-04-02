@@ -50,23 +50,21 @@ function limitCount<N extends number>(counts: N[], limit: number) {
  * with pyramids or cupolae added, removed, or gyrated from it.
  */
 export default class Composite extends Specs<CompositeData> {
-  constructor({
+  private constructor({
     augmented = 0,
     diminished = 0,
     gyrate = 0,
     source,
     align,
   }: Partial<CompositeData> & { source: Prismatic | Classical }) {
-    // if (!source) throw new Error("Source not provided in constructor")
     super("composite", { source, align, augmented, diminished, gyrate })
+    if (!this.isBi()) {
+      delete this.data.align
+    }
   }
 
   withData(data: Partial<CompositeData>) {
-    const result = new Composite({ ...this.data, ...data })
-    if (!result.isBi()) {
-      delete result.data.align
-    }
-    return result
+    return new Composite({ ...this.data, ...data })
   }
 
   totalCount() {
@@ -101,7 +99,7 @@ export default class Composite extends Specs<CompositeData> {
         options.augmented,
         source.data.family - 2,
       )) {
-        if (source.data.family === 5 && augmented === 2) {
+        if (source.isIcosahedral() && augmented === 2) {
           for (const align of options.align) {
             yield new Composite({ source, augmented, align })
           }

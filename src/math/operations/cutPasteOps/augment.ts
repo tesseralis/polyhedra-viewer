@@ -46,7 +46,7 @@ function hasAugmentAlignment(polyhedron: Polyhedron) {
   const { source, augmented } = info.data
   if (augmented !== 1) return false
   if (source.isPrismatic()) return source.data.base === 6
-  return source.data.family === 5
+  return source.isIcosahedral()
 }
 
 function getAugmentAlignment(polyhedron: Polyhedron, face: Face) {
