@@ -1,6 +1,8 @@
 import { pivot } from "utils"
 import { Twist } from "types"
 import { Polyhedron, FaceLike } from "math/polyhedra"
+import Prismatic from "data/specs/Prismatic"
+import Capstone from "data/specs/Capstone"
 import makeOperation from "../makeOperation"
 import {
   getChirality,
@@ -93,14 +95,14 @@ function doTurn(polyhedron: Polyhedron, { twist = "left" }: Options) {
   }
 }
 
-export const turn = makeOperation<Options>("turn", {
+export const turn = makeOperation<Options, Prismatic | Capstone>("turn", {
   apply(info, polyhedron, options) {
     return doTurn(polyhedron, options)
   },
 
   optionTypes: ["twist"],
 
-  canApplyTo(info) {
+  canApplyTo(info): info is Prismatic | Capstone {
     if (info.isPrismatic()) return info.data.base > 2
     if (!info.isCapstone()) return false
     return !info.isShortened() && info.data.base > 3
@@ -113,19 +115,15 @@ export const turn = makeOperation<Options>("turn", {
       })
     }
 
-    if (info.isCapstone()) {
-      const gyrate = (() => {
-        if (!isGyroelongatedBiCupola(info)) return undefined
-        const chirality = getChirality(polyhedron)
-        return twist === chirality ? "ortho" : "gyro"
-      })()
-      return info.withData({
-        elongation: info.data.elongation === "prism" ? "antiprism" : "prism",
-        gyrate,
-      })
-    }
-
-    throw new Error()
+    const gyrate = (() => {
+      if (!isGyroelongatedBiCupola(info)) return undefined
+      const chirality = getChirality(polyhedron)
+      return twist === chirality ? "ortho" : "gyro"
+    })()
+    return info.withData({
+      elongation: info.data.elongation === "prism" ? "antiprism" : "prism",
+      gyrate,
+    })
   },
 
   hasOptions(info) {

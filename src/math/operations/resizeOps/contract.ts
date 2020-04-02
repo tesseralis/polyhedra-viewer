@@ -1,4 +1,3 @@
-import PolyhedronSpecs from "data/specs/PolyhedronSpecs"
 import { Polygon } from "data/polygons"
 import Classical from "data/specs/Classical"
 import { Polyhedron } from "math/polyhedra"
@@ -21,11 +20,10 @@ interface Options {
 const coxeterNum: Record<Family, number> = { 3: 4, 4: 6, 5: 10 }
 
 function getContractLength(
-  info: PolyhedronSpecs,
+  info: Classical,
   polyhedron: Polyhedron,
   faceType: FaceType,
 ) {
-  if (!info.isClassical()) throw new Error()
   // Calculate dihedral angle
   // https://en.wikipedia.org/wiki/Platonic_solid#Angles
   const n = info.data.family
@@ -56,7 +54,7 @@ function getContractLengthSemi(
 }
 
 export function applyContract(
-  info: PolyhedronSpecs,
+  info: Classical,
   polyhedron: Polyhedron,
   { faceType = isBevelled(polyhedron) ? 6 : 3 }: Options,
   result: string,
@@ -81,6 +79,7 @@ export function applyContract(
   }
 }
 
+// FIXME get rid of this function
 function isBevelled(polyhedron: Polyhedron) {
   return Classical.query.hasNameWhere(
     polyhedron.name,
@@ -89,20 +88,19 @@ function isBevelled(polyhedron: Polyhedron) {
 }
 
 // NOTE: We are using the same operation for contracting both expanded and snub solids.
-export const contract = makeOperation<Options>("contract", {
+export const contract = makeOperation<Options, Classical>("contract", {
   apply(info, polyhedron, options, result) {
     return applyContract(info, polyhedron, options, result)
   },
 
   optionTypes: ["faceType"],
 
-  canApplyTo(info) {
+  canApplyTo(info): info is Classical {
     if (!info.isClassical()) return false
     return ["bevel", "cantellate", "snub"].includes(info.data.operation)
   },
 
   getResult(info, { faceType }) {
-    if (!info.isClassical()) throw new Error()
     const isVertex = faceType === (info.isBevelled() ? 6 : 3)
     return info.withData({
       operation: info.isBevelled() ? "truncate" : "regular",
@@ -111,11 +109,10 @@ export const contract = makeOperation<Options>("contract", {
   },
 
   hasOptions(info) {
-    return info.isClassical() && !info.isTetrahedral()
+    return !info.isTetrahedral()
   },
 
   *allOptionCombos(info) {
-    if (!info.isClassical()) throw new Error("Invalid polyhedron")
     if (info.isTetrahedral()) {
       yield {}
     } else {

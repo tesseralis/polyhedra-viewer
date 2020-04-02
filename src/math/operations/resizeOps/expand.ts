@@ -1,5 +1,6 @@
 import { every, take } from "lodash-es"
 import { Twist } from "types"
+import Classical from "data/specs/Classical"
 import { Polyhedron } from "math/polyhedra"
 import { withOrigin } from "math/geom"
 import {
@@ -82,21 +83,20 @@ function doExpansion(
   }
 }
 
-export const expand = makeOperation("expand", {
+export const expand = makeOperation<{}, Classical>("expand", {
   apply(info, polyhedron, $, result) {
-    if (info.isClassical() && info.isTruncated()) {
+    if (info.isTruncated()) {
       return doSemiExpansion(polyhedron, result)
     }
     return doExpansion(polyhedron, result)
   },
 
-  canApplyTo(info) {
+  canApplyTo(info): info is Classical {
     if (!info.isClassical()) return false
     return ["regular", "truncate"].includes(info.data.operation)
   },
 
   getResult(info) {
-    if (!info.isClassical()) throw new Error()
     return info.withData({
       operation: info.isRegular() ? "cantellate" : "bevel",
     })
@@ -106,24 +106,23 @@ export const expand = makeOperation("expand", {
 interface SnubOpts {
   twist: Twist
 }
-export const snub = makeOperation<SnubOpts>("snub", {
+export const snub = makeOperation<SnubOpts, Classical>("snub", {
   apply(info, polyhedron, { twist = "left" }, result) {
     return doExpansion(polyhedron, result, twist)
   },
 
-  canApplyTo(info) {
+  canApplyTo(info): info is Classical {
     return info.isRegular()
   },
 
   getResult(info) {
-    if (!info.isClassical()) throw new Error()
     return info.withData({ operation: "snub" })
   },
 
   optionTypes: ["twist"],
 
   hasOptions(info) {
-    return info.isClassical() && !info.isTetrahedral()
+    return !info.isTetrahedral()
   },
 
   *allOptionCombos() {
@@ -132,7 +131,7 @@ export const snub = makeOperation<SnubOpts>("snub", {
   },
 })
 
-export const dual = makeOperation("dual", {
+export const dual = makeOperation<{}, Classical>("dual", {
   apply(info, polyhedron) {
     // Scale to create a dual polyhedron with the same midradius
     const scale = (() => {
@@ -154,12 +153,11 @@ export const dual = makeOperation("dual", {
     }
   },
 
-  canApplyTo(info) {
+  canApplyTo(info): info is Classical {
     return info.isRegular()
   },
 
   getResult(info) {
-    if (!info.isClassical()) throw new Error()
     const { facet } = info.data
     if (info.isTetrahedral()) return info
     return info.withData({ facet: facet === "face" ? "vertex" : "face" })

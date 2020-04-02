@@ -1,4 +1,5 @@
 import { Twist } from "types"
+import Capstone from "data/specs/Capstone"
 import { Polyhedron, Cap, VertexList } from "math/polyhedra"
 import { expandEdges } from "../operationUtils"
 import makeOperation from "../makeOperation"
@@ -34,18 +35,17 @@ function doElongate(polyhedron: Polyhedron, twist?: Twist) {
   }
 }
 
-export const elongate = makeOperation("elongate", {
+export const elongate = makeOperation<{}, Capstone>("elongate", {
   apply(info, polyhedron) {
     return doElongate(polyhedron)
   },
 
-  canApplyTo(info) {
+  canApplyTo(info): info is Capstone {
     if (!info.isCapstone()) return false
     return info.isShortened() && info.data.base > 2
   },
 
   getResult(info) {
-    if (!info.isCapstone()) throw new Error()
     return info.withData({ elongation: "prism" })
   },
 })
@@ -53,26 +53,25 @@ export const elongate = makeOperation("elongate", {
 interface Options {
   twist?: Twist
 }
-export const gyroelongate = makeOperation<Options>("gyroelongate", {
+export const gyroelongate = makeOperation<Options, Capstone>("gyroelongate", {
   apply(info, polyhedron: Polyhedron, { twist = "left" }) {
     return doElongate(polyhedron, twist)
   },
 
   optionTypes: ["twist"],
 
-  canApplyTo(info) {
+  canApplyTo(info): info is Capstone {
     if (!info.isCapstone()) return false
     // Cannot gyroelongate fastigium or triangular pyramid
     return info.isShortened() && info.data.base > 3
   },
 
   getResult(info) {
-    if (!info.isCapstone()) throw new Error()
     return info.withData({ elongation: "antiprism" })
   },
 
   hasOptions(info) {
-    return info.isCapstone() && !info.isPyramid()
+    return !info.isPyramid()
   },
 
   *allOptionCombos() {

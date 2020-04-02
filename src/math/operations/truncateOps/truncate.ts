@@ -2,6 +2,7 @@ import { set, range } from "lodash-es"
 
 import { repeat } from "utils"
 import PolyhedronSpecs from "data/specs/PolyhedronSpecs"
+import Classical from "data/specs/Classical"
 import { withOrigin, PRECISION, Vec3D } from "math/geom"
 import { Polyhedron, Vertex } from "math/polyhedra"
 import makeOperation from "../makeOperation"
@@ -92,7 +93,7 @@ function getTruncateTransform(
 }
 
 function doTruncate(
-  info: PolyhedronSpecs,
+  info: Classical,
   polyhedron: Polyhedron,
   rectify = false,
   result?: string,
@@ -120,34 +121,32 @@ function doTruncate(
   }
 }
 
-export const truncate = makeOperation("truncate", {
+export const truncate = makeOperation<{}, Classical>("truncate", {
   apply(info, polyhedron, $, result) {
     return doTruncate(info, polyhedron, false, result)
   },
 
-  canApplyTo(info) {
+  canApplyTo(info): info is Classical {
     if (!info.isClassical()) return false
     return ["regular", "rectify"].includes(info.data.operation)
   },
 
   getResult(info) {
-    if (!info.isClassical()) throw new Error()
     return info.withData({ operation: info.isRegular() ? "truncate" : "bevel" })
   },
 })
 
-export const rectify = makeOperation("rectify", {
+export const rectify = makeOperation<{}, Classical>("rectify", {
   apply(info, polyhedron) {
     return doTruncate(info, polyhedron, true)
   },
 
-  canApplyTo(info) {
+  canApplyTo(info): info is Classical {
     if (!info.isClassical()) return false
     return ["regular"].includes(info.data.operation)
   },
 
   getResult(info) {
-    if (!info.isClassical()) throw new Error()
     return info.withData({ operation: "rectify" })
   },
 })

@@ -1,8 +1,8 @@
 import { set, flatMapDeep, meanBy } from "lodash-es"
 
+import Classical from "data/specs/Classical"
 import { Polyhedron, Vertex, Face, Edge } from "math/polyhedra"
 import makeOperation from "../makeOperation"
-import PolyhedronSpecs from "data/specs/PolyhedronSpecs"
 
 interface SharpenOptions {
   faceType?: number
@@ -41,7 +41,7 @@ function duplicateVertices(polyhedron: Polyhedron, facesTosharpen: Face[]) {
 }
 
 function getSharpenFaces(
-  info: PolyhedronSpecs,
+  info: Classical,
   polyhedron: Polyhedron,
   faceType: number,
 ) {
@@ -61,28 +61,20 @@ function calculateSharpenDist(face: Face, edge: Edge) {
   return apothem * Math.tan(theta)
 }
 
-function getSharpenDist(
-  info: PolyhedronSpecs,
-  polyhedron: Polyhedron,
-  face: Face,
-) {
+function getSharpenDist(info: Classical, face: Face) {
   if (!info.isRegular() && !info.isQuasiRegular()) {
     return meanBy(face.edges, (edge) => calculateSharpenDist(face, edge))
   }
   return calculateSharpenDist(face, face.edges[0])
 }
 
-function getVertexToAdd(
-  info: PolyhedronSpecs,
-  polyhedron: Polyhedron,
-  face: Face,
-) {
-  const dist = getSharpenDist(info, polyhedron, face)
+function getVertexToAdd(info: Classical, face: Face) {
+  const dist = getSharpenDist(info, face)
   return face.normalRay().getPointAtDistance(dist)
 }
 
 function applySharpen(
-  info: PolyhedronSpecs,
+  info: Classical,
   polyhedron: Polyhedron,
   { faceType = polyhedron.smallestFace().numSides }: SharpenOptions = {},
 ) {
@@ -97,9 +89,7 @@ function applySharpen(
     mock = polyhedron
   }
 
-  const verticesToAdd = sharpenFaces.map((face) =>
-    getVertexToAdd(info, mock, face),
-  )
+  const verticesToAdd = sharpenFaces.map((face) => getVertexToAdd(info, face))
 
   const oldToNew: Record<number, number> = {}
   sharpenFaces.forEach((face, i) => {
@@ -123,17 +113,16 @@ function applySharpen(
 interface Options {
   faceType?: number
 }
-export const sharpen = makeOperation<Options>("sharpen", {
+export const sharpen = makeOperation<Options, Classical>("sharpen", {
   apply: applySharpen,
   optionTypes: ["faceType"],
 
-  canApplyTo(info) {
+  canApplyTo(info): info is Classical {
     if (!info.isClassical()) return false
     return ["truncate", "rectify", "bevel"].includes(info.data.operation)
   },
 
   getResult(info, { faceType }) {
-    if (!info.isClassical()) throw new Error()
     if (info.isTruncated()) return info.withData({ operation: "regular" })
     if (info.isBevelled()) return info.withData({ operation: "rectify" })
 
@@ -145,11 +134,10 @@ export const sharpen = makeOperation<Options>("sharpen", {
   },
 
   hasOptions(info) {
-    return info.isClassical() && !info.isTetrahedral() && info.isRectified()
+    return !info.isTetrahedral() && info.isRectified()
   },
 
   *allOptionCombos(info) {
-    if (!info.isClassical()) throw new Error("Invalid polyhedron")
     if (info.isQuasiRegular() && !info.isRegular()) {
       yield { faceType: 3 }
       yield { faceType: info.data.family }

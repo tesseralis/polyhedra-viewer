@@ -19,7 +19,7 @@ export interface OperationResult {
   animationData?: AnimationData
 }
 
-interface BaseOperation<Options extends {}> {
+interface BaseOperation<Options extends {}, Specs extends PolyhedronSpecs> {
   optionTypes: (keyof Options)[]
 
   hitOption?: keyof Options
@@ -31,7 +31,8 @@ interface BaseOperation<Options extends {}> {
   faceSelectionStates(polyhedron: Polyhedron, options: Options): SelectState[]
 }
 
-export interface Operation<Options extends {}> extends BaseOperation<Options> {
+export interface Operation<Options extends {}, Specs extends PolyhedronSpecs>
+  extends BaseOperation<Options, Specs> {
   name: string
 
   apply(polyhedron: Polyhedron, options: Options): OperationResult
@@ -70,34 +71,34 @@ interface PartialOpResult {
   }
 }
 
-interface OperationArgs<Options extends {}>
-  extends Partial<BaseOperation<Options>> {
+interface OperationArgs<Options extends {}, Specs extends PolyhedronSpecs>
+  extends Partial<BaseOperation<Options, Specs>> {
   apply(
-    info: PolyhedronSpecs,
+    info: Specs,
     polyhedron: Polyhedron,
     options: Options,
     resultName: string,
   ): PartialOpResult | Polyhedron
 
-  canApplyTo(info: PolyhedronSpecs): boolean
+  canApplyTo(info: PolyhedronSpecs): info is Specs
 
-  hasOptions?(info: PolyhedronSpecs): boolean
+  hasOptions?(info: Specs): boolean
 
   allOptions?(
-    info: PolyhedronSpecs,
+    info: Specs,
     polyhedron: Polyhedron,
     optionName: keyof Options,
   ): Options[typeof optionName][]
 
-  allOptionCombos?(info: PolyhedronSpecs, solid: Polyhedron): Generator<Options>
+  allOptionCombos?(info: Specs, solid: Polyhedron): Generator<Options>
 
   getResult(
-    info: PolyhedronSpecs,
+    info: Specs,
     options: Options,
     polyhedron: Polyhedron,
   ): PolyhedronSpecs
 
-  isPreferredSpec?(info: PolyhedronSpecs, options: Options): boolean
+  isPreferredSpec?(info: Specs, options: Options): boolean
 
   getHitOption?(
     polyhedron: Polyhedron,
@@ -105,10 +106,10 @@ interface OperationArgs<Options extends {}>
     options: Options,
   ): Partial<Options>
 
-  defaultOptions?(info: PolyhedronSpecs): Partial<Options>
+  defaultOptions?(info: Specs): Partial<Options>
 }
 
-type OperationArg = keyof OperationArgs<any>
+type OperationArg = keyof OperationArgs<any, any>
 const methodDefaults = {
   getHitOption: {},
   hasOptions: false,
@@ -119,7 +120,9 @@ const methodDefaults = {
 }
 
 // TODO get this to return the correct type
-function fillDefaults<Options extends {}>(op: OperationArgs<Options>) {
+function fillDefaults<Options extends {}, Specs extends PolyhedronSpecs>(
+  op: OperationArgs<Options, Specs>,
+) {
   return {
     ...mapValues(
       methodDefaults,
@@ -180,10 +183,10 @@ export function deduplicateVertices(polyhedron: Polyhedron) {
   return removeExtraneousVertices(polyhedron.withFaces(newFaces))
 }
 
-export default function makeOperation<Options extends {}>(
-  name: string,
-  op: OperationArgs<Options>,
-): Operation<Options> {
+export default function makeOperation<
+  Options extends {},
+  Specs extends PolyhedronSpecs
+>(name: string, op: OperationArgs<Options, Specs>): Operation<Options, Specs> {
   const withDefaults = fillDefaults(op)
   return {
     ...(withDefaults as any),
@@ -194,6 +197,7 @@ export default function makeOperation<Options extends {}>(
           withDefaults.canApplyTo(info) &&
           withDefaults.isPreferredSpec!(info, options),
       )[0]
+      if (!withDefaults.canApplyTo(info)) throw new Error()
 
       // get the next polyhedron name
       const next = withDefaults.getResult!(
@@ -230,6 +234,7 @@ export default function makeOperation<Options extends {}>(
       const info = [...getAllSpecs(polyhedron.name)].filter((info) =>
         withDefaults.canApplyTo(info),
       )[0]
+      if (!withDefaults.canApplyTo(info)) throw new Error()
       return withDefaults.allOptions!(info, polyhedron, optionName)
     },
     *allOptionCombos(polyhedron) {
@@ -243,6 +248,7 @@ export default function makeOperation<Options extends {}>(
       const info = [...getAllSpecs(polyhedron.name)].filter((info) =>
         withDefaults.canApplyTo(info),
       )[0]
+      if (!withDefaults.canApplyTo(info)) throw new Error()
       return withDefaults.defaultOptions!(info)
     },
   }

@@ -9,7 +9,11 @@ import {
 } from "../operationUtils"
 import makeOperation from "../makeOperation"
 import { Polyhedron, Cap } from "math/polyhedra"
-import { getCapAlignment, getCupolaGyrate } from "./cutPasteUtils"
+import {
+  CutPasteSpecs,
+  getCapAlignment,
+  getCupolaGyrate,
+} from "./cutPasteUtils"
 
 function removeCap(polyhedron: Polyhedron, cap: Cap) {
   const boundary = cap.boundary()
@@ -60,14 +64,14 @@ function removeCap(polyhedron: Polyhedron, cap: Cap) {
 interface Options {
   cap: Cap
 }
-export const diminish = makeOperation<Options>("diminish", {
+export const diminish = makeOperation<Options, CutPasteSpecs>("diminish", {
   apply(info, polyhedron, { cap }) {
     return removeCap(polyhedron, cap)
   },
 
   optionTypes: ["cap"],
 
-  canApplyTo(info) {
+  canApplyTo(info): info is CutPasteSpecs {
     if (info.isCapstone()) {
       return !(info.isMono() && info.isShortened())
     }

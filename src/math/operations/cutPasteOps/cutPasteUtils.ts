@@ -1,6 +1,11 @@
 import { getSingle } from "utils"
 import { Cap, Polyhedron } from "math/polyhedra"
 import { isInverse } from "math/geom"
+import Capstone from "data/specs/Capstone"
+import Composite from "data/specs/Composite"
+import Elementary from "data/specs/Elementary"
+
+export type CutPasteSpecs = Capstone | Composite | Elementary
 
 export function getCupolaGyrate(cap: Cap) {
   const isOrtho = cap.boundary().edges.every((edge) => {

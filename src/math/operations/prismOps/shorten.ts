@@ -1,4 +1,5 @@
 import { Polyhedron } from "math/polyhedra"
+import Capstone from "data/specs/Capstone"
 import { Twist } from "types"
 import {
   antiprismHeight,
@@ -31,19 +32,18 @@ function doShorten(polyhedron: Polyhedron, options: Options) {
 interface Options {
   twist?: Twist
 }
-export const shorten = makeOperation<Options>("shorten", {
+export const shorten = makeOperation<Options, Capstone>("shorten", {
   apply(info, polyhedron, options) {
     return doShorten(polyhedron, options)
   },
 
   optionTypes: ["twist"],
 
-  canApplyTo(info) {
+  canApplyTo(info): info is Capstone {
     return info.isCapstone() && !info.isShortened()
   },
 
   getResult(info, { twist }, polyhedron) {
-    if (!info.isCapstone()) throw new Error()
     const gyrate = (() => {
       if (!isGyroelongatedBiCupola(info)) return info.data.gyrate
       const chirality = getChirality(polyhedron)

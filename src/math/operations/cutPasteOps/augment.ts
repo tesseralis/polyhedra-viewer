@@ -1,6 +1,6 @@
 import { mapValues, compact, every, xor, uniq, pickBy } from "lodash-es"
 
-import PolyhedronSpecs from "data/specs/PolyhedronSpecs"
+import Prismatic from "data/specs/Prismatic"
 import Capstone from "data/specs/Capstone"
 import Elementary from "data/specs/Elementary"
 import { Polyhedron, Face, Cap } from "math/polyhedra"
@@ -10,6 +10,9 @@ import { deduplicateVertices } from "../makeOperation"
 
 import makeOperation from "../makeOperation"
 import { withOrigin } from "../../geom"
+import { CutPasteSpecs } from "./cutPasteUtils"
+
+type AugmentSpecs = Prismatic | CutPasteSpecs
 
 type AugmentType = "pyramid" | "cupola" | "rotunda"
 const augmentees: Record<AugmentType, Record<number, string>> = {
@@ -41,7 +44,7 @@ const augmentTypes: Record<string, AugmentType> = {
   R: "rotunda",
 }
 
-function hasAugmentAlignment(info: PolyhedronSpecs) {
+function hasAugmentAlignment(info: AugmentSpecs) {
   if (!info.isComposite()) return false
   const { source, augmented } = info.data
   if (augmented !== 1) return false
@@ -50,7 +53,7 @@ function hasAugmentAlignment(info: PolyhedronSpecs) {
 }
 
 function getAugmentAlignment(
-  info: PolyhedronSpecs,
+  info: AugmentSpecs,
   polyhedron: Polyhedron,
   face: Face,
 ) {
@@ -194,7 +197,7 @@ function isFastigium(augmentType: string, numSides: number) {
 
 // Augment the following
 function doAugment(
-  info: PolyhedronSpecs,
+  info: AugmentSpecs,
   polyhedron: Polyhedron,
   base: Face,
   augmentType: AugmentType,
@@ -289,7 +292,7 @@ function getUsingOpt(using: string, numSides: number) {
     : defaultAugmentees[numSides]
 }
 
-function hasRotunda(info: PolyhedronSpecs) {
+function hasRotunda(info: AugmentSpecs) {
   if (info.isPrismatic()) {
     return info.data.base === 10
   }
@@ -304,7 +307,7 @@ function getGraphArgs(using: string) {
   return { type: augmentTypes[prefix], base: parseInt(baseStr) }
 }
 
-function getUsingOpts(info: PolyhedronSpecs) {
+function getUsingOpts(info: AugmentSpecs) {
   // Triangular prism or fastigium
   if (info.canonicalName() === "triangular prism") {
     return ["Y4", "U2"]
@@ -316,7 +319,7 @@ function getUsingOpts(info: PolyhedronSpecs) {
   return null
 }
 
-function hasGyrateOpts(info: PolyhedronSpecs) {
+function hasGyrateOpts(info: AugmentSpecs) {
   if (info.isCapstone()) {
     // Gyroelongated capstones are always gyro
     if (info.isGyroelongated()) return false
@@ -338,7 +341,7 @@ interface Options {
   gyrate?: GyrateOpts
   using?: string
 }
-export const augment = makeOperation<Options>("augment", {
+export const augment = makeOperation<Options, AugmentSpecs>("augment", {
   apply(info, polyhedron, { face, gyrate, using }) {
     const augmentType = using
       ? augmentTypes[using[0]]
@@ -347,7 +350,7 @@ export const augment = makeOperation<Options>("augment", {
   },
   optionTypes: ["face", "gyrate", "using"],
 
-  canApplyTo(info) {
+  canApplyTo(info): info is AugmentSpecs {
     if (info.isPrismatic()) {
       const { base } = info.data
       if (info.isAntiprism() && base === 3) return false
