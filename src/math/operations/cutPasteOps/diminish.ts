@@ -78,10 +78,10 @@ export const diminish = makeOperation<CutPasteSpecs, Options>("diminish", {
     if (info.isComposite()) {
       const { source, augmented, diminished } = info.data
       if (source.canonicalName() === "rhombicosidodecahedron") {
-        return diminished < 3
+        return diminished < 3 && !info.isPara()
       }
       if (source.canonicalName() === "icosahedron") {
-        return diminished < 3 || augmented === 1
+        return (diminished < 3 || augmented === 1) && !info.isPara()
       }
       return augmented > 0
     }

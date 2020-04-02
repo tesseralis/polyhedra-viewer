@@ -76,6 +76,9 @@ export default class Composite extends Specs<CompositeData> {
   isBi = () => this.totalCount() === 2
   isTri = () => this.totalCount() === 3
 
+  isPara = () => this.data.align === "para"
+  isMeta = () => this.data.align === "meta"
+
   static *getAll() {
     // Augmented prisms
     for (const source of prismaticBases) {

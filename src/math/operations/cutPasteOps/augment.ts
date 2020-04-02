@@ -370,10 +370,12 @@ export const augment = makeOperation<AugmentSpecs, Options>("augment", {
         return diminished > 0 && augmented === 0
       }
       if (source.isPrismatic()) {
-        return augmented < (source.data.base % 3 === 0 ? 3 : 2)
+        return (
+          augmented < (source.data.base % 3 === 0 ? 3 : 2) && !info.isPara()
+        )
       }
       if (source.isClassical()) {
-        return augmented < source.data.family - 2
+        return augmented < source.data.family - 2 && !info.isPara()
       }
     }
     if (info.isElementary()) {

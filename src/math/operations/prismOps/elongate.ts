@@ -61,7 +61,9 @@ export const gyroelongate = makeOperation<Capstone, Options>("gyroelongate", {
   canApplyTo(info): info is Capstone {
     if (!info.isCapstone()) return false
     // Cannot gyroelongate fastigium or triangular pyramid
-    return info.isShortened() && info.data.base > 3
+    if (info.isDigonal()) return false
+    if (info.isPyramid() && info.isTriangular()) return false
+    return info.isShortened()
   },
 
   getResult(info) {
