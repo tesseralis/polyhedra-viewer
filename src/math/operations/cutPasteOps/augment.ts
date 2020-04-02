@@ -48,16 +48,13 @@ function hasAugmentAlignment(info: AugmentSpecs) {
   if (!info.isComposite()) return false
   const { source, augmented } = info.data
   if (augmented !== 1) return false
+  // Only hexagonal prism has augment alignment
   if (source.isPrismatic()) return source.data.base === 6
+  // If Classical, has alignment if it has icosahedral symmetryk
   return source.isIcosahedral()
 }
 
-function getAugmentAlignment(
-  info: AugmentSpecs,
-  polyhedron: Polyhedron,
-  face: Face,
-) {
-  if (!hasAugmentAlignment(info)) return
+function getAugmentAlignment(polyhedron: Polyhedron, face: Face) {
   const boundary = getSingle(Cap.getAll(polyhedron)).boundary()
   return isInverse(boundary.normal(), face.normal()) ? "para" : "meta"
 }
@@ -431,10 +428,9 @@ export const augment = makeOperation<AugmentSpecs, Options>("augment", {
       }
       return info.withData({
         augmented: inc(augmented),
-        align:
-          augmented === 1
-            ? getAugmentAlignment(info, polyhedron, face)
-            : undefined,
+        align: hasAugmentAlignment(info)
+          ? getAugmentAlignment(polyhedron, face)
+          : undefined,
       })
     }
     if (info.isElementary()) {

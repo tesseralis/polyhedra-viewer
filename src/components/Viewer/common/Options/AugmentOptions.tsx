@@ -67,7 +67,7 @@ export default function AugmentOptions() {
         const value = options![name]
         return (
           <div key={name} {...optionCss()}>
-            {operation?.allOptions(polyhedron, name).map((optValue: string) => (
+            {operation?.allOptions(polyhedron, name).map((optValue) => (
               <OptionButton
                 key={optValue}
                 optValue={optValue}

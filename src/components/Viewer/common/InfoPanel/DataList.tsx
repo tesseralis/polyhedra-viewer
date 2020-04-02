@@ -124,7 +124,7 @@ function Datum({
   )
 }
 
-export default function DataList({ info, polyhedron }: RenderProps) {
+export default function DataList(props: RenderProps) {
   const css = useStyle({
     display: "grid",
     gridTemplateAreas: `
@@ -140,13 +140,8 @@ export default function DataList({ info, polyhedron }: RenderProps) {
 
   return (
     <dl {...css()}>
-      {infoRows.map((props) => (
-        <Datum
-          key={props.name}
-          {...props}
-          info={info}
-          polyhedron={polyhedron}
-        />
+      {infoRows.map((rowProps) => (
+        <Datum key={rowProps.name} {...rowProps} {...props} />
       ))}
     </dl>
   )

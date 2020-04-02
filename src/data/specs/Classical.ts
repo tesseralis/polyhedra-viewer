@@ -31,10 +31,7 @@ const options: DataOptions<ClassicalData> = {
 export default class Classical extends Specs<ClassicalData> {
   private constructor(data: ClassicalData) {
     super("classical", data)
-    if (
-      this.isTetrahedral() ||
-      !["regular", "truncate"].includes(this.data.operation)
-    ) {
+    if (this.isTetrahedral() || !this.hasFacet()) {
       delete this.data.facet
     }
   }
@@ -53,6 +50,8 @@ export default class Classical extends Specs<ClassicalData> {
   isBevelled = () => this.data.operation === "bevel"
   isCantellated = () => this.data.operation === "cantellate"
   isSnub = () => this.data.operation === "snub"
+
+  hasFacet = () => this.isRegular() || this.isTruncated()
 
   isFace = () => this.data.facet === "face"
   isVertex = () => this.data.facet === "vertex"
