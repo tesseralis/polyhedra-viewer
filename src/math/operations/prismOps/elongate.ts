@@ -75,7 +75,8 @@ export const gyroelongate = makeOperation<Options>("gyroelongate", {
     return info.isCapstone() && !info.isPyramid()
   },
 
-  allOptionCombos() {
-    return [{ twist: "left" }, { twist: "right" }]
+  *allOptionCombos() {
+    yield { twist: "left" }
+    yield { twist: "right" }
   },
 })

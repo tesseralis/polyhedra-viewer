@@ -102,8 +102,8 @@ export const gyrate = makeOperation("gyrate", {
     return true
   },
 
-  allOptionCombos(polyhedron) {
-    return Cap.getAll(polyhedron).map((cap) => ({ cap }))
+  *allOptionCombos(info, polyhedron) {
+    for (const cap of Cap.getAll(polyhedron)) yield { cap }
   },
 
   hitOption: "cap",

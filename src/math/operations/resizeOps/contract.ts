@@ -116,15 +116,15 @@ export const contract = makeOperation<Options>("contract", {
     return info.isClassical() && !info.isTetrahedral()
   },
 
-  allOptionCombos(polyhedron) {
-    if (getFamily(polyhedron) === 3) return [{}]
-    const multiplier = isBevelled(polyhedron) ? 2 : 1
-    const info = polyhedron.info
+  *allOptionCombos(info) {
     if (!info.isClassical()) throw new Error("Invalid polyhedron")
-    return [
-      { faceType: (3 * multiplier) as any },
-      { faceType: (info.data.family * multiplier) as any },
-    ]
+    if (info.isTetrahedral()) {
+      yield {}
+    } else {
+      const multiplier = info.isBevelled() ? 2 : 1
+      yield { faceType: (3 * multiplier) as any }
+      yield { faceType: (info.data.family * multiplier) as any }
+    }
   },
 
   hitOption: "faceType",

@@ -142,10 +142,11 @@ export const twist = makeOperation<Options>("twist", {
     return info.isClassical() && !info.isTetrahedral() && info.isCantellated()
   },
 
-  allOptionCombos(polyhedron) {
-    if (expansionType(polyhedron) !== "snub") {
-      return [{ twist: "left" }, { twist: "right" }]
+  *allOptionCombos(info) {
+    if (info.isClassical() && !info.isSnub()) {
+      yield { twist: "left" }
+      yield { twist: "right" }
     }
-    return [{}]
+    yield {}
   },
 })

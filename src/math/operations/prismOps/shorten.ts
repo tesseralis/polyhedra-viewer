@@ -54,10 +54,12 @@ export const shorten = makeOperation<Options>("shorten", {
     return isGyroelongatedBiCupola(info)
   },
 
-  allOptionCombos(polyhedron) {
-    if (isGyroelongatedBiCupola(polyhedron.info)) {
-      return [{ twist: "left" }, { twist: "right" }]
+  *allOptionCombos(info) {
+    if (isGyroelongatedBiCupola(info)) {
+      yield { twist: "left" }
+      yield { twist: "right" }
+    } else {
+      yield {}
     }
-    return [{}]
   },
 })

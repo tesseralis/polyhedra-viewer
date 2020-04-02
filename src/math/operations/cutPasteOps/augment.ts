@@ -41,8 +41,7 @@ const augmentTypes: Record<string, AugmentType> = {
   R: "rotunda",
 }
 
-function hasAugmentAlignment(polyhedron: Polyhedron) {
-  const info = polyhedron.info
+function hasAugmentAlignment(info: PolyhedronSpecs) {
   if (!info.isComposite()) return false
   const { source, augmented } = info.data
   if (augmented !== 1) return false
@@ -51,7 +50,7 @@ function hasAugmentAlignment(polyhedron: Polyhedron) {
 }
 
 function getAugmentAlignment(polyhedron: Polyhedron, face: Face) {
-  if (!hasAugmentAlignment(polyhedron)) return
+  if (!hasAugmentAlignment(polyhedron.info)) return
   const boundary = getSingle(Cap.getAll(polyhedron)).boundary()
   return isInverse(boundary.normal(), face.normal()) ? "para" : "meta"
 }
@@ -445,27 +444,21 @@ export const augment = makeOperation<Options>("augment", {
     return true
   },
 
-  allOptionCombos(polyhedron) {
-    const gyrateOpts = hasGyrateOpts(polyhedron.info)
-      ? allGyrateOpts
-      : [undefined]
+  *allOptionCombos(info, polyhedron) {
+    const gyrateOpts = hasGyrateOpts(info) ? allGyrateOpts : [undefined]
 
-    const usingOpts = getUsingOpts(polyhedron.info) ?? [undefined]
+    const usingOpts = getUsingOpts(info) ?? [undefined]
     const faceOpts = polyhedron.faces.filter((face) => canAugment(face))
-
-    const options: Options[] = []
 
     for (const face of faceOpts) {
       for (const gyrate of gyrateOpts) {
         for (const using of usingOpts) {
           if (!using || canAugmentWithType(face, augmentTypes[using[0]])) {
-            options.push({ gyrate, using, face })
+            yield { gyrate, using, face }
           }
         }
       }
     }
-
-    return options
   },
 
   hitOption: "face",

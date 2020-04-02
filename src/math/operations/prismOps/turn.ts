@@ -130,10 +130,12 @@ export const turn = makeOperation<Options>("turn", {
     return info.isCapstone() && !info.isPyramid() && info.isBi()
   },
 
-  allOptionCombos(polyhedron) {
-    if (isGyroelongatedBiCupola(polyhedron.info)) {
-      return [{ twist: "left" }, { twist: "right" }]
+  *allOptionCombos(info) {
+    if (isGyroelongatedBiCupola(info)) {
+      yield { twist: "left" }
+      yield { twist: "right" }
+    } else {
+      yield {}
     }
-    return [{}]
   },
 })

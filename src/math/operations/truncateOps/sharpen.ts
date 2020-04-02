@@ -132,13 +132,14 @@ export const sharpen = makeOperation<Options>("sharpen", {
     return info.isClassical() && !info.isTetrahedral() && info.isRectified()
   },
 
-  allOptionCombos(polyhedron) {
-    const info = polyhedron.info
+  *allOptionCombos(info) {
     if (!info.isClassical()) throw new Error("Invalid polyhedron")
     if (info.isQuasiRegular() && !info.isRegular()) {
-      return [{ faceType: 3 }, { faceType: info.data.family }]
+      yield { faceType: 3 }
+      yield { faceType: info.data.family }
+    } else {
+      yield {}
     }
-    return [{}]
   },
 
   hitOption: "faceType",

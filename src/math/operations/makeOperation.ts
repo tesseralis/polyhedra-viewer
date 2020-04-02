@@ -25,12 +25,6 @@ interface BaseOperation<Options extends {}> {
   hitOption?: keyof Options
 
   /**
-   * Test utility.
-   * @return all possible option permutations for applying this operation to the given polyhedron.
-   */
-  allOptionCombos(polyhedron: Polyhedron): Options[]
-
-  /**
    * Given an application of an operation to a given polyhedron with the given options,
    * @return an array mapping face indices to selection states (selectable, selected, or none).
    */
@@ -64,6 +58,8 @@ export interface Operation<Options extends {}> extends BaseOperation<Options> {
    * @return whether this operation has multiple options for the given polyhedron.
    */
   hasOptions(polyhedron: Polyhedron): boolean
+
+  allOptionCombos(polyhedron: Polyhedron): Generator<Options>
 }
 
 interface PartialOpResult {
@@ -85,6 +81,8 @@ interface OperationArgs<Options extends {}>
   canApplyTo(info: PolyhedronSpecs): boolean
 
   hasOptions?(info: PolyhedronSpecs): boolean
+
+  allOptionCombos?(info: PolyhedronSpecs, solid: Polyhedron): Generator<Options>
 
   getResult(
     info: PolyhedronSpecs,
@@ -218,6 +216,13 @@ export default function makeOperation<Options extends {}>(
         }
       }
       return false
+    },
+    *allOptionCombos(polyhedron) {
+      for (const specs of getAllSpecs(polyhedron.name)) {
+        if (withDefaults.canApplyTo(specs) && withDefaults.hasOptions!(specs)) {
+          yield* withDefaults.allOptionCombos!(specs, polyhedron)
+        }
+      }
     },
   }
 }

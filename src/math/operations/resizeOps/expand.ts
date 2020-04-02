@@ -137,8 +137,9 @@ export const snub = makeOperation<SnubOpts>("snub", {
     return info.isClassical() && !info.isTetrahedral()
   },
 
-  allOptionCombos() {
-    return [{ twist: "left" }, { twist: "right" }]
+  *allOptionCombos() {
+    yield { twist: "left" }
+    yield { twist: "right" }
   },
 })
 
