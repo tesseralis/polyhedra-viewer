@@ -126,8 +126,7 @@ export const turn = makeOperation<Options>("turn", {
     throw new Error()
   },
 
-  hasOptions(polyhedron) {
-    const info = polyhedron.info
+  hasOptions(info) {
     return info.isCapstone() && !info.isPyramid() && info.isBi()
   },
 

@@ -128,8 +128,7 @@ export const sharpen = makeOperation<Options>("sharpen", {
     })
   },
 
-  hasOptions(polyhedron) {
-    const info = polyhedron.info
+  hasOptions(info) {
     return info.isClassical() && !info.isTetrahedral() && info.isRectified()
   },
 

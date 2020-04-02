@@ -112,8 +112,8 @@ export const contract = makeOperation<Options>("contract", {
     })
   },
 
-  hasOptions(polyhedron) {
-    return getFamily(polyhedron) !== 3
+  hasOptions(info) {
+    return info.isClassical() && !info.isTetrahedral()
   },
 
   allOptionCombos(polyhedron) {

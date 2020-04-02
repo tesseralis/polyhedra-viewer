@@ -50,8 +50,8 @@ export const shorten = makeOperation<Options>("shorten", {
     return info.withData({ elongation: null, gyrate })
   },
 
-  hasOptions(polyhedron) {
-    return isGyroelongatedBiCupola(polyhedron.info)
+  hasOptions(info) {
+    return isGyroelongatedBiCupola(info)
   },
 
   allOptionCombos(polyhedron) {

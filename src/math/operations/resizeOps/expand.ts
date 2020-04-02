@@ -133,8 +133,8 @@ export const snub = makeOperation<SnubOpts>("snub", {
 
   optionTypes: ["twist"],
 
-  hasOptions(polyhedron) {
-    return polyhedron.info.isClassical() && polyhedron.info.data.family !== 3
+  hasOptions(info) {
+    return info.isClassical() && !info.isTetrahedral()
   },
 
   allOptionCombos() {

@@ -84,7 +84,7 @@ interface OperationArgs<Options extends {}>
 
   canApplyTo(info: PolyhedronSpecs): boolean
 
-  hasOptions?(polyhedron: Polyhedron): boolean
+  hasOptions?(info: PolyhedronSpecs): boolean
 
   getResult(
     info: PolyhedronSpecs,
@@ -206,6 +206,14 @@ export default function makeOperation<Options extends {}>(
       // FIXME we're missing two operation applications so there's a bug somewhere
       for (const specs of getAllSpecs(polyhedron.name)) {
         if (withDefaults.canApplyTo(specs)) {
+          return true
+        }
+      }
+      return false
+    },
+    hasOptions(polyhedron) {
+      for (const specs of getAllSpecs(polyhedron.name)) {
+        if (withDefaults.canApplyTo(specs) && withDefaults.hasOptions!(specs)) {
           return true
         }
       }

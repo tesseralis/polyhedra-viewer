@@ -71,8 +71,8 @@ export const gyroelongate = makeOperation<Options>("gyroelongate", {
     return info.withData({ elongation: "antiprism" })
   },
 
-  hasOptions(polyhedron) {
-    return polyhedron.info.isCapstone() && !polyhedron.info.isPyramid()
+  hasOptions(info) {
+    return info.isCapstone() && !info.isPyramid()
   },
 
   allOptionCombos() {

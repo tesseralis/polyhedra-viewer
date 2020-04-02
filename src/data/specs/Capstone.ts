@@ -37,6 +37,11 @@ export default class Capstone extends Specs<CapstoneData> {
     return new Capstone({ ...this.data, ...data })
   }
 
+  isDigonal = () => this.data.base === 2
+  isTriangular = () => this.data.base === 3
+  isSquare = () => this.data.base === 4
+  isPentagonal = () => this.data.base === 5
+
   isPyramid = () => this.data.type === "pyramid"
   isCupola = () => this.data.type === "cupola"
   isRotunda = () => this.data.type === "rotunda"

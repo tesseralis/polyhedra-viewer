@@ -138,8 +138,7 @@ export const twist = makeOperation<Options>("twist", {
     })
   },
 
-  hasOptions(polyhedron) {
-    const info = polyhedron.info
+  hasOptions(info) {
     return info.isClassical() && !info.isTetrahedral() && info.isCantellated()
   },
 

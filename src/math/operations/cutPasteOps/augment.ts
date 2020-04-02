@@ -1,5 +1,6 @@
 import { mapValues, compact, every, xor, uniq, pickBy } from "lodash-es"
 
+import PolyhedronSpecs from "data/specs/PolyhedronSpecs"
 import Capstone from "data/specs/Capstone"
 import Elementary from "data/specs/Elementary"
 import { Polyhedron, Face, Cap } from "math/polyhedra"
@@ -284,8 +285,7 @@ function getUsingOpt(using: string, numSides: number) {
     : defaultAugmentees[numSides]
 }
 
-function hasRotunda(polyhedron: Polyhedron) {
-  const info = polyhedron.info
+function hasRotunda(info: PolyhedronSpecs) {
   if (info.isPrismatic()) {
     return info.data.base === 10
   }
@@ -300,25 +300,24 @@ function getGraphArgs(using: string) {
   return { type: augmentTypes[prefix], base: parseInt(baseStr) }
 }
 
-const getUsingOpts = (polyhedron: Polyhedron) => {
+function getUsingOpts(info: PolyhedronSpecs) {
   // Triangular prism or fastigium
-  if (polyhedron.name === "triangular prism") {
+  if (info.canonicalName() === "triangular prism") {
     return ["Y4", "U2"]
   }
 
-  if (hasRotunda(polyhedron)) {
+  if (hasRotunda(info)) {
     return ["U5", "R5"]
   }
   return null
 }
 
-function hasGyrateOpts(polyhedron: Polyhedron) {
-  const info = polyhedron.info
+function hasGyrateOpts(info: PolyhedronSpecs) {
   if (info.isCapstone()) {
     // Gyroelongated capstones are always gyro
     if (info.isGyroelongated()) return false
     // Cupolae and rotundae (that are not the gyrobifastigium) always have gyrate opts
-    if (info.data.base !== 2 && !info.isPyramid()) return true
+    if (!info.isDigonal() && !info.isPyramid()) return true
     return false
   }
   if (info.isComposite()) {
@@ -447,9 +446,11 @@ export const augment = makeOperation<Options>("augment", {
   },
 
   allOptionCombos(polyhedron) {
-    const gyrateOpts = hasGyrateOpts(polyhedron) ? allGyrateOpts : [undefined]
+    const gyrateOpts = hasGyrateOpts(polyhedron.info)
+      ? allGyrateOpts
+      : [undefined]
 
-    const usingOpts = getUsingOpts(polyhedron) ?? [undefined]
+    const usingOpts = getUsingOpts(polyhedron.info) ?? [undefined]
     const faceOpts = polyhedron.faces.filter((face) => canAugment(face))
 
     const options: Options[] = []
@@ -495,9 +496,9 @@ export const augment = makeOperation<Options>("augment", {
   allOptions(polyhedron, optionName) {
     switch (optionName) {
       case "gyrate":
-        return hasGyrateOpts(polyhedron) ? allGyrateOpts : []
+        return hasGyrateOpts(polyhedron.info) ? allGyrateOpts : []
       case "using":
-        return getUsingOpts(polyhedron) ?? []
+        return getUsingOpts(polyhedron.info) ?? []
       case "face":
         return polyhedron.faces.filter((face) => canAugment(face))
     }
@@ -505,9 +506,9 @@ export const augment = makeOperation<Options>("augment", {
 
   defaultOptions(solid) {
     if (!solid) return {}
-    const usingOpts = getUsingOpts(solid) ?? []
+    const usingOpts = getUsingOpts(solid.info) ?? []
     return pickBy({
-      gyrate: hasGyrateOpts(solid) && "gyro",
+      gyrate: hasGyrateOpts(solid.info) && "gyro",
       using: usingOpts.length > 1 && usingOpts[0],
     })
   },
