@@ -10,6 +10,8 @@ import {
 import makeOperation from "../makeOperation"
 import { Polyhedron, Cap } from "math/polyhedra"
 import {
+  inc,
+  dec,
   CutPasteSpecs,
   getCapAlignment,
   getCupolaGyrate,
@@ -126,12 +128,12 @@ export const diminish = makeOperation<Options, CutPasteSpecs>("diminish", {
         if (gyration === "ortho") {
           // we're just removing a gyrated cap in this case
           return info.withData({
-            gyrate: (gyrate - 1) as any,
-            diminished: (diminished + 1) as any,
+            gyrate: dec(gyrate),
+            diminished: inc(diminished),
           })
         } else {
           return info.withData({
-            diminished: (diminished + 1) as any,
+            diminished: inc(diminished),
             align: info.isMono() ? getCapAlignment(polyhedron, cap) : undefined,
           })
         }
@@ -139,13 +141,13 @@ export const diminish = makeOperation<Options, CutPasteSpecs>("diminish", {
       if (source.canonicalName() === "icosahedron") {
         if (augmented === 1) return info.withData({ augmented: 0 })
         return info.withData({
-          diminished: (diminished + 1) as any,
+          diminished: inc(diminished),
           align:
             diminished === 1 ? getCapAlignment(polyhedron, cap) : undefined,
         })
       }
       return info.withData({
-        augmented: (augmented - 1) as any,
+        augmented: dec(augmented),
         align:
           augmented === 3 && source.canonicalName() !== "triangular prism"
             ? "meta"

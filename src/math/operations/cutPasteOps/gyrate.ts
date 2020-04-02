@@ -3,7 +3,7 @@ import { Polyhedron, Cap } from "math/polyhedra"
 import { mapObject } from "utils"
 import Capstone from "data/specs/Capstone"
 import Composite from "data/specs/Composite"
-import { getCapAlignment, getCupolaGyrate } from "./cutPasteUtils"
+import { inc, dec, getCapAlignment, getCupolaGyrate } from "./cutPasteUtils"
 import { getTransformedVertices } from "../operationUtils"
 import makeOperation from "../makeOperation"
 
@@ -90,13 +90,10 @@ export const gyrate = makeOperation<{ cap: Cap }, Capstone | Composite>(
       }
       const { gyrate } = info.data
       if (isGyrated(cap)) {
-        return info.withData({
-          gyrate: (gyrate - 1) as any,
-          align: "meta",
-        })
+        return info.withData({ gyrate: dec(gyrate), align: "meta" })
       } else {
         return info.withData({
-          gyrate: (gyrate + 1) as any,
+          gyrate: inc(gyrate),
           align: info.isMono() ? getCapAlignment(polyhedron, cap) : undefined,
         })
       }

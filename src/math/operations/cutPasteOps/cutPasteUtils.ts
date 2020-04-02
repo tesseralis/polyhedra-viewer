@@ -7,6 +7,17 @@ import Elementary from "data/specs/Elementary"
 
 export type CutPasteSpecs = Capstone | Composite | Elementary
 
+type Count = Composite["data"]["augmented"]
+export function inc(count: Count): Count {
+  if (count === 3) throw new Error(`Count ${count} is too high to increment`)
+  return (count + 1) as any
+}
+
+export function dec(count: Count): Count {
+  if (count === 0) throw new Error(`Count ${count} is too low to decrement`)
+  return (count - 1) as any
+}
+
 export function getCupolaGyrate(cap: Cap) {
   const isOrtho = cap.boundary().edges.every((edge) => {
     const [n1, n2] = edge.adjacentFaces().map((f) => f.numSides)

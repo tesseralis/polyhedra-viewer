@@ -10,7 +10,7 @@ import { deduplicateVertices } from "../makeOperation"
 
 import makeOperation from "../makeOperation"
 import { withOrigin } from "../../geom"
-import { CutPasteSpecs } from "./cutPasteUtils"
+import { inc, dec, CutPasteSpecs } from "./cutPasteUtils"
 
 type AugmentSpecs = Prismatic | CutPasteSpecs
 
@@ -417,27 +417,21 @@ export const augment = makeOperation<Options, AugmentSpecs>("augment", {
       if (source.canonicalName() === "rhombicosidodecahedron") {
         if (gyrate === "ortho") {
           return info.withData({
-            gyrate: (gyrated + 1) as any,
-            diminished: (diminished - 1) as any,
+            gyrate: inc(gyrated),
+            diminished: dec(diminished),
           })
         } else {
-          return info.withData({
-            diminished: (diminished - 1) as any,
-            align: info.isTri() ? "meta" : undefined,
-          })
+          return info.withData({ diminished: dec(diminished), align: "meta" })
         }
       }
       if (source.canonicalName() === "icosahedron") {
         if (base === 3) {
           return info.withData({ augmented: 1 })
         }
-        return info.withData({
-          diminished: (diminished - 1) as any,
-          align: diminished === 3 ? "meta" : undefined,
-        })
+        return info.withData({ diminished: dec(diminished), align: "meta" })
       }
       return info.withData({
-        augmented: (augmented + 1) as any,
+        augmented: inc(augmented),
         align:
           augmented === 1
             ? getAugmentAlignment(info, polyhedron, face)
