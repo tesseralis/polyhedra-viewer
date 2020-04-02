@@ -186,16 +186,32 @@ export default function makeOperation<
   Options extends {} = {}
 >(name: string, op: OperationArgs<Options, Specs>): Operation<Options, Specs> {
   const withDefaults = fillDefaults(op)
+
+  // FIXME we have to calculate this with every operation...
+  // I wish I could store it in a class or something to get it to work right
+  function* validSpecs(polyhedron: Polyhedron): Generator<Specs> {
+    for (const specs of getAllSpecs(polyhedron.name)) {
+      if (withDefaults.canApplyTo(specs)) {
+        yield specs
+      }
+    }
+  }
+
+  function getValidSpecs(polyhedron: Polyhedron) {
+    return [...validSpecs(polyhedron)]
+  }
+
   return {
     ...(withDefaults as any),
     name,
     apply(polyhedron, options) {
-      const info = [...getAllSpecs(polyhedron.name)].filter(
-        (info) =>
-          withDefaults.canApplyTo(info) &&
-          withDefaults.isPreferredSpec!(info, options),
-      )[0]
-      if (!withDefaults.canApplyTo(info)) throw new Error()
+      const info = getValidSpecs(polyhedron).find((info) =>
+        withDefaults.isPreferredSpec!(info, options),
+      )
+      if (!info)
+        throw new Error(
+          `Could not find specs for polyhedron ${polyhedron.name}`,
+        )
 
       // get the next polyhedron name
       const next = withDefaults.getResult!(
@@ -213,41 +229,25 @@ export default function makeOperation<
     },
     canApplyTo(polyhedron) {
       // FIXME we're missing two operation applications so there's a bug somewhere
-      for (const specs of getAllSpecs(polyhedron.name)) {
-        if (withDefaults.canApplyTo(specs)) {
-          return true
-        }
-      }
-      return false
+      return getValidSpecs(polyhedron).length > 0
     },
     hasOptions(polyhedron) {
-      for (const specs of getAllSpecs(polyhedron.name)) {
-        if (withDefaults.canApplyTo(specs) && withDefaults.hasOptions!(specs)) {
-          return true
-        }
-      }
-      return false
+      return getValidSpecs(polyhedron).some(withDefaults.hasOptions!)
     },
     allOptions(polyhedron, optionName) {
-      const info = [...getAllSpecs(polyhedron.name)].filter((info) =>
-        withDefaults.canApplyTo(info),
-      )[0]
-      if (!withDefaults.canApplyTo(info)) throw new Error()
-      return withDefaults.allOptions!(info, polyhedron, optionName)
+      return withDefaults.allOptions!(
+        getValidSpecs(polyhedron)[0],
+        polyhedron,
+        optionName,
+      )
     },
     *allOptionCombos(polyhedron) {
-      for (const specs of getAllSpecs(polyhedron.name)) {
-        if (withDefaults.canApplyTo(specs) && withDefaults.hasOptions!(specs)) {
-          yield* withDefaults.allOptionCombos!(specs, polyhedron)
-        }
+      for (const specs of getValidSpecs(polyhedron)) {
+        yield* withDefaults.allOptionCombos!(specs, polyhedron)
       }
     },
     defaultOptions(polyhedron) {
-      const info = [...getAllSpecs(polyhedron.name)].filter((info) =>
-        withDefaults.canApplyTo(info),
-      )[0]
-      if (!withDefaults.canApplyTo(info)) throw new Error()
-      return withDefaults.defaultOptions!(info)
+      return withDefaults.defaultOptions!(getValidSpecs(polyhedron)[0])
     },
   }
 }
