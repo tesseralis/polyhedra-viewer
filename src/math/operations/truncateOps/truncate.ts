@@ -122,10 +122,7 @@ export const truncate = makeOperation("truncate", {
 
   getResult(info) {
     if (!info.isClassical()) throw new Error()
-    const { operation } = info.data
-    return info.withData({
-      operation: operation === "regular" ? "truncate" : "bevel",
-    })
+    return info.withData({ operation: info.isRegular() ? "truncate" : "bevel" })
   },
 })
 

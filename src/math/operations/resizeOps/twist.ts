@@ -134,17 +134,13 @@ export const twist = makeOperation<Options>("twist", {
   getResult(info) {
     if (!info.isClassical()) throw new Error()
     return info.withData({
-      operation: info.data.operation === "cantellate" ? "snub" : "cantellate",
+      operation: info.isCantellated() ? "snub" : "cantellate",
     })
   },
 
   hasOptions(polyhedron) {
     const info = polyhedron.info
-    return (
-      info.isClassical() &&
-      info.data.family !== 3 &&
-      info.data.operation === "cantellate"
-    )
+    return info.isClassical() && !info.isTetrahedral() && info.isCantellated()
   },
 
   allOptionCombos(polyhedron) {

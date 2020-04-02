@@ -23,7 +23,7 @@ function isTruncated(polyhedron: Polyhedron) {
   if (!polyhedron.info.isClassical()) {
     throw new Error("Invalid polyhedron")
   }
-  return polyhedron.info.data.operation === "truncate"
+  return polyhedron.info.isTruncated()
 }
 
 // TODO figure out a way to deduplicate these functions?
@@ -108,9 +108,8 @@ export const expand = makeOperation("expand", {
 
   getResult(info) {
     if (!info.isClassical()) throw new Error()
-    const { operation } = info.data
     return info.withData({
-      operation: operation === "regular" ? "cantellate" : "bevel",
+      operation: info.isRegular() ? "cantellate" : "bevel",
     })
   },
 })

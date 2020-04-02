@@ -47,6 +47,12 @@ export default class Classical extends Specs<ClassicalData> {
   isOctahedral = () => this.data.family === 4
   isIcosahedral = () => this.data.family === 5
 
+  isTruncated = () => this.data.operation === "truncate"
+  isRectified = () => this.data.operation === "rectify"
+  isBevelled = () => this.data.operation === "bevel"
+  isCantellated = () => this.data.operation === "cantellate"
+  isSnub = () => this.data.operation === "snub"
+
   static *getAll() {
     for (const operation of options.operation) {
       for (const family of options.family) {

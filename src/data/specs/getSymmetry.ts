@@ -93,8 +93,7 @@ function getCompositeSymmetry(composite: Composite) {
 
 export default function getSymmetry(solid: Specs): Symmetry {
   if (solid.isClassical()) {
-    const { family, operation } = solid.data
-    return Polyhedral.get(family, operation === "snub")
+    return Polyhedral.get(solid.data.family, solid.isSnub())
   }
   if (solid.isPrismatic()) {
     const { base, type } = solid.data

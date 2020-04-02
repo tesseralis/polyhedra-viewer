@@ -65,9 +65,7 @@ export default abstract class PolyhedronSpecs<Data extends {} = {}> {
   isQuasiRegular() {
     // FIXME kludge used to make `sharpen` work
     if (this.canonicalName() === "octahedron") return true
-    if (this.isClassical()) {
-      return this.data.operation === "rectify"
-    }
+    if (this.isClassical()) return this.isRectified()
     return false
   }
 
@@ -77,7 +75,7 @@ export default abstract class PolyhedronSpecs<Data extends {} = {}> {
 
   isChiral() {
     if (this.isClassical()) {
-      return this.data.operation === "snub"
+      return this.isSnub()
     }
     if (this.isCapstone()) {
       return this.isGyroelongated() && this.isBi() && !this.isPyramid()

@@ -118,22 +118,19 @@ export const sharpen = makeOperation<Options>("sharpen", {
 
   getResult(info, { faceType }) {
     if (!info.isClassical()) throw new Error()
-    const { operation } = info.data
-    if (operation === "truncate") return info.withData({ operation: "regular" })
-    if (operation === "bevel") return info.withData({ operation: "rectify" })
+    if (info.isTruncated()) return info.withData({ operation: "regular" })
+    if (info.isBevelled()) return info.withData({ operation: "rectify" })
 
     // if rectified, we have to figure out the facet from the faceType
-    const facet = faceType === 3 ? "face" : "vertex"
-    return info.withData({ operation: "regular", facet })
+    return info.withData({
+      operation: "regular",
+      facet: faceType === 3 ? "face" : "vertex",
+    })
   },
 
   hasOptions(polyhedron) {
     const info = polyhedron.info
-    return (
-      info.isClassical() &&
-      info.data.family !== 3 &&
-      info.data.operation === "rectify"
-    )
+    return info.isClassical() && !info.isTetrahedral() && info.isRectified()
   },
 
   allOptionCombos(polyhedron) {
