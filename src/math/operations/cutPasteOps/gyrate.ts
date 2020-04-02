@@ -86,15 +86,12 @@ export const gyrate = makeOperation("gyrate", {
       if (isGyrated(cap)) {
         return info.withData({
           gyrate: (gyrate - 1) as any,
-          align: info.totalCount() === 3 ? "meta" : undefined,
+          align: "meta",
         })
       } else {
         return info.withData({
           gyrate: (gyrate + 1) as any,
-          align:
-            info.totalCount() === 1
-              ? getCapAlignment(polyhedron, cap)
-              : undefined,
+          align: info.isMono() ? getCapAlignment(polyhedron, cap) : undefined,
         })
       }
     }

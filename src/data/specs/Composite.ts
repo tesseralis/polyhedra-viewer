@@ -56,24 +56,27 @@ export default class Composite extends Specs<CompositeData> {
     gyrate = 0,
     source,
     align,
-  }: Partial<CompositeData>) {
-    if (!source) throw new Error("Source not provided in constructor")
+  }: Partial<CompositeData> & { source: Prismatic | Classical }) {
+    // if (!source) throw new Error("Source not provided in constructor")
     super("composite", { source, align, augmented, diminished, gyrate })
   }
 
   withData(data: Partial<CompositeData>) {
-    const newData = { ...this.data, ...data }
-    const { augmented, diminished, gyrate } = newData
-    if (augmented + diminished + gyrate !== 2) {
-      delete newData.align
+    const result = new Composite({ ...this.data, ...data })
+    if (!result.isBi()) {
+      delete result.data.align
     }
-    return new Composite(newData)
+    return result
   }
 
   totalCount() {
     const { augmented, diminished, gyrate } = this.data
     return augmented + diminished + gyrate
   }
+
+  isMono = () => this.totalCount() === 1
+  isBi = () => this.totalCount() === 2
+  isTri = () => this.totalCount() === 3
 
   static *getAll() {
     // Augmented prisms
@@ -146,5 +149,4 @@ export default class Composite extends Specs<CompositeData> {
   }
 
   static query = new Queries(Composite.getAll())
-  static options = options
 }

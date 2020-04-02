@@ -26,13 +26,8 @@ export default class Prismatic extends Specs<PrismaticData> {
     return new Prismatic({ ...this.data, ...data })
   }
 
-  isPrism() {
-    return this.data.type === "prism"
-  }
-
-  isAntiprism() {
-    return this.data.type === "antiprism"
-  }
+  isPrism = () => this.data.type === "prism"
+  isAntiprism = () => this.data.type === "antiprism"
 
   static *getAll() {
     for (const base of options.base) {

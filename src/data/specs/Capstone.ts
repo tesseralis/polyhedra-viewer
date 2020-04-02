@@ -31,14 +31,11 @@ export default class Capstone extends Specs<CapstoneData> {
   }
 
   withData(data: Partial<CapstoneData>) {
-    const newData = { ...this.data, ...data }
-    if (newData.elongation === "antiprism") {
-      delete newData.gyrate
+    const result = new Capstone({ ...this.data, ...data })
+    if (result.isGyroelongated() || result.isMono()) {
+      delete result.data.gyrate
     }
-    if (newData.count === 1) {
-      delete newData.gyrate
-    }
-    return new Capstone(newData)
+    return result
   }
 
   isPyramid = () => this.data.type === "pyramid"
@@ -103,5 +100,4 @@ export default class Capstone extends Specs<CapstoneData> {
   }
 
   static query = new Queries(Capstone.getAll())
-  static options = options
 }

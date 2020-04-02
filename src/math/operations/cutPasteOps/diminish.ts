@@ -128,10 +128,7 @@ export const diminish = makeOperation<Options>("diminish", {
         } else {
           return info.withData({
             diminished: (diminished + 1) as any,
-            align:
-              info.totalCount() === 1
-                ? getCapAlignment(polyhedron, cap)
-                : undefined,
+            align: info.isMono() ? getCapAlignment(polyhedron, cap) : undefined,
           })
         }
       }

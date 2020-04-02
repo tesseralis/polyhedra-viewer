@@ -417,7 +417,7 @@ export const augment = makeOperation<Options>("augment", {
         } else {
           return info.withData({
             diminished: (diminished - 1) as any,
-            align: info.totalCount() === 3 ? "meta" : undefined,
+            align: info.isTri() ? "meta" : undefined,
           })
         }
       }
