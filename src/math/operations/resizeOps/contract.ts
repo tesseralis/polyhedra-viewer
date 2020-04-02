@@ -20,13 +20,13 @@ interface Options {
 const coxeterNum: Record<Family, number> = { 3: 4, 4: 6, 5: 10 }
 
 function getContractLength(
-  info: Classical,
+  family: Family,
   polyhedron: Polyhedron,
   faceType: FaceType,
 ) {
   // Calculate dihedral angle
   // https://en.wikipedia.org/wiki/Platonic_solid#Angles
-  const n = info.data.family
+  const n = family
   const s = polyhedron.edgeLength()
   const p = faceType
   const q = 3 + n - p
@@ -61,7 +61,7 @@ export function applyContract(
 ) {
   const resultLength = isBevelled(polyhedron)
     ? getContractLengthSemi(polyhedron, faceType, result)
-    : getContractLength(info, polyhedron, faceType)
+    : getContractLength(info.data.family, polyhedron, faceType)
 
   // Take all the stuff and push it inwards
   const contractFaces = getExpandedFaces(polyhedron, faceType)
@@ -79,7 +79,7 @@ export function applyContract(
   }
 }
 
-// FIXME get rid of this function
+// FIXME figure out how to get rid of this function
 function isBevelled(polyhedron: Polyhedron) {
   return Classical.query.hasNameWhere(
     polyhedron.name,
@@ -95,7 +95,7 @@ export const contract = makeOperation<Classical, Options>("contract", {
 
   canApplyTo(info): info is Classical {
     if (!info.isClassical()) return false
-    return ["bevel", "cantellate", "snub"].includes(info.data.operation)
+    return info.isBevelled() || info.isCantellated() || info.isSnub()
   },
 
   getResult(info, { faceType }) {

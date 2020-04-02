@@ -125,9 +125,7 @@ export const twist = makeOperation<Classical, Options>("twist", {
   },
 
   canApplyTo(info): info is Classical {
-    return (
-      info.isClassical() && ["cantellate", "snub"].includes(info.data.operation)
-    )
+    return info.isClassical() && (info.isCantellated() || info.isSnub())
   },
 
   getResult(info) {

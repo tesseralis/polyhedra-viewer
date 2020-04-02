@@ -108,9 +108,7 @@ export const turn = makeOperation<Prismatic | Capstone, Options>("turn", {
 
   getResult(info, { twist }, polyhedron) {
     if (info.isPrismatic()) {
-      return info.withData({
-        type: info.data.type === "prism" ? "antiprism" : "prism",
-      })
+      return info.withData({ type: info.isPrism() ? "antiprism" : "prism" })
     }
 
     const gyrate = (() => {
@@ -118,8 +116,9 @@ export const turn = makeOperation<Prismatic | Capstone, Options>("turn", {
       const chirality = getChirality(polyhedron)
       return twist === chirality ? "ortho" : "gyro"
     })()
+
     return info.withData({
-      elongation: info.data.elongation === "prism" ? "antiprism" : "prism",
+      elongation: info.isElongated() ? "antiprism" : "prism",
       gyrate,
     })
   },

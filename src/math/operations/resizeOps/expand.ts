@@ -93,7 +93,7 @@ export const expand = makeOperation<Classical>("expand", {
 
   canApplyTo(info): info is Classical {
     if (!info.isClassical()) return false
-    return ["regular", "truncate"].includes(info.data.operation)
+    return info.isRegular() || info.isTruncated()
   },
 
   getResult(info) {
@@ -156,8 +156,7 @@ export const dual = makeOperation<Classical>("dual", {
   },
 
   getResult(info) {
-    const { facet } = info.data
     if (info.isTetrahedral()) return info
-    return info.withData({ facet: facet === "face" ? "vertex" : "face" })
+    return info.withData({ facet: info.isFace() ? "vertex" : "face" })
   },
 })

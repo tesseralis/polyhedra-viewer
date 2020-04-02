@@ -54,6 +54,9 @@ export default class Classical extends Specs<ClassicalData> {
   isCantellated = () => this.data.operation === "cantellate"
   isSnub = () => this.data.operation === "snub"
 
+  isFace = () => this.data.facet === "face"
+  isVertex = () => this.data.facet === "vertex"
+
   static *getAll() {
     for (const operation of options.operation) {
       for (const family of options.family) {
