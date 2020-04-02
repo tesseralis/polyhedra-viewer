@@ -80,7 +80,8 @@ function canAugmentWith(base: Face, augmentee: Polyhedron, offset: number) {
   })
 }
 
-function canAugmentWithType(base: Face, augmentType: AugmentType) {
+function canAugmentWithType(base: Face, using: string) {
+  const augmentType = getUsingType(using)
   const n = augmentType === "pyramid" ? base.numSides : base.numSides / 2
   for (const offset of [0, 1]) {
     if (canAugmentWith(base, augmentData[augmentType][n], offset)) {
@@ -278,13 +279,12 @@ const defaultAugmentees: Record<number, string> = {
 }
 
 function getAugmenteeNumSides(using: string) {
-  const prefix = using[0]
-  const index = parseInt(using.substring(1))
-  return "RU".includes(prefix) ? index * 2 : index
+  const { type, base } = getUsingData(using)
+  return ["rotunda", "cupola"].includes(type) ? base * 2 : base
 }
 
-function getUsingOpt(using: string, numSides: number) {
-  return typeof using === "string" && getAugmenteeNumSides(using) === numSides
+function getUsingOpt(numSides: number, using?: string) {
+  return !!using && getAugmenteeNumSides(using) === numSides
     ? using
     : defaultAugmentees[numSides]
 }
@@ -299,9 +299,13 @@ function hasRotunda(info: AugmentSpecs) {
   return false
 }
 
-function getGraphArgs(using: string) {
+function getUsingData(using: string) {
   const [prefix, baseStr] = using
   return { type: augmentTypes[prefix], base: parseInt(baseStr) }
+}
+
+function getUsingType(using: string) {
+  return getUsingData(using).type
 }
 
 function getUsingOpts(info: AugmentSpecs) {
@@ -341,7 +345,7 @@ interface Options {
 export const augment = makeOperation<AugmentSpecs, Options>("augment", {
   apply(info, polyhedron, { face, gyrate, using }) {
     const augmentType = using
-      ? augmentTypes[using[0]]
+      ? getUsingType(using)
       : defaultAugmentType(face.numSides)
     return doAugment(info, polyhedron, face, augmentType, gyrate)
   },
@@ -378,7 +382,7 @@ export const augment = makeOperation<AugmentSpecs, Options>("augment", {
 
   isPreferredSpec(info, { face, using }) {
     const n = face.numSides
-    const { type, base } = getGraphArgs(getUsingOpt(using!, n))
+    const { type, base } = getUsingData(getUsingOpt(n, using))
     if (base === 4 && type === "pyramid") {
       if (info.isPrismatic() && info.isPrism()) return false
     }
@@ -392,7 +396,7 @@ export const augment = makeOperation<AugmentSpecs, Options>("augment", {
 
   getResult(info, { face, using, gyrate }, polyhedron) {
     const n = face.numSides
-    const { type, base } = getGraphArgs(getUsingOpt(using!, n))
+    const { type, base } = getUsingData(getUsingOpt(n, using))
     if (info.isPrismatic()) {
       return Capstone.query.withData({
         count: 1,
@@ -452,7 +456,7 @@ export const augment = makeOperation<AugmentSpecs, Options>("augment", {
     for (const face of faceOpts) {
       for (const gyrate of gyrateOpts) {
         for (const using of usingOpts) {
-          if (!using || canAugmentWithType(face, augmentTypes[using[0]])) {
+          if (!using || canAugmentWithType(face, using)) {
             yield { gyrate, using, face }
           }
         }
@@ -467,7 +471,7 @@ export const augment = makeOperation<AugmentSpecs, Options>("augment", {
     if (!options.using) {
       return canAugment(face) ? { face } : {}
     }
-    if (!canAugmentWithType(face, augmentTypes[options.using[0]])) {
+    if (!canAugmentWithType(face, options.using)) {
       return {}
     }
     return { face }
@@ -479,8 +483,7 @@ export const augment = makeOperation<AugmentSpecs, Options>("augment", {
 
       if (!using && canAugment(f)) return "selectable"
 
-      if (using && canAugmentWithType(f, augmentTypes[using[0]]))
-        return "selectable"
+      if (using && canAugmentWithType(f, using)) return "selectable"
       return undefined
     })
   },
