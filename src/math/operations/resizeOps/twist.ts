@@ -119,7 +119,7 @@ interface Options {
   twist?: Twist
 }
 export const twist = makeOperation<Options>("twist", {
-  apply(polyhedron, { twist: twistOpt }, result) {
+  apply(info, polyhedron, { twist: twistOpt }, result) {
     return doTwist(polyhedron, result, twistOpt)
   },
 

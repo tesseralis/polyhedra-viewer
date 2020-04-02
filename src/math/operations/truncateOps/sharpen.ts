@@ -2,6 +2,7 @@ import { set, flatMapDeep, meanBy } from "lodash-es"
 
 import { Polyhedron, Vertex, Face, Edge } from "math/polyhedra"
 import makeOperation from "../makeOperation"
+import PolyhedronSpecs from "data/specs/PolyhedronSpecs"
 
 interface SharpenOptions {
   faceType?: number
@@ -39,9 +40,13 @@ function duplicateVertices(polyhedron: Polyhedron, facesTosharpen: Face[]) {
   )
 }
 
-function getSharpenFaces(polyhedron: Polyhedron, faceType: number) {
+function getSharpenFaces(
+  info: PolyhedronSpecs,
+  polyhedron: Polyhedron,
+  faceType: number,
+) {
   // Special octahedron case
-  if (polyhedron.info.isRegular()) {
+  if (info.isRegular()) {
     const face0 = polyhedron.getFace()
     const adjacentFaces = face0.adjacentFaces()
     return face0.vertexAdjacentFaces().filter((f) => !f.inSet(adjacentFaces))
@@ -56,34 +61,45 @@ function calculateSharpenDist(face: Face, edge: Edge) {
   return apothem * Math.tan(theta)
 }
 
-function getSharpenDist(polyhedron: Polyhedron, face: Face) {
-  if (!polyhedron.info.isRegular() && !polyhedron.info.isQuasiRegular()) {
+function getSharpenDist(
+  info: PolyhedronSpecs,
+  polyhedron: Polyhedron,
+  face: Face,
+) {
+  if (!info.isRegular() && !info.isQuasiRegular()) {
     return meanBy(face.edges, (edge) => calculateSharpenDist(face, edge))
   }
   return calculateSharpenDist(face, face.edges[0])
 }
 
-function getVertexToAdd(polyhedron: Polyhedron, face: Face) {
-  const dist = getSharpenDist(polyhedron, face)
+function getVertexToAdd(
+  info: PolyhedronSpecs,
+  polyhedron: Polyhedron,
+  face: Face,
+) {
+  const dist = getSharpenDist(info, polyhedron, face)
   return face.normalRay().getPointAtDistance(dist)
 }
 
 function applySharpen(
+  info: PolyhedronSpecs,
   polyhedron: Polyhedron,
   { faceType = polyhedron.smallestFace().numSides }: SharpenOptions = {},
 ) {
   // face indices with the right number of sides
-  let sharpenFaces = getSharpenFaces(polyhedron, faceType)
+  let sharpenFaces = getSharpenFaces(info, polyhedron, faceType)
 
   let mock: Polyhedron
-  if (polyhedron.info.isQuasiRegular()) {
+  if (info.isQuasiRegular()) {
     mock = duplicateVertices(polyhedron, sharpenFaces)
     sharpenFaces = sharpenFaces.map((face) => mock.faces[face.index])
   } else {
     mock = polyhedron
   }
 
-  const verticesToAdd = sharpenFaces.map((face) => getVertexToAdd(mock, face))
+  const verticesToAdd = sharpenFaces.map((face) =>
+    getVertexToAdd(info, mock, face),
+  )
 
   const oldToNew: Record<number, number> = {}
   sharpenFaces.forEach((face, i) => {

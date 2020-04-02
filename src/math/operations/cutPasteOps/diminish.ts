@@ -61,7 +61,7 @@ interface Options {
   cap: Cap
 }
 export const diminish = makeOperation<Options>("diminish", {
-  apply(polyhedron, { cap }) {
+  apply(info, polyhedron, { cap }) {
     return removeCap(polyhedron, cap)
   },
 

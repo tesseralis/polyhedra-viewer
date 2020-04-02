@@ -1,6 +1,7 @@
 import { set, range } from "lodash-es"
 
 import { repeat } from "utils"
+import PolyhedronSpecs from "data/specs/PolyhedronSpecs"
 import { withOrigin, PRECISION, Vec3D } from "math/geom"
 import { Polyhedron, Vertex } from "math/polyhedra"
 import makeOperation from "../makeOperation"
@@ -55,8 +56,12 @@ function getTruncateLength(polyhedron: Polyhedron) {
 
 type Transform = (vector: Vec3D, vertex: Vertex) => Vec3D
 
-function getTruncateTransform(polyhedron: Polyhedron, result = ""): Transform {
-  if (polyhedron.info.isRegular()) {
+function getTruncateTransform(
+  info: PolyhedronSpecs,
+  polyhedron: Polyhedron,
+  result = "",
+): Transform {
+  if (info.isRegular()) {
     return (vector) => vector
   }
 
@@ -86,12 +91,17 @@ function getTruncateTransform(polyhedron: Polyhedron, result = ""): Transform {
   }
 }
 
-function doTruncate(polyhedron: Polyhedron, rectify = false, result?: string) {
+function doTruncate(
+  info: PolyhedronSpecs,
+  polyhedron: Polyhedron,
+  rectify = false,
+  result?: string,
+) {
   const truncateLength = getTruncateLength(polyhedron)
   const oldSideLength = polyhedron.edgeLength()
   const truncateScale = (oldSideLength - truncateLength) / 2 / oldSideLength
   const duplicated = duplicateVertices(polyhedron)
-  const transform = getTruncateTransform(polyhedron, result)
+  const transform = getTruncateTransform(info, polyhedron, result)
 
   const truncatedVertices = duplicated.vertices.map((vertex) => {
     const adjacentVertices = vertex.adjacentVertices()
@@ -111,8 +121,8 @@ function doTruncate(polyhedron: Polyhedron, rectify = false, result?: string) {
 }
 
 export const truncate = makeOperation("truncate", {
-  apply(polyhedron, $, result) {
-    return doTruncate(polyhedron, false, result)
+  apply(info, polyhedron, $, result) {
+    return doTruncate(info, polyhedron, false, result)
   },
 
   canApplyTo(info) {
@@ -127,8 +137,8 @@ export const truncate = makeOperation("truncate", {
 })
 
 export const rectify = makeOperation("rectify", {
-  apply(polyhedron) {
-    return doTruncate(polyhedron, true)
+  apply(info, polyhedron) {
+    return doTruncate(info, polyhedron, true)
   },
 
   canApplyTo(info) {

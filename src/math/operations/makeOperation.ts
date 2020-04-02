@@ -73,6 +73,7 @@ interface PartialOpResult {
 interface OperationArgs<Options extends {}>
   extends Partial<BaseOperation<Options>> {
   apply(
+    info: PolyhedronSpecs,
     polyhedron: Polyhedron,
     options: Options,
     resultName: string,
@@ -194,7 +195,7 @@ export default function makeOperation<Options extends {}>(
       ).canonicalName()
 
       // Get the actual operation result
-      const opResult = withDefaults.apply(polyhedron, options ?? {}, next)
+      const opResult = withDefaults.apply(info, polyhedron, options ?? {}, next)
       return normalizeOpResult(opResult, next)
     },
     getHitOption(polyhedron, hitPnt, options) {

@@ -32,7 +32,9 @@ interface Options {
   twist?: Twist
 }
 export const shorten = makeOperation<Options>("shorten", {
-  apply: doShorten,
+  apply(info, polyhedron, options) {
+    return doShorten(polyhedron, options)
+  },
 
   optionTypes: ["twist"],
 

@@ -94,7 +94,9 @@ function doTurn(polyhedron: Polyhedron, { twist = "left" }: Options) {
 }
 
 export const turn = makeOperation<Options>("turn", {
-  apply: doTurn,
+  apply(info, polyhedron, options) {
+    return doTurn(polyhedron, options)
+  },
 
   optionTypes: ["twist"],
 

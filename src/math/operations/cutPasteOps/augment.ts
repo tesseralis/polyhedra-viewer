@@ -49,8 +49,12 @@ function hasAugmentAlignment(info: PolyhedronSpecs) {
   return source.isIcosahedral()
 }
 
-function getAugmentAlignment(polyhedron: Polyhedron, face: Face) {
-  if (!hasAugmentAlignment(polyhedron.info)) return
+function getAugmentAlignment(
+  info: PolyhedronSpecs,
+  polyhedron: Polyhedron,
+  face: Face,
+) {
+  if (!hasAugmentAlignment(info)) return
   const boundary = getSingle(Cap.getAll(polyhedron)).boundary()
   return isInverse(boundary.normal(), face.normal()) ? "para" : "meta"
 }
@@ -190,6 +194,7 @@ function isFastigium(augmentType: string, numSides: number) {
 
 // Augment the following
 function doAugment(
+  info: PolyhedronSpecs,
   polyhedron: Polyhedron,
   base: Face,
   augmentType: AugmentType,
@@ -334,11 +339,11 @@ interface Options {
   using?: string
 }
 export const augment = makeOperation<Options>("augment", {
-  apply(polyhedron, { face, gyrate, using }) {
+  apply(info, polyhedron, { face, gyrate, using }) {
     const augmentType = using
       ? augmentTypes[using[0]]
       : defaultAugmentType(face.numSides)
-    return doAugment(polyhedron, face, augmentType, gyrate)
+    return doAugment(info, polyhedron, face, augmentType, gyrate)
   },
   optionTypes: ["face", "gyrate", "using"],
 
@@ -431,7 +436,9 @@ export const augment = makeOperation<Options>("augment", {
       return info.withData({
         augmented: (augmented + 1) as any,
         align:
-          augmented === 1 ? getAugmentAlignment(polyhedron, face) : undefined,
+          augmented === 1
+            ? getAugmentAlignment(info, polyhedron, face)
+            : undefined,
       })
     }
     if (info.isElementary()) {

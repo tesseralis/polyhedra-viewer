@@ -15,17 +15,6 @@ import {
   getResizedVertices,
 } from "./resizeUtils"
 
-/**
- * Duplication function for semi-expanding truncated polyhedra
- */
-
-function isTruncated(polyhedron: Polyhedron) {
-  if (!polyhedron.info.isClassical()) {
-    throw new Error("Invalid polyhedron")
-  }
-  return polyhedron.info.isTruncated()
-}
-
 // TODO figure out a way to deduplicate these functions?
 // (or not)
 function doSemiExpansion(polyhedron: Polyhedron, referenceName: string) {
@@ -94,8 +83,8 @@ function doExpansion(
 }
 
 export const expand = makeOperation("expand", {
-  apply(polyhedron, $, result) {
-    if (isTruncated(polyhedron)) {
+  apply(info, polyhedron, $, result) {
+    if (info.isClassical() && info.isTruncated()) {
       return doSemiExpansion(polyhedron, result)
     }
     return doExpansion(polyhedron, result)
@@ -118,7 +107,7 @@ interface SnubOpts {
   twist: Twist
 }
 export const snub = makeOperation<SnubOpts>("snub", {
-  apply(polyhedron, { twist = "left" }, result) {
+  apply(info, polyhedron, { twist = "left" }, result) {
     return doExpansion(polyhedron, result, twist)
   },
 
@@ -144,7 +133,7 @@ export const snub = makeOperation<SnubOpts>("snub", {
 })
 
 export const dual = makeOperation("dual", {
-  apply(polyhedron) {
+  apply(info, polyhedron) {
     // Scale to create a dual polyhedron with the same midradius
     const scale = (() => {
       const f = polyhedron.getFace().distanceToCenter()

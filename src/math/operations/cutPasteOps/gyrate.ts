@@ -60,7 +60,10 @@ function applyGyrate(polyhedron: Polyhedron, { cap }: Options) {
 }
 
 export const gyrate = makeOperation("gyrate", {
-  apply: applyGyrate,
+  apply(info, polyhedron, options) {
+    return applyGyrate(polyhedron, options)
+  },
+
   optionTypes: ["cap"],
 
   canApplyTo(info) {
