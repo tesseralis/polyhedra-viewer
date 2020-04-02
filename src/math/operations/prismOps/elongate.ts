@@ -35,7 +35,7 @@ function doElongate(polyhedron: Polyhedron, twist?: Twist) {
   }
 }
 
-export const elongate = makeOperation<{}, Capstone>("elongate", {
+export const elongate = makeOperation<Capstone>("elongate", {
   apply(info, polyhedron) {
     return doElongate(polyhedron)
   },
@@ -53,7 +53,7 @@ export const elongate = makeOperation<{}, Capstone>("elongate", {
 interface Options {
   twist?: Twist
 }
-export const gyroelongate = makeOperation<Options, Capstone>("gyroelongate", {
+export const gyroelongate = makeOperation<Capstone, Options>("gyroelongate", {
   apply(info, polyhedron: Polyhedron, { twist = "left" }) {
     return doElongate(polyhedron, twist)
   },

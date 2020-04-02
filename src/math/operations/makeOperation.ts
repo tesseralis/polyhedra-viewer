@@ -184,8 +184,8 @@ export function deduplicateVertices(polyhedron: Polyhedron) {
 }
 
 export default function makeOperation<
-  Options extends {},
-  Specs extends PolyhedronSpecs
+  Specs extends PolyhedronSpecs,
+  Options extends {} = {}
 >(name: string, op: OperationArgs<Options, Specs>): Operation<Options, Specs> {
   const withDefaults = fillDefaults(op)
   return {

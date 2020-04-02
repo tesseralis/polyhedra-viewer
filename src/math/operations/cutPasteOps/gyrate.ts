@@ -61,7 +61,7 @@ function applyGyrate(polyhedron: Polyhedron, { cap }: Options) {
   }
 }
 
-export const gyrate = makeOperation<{ cap: Cap }, Capstone | Composite>(
+export const gyrate = makeOperation<Capstone | Composite, { cap: Cap }>(
   "gyrate",
   {
     apply(info, polyhedron, options) {

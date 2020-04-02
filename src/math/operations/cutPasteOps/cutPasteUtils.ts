@@ -8,6 +8,7 @@ import Elementary from "data/specs/Elementary"
 export type CutPasteSpecs = Capstone | Composite | Elementary
 
 type Count = Composite["data"]["augmented"]
+
 export function inc(count: Count): Count {
   if (count === 3) throw new Error(`Count ${count} is too high to increment`)
   return (count + 1) as any

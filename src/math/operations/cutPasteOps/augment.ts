@@ -341,7 +341,7 @@ interface Options {
   gyrate?: GyrateOpts
   using?: string
 }
-export const augment = makeOperation<Options, AugmentSpecs>("augment", {
+export const augment = makeOperation<AugmentSpecs, Options>("augment", {
   apply(info, polyhedron, { face, gyrate, using }) {
     const augmentType = using
       ? augmentTypes[using[0]]

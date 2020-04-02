@@ -95,7 +95,7 @@ function doTurn(polyhedron: Polyhedron, { twist = "left" }: Options) {
   }
 }
 
-export const turn = makeOperation<Options, Prismatic | Capstone>("turn", {
+export const turn = makeOperation<Prismatic | Capstone, Options>("turn", {
   apply(info, polyhedron, options) {
     return doTurn(polyhedron, options)
   },

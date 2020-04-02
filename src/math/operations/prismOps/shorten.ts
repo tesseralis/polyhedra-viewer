@@ -32,7 +32,7 @@ function doShorten(polyhedron: Polyhedron, options: Options) {
 interface Options {
   twist?: Twist
 }
-export const shorten = makeOperation<Options, Capstone>("shorten", {
+export const shorten = makeOperation<Capstone, Options>("shorten", {
   apply(info, polyhedron, options) {
     return doShorten(polyhedron, options)
   },

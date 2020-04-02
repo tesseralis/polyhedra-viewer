@@ -66,7 +66,7 @@ function removeCap(polyhedron: Polyhedron, cap: Cap) {
 interface Options {
   cap: Cap
 }
-export const diminish = makeOperation<Options, CutPasteSpecs>("diminish", {
+export const diminish = makeOperation<CutPasteSpecs, Options>("diminish", {
   apply(info, polyhedron, { cap }) {
     return removeCap(polyhedron, cap)
   },

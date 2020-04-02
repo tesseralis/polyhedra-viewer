@@ -119,7 +119,7 @@ function doTwist(
 interface Options {
   twist?: Twist
 }
-export const twist = makeOperation<Options, Classical>("twist", {
+export const twist = makeOperation<Classical, Options>("twist", {
   apply(info, polyhedron, { twist: twistOpt }, result) {
     return doTwist(polyhedron, result, twistOpt)
   },

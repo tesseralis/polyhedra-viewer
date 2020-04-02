@@ -113,7 +113,7 @@ function applySharpen(
 interface Options {
   faceType?: number
 }
-export const sharpen = makeOperation<Options, Classical>("sharpen", {
+export const sharpen = makeOperation<Classical, Options>("sharpen", {
   apply: applySharpen,
   optionTypes: ["faceType"],
 

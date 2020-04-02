@@ -121,7 +121,7 @@ function doTruncate(
   }
 }
 
-export const truncate = makeOperation<{}, Classical>("truncate", {
+export const truncate = makeOperation<Classical>("truncate", {
   apply(info, polyhedron, $, result) {
     return doTruncate(info, polyhedron, false, result)
   },
@@ -136,7 +136,7 @@ export const truncate = makeOperation<{}, Classical>("truncate", {
   },
 })
 
-export const rectify = makeOperation<{}, Classical>("rectify", {
+export const rectify = makeOperation<Classical>("rectify", {
   apply(info, polyhedron) {
     return doTruncate(info, polyhedron, true)
   },

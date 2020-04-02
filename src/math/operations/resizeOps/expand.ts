@@ -83,7 +83,7 @@ function doExpansion(
   }
 }
 
-export const expand = makeOperation<{}, Classical>("expand", {
+export const expand = makeOperation<Classical>("expand", {
   apply(info, polyhedron, $, result) {
     if (info.isTruncated()) {
       return doSemiExpansion(polyhedron, result)
@@ -106,7 +106,7 @@ export const expand = makeOperation<{}, Classical>("expand", {
 interface SnubOpts {
   twist: Twist
 }
-export const snub = makeOperation<SnubOpts, Classical>("snub", {
+export const snub = makeOperation<Classical, SnubOpts>("snub", {
   apply(info, polyhedron, { twist = "left" }, result) {
     return doExpansion(polyhedron, result, twist)
   },
@@ -131,7 +131,7 @@ export const snub = makeOperation<SnubOpts, Classical>("snub", {
   },
 })
 
-export const dual = makeOperation<{}, Classical>("dual", {
+export const dual = makeOperation<Classical>("dual", {
   apply(info, polyhedron) {
     // Scale to create a dual polyhedron with the same midradius
     const scale = (() => {

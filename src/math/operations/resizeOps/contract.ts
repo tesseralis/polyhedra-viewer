@@ -88,7 +88,7 @@ function isBevelled(polyhedron: Polyhedron) {
 }
 
 // NOTE: We are using the same operation for contracting both expanded and snub solids.
-export const contract = makeOperation<Options, Classical>("contract", {
+export const contract = makeOperation<Classical, Options>("contract", {
   apply(info, polyhedron, options, result) {
     return applyContract(info, polyhedron, options, result)
   },
