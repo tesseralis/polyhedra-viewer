@@ -58,13 +58,6 @@ export default abstract class PolyhedronSpecs<Data extends {} = {}> {
     return "Johnson solid"
   }
 
-  isQuasiRegular() {
-    // FIXME kludge used to make `sharpen` work
-    if (this.canonicalName() === "octahedron") return true
-    if (this.isClassical()) return this.isRectified()
-    return false
-  }
-
   isUniform() {
     return this.isClassical() || this.isPrismatic()
   }

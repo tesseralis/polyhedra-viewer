@@ -130,7 +130,6 @@ const properties: Properties[] = [
   { name: "deltahedron", check: (_, p) => p.isDeltahedron() },
   { name: "chiral", check: (info) => info.isChiral() },
   { name: "honeycomb", check: (info) => info.isHoneycomb() },
-  { name: "quasiregular", check: (info) => info.isQuasiRegular() },
 ]
 
 export function displayProperties({ info, polyhedron }: RenderProps) {

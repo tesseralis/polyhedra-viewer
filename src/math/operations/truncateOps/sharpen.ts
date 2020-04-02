@@ -40,18 +40,13 @@ function duplicateVertices(polyhedron: Polyhedron, facesTosharpen: Face[]) {
   )
 }
 
-function getSharpenFaces(
-  info: Classical,
-  polyhedron: Polyhedron,
-  faceType: number,
-) {
-  // Special octahedron case
-  if (info.isRegular()) {
-    const face0 = polyhedron.getFace()
-    const adjacentFaces = face0.adjacentFaces()
-    return face0.vertexAdjacentFaces().filter((f) => !f.inSet(adjacentFaces))
-  }
+function getOctahedronSharpenFaces(polyhedron: Polyhedron) {
+  const face0 = polyhedron.getFace()
+  const adjacentFaces = face0.adjacentFaces()
+  return face0.vertexAdjacentFaces().filter((f) => !f.inSet(adjacentFaces))
+}
 
+function getSharpenFaces(polyhedron: Polyhedron, faceType: number) {
   return polyhedron.faces.filter((f) => f.numSides === faceType)
 }
 
@@ -62,7 +57,7 @@ function calculateSharpenDist(face: Face, edge: Edge) {
 }
 
 function getSharpenDist(info: Classical, face: Face) {
-  if (!info.isRegular() && !info.isQuasiRegular()) {
+  if (info.isBevelled()) {
     return meanBy(face.edges, (edge) => calculateSharpenDist(face, edge))
   }
   return calculateSharpenDist(face, face.edges[0])
@@ -79,10 +74,13 @@ function applySharpen(
   { faceType = polyhedron.smallestFace().numSides }: SharpenOptions = {},
 ) {
   // face indices with the right number of sides
-  let sharpenFaces = getSharpenFaces(info, polyhedron, faceType)
+  let sharpenFaces =
+    info.isRectified() && info.isTetrahedral()
+      ? getOctahedronSharpenFaces(polyhedron)
+      : getSharpenFaces(polyhedron, faceType)
 
   let mock: Polyhedron
-  if (info.isQuasiRegular()) {
+  if (info.isRectified()) {
     mock = duplicateVertices(polyhedron, sharpenFaces)
     sharpenFaces = sharpenFaces.map((face) => mock.faces[face.index])
   } else {
@@ -137,7 +135,7 @@ export const sharpen = makeOperation<Classical, Options>("sharpen", {
   },
 
   *allOptionCombos(info) {
-    if (info.isQuasiRegular() && !info.isRegular()) {
+    if (info.isRectified() && !info.isTetrahedral()) {
       yield { faceType: 3 }
       yield { faceType: info.data.family }
     } else {
