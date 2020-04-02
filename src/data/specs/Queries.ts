@@ -1,15 +1,8 @@
-import { pickBy, isFunction, isMatch, some } from "lodash-es"
+import { pickBy, isMatch, some } from "lodash-es"
 import { getSingle } from "utils"
 import type Specs from "./PolyhedronSpecs"
 
-type QueryFilter<Data extends {}> = Partial<Data> | ((data: Data) => boolean)
-
-function applyFilter<Data extends {}>(item: Data, filter: QueryFilter<Data>) {
-  if (isFunction(filter)) {
-    return filter(item)
-  }
-  return isMatch(item, filter)
-}
+type QueryFilter<Data extends {}> = (data: Data) => boolean
 
 export default class Queries<S extends Specs> {
   entries: S[]
@@ -54,14 +47,13 @@ export default class Queries<S extends Specs> {
   }
 
   where(filter: QueryFilter<S["data"]>) {
-    return this.entries.filter((entry) => applyFilter(entry.data, filter))
+    return this.entries.filter((entry) => filter(entry.data))
   }
 
   hasNameWhere(name: string, filter: QueryFilter<S["data"]>) {
     return some(
       this.nameMapping.get(name)!,
-      (entry) =>
-        entry.canonicalName() === name && applyFilter(entry.data, filter),
+      (entry) => entry.canonicalName() === name && filter(entry.data),
     )
   }
 }
