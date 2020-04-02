@@ -124,8 +124,6 @@ export const twist = makeOperation<Classical, Options>("twist", {
     return doTwist(polyhedron, result, twistOpt)
   },
 
-  optionTypes: ["twist"],
-
   canApplyTo(info): info is Classical {
     return (
       info.isClassical() && ["cantellate", "snub"].includes(info.data.operation)

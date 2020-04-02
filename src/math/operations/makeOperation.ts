@@ -20,8 +20,6 @@ export interface OperationResult {
 }
 
 interface BaseOperation<Options extends {}, Specs extends PolyhedronSpecs> {
-  optionTypes: (keyof Options)[]
-
   hitOption?: keyof Options
 
   /**

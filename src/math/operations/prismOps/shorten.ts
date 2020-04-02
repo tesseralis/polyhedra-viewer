@@ -37,8 +37,6 @@ export const shorten = makeOperation<Capstone, Options>("shorten", {
     return doShorten(polyhedron, options)
   },
 
-  optionTypes: ["twist"],
-
   canApplyTo(info): info is Capstone {
     return info.isCapstone() && !info.isShortened()
   },

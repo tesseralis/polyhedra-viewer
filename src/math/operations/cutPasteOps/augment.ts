@@ -348,7 +348,6 @@ export const augment = makeOperation<AugmentSpecs, Options>("augment", {
       : defaultAugmentType(face.numSides)
     return doAugment(info, polyhedron, face, augmentType, gyrate)
   },
-  optionTypes: ["face", "gyrate", "using"],
 
   canApplyTo(info): info is AugmentSpecs {
     if (info.isPrismatic()) {

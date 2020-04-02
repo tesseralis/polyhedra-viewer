@@ -68,8 +68,6 @@ export const gyrate = makeOperation<Capstone | Composite, { cap: Cap }>(
       return applyGyrate(polyhedron, options)
     },
 
-    optionTypes: ["cap"],
-
     canApplyTo(info): info is Capstone | Composite {
       if (info.isCapstone()) {
         return info.isBi() && !info.isPyramid() && info.data.base > 2

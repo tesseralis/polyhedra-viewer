@@ -71,8 +71,6 @@ export const diminish = makeOperation<CutPasteSpecs, Options>("diminish", {
     return removeCap(polyhedron, cap)
   },
 
-  optionTypes: ["cap"],
-
   canApplyTo(info): info is CutPasteSpecs {
     if (info.isCapstone()) {
       return !(info.isMono() && info.isShortened())

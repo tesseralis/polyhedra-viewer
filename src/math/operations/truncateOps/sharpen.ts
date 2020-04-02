@@ -115,7 +115,6 @@ interface Options {
 }
 export const sharpen = makeOperation<Classical, Options>("sharpen", {
   apply: applySharpen,
-  optionTypes: ["faceType"],
 
   canApplyTo(info): info is Classical {
     if (!info.isClassical()) return false

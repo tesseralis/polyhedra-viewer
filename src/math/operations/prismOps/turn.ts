@@ -100,8 +100,6 @@ export const turn = makeOperation<Prismatic | Capstone, Options>("turn", {
     return doTurn(polyhedron, options)
   },
 
-  optionTypes: ["twist"],
-
   canApplyTo(info): info is Prismatic | Capstone {
     if (info.isPrismatic()) return info.data.base > 2
     if (!info.isCapstone()) return false

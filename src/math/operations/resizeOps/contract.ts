@@ -93,8 +93,6 @@ export const contract = makeOperation<Classical, Options>("contract", {
     return applyContract(info, polyhedron, options, result)
   },
 
-  optionTypes: ["faceType"],
-
   canApplyTo(info): info is Classical {
     if (!info.isClassical()) return false
     return ["bevel", "cantellate", "snub"].includes(info.data.operation)

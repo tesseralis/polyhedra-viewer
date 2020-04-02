@@ -119,8 +119,6 @@ export const snub = makeOperation<Classical, SnubOpts>("snub", {
     return info.withData({ operation: "snub" })
   },
 
-  optionTypes: ["twist"],
-
   hasOptions(info) {
     return !info.isTetrahedral()
   },
