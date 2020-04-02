@@ -52,7 +52,7 @@ function hasAugmentAlignment(info: AugmentSpecs) {
   if (augmented !== 1) return false
   // Only hexagonal prism has augment alignment
   if (source.isPrismatic()) return source.data.base === 6
-  // If Classical, has alignment if it has icosahedral symmetryk
+  // If Classical, has alignment if it has icosahedral symmetry
   return source.isIcosahedral()
 }
 

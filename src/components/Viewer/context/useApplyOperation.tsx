@@ -26,10 +26,16 @@ export default function useApplyOperation() {
       if (!operation) throw new Error("no operation defined")
 
       const { result, animationData } = operation.apply(polyhedron, options)
-      if (!operation.canApplyTo(result) || !operation.hasOptions(result)) {
-        unsetOperation()
-      } else {
+      // If the current operation has options and the result has options,
+      // keep the options set
+      if (
+        operation.hasOptions(polyhedron) &&
+        operation.canApplyTo(result) &&
+        operation.hasOptions(result)
+      ) {
         setOperation(operation, result)
+      } else {
+        unsetOperation()
       }
 
       transition(result, animationData)
