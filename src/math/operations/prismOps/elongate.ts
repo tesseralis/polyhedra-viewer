@@ -71,7 +71,7 @@ export const gyroelongate = makeOperation<Capstone, Options>("gyroelongate", {
   },
 
   hasOptions(info) {
-    return !info.isPyramid()
+    return !info.isPyramid() && info.isBi()
   },
 
   *allOptionCombos() {
