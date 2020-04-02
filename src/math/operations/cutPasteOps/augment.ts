@@ -15,6 +15,8 @@ import { inc, dec, CutPasteSpecs } from "./cutPasteUtils"
 type AugmentSpecs = Prismatic | CutPasteSpecs
 
 type AugmentType = "pyramid" | "cupola" | "rotunda"
+
+// TODO simplify using Specs
 const augmentees: Record<AugmentType, Record<number, string>> = {
   pyramid: {
     3: "tetrahedron",
