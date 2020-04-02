@@ -1,4 +1,4 @@
-import { set, range } from "lodash-es"
+import { identity, set, range } from "lodash-es"
 
 import { repeat } from "utils"
 import Classical from "data/specs/Classical"
@@ -56,15 +56,7 @@ function getTruncateLength(polyhedron: Polyhedron) {
 
 type Transform = (vector: Vec3D, vertex: Vertex) => Vec3D
 
-function getTruncateTransform(
-  info: Classical,
-  polyhedron: Polyhedron,
-  result = "",
-): Transform {
-  if (info.isRegular()) {
-    return (vector) => vector
-  }
-
+function getTruncateTransform(polyhedron: Polyhedron, result = ""): Transform {
   // If we're doing a bevel, we need to do some fidgeting to make sure the created
   // faces are all regular
   const truncateLength = getTruncateLength(polyhedron)
@@ -101,7 +93,9 @@ function doTruncate(
   const oldSideLength = polyhedron.edgeLength()
   const truncateScale = (oldSideLength - truncateLength) / 2 / oldSideLength
   const duplicated = duplicateVertices(polyhedron)
-  const transform = getTruncateTransform(info, polyhedron, result)
+  const transform = info.isRegular()
+    ? (identity as Transform)
+    : getTruncateTransform(polyhedron, result)
 
   const truncatedVertices = duplicated.vertices.map((vertex) => {
     const adjacentVertices = vertex.adjacentVertices()
@@ -127,7 +121,7 @@ export const truncate = makeOperation<Classical>("truncate", {
 
   canApplyTo(info): info is Classical {
     if (!info.isClassical()) return false
-    return ["regular", "rectify"].includes(info.data.operation)
+    return info.isRegular() || info.isRectified()
   },
 
   getResult(info) {
@@ -142,7 +136,7 @@ export const rectify = makeOperation<Classical>("rectify", {
 
   canApplyTo(info): info is Classical {
     if (!info.isClassical()) return false
-    return ["regular"].includes(info.data.operation)
+    return info.isRegular()
   },
 
   getResult(info) {
