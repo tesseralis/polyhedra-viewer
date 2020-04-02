@@ -32,7 +32,7 @@
     "d3-ease": "^1.0.6",
     "d3-interpolate": "^1.4.0",
     "file-saver": "^2.0.2",
-    "jszip": "^3.2.2",
+    "jszip": "^3.3.0",
     "lodash-es": "^4.17.15",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
