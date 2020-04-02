@@ -187,7 +187,7 @@ export default function makeOperation<
 >(name: string, op: OperationArgs<Options, Specs>): Operation<Options, Specs> {
   const withDefaults = fillDefaults(op)
 
-  // FIXME we have to calculate this with every operation...
+  // TODO we have to calculate this with every operation...
   // I wish I could store it in a class or something to get it to work right
   function* validSpecs(polyhedron: Polyhedron): Generator<Specs> {
     for (const specs of getAllSpecs(polyhedron.name)) {
@@ -228,7 +228,6 @@ export default function makeOperation<
       return withDefaults.getHitOption!(polyhedron, vec(hitPnt), options)
     },
     canApplyTo(polyhedron) {
-      // FIXME we're missing two operation applications so there's a bug somewhere
       return getValidSpecs(polyhedron).length > 0
     },
     hasOptions(polyhedron) {

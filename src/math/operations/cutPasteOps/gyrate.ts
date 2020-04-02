@@ -74,9 +74,9 @@ export const gyrate = makeOperation<Capstone | Composite, { cap: Cap }>(
       }
       if (info.isComposite()) {
         const { source, diminished } = info.data
-        return (
-          source.canonicalName() === "rhombicosidodecahedron" && diminished < 3
-        )
+        if (source.canonicalName() !== "rhombicosidodecahedron") return false
+        if (diminished === 2) return !info.isPara()
+        return diminished < 3
       }
       return false
     },

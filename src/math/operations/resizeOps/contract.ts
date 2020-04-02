@@ -79,7 +79,7 @@ export function applyContract(
   }
 }
 
-// FIXME figure out how to get rid of this function
+// TODO figure out how to get rid of this function
 function isBevelled(polyhedron: Polyhedron) {
   return Classical.query.hasNameWhere(
     polyhedron.name,
