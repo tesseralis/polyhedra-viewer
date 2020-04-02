@@ -47,6 +47,7 @@ export default class Classical extends Specs<ClassicalData> {
   isOctahedral = () => this.data.family === 4
   isIcosahedral = () => this.data.family === 5
 
+  isRegular = () => this.data.operation === "regular"
   isTruncated = () => this.data.operation === "truncate"
   isRectified = () => this.data.operation === "rectify"
   isBevelled = () => this.data.operation === "bevel"

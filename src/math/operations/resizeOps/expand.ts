@@ -112,7 +112,7 @@ export const snub = makeOperation<Classical, SnubOpts>("snub", {
   },
 
   canApplyTo(info): info is Classical {
-    return info.isRegular()
+    return info.isClassical() && info.isRegular()
   },
 
   getResult(info) {
@@ -152,7 +152,7 @@ export const dual = makeOperation<Classical>("dual", {
   },
 
   canApplyTo(info): info is Classical {
-    return info.isRegular()
+    return info.isClassical() && info.isRegular()
   },
 
   getResult(info) {

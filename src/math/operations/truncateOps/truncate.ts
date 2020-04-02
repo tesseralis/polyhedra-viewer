@@ -1,7 +1,6 @@
 import { set, range } from "lodash-es"
 
 import { repeat } from "utils"
-import PolyhedronSpecs from "data/specs/PolyhedronSpecs"
 import Classical from "data/specs/Classical"
 import { withOrigin, PRECISION, Vec3D } from "math/geom"
 import { Polyhedron, Vertex } from "math/polyhedra"
@@ -58,7 +57,7 @@ function getTruncateLength(polyhedron: Polyhedron) {
 type Transform = (vector: Vec3D, vertex: Vertex) => Vec3D
 
 function getTruncateTransform(
-  info: PolyhedronSpecs,
+  info: Classical,
   polyhedron: Polyhedron,
   result = "",
 ): Transform {
