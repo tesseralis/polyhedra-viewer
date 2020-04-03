@@ -1,5 +1,6 @@
 import { set, flatMapDeep, meanBy } from "lodash-es"
 
+import Classical from "data/specs/Classical"
 import { Polyhedron, Vertex, Face, Edge } from "math/polyhedra"
 import makeOperation from "../makeOperation"
 
@@ -39,14 +40,13 @@ function duplicateVertices(polyhedron: Polyhedron, facesTosharpen: Face[]) {
   )
 }
 
-function getSharpenFaces(polyhedron: Polyhedron, faceType: number) {
-  // Special octahedron case
-  if (polyhedron.info.isRegular()) {
-    const face0 = polyhedron.getFace()
-    const adjacentFaces = face0.adjacentFaces()
-    return face0.vertexAdjacentFaces().filter((f) => !f.inSet(adjacentFaces))
-  }
+function getOctahedronSharpenFaces(polyhedron: Polyhedron) {
+  const face0 = polyhedron.getFace()
+  const adjacentFaces = face0.adjacentFaces()
+  return face0.vertexAdjacentFaces().filter((f) => !f.inSet(adjacentFaces))
+}
 
+function getSharpenFaces(polyhedron: Polyhedron, faceType: number) {
   return polyhedron.faces.filter((f) => f.numSides === faceType)
 }
 
@@ -56,34 +56,38 @@ function calculateSharpenDist(face: Face, edge: Edge) {
   return apothem * Math.tan(theta)
 }
 
-function getSharpenDist(polyhedron: Polyhedron, face: Face) {
-  if (!polyhedron.info.isRegular() && !polyhedron.info.isQuasiRegular()) {
+function getSharpenDist(info: Classical, face: Face) {
+  if (info.isBevelled()) {
     return meanBy(face.edges, (edge) => calculateSharpenDist(face, edge))
   }
   return calculateSharpenDist(face, face.edges[0])
 }
 
-function getVertexToAdd(polyhedron: Polyhedron, face: Face) {
-  const dist = getSharpenDist(polyhedron, face)
+function getVertexToAdd(info: Classical, face: Face) {
+  const dist = getSharpenDist(info, face)
   return face.normalRay().getPointAtDistance(dist)
 }
 
 function applySharpen(
+  info: Classical,
   polyhedron: Polyhedron,
   { faceType = polyhedron.smallestFace().numSides }: SharpenOptions = {},
 ) {
   // face indices with the right number of sides
-  let sharpenFaces = getSharpenFaces(polyhedron, faceType)
+  let sharpenFaces =
+    info.isRectified() && info.isTetrahedral()
+      ? getOctahedronSharpenFaces(polyhedron)
+      : getSharpenFaces(polyhedron, faceType)
 
   let mock: Polyhedron
-  if (polyhedron.info.isQuasiRegular()) {
+  if (info.isRectified()) {
     mock = duplicateVertices(polyhedron, sharpenFaces)
     sharpenFaces = sharpenFaces.map((face) => mock.faces[face.index])
   } else {
     mock = polyhedron
   }
 
-  const verticesToAdd = sharpenFaces.map((face) => getVertexToAdd(mock, face))
+  const verticesToAdd = sharpenFaces.map((face) => getVertexToAdd(info, face))
 
   const oldToNew: Record<number, number> = {}
   sharpenFaces.forEach((face, i) => {
@@ -107,30 +111,35 @@ function applySharpen(
 interface Options {
   faceType?: number
 }
-export const sharpen = makeOperation<Options>("sharpen", {
+export const sharpen = makeOperation<Classical, Options>("sharpen", {
   apply: applySharpen,
-  optionTypes: ["faceType"],
 
-  resultsFilter(polyhedron, config) {
-    const { faceType } = config
-    switch (polyhedron.name) {
-      case "cuboctahedron":
-        return { value: faceType === 3 ? "C" : "O" }
-      case "icosidodecahedron":
-        return { value: faceType === 3 ? "D" : "I" }
-      default:
-        return {}
-    }
+  canApplyTo(info): info is Classical {
+    if (!info.isClassical()) return false
+    return ["truncate", "rectify", "bevel"].includes(info.data.operation)
   },
 
-  allOptionCombos(polyhedron) {
-    switch (polyhedron.name) {
-      case "cuboctahedron":
-        return [{ faceType: 3 }, { faceType: 4 }]
-      case "icosidodecahedron":
-        return [{ faceType: 3 }, { faceType: 5 }]
-      default:
-        return [{}]
+  getResult(info, { faceType }) {
+    if (info.isTruncated()) return info.withData({ operation: "regular" })
+    if (info.isBevelled()) return info.withData({ operation: "rectify" })
+
+    // if rectified, we have to figure out the facet from the faceType
+    return info.withData({
+      operation: "regular",
+      facet: faceType === 3 ? "face" : "vertex",
+    })
+  },
+
+  hasOptions(info) {
+    return !info.isTetrahedral() && info.isRectified()
+  },
+
+  *allOptionCombos(info) {
+    if (info.isRectified() && !info.isTetrahedral()) {
+      yield { faceType: 3 }
+      yield { faceType: info.data.family }
+    } else {
+      yield {}
     }
   },
 

@@ -13,11 +13,10 @@ describe("applyOperation", () => {
       for (const polyhedron of polyhedra) {
         if (operation.canApplyTo(polyhedron)) {
           it(polyhedron.name, () => {
-            const optsToTest = operation.allOptionCombos(polyhedron)
-            optsToTest.forEach((options) => {
+            for (const options of operation.allOptionCombos(polyhedron)) {
               const result = operation.apply(polyhedron, options as any)
               expect(result).toBeValidPolyhedron()
-            })
+            }
           })
         }
       }

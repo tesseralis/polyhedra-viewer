@@ -1,5 +1,6 @@
 import { every, take } from "lodash-es"
 import { Twist } from "types"
+import Classical from "data/specs/Classical"
 import { Polyhedron } from "math/polyhedra"
 import { withOrigin } from "math/geom"
 import {
@@ -14,17 +15,6 @@ import {
   isExpandedFace,
   getResizedVertices,
 } from "./resizeUtils"
-
-/**
- * Duplication function for semi-expanding truncated polyhedra
- */
-
-function isTruncated(polyhedron: Polyhedron) {
-  if (!polyhedron.info.isClassical()) {
-    throw new Error("Invalid polyhedron")
-  }
-  return polyhedron.info.data.operation === "truncate"
-}
 
 // TODO figure out a way to deduplicate these functions?
 // (or not)
@@ -93,30 +83,54 @@ function doExpansion(
   }
 }
 
-export const expand = makeOperation("expand", {
-  apply(polyhedron, $, result) {
-    if (isTruncated(polyhedron)) {
+export const expand = makeOperation<Classical>("expand", {
+  apply(info, polyhedron, $, result) {
+    if (info.isTruncated()) {
       return doSemiExpansion(polyhedron, result)
     }
     return doExpansion(polyhedron, result)
+  },
+
+  canApplyTo(info): info is Classical {
+    if (!info.isClassical()) return false
+    return info.isRegular() || info.isTruncated()
+  },
+
+  getResult(info) {
+    return info.withData({
+      operation: info.isRegular() ? "cantellate" : "bevel",
+    })
   },
 })
 
 interface SnubOpts {
   twist: Twist
 }
-export const snub = makeOperation<SnubOpts>("snub", {
-  apply(polyhedron, { twist = "left" }, result) {
+export const snub = makeOperation<Classical, SnubOpts>("snub", {
+  apply(info, polyhedron, { twist = "left" }, result) {
     return doExpansion(polyhedron, result, twist)
   },
-  optionTypes: ["twist"],
-  allOptionCombos() {
-    return [{ twist: "left" }, { twist: "right" }]
+
+  canApplyTo(info): info is Classical {
+    return info.isClassical() && info.isRegular()
+  },
+
+  getResult(info) {
+    return info.withData({ operation: "snub" })
+  },
+
+  hasOptions(info) {
+    return !info.isTetrahedral()
+  },
+
+  *allOptionCombos() {
+    yield { twist: "left" }
+    yield { twist: "right" }
   },
 })
 
-export const dual = makeOperation("dual", {
-  apply(polyhedron) {
+export const dual = makeOperation<Classical>("dual", {
+  apply(info, polyhedron) {
     // Scale to create a dual polyhedron with the same midradius
     const scale = (() => {
       const f = polyhedron.getFace().distanceToCenter()
@@ -135,5 +149,14 @@ export const dual = makeOperation("dual", {
         endVertices,
       },
     }
+  },
+
+  canApplyTo(info): info is Classical {
+    return info.isClassical() && info.isRegular()
+  },
+
+  getResult(info) {
+    if (info.isTetrahedral()) return info
+    return info.withData({ facet: info.isFace() ? "vertex" : "face" })
   },
 })

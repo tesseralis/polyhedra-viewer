@@ -73,7 +73,7 @@ const infoRows: InfoRow[] = [
   {
     name: "Order",
     area: "order",
-    render: ({ polyhedron: p }) => <>{p.info.symmetry().order()}</>,
+    render: ({ info }) => <>{info.symmetry().order()}</>,
   },
   {
     name: "Properties",
@@ -83,8 +83,8 @@ const infoRows: InfoRow[] = [
   {
     name: "Also known as",
     area: "alt",
-    render: ({ polyhedron }: RenderProps) => {
-      const alts = polyhedron.info.alternateNames()
+    render: ({ info }: RenderProps) => {
+      const alts = info.alternateNames()
       if (alts.length === 0) return <>--</>
       return (
         <ul>
@@ -98,6 +98,7 @@ const infoRows: InfoRow[] = [
 ]
 
 function Datum({
+  info,
   polyhedron,
   name,
   area,
@@ -117,13 +118,13 @@ function Datum({
     <div {...css()} style={{ gridArea: area }}>
       <dd {...nameCss()}>{name}</dd>
       <dt {...valueCss()}>
-        <Renderer polyhedron={polyhedron} />
+        <Renderer polyhedron={polyhedron} info={info} />
       </dt>
     </div>
   )
 }
 
-export default function DataList({ polyhedron }: RenderProps) {
+export default function DataList(props: RenderProps) {
   const css = useStyle({
     display: "grid",
     gridTemplateAreas: `
@@ -139,8 +140,8 @@ export default function DataList({ polyhedron }: RenderProps) {
 
   return (
     <dl {...css()}>
-      {infoRows.map((props) => (
-        <Datum key={props.name} {...props} polyhedron={polyhedron} />
+      {infoRows.map((rowProps) => (
+        <Datum key={rowProps.name} {...rowProps} {...props} />
       ))}
     </dl>
   )

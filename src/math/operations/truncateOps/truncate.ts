@@ -1,6 +1,7 @@
-import { set, range } from "lodash-es"
+import { identity, set, range } from "lodash-es"
 
 import { repeat } from "utils"
+import Classical from "data/specs/Classical"
 import { withOrigin, PRECISION, Vec3D } from "math/geom"
 import { Polyhedron, Vertex } from "math/polyhedra"
 import makeOperation from "../makeOperation"
@@ -56,10 +57,6 @@ function getTruncateLength(polyhedron: Polyhedron) {
 type Transform = (vector: Vec3D, vertex: Vertex) => Vec3D
 
 function getTruncateTransform(polyhedron: Polyhedron, result = ""): Transform {
-  if (polyhedron.info.isRegular()) {
-    return (vector) => vector
-  }
-
   // If we're doing a bevel, we need to do some fidgeting to make sure the created
   // faces are all regular
   const truncateLength = getTruncateLength(polyhedron)
@@ -86,12 +83,19 @@ function getTruncateTransform(polyhedron: Polyhedron, result = ""): Transform {
   }
 }
 
-function doTruncate(polyhedron: Polyhedron, rectify = false, result?: string) {
+function doTruncate(
+  info: Classical,
+  polyhedron: Polyhedron,
+  rectify = false,
+  result?: string,
+) {
   const truncateLength = getTruncateLength(polyhedron)
   const oldSideLength = polyhedron.edgeLength()
   const truncateScale = (oldSideLength - truncateLength) / 2 / oldSideLength
   const duplicated = duplicateVertices(polyhedron)
-  const transform = getTruncateTransform(polyhedron, result)
+  const transform = info.isRegular()
+    ? (identity as Transform)
+    : getTruncateTransform(polyhedron, result)
 
   const truncatedVertices = duplicated.vertices.map((vertex) => {
     const adjacentVertices = vertex.adjacentVertices()
@@ -110,14 +114,32 @@ function doTruncate(polyhedron: Polyhedron, rectify = false, result?: string) {
   }
 }
 
-export const truncate = makeOperation("truncate", {
-  apply(polyhedron, $, result) {
-    return doTruncate(polyhedron, false, result)
+export const truncate = makeOperation<Classical>("truncate", {
+  apply(info, polyhedron, $, result) {
+    return doTruncate(info, polyhedron, false, result)
+  },
+
+  canApplyTo(info): info is Classical {
+    if (!info.isClassical()) return false
+    return info.isRegular() || info.isRectified()
+  },
+
+  getResult(info) {
+    return info.withData({ operation: info.isRegular() ? "truncate" : "bevel" })
   },
 })
 
-export const rectify = makeOperation("rectify", {
-  apply(polyhedron) {
-    return doTruncate(polyhedron, true)
+export const rectify = makeOperation<Classical>("rectify", {
+  apply(info, polyhedron) {
+    return doTruncate(info, polyhedron, true)
+  },
+
+  canApplyTo(info): info is Classical {
+    if (!info.isClassical()) return false
+    return info.isRegular()
+  },
+
+  getResult(info) {
+    return info.withData({ operation: "rectify" })
   },
 })

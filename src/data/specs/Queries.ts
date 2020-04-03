@@ -1,5 +1,8 @@
-import { some } from "lodash-es"
+import { pickBy, isMatch, some } from "lodash-es"
+import { getSingle } from "utils"
 import type Specs from "./PolyhedronSpecs"
+
+type QueryFilter<Data extends {}> = (data: Data) => boolean
 
 export default class Queries<S extends Specs> {
   entries: S[]
@@ -20,6 +23,12 @@ export default class Queries<S extends Specs> {
     return this.nameMapping.has(name)
   }
 
+  withData(data: S["data"]) {
+    // Remove nullish elements from the filter
+    const compact = pickBy(data)
+    return getSingle(this.entries.filter((item) => isMatch(item.data, compact)))
+  }
+
   /**
    * Get the entry with the given canonical name.
    */
@@ -30,11 +39,18 @@ export default class Queries<S extends Specs> {
     return this.nameMapping.get(name)![0]
   }
 
-  where(filter: (data: S["data"]) => boolean) {
+  allWithName(name: string) {
+    if (!this.nameMapping.has(name)) {
+      throw new Error(`Could not find entry with canonical name ${name}`)
+    }
+    return this.nameMapping.get(name)!
+  }
+
+  where(filter: QueryFilter<S["data"]>) {
     return this.entries.filter((entry) => filter(entry.data))
   }
 
-  hasNameWhere(name: string, filter: (data: S["data"]) => boolean) {
+  hasNameWhere(name: string, filter: QueryFilter<S["data"]>) {
     return some(
       this.nameMapping.get(name)!,
       (entry) => entry.canonicalName() === name && filter(entry.data),

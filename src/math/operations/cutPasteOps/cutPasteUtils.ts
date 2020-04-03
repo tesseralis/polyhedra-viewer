@@ -1,14 +1,30 @@
-import { every } from "lodash-es"
 import { getSingle } from "utils"
 import { Cap, Polyhedron } from "math/polyhedra"
 import { isInverse } from "math/geom"
+import Capstone from "data/specs/Capstone"
+import Composite from "data/specs/Composite"
+import Elementary from "data/specs/Elementary"
 
-type Relation = Record<string, any>
+export type CutPasteSpecs = Capstone | Composite | Elementary
 
-// true if the relation has multiple values that have that property
-export const hasMultiple = (relations: Relation[], property: string) => {
-  const set = new Set(relations.map((r) => r[property]).filter((x) => !!x))
-  return set.size > 1
+type Count = Composite["data"]["augmented"]
+
+export function inc(count: Count): Count {
+  if (count === 3) throw new Error(`Count ${count} is too high to increment`)
+  return (count + 1) as any
+}
+
+export function dec(count: Count): Count {
+  if (count === 0) throw new Error(`Count ${count} is too low to decrement`)
+  return (count - 1) as any
+}
+
+export function getCupolaGyrate(cap: Cap) {
+  const isOrtho = cap.boundary().edges.every((edge) => {
+    const [n1, n2] = edge.adjacentFaces().map((f) => f.numSides)
+    return (n1 === 4) === (n2 === 4)
+  })
+  return isOrtho ? "ortho" : "gyro"
 }
 
 export function getCapAlignment(polyhedron: Polyhedron, cap: Cap) {
@@ -23,16 +39,4 @@ export function getCapAlignment(polyhedron: Polyhedron, cap: Cap) {
       : polyhedron.largestFace().normal()
 
   return isInverse(cap.normal(), otherNormal) ? "para" : "meta"
-}
-
-export function getCupolaGyrate(cap: Cap) {
-  const isOrtho = every(cap.boundary().edges, (edge) => {
-    const [n1, n2] = edge.adjacentFaces().map((f) => f.numSides)
-    return (n1 === 4) === (n2 === 4)
-  })
-  return isOrtho ? "ortho" : "gyro"
-}
-
-export function getGyrateDirection(cap: Cap) {
-  return getCupolaGyrate(cap) === "ortho" ? "back" : "forward"
 }

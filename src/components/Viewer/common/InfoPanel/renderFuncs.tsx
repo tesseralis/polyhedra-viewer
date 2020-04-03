@@ -2,6 +2,7 @@ import React from "react"
 import { capitalize, map } from "lodash-es"
 import { ChildrenProp } from "types"
 import { polygonNames } from "data/polygons"
+import PolyhedronSpecs from "data/specs/PolyhedronSpecs"
 import { Polyhedron } from "math/polyhedra"
 import { useStyle } from "styles"
 
@@ -75,6 +76,7 @@ function getShortVertexConfig(config: string) {
 
 export interface RenderProps {
   polyhedron: Polyhedron
+  info: PolyhedronSpecs
 }
 
 export function displayVertexConfig({ polyhedron }: RenderProps) {
@@ -108,9 +110,9 @@ export function displayFaceTypes({ polyhedron }: RenderProps) {
   )
 }
 
-export function displaySymmetry({ polyhedron }: RenderProps) {
-  const { base, sub } = polyhedron.info.symmetry().symbol()
-  const symName = polyhedron.info.symmetry().name()
+export function displaySymmetry({ info }: RenderProps) {
+  const { base, sub } = info.symmetry().symbol()
+  const symName = info.symmetry().name()
   return (
     <>
       {capitalize(symName)}, {base}
@@ -121,19 +123,18 @@ export function displaySymmetry({ polyhedron }: RenderProps) {
 
 interface Properties {
   name: string
-  check(p: Polyhedron): boolean
+  check(info: PolyhedronSpecs, p: Polyhedron): boolean
 }
 
 const properties: Properties[] = [
-  { name: "deltahedron", check: (p) => p.isDeltahedron() },
-  { name: "chiral", check: (p) => p.info.isChiral() },
-  { name: "honeycomb", check: (p) => p.info.isHoneycomb() },
-  { name: "quasiregular", check: (p) => p.info.isQuasiRegular() },
+  { name: "deltahedron", check: (_, p) => p.isDeltahedron() },
+  { name: "chiral", check: (info) => info.isChiral() },
+  { name: "honeycomb", check: (info) => info.isHoneycomb() },
 ]
 
-export function displayProperties({ polyhedron }: RenderProps) {
+export function displayProperties({ info, polyhedron }: RenderProps) {
   const filteredProps = properties.filter((property) =>
-    property.check(polyhedron),
+    property.check(info, polyhedron),
   )
 
   return <>{filteredProps.map((prop) => prop.name).join(", ") || "--"}</>

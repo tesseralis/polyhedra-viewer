@@ -1,6 +1,8 @@
 import { pivot } from "utils"
 import { Twist } from "types"
 import { Polyhedron, FaceLike } from "math/polyhedra"
+import Prismatic from "data/specs/Prismatic"
+import Capstone from "data/specs/Capstone"
 import makeOperation from "../makeOperation"
 import {
   getChirality,
@@ -93,21 +95,45 @@ function doTurn(polyhedron: Polyhedron, { twist = "left" }: Options) {
   }
 }
 
-export const turn = makeOperation<Options>("turn", {
-  apply: doTurn,
-  optionTypes: ["twist"],
-  resultsFilter(polyhedron, options) {
-    if (!isGyroelongatedBiCupola(polyhedron)) return
-    const { twist } = options
-    const chirality = getChirality(polyhedron)
-    const gyrate = twist === chirality ? "ortho" : "gyro"
-    return { gyrate }
+export const turn = makeOperation<Prismatic | Capstone, Options>("turn", {
+  apply(info, polyhedron, options) {
+    return doTurn(polyhedron, options)
   },
 
-  allOptionCombos(polyhedron) {
-    if (isGyroelongatedBiCupola(polyhedron)) {
-      return [{ twist: "left" }, { twist: "right" }]
+  canApplyTo(info): info is Prismatic | Capstone {
+    if (info.isPrismatic()) return info.data.base > 2
+    if (!info.isCapstone()) return false
+    if (info.isPyramid() && info.isTriangular()) return false
+    return !info.isShortened()
+  },
+
+  getResult(info, { twist }, polyhedron) {
+    if (info.isPrismatic()) {
+      return info.withData({ type: info.isPrism() ? "antiprism" : "prism" })
     }
-    return [{}]
+
+    const gyrate = (() => {
+      if (!isGyroelongatedBiCupola(info)) return undefined
+      const chirality = getChirality(polyhedron)
+      return twist === chirality ? "ortho" : "gyro"
+    })()
+
+    return info.withData({
+      elongation: info.isElongated() ? "antiprism" : "prism",
+      gyrate,
+    })
+  },
+
+  hasOptions(info) {
+    return info.isCapstone() && !info.isPyramid() && info.isBi()
+  },
+
+  *allOptionCombos(info) {
+    if (isGyroelongatedBiCupola(info)) {
+      yield { twist: "left" }
+      yield { twist: "right" }
+    } else {
+      yield {}
+    }
   },
 })

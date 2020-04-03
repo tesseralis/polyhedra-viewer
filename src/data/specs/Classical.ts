@@ -29,9 +29,32 @@ const options: DataOptions<ClassicalData> = {
  * An classical uniform polyhedron is a Platonic or Archimedean solid.
  */
 export default class Classical extends Specs<ClassicalData> {
-  constructor(data: ClassicalData) {
+  private constructor(data: ClassicalData) {
     super("classical", data)
+    if (this.isTetrahedral() || !this.hasFacet()) {
+      delete this.data.facet
+    }
   }
+
+  withData(data: Partial<ClassicalData>) {
+    return new Classical({ ...this.data, ...data })
+  }
+
+  isTetrahedral = () => this.data.family === 3
+  isOctahedral = () => this.data.family === 4
+  isIcosahedral = () => this.data.family === 5
+
+  isRegular = () => this.data.operation === "regular"
+  isTruncated = () => this.data.operation === "truncate"
+  isRectified = () => this.data.operation === "rectify"
+  isBevelled = () => this.data.operation === "bevel"
+  isCantellated = () => this.data.operation === "cantellate"
+  isSnub = () => this.data.operation === "snub"
+
+  hasFacet = () => this.isRegular() || this.isTruncated()
+
+  isFace = () => this.data.facet === "face"
+  isVertex = () => this.data.facet === "vertex"
 
   static *getAll() {
     for (const operation of options.operation) {

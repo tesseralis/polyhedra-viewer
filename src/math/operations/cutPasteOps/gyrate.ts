@@ -1,9 +1,9 @@
-import { some } from "lodash-es"
-
 import { withOrigin } from "math/geom"
 import { Polyhedron, Cap } from "math/polyhedra"
 import { mapObject } from "utils"
-import { getCapAlignment, getGyrateDirection } from "./cutPasteUtils"
+import Capstone from "data/specs/Capstone"
+import Composite from "data/specs/Composite"
+import { inc, dec, getCapAlignment, getCupolaGyrate } from "./cutPasteUtils"
 import { getTransformedVertices } from "../operationUtils"
 import makeOperation from "../makeOperation"
 
@@ -11,6 +11,10 @@ const TAU = 2 * Math.PI
 
 interface Options {
   cap: Cap
+}
+
+export function isGyrated(cap: Cap) {
+  return getCupolaGyrate(cap) === "ortho"
 }
 
 function applyGyrate(polyhedron: Polyhedron, { cap }: Options) {
@@ -57,46 +61,63 @@ function applyGyrate(polyhedron: Polyhedron, { cap }: Options) {
   }
 }
 
-export const gyrate = makeOperation("gyrate", {
-  apply: applyGyrate,
-  optionTypes: ["cap"],
+export const gyrate = makeOperation<Capstone | Composite, { cap: Cap }>(
+  "gyrate",
+  {
+    apply(info, polyhedron, options) {
+      return applyGyrate(polyhedron, options)
+    },
 
-  resultsFilter(polyhedron, config, relations) {
-    const options: any = {}
-    const { cap } = config
-    if (!cap) {
-      throw new Error("Invalid cap")
-    }
-    if (some(relations, "direction")) {
-      options.direction = getGyrateDirection(cap)
-      if (
-        relations.filter(
-          (relation) =>
-            relation.direction === options.direction && !!relation.align,
-        ).length > 1
-      ) {
-        options.align = getCapAlignment(polyhedron, cap)
+    canApplyTo(info): info is Capstone | Composite {
+      if (info.isCapstone()) {
+        return info.isBi() && !info.isPyramid() && info.data.base > 2
       }
-    }
-    return options
-  },
+      if (info.isComposite()) {
+        const { source, diminished } = info.data
+        if (source.canonicalName() !== "rhombicosidodecahedron") return false
+        if (diminished === 2) return !info.isPara()
+        return diminished < 3
+      }
+      return false
+    },
 
-  allOptionCombos(polyhedron) {
-    return Cap.getAll(polyhedron).map((cap) => ({ cap }))
-  },
+    getResult(info, { cap }, polyhedron) {
+      if (info.isCapstone()) {
+        const { gyrate } = info.data
+        return info.withData({ gyrate: gyrate === "ortho" ? "gyro" : "ortho" })
+      }
+      const { gyrate } = info.data
+      if (isGyrated(cap)) {
+        return info.withData({ gyrate: dec(gyrate), align: "meta" })
+      } else {
+        return info.withData({
+          gyrate: inc(gyrate),
+          align: info.isMono() ? getCapAlignment(polyhedron, cap) : undefined,
+        })
+      }
+    },
 
-  hitOption: "cap",
-  getHitOption(polyhedron, hitPnt) {
-    const cap = Cap.find(polyhedron, hitPnt)
-    return cap ? { cap } : {}
-  },
+    hasOptions() {
+      return true
+    },
 
-  faceSelectionStates(polyhedron, { cap }) {
-    const allCapFaces = Cap.getAll(polyhedron).flatMap((cap) => cap.faces())
-    return polyhedron.faces.map((face) => {
-      if (cap instanceof Cap && face.inSet(cap.faces())) return "selected"
-      if (face.inSet(allCapFaces)) return "selectable"
-      return undefined
-    })
+    *allOptionCombos(info, polyhedron) {
+      for (const cap of Cap.getAll(polyhedron)) yield { cap }
+    },
+
+    hitOption: "cap",
+    getHitOption(polyhedron, hitPnt) {
+      const cap = Cap.find(polyhedron, hitPnt)
+      return cap ? { cap } : {}
+    },
+
+    faceSelectionStates(polyhedron, { cap }) {
+      const allCapFaces = Cap.getAll(polyhedron).flatMap((cap) => cap.faces())
+      return polyhedron.faces.map((face) => {
+        if (cap instanceof Cap && face.inSet(cap.faces())) return "selected"
+        if (face.inSet(allCapFaces)) return "selectable"
+        return undefined
+      })
+    },
   },
-})
+)

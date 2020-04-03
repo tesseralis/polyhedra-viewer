@@ -26,9 +26,21 @@ const options: DataOptions<CapstoneData> = {
  * or doubled.
  */
 export default class Capstone extends Specs<CapstoneData> {
-  constructor(data: CapstoneData) {
+  private constructor(data: CapstoneData) {
     super("capstone", data)
+    if (this.isGyroelongated() || this.isMono()) {
+      delete this.data.gyrate
+    }
   }
+
+  withData(data: Partial<CapstoneData>) {
+    return new Capstone({ ...this.data, ...data })
+  }
+
+  isDigonal = () => this.data.base === 2
+  isTriangular = () => this.data.base === 3
+  isSquare = () => this.data.base === 4
+  isPentagonal = () => this.data.base === 5
 
   isPyramid = () => this.data.type === "pyramid"
   isCupola = () => this.data.type === "cupola"
@@ -38,6 +50,7 @@ export default class Capstone extends Specs<CapstoneData> {
   isMono = () => this.data.count === 1
   isBi = () => this.data.count === 2
 
+  isShortened = () => !this.data.elongation
   isElongated = () => this.data.elongation === "prism"
   isGyroelongated = () => this.data.elongation === "antiprism"
 

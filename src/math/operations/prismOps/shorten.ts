@@ -1,4 +1,5 @@
 import { Polyhedron } from "math/polyhedra"
+import Capstone from "data/specs/Capstone"
 import { Twist } from "types"
 import {
   antiprismHeight,
@@ -31,21 +32,34 @@ function doShorten(polyhedron: Polyhedron, options: Options) {
 interface Options {
   twist?: Twist
 }
-export const shorten = makeOperation<Options>("shorten", {
-  apply: doShorten,
-  optionTypes: ["twist"],
-  resultsFilter(polyhedron, options) {
-    if (!isGyroelongatedBiCupola(polyhedron)) return
-    const { twist } = options
-    const chirality = getChirality(polyhedron)
-    const gyrate = twist === chirality ? "ortho" : "gyro"
-    return { gyrate }
+export const shorten = makeOperation<Capstone, Options>("shorten", {
+  apply(info, polyhedron, options) {
+    return doShorten(polyhedron, options)
   },
 
-  allOptionCombos(polyhedron) {
-    if (isGyroelongatedBiCupola(polyhedron)) {
-      return [{ twist: "left" }, { twist: "right" }]
+  canApplyTo(info): info is Capstone {
+    return info.isCapstone() && !info.isShortened()
+  },
+
+  getResult(info, { twist }, polyhedron) {
+    const gyrate = (() => {
+      if (!isGyroelongatedBiCupola(info)) return info.data.gyrate
+      const chirality = getChirality(polyhedron)
+      return twist === chirality ? "ortho" : "gyro"
+    })()
+    return info.withData({ elongation: null, gyrate })
+  },
+
+  hasOptions(info) {
+    return isGyroelongatedBiCupola(info)
+  },
+
+  *allOptionCombos(info) {
+    if (isGyroelongatedBiCupola(info)) {
+      yield { twist: "left" }
+      yield { twist: "right" }
+    } else {
+      yield {}
     }
-    return [{}]
   },
 })

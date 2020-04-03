@@ -1,5 +1,6 @@
 import { pivot } from "utils"
 import { Twist } from "types"
+import Classical from "data/specs/Classical"
 import { Face, Polyhedron } from "math/polyhedra"
 import { getTwistSign } from "../operationUtils"
 import {
@@ -118,15 +119,30 @@ function doTwist(
 interface Options {
   twist?: Twist
 }
-export const twist = makeOperation<Options>("twist", {
-  apply(polyhedron, { twist: twistOpt }, result) {
+export const twist = makeOperation<Classical, Options>("twist", {
+  apply(info, polyhedron, { twist: twistOpt }, result) {
     return doTwist(polyhedron, result, twistOpt)
   },
-  optionTypes: ["twist"],
-  allOptionCombos(polyhedron) {
-    if (expansionType(polyhedron) !== "snub") {
-      return [{ twist: "left" }, { twist: "right" }]
+
+  canApplyTo(info): info is Classical {
+    return info.isClassical() && (info.isCantellated() || info.isSnub())
+  },
+
+  getResult(info) {
+    return info.withData({
+      operation: info.isCantellated() ? "snub" : "cantellate",
+    })
+  },
+
+  hasOptions(info) {
+    return !info.isTetrahedral() && info.isCantellated()
+  },
+
+  *allOptionCombos(info) {
+    if (!info.isSnub()) {
+      yield { twist: "left" }
+      yield { twist: "right" }
     }
-    return [{}]
+    yield {}
   },
 })

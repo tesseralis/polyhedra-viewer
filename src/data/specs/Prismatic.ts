@@ -22,6 +22,13 @@ export default class Prismatic extends Specs<PrismaticData> {
     super("prismatic", data)
   }
 
+  withData(data: Partial<PrismaticData>) {
+    return new Prismatic({ ...this.data, ...data })
+  }
+
+  isPrism = () => this.data.type === "prism"
+  isAntiprism = () => this.data.type === "antiprism"
+
   static *getAll() {
     for (const base of options.base) {
       for (const type of options.type) {

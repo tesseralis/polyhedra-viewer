@@ -1,5 +1,3 @@
-import { isEmpty } from "lodash-es"
-
 import { useCallback } from "react"
 import { useHistory } from "react-router-dom"
 import { Operation } from "math/operations"
@@ -28,10 +26,16 @@ export default function useApplyOperation() {
       if (!operation) throw new Error("no operation defined")
 
       const { result, animationData } = operation.apply(polyhedron, options)
-      if (!operation.hasOptions(result) || isEmpty(options)) {
-        unsetOperation()
-      } else {
+      // If the current operation has options and the result has options,
+      // keep the options set
+      if (
+        operation.hasOptions(polyhedron) &&
+        operation.canApplyTo(result) &&
+        operation.hasOptions(result)
+      ) {
         setOperation(operation, result)
+      } else {
+        unsetOperation()
       }
 
       transition(result, animationData)

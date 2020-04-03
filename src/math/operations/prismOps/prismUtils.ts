@@ -1,5 +1,6 @@
 import { maxBy, isEqual, uniqBy, countBy } from "lodash-es"
 import { Twist } from "types"
+import PolyhedronSpecs from "data/specs/PolyhedronSpecs"
 import { Polyhedron, Cap, FaceLike } from "math/polyhedra"
 import { withOrigin, isInverse } from "math/geom"
 import { getTwistSign, getTransformedVertices } from "../operationUtils"
@@ -29,8 +30,7 @@ export function getChirality(polyhedron: Polyhedron) {
 /**
  * Return true if the polyhedron a gyroelongated bicupola, cupolarotunda, or birotunda
  */
-export function isGyroelongatedBiCupola(polyhedron: Polyhedron) {
-  const info = polyhedron.info
+export function isGyroelongatedBiCupola(info: PolyhedronSpecs) {
   if (!info.isCapstone()) return false
   return info.isGyroelongated() && info.isBi() && !info.isPyramid()
 }

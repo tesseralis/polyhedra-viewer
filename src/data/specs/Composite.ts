@@ -10,9 +10,9 @@ export const counts: Count[] = [0, 1, 2, 3]
 
 interface CompositeData {
   source: Classical | Prismatic
-  augmented?: Count
-  diminished?: Count
-  gyrate?: Count
+  augmented: Count
+  diminished: Count
+  gyrate: Count
   align?: "meta" | "para"
 }
 
@@ -50,9 +50,34 @@ function limitCount<N extends number>(counts: N[], limit: number) {
  * with pyramids or cupolae added, removed, or gyrated from it.
  */
 export default class Composite extends Specs<CompositeData> {
-  constructor(data: CompositeData) {
-    super("composite", data)
+  private constructor({
+    augmented = 0,
+    diminished = 0,
+    gyrate = 0,
+    source,
+    align,
+  }: Partial<CompositeData> & { source: Prismatic | Classical }) {
+    super("composite", { source, align, augmented, diminished, gyrate })
+    if (!this.isBi()) {
+      delete this.data.align
+    }
   }
+
+  withData(data: Partial<CompositeData>) {
+    return new Composite({ ...this.data, ...data })
+  }
+
+  totalCount() {
+    const { augmented, diminished, gyrate } = this.data
+    return augmented + diminished + gyrate
+  }
+
+  isMono = () => this.totalCount() === 1
+  isBi = () => this.totalCount() === 2
+  isTri = () => this.totalCount() === 3
+
+  isPara = () => this.data.align === "para"
+  isMeta = () => this.data.align === "meta"
 
   static *getAll() {
     // Augmented prisms
@@ -77,7 +102,7 @@ export default class Composite extends Specs<CompositeData> {
         options.augmented,
         source.data.family - 2,
       )) {
-        if (source.data.family === 5 && augmented === 2) {
+        if (source.isIcosahedral() && augmented === 2) {
           for (const align of options.align) {
             yield new Composite({ source, augmented, align })
           }

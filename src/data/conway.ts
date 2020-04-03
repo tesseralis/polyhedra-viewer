@@ -12,10 +12,6 @@ const conwayMapping = bimap<string, string>(
   ),
 )
 
-export function toConwayNotation(name: string) {
-  return conwayMapping.get(name)
-}
-
 export function isConwayNotation(symbol: string) {
   return conwayMapping.hasValue(symbol)
 }
