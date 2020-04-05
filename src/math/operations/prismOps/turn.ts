@@ -96,8 +96,8 @@ function doTurn(polyhedron: Polyhedron, { twist = "left" }: Options) {
 }
 
 export const turn = makeOperation<Prismatic | Capstone, Options>("turn", {
-  apply(info, polyhedron, options) {
-    return doTurn(polyhedron, options)
+  apply({ geom }, options) {
+    return doTurn(geom, options)
   },
 
   canApplyTo(info): info is Prismatic | Capstone {
@@ -107,19 +107,19 @@ export const turn = makeOperation<Prismatic | Capstone, Options>("turn", {
     return !info.isShortened()
   },
 
-  getResult(info, { twist }, polyhedron) {
-    if (info.isPrismatic()) {
-      return info.withData({ type: info.isPrism() ? "antiprism" : "prism" })
+  getResult({ specs, geom }, { twist }) {
+    if (specs.isPrismatic()) {
+      return specs.withData({ type: specs.isPrism() ? "antiprism" : "prism" })
     }
 
     const gyrate = (() => {
-      if (!isGyroelongatedBiCupola(info)) return undefined
-      const chirality = getChirality(polyhedron)
+      if (!isGyroelongatedBiCupola(specs)) return undefined
+      const chirality = getChirality(geom)
       return twist === chirality ? "ortho" : "gyro"
     })()
 
-    return info.withData({
-      elongation: info.isElongated() ? "antiprism" : "prism",
+    return specs.withData({
+      elongation: specs.isElongated() ? "antiprism" : "prism",
       gyrate,
     })
   },
@@ -128,8 +128,8 @@ export const turn = makeOperation<Prismatic | Capstone, Options>("turn", {
     return info.isCapstone() && !info.isPyramid() && info.isBi()
   },
 
-  *allOptionCombos(info) {
-    if (isGyroelongatedBiCupola(info)) {
+  *allOptionCombos({ specs }) {
+    if (isGyroelongatedBiCupola(specs)) {
       yield { twist: "left" }
       yield { twist: "right" }
     } else {

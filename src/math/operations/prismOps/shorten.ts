@@ -33,29 +33,29 @@ interface Options {
   twist?: Twist
 }
 export const shorten = makeOperation<Capstone, Options>("shorten", {
-  apply(info, polyhedron, options) {
-    return doShorten(polyhedron, options)
+  apply({ geom }, options) {
+    return doShorten(geom, options)
   },
 
   canApplyTo(info): info is Capstone {
     return info.isCapstone() && !info.isShortened()
   },
 
-  getResult(info, { twist }, polyhedron) {
+  getResult({ specs, geom }, { twist }) {
     const gyrate = (() => {
-      if (!isGyroelongatedBiCupola(info)) return info.data.gyrate
-      const chirality = getChirality(polyhedron)
+      if (!isGyroelongatedBiCupola(specs)) return specs.data.gyrate
+      const chirality = getChirality(geom)
       return twist === chirality ? "ortho" : "gyro"
     })()
-    return info.withData({ elongation: null, gyrate })
+    return specs.withData({ elongation: null, gyrate })
   },
 
   hasOptions(info) {
     return isGyroelongatedBiCupola(info)
   },
 
-  *allOptionCombos(info) {
-    if (isGyroelongatedBiCupola(info)) {
+  *allOptionCombos({ specs }) {
+    if (isGyroelongatedBiCupola(specs)) {
       yield { twist: "left" }
       yield { twist: "right" }
     } else {

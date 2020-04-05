@@ -14,29 +14,35 @@ export interface AnimationData {
   endVertices: Point[]
 }
 
-export interface OperationResult {
+interface OpResult {
   result: Polyhedron
   animationData?: AnimationData
 }
 
-interface BaseOperation<Options extends {}> {
-  hitOption?: keyof Options
-
-  /**
-   * Given an application of an operation to a given polyhedron with the given options,
-   * @return an array mapping face indices to selection states (selectable, selected, or none).
-   */
-  faceSelectionStates(polyhedron: Polyhedron, options: Options): SelectState[]
+interface PartialOpResult {
+  result?: Polyhedron
+  animationData?: {
+    start: Polyhedron
+    endVertices: VertexArg[]
+  }
 }
 
-export interface Operation<Options extends {}> extends BaseOperation<Options> {
+type OpResultArg = PartialOpResult | Polyhedron
+
+export interface Operation<Options extends {}> {
   name: string
 
-  apply(polyhedron: Polyhedron, options: Options): OperationResult
+  hitOption?: keyof Options
+
+  apply(polyhedron: Polyhedron, options: Options): OpResult
 
   canApplyTo(polyhedron: Polyhedron): boolean
 
-  getHitOption(polyhedron: Polyhedron, hitPnt: Point, options: Options): Options
+  getHitOption(
+    polyhedron: Polyhedron,
+    hitPnt: Point,
+    options: Partial<Options>,
+  ): Partial<Options>
 
   /**
    * @return whether this operation has multiple options for the given polyhedron.
@@ -58,55 +64,55 @@ export interface Operation<Options extends {}> extends BaseOperation<Options> {
    * selected on a polyhedron.
    */
   defaultOptions(polyhedron: Polyhedron): Partial<Options>
+
+  /**
+   * Given an application of an operation to a given polyhedron with the given options,
+   * @return an array mapping face indices to selection states (selectable, selected, or none).
+   */
+  faceSelectionStates(polyhedron: Polyhedron, options: Options): SelectState[]
 }
 
-interface PartialOpResult {
-  result?: Polyhedron
-  animationData?: {
-    start: Polyhedron
-    endVertices: VertexArg[]
-  }
+interface SolidArgs<Specs extends PolyhedronSpecs> {
+  specs: Specs
+  geom: Polyhedron
 }
 
-interface OperationArgs<Options extends {}, Specs extends PolyhedronSpecs>
-  extends Partial<BaseOperation<Options>> {
-  apply(
-    info: Specs,
-    polyhedron: Polyhedron,
-    options: Options,
-    result: Polyhedron,
-  ): PartialOpResult | Polyhedron
-
+interface OpArgs<Options extends {}, Specs extends PolyhedronSpecs> {
   canApplyTo(info: PolyhedronSpecs): info is Specs
 
   hasOptions?(info: Specs): boolean
 
+  isPreferredSpec?(info: Specs, options: Options): boolean
+
+  apply(
+    solid: SolidArgs<Specs>,
+    options: Options,
+    result: Polyhedron,
+  ): OpResultArg
+
   allOptions?(
-    info: Specs,
-    polyhedron: Polyhedron,
+    solid: SolidArgs<Specs>,
     optionName: keyof Options,
   ): Options[typeof optionName][]
 
-  allOptionCombos?(info: Specs, solid: Polyhedron): Generator<Options>
+  allOptionCombos?(solid: SolidArgs<Specs>): Generator<Options>
 
-  getResult(
-    info: Specs,
-    options: Options,
-    polyhedron: Polyhedron,
-  ): PolyhedronSpecs
+  getResult(solid: SolidArgs<Specs>, options: Options): PolyhedronSpecs
 
-  isPreferredSpec?(info: Specs, options: Options): boolean
+  hitOption?: keyof Options
 
   getHitOption?(
-    polyhedron: Polyhedron,
+    solid: SolidArgs<Specs>,
     hitPnt: Vec3D,
-    options: Options,
+    options: Partial<Options>,
   ): Partial<Options>
 
   defaultOptions?(info: Specs): Partial<Options>
+
+  faceSelectionStates?(solid: SolidArgs<Specs>, options: Options): SelectState[]
 }
 
-type OperationArg = keyof OperationArgs<any, any>
+type OperationArg = keyof OpArgs<any, any>
 const methodDefaults = {
   getHitOption: {},
   hasOptions: false,
@@ -118,21 +124,18 @@ const methodDefaults = {
 
 // TODO get this to return the correct type
 function fillDefaults<Options extends {}, Specs extends PolyhedronSpecs>(
-  op: OperationArgs<Options, Specs>,
-) {
+  op: OpArgs<Options, Specs>,
+): Required<OpArgs<Options, Specs>> {
   return {
     ...mapValues(
       methodDefaults,
       (fnDefault, fn: OperationArg) => op[fn] ?? (() => fnDefault),
     ),
     ...op,
-  }
+  } as Required<OpArgs<Options, Specs>>
 }
 
-function normalizeOpResult(
-  opResult: PartialOpResult | Polyhedron,
-  newName: string,
-): OperationResult {
+function normalizeOpResult(opResult: OpResultArg, newName: string): OpResult {
   if (opResult instanceof Polyhedron) {
     return { result: deduplicateVertices(opResult).withName(newName) }
   }
@@ -183,14 +186,14 @@ export function deduplicateVertices(polyhedron: Polyhedron) {
 export default function makeOperation<
   Specs extends PolyhedronSpecs,
   Options extends {} = {}
->(name: string, op: OperationArgs<Options, Specs>): Operation<Options> {
-  const withDefaults = fillDefaults(op)
+>(name: string, partialOpArgs: OpArgs<Options, Specs>): Operation<Options> {
+  const opArgs = fillDefaults(partialOpArgs)
 
   // TODO we have to calculate this with every operation...
   // I wish I could store it in a class or something to get it to work right
   function* validSpecs(polyhedron: Polyhedron): Generator<Specs> {
     for (const specs of getAllSpecs(polyhedron.name)) {
-      if (withDefaults.canApplyTo(specs)) {
+      if (opArgs.canApplyTo(specs)) {
         yield specs
       }
     }
@@ -201,56 +204,68 @@ export default function makeOperation<
   }
 
   return {
-    ...(withDefaults as any),
     name,
-    apply(polyhedron, options) {
-      const info = getValidSpecs(polyhedron).find((info) =>
-        withDefaults.isPreferredSpec!(info, options),
+
+    apply(geom, options) {
+      const specs = getValidSpecs(geom).find((info) =>
+        opArgs.isPreferredSpec(info, options),
       )
-      if (!info)
-        throw new Error(
-          `Could not find specs for polyhedron ${polyhedron.name}`,
-        )
+      if (!specs)
+        throw new Error(`Could not find specs for polyhedron ${geom.name}`)
 
       // get the next polyhedron name
-      const next = withDefaults.getResult!(
-        info,
+      const next = opArgs.getResult!(
+        { specs, geom },
         options ?? {},
-        polyhedron,
       ).canonicalName()
 
       // Get the actual operation result
-      const opResult = withDefaults.apply(
-        info,
-        polyhedron,
+      const opResult = opArgs.apply(
+        { specs, geom },
         options ?? {},
         Polyhedron.get(next),
       )
       return normalizeOpResult(opResult, next)
     },
-    getHitOption(polyhedron, hitPnt, options) {
-      return withDefaults.getHitOption!(polyhedron, vec(hitPnt), options)
+
+    hitOption: opArgs.hitOption,
+
+    getHitOption(geom, hitPnt, options) {
+      // TODO think of situations where this wouldn't be okay
+      const specs = getValidSpecs(geom)[0]
+      return opArgs.getHitOption({ specs, geom }, vec(hitPnt), options)
     },
+
     canApplyTo(polyhedron) {
       return getValidSpecs(polyhedron).length > 0
     },
+
     hasOptions(polyhedron) {
-      return getValidSpecs(polyhedron).some(withDefaults.hasOptions!)
+      return getValidSpecs(polyhedron).some(opArgs.hasOptions!)
     },
-    allOptions(polyhedron, optionName) {
-      return withDefaults.allOptions!(
-        getValidSpecs(polyhedron)[0],
-        polyhedron,
+
+    allOptions(geom, optionName) {
+      return opArgs.allOptions(
+        { specs: getValidSpecs(geom)[0], geom },
         optionName,
       )
     },
-    *allOptionCombos(polyhedron) {
-      for (const specs of getValidSpecs(polyhedron)) {
-        yield* withDefaults.allOptionCombos!(specs, polyhedron)
+
+    *allOptionCombos(geom) {
+      for (const specs of getValidSpecs(geom)) {
+        yield* opArgs.allOptionCombos({ specs, geom })
       }
     },
+
     defaultOptions(polyhedron) {
-      return withDefaults.defaultOptions!(getValidSpecs(polyhedron)[0])
+      return opArgs.defaultOptions(getValidSpecs(polyhedron)[0])
+    },
+
+    faceSelectionStates(geom, options) {
+      return opArgs.faceSelectionStates(
+        { specs: getValidSpecs(geom)[0], geom },
+        options,
+      )
     },
   }
 }

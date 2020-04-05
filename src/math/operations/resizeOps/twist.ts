@@ -119,17 +119,17 @@ interface Options {
   twist?: Twist
 }
 export const twist = makeOperation<Classical, Options>("twist", {
-  apply(info, polyhedron, { twist: twistOpt }, result) {
-    return doTwist(polyhedron, result, twistOpt)
+  apply({ geom }, { twist: twistOpt }, result) {
+    return doTwist(geom, result, twistOpt)
   },
 
   canApplyTo(info): info is Classical {
     return info.isClassical() && (info.isCantellated() || info.isSnub())
   },
 
-  getResult(info) {
-    return info.withData({
-      operation: info.isCantellated() ? "snub" : "cantellate",
+  getResult({ specs }) {
+    return specs.withData({
+      operation: specs.isCantellated() ? "snub" : "cantellate",
     })
   },
 
@@ -137,8 +137,8 @@ export const twist = makeOperation<Classical, Options>("twist", {
     return !info.isTetrahedral() && info.isCantellated()
   },
 
-  *allOptionCombos(info) {
-    if (!info.isSnub()) {
+  *allOptionCombos({ specs }) {
+    if (!specs.isSnub()) {
       yield { twist: "left" }
       yield { twist: "right" }
     }

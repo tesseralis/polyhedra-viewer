@@ -36,8 +36,8 @@ function doElongate(polyhedron: Polyhedron, twist?: Twist) {
 }
 
 export const elongate = makeOperation<Capstone>("elongate", {
-  apply(info, polyhedron) {
-    return doElongate(polyhedron)
+  apply({ geom }) {
+    return doElongate(geom)
   },
 
   canApplyTo(info): info is Capstone {
@@ -45,8 +45,8 @@ export const elongate = makeOperation<Capstone>("elongate", {
     return info.isShortened() && info.data.base > 2
   },
 
-  getResult(info) {
-    return info.withData({ elongation: "prism" })
+  getResult({ specs }) {
+    return specs.withData({ elongation: "prism" })
   },
 })
 
@@ -54,8 +54,8 @@ interface Options {
   twist?: Twist
 }
 export const gyroelongate = makeOperation<Capstone, Options>("gyroelongate", {
-  apply(info, polyhedron: Polyhedron, { twist = "left" }) {
-    return doElongate(polyhedron, twist)
+  apply({ geom }, { twist = "left" }) {
+    return doElongate(geom, twist)
   },
 
   canApplyTo(info): info is Capstone {
@@ -66,8 +66,8 @@ export const gyroelongate = makeOperation<Capstone, Options>("gyroelongate", {
     return info.isShortened()
   },
 
-  getResult(info) {
-    return info.withData({ elongation: "antiprism" })
+  getResult({ specs }) {
+    return specs.withData({ elongation: "antiprism" })
   },
 
   hasOptions(info) {

@@ -64,8 +64,8 @@ function applyGyrate(polyhedron: Polyhedron, { cap }: Options) {
 export const gyrate = makeOperation<Capstone | Composite, { cap: Cap }>(
   "gyrate",
   {
-    apply(info, polyhedron, options) {
-      return applyGyrate(polyhedron, options)
+    apply({ geom }, options) {
+      return applyGyrate(geom, options)
     },
 
     canApplyTo(info): info is Capstone | Composite {
@@ -81,18 +81,18 @@ export const gyrate = makeOperation<Capstone | Composite, { cap: Cap }>(
       return false
     },
 
-    getResult(info, { cap }, polyhedron) {
-      if (info.isCapstone()) {
-        const { gyrate } = info.data
-        return info.withData({ gyrate: gyrate === "ortho" ? "gyro" : "ortho" })
+    getResult({ specs, geom }, { cap }) {
+      if (specs.isCapstone()) {
+        const { gyrate } = specs.data
+        return specs.withData({ gyrate: gyrate === "ortho" ? "gyro" : "ortho" })
       }
-      const { gyrate } = info.data
+      const { gyrate } = specs.data
       if (isGyrated(cap)) {
-        return info.withData({ gyrate: dec(gyrate), align: "meta" })
+        return specs.withData({ gyrate: dec(gyrate), align: "meta" })
       } else {
-        return info.withData({
+        return specs.withData({
           gyrate: inc(gyrate),
-          align: info.isMono() ? getCapAlignment(polyhedron, cap) : undefined,
+          align: specs.isMono() ? getCapAlignment(geom, cap) : undefined,
         })
       }
     },
@@ -101,19 +101,19 @@ export const gyrate = makeOperation<Capstone | Composite, { cap: Cap }>(
       return true
     },
 
-    *allOptionCombos(info, polyhedron) {
-      for (const cap of Cap.getAll(polyhedron)) yield { cap }
+    *allOptionCombos({ geom }) {
+      for (const cap of Cap.getAll(geom)) yield { cap }
     },
 
     hitOption: "cap",
-    getHitOption(polyhedron, hitPnt) {
-      const cap = Cap.find(polyhedron, hitPnt)
+    getHitOption({ geom }, hitPnt) {
+      const cap = Cap.find(geom, hitPnt)
       return cap ? { cap } : {}
     },
 
-    faceSelectionStates(polyhedron, { cap }) {
-      const allCapFaces = Cap.getAll(polyhedron).flatMap((cap) => cap.faces())
-      return polyhedron.faces.map((face) => {
+    faceSelectionStates({ geom }, { cap }) {
+      const allCapFaces = Cap.getAll(geom).flatMap((cap) => cap.faces())
+      return geom.faces.map((face) => {
         if (cap instanceof Cap && face.inSet(cap.faces())) return "selected"
         if (face.inSet(allCapFaces)) return "selectable"
         return undefined
