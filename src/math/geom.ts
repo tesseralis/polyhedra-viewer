@@ -1,4 +1,3 @@
-import { every } from "lodash-es"
 import { Vec3D, Ray3D, Triangle3D, Plane, Matrix4x4 } from "toxiclibsjs/geom"
 import { Point } from "types"
 
@@ -28,7 +27,7 @@ export function getPlane(points: Vec3D[]) {
 // Return whether the set of points lie on a plane
 export function isPlanar(points: Vec3D[]) {
   const plane = getPlane(points)
-  return every(points, (vec) => plane.getDistanceToPoint(vec) < PRECISION)
+  return points.every((vec) => plane.getDistanceToPoint(vec) < PRECISION)
 }
 
 export function getCentroid(vectors: Vec3D[]) {

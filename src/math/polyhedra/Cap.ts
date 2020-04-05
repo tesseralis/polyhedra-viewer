@@ -1,4 +1,4 @@
-import { minBy, once, every, countBy, isEqual } from "lodash-es"
+import { minBy, once, countBy, isEqual } from "lodash-es"
 
 import { flatMapUniq } from "utils"
 import { Vec3D } from "math/geom"
@@ -129,13 +129,13 @@ export default abstract class Cap implements VertexList {
   }
 
   isValid() {
-    const matchFaces = every(this.innerVertices(), (vertex) => {
+    const matchFaces = this.innerVertices().every((vertex) => {
       const faceCount = countBy(vertex.adjacentFaces(), "numSides")
       return isEqual(faceCount, this.faceConfiguration)
     })
     return (
       matchFaces &&
-      every(this.faces(), (face) => face.isValid()) &&
+      this.faces().every((face) => face.isValid()) &&
       this.boundary().isPlanar()
     )
   }

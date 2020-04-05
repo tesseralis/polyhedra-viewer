@@ -1,4 +1,4 @@
-import { mapValues, compact, every, xor, uniq, pickBy } from "lodash-es"
+import { mapValues, compact, xor, uniq, pickBy } from "lodash-es"
 
 import Prismatic from "data/specs/Prismatic"
 import Capstone from "data/specs/Capstone"
@@ -72,7 +72,7 @@ function canAugmentWith(base: Face, augmentee: Polyhedron, offset: number) {
   if (!augmentee) return false
   const underside = augmentee.faceWithNumSides(n)
 
-  return every(base.edges, (edge, i: number) => {
+  return base.edges.every((edge, i: number) => {
     const baseAngle = edge.dihedralAngle()
 
     const edge2 = getCyclic(underside.edges, i - 1 + offset)

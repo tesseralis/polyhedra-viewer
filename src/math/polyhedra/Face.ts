@@ -1,4 +1,4 @@
-import { some, countBy } from "lodash-es"
+import { countBy } from "lodash-es"
 
 import { getCyclic, flatMapUniq } from "utils"
 import { VIndex, FIndex } from "./solidTypes"
@@ -29,7 +29,7 @@ export default class Face extends FaceLike {
   }
 
   inSet(faces: Face[]) {
-    return some(faces, (face) => this.equals(face))
+    return faces.some((face) => this.equals(face))
   }
 
   /** Return the set of faces that share a vertex to this face (including itself) */

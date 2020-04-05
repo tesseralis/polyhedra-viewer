@@ -1,4 +1,3 @@
-import { every } from "lodash-es"
 import { Vec3D } from "math/geom"
 
 import {
@@ -85,6 +84,6 @@ export default class FaceLike implements VertexList {
   }
 
   isValid() {
-    return every(this.edges, (edge) => edge.length() > PRECISION)
+    return this.edges.every((edge) => edge.length() > PRECISION)
   }
 }

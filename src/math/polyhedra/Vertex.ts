@@ -1,4 +1,4 @@
-import { some, findKey, countBy } from "lodash-es"
+import { findKey, countBy } from "lodash-es"
 import { Point } from "types"
 import { vec, Vec3D } from "math/geom"
 import { VIndex } from "./solidTypes"
@@ -41,7 +41,7 @@ export default class Vertex {
   }
 
   inSet(vertices: Vertex[]) {
-    return some(vertices, (vertex) => this.equals(vertex))
+    return vertices.some((vertex) => this.equals(vertex))
   }
 
   private *adjacentEdgesIter() {

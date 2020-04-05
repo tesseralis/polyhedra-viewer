@@ -1,4 +1,4 @@
-import { every, take } from "lodash-es"
+import { take } from "lodash-es"
 import { Twist } from "types"
 import Classical from "data/specs/Classical"
 import { Polyhedron } from "math/polyhedra"
@@ -32,7 +32,7 @@ function doSemiExpansion(polyhedron: Polyhedron, referenceName: string) {
   const duplicated = expandEdges(
     polyhedron,
     polyhedron.edges.filter((e) =>
-      every(e.adjacentFaces(), (f) => f.numSides === largeFaceType),
+      e.adjacentFaces().every((f) => f.numSides === largeFaceType),
     ),
   )
   const expandFaces = duplicated.faces.filter((face) =>

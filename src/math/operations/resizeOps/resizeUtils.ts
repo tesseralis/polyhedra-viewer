@@ -1,4 +1,4 @@
-import { every, minBy } from "lodash-es"
+import { minBy } from "lodash-es"
 
 import { flatMapUniq } from "utils"
 import { Polyhedron, Face } from "math/polyhedra"
@@ -41,7 +41,7 @@ export function isExpandedFace(
   const type = expansionType(polyhedron)
   if (typeof nSides === "number" && face.numSides !== nSides) return false
   if (!face.isValid()) return false
-  return every(face.adjacentFaces(), { numSides: edgeShape[type] })
+  return face.adjacentFaces().every((f) => f.numSides === edgeShape[type])
 }
 
 function getFaceDistance(face1: Face, face2: Face) {

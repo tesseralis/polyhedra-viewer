@@ -1,4 +1,4 @@
-import { pickBy, isMatch, some } from "lodash-es"
+import { pickBy, isMatch } from "lodash-es"
 import { getSingle } from "utils"
 import type Specs from "./PolyhedronSpecs"
 
@@ -51,8 +51,9 @@ export default class Queries<S extends Specs> {
   }
 
   hasNameWhere(name: string, filter: QueryFilter<S["data"]>) {
-    return some(
-      this.nameMapping.get(name)!,
+    const entries = this.nameMapping.get(name)
+    if (!entries) return false
+    return entries.some(
       (entry) => entry.canonicalName() === name && filter(entry.data),
     )
   }
