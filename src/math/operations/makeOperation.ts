@@ -14,17 +14,27 @@ export interface AnimationData {
   endVertices: Point[]
 }
 
-export interface OperationResult {
+interface OpResult {
   result: Polyhedron
   animationData?: AnimationData
 }
+
+interface PartialOpResult {
+  result?: Polyhedron
+  animationData?: {
+    start: Polyhedron
+    endVertices: VertexArg[]
+  }
+}
+
+type OpResultArg = PartialOpResult | Polyhedron
 
 export interface Operation<Options extends {}> {
   name: string
 
   hitOption?: keyof Options
 
-  apply(polyhedron: Polyhedron, options: Options): OperationResult
+  apply(polyhedron: Polyhedron, options: Options): OpResult
 
   canApplyTo(polyhedron: Polyhedron): boolean
 
@@ -62,14 +72,6 @@ export interface Operation<Options extends {}> {
   faceSelectionStates(polyhedron: Polyhedron, options: Options): SelectState[]
 }
 
-interface PartialOpResult {
-  result?: Polyhedron
-  animationData?: {
-    start: Polyhedron
-    endVertices: VertexArg[]
-  }
-}
-
 interface SolidArgs<Specs extends PolyhedronSpecs> {
   specs: Specs
   geom: Polyhedron
@@ -86,7 +88,7 @@ interface OpArgs<Options extends {}, Specs extends PolyhedronSpecs> {
     solid: SolidArgs<Specs>,
     options: Options,
     result: Polyhedron,
-  ): PartialOpResult | Polyhedron
+  ): OpResultArg
 
   allOptions?(
     solid: SolidArgs<Specs>,
@@ -133,10 +135,7 @@ function fillDefaults<Options extends {}, Specs extends PolyhedronSpecs>(
   } as Required<OpArgs<Options, Specs>>
 }
 
-function normalizeOpResult(
-  opResult: PartialOpResult | Polyhedron,
-  newName: string,
-): OperationResult {
+function normalizeOpResult(opResult: OpResultArg, newName: string): OpResult {
   if (opResult instanceof Polyhedron) {
     return { result: deduplicateVertices(opResult).withName(newName) }
   }
