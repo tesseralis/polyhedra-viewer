@@ -78,10 +78,9 @@ function joinEdgeFaces(twistFaces: Face[], twist: Twist) {
 // TODO deduplicate with expand/contract
 function doTwist(
   polyhedron: Polyhedron,
-  referenceName: string,
+  reference: Polyhedron,
   twist: Twist = "left",
 ) {
-  const reference = Polyhedron.get(referenceName)
   const isSnub = expansionType(polyhedron) === "snub"
   const f0 = polyhedron.largestFace()
   const n = f0.numSides

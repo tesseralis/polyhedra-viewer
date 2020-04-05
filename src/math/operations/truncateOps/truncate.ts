@@ -56,17 +56,19 @@ function getTruncateLength(polyhedron: Polyhedron) {
 
 type Transform = (vector: Vec3D, vertex: Vertex) => Vec3D
 
-function getTruncateTransform(polyhedron: Polyhedron, result = ""): Transform {
+function getTruncateTransform(
+  polyhedron: Polyhedron,
+  reference: Polyhedron,
+): Transform {
   // If we're doing a bevel, we need to do some fidgeting to make sure the created
   // faces are all regular
   const truncateLength = getTruncateLength(polyhedron)
   const oldSideLength = polyhedron.edgeLength()
 
-  const multiplier = getRectifiedMultiplier(result)
+  const multiplier = getRectifiedMultiplier(reference.name)
   const newSideLength = oldSideLength * multiplier
   const faceResizeScale = newSideLength / truncateLength
 
-  const reference = Polyhedron.get(result)
   const normalizedResizeAmount =
     reference.faceWithNumSides(6).distanceToCenter() / reference.edgeLength() -
     polyhedron.smallestFace().distanceToCenter() / newSideLength
@@ -87,15 +89,16 @@ function doTruncate(
   info: Classical,
   polyhedron: Polyhedron,
   rectify = false,
-  result?: string,
+  result?: Polyhedron,
 ) {
   const truncateLength = getTruncateLength(polyhedron)
   const oldSideLength = polyhedron.edgeLength()
   const truncateScale = (oldSideLength - truncateLength) / 2 / oldSideLength
   const duplicated = duplicateVertices(polyhedron)
-  const transform = info.isRegular()
-    ? (identity as Transform)
-    : getTruncateTransform(polyhedron, result)
+  const transform =
+    info.isRegular() || !result
+      ? (identity as Transform)
+      : getTruncateTransform(polyhedron, result)
 
   const truncatedVertices = duplicated.vertices.map((vertex) => {
     const adjacentVertices = vertex.adjacentVertices()

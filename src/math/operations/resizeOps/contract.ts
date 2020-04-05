@@ -43,9 +43,8 @@ function getContractLength(
 function getContractLengthSemi(
   polyhedron: Polyhedron,
   faceType: FaceType,
-  result: string,
+  reference: Polyhedron,
 ) {
-  const reference = Polyhedron.get(result)
   const referenceFace = reference.faceWithNumSides(faceType)
   const referenceLength =
     (referenceFace.distanceToCenter() / reference.edgeLength()) *
@@ -57,7 +56,7 @@ export function applyContract(
   info: Classical,
   polyhedron: Polyhedron,
   { faceType = isBevelled(polyhedron) ? 6 : 3 }: Options,
-  result: string,
+  result: Polyhedron,
 ) {
   const resultLength = isBevelled(polyhedron)
     ? getContractLengthSemi(polyhedron, faceType, result)

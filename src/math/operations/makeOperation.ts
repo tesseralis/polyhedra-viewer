@@ -74,7 +74,7 @@ interface OperationArgs<Options extends {}, Specs extends PolyhedronSpecs>
     info: Specs,
     polyhedron: Polyhedron,
     options: Options,
-    resultName: string,
+    result: Polyhedron,
   ): PartialOpResult | Polyhedron
 
   canApplyTo(info: PolyhedronSpecs): info is Specs
@@ -220,7 +220,12 @@ export default function makeOperation<
       ).canonicalName()
 
       // Get the actual operation result
-      const opResult = withDefaults.apply(info, polyhedron, options ?? {}, next)
+      const opResult = withDefaults.apply(
+        info,
+        polyhedron,
+        options ?? {},
+        Polyhedron.get(next),
+      )
       return normalizeOpResult(opResult, next)
     },
     getHitOption(polyhedron, hitPnt, options) {

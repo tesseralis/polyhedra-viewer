@@ -18,8 +18,7 @@ import {
 
 // TODO figure out a way to deduplicate these functions?
 // (or not)
-function doSemiExpansion(polyhedron: Polyhedron, referenceName: string) {
-  const reference = Polyhedron.get(referenceName)
+function doSemiExpansion(polyhedron: Polyhedron, reference: Polyhedron) {
   const largeFaceType = polyhedron.largestFace().numSides
   const referenceFace = reference.faceWithNumSides(largeFaceType)
   const referenceLength =
@@ -49,10 +48,9 @@ function doSemiExpansion(polyhedron: Polyhedron, referenceName: string) {
 
 function doExpansion(
   polyhedron: Polyhedron,
-  referenceName: string,
+  reference: Polyhedron,
   twist?: Twist,
 ) {
-  const reference = Polyhedron.get(referenceName)
   const n = polyhedron.getFace().numSides
   const duplicated = expandEdges(polyhedron, polyhedron.edges, twist)
 
