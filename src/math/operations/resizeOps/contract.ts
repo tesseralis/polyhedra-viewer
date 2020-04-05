@@ -55,19 +55,17 @@ function getContractLengthSemi(
 export function applyContract(
   info: Classical,
   polyhedron: Polyhedron,
-  { faceType = isBevelled(polyhedron) ? 6 : 3 }: Options,
+  { faceType = info.isBevelled() ? 6 : 3 }: Options,
   result: Polyhedron,
 ) {
-  const resultLength = isBevelled(polyhedron)
+  const resultLength = info.isBevelled()
     ? getContractLengthSemi(polyhedron, faceType, result)
     : getContractLength(info.data.family, polyhedron, faceType)
 
   // Take all the stuff and push it inwards
   const contractFaces = getExpandedFaces(polyhedron, faceType)
 
-  const angle = isBevelled(polyhedron)
-    ? 0
-    : -getSnubAngle(polyhedron, contractFaces)
+  const angle = info.isBevelled() ? 0 : -getSnubAngle(polyhedron, contractFaces)
 
   const endVertices = getResizedVertices(contractFaces, resultLength, angle)
   return {
@@ -76,14 +74,6 @@ export function applyContract(
       endVertices,
     },
   }
-}
-
-// TODO figure out how to get rid of this function
-function isBevelled(polyhedron: Polyhedron) {
-  return Classical.query.hasNameWhere(
-    polyhedron.name,
-    ({ operation }) => operation === "bevel",
-  )
 }
 
 // NOTE: We are using the same operation for contracting both expanded and snub solids.
@@ -120,10 +110,10 @@ export const contract = makeOperation<Classical, Options>("contract", {
   },
 
   hitOption: "faceType",
-  getHitOption({ geom }, hitPoint) {
+  getHitOption({ specs, geom }, hitPoint) {
     const hitFace = geom.hitFace(hitPoint)
     const faceType = hitFace.numSides as FaceType // TODO unsure if always valid
-    if (isBevelled(geom)) {
+    if (specs.isBevelled()) {
       const isValid = hitFace.numSides > 4
       return isValid ? { faceType } : {}
     }
@@ -131,8 +121,8 @@ export const contract = makeOperation<Classical, Options>("contract", {
     return isValid ? { faceType } : {}
   },
 
-  faceSelectionStates({ geom }, { faceType }) {
-    if (isBevelled(geom)) {
+  faceSelectionStates({ specs, geom }, { faceType }) {
+    if (specs.isBevelled()) {
       return geom.faces.map((face) => {
         if (faceType && face.numSides === faceType) {
           return "selected"
