@@ -203,6 +203,11 @@ export default function makeOperation<
     return [...validSpecs(polyhedron)]
   }
 
+  function getSolidArgs(polyhedron: Polyhedron) {
+    // TODO think of situations where just using the first entry won't work
+    return { specs: getValidSpecs(polyhedron)[0], geom: polyhedron }
+  }
+
   return {
     name,
 
@@ -231,9 +236,7 @@ export default function makeOperation<
     hitOption: opArgs.hitOption,
 
     getHitOption(geom, hitPnt, options) {
-      // TODO think of situations where this wouldn't be okay
-      const specs = getValidSpecs(geom)[0]
-      return opArgs.getHitOption({ specs, geom }, vec(hitPnt), options)
+      return opArgs.getHitOption(getSolidArgs(geom), vec(hitPnt), options)
     },
 
     canApplyTo(polyhedron) {
@@ -244,11 +247,8 @@ export default function makeOperation<
       return getValidSpecs(polyhedron).some(opArgs.hasOptions!)
     },
 
-    allOptions(geom, optionName) {
-      return opArgs.allOptions(
-        { specs: getValidSpecs(geom)[0], geom },
-        optionName,
-      )
+    allOptions(polyhedron, optionName) {
+      return opArgs.allOptions(getSolidArgs(polyhedron), optionName)
     },
 
     *allOptionCombos(geom) {
@@ -262,10 +262,7 @@ export default function makeOperation<
     },
 
     faceSelectionStates(geom, options) {
-      return opArgs.faceSelectionStates(
-        { specs: getValidSpecs(geom)[0], geom },
-        options,
-      )
+      return opArgs.faceSelectionStates(getSolidArgs(geom), options)
     },
   }
 }
