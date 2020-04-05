@@ -118,8 +118,8 @@ function doTruncate(
 }
 
 export const truncate = makeOperation<Classical>("truncate", {
-  apply(info, polyhedron, $, result) {
-    return doTruncate(info, polyhedron, false, result)
+  apply({ specs, geom }, $, result) {
+    return doTruncate(specs, geom, false, result)
   },
 
   canApplyTo(info): info is Classical {
@@ -127,14 +127,16 @@ export const truncate = makeOperation<Classical>("truncate", {
     return info.isRegular() || info.isRectified()
   },
 
-  getResult(info) {
-    return info.withData({ operation: info.isRegular() ? "truncate" : "bevel" })
+  getResult({ specs }) {
+    return specs.withData({
+      operation: specs.isRegular() ? "truncate" : "bevel",
+    })
   },
 })
 
 export const rectify = makeOperation<Classical>("rectify", {
-  apply(info, polyhedron) {
-    return doTruncate(info, polyhedron, true)
+  apply({ specs, geom }) {
+    return doTruncate(specs, geom, true)
   },
 
   canApplyTo(info): info is Classical {
@@ -142,7 +144,7 @@ export const rectify = makeOperation<Classical>("rectify", {
     return info.isRegular()
   },
 
-  getResult(info) {
-    return info.withData({ operation: "rectify" })
+  getResult({ specs }) {
+    return specs.withData({ operation: "rectify" })
   },
 })

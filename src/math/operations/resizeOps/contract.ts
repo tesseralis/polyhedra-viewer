@@ -88,8 +88,8 @@ function isBevelled(polyhedron: Polyhedron) {
 
 // NOTE: We are using the same operation for contracting both expanded and snub solids.
 export const contract = makeOperation<Classical, Options>("contract", {
-  apply(info, polyhedron, options, result) {
-    return applyContract(info, polyhedron, options, result)
+  apply({ specs, geom }, options, result) {
+    return applyContract(specs, geom, options, result)
   },
 
   canApplyTo(info): info is Classical {
@@ -97,10 +97,10 @@ export const contract = makeOperation<Classical, Options>("contract", {
     return info.isBevelled() || info.isCantellated() || info.isSnub()
   },
 
-  getResult(info, { faceType }) {
-    const isVertex = faceType === (info.isBevelled() ? 6 : 3)
-    return info.withData({
-      operation: info.isBevelled() ? "truncate" : "regular",
+  getResult({ specs }, { faceType }) {
+    const isVertex = faceType === (specs.isBevelled() ? 6 : 3)
+    return specs.withData({
+      operation: specs.isBevelled() ? "truncate" : "regular",
       facet: isVertex ? "vertex" : "face",
     })
   },
@@ -109,31 +109,31 @@ export const contract = makeOperation<Classical, Options>("contract", {
     return !info.isTetrahedral()
   },
 
-  *allOptionCombos(info) {
-    if (info.isTetrahedral()) {
+  *allOptionCombos({ specs }) {
+    if (specs.isTetrahedral()) {
       yield {}
     } else {
-      const multiplier = info.isBevelled() ? 2 : 1
+      const multiplier = specs.isBevelled() ? 2 : 1
       yield { faceType: (3 * multiplier) as any }
-      yield { faceType: (info.data.family * multiplier) as any }
+      yield { faceType: (specs.data.family * multiplier) as any }
     }
   },
 
   hitOption: "faceType",
-  getHitOption(polyhedron, hitPoint) {
-    const hitFace = polyhedron.hitFace(hitPoint)
+  getHitOption({ geom }, hitPoint) {
+    const hitFace = geom.hitFace(hitPoint)
     const faceType = hitFace.numSides as FaceType // TODO unsure if always valid
-    if (isBevelled(polyhedron)) {
+    if (isBevelled(geom)) {
       const isValid = hitFace.numSides > 4
       return isValid ? { faceType } : {}
     }
-    const isValid = isExpandedFace(polyhedron, hitFace)
+    const isValid = isExpandedFace(geom, hitFace)
     return isValid ? { faceType } : {}
   },
 
-  faceSelectionStates(polyhedron, { faceType }) {
-    if (isBevelled(polyhedron)) {
-      return polyhedron.faces.map((face) => {
+  faceSelectionStates({ geom }, { faceType }) {
+    if (isBevelled(geom)) {
+      return geom.faces.map((face) => {
         if (faceType && face.numSides === faceType) {
           return "selected"
         }
@@ -141,10 +141,9 @@ export const contract = makeOperation<Classical, Options>("contract", {
         return undefined
       })
     }
-    return polyhedron.faces.map((face) => {
-      if (faceType && isExpandedFace(polyhedron, face, faceType))
-        return "selected"
-      if (isExpandedFace(polyhedron, face)) return "selectable"
+    return geom.faces.map((face) => {
+      if (faceType && isExpandedFace(geom, face, faceType)) return "selected"
+      if (isExpandedFace(geom, face)) return "selectable"
       return undefined
     })
   },

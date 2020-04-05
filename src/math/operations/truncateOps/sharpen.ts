@@ -71,7 +71,7 @@ function getVertexToAdd(info: Classical, face: Face) {
 function applySharpen(
   info: Classical,
   polyhedron: Polyhedron,
-  { faceType = polyhedron.smallestFace().numSides }: SharpenOptions = {},
+  faceType: number = polyhedron.smallestFace().numSides,
 ) {
   // face indices with the right number of sides
   let sharpenFaces =
@@ -112,19 +112,21 @@ interface Options {
   faceType?: number
 }
 export const sharpen = makeOperation<Classical, Options>("sharpen", {
-  apply: applySharpen,
+  apply({ specs, geom }, { faceType }) {
+    return applySharpen(specs, geom, faceType)
+  },
 
   canApplyTo(info): info is Classical {
     if (!info.isClassical()) return false
     return ["truncate", "rectify", "bevel"].includes(info.data.operation)
   },
 
-  getResult(info, { faceType }) {
-    if (info.isTruncated()) return info.withData({ operation: "regular" })
-    if (info.isBevelled()) return info.withData({ operation: "rectify" })
+  getResult({ specs }, { faceType }) {
+    if (specs.isTruncated()) return specs.withData({ operation: "regular" })
+    if (specs.isBevelled()) return specs.withData({ operation: "rectify" })
 
     // if rectified, we have to figure out the facet from the faceType
-    return info.withData({
+    return specs.withData({
       operation: "regular",
       facet: faceType === 3 ? "face" : "vertex",
     })
@@ -134,23 +136,23 @@ export const sharpen = makeOperation<Classical, Options>("sharpen", {
     return !info.isTetrahedral() && info.isRectified()
   },
 
-  *allOptionCombos(info) {
-    if (info.isRectified() && !info.isTetrahedral()) {
+  *allOptionCombos({ specs }) {
+    if (specs.isRectified() && !specs.isTetrahedral()) {
       yield { faceType: 3 }
-      yield { faceType: info.data.family }
+      yield { faceType: specs.data.family }
     } else {
       yield {}
     }
   },
 
   hitOption: "faceType",
-  getHitOption(polyhedron, hitPoint) {
-    const n = polyhedron.hitFace(hitPoint).numSides
+  getHitOption({ geom }, hitPoint) {
+    const n = geom.hitFace(hitPoint).numSides
     return n <= 5 ? { faceType: n } : {}
   },
 
-  faceSelectionStates(polyhedron, { faceType = -1 }) {
-    return polyhedron.faces.map((face) => {
+  faceSelectionStates({ geom }, { faceType = -1 }) {
+    return geom.faces.map((face) => {
       if (face.numSides === faceType) return "selected"
       return "selectable"
     })

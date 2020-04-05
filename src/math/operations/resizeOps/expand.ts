@@ -82,11 +82,11 @@ function doExpansion(
 }
 
 export const expand = makeOperation<Classical>("expand", {
-  apply(info, polyhedron, $, result) {
-    if (info.isTruncated()) {
-      return doSemiExpansion(polyhedron, result)
+  apply({ specs, geom }, $, result) {
+    if (specs.isTruncated()) {
+      return doSemiExpansion(geom, result)
     }
-    return doExpansion(polyhedron, result)
+    return doExpansion(geom, result)
   },
 
   canApplyTo(info): info is Classical {
@@ -94,9 +94,9 @@ export const expand = makeOperation<Classical>("expand", {
     return info.isRegular() || info.isTruncated()
   },
 
-  getResult(info) {
-    return info.withData({
-      operation: info.isRegular() ? "cantellate" : "bevel",
+  getResult({ specs }) {
+    return specs.withData({
+      operation: specs.isRegular() ? "cantellate" : "bevel",
     })
   },
 })
@@ -105,16 +105,16 @@ interface SnubOpts {
   twist: Twist
 }
 export const snub = makeOperation<Classical, SnubOpts>("snub", {
-  apply(info, polyhedron, { twist = "left" }, result) {
-    return doExpansion(polyhedron, result, twist)
+  apply({ geom }, { twist = "left" }, result) {
+    return doExpansion(geom, result, twist)
   },
 
   canApplyTo(info): info is Classical {
     return info.isClassical() && info.isRegular()
   },
 
-  getResult(info) {
-    return info.withData({ operation: "snub" })
+  getResult({ specs }) {
+    return specs.withData({ operation: "snub" })
   },
 
   hasOptions(info) {
@@ -128,17 +128,17 @@ export const snub = makeOperation<Classical, SnubOpts>("snub", {
 })
 
 export const dual = makeOperation<Classical>("dual", {
-  apply(info, polyhedron) {
+  apply({ geom }) {
     // Scale to create a dual polyhedron with the same midradius
     const scale = (() => {
-      const f = polyhedron.getFace().distanceToCenter()
-      const e = polyhedron.getEdge().distanceToCenter()
+      const f = geom.getFace().distanceToCenter()
+      const e = geom.getEdge().distanceToCenter()
       return (e * e) / (f * f)
     })()
-    const duplicated = expandEdges(polyhedron, polyhedron.edges)
-    const faces = take(duplicated.faces, polyhedron.numFaces())
+    const duplicated = expandEdges(geom, geom.edges)
+    const faces = take(duplicated.faces, geom.numFaces())
     const endVertices = getTransformedVertices(faces, (f) =>
-      withOrigin(polyhedron.centroid(), (v) => v.scale(scale))(f.centroid()),
+      withOrigin(geom.centroid(), (v) => v.scale(scale))(f.centroid()),
     )
 
     return {
@@ -153,8 +153,8 @@ export const dual = makeOperation<Classical>("dual", {
     return info.isClassical() && info.isRegular()
   },
 
-  getResult(info) {
-    if (info.isTetrahedral()) return info
-    return info.withData({ facet: info.isFace() ? "vertex" : "face" })
+  getResult({ specs }) {
+    if (specs.isTetrahedral()) return specs
+    return specs.withData({ facet: specs.isFace() ? "vertex" : "face" })
   },
 })

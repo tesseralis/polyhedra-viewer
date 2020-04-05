@@ -345,11 +345,11 @@ interface Options {
   using?: string
 }
 export const augment = makeOperation<AugmentSpecs, Options>("augment", {
-  apply(info, polyhedron, { face, gyrate, using }) {
+  apply({ specs, geom }, { face, gyrate, using }) {
     const augmentType = using
       ? getUsingType(using)
       : defaultAugmentType(face.numSides)
-    return doAugment(info, polyhedron, face, augmentType, gyrate)
+    return doAugment(specs, geom, face, augmentType, gyrate)
   },
 
   canApplyTo(info): info is AugmentSpecs {
@@ -398,50 +398,50 @@ export const augment = makeOperation<AugmentSpecs, Options>("augment", {
     return true
   },
 
-  getResult(info, { face, using, gyrate }, polyhedron) {
+  getResult({ specs, geom }, { face, using, gyrate }) {
     const n = face.numSides
     const { type, base } = getUsingData(getUsingOpt(n, using))
-    if (info.isPrismatic()) {
+    if (specs.isPrismatic()) {
       return Capstone.query.withData({
         count: 1,
-        elongation: info.data.type,
+        elongation: specs.data.type,
         type,
         base: base as any,
       })
     }
-    if (info.isCapstone()) {
-      return info.withData({
+    if (specs.isCapstone()) {
+      return specs.withData({
         count: 2,
         gyrate: base === 2 ? "gyro" : gyrate,
-        type: type === info.data.type ? type : "cupolarotunda",
+        type: type === specs.data.type ? type : "cupolarotunda",
       })
     }
-    if (info.isComposite()) {
-      const { source, augmented, diminished, gyrate: gyrated } = info.data
+    if (specs.isComposite()) {
+      const { source, augmented, diminished, gyrate: gyrated } = specs.data
       if (source.canonicalName() === "rhombicosidodecahedron") {
         if (gyrate === "ortho") {
-          return info.withData({
+          return specs.withData({
             gyrate: inc(gyrated),
             diminished: dec(diminished),
           })
         } else {
-          return info.withData({ diminished: dec(diminished), align: "meta" })
+          return specs.withData({ diminished: dec(diminished), align: "meta" })
         }
       }
       if (source.canonicalName() === "icosahedron") {
         if (base === 3) {
-          return info.withData({ augmented: 1 })
+          return specs.withData({ augmented: 1 })
         }
-        return info.withData({ diminished: dec(diminished), align: "meta" })
+        return specs.withData({ diminished: dec(diminished), align: "meta" })
       }
-      return info.withData({
+      return specs.withData({
         augmented: inc(augmented),
-        align: hasAugmentAlignment(info)
-          ? getAugmentAlignment(polyhedron, face)
+        align: hasAugmentAlignment(specs)
+          ? getAugmentAlignment(geom, face)
           : undefined,
       })
     }
-    if (info.isElementary()) {
+    if (specs.isElementary()) {
       return Elementary.query.withName("augmented sphenocorona")
     }
     throw new Error()
@@ -451,11 +451,11 @@ export const augment = makeOperation<AugmentSpecs, Options>("augment", {
     return true
   },
 
-  *allOptionCombos(info, polyhedron) {
-    const gyrateOpts = hasGyrateOpts(info) ? allGyrateOpts : [undefined]
+  *allOptionCombos({ specs, geom }) {
+    const gyrateOpts = hasGyrateOpts(specs) ? allGyrateOpts : [undefined]
 
-    const usingOpts = getUsingOpts(info) ?? [undefined]
-    const faceOpts = polyhedron.faces.filter((face) => canAugment(face))
+    const usingOpts = getUsingOpts(specs) ?? [undefined]
+    const faceOpts = geom.faces.filter((face) => canAugment(face))
 
     for (const face of faceOpts) {
       for (const gyrate of gyrateOpts) {
@@ -469,9 +469,9 @@ export const augment = makeOperation<AugmentSpecs, Options>("augment", {
   },
 
   hitOption: "face",
-  getHitOption(polyhedron, hitPnt, options) {
+  getHitOption({ geom }, hitPnt, options) {
     if (!options) return {}
-    const face = polyhedron.hitFace(hitPnt)
+    const face = geom.hitFace(hitPnt)
     if (!options.using) {
       return canAugment(face) ? { face } : {}
     }
@@ -481,8 +481,8 @@ export const augment = makeOperation<AugmentSpecs, Options>("augment", {
     return { face }
   },
 
-  faceSelectionStates(polyhedron, { face, using }) {
-    return polyhedron.faces.map((f) => {
+  faceSelectionStates({ geom }, { face, using }) {
+    return geom.faces.map((f) => {
       if (face && f.equals(face)) return "selected"
 
       if (!using && canAugment(f)) return "selectable"
@@ -492,14 +492,14 @@ export const augment = makeOperation<AugmentSpecs, Options>("augment", {
     })
   },
 
-  allOptions(info, polyhedron, optionName) {
+  allOptions({ specs, geom }, optionName) {
     switch (optionName) {
       case "gyrate":
-        return hasGyrateOpts(info) ? allGyrateOpts : []
+        return hasGyrateOpts(specs) ? allGyrateOpts : []
       case "using":
-        return getUsingOpts(info) ?? []
+        return getUsingOpts(specs) ?? []
       case "face":
-        return polyhedron.faces.filter((face) => canAugment(face))
+        return geom.faces.filter((face) => canAugment(face))
     }
   },
 

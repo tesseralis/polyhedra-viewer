@@ -18,7 +18,7 @@ export default function useSolidContext() {
     isTransitioning,
     faceColors = [],
   } = TransitionCtx.useState()
-  const { operation, options } = OperationCtx.useState()
+  const { operation, options = {} } = OperationCtx.useState()
 
   // TODO I'm trying to useMemo here so it's similar to reselect?
   // but is that a bad idea?
@@ -34,7 +34,7 @@ export default function useSolidContext() {
   // Colors when in operation mode and hit options are being selected
   const operationColors = useMemo(() => {
     if (!operation) return
-    const selectState = operation.faceSelectionStates(polyhedron, options!)
+    const selectState = operation.faceSelectionStates(polyhedron, options)
     return polyhedron.faces.map((face, i) => {
       switch (selectState[i]) {
         case "selected":
