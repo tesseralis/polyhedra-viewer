@@ -15,7 +15,7 @@ jobs:
     steps:
       - checkout
       - node/install-packages
-      - npm test -- --runInBand
+      - run: npm test -- --runInBand
 workflows:
   build-and-test:
     jobs:
