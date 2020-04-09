@@ -8,7 +8,7 @@ jobs:
     steps:
       - checkout
       - node/install-packages
-      - npm run lint
+      - run: npm run lint
   test:
     executor:
       name: node/default
