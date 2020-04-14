@@ -37,7 +37,7 @@ function ShareText() {
 }
 
 function ShareLink({ url, icon, name }: typeof links[0]) {
-  const css = useStyle({ fill: "DimGrey" })
+  const css = useStyle({ color: "DimGrey" })
   return (
     <ExternalLink
       {...css()}
