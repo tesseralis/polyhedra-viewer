@@ -1,10 +1,7 @@
-import { capitalize } from "lodash-es"
-
 import React, { useEffect } from "react"
-import { Route, Redirect } from "react-router-dom"
 
 import { Polyhedron } from "math/polyhedra"
-import { usePageTitle, wrapProviders } from "components/common"
+import { wrapProviders } from "components/common"
 import { OperationCtx, TransitionCtx, PolyhedronCtx } from "./context"
 import DesktopViewer from "./DesktopViewer"
 import MobileViewer from "./MobileViewer"
@@ -13,24 +10,22 @@ import useMediaInfo from "components/useMediaInfo"
 interface InnerProps {
   solid: string
   panel: string
-  action: string
+  goBack?: boolean
 }
 
-function InnerViewer({ solid, panel, action }: InnerProps) {
+function InnerViewer({ solid, panel, goBack = false }: InnerProps) {
   const { unsetOperation } = OperationCtx.useActions()
   const { setPolyhedron } = PolyhedronCtx.useActions()
-  usePageTitle(`${capitalize(solid)} - Polyhedra Viewer`)
-
   useEffect(() => {
     // Whenever we navigate back, unset the operation and reset the polyhedron
-    if (action === "POP") {
+    if (goBack) {
       unsetOperation()
       // TODO track the history of the polyhedron states and keep a "stack" of operations
       setPolyhedron(Polyhedron.get(solid))
       // TODO cancel animations when switching panels
       // (I don't think I've ever had that happen so low prio)
     }
-  }, [action, solid, unsetOperation, setPolyhedron])
+  }, [goBack, solid, unsetOperation, setPolyhedron])
 
   // If we're not on the operations panel, the solid data is determined
   // by the URL.
@@ -43,44 +38,19 @@ function InnerViewer({ solid, panel, action }: InnerProps) {
 
   const { device } = useMediaInfo()
 
-  const Viewer = device === "desktop" ? DesktopViewer : MobileViewer
+  const ViewerComponent = device === "desktop" ? DesktopViewer : MobileViewer
 
-  return <Viewer solid={solid} panel={panel} />
-}
-
-interface Props {
-  solid: string
-  url: string
+  return <ViewerComponent solid={solid} panel={panel} />
 }
 
 const Providers = wrapProviders([TransitionCtx.Provider, OperationCtx.Provider])
 
-export default function Viewer({ solid, url }: Props) {
+export default function Viewer({ solid, panel, goBack }: InnerProps) {
   return (
-    <>
-      <Route
-        exact
-        path={url}
-        render={() => <Redirect to={`${url}/operations`} />}
-      />
-      <Route
-        path={`${url}/:panel`}
-        render={({ match, history }) => {
-          const { panel } = match.params
-
-          return (
-            <PolyhedronCtx.Provider name={solid}>
-              <Providers>
-                <InnerViewer
-                  action={history.action}
-                  solid={solid}
-                  panel={panel ?? ""}
-                />
-              </Providers>
-            </PolyhedronCtx.Provider>
-          )
-        }}
-      />
-    </>
+    <PolyhedronCtx.Provider name={solid}>
+      <Providers>
+        <InnerViewer solid={solid} panel={panel} goBack={goBack} />
+      </Providers>
+    </PolyhedronCtx.Provider>
   )
 }

@@ -2,7 +2,7 @@ import React from "react"
 import { useStyle, scales } from "styles"
 
 import { media, fonts } from "styles"
-import { OperationCtx } from "components/Viewer/context"
+import { OperationCtx } from "components/ViewerPage/context"
 
 function getMessage(opName: string) {
   switch (opName) {

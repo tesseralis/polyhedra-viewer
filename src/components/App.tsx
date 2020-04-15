@@ -11,7 +11,7 @@ import ErrorPage from "./ErrorPage"
 import Loading from "./Loading"
 
 const HomePage = React.lazy(() => import("./HomePage"))
-const Viewer = React.lazy(() => import("./Viewer"))
+const ViewerPage = React.lazy(() => import("./ViewerPage"))
 
 const unescapeName = (name: string) => name.replace(/-/g, " ")
 
@@ -49,7 +49,7 @@ export default () => (
             return <Redirect to={newPath} />
           }
           if (isValidSolid(solid)) {
-            return <Viewer solid={solid} url={match.url} />
+            return <ViewerPage solid={solid} url={match.url} />
           }
           return <ErrorPage />
         }}
