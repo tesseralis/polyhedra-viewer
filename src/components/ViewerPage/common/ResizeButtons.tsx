@@ -1,7 +1,7 @@
 import React, { ButtonHTMLAttributes } from "react"
 import { useStyle, scales } from "styles"
 
-import { TransitionCtx, PolyhedronCtx } from "components/Viewer/context"
+import { TransitionCtx, PolyhedronCtx } from "components/ViewerPage/context"
 
 import { Polyhedron } from "math/polyhedra"
 import { andaleMono } from "styles/fonts"

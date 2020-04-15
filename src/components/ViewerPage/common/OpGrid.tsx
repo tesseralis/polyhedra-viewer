@@ -11,7 +11,7 @@ import {
   OperationCtx,
   TransitionCtx,
   PolyhedronCtx,
-} from "components/Viewer/context"
+} from "components/ViewerPage/context"
 import OperationIcon from "./OperationIcon"
 
 const opLayout: OpName[][] = [
