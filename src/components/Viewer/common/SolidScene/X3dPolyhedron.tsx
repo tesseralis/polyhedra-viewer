@@ -110,16 +110,7 @@ export default function X3dPolyhedron({
   return (
     <>
       {showFaces && (
-        // NOTE: The mouse handlers are duplicated to make it easy to test on enzyme.
-        // They don't actually do anything in production
-        <shape
-          is="x3d"
-          ref={shape}
-          onMouseDown={listeners.mousedown}
-          onMouseMove={listeners.mousemove}
-          onMouseUp={listeners.mouseup}
-          onMouseOut={listeners.mouseout}
-        >
+        <shape is="x3d" data-testid="polyhedron-faces" ref={shape}>
           <appearance is="x3d">
             <material is="x3d" transparency={1 - opacity} />
           </appearance>
