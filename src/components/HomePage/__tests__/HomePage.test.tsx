@@ -6,16 +6,24 @@ import { BrowserRouter } from "react-router-dom"
 jest.mock("components/useMediaInfo")
 const { DeviceProvider } = require("components/useMediaInfo")
 
+function renderHomePage(media: any) {
+  return render(
+    <DeviceProvider value={media}>
+      <BrowserRouter>
+        <HomePage />
+      </BrowserRouter>
+    </DeviceProvider>,
+  )
+}
+
 describe("HomePage", () => {
-  it("generates a compact view on mobile vertical", () => {
-    //
-    render(
-      <DeviceProvider value={{ device: "mobile", orientation: "portrait" }}>
-        <BrowserRouter>
-          <HomePage />
-        </BrowserRouter>
-      </DeviceProvider>,
-    )
+  it("displays the full table list on desktop", () => {
+    renderHomePage({ device: "desktop" })
+    expect(screen.queryByText(/Gyrate and Diminished/)).toBeInTheDocument()
+  })
+
+  it("displays split tables on mobile vertical", () => {
+    renderHomePage({ device: "mobile", orientation: "portrait" })
     expect(screen.queryByText(/Bipyramids,/)).toBeInTheDocument()
     expect(screen.queryByText(/Gyrate Rhombicos/)).toBeInTheDocument()
   })
