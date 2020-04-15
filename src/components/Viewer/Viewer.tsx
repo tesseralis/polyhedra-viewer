@@ -21,16 +21,16 @@ function InnerViewer({ solid, panel, action }: InnerProps) {
   const { setPolyhedron } = PolyhedronCtx.useActions()
   usePageTitle(`${capitalize(solid)} - Polyhedra Viewer`)
 
-  // TODO I wish we could make this less verbose...
-
-  // Unset operation if we move away from the operations panel
   useEffect(() => {
-    if (panel !== "operations" || action === "POP") {
+    // Whenever we navigate back, unset the operation and reset the polyhedron
+    if (action === "POP") {
       unsetOperation()
+      // TODO track the history of the polyhedron states and keep a "stack" of operations
+      setPolyhedron(Polyhedron.get(solid))
       // TODO cancel animations when switching panels
       // (I don't think I've ever had that happen so low prio)
     }
-  }, [panel, action, unsetOperation])
+  }, [action, solid, unsetOperation, setPolyhedron])
 
   // If we're not on the operations panel, the solid data is determined
   // by the URL.
@@ -40,12 +40,6 @@ function InnerViewer({ solid, panel, action }: InnerProps) {
     // we want to keep the current data.
     // eslint-disable-next-line
   }, [solid, setPolyhedron])
-
-  // Reset the polyhedron whenever we go back.
-  // We may replace this with a "stack".
-  useEffect(() => {
-    if (action === "POP") setPolyhedron(Polyhedron.get(solid))
-  }, [solid, action, setPolyhedron])
 
   const { device } = useMediaInfo()
 
