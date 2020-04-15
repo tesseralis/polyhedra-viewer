@@ -81,7 +81,14 @@ const OpButton = memo(function ({ name, disabled }: Props) {
 })
 
 export default function OpGrid() {
+  const { unsetOperation } = OperationCtx.useActions()
   const { isTransitioning } = TransitionCtx.useState()
+
+  React.useEffect(() => {
+    return () => {
+      unsetOperation()
+    }
+  }, [unsetOperation])
   const css = useStyle({
     [media.notMobile]: {
       display: "grid",
