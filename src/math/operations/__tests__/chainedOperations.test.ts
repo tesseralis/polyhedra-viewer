@@ -1,11 +1,65 @@
-import { Polyhedron } from "math/polyhedra"
-import { operations } from "math/operations"
+import { Polyhedron, Cap } from "math/polyhedra"
+import { OpName, operations } from "math/operations"
 import { setupOperations } from "../operationTestUtils"
 
 setupOperations()
 
+interface Args {
+  faceType?: number
+  face?: number
+  cap?: boolean
+}
+
+type OpInfoArray = [OpName, string]
+
+interface OpInfoObject {
+  op: OpName
+  args: Args
+  expected: string
+}
+
+type OpInfo = OpInfoArray | OpInfoObject
+
+// Translate the test argument into an operation argument
+function getArgs(args: Args, polyhedron: Polyhedron) {
+  if (args.face) {
+    return { ...args, face: polyhedron.faceWithNumSides(args.face) }
+  }
+  if (args.cap) {
+    return { ...args, cap: Cap.getAll(polyhedron)[0] }
+  }
+  return args
+}
+
+function getOpInfo(opInfo: OpInfo, polyhedron: Polyhedron) {
+  if (Array.isArray(opInfo)) {
+    return { op: operations[opInfo[0]], expected: opInfo[1] }
+  }
+  const { op, args, expected } = opInfo
+  return {
+    op: operations[op],
+    expected,
+    args: getArgs(args, polyhedron),
+  }
+}
+
+interface OpTest {
+  description: string
+  start: string
+  operations: OpInfo[]
+}
+
 describe("chained tests", () => {
-  const tests = [
+  const tests: OpTest[] = [
+    {
+      description: "pyramid operations",
+      start: "square pyramid",
+      operations: [
+        { op: "augment", args: { face: 4 }, expected: "octahedron" },
+        { op: "diminish", args: { cap: true }, expected: "square pyramid" },
+        ["elongate", "elongated square pyramid"],
+      ],
+    },
     {
       description: "combining twist and turn operations",
       start: "elongated pentagonal bipyramid",
@@ -20,7 +74,7 @@ describe("chained tests", () => {
       description: "augmenting and contracting icosahedron",
       start: "gyroelongated pentagonal pyramid",
       operations: [
-        { op: "augment", args: { n: 5 }, expected: "icosahedron" },
+        { op: "augment", args: { face: 5 }, expected: "icosahedron" },
         ["contract", "tetrahedron"],
       ],
     },
@@ -57,58 +111,39 @@ describe("chained tests", () => {
         ["truncate", "truncated cube"],
         {
           op: "augment",
-          args: { n: 8 },
+          args: { face: 8 },
           expected: "augmented truncated cube",
         },
       ],
     },
-    // {
-    //   description: "rhombicosidodecahedron",
-    //   start: "dodecahedron",
-    //   operations: [
-    //     ["expand", "rhombicosidodecahedron"],
-    //     {
-    //       op: "diminish",
-    //       args: {},
-    //       expected: "diminished rhombicosidodecahedron",
-    //     },
-    //   ],
-    // },
+    {
+      description: "dodecahedron -> expand -> diminish",
+      start: "dodecahedron",
+      operations: [
+        ["expand", "rhombicosidodecahedron"],
+        {
+          op: "diminish",
+          args: { cap: true },
+          expected: "diminished rhombicosidodecahedron",
+        },
+      ],
+    },
   ]
 
-  function getArgs(args, polyhedron) {
-    if (args.n) {
-      return { face: polyhedron.faceWithNumSides(args.n) }
-    }
-    return args
-  }
-
-  function getOpInfo(opInfo, polyhedron) {
-    if (Array.isArray(opInfo)) {
-      return { op: operations[opInfo[0]], expected: opInfo[1] }
-    }
-    const { op, args, expected } = opInfo
-    return {
-      op: operations[op],
-      expected,
-      args: getArgs(args, polyhedron),
-    }
-  }
-
-  tests.forEach((test) => {
+  for (const test of tests) {
     const { start, description, operations } = test
     let polyhedron = Polyhedron.get(start)
-    let solidName = start
     it(description, () => {
       operations.forEach((opInfo) => {
         const { op, args, expected } = getOpInfo(opInfo, polyhedron)
-        const result = op.apply(polyhedron, args)
+
+        expect(op.canApplyTo(polyhedron)).toBeTruthy()
+        const result = op.apply(polyhedron, args as any)
         expect(result).toBeValidPolyhedron()
 
         polyhedron = result.result
         expect(polyhedron.name).toBe(expected)
-        solidName = result.name
       })
     })
-  })
+  }
 })

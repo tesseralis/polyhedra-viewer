@@ -101,21 +101,6 @@ xdescribe("viewer", () => {
       .expectTransitionTo("pentagonal orthobicupola")
   })
 
-  it("can transition through a pyramid series", () => {
-    setup("square pyramid")
-
-    page
-      .clickButtonWithText("augment")
-      .clickFaceWithNumSides(4)
-      .expectTransitionTo("octahedron")
-      .clickButtonWithText("diminish")
-      .clickFaceWithNumSides(3)
-      .expectTransitionTo("square pyramid")
-      .clickButtonWithText("elongate")
-      .expectTransitionTo("elongated square pyramid")
-      .clickButtonWithText("augment")
-  })
-
   it("can augment triangular prism with pyramid and cupola", () => {
     setup("triangular-prism")
     page
@@ -152,16 +137,6 @@ xdescribe("viewer", () => {
       .clickButtonWithText("ortho")
       .clickFaceWithNumSides(10)
       .expectTransitionTo("trigyrate rhombicosidodecahedron")
-  })
-
-  it("can go through an expansion workflow", () => {
-    setup("dodecahedron")
-    page
-      .clickButtonWithText("expand")
-      .expectTransitionTo("rhombicosidodecahedron")
-      .clickButtonWithText("diminish")
-      .clickAnyFace()
-      .expectTransitionTo("diminished rhombicosidodecahedron")
   })
 
   // TODO the test is broken most likely due to history being mutable.
