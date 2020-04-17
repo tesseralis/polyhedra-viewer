@@ -62,6 +62,18 @@ describe("chained tests", () => {
         },
       ],
     },
+    // {
+    //   description: "rhombicosidodecahedron",
+    //   start: "dodecahedron",
+    //   operations: [
+    //     ["expand", "rhombicosidodecahedron"],
+    //     {
+    //       op: "diminish",
+    //       args: {},
+    //       expected: "diminished rhombicosidodecahedron",
+    //     },
+    //   ],
+    // },
   ]
 
   function getArgs(args, polyhedron) {

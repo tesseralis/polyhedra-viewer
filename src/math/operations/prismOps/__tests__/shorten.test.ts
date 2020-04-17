@@ -10,6 +10,18 @@ function expectHasOptions(name: string, value: boolean = true) {
 }
 
 describe("shorten", () => {
+  describe("apply", () => {
+    it("applies left and right options correctly", () => {
+      const polyhedron = Polyhedron.get("gyroelongated pentagonal bicupola")
+      expect(shorten.apply(polyhedron, { twist: "right" }).result.name).toEqual(
+        "pentagonal gyrobicupola",
+      )
+      expect(shorten.apply(polyhedron, { twist: "left" }).result.name).toEqual(
+        "pentagonal orthobicupola",
+      )
+    })
+  })
+
   describe("canApplyTo", () => {
     it("works on nonshortened capstones", () => {
       // elongated and gyroelongated capstones

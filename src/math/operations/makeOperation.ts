@@ -215,8 +215,11 @@ export default function makeOperation<
       const specs = getValidSpecs(geom).find((info) =>
         opArgs.isPreferredSpec(info, options),
       )
-      if (!specs)
-        throw new Error(`Could not find specs for polyhedron ${geom.name}`)
+      if (!specs) {
+        throw new Error(
+          `Could not find specs for polyhedron ${geom.name}. Are you sure you can apply this operation to this polyhedron?`,
+        )
+      }
 
       // get the next polyhedron name
       const next = opArgs.getResult!(

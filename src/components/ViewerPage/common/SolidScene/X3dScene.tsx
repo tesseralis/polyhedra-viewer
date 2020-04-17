@@ -25,8 +25,8 @@ export default function X3dScene({ label, children }: Props) {
       // so we have to manually fix things
       if (x3d.current) {
         const canvas = x3d.current.querySelector("canvas")
-        canvas.setAttribute("tabIndex", -1)
-        canvas.setAttribute("aria-label", label)
+        canvas?.setAttribute("tabIndex", -1)
+        canvas?.setAttribute("aria-label", label)
       }
     })
   }, [label])

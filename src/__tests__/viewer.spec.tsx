@@ -1,7 +1,7 @@
 import ViewerPage from "pages/ViewerPage"
 import { PageOptions } from "pages/AppPage"
 
-describe("viewer", () => {
+xdescribe("viewer", () => {
   let page: ViewerPage
 
   function setup(solid = "tetrahedron", panel?: string, options?: PageOptions) {

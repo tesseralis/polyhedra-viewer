@@ -10,6 +10,18 @@ function expectHasOptions(name: string, value: boolean = true) {
 }
 
 describe("turn", () => {
+  describe("apply", () => {
+    it("applies twist left and right correctly", () => {
+      const polyhedron = Polyhedron.get("gyroelongated pentagonal bicupola")
+      expect(turn.apply(polyhedron, { twist: "right" }).result.name).toEqual(
+        "elongated pentagonal gyrobicupola",
+      )
+      expect(turn.apply(polyhedron, { twist: "left" }).result.name).toEqual(
+        "elongated pentagonal orthobicupola",
+      )
+    })
+  })
+
   describe("canApplyTo", () => {
     it("works on prismatics", () => {
       expectApplyTo("cube")
