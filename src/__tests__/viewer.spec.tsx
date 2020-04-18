@@ -74,33 +74,6 @@ xdescribe("viewer", () => {
       .expectTransitionTo("tetrahedron")
   })
 
-  it("shows options on snub only when chiral options available", () => {
-    setup("tetrahedron")
-
-    page
-      .clickButtonWithText("snub")
-      .expectTransitionTo("icosahedron")
-      .clickButtonWithText("snub")
-      .clickButtonWithText("left")
-      .expectTransitionTo("snub dodecahedron")
-  })
-
-  it("twists things left and right correctly", () => {
-    setup("gyroelongated pentagonal bicupola")
-
-    page
-      .clickButtonWithText("shorten")
-      .clickButtonWithText("right")
-      .expectTransitionTo("pentagonal gyrobicupola")
-
-    setup("gyroelongated pentagonal bicupola")
-
-    page
-      .clickButtonWithText("shorten")
-      .clickButtonWithText("left")
-      .expectTransitionTo("pentagonal orthobicupola")
-  })
-
   it("can augment triangular prism with pyramid and cupola", () => {
     setup("triangular-prism")
     page

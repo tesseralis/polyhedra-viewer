@@ -40,9 +40,7 @@ export default function useApplyOperation() {
 
       transition(result, animationData)
       history.push(`/${escape(result.name)}/operations`)
-      if (typeof callback === "function") {
-        callback(result)
-      }
+      callback?.(result)
     },
     [polyhedron, history, transition, setOperation, unsetOperation],
   )

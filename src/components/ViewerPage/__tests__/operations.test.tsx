@@ -4,6 +4,8 @@ import { render, screen, fireEvent, cleanup } from "@testing-library/react"
 import { BrowserRouter } from "react-router-dom"
 import Viewer from "../Viewer"
 
+jest.mock("transition")
+
 // FIXME wait for transition to occur
 // FIXME enable clicking on a face
 
@@ -15,6 +17,14 @@ function renderViewer(solid: string) {
   )
 }
 
+function clickOperation(operation: string) {
+  fireEvent.click(screen.getByText(operation))
+}
+
+function clickFaceWithNumSides() {
+  //
+}
+
 describe("Viewer operations panel", () => {
   it("disables operations that cannot be applied to the current polyhedron", () => {
     renderViewer("tetrahedron")
@@ -23,8 +33,23 @@ describe("Viewer operations panel", () => {
 
   it("unsets the operation when clicking an op button twice", () => {
     renderViewer("tetrahedron")
-    fireEvent.click(screen.getByText("augment"))
-    fireEvent.click(screen.getByText("augment"))
+    clickOperation("augment")
+    clickOperation("augment")
+    expect(screen.queryByText("Select a face")).not.toBeInTheDocument()
+  })
+
+  it("immediately applies operations without options", () => {
+    renderViewer("tetrahedron")
+    clickOperation("elongate")
+    expect(
+      screen.queryByText("Elongated triangular pyramid"),
+    ).toBeInTheDocument()
+  })
+
+  it("unsets the operation and options when choosing a different operation without options", () => {
+    renderViewer("tetrahedron")
+    clickOperation("augment")
+    clickOperation("elongate")
     expect(screen.queryByText("Select a face")).not.toBeInTheDocument()
   })
 
@@ -33,14 +58,7 @@ describe("Viewer operations panel", () => {
     // page.clickButtonWithText("diminish").clickFaceWithNumSides(6)
   })
 
-  it("unsets the operation and options when choosing a different operation without options", () => {
-    renderViewer("tetrahedron")
-    fireEvent.click(screen.getByText("augment"))
-    fireEvent.click(screen.getByText("elongate"))
-    expect(screen.queryByText("Select a face")).not.toBeInTheDocument()
-  })
-
-  it("unsets the operation and when there are no more valid options", () => {
+  it("unsets the operation and options when there are no more valid options", () => {
     // setup("cuboctahedron")
     // page
     //   .clickButtonWithText("sharpen")
@@ -51,21 +69,64 @@ describe("Viewer operations panel", () => {
 
   xit("unsets the operation when clicking on a different tab", () => {
     renderViewer("tetrahedron")
-    fireEvent.click(screen.getByText("augment"))
+    clickOperation("augment")
     fireEvent.click(screen.getByText("Options"))
     // FIXME
     // fireEvent.click(screen.getByText("Operations"))
     expect(screen.queryByText("Select a face")).not.toBeInTheDocument()
   })
 
-  it("shows options on snub only when chiral options are available", () => {
-    // renderViewer("tetrahedron")
-    // fireEvent.click(screen.getByText("snub"))
-    // expect(screen.queryByText("icosahedron")).toBeInTheDocument()
+  // should just be a test that twist options appear
+  it("correctly displays twist operations", () => {
     renderViewer("icosahedron")
-    fireEvent.click(screen.getByText("snub"))
+    clickOperation("snub")
     expect(screen.queryByText("left")).toBeInTheDocument()
+    expect(screen.queryByText("right")).toBeInTheDocument()
+    // TODO apply the operation
+    // TODO better for `turn` which gives different polyhedra options
   })
 
-  // FIXME implement "workflow" functions
+  describe("augment options", () => {
+    it("correctly displays gyrate options", () => {
+      renderViewer("triangular cupola")
+      clickOperation("augment")
+      expect(screen.queryByText("ortho")).toBeInTheDocument()
+      expect(screen.queryByText("gyro")).toBeInTheDocument()
+      // TODO click on one of them and make sure it's selected
+    })
+
+    it("does not display gyrate options when unavailable", () => {
+      renderViewer("square pyramid")
+      clickOperation("augment")
+      expect(screen.queryByText("ortho")).not.toBeInTheDocument()
+      expect(screen.queryByText("gyro")).not.toBeInTheDocument()
+    })
+
+    it("correctly displays using options for cupola-rotundae", () => {
+      renderViewer("pentagonal cupola")
+      clickOperation("augment")
+      expect(screen.queryByText("cupola")).toBeInTheDocument()
+      expect(screen.queryByText("rotunda")).toBeInTheDocument()
+      // TODO apply operation
+    })
+
+    it("correctly displays using options for the fastigium", () => {
+      renderViewer("triangular prism")
+      clickOperation("augment")
+      expect(screen.queryByText("pyramid")).toBeInTheDocument()
+      expect(screen.queryByText("fastigium")).toBeInTheDocument()
+      // TODO apply operation
+    })
+
+    it("does not display using options when unavailable", () => {
+      renderViewer("triangular cupola")
+      clickOperation("augment")
+      expect(screen.queryByText("cupola")).not.toBeInTheDocument()
+      expect(screen.queryByText("rotunda")).not.toBeInTheDocument()
+    })
+  })
+
+  describe("viewer options", () => {
+    //
+  })
 })
