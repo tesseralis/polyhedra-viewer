@@ -58,6 +58,9 @@
     "not ie <= 11",
     "not op_mini all"
   ],
+  "engines": {
+    "node": ">=12.16.1"
+  },
   "lint-staged": {
     "*.{ts,tsx,json,css}": [
       "prettier --write"
