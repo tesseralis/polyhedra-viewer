@@ -1,4 +1,3 @@
-import _ from "lodash-es"
 import React from "react"
 import { createMemoryHistory, History } from "history"
 import { Router } from "react-router-dom"

@@ -59,7 +59,7 @@ function getFaceDistance(face1: Face, face2: Face) {
 }
 
 function getIcosahedronContractFaces(polyhedron: Polyhedron) {
-  let result = []
+  const result = []
   let toTest = polyhedron.faces
   while (toTest.length > 0) {
     const [next, ...rest] = toTest

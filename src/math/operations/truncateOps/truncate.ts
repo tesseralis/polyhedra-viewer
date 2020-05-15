@@ -107,7 +107,7 @@ function doTruncate(
       (adj) => adj.vec.distanceTo(v) > PRECISION,
     )!
     const truncated = v.interpolateTo(v1.vec, rectify ? 0.5 : truncateScale)
-    return !!transform ? transform(truncated, vertex) : truncated
+    return transform?.(truncated, vertex) ?? truncated
   })
   return {
     animationData: {

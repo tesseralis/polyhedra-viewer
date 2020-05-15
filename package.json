@@ -49,6 +49,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test --transformIgnorePatterns \"node_modules/(?!(lodash-es))/\"",
     "prettier": "prettier 'src/**/*.{ts,tsx,json,css}'",
+    "eslint": "eslint 'src/**/*.{ts,tsx}'",
     "lint": "yarn prettier --check",
     "format": "yarn prettier --write"
   },
