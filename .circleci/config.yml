@@ -8,14 +8,14 @@ jobs:
     steps:
       - checkout
       - node/install-packages
-      - run: npm run lint
+      - run: yarn lint
   test:
     executor:
       name: node/default
     steps:
       - checkout
       - node/install-packages
-      - run: npm test -- --runInBand
+      - run: yarn test --runInBand
 workflows:
   build-and-test:
     jobs:
