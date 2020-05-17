@@ -10,7 +10,7 @@ export function getResizedVertices(
   resizedLength: number,
   angle: number = 0,
 ) {
-  // Update the vertices with the expanded-out version
+  // Update the vertices with the expanded-out version.
   const f0 = faces[0]
   const scale = resizedLength - f0.distanceToCenter()
   return getTransformedVertices(faces, (f) =>
