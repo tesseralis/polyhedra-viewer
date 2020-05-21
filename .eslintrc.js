@@ -9,6 +9,7 @@ module.exports = {
     "prettier/react",
     "react-app",
   ],
+  parser: "@typescript-eslint/parser",
   plugins: ["prettier", "react", "@typescript-eslint"],
   rules: {
     // we have a lot of anonymous renderers passed as props
