@@ -6,7 +6,7 @@ import { withOrigin, PRECISION, Vec3D } from "math/geom"
 import { Polyhedron, Vertex } from "math/polyhedra"
 import makeOperation from "../makeOperation"
 
-// Side ratios gotten when calling our "sharpen" operation on a bevelled polyhedron
+// Side ratios gotten when calling our "sharpen" operation on a bevelled polyhedron.
 // I couldn't actually figure out the math for this so I reverse engineered it.
 function getRectifiedMultiplier(result: string) {
   switch (result) {
@@ -107,7 +107,7 @@ function doTruncate(
       (adj) => adj.vec.distanceTo(v) > PRECISION,
     )!
     const truncated = v.interpolateTo(v1.vec, rectify ? 0.5 : truncateScale)
-    return !!transform ? transform(truncated, vertex) : truncated
+    return transform?.(truncated, vertex) ?? truncated
   })
   return {
     animationData: {

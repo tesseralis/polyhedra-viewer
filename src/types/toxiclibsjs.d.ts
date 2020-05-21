@@ -1,5 +1,5 @@
 declare module "toxiclibsjs/geom" {
-  class Vec3D {
+  export class Vec3D {
     constructor()
     constructor(x: number, y: number, z: number)
     constructor(v: Vec3D)
@@ -13,7 +13,7 @@ declare module "toxiclibsjs/geom" {
     distanceTo(v: Vec3D): number
     distanceToSquared(v: Vec3D): number
     dot(v: Vec3D): number
-    equals(obj: Object): boolean
+    equals(obj: unknown): boolean
     equalsWithTolerance(v: Vec3D, tolerance: number): boolean
     getAbs(): Vec3D
     getComponent(id: number): number
@@ -59,7 +59,7 @@ declare module "toxiclibsjs/geom" {
     z: number
   }
 
-  class Plane extends Vec3D {
+  export class Plane extends Vec3D {
     constructor()
     constructor(t: Triangle3D)
     constructor(origin: Vec3D, norm: Vec3D)
@@ -74,7 +74,7 @@ declare module "toxiclibsjs/geom" {
     toString(): string
   }
 
-  class Ray3D extends Vec3D {
+  export class Ray3D extends Vec3D {
     constructor()
     constructor(x: number, y: number, z: number, d: Vec3D)
     constructor(o: Vec3D, d: Vec3D)
@@ -85,12 +85,12 @@ declare module "toxiclibsjs/geom" {
     toString(): string
   }
 
-  class Triangle3D {
+  export class Triangle3D {
     constructor()
     constructor(a: Vec3D, b: Vec3D, c: Vec3D)
   }
 
-  class Matrix4x4 {
+  export class Matrix4x4 {
     constructor()
     constructor(array: number[])
     // prettier-ignore

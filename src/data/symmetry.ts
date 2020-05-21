@@ -156,7 +156,7 @@ export class Dihedral extends Symmetry {
 
   name() {
     const { n, reflection } = this.data
-    const base = !!reflection ? `${reflection}atic` : "dihedral"
+    const base = reflection ? `${reflection}atic` : "dihedral"
     return `${polygonPrefixes.get(n)} ${base}`
   }
 

@@ -30,6 +30,8 @@
     "aphrodite": "^2.4.0",
     "d3-ease": "^1.0.6",
     "d3-interpolate": "^1.4.0",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-plugin-prettier": "^3.1.3",
     "file-saver": "^2.0.2",
     "jszip": "^3.4.0",
     "lodash-es": "^4.17.15",
@@ -48,9 +50,14 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --transformIgnorePatterns \"node_modules/(?!(lodash-es))/\"",
-    "prettier": "prettier 'src/**/*.{ts,tsx,json,css}'",
-    "lint": "yarn prettier --check",
-    "format": "yarn prettier --write"
+    "prettier": "prettier 'src/**/*.{json,css}'",
+    "eslint": "eslint 'src/**/*.{ts,tsx}'",
+    "lint:code": "yarn eslint",
+    "lint:other": "yarn prettier --check",
+    "lint": "yarn lint:other && yarn lint:code",
+    "format:code": "yarn eslint --fix",
+    "format:other": "yarn prettier --write",
+    "format": "yarn format:other && yarn format:code"
   },
   "browserslist": [
     ">0.2%",
@@ -61,6 +68,9 @@
   "lint-staged": {
     "*.{ts,tsx,json,css}": [
       "prettier --write"
+    ],
+    "*.{ts,tsx}": [
+      "eslint --fix"
     ]
   },
   "husky": {

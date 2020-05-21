@@ -52,7 +52,7 @@ function getCompositeSymmetry(composite: Composite) {
         ? Cyclic.biradial
         : Cyclic.get(source.data.family)
 
-    case 2:
+    case 2: {
       if (source.isPrismatic()) {
         // para-augmented prisms have digonal prismatic symmetry
         // meta-augmented prisms have biradial symmetry
@@ -72,6 +72,7 @@ function getCompositeSymmetry(composite: Composite) {
       } else {
         return pure ? Cyclic.biradial : Cyclic.bilateral
       }
+    }
 
     case 3:
       // The only tri-augmented prisms are triangular and hexagonal

@@ -56,7 +56,7 @@ const alternateNames = Object.keys(canonicalMapping)
 
 export function getCanonicalName(name: string) {
   const canonical = canonicalMapping[name]
-  if (!!canonical) return canonical
+  if (canonical) return canonical
   return assertValidSolid(name)
 }
 
