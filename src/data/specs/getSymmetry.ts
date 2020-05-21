@@ -3,7 +3,7 @@ import type Specs from "./PolyhedronSpecs"
 import type Composite from "./Composite"
 import type Capstone from "./Capstone"
 
-const elementaryMapping: Record<string, Symmetry> = {
+const elementaryMapping = {
   sphenocorona: Cyclic.biradial,
   "augmented sphenocorona": Cyclic.bilateral,
   sphenomegacorona: Cyclic.biradial,

@@ -17,7 +17,7 @@ interface Options {
   faceType?: FaceType
 }
 
-const coxeterNum: Record<Family, number> = { 3: 4, 4: 6, 5: 10 }
+const coxeterNum = { 3: 4, 4: 6, 5: 10 }
 
 function getContractLength(
   family: Family,

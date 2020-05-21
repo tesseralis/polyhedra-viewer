@@ -17,7 +17,7 @@ export function prefix(prefix: string = "", rest: string) {
   return `${prefix}${rest}`
 }
 
-const rectifiedNames: Record<PrimaryPolygon, string> = {
+const rectifiedNames = {
   3: "tetratetrahedron",
   4: "cuboctahedron",
   5: "icosidodecahedron",

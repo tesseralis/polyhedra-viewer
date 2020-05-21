@@ -1,9 +1,9 @@
 import { startCase, set } from "lodash-es"
-import { polygons, polygonNames, Polygon } from "data/polygons"
+import { polygons, polygonNames } from "data/polygons"
 
 // Colors from d3-scale-chromatic:
 // https://github.com/d3/d3-scale-chromatic#schemeCategory10
-const defaultColors: Record<Polygon, string> = {
+const defaultColors = {
   3: "#ff7f00",
   4: "#e41a1c",
   5: "#377eb8",
