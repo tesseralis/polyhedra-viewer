@@ -50,10 +50,14 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --transformIgnorePatterns \"node_modules/(?!(lodash-es))/\"",
-    "prettier": "prettier 'src/**/*.{ts,tsx,json,css}'",
+    "prettier": "prettier 'src/**/*.{json,css}'",
     "eslint": "eslint 'src/**/*.{ts,tsx}'",
-    "lint": "yarn prettier --check",
-    "format": "yarn prettier --write"
+    "lint:code": "yarn eslint",
+    "lint:other": "yarn prettier --check",
+    "lint": "yarn lint:other && yarn lint:code",
+    "format:code": "yarn eslint --fix",
+    "format:other": "yarn prettier --write",
+    "format": "yarn format:other && yarn format:code"
   },
   "browserslist": [
     ">0.2%",
@@ -64,6 +68,9 @@
   "lint-staged": {
     "*.{ts,tsx,json,css}": [
       "prettier --write"
+    ],
+    "*.{ts,tsx}": [
+      "eslint --fix"
     ]
   },
   "husky": {
