@@ -1,3 +1,4 @@
+import { Items } from "types"
 import { bimap } from "utils"
 
 export type PolygonMap<T> = { [n: number]: T }
@@ -22,11 +23,11 @@ export const polygonPrefixes = bimap({
   10: "decagonal",
 })
 
-export type PrimaryPolygon = 3 | 4 | 5
-export const primaryPolygons: PrimaryPolygon[] = [3, 4, 5]
+export const primaryPolygons = [3, 4, 5] as const
+export type PrimaryPolygon = Items<typeof primaryPolygons>
 
-export type SecondaryPolygon = 6 | 8 | 10
-export const secondaryPolygons: SecondaryPolygon[] = [6, 8, 10]
+export const secondaryPolygons = [6, 8, 10] as const
+export type SecondaryPolygon = Items<typeof secondaryPolygons>
 
+export const polygons = [...primaryPolygons, ...secondaryPolygons]
 export type Polygon = PrimaryPolygon | SecondaryPolygon
-export const polygons: Polygon[] = [...primaryPolygons, ...secondaryPolygons]

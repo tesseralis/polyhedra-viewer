@@ -1,19 +1,22 @@
-import { DataOptions } from "./common"
+import { Items } from "types"
 
 import Specs from "./PolyhedronSpecs"
 import Queries from "./Queries"
 import Classical from "./Classical"
 import Prismatic from "./Prismatic"
 
-export type Count = 0 | 1 | 2 | 3
-export const counts: Count[] = [0, 1, 2, 3]
+export const counts = [0, 1, 2, 3] as const
+export type Count = Items<typeof counts>
+
+const alignments = ["meta", "para"] as const
+type Align = Items<typeof alignments>
 
 interface CompositeData {
   source: Classical | Prismatic
   augmented: Count
   diminished: Count
   gyrate: Count
-  align?: "meta" | "para"
+  align?: Align
 }
 
 const prismaticBases = Prismatic.query.where(
@@ -28,20 +31,7 @@ const rhombicosidodecahedron = Classical.query.withName(
   "rhombicosidodecahedron",
 )
 
-const options: DataOptions<CompositeData> = {
-  source: [
-    ...prismaticBases,
-    ...augmentedClassicalBases,
-    icosahedron,
-    rhombicosidodecahedron,
-  ],
-  augmented: counts,
-  diminished: counts,
-  gyrate: counts,
-  align: ["meta", "para"],
-}
-
-function limitCount<N extends number>(counts: N[], limit: number) {
+function limitCount(limit: number) {
   return counts.filter((n) => n <= limit)
 }
 
@@ -82,12 +72,9 @@ export default class Composite extends Specs<CompositeData> {
   static *getAll() {
     // Augmented prisms
     for (const source of prismaticBases) {
-      for (const augmented of limitCount(
-        options.augmented,
-        source.data.base % 3 === 0 ? 3 : 2,
-      )) {
+      for (const augmented of limitCount(source.data.base % 3 === 0 ? 3 : 2)) {
         if (source.data.base === 6 && augmented === 2) {
-          for (const align of options.align) {
+          for (const align of alignments) {
             yield new Composite({ source, augmented, align })
           }
         } else {
@@ -98,12 +85,9 @@ export default class Composite extends Specs<CompositeData> {
 
     // Augmented classical polyhedra
     for (const source of augmentedClassicalBases) {
-      for (const augmented of limitCount(
-        options.augmented,
-        source.data.family - 2,
-      )) {
+      for (const augmented of limitCount(source.data.family - 2)) {
         if (source.isIcosahedral() && augmented === 2) {
-          for (const align of options.align) {
+          for (const align of alignments) {
             yield new Composite({ source, augmented, align })
           }
         } else {
@@ -115,9 +99,9 @@ export default class Composite extends Specs<CompositeData> {
     // TODO add more diminished and gyrate polyhedra
 
     // diminished icosahedra
-    for (const diminished of options.diminished) {
+    for (const diminished of counts) {
       if (diminished === 2) {
-        for (const align of options.align) {
+        for (const align of alignments) {
           yield new Composite({ source: icosahedron, diminished, align })
         }
       } else {
@@ -127,10 +111,10 @@ export default class Composite extends Specs<CompositeData> {
     yield new Composite({ source: icosahedron, diminished: 3, augmented: 1 })
 
     // rhombicosidodecahedra
-    for (const gyrate of options.gyrate) {
-      for (const diminished of limitCount(options.diminished, 3 - gyrate)) {
+    for (const gyrate of counts) {
+      for (const diminished of limitCount(3 - gyrate)) {
         if (gyrate + diminished === 2) {
-          for (const align of options.align) {
+          for (const align of alignments) {
             yield new Composite({
               source: rhombicosidodecahedron,
               gyrate,

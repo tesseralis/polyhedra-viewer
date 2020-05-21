@@ -1,16 +1,13 @@
 import Specs from "./PolyhedronSpecs"
 import Queries from "./Queries"
 import { polygons, Polygon } from "../polygons"
-import { prismaticTypes, PrismaticType, DataOptions } from "./common"
+import { prismaticTypes, PrismaticType } from "./common"
+
+const bases = [2, ...polygons] as const
 
 interface PrismaticData {
   base: 2 | Polygon
   type: PrismaticType
-}
-
-const options: DataOptions<PrismaticData> = {
-  base: [2, ...polygons],
-  type: prismaticTypes,
 }
 
 /**
@@ -30,8 +27,8 @@ export default class Prismatic extends Specs<PrismaticData> {
   isAntiprism = () => this.data.type === "antiprism"
 
   static *getAll() {
-    for (const base of options.base) {
-      for (const type of options.type) {
+    for (const base of bases) {
+      for (const type of prismaticTypes) {
         // The digonal prism is just a square, so skip
         if (base === 2 && type === "prism") continue
         yield new Prismatic({ base, type })

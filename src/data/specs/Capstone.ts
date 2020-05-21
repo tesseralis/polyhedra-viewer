@@ -1,24 +1,26 @@
+import { Items } from "types"
 import { PrimaryPolygon, primaryPolygons } from "../polygons"
 import Specs from "./PolyhedronSpecs"
 import Queries from "./Queries"
-import { DataOptions, PrismaticType, prismaticTypes } from "./common"
+import { PrismaticType, prismaticTypes } from "./common"
 
-type CapstoneType = "pyramid" | "cupola" | "rotunda" | "cupolarotunda"
+const elongations = [null, ...prismaticTypes]
+
+const counts = [1, 2] as const
+type Count = Items<typeof counts>
+
+const gyrations = ["ortho", "gyro"] as const
+type Gyration = Items<typeof gyrations>
+
+const capTypes = ["pyramid", "cupola", "rotunda", "cupolarotunda"] as const
+type CapstoneType = Items<typeof capTypes>
 
 interface CapstoneData {
   base: 2 | PrimaryPolygon
   type: CapstoneType
   elongation: null | PrismaticType
-  count: 1 | 2
-  gyrate?: "ortho" | "gyro"
-}
-
-const options: DataOptions<CapstoneData> = {
-  base: [2, ...primaryPolygons],
-  type: ["pyramid", "cupola", "rotunda", "cupolarotunda"],
-  elongation: [null, ...prismaticTypes],
-  count: [1, 2],
-  gyrate: ["ortho", "gyro"],
+  count: Count
+  gyrate?: Gyration
 }
 
 /**
@@ -55,18 +57,18 @@ export default class Capstone extends Specs<CapstoneData> {
   isGyroelongated = () => this.data.elongation === "antiprism"
 
   static *getAll() {
-    for (const base of options.base.slice(1)) {
-      for (const type of options.type) {
+    for (const base of primaryPolygons) {
+      for (const type of capTypes) {
         // Only pentagonal rotundae exist
         if (["rotunda", "cupolarotunda"].includes(type) && base !== 5) {
           continue
         }
-        for (const elongation of options.elongation) {
+        for (const elongation of elongations) {
           // Gyroelongated pyramids are concave
           if (base === 3 && type === "pyramid" && elongation === "antiprism") {
             continue
           }
-          for (const count of options.count) {
+          for (const count of counts) {
             // Cupola-rotundae only exist if there are two of them
             if (type === "cupolarotunda" && count !== 2) {
               continue
@@ -77,7 +79,7 @@ export default class Capstone extends Specs<CapstoneData> {
               type !== "pyramid" &&
               elongation !== "antiprism"
             ) {
-              for (const gyrate of options.gyrate) {
+              for (const gyrate of gyrations) {
                 yield new Capstone({
                   base,
                   type,
