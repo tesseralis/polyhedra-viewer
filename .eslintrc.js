@@ -35,14 +35,5 @@ module.exports = {
         ignoreParameters: true,
       },
     ],
-    // We use the `semi: false` in prettier
-    "@typescript-eslint/member-delimiter-style": [
-      "error",
-      {
-        multiline: {
-          delimiter: "none",
-        },
-      },
-    ],
   },
 }
