@@ -1,27 +1,27 @@
 import { Items } from "types"
-import { bimap } from "utils"
+import { BiMap } from "bimap"
 
 export type PolygonMap<T> = { [n: number]: T }
 
-export const polygonNames = bimap({
-  3: "triangle",
-  4: "square",
-  5: "pentagon",
-  6: "hexagon",
-  8: "octagon",
-  10: "decagon",
-})
+export const polygonNames = new BiMap([
+  [3, "triangle"],
+  [4, "square"],
+  [5, "pentagon"],
+  [6, "hexagon"],
+  [8, "octagon"],
+  [10, "decagon"],
+] as const)
 
-export const polygonPrefixes = bimap({
-  1: "monogonal",
-  2: "digonal",
-  3: "triangular",
-  4: "square",
-  5: "pentagonal",
-  6: "hexagonal",
-  8: "octagonal",
-  10: "decagonal",
-})
+export const polygonPrefixes = new BiMap([
+  [1, "monogonal"],
+  [2, "digonal"],
+  [3, "triangular"],
+  [4, "square"],
+  [5, "pentagonal"],
+  [6, "hexagonal"],
+  [8, "octagonal"],
+  [10, "decagonal"],
+] as const)
 
 export const primaryPolygons = [3, 4, 5] as const
 export type PrimaryPolygon = Items<typeof primaryPolygons>

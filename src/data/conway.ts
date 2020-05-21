@@ -1,4 +1,4 @@
-import { bimap } from "utils"
+import { BiMap } from "bimap"
 import { allSolidNames } from "./common"
 import getSpecs from "./specs/getSpecs"
 
@@ -6,10 +6,8 @@ function getConwayNotation(name: string) {
   return getSpecs(name).conwaySymbol()
 }
 
-const conwayMapping = bimap<string, string>(
-  Object.fromEntries(
-    allSolidNames.map((name) => [name, getConwayNotation(name)]),
-  ),
+const conwayMapping = new BiMap(
+  allSolidNames.map((name) => [name, getConwayNotation(name)]),
 )
 
 export function isConwayNotation(symbol: string) {
