@@ -2,7 +2,7 @@ import React from "react"
 import ReactDOM from "react-dom"
 import ReactGA from "react-ga"
 
-import registerServiceWorker from "./registerServiceWorker"
+import * as serviceWorker from "./registerServiceWorker"
 import Root from "./components/Root"
 
 import "what-input"
@@ -19,4 +19,4 @@ const root = document.getElementById("root")
 if (root) {
   ReactDOM.render(<Root />, root)
 }
-registerServiceWorker()
+serviceWorker.register()

@@ -17,38 +17,31 @@ module.exports = {
     "react/no-unescaped-entities": "off",
     // typescript will take care of this for me
     "react/prop-types": "off",
-  },
-  overrides: [
-    {
-      files: ["**/*.ts?(x)"],
-      rules: {
-        // This is too annoying for a personal project
-        "@typescript-eslint/no-explicit-any": "off",
-        // Want to enable this, but will take lots of fiddling
-        "@typescript-eslint/explicit-function-return-type": "off",
-        // Lots of places where we use ! for simplicity
-        "@typescript-eslint/no-non-null-assertion": "off",
-        // idk why this is a rule, it's better than importing lodash/noop
-        "@typescript-eslint/no-empty-function": "off",
-        // We use `require()` for jest imports
-        "@typescript-eslint/no-var-requires": "off",
-        // Enabled only for parameters with defaults for clarity
-        "@typescript-eslint/no-inferrable-types": [
-          "error",
-          {
-            ignoreParameters: true,
-          },
-        ],
-        // We use the `semi: false` in prettier
-        "@typescript-eslint/member-delimiter-style": [
-          "error",
-          {
-            multiline: {
-              delimiter: "none",
-            },
-          },
-        ],
+    // This is too annoying for a personal project
+    "@typescript-eslint/no-explicit-any": "off",
+    // Want to enable this, but will take lots of fiddling
+    "@typescript-eslint/explicit-function-return-type": "off",
+    // Lots of places where we use ! for simplicity
+    "@typescript-eslint/no-non-null-assertion": "off",
+    // idk why this is a rule, it's better than importing lodash/noop
+    "@typescript-eslint/no-empty-function": "off",
+    // We use `require()` for jest imports
+    "@typescript-eslint/no-var-requires": "off",
+    // Enabled only for parameters with defaults for clarity
+    "@typescript-eslint/no-inferrable-types": [
+      "error",
+      {
+        ignoreParameters: true,
       },
-    },
-  ],
+    ],
+    // We use the `semi: false` in prettier
+    "@typescript-eslint/member-delimiter-style": [
+      "error",
+      {
+        multiline: {
+          delimiter: "none",
+        },
+      },
+    ],
+  },
 }
