@@ -91,7 +91,7 @@ export default function DataDownloader({ solid }: Props) {
       <h2 {...heading()}>Download model</h2>
       <div>
         {fileFormats.map((format) => (
-          <DownloadLink {...format} solid={solid} />
+          <DownloadLink key={format.ext} {...format} solid={solid} />
         ))}
       </div>
     </div>
