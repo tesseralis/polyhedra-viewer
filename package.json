@@ -10,7 +10,7 @@
     "exports-loader": "^0.7.0",
     "file-loader": "^6.0.0",
     "husky": "^4.2.5",
-    "lint-staged": "^10.2.4",
+    "lint-staged": "^10.2.6",
     "prettier": "^2.0.5",
     "react-scripts": "^3.4.1"
   },
