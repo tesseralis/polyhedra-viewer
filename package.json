@@ -15,7 +15,7 @@
     "react-scripts": "^3.4.1"
   },
   "dependencies": {
-    "@mdi/js": "^5.2.45",
+    "@mdi/js": "^5.3.45",
     "@mdi/react": "^1.4.0",
     "@types/d3-ease": "^1.0.9",
     "@types/d3-interpolate": "^1.3.1",
