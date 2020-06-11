@@ -7,6 +7,7 @@ import { isAlternateName, getCanonicalName } from "data/alternates"
 import { isConwayNotation, fromConwayNotation } from "data/conway"
 import { escape } from "utils"
 
+import usePageTracker from "./usePageTracker"
 import ErrorPage from "./ErrorPage"
 import Loading from "./Loading"
 
@@ -16,6 +17,7 @@ const ViewerPage = React.lazy(() => import("./ViewerPage"))
 const unescapeName = (name: string) => name.replace(/-/g, " ")
 
 export default function App() {
+  usePageTracker()
   return (
     <Suspense fallback={<Loading />}>
       <Switch>
