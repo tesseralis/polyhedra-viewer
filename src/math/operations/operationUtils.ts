@@ -1,7 +1,7 @@
-import { takeRight, dropRight, invert, times } from "lodash-es"
+import { takeRight, dropRight, invert, times, isEmpty, uniq } from "lodash-es"
 import { Twist } from "types"
 import { Polyhedron, Vertex, Edge, VertexList, VertexArg } from "math/polyhedra"
-import { Vec3D, Transform } from "math/geom"
+import { Vec3D, Transform, PRECISION } from "math/geom"
 import { mapObject, getCyclic } from "utils"
 /**
  * Remove vertices in the polyhedron that aren't connected to any faces,
@@ -38,6 +38,35 @@ export function removeExtraneousVertices(polyhedron: Polyhedron) {
         face.vertices.map((v) => newToOld[v.index] ?? v.index),
       ),
   )
+}
+
+/** Remove vertices (and faces) from the polyhedron when they are all the same */
+export function deduplicateVertices(polyhedron: Polyhedron) {
+  // group vertex indices by same
+  const unique: Vertex[] = []
+  const oldToNew: Record<number, number> = {}
+
+  polyhedron.vertices.forEach((v, vIndex) => {
+    const match = unique.find((point) =>
+      v.vec.equalsWithTolerance(point.vec, PRECISION),
+    )
+    if (match === undefined) {
+      unique.push(v)
+      oldToNew[vIndex] = vIndex
+    } else {
+      oldToNew[vIndex] = match.index
+    }
+  })
+
+  if (isEmpty(oldToNew)) return polyhedron
+
+  // replace vertices that are the same
+  const newFaces = polyhedron.faces
+    .map((face) => uniq(face.vertices.map((v) => oldToNew[v.index])))
+    .filter((vIndices) => vIndices.length >= 3)
+
+  // remove extraneous vertices
+  return removeExtraneousVertices(polyhedron.withFaces(newFaces))
 }
 
 export function getTwistSign(twist?: Twist) {

@@ -4,7 +4,7 @@ import { repeat } from "utils"
 import Classical from "data/specs/Classical"
 import { withOrigin, PRECISION, Vec3D } from "math/geom"
 import { Polyhedron, Vertex } from "math/polyhedra"
-import makeOperation from "../makeOperation"
+import Operation from "../Operation"
 
 // Side ratios gotten when calling our "sharpen" operation on a bevelled polyhedron.
 // I couldn't actually figure out the math for this so I reverse engineered it.
@@ -117,7 +117,7 @@ function doTruncate(
   }
 }
 
-export const truncate = makeOperation<Classical>("truncate", {
+export const truncate = new Operation<{}, Classical>("truncate", {
   apply({ specs, geom }, $, result) {
     return doTruncate(specs, geom, false, result)
   },
@@ -134,7 +134,7 @@ export const truncate = makeOperation<Classical>("truncate", {
   },
 })
 
-export const rectify = makeOperation<Classical>("rectify", {
+export const rectify = new Operation<{}, Classical>("rectify", {
   apply({ specs, geom }) {
     return doTruncate(specs, geom, true)
   },

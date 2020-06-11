@@ -2,11 +2,7 @@ import { set, flatMapDeep, meanBy } from "lodash-es"
 
 import Classical from "data/specs/Classical"
 import { Polyhedron, Vertex, Face, Edge } from "math/polyhedra"
-import makeOperation from "../makeOperation"
-
-interface SharpenOptions {
-  faceType?: number
-}
+import Operation from "../Operation"
 
 // Adjacent faces of the vertex with a sharpen face first
 function getShiftedAdjacentFaces(vertex: Vertex, facesTosharpen: Face[]) {
@@ -111,7 +107,7 @@ function applySharpen(
 interface Options {
   faceType?: number
 }
-export const sharpen = makeOperation<Classical, Options>("sharpen", {
+export const sharpen = new Operation<Options, Classical>("sharpen", {
   apply({ specs, geom }, { faceType }) {
     return applySharpen(specs, geom, faceType)
   },

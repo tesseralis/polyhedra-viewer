@@ -2,7 +2,7 @@ import { Twist } from "types"
 import Capstone from "data/specs/Capstone"
 import { Polyhedron, Cap, VertexList } from "math/polyhedra"
 import { expandEdges } from "../operationUtils"
-import makeOperation from "../makeOperation"
+import Operation from "../Operation"
 import { antiprismHeight, getScaledPrismVertices } from "./prismUtils"
 
 function doElongate(polyhedron: Polyhedron, twist?: Twist) {
@@ -35,7 +35,7 @@ function doElongate(polyhedron: Polyhedron, twist?: Twist) {
   }
 }
 
-export const elongate = makeOperation<Capstone>("elongate", {
+export const elongate = new Operation<{}, Capstone>("elongate", {
   apply({ geom }) {
     return doElongate(geom)
   },
@@ -53,7 +53,7 @@ export const elongate = makeOperation<Capstone>("elongate", {
 interface Options {
   twist?: Twist
 }
-export const gyroelongate = makeOperation<Capstone, Options>("gyroelongate", {
+export const gyroelongate = new Operation<Options, Capstone>("gyroelongate", {
   apply({ geom }, { twist = "left" }) {
     return doElongate(geom, twist)
   },

@@ -3,7 +3,7 @@ import { Twist } from "types"
 import { Polyhedron, FaceLike } from "math/polyhedra"
 import Prismatic from "data/specs/Prismatic"
 import Capstone from "data/specs/Capstone"
-import makeOperation from "../makeOperation"
+import Operation from "../Operation"
 import {
   getChirality,
   isGyroelongatedBiCupola,
@@ -95,7 +95,7 @@ function doTurn(polyhedron: Polyhedron, { twist = "left" }: Options) {
   }
 }
 
-export const turn = makeOperation<Prismatic | Capstone, Options>("turn", {
+export const turn = new Operation<Options, Prismatic | Capstone>("turn", {
   apply({ geom }, options) {
     return doTurn(geom, options)
   },

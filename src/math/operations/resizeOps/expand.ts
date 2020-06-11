@@ -8,7 +8,7 @@ import {
   getTransformedVertices,
   expandEdges,
 } from "../operationUtils"
-import makeOperation from "../makeOperation"
+import Operation from "../Operation"
 import {
   getSnubAngle,
   getExpandedFaces,
@@ -81,7 +81,7 @@ function doExpansion(
   }
 }
 
-export const expand = makeOperation<Classical>("expand", {
+export const expand = new Operation<{}, Classical>("expand", {
   apply({ specs, geom }, $, result) {
     if (specs.isTruncated()) {
       return doSemiExpansion(geom, result)
@@ -104,7 +104,7 @@ export const expand = makeOperation<Classical>("expand", {
 interface SnubOpts {
   twist: Twist
 }
-export const snub = makeOperation<Classical, SnubOpts>("snub", {
+export const snub = new Operation<SnubOpts, Classical>("snub", {
   apply({ geom }, { twist = "left" }, result) {
     return doExpansion(geom, result, twist)
   },
@@ -127,7 +127,7 @@ export const snub = makeOperation<Classical, SnubOpts>("snub", {
   },
 })
 
-export const dual = makeOperation<Classical>("dual", {
+export const dual = new Operation<{}, Classical>("dual", {
   apply({ geom }) {
     // Scale to create a dual polyhedron with the same midradius
     const scale = (() => {

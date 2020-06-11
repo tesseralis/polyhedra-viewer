@@ -8,7 +8,7 @@ import {
   getAdjustInformation,
   getScaledPrismVertices,
 } from "./prismUtils"
-import makeOperation from "../makeOperation"
+import Operation from "../Operation"
 
 function doShorten(polyhedron: Polyhedron, options: Options) {
   const adjustInfo = getAdjustInformation(polyhedron)
@@ -32,7 +32,7 @@ function doShorten(polyhedron: Polyhedron, options: Options) {
 interface Options {
   twist?: Twist
 }
-export const shorten = makeOperation<Capstone, Options>("shorten", {
+export const shorten = new Operation<Options, Capstone>("shorten", {
   apply({ geom }, options) {
     return doShorten(geom, options)
   },

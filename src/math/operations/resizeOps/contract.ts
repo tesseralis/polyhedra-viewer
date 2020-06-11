@@ -7,7 +7,7 @@ import {
   getResizedVertices,
   getExpandedFaces,
 } from "./resizeUtils"
-import makeOperation from "../makeOperation"
+import Operation from "../Operation"
 
 // TODO hopefully there's a better way to do this once we make the new opGraph
 type FaceType = Polygon
@@ -77,7 +77,7 @@ export function applyContract(
 }
 
 // NOTE: We are using the same operation for contracting both expanded and snub solids.
-export const contract = makeOperation<Classical, Options>("contract", {
+export const contract = new Operation<Options, Classical>("contract", {
   apply({ specs, geom }, options, result) {
     return applyContract(specs, geom, options, result)
   },

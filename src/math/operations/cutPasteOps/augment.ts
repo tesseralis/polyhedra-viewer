@@ -6,10 +6,9 @@ import Elementary from "data/specs/Elementary"
 import { Polyhedron, Face, Cap } from "math/polyhedra"
 import { isInverse, getOrthonormalTransform, PRECISION } from "math/geom"
 import { repeat, getCyclic, getSingle } from "utils"
-import { deduplicateVertices } from "../makeOperation"
-
-import makeOperation from "../makeOperation"
+import Operation from "../Operation"
 import { withOrigin } from "../../geom"
+import { deduplicateVertices } from "../operationUtils"
 import { inc, dec, CutPasteSpecs } from "./cutPasteUtils"
 
 type AugmentSpecs = Prismatic | CutPasteSpecs
@@ -344,7 +343,7 @@ interface Options {
   gyrate?: GyrateOpts
   using?: string
 }
-export const augment = makeOperation<AugmentSpecs, Options>("augment", {
+export const augment = new Operation<Options, AugmentSpecs>("augment", {
   apply({ specs, geom }, { face, gyrate, using }) {
     const augmentType = using
       ? getUsingType(using)
