@@ -23,16 +23,9 @@ export default function ViewerPage({ solid, url }: Props) {
       />
       <Route
         path={`${url}/:panel`}
-        render={({ match, history }) => {
+        render={({ match }) => {
           const { panel } = match.params
-
-          return (
-            <Viewer
-              solid={solid}
-              panel={panel ?? ""}
-              goBack={history.action === "POP"}
-            />
-          )
+          return <Viewer solid={solid} panel={panel ?? ""} />
         }}
       />
     </>

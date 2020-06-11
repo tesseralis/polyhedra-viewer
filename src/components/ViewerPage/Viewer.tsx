@@ -1,5 +1,7 @@
 import React, { useEffect } from "react"
+import { useHistory } from "react-router-dom"
 
+import { escape } from "utils"
 import { Polyhedron } from "math/polyhedra"
 import { wrapProviders } from "components/common"
 import { OperationCtx, TransitionCtx, PolyhedronCtx } from "./context"
@@ -10,31 +12,40 @@ import useMediaInfo from "components/useMediaInfo"
 interface InnerProps {
   solid: string
   panel: string
-  goBack?: boolean
 }
 
-function InnerViewer({ solid, panel, goBack = false }: InnerProps) {
+function InnerViewer({ solid, panel }: InnerProps) {
   const { unsetOperation } = OperationCtx.useActions()
   const { setPolyhedron } = PolyhedronCtx.useActions()
-  useEffect(() => {
-    // Whenever we navigate back, unset the operation and reset the polyhedron
-    if (goBack) {
-      unsetOperation()
-      // TODO track the history of the polyhedron states and keep a "stack" of operations
-      setPolyhedron(Polyhedron.get(solid))
-      // TODO cancel animations when switching panels
-      // (I don't think I've ever had that happen so low prio)
-    }
-  }, [goBack, solid, unsetOperation, setPolyhedron])
+  const polyhedron = PolyhedronCtx.useState()
+  const history = useHistory()
+  // Use a buffer variable to keep the two states in sync
+  const [solidSync, setSolidSync] = React.useState(solid)
 
-  // If we're not on the operations panel, the solid data is determined
-  // by the URL.
+  // When either `solid` (derived from the route) or `polyhedron.name` (derived from operation)
+  // chagnes, update the *other* state.
   useEffect(() => {
-    if (panel !== "operations") setPolyhedron(Polyhedron.get(solid))
-    // NOTE: do not depend on "panel" here -- if we go from operation -> something else
-    // we want to keep the current data.
-    // eslint-disable-next-line
-  }, [solid, setPolyhedron])
+    setSolidSync(solid)
+  }, [solid])
+
+  useEffect(() => {
+    setSolidSync(polyhedron.name)
+  }, [polyhedron.name])
+
+  useEffect(() => {
+    if (polyhedron.name !== solidSync) {
+      // If the route has changed (and it wasn't from an operation)
+      // cancel the current operation and set the polyhedorn model
+      unsetOperation()
+      setPolyhedron(Polyhedron.get(solid))
+    } else if (solid !== solidSync) {
+      // If an operation was executed, update the URL
+      history.push(`/${escape(polyhedron.name)}/operations`)
+    }
+    // Don't depend on `solid` or `polyhedron.name` over here:
+    // this is how the two states get synced with each other
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [solidSync, history, setPolyhedron, unsetOperation])
 
   const { device } = useMediaInfo()
 
@@ -45,11 +56,11 @@ function InnerViewer({ solid, panel, goBack = false }: InnerProps) {
 
 const Providers = wrapProviders([TransitionCtx.Provider, OperationCtx.Provider])
 
-export default function Viewer({ solid, panel, goBack }: InnerProps) {
+export default function Viewer({ solid, panel }: InnerProps) {
   return (
     <PolyhedronCtx.Provider name={solid}>
       <Providers>
-        <InnerViewer solid={solid} panel={panel} goBack={goBack} />
+        <InnerViewer solid={solid} panel={panel} />
       </Providers>
     </PolyhedronCtx.Provider>
   )
