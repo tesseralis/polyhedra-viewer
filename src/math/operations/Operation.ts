@@ -1,8 +1,9 @@
 import { mapValues } from "lodash-es"
 
 import { getAllSpecs } from "data/specs/getSpecs"
-import { Vec3D, vec } from "math/geom"
-import { Polyhedron, VertexArg, normalizeVertex } from "math/polyhedra"
+import { Polygon } from "data/polygons"
+import { Vec3D, vec, PRECISION } from "math/geom"
+import { Polyhedron, Face, VertexArg, normalizeVertex } from "math/polyhedra"
 import { deduplicateVertices } from "./operationUtils"
 import { Point } from "types"
 import PolyhedronSpecs from "data/specs/PolyhedronSpecs"
@@ -12,6 +13,8 @@ type SelectState = "selected" | "selectable" | undefined
 export interface AnimationData {
   start: Polyhedron
   endVertices: Point[]
+  startColors: Polygon[]
+  endColors: Polygon[]
 }
 
 interface OpResult {
@@ -92,6 +95,43 @@ function fillDefaults<Options extends {}, Specs extends PolyhedronSpecs>(
   } as Required<OpArgs<Options, Specs>>
 }
 
+function getCoplanarFaces(polyhedron: Polyhedron) {
+  const found: Face[] = []
+  const pairs: [Face, Face][] = []
+  polyhedron.faces.forEach((f1) => {
+    if (f1.inSet(found) || !f1.isValid()) return
+
+    f1.adjacentFaces().forEach((f2) => {
+      if (!f2 || !f2.isValid()) return
+      if (f1.normal().equalsWithTolerance(f2.normal(), PRECISION)) {
+        pairs.push([f1, f2])
+        found.push(f1)
+        found.push(f2)
+        return
+      }
+    })
+  })
+  return pairs
+}
+
+function getFaceColors(polyhedron: Polyhedron): Polygon[] {
+  const pairs = getCoplanarFaces(polyhedron)
+  const mapping: Record<number, Polygon> = {}
+  for (const [f1, f2] of pairs) {
+    const numSides = (f1.numSides + f2.numSides - 2) as Polygon
+    mapping[f1.index] = numSides
+    mapping[f2.index] = numSides
+  }
+
+  return polyhedron.faces.map(
+    (face) => mapping[face.index] ?? face.numUniqueSides(),
+  )
+}
+
+function arrayDefaults<T>(first: T[], second: T[]) {
+  return first.map((item, i) => item ?? second[i])
+}
+
 function normalizeOpResult(opResult: OpResultArg, newName: string): OpResult {
   if (opResult instanceof Polyhedron) {
     return { result: deduplicateVertices(opResult).withName(newName) }
@@ -99,14 +139,20 @@ function normalizeOpResult(opResult: OpResultArg, newName: string): OpResult {
   const { result, animationData } = opResult
   const { start, endVertices } = animationData!
 
-  const normedResult =
-    result ?? deduplicateVertices(start.withVertices(endVertices))
+  const end = start.withVertices(endVertices)
+  const normedResult = result ?? deduplicateVertices(end)
+
+  // Populate the how the faces in the start and end vertices should be colored
+  const startColors = getFaceColors(start)
+  const endColors = getFaceColors(end)
 
   return {
     result: normedResult.withName(newName),
     animationData: {
       start,
       endVertices: endVertices.map(normalizeVertex),
+      startColors: arrayDefaults(startColors, endColors),
+      endColors: arrayDefaults(endColors, startColors),
     },
   }
 }

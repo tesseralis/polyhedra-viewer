@@ -7,46 +7,12 @@ import { createHookedContext } from "components/common"
 import Config from "components/ConfigCtx"
 import PolyhedronCtx from "./PolyhedronCtx"
 import transition from "transition"
-import { Polyhedron, Face, SolidData } from "math/polyhedra"
+import { Polyhedron, SolidData } from "math/polyhedra"
 import { AnimationData } from "math/operations"
-import { PRECISION } from "math/geom"
 
-// TODO move this to the math section
-function getCoplanarFaces(polyhedron: Polyhedron) {
-  const found: Face[] = []
-  const pairs: [Face, Face][] = []
-  polyhedron.faces.forEach((f1) => {
-    if (f1.inSet(found) || !f1.isValid()) return
-
-    f1.adjacentFaces().forEach((f2) => {
-      if (!f2 || !f2.isValid()) return
-      if (f1.normal().equalsWithTolerance(f2.normal(), PRECISION)) {
-        pairs.push([f1, f2])
-        found.push(f1)
-        found.push(f2)
-        return
-      }
-    })
-  })
-  return pairs
-}
-
-function getFaceColors(polyhedron: Polyhedron, colors: any) {
-  const pairs = getCoplanarFaces(polyhedron)
-  const mapping: { [fIndex: number]: number } = {}
-  for (const [f1, f2] of pairs) {
-    const numSides = f1.numSides + f2.numSides - 2
-    mapping[f1.index] = numSides
-    mapping[f2.index] = numSides
-  }
-
-  return polyhedron.faces.map(
-    (face) => colors[mapping[face.index] ?? face.numUniqueSides()],
-  )
-}
-
-function arrayDefaults<T>(first: T[], second: T[]) {
-  return first.map((item, i) => item ?? second[i])
+// Get the colors for each face given our current configuration
+function getFaceColors(mapping: number[], colors: any) {
+  return mapping.map((f) => colors[f])
 }
 
 const defaultState = {
@@ -96,13 +62,8 @@ function InnerProvider({ children }: ChildrenProp) {
         return
       }
 
-      const { start, endVertices } = animationData
-      const colorStart = getFaceColors(start, colors)
-      const colorEnd = getFaceColors(start.withVertices(endVertices), colors)
-
-      // if no colors are defined at the start, use the end colors
-      const allColorStart = arrayDefaults(colorStart, colorEnd)
-      anim.set(start.solidData, allColorStart)
+      const { start, endVertices, startColors, endColors } = animationData
+      anim.set(start.solidData, getFaceColors(startColors, colors))
 
       transitionId.current = transition(
         {
@@ -110,11 +71,11 @@ function InnerProvider({ children }: ChildrenProp) {
           ease: "easeQuadInOut",
           startValue: {
             vertices: start.solidData.vertices,
-            faceColors: allColorStart,
+            faceColors: getFaceColors(startColors, colors),
           },
           endValue: {
             vertices: endVertices,
-            faceColors: arrayDefaults(colorEnd, colorStart),
+            faceColors: getFaceColors(endColors, colors),
           },
           onFinish: () => {
             setPolyhedron(result)
