@@ -1,5 +1,5 @@
 import React, { Suspense } from "react"
-import { Route, Switch } from "react-router-dom"
+import { Route, Routes } from "react-router-dom"
 
 import usePageTracker from "./usePageTracker"
 import Loading from "./Loading"
@@ -11,11 +11,10 @@ export default function App() {
   usePageTracker()
   return (
     <Suspense fallback={<Loading />}>
-      <Switch>
-        {/* eslint-disable react/no-children-prop */}
-        <Route exact path="/" children={<HomePage />} />
-        <Route path="/:solid" children={<ViewerPage />} />
-      </Switch>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path=":solid/*" element={<ViewerPage />} />
+      </Routes>
     </Suspense>
   )
 }

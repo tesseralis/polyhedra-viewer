@@ -26,9 +26,9 @@ export default class AppPage {
     this.history.push(path)
     this.wrapper = mount(
       <DeviceProvider value={mediaInfo}>
-        <Router history={this.history}>
+        {/* <Router history={this.history}>
           <App />
-        </Router>
+        </Router> */}
       </DeviceProvider>,
     )
   }
@@ -39,7 +39,7 @@ export default class AppPage {
   }
 
   goBack() {
-    this.history.goBack()
+    // this.history.goBack()
     this.wrapper.update()
     return this
   }

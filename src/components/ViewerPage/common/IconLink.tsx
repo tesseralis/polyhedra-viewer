@@ -1,5 +1,5 @@
 import React from "react"
-import { Route, NavLink, NavLinkProps } from "react-router-dom"
+import { NavLink, NavLinkProps } from "react-router-dom"
 import { useStyle, scales } from "styles"
 import Icon from "@mdi/react"
 
@@ -32,7 +32,6 @@ export default function IconLink({
   title,
   to,
   replace,
-  exact,
   onClick,
   iconOnly = false,
 }: Props) {
@@ -51,18 +50,15 @@ export default function IconLink({
   const activeCss = useStyle(colorFill("DarkSlateGray"))
 
   return (
-    <Route>
-      <NavLink
-        to={to}
-        replace={replace}
-        exact={exact}
-        {...css()}
-        {...activeCss("activeClassName")}
-        onClick={onClick}
-      >
-        <Icon path={iconName} size={scales.size[2]} />
-        <LinkText text={title} hidden={iconOnly} />
-      </NavLink>
-    </Route>
+    <NavLink
+      to={to}
+      replace={replace}
+      {...css()}
+      {...activeCss("activeClassName")}
+      onClick={onClick}
+    >
+      <Icon path={iconName} size={scales.size[2]} />
+      <LinkText text={title} hidden={iconOnly} />
+    </NavLink>
   )
 }

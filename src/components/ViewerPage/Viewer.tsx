@@ -1,6 +1,6 @@
 import { capitalize } from "lodash-es"
 import React, { useEffect } from "react"
-import { useRouteMatch, useHistory } from "react-router-dom"
+import { useParams } from "react-router-dom"
 
 import { Polyhedron } from "math/polyhedra"
 import { wrapProviders } from "components/common"
@@ -49,15 +49,15 @@ function InnerViewer({ solid, panel, goBack = false }: InnerProps) {
 const Providers = wrapProviders([TransitionCtx.Provider, OperationCtx.Provider])
 
 export default function Viewer({ solid }: { solid: string }) {
-  const { panel } = useRouteMatch<{ panel: string }>().params
-  const history = useHistory()
-  const goBack = history.action === "POP"
+  const { panel } = useParams()
+  // const history = useNavigate()
+  // const goBack = history.action === "POP"
   usePageTitle(`${capitalize(solid)} - Polyhedra Viewer`)
 
   return (
     <PolyhedronCtx.Provider name={solid}>
       <Providers>
-        <InnerViewer solid={solid} panel={panel} goBack={goBack} />
+        <InnerViewer solid={solid} panel={panel} goBack={false} />
       </Providers>
     </PolyhedronCtx.Provider>
   )

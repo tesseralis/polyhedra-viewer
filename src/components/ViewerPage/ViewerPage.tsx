@@ -1,9 +1,9 @@
 import React from "react"
 import {
-  Switch,
+  Routes,
   Route,
-  Redirect,
-  useRouteMatch,
+  Navigate,
+  useParams,
   useLocation,
 } from "react-router-dom"
 
@@ -34,7 +34,7 @@ function resolveSolidName(solid: string) {
 }
 
 export default function ViewerPage() {
-  const { params, url } = useRouteMatch<{ solid: string }>()
+  const params = useParams()
   const { pathname } = useLocation()
   const solidParam = unescapeName(params.solid)
   const solid = resolveSolidName(solidParam)
@@ -44,18 +44,15 @@ export default function ViewerPage() {
   }
 
   if (solid !== solidParam) {
-    return <Redirect to={pathname.replace(params.solid, escape(solid))} />
+    return (
+      <Navigate replace to={pathname.replace(params.solid, escape(solid))} />
+    )
   }
 
   return (
-    <Switch>
-      {/* eslint-disable react/no-children-prop */}
-      <Route
-        exact
-        path={url}
-        children={<Redirect to={`${url}/operations`} />}
-      />
-      <Route path={`${url}/:panel`} children={<Viewer solid={solid} />} />
-    </Switch>
+    <Routes>
+      <Route path="/" element={<Navigate replace to={`operations`} />} />
+      <Route path=":panel" element={<Viewer solid={solid} />} />
+    </Routes>
   )
 }
