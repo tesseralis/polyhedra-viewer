@@ -1,6 +1,6 @@
 import React from "react"
 // import { createMemoryHistory, History } from "history"
-import { MemoryRouter } from "react-router-dom"
+import { useLocation, MemoryRouter } from "react-router-dom"
 
 import { mount, ReactWrapper } from "enzyme"
 
@@ -10,6 +10,11 @@ jest.mock("components/useMediaInfo")
 
 const { DeviceProvider } = require("components/useMediaInfo")
 
+function LocationStub() {
+  const { pathname } = useLocation()
+  return <div id="pathname">{pathname}</div>
+}
+
 export interface PageOptions {
   device?: string
   orientation?: string
@@ -17,16 +22,14 @@ export interface PageOptions {
 
 export default class AppPage {
   wrapper: ReactWrapper
-  // history: History
 
   constructor(path: string = "/", options: PageOptions = {}) {
     const { device = "desktop", orientation = "" } = options
     const mediaInfo = { device, orientation }
-    // this.history = createMemoryHistory()
-    // this.history.push(path)
     this.wrapper = mount(
       <DeviceProvider value={mediaInfo}>
         <MemoryRouter initialEntries={[path]}>
+          <LocationStub />
           <App />
         </MemoryRouter>
       </DeviceProvider>,
@@ -34,8 +37,8 @@ export default class AppPage {
   }
 
   expectPath(path: string) {
-    // TODO re-enable this sort of test when
-    // expect(this.history.location.pathname).toEqual(path)
+    const location = this.wrapper.find("#pathname")
+    expect(location.text()).toEqual(path)
     return this
   }
 
