@@ -4,7 +4,7 @@ import { BrowserRouter } from "react-router-dom"
 import { wrapProviders } from "components/common"
 import { DeviceProvider } from "./useMediaInfo"
 import ConfigCtx from "./ConfigCtx"
-import PageTracker from "./PageTracker"
+import usePageTracker from "./usePageTracker"
 
 import App from "./App"
 const Providers = wrapProviders([
@@ -13,13 +13,12 @@ const Providers = wrapProviders([
   ConfigCtx.Provider,
 ])
 
-const Root = () => {
+export default function Root() {
+  usePageTracker()
+
   return (
     <Providers>
-      <PageTracker />
       <App />
     </Providers>
   )
 }
-
-export default Root
