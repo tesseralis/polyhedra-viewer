@@ -12,6 +12,7 @@ module.exports = {
   parser: "@typescript-eslint/parser",
   plugins: ["prettier", "react", "@typescript-eslint"],
   rules: {
+    "no-console": "warn",
     // we have a lot of anonymous renderers passed as props
     "react/display-name": "off",
     // I care more about readibility than possible errors
@@ -31,9 +32,7 @@ module.exports = {
     // Enabled only for parameters with defaults for clarity
     "@typescript-eslint/no-inferrable-types": [
       "error",
-      {
-        ignoreParameters: true,
-      },
+      { ignoreParameters: true },
     ],
   },
 }
