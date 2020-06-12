@@ -12,7 +12,7 @@ jest.mock("transition")
 function renderViewer(solid: string) {
   return render(
     <BrowserRouter>
-      <Viewer solid={solid} panel="operations" />
+      <Viewer solid={solid} />
     </BrowserRouter>,
   )
 }
