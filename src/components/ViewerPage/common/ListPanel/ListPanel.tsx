@@ -137,8 +137,8 @@ export default function ListPanel() {
   return (
     <section {...css()}>
       <SearchBar value={filterText} onChange={setFilterText} />
-      {filteredGroups.map(({ name, ...group }: any) => (
-        <PolyhedronGroup key={name} group={group} />
+      {filteredGroups.map((group: any) => (
+        <PolyhedronGroup key={group.display} group={group} />
       ))}
     </section>
   )
