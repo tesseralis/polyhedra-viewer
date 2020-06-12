@@ -4,7 +4,7 @@ import React, { useState } from "react"
 import { NavLink } from "react-router-dom"
 import { fonts, useStyle, scales } from "styles"
 
-import { groups } from "data/list"
+import { PolyhedronGroup, PolyhedronSubgroup, groups } from "data/list"
 import { escape } from "utils"
 import { hover, padding, paddingVert, margin, marginVert } from "styles/common"
 
@@ -14,24 +14,22 @@ function getFilteredPolyhedra(polyhedra: string[], filter: string) {
   return polyhedra.filter((solid) => solid.includes(filter.toLowerCase()))
 }
 
-function filterGroups(groups: any[], filterText: string): any {
+function filterSubgroups(subgroups: PolyhedronSubgroup[], filterText: string) {
+  return subgroups
+    .map(({ name, polyhedra }) => ({
+      name,
+      polyhedra: getFilteredPolyhedra(polyhedra, filterText),
+    }))
+    .filter(({ polyhedra }) => polyhedra.length > 0)
+}
+
+function filterGroups(groups: PolyhedronGroup[], filterText: string) {
   return groups
-    .map((group) => {
-      if (group.groups) {
-        return {
-          ...group,
-          groups: filterGroups(group.groups, filterText),
-        }
-      }
-      return {
-        ...group,
-        polyhedra: getFilteredPolyhedra(group.polyhedra, filterText),
-      }
-    })
-    .filter(
-      ({ groups, polyhedra }) =>
-        (groups && groups.length > 0) || (polyhedra && polyhedra.length > 0),
-    )
+    .map(({ name, groups }) => ({
+      name,
+      groups: filterSubgroups(groups, filterText),
+    }))
+    .filter(({ groups }) => groups.length > 0)
 }
 
 function PolyhedronLink({ name }: { name: string }) {
@@ -87,13 +85,7 @@ function SubgroupHeader({ name }: { name: string }) {
   return <h3 {...css()}>{capitalize(name)}</h3>
 }
 
-const Subgroup = ({
-  name,
-  polyhedra,
-}: {
-  name: string
-  polyhedra: string[]
-}) => {
+function Subgroup({ name, polyhedra }: PolyhedronSubgroup) {
   const css = useStyle(marginVert(scales.spacing[3]))
 
   return (
@@ -113,16 +105,16 @@ function GroupHeader({ text }: { text: string }) {
   return <h2 {...css()}>{text}</h2>
 }
 
-const PolyhedronGroup = ({ group }: { group: any }) => {
-  const { display, polyhedra, groups } = group
+function Group({ group }: { group: PolyhedronGroup }) {
+  const { name, groups } = group
   const css = useStyle({ marginTop: scales.spacing[2] })
 
   return (
     <div {...css()}>
-      <GroupHeader text={display} />
-      {polyhedra && <SubList polyhedra={polyhedra} />}
-      {groups &&
-        groups.map((group: any) => <Subgroup key={group.name} {...group} />)}
+      <GroupHeader text={name} />
+      {groups.map((group) => (
+        <Subgroup key={group.name} {...group} />
+      ))}
     </div>
   )
 }
@@ -137,8 +129,8 @@ export default function ListPanel() {
   return (
     <section {...css()}>
       <SearchBar value={filterText} onChange={setFilterText} />
-      {filteredGroups.map(({ name, ...group }: any) => (
-        <PolyhedronGroup key={name} group={group} />
+      {filteredGroups.map((group) => (
+        <Group key={group.name} group={group} />
       ))}
     </section>
   )

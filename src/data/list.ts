@@ -34,23 +34,35 @@ const johnsonSubgroups = [
   { name: "others", index: 85 },
 ]
 
-const getUniformPolyhedra = () =>
-  uniformData.map(({ name, display }) => ({
+export interface PolyhedronSubgroup {
+  name: string
+  polyhedra: string[]
+}
+
+export interface PolyhedronGroup {
+  name: string
+  groups: PolyhedronSubgroup[]
+}
+
+function getUniformPolyhedra(): PolyhedronSubgroup[] {
+  return uniformData.map(({ name, display }) => ({
     name: display,
     polyhedra: getPolyhedraNames(name),
   }))
+}
 
-const getEndIndex = (i: number) =>
-  i === johnsonSubgroups.length - 1 ? 92 : johnsonSubgroups[i + 1].index
+function getEndIndex(i: number) {
+  return i === johnsonSubgroups.length - 1 ? 92 : johnsonSubgroups[i + 1].index
+}
 
-const getJohnsonPolyhedra = () => {
+function getJohnsonPolyhedra(): PolyhedronSubgroup[] {
   return johnsonSubgroups.map(({ name, index }, i) => ({
     name,
     polyhedra: getPolyhedraNames("johnson").slice(index, getEndIndex(i)),
   }))
 }
 
-export const groups = [
-  { display: "Uniform Polyhedra", groups: getUniformPolyhedra() },
-  { display: "Johnson Solids", groups: getJohnsonPolyhedra() },
+export const groups: PolyhedronGroup[] = [
+  { name: "Uniform Polyhedra", groups: getUniformPolyhedra() },
+  { name: "Johnson Solids", groups: getJohnsonPolyhedra() },
 ]
