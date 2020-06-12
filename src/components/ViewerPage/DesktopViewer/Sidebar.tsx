@@ -48,7 +48,7 @@ export default function Sidebar({ panel, solid, compact }: Props) {
   return (
     <section {...css()}>
       <div {...navCss()}>
-        <NavMenu solid={solid} compact={compact} onClick={focusOnHeader} />
+        <NavMenu compact={compact} onClick={focusOnHeader} />
       </div>
       {!compact && (
         <div {...contentCss()}>

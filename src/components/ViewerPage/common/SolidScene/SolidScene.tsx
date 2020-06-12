@@ -7,7 +7,7 @@ import useSolidContext from "./useSolidContext"
 import useHitOptions from "./useHitOptions"
 import Config from "components/ConfigCtx"
 
-export default ({ label }: { label: string }) => {
+export default function SolidScene({ label }: { label: string }) {
   const { colors, solidData } = useSolidContext()
   const config = Config.useState()
   const { setHitOption, unsetHitOption, applyWithHitOption } = useHitOptions()

@@ -8,12 +8,10 @@ import {
   mdiCubeOutline,
 } from "@mdi/js"
 
-import { escape } from "utils"
 import { useStyle } from "styles"
 import IconLink from "./IconLink"
 
 interface Props {
-  solid: string
   compact?: boolean
   onClick(): void
 }
@@ -26,7 +24,7 @@ const links = [
   { name: "full", title: "Fullscreen", icon: mdiCubeOutline },
 ]
 
-export default function NavMenu({ solid, compact = false, onClick }: Props) {
+export default function NavMenu({ compact = false, onClick }: Props) {
   const css = useStyle({
     // Using grid here bc it's easier to get evenly spaced than flex
     display: "grid",
@@ -41,7 +39,7 @@ export default function NavMenu({ solid, compact = false, onClick }: Props) {
         <IconLink
           key={name}
           replace
-          to={`/${escape(solid)}/${name}`}
+          to={`../${name}`}
           title={capitalize(title)}
           iconName={icon}
           iconOnly={compact}

@@ -3,7 +3,7 @@ import type Specs from "./PolyhedronSpecs"
 import type Composite from "./Composite"
 import type Capstone from "./Capstone"
 
-const elementaryMapping: Record<string, Symmetry> = {
+const elementaryMapping = {
   sphenocorona: Cyclic.biradial,
   "augmented sphenocorona": Cyclic.bilateral,
   sphenomegacorona: Cyclic.biradial,
@@ -52,7 +52,7 @@ function getCompositeSymmetry(composite: Composite) {
         ? Cyclic.biradial
         : Cyclic.get(source.data.family)
 
-    case 2:
+    case 2: {
       if (source.isPrismatic()) {
         // para-augmented prisms have digonal prismatic symmetry
         // meta-augmented prisms have biradial symmetry
@@ -72,6 +72,7 @@ function getCompositeSymmetry(composite: Composite) {
       } else {
         return pure ? Cyclic.biradial : Cyclic.bilateral
       }
+    }
 
     case 3:
       // The only tri-augmented prisms are triangular and hexagonal

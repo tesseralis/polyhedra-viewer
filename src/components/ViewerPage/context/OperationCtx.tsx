@@ -19,7 +19,9 @@ export default createHookedContext<State, Actions>(
     setOperation: (operation, solid) => () => {
       return { operation, options: operation.defaultOptions(solid) }
     },
-    unsetOperation: () => () => defaultState,
+    unsetOperation: () => () => {
+      return defaultState
+    },
     setOption: (name, value) => ({ operation, options }) => {
       return { operation, options: { ...options, [name]: value } }
     },

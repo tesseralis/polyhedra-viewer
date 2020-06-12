@@ -1,30 +1,21 @@
+import { Items } from "types"
 import Specs from "./PolyhedronSpecs"
 import Queries from "./Queries"
-import { DataOptions } from "./common"
 
-type ElementaryBase =
-  | "sphenocorona"
-  | "augmented sphenocorona"
-  | "sphenomegacorona"
-  | "hebesphenomegacorona"
-  | "disphenocingulum"
-  | "bilunabirotunda"
-  | "triangular hebesphenorotunda"
+const bases = [
+  "sphenocorona",
+  "augmented sphenocorona",
+  "sphenomegacorona",
+  "hebesphenomegacorona",
+  "disphenocingulum",
+  "bilunabirotunda",
+  "triangular hebesphenorotunda",
+] as const
+
+type ElementaryBase = Items<typeof bases>
 
 interface ElementaryData {
   base: ElementaryBase
-}
-
-const options: DataOptions<ElementaryData> = {
-  base: [
-    "sphenocorona",
-    "augmented sphenocorona",
-    "sphenomegacorona",
-    "hebesphenomegacorona",
-    "disphenocingulum",
-    "bilunabirotunda",
-    "triangular hebesphenorotunda",
-  ],
 }
 
 export default class Elementary extends Specs<ElementaryData> {
@@ -33,7 +24,7 @@ export default class Elementary extends Specs<ElementaryData> {
   }
 
   static *getAll() {
-    for (const base of options.base) {
+    for (const base of bases) {
       yield new Elementary({ base })
     }
   }

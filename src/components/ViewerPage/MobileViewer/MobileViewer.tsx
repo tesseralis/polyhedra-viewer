@@ -112,7 +112,7 @@ export default memo(function MobileViewer({ panel, solid }: Props) {
         <SolidScene label={solid} />
       </main>
       <div {...navCss()}>
-        <NavMenu solid={solid} onClick={focusOnHeader} />
+        <NavMenu onClick={focusOnHeader} />
       </div>
     </section>
   )

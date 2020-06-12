@@ -15,11 +15,11 @@ export default function useHitOptions() {
   const { operation, options = {} } = OperationCtx.useState()
   const { setOption } = OperationCtx.useActions()
   const applyOperation = useApplyOperation()
-  const { hitOption = "", getHitOption = () => ({}) } = operation ?? {}
+  const { hitOption = "" } = operation ?? {}
 
   const setHitOption = (hitPnt: Point) => {
     if (!operation || isTransitioning) return
-    const newHitOptions = getHitOption(polyhedron, hitPnt, options)
+    const newHitOptions = operation.getHitOption(polyhedron, hitPnt, options)
     if (isEmpty(newHitOptions)) {
       return setOption(hitOption, undefined)
     }
@@ -36,7 +36,7 @@ export default function useHitOptions() {
 
   const applyWithHitOption = (hitPnt: Point) => {
     if (!operation || isTransitioning) return
-    const newHitOptions = getHitOption(polyhedron, hitPnt, options)
+    const newHitOptions = operation.getHitOption(polyhedron, hitPnt, options)
     const newValue = newHitOptions[hitOption]
     // only apply operation if we have a hit
     if (options && newValue) {

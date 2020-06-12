@@ -1,5 +1,5 @@
 import { ValueIteratee } from "lodash"
-import { uniqBy, invert } from "lodash-es"
+import { uniqBy } from "lodash-es"
 
 function mod(a: number, b: number) {
   return a >= 0 ? a % b : (a % b) + b
@@ -68,31 +68,6 @@ export function pivot<T>(list: T[], value: T) {
   const index = list.indexOf(value)
   const [front, back] = splitAt(list, index)
   return [...back, ...front]
-}
-
-type Key = string | number | symbol
-export function bimap<K extends Key, V extends Key>(obj: Record<K, V>) {
-  const inverse = invert(obj) as Record<V, K>
-  return {
-    get(key: K): V {
-      return obj[key] as V
-    },
-    of(val: V): K {
-      return inverse[val] as K
-    },
-    hasKey(key: Key): key is K {
-      return !!(obj as any)[key]
-    },
-    hasValue(val: Key): val is V {
-      return !!(inverse as any)[val]
-    },
-    keys(): K[] {
-      return Object.keys(obj) as K[]
-    },
-    values(): V[] {
-      return Object.values(obj)
-    },
-  }
 }
 
 export const escape = (str: string) => str.replace(/ /g, "-")

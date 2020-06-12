@@ -1,28 +1,28 @@
+import { Items } from "types"
 import { PrimaryPolygon, primaryPolygons } from "../polygons"
 import Specs from "./PolyhedronSpecs"
-import { DataOptions } from "./common"
 import Queries from "./Queries"
 
+const families = primaryPolygons
 type Family = PrimaryPolygon
-type Facet = "face" | "vertex"
-type Operation =
-  | "regular"
-  | "truncate"
-  | "rectify"
-  | "bevel"
-  | "cantellate"
-  | "snub"
+
+const facets = ["face", "vertex"] as const
+type Facet = Items<typeof facets>
+
+const operations = [
+  "regular",
+  "truncate",
+  "rectify",
+  "bevel",
+  "cantellate",
+  "snub",
+] as const
+type Operation = Items<typeof operations>
 
 interface ClassicalData {
   family: Family
   facet?: Facet
   operation: Operation
-}
-
-const options: DataOptions<ClassicalData> = {
-  family: primaryPolygons,
-  facet: ["face", "vertex"],
-  operation: ["regular", "truncate", "rectify", "bevel", "cantellate", "snub"],
 }
 
 /**
@@ -57,10 +57,10 @@ export default class Classical extends Specs<ClassicalData> {
   isVertex = () => this.data.facet === "vertex"
 
   static *getAll() {
-    for (const operation of options.operation) {
-      for (const family of options.family) {
+    for (const operation of operations) {
+      for (const family of families) {
         if (family !== 3 && ["regular", "truncate"].includes(operation)) {
-          for (const facet of options.facet) {
+          for (const facet of facets) {
             yield new Classical({ family, operation, facet })
           }
         } else {

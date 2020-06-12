@@ -120,7 +120,7 @@ xdescribe("viewer", () => {
     page
       .clickButtonWithText("truncate")
       .expectTransitionTo("truncated tetrahedron")
-      .goBack()
+      // .goBack()
       .expectTransitionTo("tetrahedron")
       .clickButtonWithText("truncate")
       .expectTransitionTo("truncated tetrahedron")

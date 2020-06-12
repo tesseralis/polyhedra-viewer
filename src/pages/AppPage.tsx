@@ -1,7 +1,5 @@
-import _ from "lodash-es"
 import React from "react"
-import { createMemoryHistory, History } from "history"
-import { Router } from "react-router-dom"
+import { useLocation, MemoryRouter } from "react-router-dom"
 
 import { mount, ReactWrapper } from "enzyme"
 
@@ -11,6 +9,11 @@ jest.mock("components/useMediaInfo")
 
 const { DeviceProvider } = require("components/useMediaInfo")
 
+function LocationStub() {
+  const { pathname } = useLocation()
+  return <div id="pathname">{pathname}</div>
+}
+
 export interface PageOptions {
   device?: string
   orientation?: string
@@ -18,32 +21,31 @@ export interface PageOptions {
 
 export default class AppPage {
   wrapper: ReactWrapper
-  history: History
 
   constructor(path: string = "/", options: PageOptions = {}) {
     const { device = "desktop", orientation = "" } = options
     const mediaInfo = { device, orientation }
-    this.history = createMemoryHistory()
-    this.history.push(path)
     this.wrapper = mount(
       <DeviceProvider value={mediaInfo}>
-        <Router history={this.history}>
+        <MemoryRouter initialEntries={[path]}>
+          <LocationStub />
           <App />
-        </Router>
+        </MemoryRouter>
       </DeviceProvider>,
     )
   }
 
   expectPath(path: string) {
-    expect(this.history.location.pathname).toEqual(path)
+    const location = this.wrapper.find("#pathname")
+    expect(location.text()).toEqual(path)
     return this
   }
 
-  goBack() {
-    this.history.goBack()
-    this.wrapper.update()
-    return this
-  }
+  // goBack() {
+  //   // this.history.goBack()
+  //   this.wrapper.update()
+  //   return this
+  // }
 
   findElementWithText(element: string, text: string) {
     return this.wrapper

@@ -1,19 +1,18 @@
+import { Items } from "types"
 import Specs from "./PolyhedronSpecs"
 import Queries from "./Queries"
 import Prismatic from "./Prismatic"
-import { DataOptions } from "./common"
+
+const sources = Prismatic.query.where(
+  ({ base, type }) => type === "antiprism" && base <= 5,
+)
+const operations = [null, "snub"] as const
+type Operation = Items<typeof operations>
 
 interface ModifiedAntiprismData {
   source: Prismatic
   // operation: null | "rectified" | "snub"
-  operation: null | "snub"
-}
-
-const options: DataOptions<ModifiedAntiprismData> = {
-  source: Prismatic.query.where(
-    ({ base, type }) => type === "antiprism" && base <= 5,
-  ),
-  operation: [null, "snub"],
+  operation: Operation
 }
 
 export default class ModifiedAntiprism extends Specs<ModifiedAntiprismData> {
@@ -22,8 +21,8 @@ export default class ModifiedAntiprism extends Specs<ModifiedAntiprismData> {
   }
 
   static *getAll() {
-    for (const source of options.source) {
-      for (const operation of options.operation) {
+    for (const source of sources) {
+      for (const operation of operations) {
         // The snub pentagonal antiprism is non-CRF
         if (source.data.base === 5 && operation === "snub") {
           continue

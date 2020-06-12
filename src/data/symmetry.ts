@@ -59,13 +59,13 @@ export abstract class Symmetry {
 
 type Family = 3 | 4 | 5
 
-const polyhedralOrders: Record<Family, number> = {
+const polyhedralOrders = {
   3: 12,
   4: 24,
   5: 60,
 }
 
-const groupNames: Record<Family, string> = {
+const groupNames = {
   3: "tetrahedral",
   4: "octahedral",
   5: "icosahedral",
@@ -156,7 +156,7 @@ export class Dihedral extends Symmetry {
 
   name() {
     const { n, reflection } = this.data
-    const base = !!reflection ? `${reflection}atic` : "dihedral"
+    const base = reflection ? `${reflection}atic` : "dihedral"
     return `${polygonPrefixes.get(n)} ${base}`
   }
 

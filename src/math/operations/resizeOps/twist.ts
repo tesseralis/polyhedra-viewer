@@ -10,7 +10,7 @@ import {
   getResizedVertices,
   expansionType,
 } from "./resizeUtils"
-import makeOperation from "../makeOperation"
+import Operation from "../Operation"
 
 // TODO deduplicate with turn
 function bisectEdgeFaces(expandedFaces: Face[], twist: Twist) {
@@ -118,7 +118,7 @@ function doTwist(
 interface Options {
   twist?: Twist
 }
-export const twist = makeOperation<Classical, Options>("twist", {
+export const twist = new Operation<Options, Classical>("twist", {
   apply({ geom }, { twist: twistOpt }, result) {
     return doTwist(geom, result, twistOpt)
   },

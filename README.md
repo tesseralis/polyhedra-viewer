@@ -17,15 +17,15 @@ Geometric data taken from George W. Hart's [Virtual Polyhedra].
 
 1. `git clone https://github.com/tesseralis/polyhedra-viewer`
 2. `cd polyhedra-viewer`
-3. `npm install`
+3. `yarn`
 
 ### Running locally
 
-Run `npm start` to start the site locally on `http://localhost:3000`.
+Run `yarn start` to start the site locally on `http://localhost:3000`.
 
 ### Testing
 
-Run `npm test` to run the test suite.
+Run `yarn test` to run the test suite.
 
 ## Contributing
 

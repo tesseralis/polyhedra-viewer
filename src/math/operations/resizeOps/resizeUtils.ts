@@ -10,7 +10,7 @@ export function getResizedVertices(
   resizedLength: number,
   angle: number = 0,
 ) {
-  // Update the vertices with the expanded-out version
+  // Update the vertices with the expanded-out version.
   const f0 = faces[0]
   const scale = resizedLength - f0.distanceToCenter()
   return getTransformedVertices(faces, (f) =>
@@ -59,7 +59,7 @@ function getFaceDistance(face1: Face, face2: Face) {
 }
 
 function getIcosahedronContractFaces(polyhedron: Polyhedron) {
-  let result = []
+  const result = []
   let toTest = polyhedron.faces
   while (toTest.length > 0) {
     const [next, ...rest] = toTest
