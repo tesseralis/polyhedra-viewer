@@ -46,8 +46,9 @@ function InnerViewer({ solid, panel }: InnerProps) {
     }
     // Don't depend on `solid` or `polyhedron.name` over here:
     // this is how the two states get synced with each other
+    // Also don't depend on `navigate` because it's not memoized
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [solidSync, navigate, setPolyhedron, unsetOperation])
+  }, [solidSync, setPolyhedron, unsetOperation])
 
   const { device } = useMediaInfo()
 
