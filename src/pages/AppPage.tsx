@@ -1,5 +1,4 @@
 import React from "react"
-// import { createMemoryHistory, History } from "history"
 import { useLocation, MemoryRouter } from "react-router-dom"
 
 import { mount, ReactWrapper } from "enzyme"
