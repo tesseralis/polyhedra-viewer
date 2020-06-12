@@ -1,4 +1,5 @@
 import React, { useEffect } from "react"
+import { useLocation } from "react-router-dom"
 
 import { useStyle, scales } from "styles"
 import useMediaInfo from "components/useMediaInfo"
@@ -55,11 +56,8 @@ function Footer() {
   )
 }
 
-interface Props {
-  hash?: string
-}
-
-export default function HomePage({ hash = "" }: Props) {
+export default function HomePage() {
+  const hash = useLocation().hash.substring(1)
   useEffect(() => {
     const el = document.getElementById(hash)
     if (el !== null) {

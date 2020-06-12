@@ -14,10 +14,7 @@ export default function BackLink({ solid }: Props) {
       iconOnly
       iconName={mdiChevronLeft}
       title="Back"
-      to={{
-        pathname: "/",
-        hash: escape(solid),
-      }}
+      to={`/#${escape(solid)}`}
     />
   )
 }

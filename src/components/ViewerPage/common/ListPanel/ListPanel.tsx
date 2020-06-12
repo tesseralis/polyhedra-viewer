@@ -1,7 +1,7 @@
 import { capitalize } from "lodash-es"
 
 import React, { useState } from "react"
-import { NavLink, Route } from "react-router-dom"
+import { NavLink } from "react-router-dom"
 import { fonts, useStyle, scales } from "styles"
 
 import { groups } from "data/list"
@@ -56,15 +56,13 @@ function PolyhedronLink({ name }: { name: string }) {
   })
 
   return (
-    <Route>
-      <NavLink
-        to={`/${escape(name)}/list`}
-        {...css()}
-        {...activeCss("activeClassName")}
-      >
-        {capitalize(name)}
-      </NavLink>
-    </Route>
+    <NavLink
+      to={`../../${escape(name)}/list`}
+      {...css()}
+      {...activeCss("activeClassName")}
+    >
+      {capitalize(name)}
+    </NavLink>
   )
 }
 

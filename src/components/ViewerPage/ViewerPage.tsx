@@ -1,33 +1,58 @@
-import { capitalize } from "lodash-es"
-
 import React from "react"
-import { Route, Redirect } from "react-router-dom"
+import {
+  Routes,
+  Route,
+  Navigate,
+  useParams,
+  useLocation,
+} from "react-router-dom"
 
-import { usePageTitle } from "components/common"
+import { escape, choose } from "utils"
+import { isValidSolid, allSolidNames } from "data/common"
+import { isAlternateName, getCanonicalName } from "data/alternates"
+import { isConwayNotation, fromConwayNotation } from "data/conway"
+
+import ErrorPage from "components/ErrorPage"
 import Viewer from "./Viewer"
 
-interface Props {
-  solid: string
-  url: string
+const unescapeName = (name: string) => name.replace(/-/g, " ")
+
+function resolveSolidName(solid: string) {
+  if (solid === "random") {
+    return choose(allSolidNames)
+  }
+  if (isConwayNotation(solid)) {
+    return fromConwayNotation(solid)
+  }
+  if (isAlternateName(solid)) {
+    return getCanonicalName(solid)
+  }
+  if (isValidSolid(solid)) {
+    return solid
+  }
+  return null
 }
 
-export default function ViewerPage({ solid, url }: Props) {
-  usePageTitle(`${capitalize(solid)} - Polyhedra Viewer`)
+export default function ViewerPage() {
+  const params = useParams()
+  const { pathname } = useLocation()
+  const solidParam = unescapeName(params.solid)
+  const solid = resolveSolidName(solidParam)
+
+  if (!solid) {
+    return <ErrorPage />
+  }
+
+  if (solid !== solidParam) {
+    return (
+      <Navigate replace to={pathname.replace(params.solid, escape(solid))} />
+    )
+  }
 
   return (
-    <>
-      <Route
-        exact
-        path={url}
-        render={() => <Redirect to={`${url}/operations`} />}
-      />
-      <Route
-        path={`${url}/:panel`}
-        render={({ match }) => {
-          const { panel } = match.params
-          return <Viewer solid={solid} panel={panel ?? ""} />
-        }}
-      />
-    </>
+    <Routes>
+      <Route path="/" element={<Navigate replace to="operations" />} />
+      <Route path=":panel" element={<Viewer solid={solid} />} />
+    </Routes>
   )
 }
