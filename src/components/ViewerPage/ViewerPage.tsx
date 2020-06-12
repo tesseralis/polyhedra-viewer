@@ -51,7 +51,7 @@ export default function ViewerPage() {
 
   return (
     <Routes>
-      <Route path="/" element={<Navigate replace to={`operations`} />} />
+      <Route path="/" element={<Navigate replace to="operations" />} />
       <Route path=":panel" element={<Viewer solid={solid} />} />
     </Routes>
   )
