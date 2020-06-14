@@ -60,7 +60,8 @@ function InnerViewer({ solid, panel }: InnerProps) {
 const Providers = wrapProviders([TransitionCtx.Provider, OperationCtx.Provider])
 
 export default function Viewer({ solid }: { solid: string }) {
-  const { panel } = useParams()
+  // FIXME split up these components a more reasonable way
+  const { panel = "operations" } = useParams()
   usePageTitle(`${capitalize(solid)} - Polyhedra Viewer`)
 
   return (
