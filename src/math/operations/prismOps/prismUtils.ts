@@ -120,8 +120,8 @@ export function getScaledPrismVertices(
   return getTransformedVertices<FaceLike>(vertexSets, (set) =>
     withOrigin(set.normalRay(), (v) =>
       v
-        .add(set.normal().scale((scale * 1) / 2))
-        .getRotatedAroundAxis(set.normal(), (angle * 1) / 2),
+        .add(set.normal().scale(scale / 2))
+        .getRotatedAroundAxis(set.normal(), angle / 2),
     ),
   )
 }

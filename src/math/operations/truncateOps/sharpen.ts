@@ -1,4 +1,4 @@
-import { set, flatMapDeep, meanBy } from "lodash-es"
+import { set, flatMapDeep } from "lodash-es"
 
 import Classical from "data/specs/Classical"
 import { Polyhedron, Vertex, Face, Edge } from "math/polyhedra"

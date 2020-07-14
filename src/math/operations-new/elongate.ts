@@ -1,7 +1,11 @@
 import { sortBy } from "lodash-es"
-import { Polyhedron, Cap } from "math/polyhedra"
+import { Cap } from "math/polyhedra"
 import Capstone from "data/specs/Capstone"
 import OperationPair from "./OperationPair"
+import {
+  getAdjustInformation,
+  getScaledPrismVertices,
+} from "../operations/prismOps/prismUtils"
 
 // Every unelongated capstone (except fastigium) can be elongated
 const graph = Capstone.query
@@ -17,7 +21,7 @@ const graph = Capstone.query
 
 const capTypeMap: Record<string, number> = { rotunda: 0, cupola: 1, pyramid: 2 }
 
-export const elongate = new OperationPair<Capstone, {}>({
+export default new OperationPair<Capstone, {}>({
   graph,
   getPose({ geom, specs }) {
     // Pick a cap, favoring rotunda over cupola in the case of cupolarotundae
@@ -45,10 +49,13 @@ export const elongate = new OperationPair<Capstone, {}>({
     // Shorten the solid
     // FIXME get the cap that we are aligned with and its opposite cap
     // push the caps inwards
-    return geom
+    const adjustInfo = getAdjustInformation(geom)
+    const scale = geom.edgeLength()
+
+    return getScaledPrismVertices(adjustInfo, -scale)
   },
   toEnd({ geom }) {
     // Elongated solids are already the intermediate
-    return geom
+    return geom.vertices
   },
 })
