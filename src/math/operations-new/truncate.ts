@@ -29,6 +29,21 @@ function getVertexToAdd(info: Classical, face: Face) {
   return face.normalRay().getPointAtDistance(dist)
 }
 
+// Get the regular face of a truncated solid
+function truncatedToRegular(specs: Classical, geom: Polyhedron) {
+  const sharpenFaces = getSharpenFaces(geom)
+  const verticesToAdd = sharpenFaces.map((face) => getVertexToAdd(specs, face))
+  const oldToNew: Record<number, number> = {}
+  sharpenFaces.forEach((face, i) => {
+    face.vertices.forEach((v) => {
+      oldToNew[v.index] = i
+    })
+  })
+  return geom.vertices.map(
+    (v, vIndex) => verticesToAdd[oldToNew[vIndex]] ?? v.vec,
+  )
+}
+
 export const truncate = new OperationPair<Classical, {}>({
   graph: Classical.query
     .where((data) => ["regular", "rectify"].includes(data.operation))
@@ -94,19 +109,7 @@ export const truncate = new OperationPair<Classical, {}>({
     throw new Error(`Not implemented`)
   },
   toStart({ geom, specs }) {
-    const sharpenFaces = getSharpenFaces(geom)
-    const verticesToAdd = sharpenFaces.map((face) =>
-      getVertexToAdd(specs, face),
-    )
-    const oldToNew: Record<number, number> = {}
-    sharpenFaces.forEach((face, i) => {
-      face.vertices.forEach((v) => {
-        oldToNew[v.index] = i
-      })
-    })
-    return geom.vertices.map(
-      (v, vIndex) => verticesToAdd[oldToNew[vIndex]] ?? v.vec,
-    )
+    return truncatedToRegular(specs, geom)
   },
   toEnd({ geom }) {
     // truncated solids are already the intermediate
@@ -167,7 +170,7 @@ export const rectify = new OperationPair<Classical, Options>({
         (face) =>
           face.numSides === (facet === "vertex" ? 3 : specs.data.family),
       )!
-      const crossAxis = face.edges[0].midpoint().sub(face.centroid())
+      const crossAxis = face.vertices[0].vec.sub(face.centroid())
       return {
         origin,
         // scale with respect to the sharpen face
@@ -181,20 +184,7 @@ export const rectify = new OperationPair<Classical, Options>({
     throw new Error("Not supported")
   },
   toStart({ geom, specs }) {
-    // FIXME deduplicate with truncate
-    const sharpenFaces = getSharpenFaces(geom)
-    const verticesToAdd = sharpenFaces.map((face) =>
-      getVertexToAdd(specs, face),
-    )
-    const oldToNew: Record<number, number> = {}
-    sharpenFaces.forEach((face, i) => {
-      face.vertices.forEach((v) => {
-        oldToNew[v.index] = i
-      })
-    })
-    return geom.vertices.map(
-      (v, vIndex) => verticesToAdd[oldToNew[vIndex]] ?? v.vec,
-    )
+    return truncatedToRegular(specs, geom)
   },
   toEnd({ geom }) {
     const oldToNew: Record<number, Vec3D> = {}
@@ -205,6 +195,7 @@ export const rectify = new OperationPair<Classical, Options>({
       oldToNew[edge.v1.index] = edge.midpoint()
       oldToNew[edge.v2.index] = edge.midpoint()
     }
+    // FIXME octahedron case
     return geom.vertices.map((v, vIndex) => oldToNew[vIndex])
   },
 })

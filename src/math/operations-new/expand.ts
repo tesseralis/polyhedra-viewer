@@ -40,7 +40,7 @@ export const expand = new OperationPair<Classical, Options>({
         source: entry,
         intermediate: target,
         target,
-        options: { faceType: entry.data.family },
+        options: { faceType: entry.isFace() ? entry.data.family : 3 },
       }
     }),
   getPose({ geom, specs }, { faceType }) {

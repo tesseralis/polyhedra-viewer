@@ -1,3 +1,4 @@
+import { isMatch } from "lodash-es"
 import { getAllSpecs } from "data/specs/getSpecs"
 import PolyhedronSpecs from "data/specs/PolyhedronSpecs"
 import { Polyhedron, VertexArg } from "math/polyhedra"
@@ -102,7 +103,9 @@ export default class OperationPair<
     const { graph, getPose, toStart, toEnd } = this.inputs
     const specs = this.getSpecs(solid)
     const interSpecs = graph.find(
-      (entry) => entry[input].name() === specs.name(),
+      (entry) =>
+        entry[input].name() === specs.name() &&
+        isMatch(entry.options || {}, opts),
     )!.intermediate
 
     const interSolid = Polyhedron.get(interSpecs.canonicalName())
