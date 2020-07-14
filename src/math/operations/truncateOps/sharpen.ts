@@ -3,6 +3,7 @@ import { set, flatMapDeep, meanBy } from "lodash-es"
 import Classical from "data/specs/Classical"
 import { Polyhedron, Vertex, Face, Edge } from "math/polyhedra"
 import Operation from "../Operation"
+import metaTruncate from "../../operations-new/truncate"
 
 // Adjacent faces of the vertex with a sharpen face first
 function getShiftedAdjacentFaces(vertex: Vertex, facesTosharpen: Face[]) {
@@ -64,24 +65,18 @@ function getVertexToAdd(info: Classical, face: Face) {
   return face.normalRay().getPointAtDistance(dist)
 }
 
-function applySharpen(
+function applyUnrectify(
   info: Classical,
   polyhedron: Polyhedron,
   faceType: number = polyhedron.smallestFace().numSides,
 ) {
   // face indices with the right number of sides
-  let sharpenFaces =
-    info.isRectified() && info.isTetrahedral()
-      ? getOctahedronSharpenFaces(polyhedron)
-      : getSharpenFaces(polyhedron, faceType)
+  let sharpenFaces = info.isTetrahedral()
+    ? getOctahedronSharpenFaces(polyhedron)
+    : getSharpenFaces(polyhedron, faceType)
 
-  let mock: Polyhedron
-  if (info.isRectified()) {
-    mock = duplicateVertices(polyhedron, sharpenFaces)
-    sharpenFaces = sharpenFaces.map((face) => mock.faces[face.index])
-  } else {
-    mock = polyhedron
-  }
+  const mock = duplicateVertices(polyhedron, sharpenFaces)
+  sharpenFaces = sharpenFaces.map((face) => mock.faces[face.index])
 
   const verticesToAdd = sharpenFaces.map((face) => getVertexToAdd(info, face))
 
@@ -109,31 +104,39 @@ interface Options {
 }
 export const sharpen = new Operation<Options, Classical>("sharpen", {
   apply({ specs, geom }, { faceType }) {
-    return applySharpen(specs, geom, faceType)
+    if (!specs.isRectified()) {
+      return metaTruncate.unapply(geom)
+    }
+    return applyUnrectify(specs, geom, faceType)
   },
 
   canApplyTo(info): info is Classical {
+    if (metaTruncate.canUnapplyTo(info)) return true
     if (!info.isClassical()) return false
     return ["truncate", "rectify", "bevel"].includes(info.data.operation)
   },
 
   getResult({ specs }, { faceType }) {
-    if (specs.isTruncated()) return specs.withData({ operation: "regular" })
-    if (specs.isBevelled()) return specs.withData({ operation: "rectify" })
-
-    // if rectified, we have to figure out the facet from the faceType
-    return specs.withData({
-      operation: "regular",
-      facet: faceType === 3 ? "face" : "vertex",
-    })
+    if (specs.isRectified()) {
+      // if rectified, we have to figure out the facet from the faceType
+      return specs.withData({
+        operation: "regular",
+        facet: faceType === 3 ? "face" : "vertex",
+      })
+    } else {
+      return metaTruncate.getSource(specs)
+    }
   },
 
   hasOptions(info) {
+    if (metaTruncate.canUnapplyTo(info)) return false
     return !info.isTetrahedral() && info.isRectified()
   },
 
   *allOptionCombos({ specs }) {
-    if (specs.isRectified() && !specs.isTetrahedral()) {
+    if (metaTruncate.canUnapplyTo(specs)) {
+      yield {}
+    } else if (specs.isRectified() && !specs.isTetrahedral()) {
       yield { faceType: 3 }
       yield { faceType: specs.data.family }
     } else {

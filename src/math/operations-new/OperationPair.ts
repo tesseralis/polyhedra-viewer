@@ -61,22 +61,21 @@ export default class OperationPair<Specs extends PolyhedronSpecs, Opts> {
 
   private getSpecs(solid: Polyhedron): Specs {
     for (const specs of getAllSpecs(solid.name)) {
-      if (this.canApplyTo(specs)) {
-        return specs
+      if (this.canApplyTo(specs) || this.canUnapplyTo(specs)) {
+        return specs as any
       }
     }
     throw new Error("could not find proper specs")
   }
 
-  canApplyTo(specs: PolyhedronSpecs): specs is Specs {
+  canApplyTo(specs: PolyhedronSpecs) {
     // TODO do specs have identity?
     return this.inputs.graph.some(
       (entry) => entry.source.name() === specs.name(),
     )
   }
 
-  canUnapplyTo(solid: Polyhedron) {
-    const specs = this.getSpecs(solid)
+  canUnapplyTo(specs: PolyhedronSpecs) {
     return this.inputs.graph.some(
       (entry) => entry.target.name() === specs.name(),
     )
@@ -85,6 +84,11 @@ export default class OperationPair<Specs extends PolyhedronSpecs, Opts> {
   getResult(source: Specs) {
     return this.inputs.graph.find((x) => x.source.name() === source.name())!
       .target
+  }
+
+  getSource(target: Specs) {
+    return this.inputs.graph.find((x) => x.target.name() === target.name())!
+      .source
   }
 
   apply(solid: Polyhedron) {
@@ -102,6 +106,26 @@ export default class OperationPair<Specs extends PolyhedronSpecs, Opts> {
       animationData: {
         start: toStart({ specs: interSpecs, geom: alignedInter }),
         endVertices: toEnd({ specs: interSpecs, geom: alignedInter }).vertices,
+      },
+    }
+  }
+
+  unapply(solid: Polyhedron) {
+    const { graph, getPose, toStart, toEnd } = this.inputs
+    const endSpecs = this.getSpecs(solid)
+    const interSpecs = graph.find((x) => x.target.name() === endSpecs.name())!
+      .intermediate
+    const interSolid = Polyhedron.get(interSpecs.canonicalName())
+    const alignedInter = alignPolyhedron(
+      interSolid,
+      getPose({ specs: interSpecs, geom: interSolid }),
+      getPose({ specs: endSpecs, geom: solid }),
+    )
+    return {
+      animationData: {
+        start: toEnd({ specs: interSpecs, geom: alignedInter }),
+        endVertices: toStart({ specs: interSpecs, geom: alignedInter })
+          .vertices,
       },
     }
   }
