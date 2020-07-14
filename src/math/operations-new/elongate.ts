@@ -33,6 +33,7 @@ export const elongate = new OperationPair<Capstone, {}>({
     const edge = capBoundary.edges.find((e) => e.face.numSides === 3)!
     return {
       origin,
+      scale: capBoundary.sideLength(),
       orientation: [
         // For orientation, use the normal and one of the vertices on the boundary
         capBoundary.normal(),

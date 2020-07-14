@@ -5,6 +5,7 @@ import Classical from "data/specs/Classical"
 import { withOrigin, PRECISION, Vec3D } from "math/geom"
 import { Polyhedron, Vertex } from "math/polyhedra"
 import Operation from "../Operation"
+import metaTruncate from "../../operations-new/truncate"
 
 // Side ratios gotten when calling our "sharpen" operation on a bevelled polyhedron.
 // I couldn't actually figure out the math for this so I reverse engineered it.
@@ -118,19 +119,17 @@ function doTruncate(
 }
 
 export const truncate = new Operation<{}, Classical>("truncate", {
-  apply({ specs, geom }, $, result) {
-    return doTruncate(specs, geom, false, result)
+  apply({ geom }) {
+    return metaTruncate.apply(geom)
+    // return doTruncate(specs, geom, false, result)
   },
 
   canApplyTo(info): info is Classical {
-    if (!info.isClassical()) return false
-    return info.isRegular() || info.isRectified()
+    return metaTruncate.canApplyTo(info)
   },
 
   getResult({ specs }) {
-    return specs.withData({
-      operation: specs.isRegular() ? "truncate" : "bevel",
-    })
+    return metaTruncate.getResult(specs)
   },
 })
 
