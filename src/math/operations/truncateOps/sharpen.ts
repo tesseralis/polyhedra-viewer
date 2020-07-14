@@ -12,9 +12,12 @@ interface Options {
 export const sharpen = new Operation<Options, Classical>("sharpen", {
   apply({ specs, geom }, { faceType }) {
     if (specs.isRectified()) {
-      return metaRectify.unapply(geom, {
-        facet: faceType === 3 ? "face" : "vertex",
-      })
+      return metaRectify.unapply(
+        geom,
+        specs.isTetrahedral()
+          ? {}
+          : { facet: faceType === 3 ? "face" : "vertex" },
+      )
     }
     return metaTruncate.unapply(geom, {})
   },

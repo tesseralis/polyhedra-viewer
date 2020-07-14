@@ -62,9 +62,11 @@ export default class OperationPair<
     this.inputs = inputs
   }
 
-  private getSpecs(solid: Polyhedron): Specs {
+  private getSpecs(solid: Polyhedron, input: "source" | "target"): Specs {
     for (const specs of getAllSpecs(solid.name)) {
-      if (this.canApplyTo(specs) || this.canUnapplyTo(specs)) {
+      if (
+        this.inputs.graph.some((entry) => entry[input].name() === specs.name())
+      ) {
         return specs as any
       }
     }
@@ -101,7 +103,7 @@ export default class OperationPair<
 
   doApply(solid: Polyhedron, input: "source" | "target", opts: Opts) {
     const { graph, getPose, toStart, toEnd } = this.inputs
-    const specs = this.getSpecs(solid)
+    const specs = this.getSpecs(solid, input)
     const interSpecs = graph.find(
       (entry) =>
         entry[input].name() === specs.name() &&
