@@ -15,7 +15,7 @@ import {
   isExpandedFace,
   getResizedVertices,
 } from "./resizeUtils"
-import metaExpand from "../../operations-new/expand"
+import { expand as metaExpand } from "../../operations-new/expand"
 
 // TODO figure out a way to deduplicate these functions?
 // (or not)
