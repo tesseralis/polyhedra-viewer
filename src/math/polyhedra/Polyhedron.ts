@@ -34,7 +34,7 @@ export default class Polyhedron {
   private _edges?: Edge[]
 
   static get(name: string) {
-    return new Polyhedron(getSolidData(name)).reflect()
+    return new Polyhedron(getSolidData(name))
   }
 
   constructor(solidData: SolidData) {
