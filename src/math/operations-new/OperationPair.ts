@@ -1,6 +1,6 @@
 import { getAllSpecs } from "data/specs/getSpecs"
 import PolyhedronSpecs from "data/specs/PolyhedronSpecs"
-import { Polyhedron } from "math/polyhedra"
+import { Polyhedron, VertexArg } from "math/polyhedra"
 import { Vec3D, getOrthonormalTransform, withOrigin } from "math/geom"
 
 interface GraphEntry<Specs, Opts> {
@@ -30,9 +30,9 @@ interface OpPairInput<Specs extends PolyhedronSpecs, Opts> {
   // Get the post of an input, output or intermediate solid
   getPose(solid: SolidArgs<Specs>): Pose
   // Move the intermediate figure to the start position
-  toStart(solid: SolidArgs<Specs>): Polyhedron
+  toStart(solid: SolidArgs<Specs>): VertexArg[]
   // Move the intermediate figure to the end position
-  toEnd(solid: SolidArgs<Specs>): Polyhedron
+  toEnd(solid: SolidArgs<Specs>): VertexArg[]
 }
 
 // Transform the polyhedron with the transformation given by the two poses
@@ -68,65 +68,66 @@ export default class OperationPair<Specs extends PolyhedronSpecs, Opts> {
     throw new Error("could not find proper specs")
   }
 
-  canApplyTo(specs: PolyhedronSpecs) {
-    // TODO do specs have identity?
-    return this.inputs.graph.some(
-      (entry) => entry.source.name() === specs.name(),
+  private entryFromSource(source: PolyhedronSpecs) {
+    return this.inputs.graph.find(
+      (entry) => entry.source.name() === source.name(),
     )
+  }
+
+  private entryFromTarget(target: PolyhedronSpecs) {
+    return this.inputs.graph.find(
+      (entry) => entry.target.name() === target.name(),
+    )
+  }
+
+  canApplyTo(specs: PolyhedronSpecs) {
+    return !!this.entryFromSource(specs)
   }
 
   canUnapplyTo(specs: PolyhedronSpecs) {
-    return this.inputs.graph.some(
-      (entry) => entry.target.name() === specs.name(),
-    )
+    return !!this.entryFromTarget(specs)
   }
 
   getResult(source: Specs) {
-    return this.inputs.graph.find((x) => x.source.name() === source.name())!
-      .target
+    return this.entryFromSource(source)!.target
   }
 
   getSource(target: Specs) {
-    return this.inputs.graph.find((x) => x.target.name() === target.name())!
-      .source
+    return this.entryFromTarget(target)!.source
+  }
+
+  doApply(solid: Polyhedron, input: "source" | "target") {
+    const { graph, getPose, toStart, toEnd } = this.inputs
+    const specs = this.getSpecs(solid)
+    const interSpecs = graph.find(
+      (entry) => entry[input].name() === specs.name(),
+    )!.intermediate
+
+    const interSolid = Polyhedron.get(interSpecs.canonicalName())
+    const alignedInter = alignPolyhedron(
+      interSolid,
+      getPose({ specs: interSpecs, geom: interSolid }),
+      getPose({ specs, geom: solid }),
+    )
+
+    const [startFn, endFn] =
+      input === "source" ? [toStart, toEnd] : [toEnd, toStart]
+
+    return {
+      animationData: {
+        start: alignedInter.withVertices(
+          startFn({ specs: interSpecs, geom: alignedInter }),
+        ),
+        endVertices: endFn({ specs: interSpecs, geom: alignedInter }),
+      },
+    }
   }
 
   apply(solid: Polyhedron) {
-    const { graph, getPose, toStart, toEnd } = this.inputs
-    const startSpecs = this.getSpecs(solid)
-    const interSpecs = graph.find((x) => x.source.name() === startSpecs.name())!
-      .intermediate
-    const interSolid = Polyhedron.get(interSpecs.canonicalName())
-    const alignedInter = alignPolyhedron(
-      interSolid,
-      getPose({ specs: interSpecs, geom: interSolid }),
-      getPose({ specs: startSpecs, geom: solid }),
-    )
-    return {
-      animationData: {
-        start: toStart({ specs: interSpecs, geom: alignedInter }),
-        endVertices: toEnd({ specs: interSpecs, geom: alignedInter }).vertices,
-      },
-    }
+    return this.doApply(solid, "source")
   }
 
   unapply(solid: Polyhedron) {
-    const { graph, getPose, toStart, toEnd } = this.inputs
-    const endSpecs = this.getSpecs(solid)
-    const interSpecs = graph.find((x) => x.target.name() === endSpecs.name())!
-      .intermediate
-    const interSolid = Polyhedron.get(interSpecs.canonicalName())
-    const alignedInter = alignPolyhedron(
-      interSolid,
-      getPose({ specs: interSpecs, geom: interSolid }),
-      getPose({ specs: endSpecs, geom: solid }),
-    )
-    return {
-      animationData: {
-        start: toEnd({ specs: interSpecs, geom: alignedInter }),
-        endVertices: toStart({ specs: interSpecs, geom: alignedInter })
-          .vertices,
-      },
-    }
+    return this.doApply(solid, "target")
   }
 }

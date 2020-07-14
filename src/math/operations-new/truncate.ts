@@ -104,14 +104,12 @@ export default new OperationPair<Classical, {}>({
         oldToNew[v.index] = i
       })
     })
-    const endVertices = geom.vertices.map(
+    return geom.vertices.map(
       (v, vIndex) => verticesToAdd[oldToNew[vIndex]] ?? v.vec,
     )
-
-    return geom.withVertices(endVertices)
   },
   toEnd({ geom }) {
     // truncated solids are already the intermediate
-    return geom
+    return geom.vertices
   },
 })
