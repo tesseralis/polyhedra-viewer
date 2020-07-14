@@ -3,7 +3,7 @@ import { set, flatMapDeep } from "lodash-es"
 import Classical from "data/specs/Classical"
 import { Polyhedron, Vertex, Face, Edge } from "math/polyhedra"
 import Operation from "../Operation"
-import metaTruncate from "../../operations-new/truncate"
+import { truncate as metaTruncate } from "../../operations-new/truncate"
 
 // Adjacent faces of the vertex with a sharpen face first
 function getShiftedAdjacentFaces(vertex: Vertex, facesTosharpen: Face[]) {
