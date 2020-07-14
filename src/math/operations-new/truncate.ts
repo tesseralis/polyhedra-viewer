@@ -141,6 +141,7 @@ export const rectify = new OperationPair<Classical, Options>({
     }),
   getPose({ geom, specs }, { facet }) {
     const origin = geom.centroid()
+    // FIXME deduplicate these poses
     if (specs.isRegular()) {
       const face = geom.getFace()
       const crossAxis = face.edges[0].midpoint().sub(face.centroid())
