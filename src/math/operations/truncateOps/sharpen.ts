@@ -102,7 +102,7 @@ interface Options {
 export const sharpen = new Operation<Options, Classical>("sharpen", {
   apply({ specs, geom }, { faceType }) {
     if (!specs.isRectified()) {
-      return metaTruncate.unapply(geom)
+      return metaTruncate.unapply(geom, {})
     }
     return applyUnrectify(specs, geom, faceType)
   },

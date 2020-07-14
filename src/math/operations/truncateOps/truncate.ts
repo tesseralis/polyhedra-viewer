@@ -55,7 +55,7 @@ function doRectify(polyhedron: Polyhedron) {
 
 export const truncate = new Operation<{}, Classical>("truncate", {
   apply({ geom }) {
-    return metaTruncate.apply(geom)
+    return metaTruncate.apply(geom, {})
   },
 
   canApplyTo(info): info is Classical {

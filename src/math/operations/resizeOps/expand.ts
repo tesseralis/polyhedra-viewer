@@ -15,6 +15,7 @@ import {
   isExpandedFace,
   getResizedVertices,
 } from "./resizeUtils"
+import metaExpand from "../../operations-new/expand"
 
 // TODO figure out a way to deduplicate these functions?
 // (or not)
@@ -86,18 +87,21 @@ export const expand = new Operation<{}, Classical>("expand", {
     if (specs.isTruncated()) {
       return doSemiExpansion(geom, result)
     }
-    return doExpansion(geom, result)
+    return metaExpand.apply(geom, {
+      // FIXME make it so we don't need this
+      faceType: geom.getFace().numSides as 3 | 4 | 5,
+    })
+    // return doExpansion(geom, result)
   },
 
   canApplyTo(info): info is Classical {
     if (!info.isClassical()) return false
-    return info.isRegular() || info.isTruncated()
+    return info.isTruncated() || metaExpand.canApplyTo(info)
   },
 
   getResult({ specs }) {
-    return specs.withData({
-      operation: specs.isRegular() ? "cantellate" : "bevel",
-    })
+    if (specs.isTruncated()) return specs.withData({ operation: "bevel" })
+    return metaExpand.getResult(specs)
   },
 })
 

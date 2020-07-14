@@ -28,11 +28,11 @@ interface OpPairInput<Specs extends PolyhedronSpecs, Opts> {
   // The graph of what polyhedron spec inputs are allowed and what maps to each other
   graph: OpPairGraph<Specs, Opts>
   // Get the post of an input, output or intermediate solid
-  getPose(solid: SolidArgs<Specs>): Pose
+  getPose(solid: SolidArgs<Specs>, opts: Opts): Pose
   // Move the intermediate figure to the start position
-  toStart(solid: SolidArgs<Specs>): VertexArg[]
+  toStart(solid: SolidArgs<Specs>, opts: Opts): VertexArg[]
   // Move the intermediate figure to the end position
-  toEnd(solid: SolidArgs<Specs>): VertexArg[]
+  toEnd(solid: SolidArgs<Specs>, opts: Opts): VertexArg[]
 }
 
 // Transform the polyhedron with the transformation given by the two poses
@@ -52,7 +52,10 @@ function alignPolyhedron(solid: Polyhedron, pose1: Pose, pose2: Pose) {
   return solid.withVertices(newVertices)
 }
 
-export default class OperationPair<Specs extends PolyhedronSpecs, Opts> {
+export default class OperationPair<
+  Specs extends PolyhedronSpecs,
+  Opts extends {} = {}
+> {
   inputs: OpPairInput<Specs, Opts>
   constructor(inputs: OpPairInput<Specs, Opts>) {
     this.inputs = inputs
@@ -95,7 +98,7 @@ export default class OperationPair<Specs extends PolyhedronSpecs, Opts> {
     return this.entryFromTarget(target)!.source
   }
 
-  doApply(solid: Polyhedron, input: "source" | "target") {
+  doApply(solid: Polyhedron, input: "source" | "target", opts: Opts) {
     const { graph, getPose, toStart, toEnd } = this.inputs
     const specs = this.getSpecs(solid)
     const interSpecs = graph.find(
@@ -105,8 +108,8 @@ export default class OperationPair<Specs extends PolyhedronSpecs, Opts> {
     const interSolid = Polyhedron.get(interSpecs.canonicalName())
     const alignedInter = alignPolyhedron(
       interSolid,
-      getPose({ specs: interSpecs, geom: interSolid }),
-      getPose({ specs, geom: solid }),
+      getPose({ specs: interSpecs, geom: interSolid }, opts),
+      getPose({ specs, geom: solid }, opts),
     )
 
     const [startFn, endFn] =
@@ -115,18 +118,18 @@ export default class OperationPair<Specs extends PolyhedronSpecs, Opts> {
     return {
       animationData: {
         start: alignedInter.withVertices(
-          startFn({ specs: interSpecs, geom: alignedInter }),
+          startFn({ specs: interSpecs, geom: alignedInter }, opts),
         ),
-        endVertices: endFn({ specs: interSpecs, geom: alignedInter }),
+        endVertices: endFn({ specs: interSpecs, geom: alignedInter }, opts),
       },
     }
   }
 
-  apply(solid: Polyhedron) {
-    return this.doApply(solid, "source")
+  apply(solid: Polyhedron, options: Opts) {
+    return this.doApply(solid, "source", options)
   }
 
-  unapply(solid: Polyhedron) {
-    return this.doApply(solid, "target")
+  unapply(solid: Polyhedron, options: Opts) {
+    return this.doApply(solid, "target", options)
   }
 }
