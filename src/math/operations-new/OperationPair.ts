@@ -37,7 +37,6 @@ interface OpPairInput<Specs extends PolyhedronSpecs, Opts> {
 
 // Transform the polyhedron with the transformation given by the two poses
 function alignPolyhedron(solid: Polyhedron, pose1: Pose, pose2: Pose) {
-  // FIXME scale correctly
   const [u1, u2] = pose1.orientation.map((x) => x.getNormalized())
   const [v1, v2] = pose2.orientation.map((x) => x.getNormalized())
   const matrix = getOrthonormalTransform(u1, u2, v1, v2)

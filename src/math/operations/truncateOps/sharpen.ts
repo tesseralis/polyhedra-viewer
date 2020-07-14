@@ -53,15 +53,12 @@ function calculateSharpenDist(face: Face, edge: Edge) {
   return apothem * Math.tan(theta)
 }
 
-function getSharpenDist(info: Classical, face: Face) {
-  if (info.isBevelled()) {
-    return meanBy(face.edges, (edge) => calculateSharpenDist(face, edge))
-  }
+function getSharpenDist(face: Face) {
   return calculateSharpenDist(face, face.edges[0])
 }
 
-function getVertexToAdd(info: Classical, face: Face) {
-  const dist = getSharpenDist(info, face)
+function getVertexToAdd(face: Face) {
+  const dist = getSharpenDist(face)
   return face.normalRay().getPointAtDistance(dist)
 }
 
@@ -78,7 +75,7 @@ function applyUnrectify(
   const mock = duplicateVertices(polyhedron, sharpenFaces)
   sharpenFaces = sharpenFaces.map((face) => mock.faces[face.index])
 
-  const verticesToAdd = sharpenFaces.map((face) => getVertexToAdd(info, face))
+  const verticesToAdd = sharpenFaces.map((face) => getVertexToAdd(face))
 
   const oldToNew: Record<number, number> = {}
   sharpenFaces.forEach((face, i) => {
@@ -113,7 +110,7 @@ export const sharpen = new Operation<Options, Classical>("sharpen", {
   canApplyTo(info): info is Classical {
     if (metaTruncate.canUnapplyTo(info)) return true
     if (!info.isClassical()) return false
-    return ["truncate", "rectify", "bevel"].includes(info.data.operation)
+    return info.isRectified()
   },
 
   getResult({ specs }, { faceType }) {
