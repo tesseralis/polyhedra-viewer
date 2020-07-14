@@ -34,7 +34,7 @@ export default class Polyhedron {
   private _edges?: Edge[]
 
   static get(name: string) {
-    return new Polyhedron(getSolidData(name))
+    return new Polyhedron(getSolidData(name)).reflect()
   }
 
   constructor(solidData: SolidData) {
@@ -207,6 +207,17 @@ export default class Polyhedron {
 
   addPolyhedron(other: Polyhedron) {
     return this.withChanges((s) => s.addPolyhedron(other))
+  }
+
+  /**
+   * Returns the reflection of this polyhedron on an axis
+   */
+  reflect() {
+    return this.withChanges((s) =>
+      s
+        .mapVertices((v) => new Vec3D(-v.vec.x, v.vec.y, v.vec.z))
+        .mapFaces((f) => [...f.vertices.map((v) => v.index)].reverse()),
+    )
   }
 
   /** Center the polyhedron on its centroid. */
