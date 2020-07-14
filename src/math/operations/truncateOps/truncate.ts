@@ -21,7 +21,6 @@ export const truncate = new Operation<{}, Classical>("truncate", {
 
 export const rectify = new Operation<{}, Classical>("rectify", {
   apply({ geom }) {
-    // return doRectify(geom)
     return metaRectify.apply(geom, {})
   },
 
