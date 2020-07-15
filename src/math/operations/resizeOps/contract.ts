@@ -10,6 +10,7 @@ import Operation from "../Operation"
 import {
   expand as metaExpand,
   snub as metaSnub,
+  semiExpand as metaSemiExpand,
 } from "../../operations-new/expand"
 
 // TODO hopefully there's a better way to do this once we make the new opGraph
@@ -73,15 +74,18 @@ export const contract = new Operation<Options, Classical>("contract", {
       // return metaSnub.unapply(geom, {twist})
       return metaSnub.unapply(geom, {})
     }
-    // FIXME turn semi-expand into a new operation
-    return doSemiContract(geom, options, result)
+    const opts = specs.isTetrahedral()
+      ? {}
+      : ({ facet: options.faceType === 6 ? "vertex" : "face" } as const)
+    return metaSemiExpand.unapply(geom, opts)
   },
 
   canApplyTo(info): info is Classical {
     if (!info.isClassical()) return false
     if (metaExpand.canUnapplyTo(info)) return true
     if (metaSnub.canUnapplyTo(info)) return true
-    return info.isBevelled()
+    if (metaSemiExpand.canUnapplyTo(info)) return true
+    return false
   },
 
   getResult({ specs }, { faceType = 3 }) {
@@ -98,11 +102,10 @@ export const contract = new Operation<Options, Classical>("contract", {
       // return metaSnub.getSource(specs, { twist })
       return metaSnub.getSource(specs)
     }
-    const isVertex = faceType === 6
-    return specs.withData({
-      operation: "truncate",
-      facet: isVertex ? "vertex" : "face",
-    })
+    const opts = specs.isTetrahedral()
+      ? {}
+      : ({ facet: faceType === 6 ? "vertex" : "face" } as const)
+    return metaSemiExpand.getSource(specs, opts)
   },
 
   hasOptions(info) {
