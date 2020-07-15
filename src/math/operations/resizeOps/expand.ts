@@ -3,19 +3,13 @@ import { Twist } from "types"
 import Classical from "data/specs/Classical"
 import { Polyhedron } from "math/polyhedra"
 import { withOrigin } from "math/geom"
-import {
-  getTwistSign,
-  getTransformedVertices,
-  expandEdges,
-} from "../operationUtils"
+import { getTransformedVertices, expandEdges } from "../operationUtils"
 import Operation from "../Operation"
+import { getResizedVertices } from "./resizeUtils"
 import {
-  getSnubAngle,
-  getExpandedFaces,
-  isExpandedFace,
-  getResizedVertices,
-} from "./resizeUtils"
-import { expand as metaExpand } from "../../operations-new/expand"
+  expand as metaExpand,
+  snub as metaSnub,
+} from "../../operations-new/expand"
 
 // TODO figure out a way to deduplicate these functions?
 // (or not)
@@ -47,41 +41,6 @@ function doSemiExpansion(polyhedron: Polyhedron, reference: Polyhedron) {
   }
 }
 
-function doExpansion(
-  polyhedron: Polyhedron,
-  reference: Polyhedron,
-  twist?: Twist,
-) {
-  const n = polyhedron.getFace().numSides
-  const duplicated = expandEdges(polyhedron, polyhedron.edges, twist)
-
-  // TODO precalculate this
-  const referenceFace =
-    reference.faces.find((face) => isExpandedFace(reference, face, n)) ??
-    reference.getFace()
-  const referenceLength =
-    (referenceFace.distanceToCenter() / reference.edgeLength()) *
-    polyhedron.edgeLength()
-
-  const expandFaces = duplicated.faces.filter((face) =>
-    isExpandedFace(duplicated, face, n),
-  )
-  const refFaces = getExpandedFaces(reference, n)
-  const angle = twist
-    ? getTwistSign(twist) * Math.abs(getSnubAngle(reference, refFaces))
-    : 0
-
-  // Update the vertices with the expanded-out version
-  const endVertices = getResizedVertices(expandFaces, referenceLength, angle)
-
-  return {
-    animationData: {
-      start: duplicated,
-      endVertices,
-    },
-  }
-}
-
 export const expand = new Operation<{}, Classical>("expand", {
   apply({ specs, geom }, $, result) {
     if (specs.isTruncated()) {
@@ -91,7 +50,6 @@ export const expand = new Operation<{}, Classical>("expand", {
       // FIXME make it so we don't need this
       faceType: geom.getFace().numSides as 3 | 4 | 5,
     })
-    // return doExpansion(geom, result)
   },
 
   canApplyTo(info): info is Classical {
@@ -109,25 +67,30 @@ interface SnubOpts {
   twist: Twist
 }
 export const snub = new Operation<SnubOpts, Classical>("snub", {
-  apply({ geom }, { twist = "left" }, result) {
-    return doExpansion(geom, result, twist)
+  apply({ geom }, { twist = "left" }) {
+    return metaSnub.apply(geom, { twist })
   },
 
   canApplyTo(info): info is Classical {
-    return info.isClassical() && info.isRegular()
+    if (!info.isClassical()) return false
+    return metaSnub.canApplyTo(info)
   },
 
   getResult({ specs }) {
-    return specs.withData({ operation: "snub" })
+    return metaSnub.getResult(specs)
   },
 
   hasOptions(info) {
     return !info.isTetrahedral()
   },
 
-  *allOptionCombos() {
-    yield { twist: "left" }
-    yield { twist: "right" }
+  *allOptionCombos({ specs }) {
+    if (specs.isTetrahedral()) {
+      yield { twist: "left" }
+    } else {
+      yield { twist: "left" }
+      yield { twist: "right" }
+    }
   },
 })
 

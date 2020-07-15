@@ -1,5 +1,5 @@
 import { sortBy } from "lodash-es"
-import { Cap } from "math/polyhedra"
+import { Cap, Polyhedron } from "math/polyhedra"
 import Capstone from "data/specs/Capstone"
 import OperationPair from "./OperationPair"
 import {
@@ -7,22 +7,24 @@ import {
   getScaledPrismVertices,
 } from "../operations/prismOps/prismUtils"
 
-// Every unelongated capstone (except fastigium) can be elongated
-const graph = Capstone.query
-  .where((data) => !data.elongation && data.base > 2)
-  .map((entry) => {
-    const target = entry.withData({ elongation: "prism" })
-    return {
-      source: entry,
-      intermediate: target,
-      target,
-    }
-  })
-
 const capTypeMap: Record<string, number> = { rotunda: 0, cupola: 1, pyramid: 2 }
 
 export default new OperationPair<Capstone, {}>({
-  graph,
+  // Every unelongated capstone (except fastigium) can be elongated
+  graph: Capstone.query
+    .where((data) => !data.elongation && data.base > 2)
+    .map((entry) => {
+      return {
+        source: entry,
+        target: entry.withData({ elongation: "prism" }),
+      }
+    }),
+  getIntermediate({ target }) {
+    return {
+      specs: target,
+      geom: Polyhedron.get(target.canonicalName()),
+    }
+  },
   getPose({ geom, specs }) {
     // Pick a cap, favoring rotunda over cupola in the case of cupolarotundae
     const cap = sortBy(Cap.getAll(geom), (cap) => capTypeMap[cap.type])[0]

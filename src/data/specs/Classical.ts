@@ -1,4 +1,4 @@
-import { Items } from "types"
+import { Items, Twist } from "types"
 import { PrimaryPolygon, primaryPolygons } from "../polygons"
 import Specs from "./PolyhedronSpecs"
 import Queries from "./Queries"
@@ -23,6 +23,7 @@ interface ClassicalData {
   family: Family
   facet?: Facet
   operation: Operation
+  twist?: Twist
 }
 
 /**
@@ -33,6 +34,13 @@ export default class Classical extends Specs<ClassicalData> {
     super("classical", data)
     if (this.isTetrahedral() || !this.hasFacet()) {
       delete this.data.facet
+    }
+    if (!this.isSnub() || this.isTetrahedral()) {
+      delete this.data.twist
+    }
+    // Set a default twist for snub solids
+    if (this.isSnub() && !this.isTetrahedral() && !this.data.twist) {
+      this.data.twist = "left"
     }
   }
 

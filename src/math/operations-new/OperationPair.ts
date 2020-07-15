@@ -7,14 +7,13 @@ import { Vec3D, getOrthonormalTransform, withOrigin } from "math/geom"
 interface GraphEntry<Specs, Opts> {
   source: Specs
   target: Specs
-  intermediate: Specs
   options?: Opts
 }
 
 // list of polyhedron pairs and their arguments
 type OpPairGraph<Specs, Opts> = GraphEntry<Specs, Opts>[]
 
-interface Pose {
+export interface Pose {
   scale: number
   origin: Vec3D
   orientation: readonly [Vec3D, Vec3D]
@@ -28,6 +27,8 @@ interface SolidArgs<Specs extends PolyhedronSpecs> {
 interface OpPairInput<Specs extends PolyhedronSpecs, Opts> {
   // The graph of what polyhedron spec inputs are allowed and what maps to each other
   graph: OpPairGraph<Specs, Opts>
+  // Get the intermediate polyhedron for the given graph entry
+  getIntermediate(entry: GraphEntry<Specs, Opts>): SolidArgs<Specs>
   // Get the post of an input, output or intermediate solid
   getPose(solid: SolidArgs<Specs>, opts: Opts): Pose
   // Move the intermediate figure to the start position
@@ -104,13 +105,14 @@ export default class OperationPair<
   doApply(solid: Polyhedron, input: "source" | "target", opts: Opts) {
     const { graph, getPose, toStart, toEnd } = this.inputs
     const specs = this.getSpecs(solid, input)
-    const interSpecs = graph.find(
-      (entry) =>
-        entry[input].name() === specs.name() &&
-        isMatch(entry.options || {}, opts),
-    )!.intermediate
+    const { specs: interSpecs, geom: interSolid } = this.inputs.getIntermediate(
+      graph.find(
+        (entry) =>
+          entry[input].name() === specs.name() &&
+          isMatch(entry.options || {}, opts),
+      )!,
+    )
 
-    const interSolid = Polyhedron.get(interSpecs.canonicalName())
     const alignedInter = alignPolyhedron(
       interSolid,
       getPose({ specs: interSpecs, geom: interSolid }, opts),

@@ -48,15 +48,19 @@ export const truncate = new OperationPair<Classical, {}>({
   graph: Classical.query
     .where((data) => ["regular", "rectify"].includes(data.operation))
     .map((entry) => {
-      const target = entry.withData({
-        operation: entry.isRegular() ? "truncate" : "bevel",
-      })
       return {
         source: entry,
-        intermediate: target,
-        target,
+        target: entry.withData({
+          operation: entry.isRegular() ? "truncate" : "bevel",
+        }),
       }
     }),
+  getIntermediate({ target }) {
+    return {
+      specs: target,
+      geom: Polyhedron.get(target.canonicalName()),
+    }
+  },
   getPose({ geom, specs }) {
     const origin = geom.centroid()
     // If classical, pick any face and any vertex on that face
@@ -125,20 +129,21 @@ export const rectify = new OperationPair<Classical, Options>({
   graph: Classical.query
     // TODO support rectified as well
     .where((data) => ["regular" /*, "rectify" */].includes(data.operation))
-    .map((entry) => {
-      return {
-        source: entry,
-        intermediate: entry.withData({
-          operation: entry.isRegular() ? "truncate" : "bevel",
-        }),
-        target: entry.withData({
-          operation: entry.isRegular() ? "rectify" : "cantellate",
-        }),
-        options: {
-          facet: entry.data.facet,
-        },
-      }
-    }),
+    .map((entry) => ({
+      source: entry,
+      target: entry.withData({
+        operation: entry.isRegular() ? "rectify" : "cantellate",
+      }),
+      options: {
+        facet: entry.data.facet,
+      },
+    })),
+  getIntermediate({ source }) {
+    const specs = source.withData({
+      operation: source.isRegular() ? "truncate" : "bevel",
+    })
+    return { specs, geom: Polyhedron.get(specs.canonicalName()) }
+  },
   getPose({ geom, specs }, { facet }) {
     const origin = geom.centroid()
     // FIXME deduplicate these poses
