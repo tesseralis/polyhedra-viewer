@@ -83,6 +83,7 @@ function getTruncatedOctahedronContractFaces(polyhedron: Polyhedron) {
   return [f0, ...rest]
 }
 
+// FIXME split this up into multiple functions for the different operations
 export function getExpandedFaces(polyhedron: Polyhedron, faceType?: number) {
   switch (polyhedron.name) {
     case "cuboctahedron":

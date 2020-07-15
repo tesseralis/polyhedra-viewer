@@ -82,19 +82,10 @@ export const expand = new OperationPair<Classical, ExpandOpts>({
   },
   toStart({ specs, geom }, { facet }) {
     const faceType = facet === "vertex" ? 3 : specs.data.family
-    // const resultLength = info.isBevelled()
-    //   ? getContractLengthSemi(polyhedron, faceType, result)
-    //   : getContractLength(info.data.family, polyhedron, faceType)
-
     const resultLength = getContractLength(specs.data.family, geom, faceType)
-
     // Take all the stuff and push it inwards
     const contractFaces = getExpandedFaces(geom, faceType)
-
-    // const angle = specs.isBevelled() ? 0 : -getSnubAngle(polyhedron, contractFaces)
-    const angle = 0
-
-    return getResizedVertices(contractFaces, resultLength, angle)
+    return getResizedVertices(contractFaces, resultLength)
   },
   toEnd({ geom }) {
     return geom.vertices
