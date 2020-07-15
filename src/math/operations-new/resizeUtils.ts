@@ -1,8 +1,6 @@
-import { minBy } from "lodash-es"
-
 import { flatMapUniq } from "utils"
 import { Polyhedron, Face } from "math/polyhedra"
-import { getPlane, withOrigin } from "math/geom"
+import { withOrigin } from "math/geom"
 import { getTransformedVertices } from "../operations/operationUtils"
 
 export function getResizedVertices(
@@ -100,29 +98,4 @@ export function getExpandedFaces(polyhedron: Polyhedron, faceType?: number) {
         isExpandedFace(polyhedron, face, faceType),
       )
   }
-}
-
-/**
- * Return the snub angle of the given polyhedron, given the list of expanded faces
- */
-export function getSnubAngle(polyhedron: Polyhedron, expandedFaces: Face[]) {
-  // Choose one of the expanded faces and get its properties
-  const [face0, ...rest] = expandedFaces
-  const faceCentroid = face0.centroid()
-  const midpoint = face0.edges[0].midpoint()
-
-  // Choose one of the closest faces
-  const face1 = minBy(rest, (face) => midpoint.distanceTo(face.centroid()))!
-
-  const plane = getPlane([
-    faceCentroid,
-    face1.centroid(),
-    polyhedron.centroid(),
-  ])
-
-  // Calculate the absolute angle between the two midpoints
-  const normMidpoint = midpoint.sub(faceCentroid)
-  const projected = plane.getProjectedPoint(midpoint).sub(faceCentroid)
-  // Use `||` and not `??` because this can return NaN
-  return normMidpoint.angleBetween(projected, true) || 0
 }

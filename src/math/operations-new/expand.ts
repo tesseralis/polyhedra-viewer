@@ -1,11 +1,12 @@
+import { minBy } from "lodash-es"
 import { Twist } from "types"
 import Classical, { Facet } from "data/specs/Classical"
 import OperationPair, { Pose } from "./OperationPair"
+import { getPlane } from "math/geom"
 import { Polyhedron } from "math/polyhedra"
 import {
   getResizedVertices,
   getExpandedFaces,
-  getSnubAngle,
   isExpandedFace,
 } from "./resizeUtils"
 
@@ -35,17 +36,38 @@ function getFaceType(specs: Classical, facet?: Facet) {
   return facet === "vertex" ? 3 : specs.data.family
 }
 
-function _getSnubAngle(specs: Classical, geom: Polyhedron, facet: Facet) {
-  const expandedFaces = getExpandedFaces(geom, getFaceType(specs, facet))
-  return getSnubAngle(geom, expandedFaces)
+/**
+ * Return the snub angle of the given polyhedron, given the list of expanded faces
+ */
+export function getSnubAngle(specs: Classical, facet: Facet) {
+  // Choose one of the expanded faces and get its properties
+  const polyhedron = Polyhedron.get(specs.canonicalName())
+  const expandedFaces = getExpandedFaces(polyhedron, getFaceType(specs, facet))
+  const [face0, ...rest] = expandedFaces
+  const faceCentroid = face0.centroid()
+  const midpoint = face0.edges[0].midpoint()
+
+  // Choose one of the closest faces
+  const face1 = minBy(rest, (face) => midpoint.distanceTo(face.centroid()))!
+
+  const plane = getPlane([
+    faceCentroid,
+    face1.centroid(),
+    polyhedron.centroid(),
+  ])
+
+  // Calculate the absolute angle between the two midpoints
+  const normMidpoint = midpoint.sub(faceCentroid)
+  const projected = plane.getProjectedPoint(midpoint).sub(faceCentroid)
+  // Use `||` and not `??` because this can return NaN
+  return normMidpoint.angleBetween(projected, true) || 0
 }
 
 function snubAnglesFromFamily(family: 3 | 4 | 5) {
   const specs = Classical.query.withData({ family, operation: "snub" })
-  const geom = Polyhedron.get(specs.canonicalName())
   return {
-    face: _getSnubAngle(specs, geom, "face"),
-    vertex: _getSnubAngle(specs, geom, "vertex"),
+    face: getSnubAngle(specs, "face"),
+    vertex: getSnubAngle(specs, "vertex"),
   }
 }
 
@@ -163,6 +185,7 @@ export const semiExpand = new OperationPair<Classical, ExpandOpts>({
       specs.withData({ operation: "truncate", facet }).canonicalName(),
     )
     const faceType = 2 * getFaceType(specs, facet)
+    // FIXME we can cache these values too
     const referenceFace = reference.faceWithNumSides(faceType)
     const resultLength =
       (referenceFace.distanceToCenter() / reference.edgeLength()) *
