@@ -61,11 +61,12 @@ function getCantellatedPose(
   }
 }
 
-function getSnubPose(geom: Polyhedron, specs: Classical, twist?: Twist): Pose {
-  // If the twist option is in the same direction as the spec,
-  // it's a face-solid. Otherwise it's a vertex solid
-  // FIXME doens'doesn't work for vertex figures
-  const faceType = specs.data.twist === twist ? specs.data.family : 3
+function getSnubPose(
+  geom: Polyhedron,
+  specs: Classical,
+  facet?: "vertex" | "face",
+): Pose {
+  const faceType = facet === "face" ? specs.data.family : 3
   // depends on the face type given in options
   const face = geom.faces.find(
     (face) =>
@@ -226,7 +227,10 @@ export const snub = new OperationPair<Classical, SnubOptions>({
       return getRegularPose(geom)
     }
     if (specs.isSnub()) {
-      return getSnubPose(geom, specs, twist)
+      // If the twist option is in the same direction as the spec,
+      // it's a face-solid. Otherwise it's a vertex solid
+      const facet = specs.data.twist === twist ? "face" : "vertex"
+      return getSnubPose(geom, specs, facet)
     }
     // FIXME handle expanding truncated solids
     throw new Error(`Cannot find pose`)
@@ -268,7 +272,7 @@ export const twist = new OperationPair<Classical, SnubOptions>({
       // We always want a face facet as the top for a twist
       return getCantellatedPose(geom, specs, "face")
     } else {
-      return getSnubPose(geom, specs, twist)
+      return getSnubPose(geom, specs, "face")
     }
   },
   toStart({ specs, geom }) {

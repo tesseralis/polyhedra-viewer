@@ -9,6 +9,7 @@ interface Options {
   twist?: Twist
 }
 
+// FIXME deduplicate with contract
 function getChirality(geom: Polyhedron) {
   if (geom.largestFace().numSides === 3) {
     return "left"
