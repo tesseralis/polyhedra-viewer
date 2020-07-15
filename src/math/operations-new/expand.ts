@@ -35,6 +35,27 @@ function getFaceType(specs: Classical, facet?: Facet) {
   return facet === "vertex" ? 3 : specs.data.family
 }
 
+function _getSnubAngle(specs: Classical, geom: Polyhedron, facet: Facet) {
+  const expandedFaces = getExpandedFaces(geom, getFaceType(specs, facet))
+  return getSnubAngle(geom, expandedFaces)
+}
+
+function snubAnglesFromFamily(family: 3 | 4 | 5) {
+  const specs = Classical.query.withData({ family, operation: "snub" })
+  const geom = Polyhedron.get(specs.canonicalName())
+  return {
+    face: _getSnubAngle(specs, geom, "face"),
+    vertex: _getSnubAngle(specs, geom, "vertex"),
+  }
+}
+
+// Cache snub angles, since they're always the same
+const snubAngles = {
+  3: snubAnglesFromFamily(3),
+  4: snubAnglesFromFamily(4),
+  5: snubAnglesFromFamily(5),
+}
+
 // Get the pose of a regular solid for both expand/snub
 function getRegularPose(geom: Polyhedron): Pose {
   const face = geom.getFace()
@@ -74,15 +95,15 @@ function getSnubPose(geom: Polyhedron, specs: Classical, facet?: Facet): Pose {
       face.numSides === faceType &&
       face.adjacentFaces().every((f) => f.numSides === 3),
   )!
-  const faces = getExpandedFaces(geom, faceType)
-  const snubAngle = getSnubAngle(geom, faces)
+  const sign = specs.data.twist === "left" ? 1 : -1
+  const angle = snubAngles[specs.data.family]["face"]
   const crossAxis = face.edges[0].midpoint().sub(face.centroid())
   return {
     origin: geom.centroid(),
     scale: face.sideLength(),
     orientation: [
       face.normal(),
-      crossAxis.getRotatedAroundAxis(face.normal(), -snubAngle),
+      crossAxis.getRotatedAroundAxis(face.normal(), sign * angle),
     ],
   }
 }
@@ -237,12 +258,14 @@ export const snub = new OperationPair<Classical, SnubOptions>({
     throw new Error(`Cannot find pose`)
   },
   toStart({ specs, geom }, { twist = "left" }) {
-    const faceType = twist === specs.data.twist ? specs.data.family : 3
+    const facet = twist === specs.data.twist ? "face" : "vertex"
+    const faceType = getFaceType(specs, facet)
     const resultLength = getContractLength(specs.data.family, geom, faceType)
     // Take all the stuff and push it inwards
     const contractFaces = getExpandedFaces(geom, faceType)
-    const angle = -getSnubAngle(geom, contractFaces)
-    return getResizedVertices(contractFaces, resultLength, angle)
+    const sign = specs.data.twist === "left" ? 1 : -1
+    const angle = snubAngles[specs.data.family][facet]
+    return getResizedVertices(contractFaces, resultLength, sign * angle)
   },
   toEnd({ geom }) {
     return geom.vertices
@@ -292,9 +315,10 @@ export const twist = new OperationPair<Classical, SnubOptions>({
       (referenceFace.distanceToCenter() / reference.edgeLength()) *
       geom.edgeLength()
 
-    const angle = -getSnubAngle(geom, twistFaces)
+    const sign = specs.data.twist === "left" ? 1 : -1
+    const angle = snubAngles[specs.data.family]["face"]
 
-    return getResizedVertices(twistFaces, referenceLength, angle)
+    return getResizedVertices(twistFaces, referenceLength, sign * angle)
   },
   toEnd({ geom }) {
     return geom.vertices

@@ -2,7 +2,7 @@ import { minBy } from "lodash-es"
 
 import { flatMapUniq } from "utils"
 import { Polyhedron, Face } from "math/polyhedra"
-import { PRECISION, getPlane, withOrigin } from "math/geom"
+import { getPlane, withOrigin } from "math/geom"
 import { getTransformedVertices } from "../operations/operationUtils"
 
 export function getResizedVertices(
@@ -109,7 +109,6 @@ export function getSnubAngle(polyhedron: Polyhedron, expandedFaces: Face[]) {
   // Choose one of the expanded faces and get its properties
   const [face0, ...rest] = expandedFaces
   const faceCentroid = face0.centroid()
-  const faceNormal = face0.normal()
   const midpoint = face0.edges[0].midpoint()
 
   // Choose one of the closest faces
@@ -121,16 +120,9 @@ export function getSnubAngle(polyhedron: Polyhedron, expandedFaces: Face[]) {
     polyhedron.centroid(),
   ])
 
+  // Calculate the absolute angle between the two midpoints
   const normMidpoint = midpoint.sub(faceCentroid)
   const projected = plane.getProjectedPoint(midpoint).sub(faceCentroid)
   // Use `||` and not `??` because this can return NaN
-  const angle = normMidpoint.angleBetween(projected, true) || 0
-  // Return a positive angle if it's a ccw turn, a negative angle otherwise
-  const sign = normMidpoint
-    .cross(projected)
-    .getNormalized()
-    .equalsWithTolerance(faceNormal, PRECISION)
-    ? -1
-    : 1
-  return angle * sign
+  return normMidpoint.angleBetween(projected, true) || 0
 }
