@@ -186,3 +186,55 @@ export const snub = new OperationPair<Classical, SnubOptions>({
     return geom.vertices
   },
 })
+
+export const semiExpand = new OperationPair<Classical, ExpandOpts>({
+  graph: Classical.query
+    .where((data) => data.operation === "truncate")
+    .map((entry) => ({
+      source: entry,
+      target: entry.withData({ operation: "bevel" }),
+      options: { facet: entry.data.facet },
+    })),
+  getIntermediate({ target }) {
+    return { specs: target, geom: Polyhedron.get(target.canonicalName()) }
+  },
+  getPose({ specs, geom }, { facet }) {
+    const origin = geom.centroid()
+    if (specs.isTruncated()) {
+      const face = geom.faces.find((f) => f.numSides > 5)!
+      const edge = face.edges.find(
+        (e) => e.twinFace().numSides === face.numSides,
+      )!
+      return {
+        origin,
+        scale: face.sideLength(),
+        orientation: [face.normal(), edge.midpoint().sub(face.centroid())],
+      }
+    } else {
+      const faceType = facet === "vertex" ? 6 : 2 * specs.data.family
+      const face = geom.faceWithNumSides(faceType)
+      const edge = face.edges.find((e) => e.twinFace().numSides === 4)!
+      return {
+        origin,
+        scale: face.sideLength(),
+        orientation: [face.normal(), edge.midpoint().sub(face.centroid())],
+      }
+    }
+  },
+  toStart({ specs, geom }, { facet }) {
+    const reference = Polyhedron.get(
+      specs.withData({ operation: "truncate", facet }).canonicalName(),
+    )
+    const faceType = facet === "vertex" ? 6 : specs.data.family * 2
+    const referenceFace = reference.faceWithNumSides(faceType)
+    const resultLength =
+      (referenceFace.distanceToCenter() / reference.edgeLength()) *
+      geom.edgeLength()
+    // Take all the stuff and push it inwards
+    const contractFaces = getExpandedFaces(geom, faceType)
+    return getResizedVertices(contractFaces, resultLength, 0)
+  },
+  toEnd({ geom }) {
+    return geom.vertices
+  },
+})

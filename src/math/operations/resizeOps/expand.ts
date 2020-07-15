@@ -1,61 +1,32 @@
 import { take } from "lodash-es"
 import { Twist } from "types"
 import Classical from "data/specs/Classical"
-import { Polyhedron } from "math/polyhedra"
 import { withOrigin } from "math/geom"
 import { getTransformedVertices, expandEdges } from "../operationUtils"
 import Operation from "../Operation"
-import { getResizedVertices } from "./resizeUtils"
 import {
   expand as metaExpand,
+  semiExpand as metaSemiExpand,
   snub as metaSnub,
 } from "../../operations-new/expand"
 
-// TODO figure out a way to deduplicate these functions?
-// (or not)
-function doSemiExpansion(polyhedron: Polyhedron, reference: Polyhedron) {
-  const largeFaceType = polyhedron.largestFace().numSides
-  const referenceFace = reference.faceWithNumSides(largeFaceType)
-  const referenceLength =
-    (referenceFace.distanceToCenter() / reference.edgeLength()) *
-    polyhedron.edgeLength()
-  const largeFaceIndices = polyhedron.faces
-    .filter((face) => face.numSides === largeFaceType)
-    .map((face) => face.index)
-
-  const duplicated = expandEdges(
-    polyhedron,
-    polyhedron.edges.filter((e) =>
-      e.adjacentFaces().every((f) => f.numSides === largeFaceType),
-    ),
-  )
-  const expandFaces = duplicated.faces.filter((face) =>
-    largeFaceIndices.includes(face.index),
-  )
-  const endVertices = getResizedVertices(expandFaces, referenceLength)
-  return {
-    animationData: {
-      start: duplicated,
-      endVertices,
-    },
-  }
-}
-
 export const expand = new Operation<{}, Classical>("expand", {
-  apply({ specs, geom }, $, result) {
+  apply({ specs, geom }) {
     if (specs.isTruncated()) {
-      return doSemiExpansion(geom, result)
+      return metaSemiExpand.apply(geom, { facet: specs.data.facet })
     }
     return metaExpand.apply(geom, { facet: specs.data.facet })
   },
 
   canApplyTo(info): info is Classical {
     if (!info.isClassical()) return false
-    return info.isTruncated() || metaExpand.canApplyTo(info)
+    return metaSemiExpand.canApplyTo(info) || metaExpand.canApplyTo(info)
   },
 
   getResult({ specs }) {
-    if (specs.isTruncated()) return specs.withData({ operation: "bevel" })
+    if (specs.isTruncated()) {
+      return metaSemiExpand.getResult(specs)
+    }
     return metaExpand.getResult(specs)
   },
 })
