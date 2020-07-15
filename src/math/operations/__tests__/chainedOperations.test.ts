@@ -7,6 +7,7 @@ setupOperations()
 interface Args {
   faceType?: number
   face?: number
+  facet?: "vertex" | "face"
   cap?: boolean
 }
 
@@ -83,9 +84,9 @@ describe("chained tests", () => {
       start: "cube",
       operations: [
         ["expand", "rhombicuboctahedron"],
-        { op: "contract", args: { faceType: 4 }, expected: "cube" },
+        { op: "contract", args: { facet: "face" }, expected: "cube" },
         ["expand", "rhombicuboctahedron"],
-        { op: "contract", args: { faceType: 3 }, expected: "octahedron" },
+        { op: "contract", args: { facet: "vertex" }, expected: "octahedron" },
       ],
     },
     {

@@ -12,7 +12,7 @@ import {
 type FaceType = Polygon
 
 interface Options {
-  faceType?: FaceType
+  facet?: "vertex" | "face"
 }
 
 // function getChirality(geom: Polyhedron) {
@@ -24,16 +24,11 @@ interface Options {
 //   return other.numSides !== 3 ? "right" : "left"
 // }
 
-// contract length of a bevelled polyhedron
-// TODO calculate this without a reference
-
 // NOTE: We are using the same operation for contracting both expanded and snub solids.
 export const contract = new Operation<Options, Classical>("contract", {
   apply({ specs, geom }, options) {
     if (metaExpand.canUnapplyTo(specs)) {
-      const opts = specs.isTetrahedral()
-        ? {}
-        : ({ facet: options.faceType === 3 ? "vertex" : "face" } as const)
+      const opts = specs.isTetrahedral() ? {} : options
       return metaExpand.unapply(geom, opts)
     }
     if (metaSnub.canUnapplyTo(specs)) {
@@ -44,10 +39,7 @@ export const contract = new Operation<Options, Classical>("contract", {
       // return metaSnub.unapply(geom, {twist})
       return metaSnub.unapply(geom, {})
     }
-    const opts = specs.isTetrahedral()
-      ? {}
-      : ({ facet: options.faceType === 6 ? "vertex" : "face" } as const)
-    return metaSemiExpand.unapply(geom, opts)
+    return metaSemiExpand.unapply(geom, options)
   },
 
   canApplyTo(info): info is Classical {
@@ -58,12 +50,9 @@ export const contract = new Operation<Options, Classical>("contract", {
     return false
   },
 
-  getResult({ specs }, { faceType = 3 }) {
+  getResult({ specs }, options) {
     if (metaExpand.canUnapplyTo(specs)) {
-      const opts = specs.isTetrahedral()
-        ? {}
-        : ({ facet: faceType === 3 ? "vertex" : "face" } as const)
-      return metaExpand.getSource(specs, opts)
+      return metaExpand.getSource(specs, options)
     }
     if (metaSnub.canUnapplyTo(specs)) {
       // const shapeTwist = getChirality(geom)
@@ -72,10 +61,7 @@ export const contract = new Operation<Options, Classical>("contract", {
       // return metaSnub.getSource(specs, { twist })
       return metaSnub.getSource(specs)
     }
-    const opts = specs.isTetrahedral()
-      ? {}
-      : ({ facet: faceType === 6 ? "vertex" : "face" } as const)
-    return metaSemiExpand.getSource(specs, opts)
+    return metaSemiExpand.getSource(specs, options)
   },
 
   hasOptions(info) {
@@ -86,34 +72,35 @@ export const contract = new Operation<Options, Classical>("contract", {
     if (specs.isTetrahedral()) {
       yield {}
     } else {
-      const multiplier = specs.isBevelled() ? 2 : 1
-      yield { faceType: (3 * multiplier) as any }
-      yield { faceType: (specs.data.family * multiplier) as any }
+      yield { facet: "face" }
+      yield { facet: "vertex" }
     }
   },
 
-  hitOption: "faceType",
+  hitOption: "facet",
   getHitOption({ specs, geom }, hitPoint) {
     const hitFace = geom.hitFace(hitPoint)
     const faceType = hitFace.numSides as FaceType // TODO unsure if always valid
     if (specs.isBevelled()) {
       const isValid = hitFace.numSides > 4
-      return isValid ? { faceType } : {}
+      return isValid ? { facet: faceType === 6 ? "vertex" : "face" } : {}
     }
     const isValid = isExpandedFace(geom, hitFace)
-    return isValid ? { faceType } : {}
+    return isValid ? { facet: faceType === 3 ? "vertex" : "face" } : {}
   },
 
-  faceSelectionStates({ specs, geom }, { faceType }) {
+  faceSelectionStates({ specs, geom }, { facet }) {
     if (specs.isBevelled()) {
       return geom.faces.map((face) => {
-        if (faceType && face.numSides === faceType) {
+        const faceType = facet === "vertex" ? 6 : specs.data.family * 2
+        if (facet && face.numSides === faceType) {
           return "selected"
         }
         if (face.numSides !== 4) return "selectable"
         return undefined
       })
     }
+    const faceType = facet === "vertex" ? 3 : specs.data.family
     return geom.faces.map((face) => {
       if (faceType && isExpandedFace(geom, face, faceType)) return "selected"
       if (isExpandedFace(geom, face)) return "selectable"
