@@ -1,6 +1,5 @@
-import { Polygon } from "data/polygons"
 import Classical from "data/specs/Classical"
-import { isExpandedFace } from "./resizeUtils"
+import { isExpandedFace } from "../../operations-new/resizeUtils"
 import { Polyhedron } from "math/polyhedra"
 import Operation from "../Operation"
 import {
@@ -9,13 +8,11 @@ import {
   semiExpand as metaSemiExpand,
 } from "../../operations-new/expand"
 
-// TODO hopefully there's a better way to do this once we make the new opGraph
-type FaceType = Polygon
-
 interface Options {
   facet?: "vertex" | "face"
 }
 
+// FIXME deduplicate with twist
 function getChirality(geom: Polyhedron) {
   if (geom.largestFace().numSides === 3) {
     return "left"
@@ -45,7 +42,6 @@ export const contract = new Operation<Options, Classical>("contract", {
         },
         { twist },
       )
-      // return metaSnub.unapply(geom, {})
     }
     return metaSemiExpand.unapply(solid, options)
   },
@@ -89,7 +85,7 @@ export const contract = new Operation<Options, Classical>("contract", {
   hitOption: "facet",
   getHitOption({ specs, geom }, hitPoint) {
     const hitFace = geom.hitFace(hitPoint)
-    const faceType = hitFace.numSides as FaceType // TODO unsure if always valid
+    const faceType = hitFace.numSides
     if (specs.isBevelled()) {
       const isValid = hitFace.numSides > 4
       return isValid ? { facet: faceType === 6 ? "vertex" : "face" } : {}

@@ -7,7 +7,7 @@ import {
   getExpandedFaces,
   getSnubAngle,
   isExpandedFace,
-} from "../operations/resizeOps/resizeUtils"
+} from "./resizeUtils"
 
 const coxeterNum = { 3: 4, 4: 6, 5: 10 }
 
@@ -267,7 +267,7 @@ export const twist = new OperationPair<Classical, SnubOptions>({
   getTargetGeom(specs) {
     return getChiralGeom(specs)
   },
-  getPose({ specs, geom }, { twist }) {
+  getPose({ specs, geom }) {
     if (specs.isCantellated()) {
       // We always want a face facet as the top for a twist
       return getCantellatedPose(geom, specs, "face")
