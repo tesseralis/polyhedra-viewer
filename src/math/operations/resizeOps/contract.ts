@@ -2,7 +2,6 @@ import { Polygon } from "data/polygons"
 import Classical from "data/specs/Classical"
 import { Polyhedron } from "math/polyhedra"
 import {
-  getSnubAngle,
   isExpandedFace,
   getResizedVertices,
   getExpandedFaces,
@@ -15,31 +14,9 @@ import {
 
 // TODO hopefully there's a better way to do this once we make the new opGraph
 type FaceType = Polygon
-type Family = 3 | 4 | 5
 
 interface Options {
   faceType?: FaceType
-}
-
-const coxeterNum = { 3: 4, 4: 6, 5: 10 }
-
-function getContractLength(
-  family: Family,
-  polyhedron: Polyhedron,
-  faceType: FaceType,
-) {
-  // Calculate dihedral angle
-  // https://en.wikipedia.org/wiki/Platonic_solid#Angles
-  const n = family
-  const s = polyhedron.edgeLength()
-  const p = faceType
-  const q = 3 + n - p
-  const h = coxeterNum[n]
-  const tanTheta2 = Math.cos(Math.PI / q) / Math.sin(Math.PI / h)
-
-  // Calculate the inradius
-  // https://en.wikipedia.org/wiki/Platonic_solid#Radii,_area,_and_volume
-  return (s / 2 / Math.tan(Math.PI / p)) * tanTheta2
 }
 
 // contract length of a bevelled polyhedron
@@ -56,22 +33,17 @@ function getContractLengthSemi(
   return referenceLength
 }
 
-export function applyContract(
-  info: Classical,
+export function doSemiContract(
   polyhedron: Polyhedron,
-  { faceType = info.isBevelled() ? 6 : 3 }: Options,
+  { faceType = 6 }: Options,
   result: Polyhedron,
 ) {
-  const resultLength = info.isBevelled()
-    ? getContractLengthSemi(polyhedron, faceType, result)
-    : getContractLength(info.data.family, polyhedron, faceType)
+  const resultLength = getContractLengthSemi(polyhedron, faceType, result)
 
   // Take all the stuff and push it inwards
   const contractFaces = getExpandedFaces(polyhedron, faceType)
 
-  const angle = info.isBevelled() ? 0 : -getSnubAngle(polyhedron, contractFaces)
-
-  const endVertices = getResizedVertices(contractFaces, resultLength, angle)
+  const endVertices = getResizedVertices(contractFaces, resultLength, 0)
   return {
     animationData: {
       start: polyhedron,
@@ -93,7 +65,7 @@ export const contract = new Operation<Options, Classical>("contract", {
       return metaSnub.unapply(geom, {})
     }
     // FIXME turn semi-expand into a new operation
-    return applyContract(specs, geom, options, result)
+    return doSemiContract(geom, options, result)
   },
 
   canApplyTo(info): info is Classical {
