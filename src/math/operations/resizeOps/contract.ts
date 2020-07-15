@@ -19,6 +19,15 @@ interface Options {
   faceType?: FaceType
 }
 
+// function getChirality(geom: Polyhedron) {
+//   if (geom.largestFace().numSides === 3) {
+//     return "left"
+//   }
+//   const face = geom.faces.find((f) => f.numSides !== 3)!
+//   const other = face.edges[0].twin().prev().twin().next().twinFace()
+//   return other.numSides !== 3 ? "right" : "left"
+// }
+
 // contract length of a bevelled polyhedron
 // TODO calculate this without a reference
 function getContractLengthSemi(
@@ -39,16 +48,11 @@ export function doSemiContract(
   result: Polyhedron,
 ) {
   const resultLength = getContractLengthSemi(polyhedron, faceType, result)
-
   // Take all the stuff and push it inwards
   const contractFaces = getExpandedFaces(polyhedron, faceType)
-
   const endVertices = getResizedVertices(contractFaces, resultLength, 0)
   return {
-    animationData: {
-      start: polyhedron,
-      endVertices,
-    },
+    animationData: { start: polyhedron, endVertices },
   }
 }
 
@@ -61,7 +65,11 @@ export const contract = new Operation<Options, Classical>("contract", {
       })
     }
     if (metaSnub.canUnapplyTo(specs)) {
-      // FIXME args
+      // const shapeTwist = getChirality(geom)
+      // const oppTwist = shapeTwist === "left" ? "right" : "left"
+      // const twist = options.faceType === 3 ? oppTwist : shapeTwist
+      // FIXME translate face-type args to twist
+      // return metaSnub.unapply(geom, {twist})
       return metaSnub.unapply(geom, {})
     }
     // FIXME turn semi-expand into a new operation
@@ -75,10 +83,17 @@ export const contract = new Operation<Options, Classical>("contract", {
     return info.isBevelled()
   },
 
-  getResult({ specs }, { faceType = 3 }) {
-    if (metaExpand.canUnapplyTo(specs))
+  getResult({ geom, specs }, { faceType = 3 }) {
+    if (metaExpand.canUnapplyTo(specs)) {
       return metaExpand.getSource(specs, { faceType: faceType as any })
-    if (metaSnub.canUnapplyTo(specs)) return metaSnub.getSource(specs)
+    }
+    if (metaSnub.canUnapplyTo(specs)) {
+      // const shapeTwist = getChirality(geom)
+      // const oppTwist = shapeTwist === "left" ? "right" : "left"
+      // const twist = faceType === 3 ? oppTwist : shapeTwist
+      // return metaSnub.getSource(specs, { twist })
+      return metaSnub.getSource(specs)
+    }
     const isVertex = faceType === 6
     return specs.withData({
       operation: "truncate",
