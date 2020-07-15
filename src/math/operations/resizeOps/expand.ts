@@ -46,10 +46,7 @@ export const expand = new Operation<{}, Classical>("expand", {
     if (specs.isTruncated()) {
       return doSemiExpansion(geom, result)
     }
-    return metaExpand.apply(geom, {
-      // FIXME make it so we don't need this
-      faceType: geom.getFace().numSides as 3 | 4 | 5,
-    })
+    return metaExpand.apply(geom, { facet: specs.data.facet })
   },
 
   canApplyTo(info): info is Classical {

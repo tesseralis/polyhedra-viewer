@@ -60,9 +60,10 @@ export function doSemiContract(
 export const contract = new Operation<Options, Classical>("contract", {
   apply({ specs, geom }, options, result) {
     if (metaExpand.canUnapplyTo(specs)) {
-      return metaExpand.unapply(geom, {
-        faceType: (options.faceType as any) || 3,
-      })
+      const opts = specs.isTetrahedral()
+        ? {}
+        : ({ facet: options.faceType === 3 ? "vertex" : "face" } as const)
+      return metaExpand.unapply(geom, opts)
     }
     if (metaSnub.canUnapplyTo(specs)) {
       // const shapeTwist = getChirality(geom)
@@ -83,9 +84,12 @@ export const contract = new Operation<Options, Classical>("contract", {
     return info.isBevelled()
   },
 
-  getResult({ geom, specs }, { faceType = 3 }) {
+  getResult({ specs }, { faceType = 3 }) {
     if (metaExpand.canUnapplyTo(specs)) {
-      return metaExpand.getSource(specs, { faceType: faceType as any })
+      const opts = specs.isTetrahedral()
+        ? {}
+        : ({ facet: faceType === 3 ? "vertex" : "face" } as const)
+      return metaExpand.getSource(specs, opts)
     }
     if (metaSnub.canUnapplyTo(specs)) {
       // const shapeTwist = getChirality(geom)

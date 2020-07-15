@@ -8,10 +8,6 @@ import {
   getSnubAngle,
 } from "../operations/resizeOps/resizeUtils"
 
-interface Options {
-  faceType?: 3 | 4 | 5
-}
-
 const coxeterNum = { 3: 4, 4: 6, 5: 10 }
 
 function getContractLength(
@@ -44,25 +40,30 @@ function getRegularPose(geom: Polyhedron): Pose {
   }
 }
 
-export const expand = new OperationPair<Classical, Options>({
+interface ExpandOpts {
+  facet?: "face" | "vertex"
+}
+
+export const expand = new OperationPair<Classical, ExpandOpts>({
   graph: Classical.query
     .where((data) => data.operation === "regular")
     .map((entry) => {
       return {
         source: entry,
         target: entry.withData({ operation: "cantellate" }),
-        options: { faceType: entry.isFace() ? entry.data.family : 3 },
+        options: { facet: entry.data.facet },
       }
     }),
   getIntermediate({ target }) {
     return { specs: target, geom: Polyhedron.get(target.canonicalName()) }
   },
-  getPose({ geom, specs }, { faceType }) {
+  getPose({ geom, specs }, { facet }) {
     const origin = geom.centroid()
     if (specs.isRegular()) {
       return getRegularPose(geom)
     }
     if (specs.isCantellated()) {
+      const faceType = facet === "vertex" ? 3 : specs.data.family
       // depends on the face type given in options
       const face = geom.faces.find(
         (face) =>
@@ -79,7 +80,8 @@ export const expand = new OperationPair<Classical, Options>({
     // FIXME handle expanding truncated solids
     throw new Error(`Cannot find pose`)
   },
-  toStart({ specs, geom }, { faceType = 3 }) {
+  toStart({ specs, geom }, { facet }) {
+    const faceType = facet === "vertex" ? 3 : specs.data.family
     // const resultLength = info.isBevelled()
     //   ? getContractLengthSemi(polyhedron, faceType, result)
     //   : getContractLength(info.data.family, polyhedron, faceType)
