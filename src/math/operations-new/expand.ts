@@ -1,6 +1,6 @@
 import { minBy } from "lodash-es"
 import { Twist } from "types"
-import Classical, { Facet } from "data/specs/Classical"
+import Classical, { Facet, Family } from "data/specs/Classical"
 import OperationPair, { Pose } from "./OperationPair"
 import { getPlane } from "math/geom"
 import { Polyhedron } from "math/polyhedra"
@@ -13,7 +13,7 @@ import {
 const coxeterNum = { 3: 4, 4: 6, 5: 10 }
 
 function getContractLength(
-  family: 3 | 4 | 5,
+  family: Family,
   polyhedron: Polyhedron,
   faceType: 3 | 4 | 5,
 ) {
@@ -39,7 +39,7 @@ function getFaceType(specs: Classical, facet?: Facet) {
 /**
  * Return the snub angle of the given polyhedron, given the list of expanded faces
  */
-export function getSnubAngle(specs: Classical, facet: Facet) {
+export function calcSnubAngle(specs: Classical, facet: Facet) {
   // Choose one of the expanded faces and get its properties
   const polyhedron = Polyhedron.get(specs.canonicalName())
   const expandedFaces = getExpandedFaces(polyhedron, getFaceType(specs, facet))
@@ -63,11 +63,11 @@ export function getSnubAngle(specs: Classical, facet: Facet) {
   return normMidpoint.angleBetween(projected, true) || 0
 }
 
-function snubAnglesFromFamily(family: 3 | 4 | 5) {
+function snubAnglesFromFamily(family: Family) {
   const specs = Classical.query.withData({ family, operation: "snub" })
   return {
-    face: getSnubAngle(specs, "face"),
-    vertex: getSnubAngle(specs, "vertex"),
+    face: calcSnubAngle(specs, "face"),
+    vertex: calcSnubAngle(specs, "vertex"),
   }
 }
 
@@ -76,6 +76,27 @@ const snubAngles = {
   3: snubAnglesFromFamily(3),
   4: snubAnglesFromFamily(4),
   5: snubAnglesFromFamily(5),
+}
+
+function getCantellatedDistance(family: Family) {
+  const specs = Classical.query.withData({ family, operation: "cantellate" })
+  const geom = Polyhedron.get(specs.canonicalName())
+  const referenceFace =
+    geom.faces.find((face) => isExpandedFace(geom, face, family)) ??
+    geom.getFace()
+  return referenceFace.distanceToCenter() / geom.edgeLength()
+}
+
+const cantellatedDistances = {
+  3: getCantellatedDistance(3),
+  4: getCantellatedDistance(4),
+  5: getCantellatedDistance(5),
+}
+
+function getSnubAngle(specs: Classical, facet: Facet) {
+  const sign = specs.data.twist === "left" ? 1 : -1
+  const angle = snubAngles[specs.data.family][facet]
+  return sign * angle
 }
 
 // Get the pose of a regular solid for both expand/snub
@@ -109,7 +130,7 @@ function getCantellatedPose(
   }
 }
 
-function getSnubPose(geom: Polyhedron, specs: Classical, facet?: Facet): Pose {
+function getSnubPose(geom: Polyhedron, specs: Classical, facet: Facet): Pose {
   const faceType = getFaceType(specs, facet)
   // depends on the face type given in options
   const face = geom.faces.find(
@@ -117,15 +138,13 @@ function getSnubPose(geom: Polyhedron, specs: Classical, facet?: Facet): Pose {
       face.numSides === faceType &&
       face.adjacentFaces().every((f) => f.numSides === 3),
   )!
-  const sign = specs.data.twist === "left" ? 1 : -1
-  const angle = snubAngles[specs.data.family]["face"]
   const crossAxis = face.edges[0].midpoint().sub(face.centroid())
   return {
     origin: geom.centroid(),
     scale: face.sideLength(),
     orientation: [
       face.normal(),
-      crossAxis.getRotatedAroundAxis(face.normal(), sign * angle),
+      crossAxis.getRotatedAroundAxis(face.normal(), getSnubAngle(specs, facet)),
     ],
   }
 }
@@ -286,9 +305,11 @@ export const snub = new OperationPair<Classical, SnubOptions>({
     const resultLength = getContractLength(specs.data.family, geom, faceType)
     // Take all the stuff and push it inwards
     const contractFaces = getExpandedFaces(geom, faceType)
-    const sign = specs.data.twist === "left" ? 1 : -1
-    const angle = snubAngles[specs.data.family][facet]
-    return getResizedVertices(contractFaces, resultLength, sign * angle)
+    return getResizedVertices(
+      contractFaces,
+      resultLength,
+      getSnubAngle(specs, facet),
+    )
   },
   toEnd({ geom }) {
     return geom.vertices
@@ -323,25 +344,16 @@ export const twist = new OperationPair<Classical, SnubOptions>({
     }
   },
   toStart({ specs, geom }) {
-    const f0 = geom.largestFace()
-    const n = f0.numSides
-    const twistFaces = getExpandedFaces(geom, n)
+    const twistFaces = getExpandedFaces(geom, specs.data.family)
 
-    const reference = Polyhedron.get(
-      specs.withData({ operation: "cantellate" }).canonicalName(),
-    )
-
-    const referenceFace =
-      reference.faces.find((face) => isExpandedFace(reference, face, n)) ??
-      reference.getFace()
     const referenceLength =
-      (referenceFace.distanceToCenter() / reference.edgeLength()) *
-      geom.edgeLength()
+      cantellatedDistances[specs.data.family] * geom.edgeLength()
 
-    const sign = specs.data.twist === "left" ? 1 : -1
-    const angle = snubAngles[specs.data.family]["face"]
-
-    return getResizedVertices(twistFaces, referenceLength, sign * angle)
+    return getResizedVertices(
+      twistFaces,
+      referenceLength,
+      getSnubAngle(specs, "face"),
+    )
   },
   toEnd({ geom }) {
     return geom.vertices

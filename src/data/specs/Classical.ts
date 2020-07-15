@@ -4,7 +4,7 @@ import Specs from "./PolyhedronSpecs"
 import Queries from "./Queries"
 
 const families = primaryPolygons
-type Family = PrimaryPolygon
+export type Family = PrimaryPolygon
 
 const facets = ["face", "vertex"] as const
 export type Facet = Items<typeof facets>
