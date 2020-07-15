@@ -102,12 +102,17 @@ export function getExpandedFaces(polyhedron: Polyhedron, faceType?: number) {
   }
 }
 
-export function getSnubAngle(polyhedron: Polyhedron, faces: Face[]) {
-  const [face0, ...rest] = faces
+/**
+ * Return the snub angle of the given polyhedron, given the list of expanded faces
+ */
+export function getSnubAngle(polyhedron: Polyhedron, expandedFaces: Face[]) {
+  // Choose one of the expanded faces and get its properties
+  const [face0, ...rest] = expandedFaces
   const faceCentroid = face0.centroid()
   const faceNormal = face0.normal()
   const midpoint = face0.edges[0].midpoint()
 
+  // Choose one of the closest faces
   const face1 = minBy(rest, (face) => midpoint.distanceTo(face.centroid()))!
 
   const plane = getPlane([
