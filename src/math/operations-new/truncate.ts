@@ -148,7 +148,7 @@ export const rectify = new OperationPair<Classical, Options>({
       const crossAxis = face.edges[0].midpoint().sub(face.centroid())
       return {
         origin,
-        scale: geom.getVertex().vec.distanceTo(origin),
+        scale: face.distanceToCenter(),
         orientation: [face.normal(), crossAxis],
       }
     }
@@ -160,9 +160,7 @@ export const rectify = new OperationPair<Classical, Options>({
       const crossAxis = edge.midpoint().sub(face.centroid())
       return {
         origin,
-        scale: getVertexToAdd(specs, getSharpenFaces(geom)[0]).distanceTo(
-          origin,
-        ),
+        scale: face.distanceToCenter(),
         orientation: [face.normal(), crossAxis],
       }
     }
@@ -176,10 +174,7 @@ export const rectify = new OperationPair<Classical, Options>({
       return {
         origin,
         // scale with respect to the sharpen face
-        scale: getVertexToAdd(
-          specs,
-          geom.faceWithNumSides(facet === "vertex" ? specs.data.family : 3),
-        ).distanceTo(origin),
+        scale: face.distanceToCenter(),
         orientation: [face.normal(), crossAxis],
       }
     }
