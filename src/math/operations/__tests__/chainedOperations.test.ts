@@ -5,7 +5,6 @@ import { setupOperations } from "../operationTestUtils"
 setupOperations()
 
 interface Args {
-  faceType?: number
   face?: number
   facet?: "vertex" | "face"
   cap?: boolean
@@ -94,7 +93,7 @@ describe("chained tests", () => {
       start: "dodecahedron",
       operations: [
         ["rectify", "icosidodecahedron"],
-        { op: "sharpen", args: { faceType: 5 }, expected: "icosahedron" },
+        { op: "sharpen", args: { facet: "vertex" }, expected: "icosahedron" },
         ["contract", "tetrahedron"],
       ],
     },
@@ -108,7 +107,7 @@ describe("chained tests", () => {
         ["rectify", "cuboctahedron"],
         ["truncate", "truncated cuboctahedron"],
         ["sharpen", "cuboctahedron"],
-        { op: "sharpen", args: { faceType: 3 }, expected: "cube" },
+        { op: "sharpen", args: { facet: "face" }, expected: "cube" },
         ["truncate", "truncated cube"],
         {
           op: "augment",

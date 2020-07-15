@@ -6,18 +6,13 @@ import {
 } from "../../operations-new/truncate"
 
 interface Options {
-  faceType?: number
+  facet?: "vertex" | "face"
 }
 
 export const sharpen = new Operation<Options, Classical>("sharpen", {
-  apply({ specs, geom }, { faceType }) {
+  apply({ specs, geom }, options) {
     if (specs.isRectified()) {
-      return metaRectify.unapply(
-        geom,
-        specs.isTetrahedral()
-          ? {}
-          : { facet: faceType === 3 ? "face" : "vertex" },
-      )
+      return metaRectify.unapply(geom, options)
     }
     return metaTruncate.unapply(geom, {})
   },
@@ -28,13 +23,10 @@ export const sharpen = new Operation<Options, Classical>("sharpen", {
     return false
   },
 
-  getResult({ specs }, { faceType }) {
+  getResult({ specs }, options) {
     if (specs.isRectified()) {
       // if rectified, we have to figure out the facet from the faceType
-      return specs.withData({
-        operation: "regular",
-        facet: faceType === 3 ? "face" : "vertex",
-      })
+      return metaRectify.getSource(specs, options)
     } else {
       return metaTruncate.getSource(specs)
     }
@@ -49,20 +41,21 @@ export const sharpen = new Operation<Options, Classical>("sharpen", {
     if (metaTruncate.canUnapplyTo(specs)) {
       yield {}
     } else if (specs.isRectified() && !specs.isTetrahedral()) {
-      yield { faceType: 3 }
-      yield { faceType: specs.data.family }
+      yield { facet: "face" }
+      yield { facet: "vertex" }
     } else {
       yield {}
     }
   },
 
-  hitOption: "faceType",
+  hitOption: "facet",
   getHitOption({ geom }, hitPoint) {
     const n = geom.hitFace(hitPoint).numSides
-    return n <= 5 ? { faceType: n } : {}
+    return n <= 5 ? { facet: n === 3 ? "face" : "vertex" } : {}
   },
 
-  faceSelectionStates({ geom }, { faceType = -1 }) {
+  faceSelectionStates({ specs, geom }, { facet }) {
+    const faceType = !facet ? null : facet === "face" ? 3 : specs.data.family
     return geom.faces.map((face) => {
       if (face.numSides === faceType) return "selected"
       return "selectable"

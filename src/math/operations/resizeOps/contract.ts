@@ -100,7 +100,7 @@ export const contract = new Operation<Options, Classical>("contract", {
         return undefined
       })
     }
-    const faceType = facet === "vertex" ? 3 : specs.data.family
+    const faceType = !facet ? null : facet === "vertex" ? 3 : specs.data.family
     return geom.faces.map((face) => {
       if (faceType && isExpandedFace(geom, face, faceType)) return "selected"
       if (isExpandedFace(geom, face)) return "selectable"
