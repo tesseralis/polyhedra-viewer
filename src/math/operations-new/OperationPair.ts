@@ -74,6 +74,14 @@ export default class OperationPair<
     throw new Error("could not find proper specs")
   }
 
+  private getEntry(specs: Specs, input: "source" | "target", opts?: Opts) {
+    return this.inputs.graph.find(
+      (entry) =>
+        entry[input].name() === specs.name() &&
+        isMatch(entry.options || {}, opts || {}),
+    )!
+  }
+
   private entryFromSource(source: PolyhedronSpecs) {
     return this.inputs.graph.find(
       (entry) => entry.source.name() === source.name(),
@@ -94,23 +102,19 @@ export default class OperationPair<
     return !!this.entryFromTarget(specs)
   }
 
-  getResult(source: Specs) {
-    return this.entryFromSource(source)!.target
+  getResult(source: Specs, options?: Opts) {
+    return this.getEntry(source, "source", options).target
   }
 
-  getSource(target: Specs) {
-    return this.entryFromTarget(target)!.source
+  getSource(target: Specs, options?: Opts) {
+    return this.getEntry(target, "target", options).source
   }
 
   doApply(solid: Polyhedron, input: "source" | "target", opts: Opts) {
-    const { graph, getPose, toStart, toEnd } = this.inputs
+    const { getPose, toStart, toEnd } = this.inputs
     const specs = this.getSpecs(solid, input)
     const { specs: interSpecs, geom: interSolid } = this.inputs.getIntermediate(
-      graph.find(
-        (entry) =>
-          entry[input].name() === specs.name() &&
-          isMatch(entry.options || {}, opts),
-      )!,
+      this.getEntry(specs, input, opts),
     )
 
     const alignedInter = alignPolyhedron(

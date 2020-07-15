@@ -8,6 +8,10 @@ import {
   getExpandedFaces,
 } from "./resizeUtils"
 import Operation from "../Operation"
+import {
+  expand as metaExpand,
+  snub as metaSnub,
+} from "../../operations-new/expand"
 
 // TODO hopefully there's a better way to do this once we make the new opGraph
 type FaceType = Polygon
@@ -79,18 +83,33 @@ export function applyContract(
 // NOTE: We are using the same operation for contracting both expanded and snub solids.
 export const contract = new Operation<Options, Classical>("contract", {
   apply({ specs, geom }, options, result) {
+    if (metaExpand.canUnapplyTo(specs)) {
+      return metaExpand.unapply(geom, {
+        faceType: (options.faceType as any) || 3,
+      })
+    }
+    if (metaSnub.canUnapplyTo(specs)) {
+      // FIXME args
+      return metaSnub.unapply(geom, {})
+    }
+    // FIXME turn semi-expand into a new operation
     return applyContract(specs, geom, options, result)
   },
 
   canApplyTo(info): info is Classical {
     if (!info.isClassical()) return false
-    return info.isBevelled() || info.isCantellated() || info.isSnub()
+    if (metaExpand.canUnapplyTo(info)) return true
+    if (metaSnub.canUnapplyTo(info)) return true
+    return info.isBevelled()
   },
 
-  getResult({ specs }, { faceType }) {
-    const isVertex = faceType === (specs.isBevelled() ? 6 : 3)
+  getResult({ specs }, { faceType = 3 }) {
+    if (metaExpand.canUnapplyTo(specs))
+      return metaExpand.getSource(specs, { faceType: faceType as any })
+    if (metaSnub.canUnapplyTo(specs)) return metaSnub.getSource(specs)
+    const isVertex = faceType === 6
     return specs.withData({
-      operation: specs.isBevelled() ? "truncate" : "regular",
+      operation: "truncate",
       facet: isVertex ? "vertex" : "face",
     })
   },
