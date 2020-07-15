@@ -7,7 +7,7 @@ const families = primaryPolygons
 type Family = PrimaryPolygon
 
 const facets = ["face", "vertex"] as const
-type Facet = Items<typeof facets>
+export type Facet = Items<typeof facets>
 
 const operations = [
   "regular",

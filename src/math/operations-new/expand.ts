@@ -1,5 +1,5 @@
 import { Twist } from "types"
-import Classical from "data/specs/Classical"
+import Classical, { Facet } from "data/specs/Classical"
 import OperationPair, { Pose } from "./OperationPair"
 import { Polyhedron } from "math/polyhedra"
 import {
@@ -30,6 +30,11 @@ function getContractLength(
   return (s / 2 / Math.tan(Math.PI / p)) * tanTheta2
 }
 
+// Get the face type for the given facet and solid specs
+function getFaceType(specs: Classical, facet?: Facet) {
+  return facet === "vertex" ? 3 : specs.data.family
+}
+
 // Get the pose of a regular solid for both expand/snub
 function getRegularPose(geom: Polyhedron): Pose {
   const face = geom.getFace()
@@ -44,9 +49,9 @@ function getRegularPose(geom: Polyhedron): Pose {
 function getCantellatedPose(
   geom: Polyhedron,
   specs: Classical,
-  facet?: "face" | "vertex",
+  facet?: Facet,
 ): Pose {
-  const faceType = facet === "vertex" ? 3 : specs.data.family
+  const faceType = getFaceType(specs, facet)
   // depends on the face type given in options
   const face = geom.faces.find(
     (face) =>
@@ -61,12 +66,8 @@ function getCantellatedPose(
   }
 }
 
-function getSnubPose(
-  geom: Polyhedron,
-  specs: Classical,
-  facet?: "vertex" | "face",
-): Pose {
-  const faceType = facet === "face" ? specs.data.family : 3
+function getSnubPose(geom: Polyhedron, specs: Classical, facet?: Facet): Pose {
+  const faceType = getFaceType(specs, facet)
   // depends on the face type given in options
   const face = geom.faces.find(
     (face) =>
@@ -98,7 +99,7 @@ function getChiralGeom(specs: Classical) {
 }
 
 interface ExpandOpts {
-  facet?: "face" | "vertex"
+  facet?: Facet
 }
 
 // Expansion of truncated to bevelled solids
@@ -140,7 +141,7 @@ export const semiExpand = new OperationPair<Classical, ExpandOpts>({
     const reference = Polyhedron.get(
       specs.withData({ operation: "truncate", facet }).canonicalName(),
     )
-    const faceType = facet === "vertex" ? 6 : specs.data.family * 2
+    const faceType = 2 * getFaceType(specs, facet)
     const referenceFace = reference.faceWithNumSides(faceType)
     const resultLength =
       (referenceFace.distanceToCenter() / reference.edgeLength()) *
@@ -178,7 +179,7 @@ export const expand = new OperationPair<Classical, ExpandOpts>({
     throw new Error(`Cannot find pose`)
   },
   toStart({ specs, geom }, { facet }) {
-    const faceType = facet === "vertex" ? 3 : specs.data.family
+    const faceType = getFaceType(specs, facet)
     const resultLength = getContractLength(specs.data.family, geom, faceType)
     // Take all the stuff and push it inwards
     const contractFaces = getExpandedFaces(geom, faceType)
