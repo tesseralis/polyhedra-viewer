@@ -1,11 +1,6 @@
 import { Polygon } from "data/polygons"
 import Classical from "data/specs/Classical"
-import { Polyhedron } from "math/polyhedra"
-import {
-  isExpandedFace,
-  getResizedVertices,
-  getExpandedFaces,
-} from "./resizeUtils"
+import { isExpandedFace } from "./resizeUtils"
 import Operation from "../Operation"
 import {
   expand as metaExpand,
@@ -31,35 +26,10 @@ interface Options {
 
 // contract length of a bevelled polyhedron
 // TODO calculate this without a reference
-function getContractLengthSemi(
-  polyhedron: Polyhedron,
-  faceType: FaceType,
-  reference: Polyhedron,
-) {
-  const referenceFace = reference.faceWithNumSides(faceType)
-  const referenceLength =
-    (referenceFace.distanceToCenter() / reference.edgeLength()) *
-    polyhedron.edgeLength()
-  return referenceLength
-}
-
-export function doSemiContract(
-  polyhedron: Polyhedron,
-  { faceType = 6 }: Options,
-  result: Polyhedron,
-) {
-  const resultLength = getContractLengthSemi(polyhedron, faceType, result)
-  // Take all the stuff and push it inwards
-  const contractFaces = getExpandedFaces(polyhedron, faceType)
-  const endVertices = getResizedVertices(contractFaces, resultLength, 0)
-  return {
-    animationData: { start: polyhedron, endVertices },
-  }
-}
 
 // NOTE: We are using the same operation for contracting both expanded and snub solids.
 export const contract = new Operation<Options, Classical>("contract", {
-  apply({ specs, geom }, options, result) {
+  apply({ specs, geom }, options) {
     if (metaExpand.canUnapplyTo(specs)) {
       const opts = specs.isTetrahedral()
         ? {}
