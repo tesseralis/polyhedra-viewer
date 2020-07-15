@@ -56,10 +56,7 @@ export const truncate = new OperationPair<Classical, {}>({
       }
     }),
   getIntermediate({ target }) {
-    return {
-      specs: target,
-      geom: Polyhedron.get(target.canonicalName()),
-    }
+    return target
   },
   getPose({ geom, specs }) {
     const origin = geom.centroid()
@@ -139,10 +136,9 @@ export const rectify = new OperationPair<Classical, Options>({
       },
     })),
   getIntermediate({ source }) {
-    const specs = source.withData({
+    return source.withData({
       operation: source.isRegular() ? "truncate" : "bevel",
     })
-    return { specs, geom: Polyhedron.get(specs.canonicalName()) }
   },
   getPose({ geom, specs }, { facet }) {
     const origin = geom.centroid()

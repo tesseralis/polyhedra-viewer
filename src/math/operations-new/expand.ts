@@ -1,7 +1,7 @@
 import { minBy } from "lodash-es"
 import { Twist } from "types"
 import Classical, { Facet, Family } from "data/specs/Classical"
-import OperationPair, { Pose } from "./OperationPair"
+import OperationPair, { getGeom, Pose } from "./OperationPair"
 import { getPlane } from "math/geom"
 import { Polyhedron } from "math/polyhedra"
 import {
@@ -41,7 +41,7 @@ function getFaceType(specs: Classical, facet?: Facet) {
  */
 export function calcSnubAngle(specs: Classical, facet: Facet) {
   // Choose one of the expanded faces and get its properties
-  const polyhedron = Polyhedron.get(specs.canonicalName())
+  const polyhedron = getGeom(specs)
   const expandedFaces = getExpandedFaces(polyhedron, getFaceType(specs, facet))
   const [face0, ...rest] = expandedFaces
   const faceCentroid = face0.centroid()
@@ -80,7 +80,7 @@ const snubAngles = {
 
 function getCantellatedDistance(family: Family) {
   const specs = Classical.query.withData({ family, operation: "cantellate" })
-  const geom = Polyhedron.get(specs.canonicalName())
+  const geom = getGeom(specs)
   const referenceFace =
     geom.faces.find((face) => isExpandedFace(geom, face, family)) ??
     geom.getFace()
@@ -149,17 +149,6 @@ function getSnubPose(geom: Polyhedron, specs: Classical, facet: Facet): Pose {
   }
 }
 
-/**
- * Get the geometry for the given specs with the right chirality.
- */
-function getChiralGeom(specs: Classical) {
-  const geom = Polyhedron.get(specs.canonicalName())
-  // The reference models are always right-handed,
-  // so flip 'em if not
-  // TODO don't rely on this and make it more general
-  return specs.data.twist === "left" ? geom.reflect() : geom
-}
-
 interface ExpandOpts {
   facet?: Facet
 }
@@ -174,7 +163,7 @@ export const semiExpand = new OperationPair<Classical, ExpandOpts>({
       options: { facet: entry.data.facet },
     })),
   getIntermediate({ target }) {
-    return { specs: target, geom: Polyhedron.get(target.canonicalName()) }
+    return target
   },
   getPose({ specs, geom }, { facet }) {
     const origin = geom.centroid()
@@ -200,9 +189,7 @@ export const semiExpand = new OperationPair<Classical, ExpandOpts>({
     }
   },
   toStart({ specs, geom }, { facet }) {
-    const reference = Polyhedron.get(
-      specs.withData({ operation: "truncate", facet }).canonicalName(),
-    )
+    const reference = getGeom(specs.withData({ operation: "truncate", facet }))
     const faceType = 2 * getFaceType(specs, facet)
     // FIXME we can cache these values too
     const referenceFace = reference.faceWithNumSides(faceType)
@@ -229,7 +216,7 @@ export const expand = new OperationPair<Classical, ExpandOpts>({
       }
     }),
   getIntermediate({ target }) {
-    return { specs: target, geom: Polyhedron.get(target.canonicalName()) }
+    return target
   },
   getPose({ geom, specs }, { facet }) {
     if (specs.isRegular()) {
@@ -281,10 +268,7 @@ export const snub = new OperationPair<Classical, SnubOptions>({
       }))
     }),
   getIntermediate({ target }) {
-    return { specs: target, geom: getChiralGeom(target) }
-  },
-  getTargetGeom(specs) {
-    return getChiralGeom(specs)
+    return target
   },
   getPose({ geom, specs }, { twist }) {
     if (specs.isRegular()) {
@@ -330,10 +314,7 @@ export const twist = new OperationPair<Classical, SnubOptions>({
       }))
     }),
   getIntermediate({ target }) {
-    return { specs: target, geom: getChiralGeom(target) }
-  },
-  getTargetGeom(specs) {
-    return getChiralGeom(specs)
+    return target
   },
   getPose({ specs, geom }) {
     if (specs.isCantellated()) {

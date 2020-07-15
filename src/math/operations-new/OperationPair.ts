@@ -27,15 +27,22 @@ interface OpPairInput<Specs extends PolyhedronSpecs, Opts> {
   // The graph of what polyhedron spec inputs are allowed and what maps to each other
   graph: OpPairGraph<Specs, Opts>
   // Get the intermediate polyhedron for the given graph entry
-  getIntermediate(entry: GraphEntry<Specs, Opts>): SolidArgs<Specs>
+  getIntermediate(entry: GraphEntry<Specs, Opts>): Specs | SolidArgs<Specs>
   // Get the post of an input, output or intermediate solid
   getPose(solid: SolidArgs<Specs>, opts: Opts): Pose
-  getSourceGeom?(specs: Specs): Polyhedron
-  getTargetGeom?(specs: Specs): Polyhedron
   // Move the intermediate figure to the start position
   toStart(solid: SolidArgs<Specs>, opts: Opts): VertexArg[]
   // Move the intermediate figure to the end position
   toEnd(solid: SolidArgs<Specs>, opts: Opts): VertexArg[]
+}
+
+function normalizeIntermediate<Specs extends PolyhedronSpecs>(
+  inter: Specs | SolidArgs<Specs>,
+) {
+  if (inter instanceof PolyhedronSpecs) {
+    return { specs: inter, geom: getGeom(inter) }
+  }
+  return inter
 }
 
 // Transform the polyhedron with the transformation given by the two poses
@@ -57,6 +64,17 @@ function alignPolyhedron(solid: Polyhedron, pose1: Pose, pose2: Pose) {
 
 function specsEquals(spec1: PolyhedronSpecs, spec2: PolyhedronSpecs) {
   return isEqual(spec1.data, spec2.data)
+}
+
+export function getGeom(specs: PolyhedronSpecs) {
+  const geom = Polyhedron.get(specs.canonicalName())
+  // The reference models are always right-handed,
+  // so flip 'em if not
+  // TODO don't rely on this and make it more general
+  if (specs.isClassical() && specs.isSnub() && specs.data.twist === "left") {
+    return geom.reflect()
+  }
+  return geom
 }
 
 export default class OperationPair<
@@ -100,20 +118,15 @@ export default class OperationPair<
     return this.getEntry(target, "target", options).source
   }
 
-  getGeom(specs: Specs, input: "source" | "target") {
-    const fn = input === "source" ? "getSourceGeom" : ("getTargetGeom" as const)
-    return this.inputs[fn]?.(specs) ?? Polyhedron.get(specs.canonicalName())
-  }
-
   doApply(solid: SolidArgs<Specs>, input: "source" | "target", opts: Opts) {
     const { getPose, toStart, toEnd } = this.inputs
     const entry = this.getEntry(solid.specs, input, opts)
-    const { specs: interSpecs, geom: interSolid } = this.inputs.getIntermediate(
-      entry,
+    const { specs: interSpecs, geom: interSolid } = normalizeIntermediate(
+      this.inputs.getIntermediate(entry),
     )
 
     const output = input === "source" ? "target" : "source"
-    const outputGeom = this.getGeom(entry[output], output)
+    const outputGeom = getGeom(entry[output])
     const inputPose = getPose(solid, opts)
 
     const alignedInter = alignPolyhedron(

@@ -1,5 +1,5 @@
 import { sortBy } from "lodash-es"
-import { Cap, Polyhedron } from "math/polyhedra"
+import { Cap } from "math/polyhedra"
 import Capstone from "data/specs/Capstone"
 import OperationPair from "./OperationPair"
 import {
@@ -20,10 +20,7 @@ export default new OperationPair<Capstone, {}>({
       }
     }),
   getIntermediate({ target }) {
-    return {
-      specs: target,
-      geom: Polyhedron.get(target.canonicalName()),
-    }
+    return target
   },
   getPose({ geom, specs }) {
     // Pick a cap, favoring rotunda over cupola in the case of cupolarotundae
