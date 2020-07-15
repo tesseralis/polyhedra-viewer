@@ -10,11 +10,11 @@ interface Options {
 }
 
 export const sharpen = new Operation<Options, Classical>("sharpen", {
-  apply({ specs, geom }, options) {
-    if (specs.isRectified()) {
-      return metaRectify.unapply(geom, options)
+  apply(solid, options) {
+    if (solid.specs.isRectified()) {
+      return metaRectify.unapply(solid, options)
     }
-    return metaTruncate.unapply(geom, {})
+    return metaTruncate.unapply(solid, {})
   },
 
   canApplyTo(info): info is Classical {

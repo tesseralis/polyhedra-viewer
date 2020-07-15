@@ -37,8 +37,8 @@ function doElongate(polyhedron: Polyhedron, twist?: Twist) {
 }
 
 export const elongate = new Operation<{}, Capstone>("elongate", {
-  apply({ geom }) {
-    return metaElongate.apply(geom, {})
+  apply(solid) {
+    return metaElongate.apply(solid, {})
   },
 
   canApplyTo(info): info is Capstone {

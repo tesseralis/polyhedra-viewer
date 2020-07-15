@@ -11,11 +11,12 @@ import {
 } from "../../operations-new/expand"
 
 export const expand = new Operation<{}, Classical>("expand", {
-  apply({ specs, geom }) {
+  apply(solid) {
+    const { specs } = solid
     if (specs.isTruncated()) {
-      return metaSemiExpand.apply(geom, { facet: specs.data.facet })
+      return metaSemiExpand.apply(solid, { facet: specs.data.facet })
     }
-    return metaExpand.apply(geom, { facet: specs.data.facet })
+    return metaExpand.apply(solid, { facet: specs.data.facet })
   },
 
   canApplyTo(info): info is Classical {
@@ -35,8 +36,8 @@ interface SnubOpts {
   twist: Twist
 }
 export const snub = new Operation<SnubOpts, Classical>("snub", {
-  apply({ geom }, { twist = "left" }) {
-    return metaSnub.apply(geom, { twist })
+  apply(solid, { twist = "left" }) {
+    return metaSnub.apply(solid, { twist })
   },
 
   canApplyTo(info): info is Classical {

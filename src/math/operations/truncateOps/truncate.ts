@@ -6,8 +6,8 @@ import {
 } from "../../operations-new/truncate"
 
 export const truncate = new Operation<{}, Classical>("truncate", {
-  apply({ geom }) {
-    return metaTruncate.apply(geom, {})
+  apply(solid) {
+    return metaTruncate.apply(solid, {})
   },
 
   canApplyTo(info): info is Classical {
@@ -20,8 +20,8 @@ export const truncate = new Operation<{}, Classical>("truncate", {
 })
 
 export const rectify = new Operation<{}, Classical>("rectify", {
-  apply({ geom }) {
-    return metaRectify.apply(geom, {})
+  apply(solid) {
+    return metaRectify.apply(solid, {})
   },
 
   canApplyTo(info): info is Classical {

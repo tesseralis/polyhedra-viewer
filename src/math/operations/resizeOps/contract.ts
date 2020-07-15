@@ -1,6 +1,7 @@
 import { Polygon } from "data/polygons"
 import Classical from "data/specs/Classical"
 import { isExpandedFace } from "./resizeUtils"
+import { Polyhedron } from "math/polyhedra"
 import Operation from "../Operation"
 import {
   expand as metaExpand,
@@ -15,31 +16,38 @@ interface Options {
   facet?: "vertex" | "face"
 }
 
-// function getChirality(geom: Polyhedron) {
-//   if (geom.largestFace().numSides === 3) {
-//     return "left"
-//   }
-//   const face = geom.faces.find((f) => f.numSides !== 3)!
-//   const other = face.edges[0].twin().prev().twin().next().twinFace()
-//   return other.numSides !== 3 ? "right" : "left"
-// }
+function getChirality(geom: Polyhedron) {
+  if (geom.largestFace().numSides === 3) {
+    return "left"
+  }
+  const face = geom.faces.find((f) => f.numSides !== 3)!
+  const other = face.edges[0].twin().prev().twin().next().twinFace()
+  return other.numSides !== 3 ? "right" : "left"
+}
 
 // NOTE: We are using the same operation for contracting both expanded and snub solids.
 export const contract = new Operation<Options, Classical>("contract", {
-  apply({ specs, geom }, options) {
+  apply(solid, options) {
+    const { specs, geom } = solid
     if (metaExpand.canUnapplyTo(specs)) {
       const opts = specs.isTetrahedral() ? {} : options
-      return metaExpand.unapply(geom, opts)
+      return metaExpand.unapply(solid, opts)
     }
     if (metaSnub.canUnapplyTo(specs)) {
-      // const shapeTwist = getChirality(geom)
-      // const oppTwist = shapeTwist === "left" ? "right" : "left"
-      // const twist = options.faceType === 3 ? oppTwist : shapeTwist
+      const shapeTwist = getChirality(geom)
+      const oppTwist = shapeTwist === "left" ? "right" : "left"
+      const twist = options.facet === "vertex" ? oppTwist : shapeTwist
       // FIXME translate face-type args to twist
-      // return metaSnub.unapply(geom, {twist})
-      return metaSnub.unapply(geom, {})
+      return metaSnub.unapply(
+        {
+          geom,
+          specs: specs.withData({ twist: shapeTwist }),
+        },
+        { twist },
+      )
+      // return metaSnub.unapply(geom, {})
     }
-    return metaSemiExpand.unapply(geom, options)
+    return metaSemiExpand.unapply(solid, options)
   },
 
   canApplyTo(info): info is Classical {
@@ -50,16 +58,17 @@ export const contract = new Operation<Options, Classical>("contract", {
     return false
   },
 
-  getResult({ specs }, options) {
+  getResult({ specs, geom }, options) {
     if (metaExpand.canUnapplyTo(specs)) {
       return metaExpand.getSource(specs, options)
     }
     if (metaSnub.canUnapplyTo(specs)) {
-      // const shapeTwist = getChirality(geom)
-      // const oppTwist = shapeTwist === "left" ? "right" : "left"
-      // const twist = faceType === 3 ? oppTwist : shapeTwist
-      // return metaSnub.getSource(specs, { twist })
-      return metaSnub.getSource(specs)
+      const shapeTwist = getChirality(geom)
+      const oppTwist = shapeTwist === "left" ? "right" : "left"
+      const twist = options.facet === "vertex" ? oppTwist : shapeTwist
+      return metaSnub.getSource(specs.withData({ twist: shapeTwist }), {
+        twist,
+      })
     }
     return metaSemiExpand.getSource(specs, options)
   },

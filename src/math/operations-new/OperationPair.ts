@@ -1,5 +1,4 @@
-import { isMatch } from "lodash-es"
-import { getAllSpecs } from "data/specs/getSpecs"
+import { isEqual, isMatch } from "lodash-es"
 import PolyhedronSpecs from "data/specs/PolyhedronSpecs"
 import { Polyhedron, VertexArg } from "math/polyhedra"
 import { Vec3D, getOrthonormalTransform, withOrigin } from "math/geom"
@@ -54,6 +53,10 @@ function alignPolyhedron(solid: Polyhedron, pose1: Pose, pose2: Pose) {
   return solid.withVertices(newVertices)
 }
 
+function specsEquals(spec1: PolyhedronSpecs, spec2: PolyhedronSpecs) {
+  return isEqual(spec1.data, spec2.data)
+}
+
 export default class OperationPair<
   Specs extends PolyhedronSpecs,
   Opts extends {} = {}
@@ -63,35 +66,20 @@ export default class OperationPair<
     this.inputs = inputs
   }
 
-  private getSpecs(solid: Polyhedron, input: "source" | "target"): Specs {
-    for (const specs of getAllSpecs(solid.name)) {
-      if (
-        this.inputs.graph.some((entry) => entry[input].name() === specs.name())
-      ) {
-        return specs as any
-      }
-    }
-    throw new Error("could not find proper specs")
-  }
-
   private getEntry(specs: Specs, input: "source" | "target", opts?: Opts) {
     return this.inputs.graph.find(
       (entry) =>
-        entry[input].name() === specs.name() &&
+        specsEquals(entry[input], specs) &&
         isMatch(entry.options || {}, opts || {}),
     )!
   }
 
   private entryFromSource(source: PolyhedronSpecs) {
-    return this.inputs.graph.find(
-      (entry) => entry.source.name() === source.name(),
-    )
+    return this.inputs.graph.find((entry) => specsEquals(entry.source, source))
   }
 
   private entryFromTarget(target: PolyhedronSpecs) {
-    return this.inputs.graph.find(
-      (entry) => entry.target.name() === target.name(),
-    )
+    return this.inputs.graph.find((entry) => specsEquals(entry.target, target))
   }
 
   canApplyTo(specs: PolyhedronSpecs) {
@@ -110,17 +98,21 @@ export default class OperationPair<
     return this.getEntry(target, "target", options).source
   }
 
-  doApply(solid: Polyhedron, input: "source" | "target", opts: Opts) {
+  doApply(
+    { specs, geom }: SolidArgs<Specs>,
+    input: "source" | "target",
+    opts: Opts,
+  ) {
     const { getPose, toStart, toEnd } = this.inputs
-    const specs = this.getSpecs(solid, input)
+    const entry = this.getEntry(specs, input, opts)
     const { specs: interSpecs, geom: interSolid } = this.inputs.getIntermediate(
-      this.getEntry(specs, input, opts),
+      entry,
     )
 
     const alignedInter = alignPolyhedron(
       interSolid,
       getPose({ specs: interSpecs, geom: interSolid }, opts),
-      getPose({ specs, geom: solid }, opts),
+      getPose({ specs, geom }, opts),
     )
 
     const [startFn, endFn] =
@@ -136,11 +128,11 @@ export default class OperationPair<
     }
   }
 
-  apply(solid: Polyhedron, options: Opts) {
-    return this.doApply(solid, "source", options)
+  apply(args: SolidArgs<Specs>, options: Opts) {
+    return this.doApply(args, "source", options)
   }
 
-  unapply(solid: Polyhedron, options: Opts) {
-    return this.doApply(solid, "target", options)
+  unapply(args: SolidArgs<Specs>, options: Opts) {
+    return this.doApply(args, "target", options)
   }
 }
