@@ -6,6 +6,7 @@ import {
   getResizedVertices,
   getExpandedFaces,
   getSnubAngle,
+  isExpandedFace,
 } from "../operations/resizeOps/resizeUtils"
 
 const coxeterNum = { 3: 4, 4: 6, 5: 10 }
@@ -40,144 +41,66 @@ function getRegularPose(geom: Polyhedron): Pose {
   }
 }
 
+function getCantellatedPose(
+  geom: Polyhedron,
+  specs: Classical,
+  facet?: "face" | "vertex",
+): Pose {
+  const faceType = facet === "vertex" ? 3 : specs.data.family
+  // depends on the face type given in options
+  const face = geom.faces.find(
+    (face) =>
+      face.numSides === faceType &&
+      face.adjacentFaces().every((f) => f.numSides === 4),
+  )!
+  const crossAxis = face.edges[0].midpoint().sub(face.centroid())
+  return {
+    origin: geom.centroid(),
+    scale: face.sideLength(),
+    orientation: [face.normal(), crossAxis],
+  }
+}
+
+function getSnubPose(geom: Polyhedron, specs: Classical, twist?: Twist): Pose {
+  // If the twist option is in the same direction as the spec,
+  // it's a face-solid. Otherwise it's a vertex solid
+  // FIXME doens'doesn't work for vertex figures
+  const faceType = specs.data.twist === twist ? specs.data.family : 3
+  // depends on the face type given in options
+  const face = geom.faces.find(
+    (face) =>
+      face.numSides === faceType &&
+      face.adjacentFaces().every((f) => f.numSides === 3),
+  )!
+  const faces = getExpandedFaces(geom, faceType)
+  const snubAngle = getSnubAngle(geom, faces)
+  const crossAxis = face.edges[0].midpoint().sub(face.centroid())
+  return {
+    origin: geom.centroid(),
+    scale: face.sideLength(),
+    orientation: [
+      face.normal(),
+      crossAxis.getRotatedAroundAxis(face.normal(), -snubAngle),
+    ],
+  }
+}
+
+/**
+ * Get the geometry for the given specs with the right chirality.
+ */
+function getChiralGeom(specs: Classical) {
+  const geom = Polyhedron.get(specs.canonicalName())
+  // The reference models are always right-handed,
+  // so flip 'em if not
+  // TODO don't rely on this and make it more general
+  return specs.data.twist === "left" ? geom.reflect() : geom
+}
+
 interface ExpandOpts {
   facet?: "face" | "vertex"
 }
 
-export const expand = new OperationPair<Classical, ExpandOpts>({
-  graph: Classical.query
-    .where((data) => data.operation === "regular")
-    .map((entry) => {
-      return {
-        source: entry,
-        target: entry.withData({ operation: "cantellate" }),
-        options: { facet: entry.data.facet },
-      }
-    }),
-  getIntermediate({ target }) {
-    return { specs: target, geom: Polyhedron.get(target.canonicalName()) }
-  },
-  getPose({ geom, specs }, { facet }) {
-    const origin = geom.centroid()
-    if (specs.isRegular()) {
-      return getRegularPose(geom)
-    }
-    if (specs.isCantellated()) {
-      const faceType = facet === "vertex" ? 3 : specs.data.family
-      // depends on the face type given in options
-      const face = geom.faces.find(
-        (face) =>
-          face.numSides === faceType &&
-          face.adjacentFaces().every((f) => f.numSides === 4),
-      )!
-      const crossAxis = face.edges[0].midpoint().sub(face.centroid())
-      return {
-        origin,
-        scale: face.sideLength(),
-        orientation: [face.normal(), crossAxis],
-      }
-    }
-    // FIXME handle expanding truncated solids
-    throw new Error(`Cannot find pose`)
-  },
-  toStart({ specs, geom }, { facet }) {
-    const faceType = facet === "vertex" ? 3 : specs.data.family
-    const resultLength = getContractLength(specs.data.family, geom, faceType)
-    // Take all the stuff and push it inwards
-    const contractFaces = getExpandedFaces(geom, faceType)
-    return getResizedVertices(contractFaces, resultLength)
-  },
-  toEnd({ geom }) {
-    return geom.vertices
-  },
-})
-
-interface SnubOptions {
-  twist?: Twist
-}
-
-function getOpp(twist: Twist) {
-  return twist === "left" ? "right" : "left"
-}
-
-export const snub = new OperationPair<Classical, SnubOptions>({
-  graph: Classical.query
-    .where((data) => data.operation === "regular")
-    .flatMap((entry) => {
-      // Snub tetrahedra aren't chiral (yet)
-      const options: Twist[] = entry.isTetrahedral()
-        ? ["left"]
-        : ["left", "right"]
-      return options.map((twist) => ({
-        source: entry,
-        target: entry.withData({
-          operation: "snub",
-          // If a vertex-solid, the chirality of the result
-          // is *opposite* of the twist option
-          twist: entry.isVertex() ? getOpp(twist) : twist,
-        }),
-        options: { twist },
-      }))
-    }),
-  getIntermediate({ target }) {
-    // the refs are always right twisted so flip it
-    // if the target is supposed to be left
-    // TODO don't rely on the models and calculate this yourself
-    let geom = Polyhedron.get(target.canonicalName())
-    if (target.data.twist === "left") {
-      geom = geom.reflect()
-    }
-
-    return {
-      specs: target,
-      // get the reference with the proper chirality
-      geom,
-    }
-  },
-  getPose({ geom, specs }, { twist }) {
-    const origin = geom.centroid()
-    if (specs.isRegular()) {
-      return getRegularPose(geom)
-    }
-    if (specs.isSnub()) {
-      // If the twist option is in the same direction as the spec,
-      // it's a face-solid. Otherwise it's a vertex solid
-      // FIXME doens'doesn't work for vertex figures
-      const faceType = specs.data.twist === twist ? specs.data.family : 3
-      // depends on the face type given in options
-      const face = geom.faces.find(
-        (face) =>
-          face.numSides === faceType &&
-          face.adjacentFaces().every((f) => f.numSides === 3),
-      )!
-      const faces = getExpandedFaces(geom, faceType)
-      const snubAngle = getSnubAngle(geom, faces)
-      const crossAxis = face.edges[0].midpoint().sub(face.centroid())
-      return {
-        origin,
-        scale: face.sideLength(),
-        orientation: [
-          face.normal(),
-          crossAxis.getRotatedAroundAxis(face.normal(), -snubAngle),
-        ],
-      }
-    }
-    // FIXME handle expanding truncated solids
-    throw new Error(`Cannot find pose`)
-  },
-  toStart({ specs, geom }, { twist = "left" }) {
-    const faceType = twist === specs.data.twist ? specs.data.family : 3
-    const resultLength = getContractLength(specs.data.family, geom, faceType)
-    // Take all the stuff and push it inwards
-    const contractFaces = getExpandedFaces(geom, faceType)
-    const angle = -getSnubAngle(geom, contractFaces)
-    return getResizedVertices(contractFaces, resultLength, angle)
-  },
-  toEnd({ geom }) {
-    return geom.vertices
-  },
-})
-
+// Expansion of truncated to bevelled solids
 export const semiExpand = new OperationPair<Classical, ExpandOpts>({
   graph: Classical.query
     .where((data) => data.operation === "truncate")
@@ -224,6 +147,149 @@ export const semiExpand = new OperationPair<Classical, ExpandOpts>({
     // Take all the stuff and push it inwards
     const contractFaces = getExpandedFaces(geom, faceType)
     return getResizedVertices(contractFaces, resultLength, 0)
+  },
+  toEnd({ geom }) {
+    return geom.vertices
+  },
+})
+
+export const expand = new OperationPair<Classical, ExpandOpts>({
+  graph: Classical.query
+    .where((data) => data.operation === "regular")
+    .map((entry) => {
+      return {
+        source: entry,
+        target: entry.withData({ operation: "cantellate" }),
+        options: { facet: entry.data.facet },
+      }
+    }),
+  getIntermediate({ target }) {
+    return { specs: target, geom: Polyhedron.get(target.canonicalName()) }
+  },
+  getPose({ geom, specs }, { facet }) {
+    if (specs.isRegular()) {
+      return getRegularPose(geom)
+    }
+    if (specs.isCantellated()) {
+      return getCantellatedPose(geom, specs, facet)
+    }
+    // FIXME handle expanding truncated solids
+    throw new Error(`Cannot find pose`)
+  },
+  toStart({ specs, geom }, { facet }) {
+    const faceType = facet === "vertex" ? 3 : specs.data.family
+    const resultLength = getContractLength(specs.data.family, geom, faceType)
+    // Take all the stuff and push it inwards
+    const contractFaces = getExpandedFaces(geom, faceType)
+    return getResizedVertices(contractFaces, resultLength)
+  },
+  toEnd({ geom }) {
+    return geom.vertices
+  },
+})
+
+interface SnubOptions {
+  twist?: Twist
+}
+
+function getOpp(twist: Twist) {
+  return twist === "left" ? "right" : "left"
+}
+
+export const snub = new OperationPair<Classical, SnubOptions>({
+  graph: Classical.query
+    .where((data) => data.operation === "regular")
+    .flatMap((entry) => {
+      // Snub tetrahedra aren't chiral (yet)
+      const options: Twist[] = entry.isTetrahedral()
+        ? ["left"]
+        : ["left", "right"]
+      return options.map((twist) => ({
+        source: entry,
+        target: entry.withData({
+          operation: "snub",
+          // If a vertex-solid, the chirality of the result
+          // is *opposite* of the twist option
+          twist: entry.isVertex() ? getOpp(twist) : twist,
+        }),
+        options: { twist },
+      }))
+    }),
+  getIntermediate({ target }) {
+    return { specs: target, geom: getChiralGeom(target) }
+  },
+  getTargetGeom(specs) {
+    return getChiralGeom(specs)
+  },
+  getPose({ geom, specs }, { twist }) {
+    if (specs.isRegular()) {
+      return getRegularPose(geom)
+    }
+    if (specs.isSnub()) {
+      return getSnubPose(geom, specs, twist)
+    }
+    // FIXME handle expanding truncated solids
+    throw new Error(`Cannot find pose`)
+  },
+  toStart({ specs, geom }, { twist = "left" }) {
+    const faceType = twist === specs.data.twist ? specs.data.family : 3
+    const resultLength = getContractLength(specs.data.family, geom, faceType)
+    // Take all the stuff and push it inwards
+    const contractFaces = getExpandedFaces(geom, faceType)
+    const angle = -getSnubAngle(geom, contractFaces)
+    return getResizedVertices(contractFaces, resultLength, angle)
+  },
+  toEnd({ geom }) {
+    return geom.vertices
+  },
+})
+
+export const twist = new OperationPair<Classical, SnubOptions>({
+  graph: Classical.query
+    .where((data) => data.operation === "cantellate")
+    .flatMap((source) => {
+      const options: Twist[] = source.isTetrahedral()
+        ? ["left"]
+        : ["left", "right"]
+      return options.map((twist) => ({
+        source,
+        target: source.withData({ operation: "snub", twist }),
+        options: { twist },
+      }))
+    }),
+  getIntermediate({ target }) {
+    return { specs: target, geom: getChiralGeom(target) }
+  },
+  getTargetGeom(specs) {
+    return getChiralGeom(specs)
+  },
+  getPose({ specs, geom }, { twist }) {
+    if (specs.isCantellated()) {
+      // We always want a face facet as the top for a twist
+      return getCantellatedPose(geom, specs, "face")
+    } else {
+      return getSnubPose(geom, specs, twist)
+    }
+  },
+  toStart({ specs, geom }) {
+    const f0 = geom.largestFace()
+    const n = f0.numSides
+    const twistFaces = getExpandedFaces(geom, n)
+
+    const reference = Polyhedron.get(
+      specs.withData({ operation: "cantellate" }).canonicalName(),
+    )
+
+    const referenceFace =
+      reference.faces.find((face) => isExpandedFace(reference, face, n)) ??
+      reference.getFace()
+    const referenceLength =
+      (referenceFace.distanceToCenter() / reference.edgeLength()) *
+      geom.edgeLength()
+
+    const angle = -getSnubAngle(geom, twistFaces)
+
+    return getResizedVertices(twistFaces, referenceLength, angle)
   },
   toEnd({ geom }) {
     return geom.vertices

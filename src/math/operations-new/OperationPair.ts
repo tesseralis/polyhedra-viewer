@@ -30,6 +30,8 @@ interface OpPairInput<Specs extends PolyhedronSpecs, Opts> {
   getIntermediate(entry: GraphEntry<Specs, Opts>): SolidArgs<Specs>
   // Get the post of an input, output or intermediate solid
   getPose(solid: SolidArgs<Specs>, opts: Opts): Pose
+  getSourceGeom?(specs: Specs): Polyhedron
+  getTargetGeom?(specs: Specs): Polyhedron
   // Move the intermediate figure to the start position
   toStart(solid: SolidArgs<Specs>, opts: Opts): VertexArg[]
   // Move the intermediate figure to the end position
@@ -98,21 +100,32 @@ export default class OperationPair<
     return this.getEntry(target, "target", options).source
   }
 
-  doApply(
-    { specs, geom }: SolidArgs<Specs>,
-    input: "source" | "target",
-    opts: Opts,
-  ) {
+  getGeom(specs: Specs, input: "source" | "target") {
+    const fn = input === "source" ? "getSourceGeom" : ("getTargetGeom" as const)
+    return this.inputs[fn]?.(specs) ?? Polyhedron.get(specs.canonicalName())
+  }
+
+  doApply(solid: SolidArgs<Specs>, input: "source" | "target", opts: Opts) {
     const { getPose, toStart, toEnd } = this.inputs
-    const entry = this.getEntry(specs, input, opts)
+    const entry = this.getEntry(solid.specs, input, opts)
     const { specs: interSpecs, geom: interSolid } = this.inputs.getIntermediate(
       entry,
     )
 
+    const output = input === "source" ? "target" : "source"
+    const outputGeom = this.getGeom(entry[output], output)
+    const inputPose = getPose(solid, opts)
+
     const alignedInter = alignPolyhedron(
       interSolid,
       getPose({ specs: interSpecs, geom: interSolid }, opts),
-      getPose({ specs, geom }, opts),
+      inputPose,
+    )
+
+    const alignedOutput = alignPolyhedron(
+      outputGeom,
+      getPose({ specs: entry[output], geom: outputGeom }, opts),
+      inputPose,
     )
 
     const [startFn, endFn] =
@@ -125,6 +138,7 @@ export default class OperationPair<
         ),
         endVertices: endFn({ specs: interSpecs, geom: alignedInter }, opts),
       },
+      result: alignedOutput,
     }
   }
 
