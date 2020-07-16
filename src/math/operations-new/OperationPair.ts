@@ -122,7 +122,7 @@ export default class OperationPair<
   }
 
   private doApply(side: Side, solid: SolidArgs<Specs>, opts: Opts) {
-    const { getPose, toLeft: toStart, toRight: toEnd } = this.inputs
+    const { getPose, toLeft, toRight } = this.inputs
     const entry = this.getEntry(side, solid.specs, opts)
     const middle = normalizeIntermediate(this.inputs.getIntermediate(entry))
 
@@ -145,7 +145,7 @@ export default class OperationPair<
     )
 
     const [startFn, endFn] =
-      side === "left" ? [toStart, toEnd] : [toEnd, toStart]
+      side === "left" ? [toLeft, toRight] : [toRight, toLeft]
 
     return {
       animationData: {
