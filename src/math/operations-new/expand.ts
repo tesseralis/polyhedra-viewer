@@ -200,12 +200,10 @@ export const semiExpand = new OperationPair<Classical, ExpandOpts>({
     }
   },
   toStart({ specs, geom }, { facet }) {
-    const faceType = 2 * getFaceType(specs, facet)
-    const resultLength =
-      geom.edgeLength() * bevelledDistances[specs.data.family]
-    // Take all the stuff and push it inwards
-    const contractFaces = getExpandedFaces(geom, faceType)
-    return getResizedVertices(contractFaces, resultLength, 0)
+    return getResizedVertices(
+      getExpandedFaces(geom, 2 * getFaceType(specs, facet)),
+      geom.edgeLength() * bevelledDistances[specs.data.family],
+    )
   },
   toEnd({ geom }) {
     return geom.vertices
@@ -237,10 +235,11 @@ export const expand = new OperationPair<Classical, ExpandOpts>({
   },
   toStart({ specs, geom }, { facet }) {
     const faceType = getFaceType(specs, facet)
-    const resultLength = getContractLength(specs.data.family, geom, faceType)
     // Take all the stuff and push it inwards
-    const contractFaces = getExpandedFaces(geom, faceType)
-    return getResizedVertices(contractFaces, resultLength)
+    return getResizedVertices(
+      getExpandedFaces(geom, faceType),
+      getContractLength(specs.data.family, geom, faceType),
+    )
   },
   toEnd({ geom }) {
     return geom.vertices
@@ -293,12 +292,10 @@ export const snub = new OperationPair<Classical, SnubOptions>({
   toStart({ specs, geom }, { twist = "left" }) {
     const facet = twist === specs.data.twist ? "face" : "vertex"
     const faceType = getFaceType(specs, facet)
-    const resultLength = getContractLength(specs.data.family, geom, faceType)
     // Take all the stuff and push it inwards
-    const contractFaces = getExpandedFaces(geom, faceType)
     return getResizedVertices(
-      contractFaces,
-      resultLength,
+      getExpandedFaces(geom, faceType),
+      getContractLength(specs.data.family, geom, faceType),
       getSnubAngle(specs, facet),
     )
   },
@@ -332,14 +329,9 @@ export const twist = new OperationPair<Classical, SnubOptions>({
     }
   },
   toStart({ specs, geom }) {
-    const twistFaces = getExpandedFaces(geom, specs.data.family)
-
-    const referenceLength =
-      cantellatedDistances[specs.data.family] * geom.edgeLength()
-
     return getResizedVertices(
-      twistFaces,
-      referenceLength,
+      getExpandedFaces(geom, specs.data.family),
+      cantellatedDistances[specs.data.family] * geom.edgeLength(),
       getSnubAngle(specs, "face"),
     )
   },
