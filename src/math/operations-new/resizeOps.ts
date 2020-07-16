@@ -132,9 +132,14 @@ const bevelledDists = createObject([3, 4, 5], (family: Family) => {
 })
 
 function getSnubAngle(specs: Classical, facet: Facet) {
-  const sign = specs.data.twist === "left" ? 1 : -1
+  // FIXME this is getting me really inconsistent results
+  const sign = specs.data.twist === "left" ? -1 : 1
+  // if vertex-solid, reverse the sign
+  // FIXME I think this is twisting in a weird way for icosahedron
+  // (e.g. pose is picking one thing but x another)
+  const sign2 = facet === "vertex" ? -1 : 1
   const angle = snubAngles[specs.data.family][facet]
-  return sign * angle
+  return sign2 * sign * angle
 }
 
 /**
@@ -391,7 +396,8 @@ export const dual = new OperationPair({
   },
   toRight({ specs, geom }) {
     const faceType = getFaceType(specs, "vertex")
-    // Take all the stuff and push it inwards
+    // FIXME this *pushes our faces inwards*
+    // and breaks the scale we set above
     return getResizedVertices(
       geom,
       faceType,
