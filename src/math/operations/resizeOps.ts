@@ -1,18 +1,91 @@
+import { Twist } from "types"
 import Classical from "data/specs/Classical"
-import { isExpandedFace } from "../../operations-new/resizeUtils"
 import { Polyhedron } from "math/polyhedra"
-import Operation from "../Operation"
+import Operation from "./Operation"
 import {
   expand as metaExpand,
-  snub as metaSnub,
   semiExpand as metaSemiExpand,
-} from "../../operations-new/resizeOps"
+  snub as metaSnub,
+  twist as metaTwist,
+  dual as metaDual,
+} from "../operations-new/resizeOps"
+import { isExpandedFace } from "../operations-new/resizeUtils"
 
-interface Options {
-  facet?: "vertex" | "face"
+export const expand = new Operation<{}, Classical>("expand", {
+  apply(solid) {
+    const { specs } = solid
+    if (specs.isTruncated()) {
+      return metaSemiExpand.applyLeft(solid, { facet: specs.data.facet })
+    }
+    return metaExpand.applyLeft(solid, { facet: specs.data.facet })
+  },
+
+  canApplyTo(info): info is Classical {
+    if (!info.isClassical()) return false
+    return (
+      metaSemiExpand.canApplyLeftTo(info) || metaExpand.canApplyLeftTo(info)
+    )
+  },
+
+  getResult({ specs }) {
+    if (specs.isTruncated()) {
+      return metaSemiExpand.getRight(specs)
+    }
+    return metaExpand.getRight(specs)
+  },
+})
+
+interface SnubOpts {
+  twist: Twist
 }
+export const snub = new Operation<SnubOpts, Classical>("snub", {
+  apply(solid, { twist = "left" }) {
+    return metaSnub.applyLeft(solid, { twist })
+  },
 
-// FIXME deduplicate with twist
+  canApplyTo(info): info is Classical {
+    if (!info.isClassical()) return false
+    return metaSnub.canApplyLeftTo(info)
+  },
+
+  getResult({ specs }) {
+    return metaSnub.getRight(specs)
+  },
+
+  hasOptions(info) {
+    return !info.isTetrahedral()
+  },
+
+  *allOptionCombos({ specs }) {
+    if (specs.isTetrahedral()) {
+      yield { twist: "left" }
+    } else {
+      yield { twist: "left" }
+      yield { twist: "right" }
+    }
+  },
+})
+
+export const dual = new Operation<{}, Classical>("dual", {
+  apply(solid) {
+    if (solid.specs.isVertex()) {
+      return metaDual.applyRight(solid, {})
+    } else {
+      return metaDual.applyLeft(solid, {})
+    }
+  },
+
+  // TODO replace this with the info from the operation
+  canApplyTo(info): info is Classical {
+    return info.isClassical() && info.isRegular()
+  },
+
+  getResult({ specs }) {
+    if (specs.isTetrahedral()) return specs
+    return specs.withData({ facet: specs.isFace() ? "vertex" : "face" })
+  },
+})
+
 function getChirality(geom: Polyhedron) {
   if (geom.largestFace().numSides === 3) {
     return "left"
@@ -20,6 +93,10 @@ function getChirality(geom: Polyhedron) {
   const face = geom.faces.find((f) => f.numSides !== 3)!
   const other = face.edges[0].twin().prev().twin().next().twinFace()
   return other.numSides !== 3 ? "right" : "left"
+}
+
+interface Options {
+  facet?: "vertex" | "face"
 }
 
 // NOTE: We are using the same operation for contracting both expanded and snub solids.
@@ -111,5 +188,50 @@ export const contract = new Operation<Options, Classical>("contract", {
       if (isExpandedFace(geom, face)) return "selectable"
       return undefined
     })
+  },
+})
+
+interface TwistOpts {
+  twist?: Twist
+}
+
+export const twist = new Operation<TwistOpts, Classical>("twist", {
+  apply(solid, options) {
+    const { specs, geom } = solid
+    if (specs.isSnub()) {
+      const shapeTwist = getChirality(geom)
+      return metaTwist.applyRight(
+        {
+          geom,
+          specs: specs.withData({ twist: shapeTwist }),
+        },
+        {},
+      )
+    }
+    return metaTwist.applyLeft(solid, options)
+  },
+
+  canApplyTo(info): info is Classical {
+    if (!info.isClassical()) return false
+    return metaTwist.canApplyLeftTo(info) || metaTwist.canApplyRightTo(info)
+  },
+
+  getResult(solid, options) {
+    if (solid.specs.isSnub()) {
+      return metaTwist.getLeft(solid.specs, options)
+    }
+    return metaTwist.getRight(solid.specs, options)
+  },
+
+  hasOptions(info) {
+    return !info.isTetrahedral() && info.isCantellated()
+  },
+
+  *allOptionCombos({ specs }) {
+    if (!specs.isSnub() && !specs.isTetrahedral()) {
+      yield { twist: "left" }
+      yield { twist: "right" }
+    }
+    yield {}
   },
 })

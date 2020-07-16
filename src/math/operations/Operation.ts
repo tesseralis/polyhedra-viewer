@@ -17,7 +17,7 @@ export interface AnimationData {
   endColors: Polygon[]
 }
 
-interface OpResult {
+export interface OpResult {
   result: Polyhedron
   animationData?: AnimationData
 }

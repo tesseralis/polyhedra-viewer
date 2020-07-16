@@ -142,43 +142,41 @@ export const rectify = new OperationPair<Classical, Options>({
   },
   getPose(side, { geom, specs }, { facet }) {
     const origin = geom.centroid()
-    // FIXME deduplicate these poses
-    if (specs.isRegular()) {
-      const face = geom.getFace()
-      const crossAxis = face.edges[0].midpoint().sub(face.centroid())
-      return {
-        origin,
-        scale: face.distanceToCenter(),
-        orientation: [face.normal(), crossAxis],
+    switch (side) {
+      case "left": {
+        const face = geom.getFace()
+        const crossAxis = face.edges[0].midpoint().sub(face.centroid())
+        return {
+          origin,
+          scale: face.distanceToCenter(),
+          orientation: [face.normal(), crossAxis],
+        }
+      }
+      case "middle": {
+        const face = geom.largestFace()
+        const n = face.numSides
+        const edge = face.edges.find((e) => e.twinFace().numSides === n)!
+        const crossAxis = edge.midpoint().sub(face.centroid())
+        return {
+          origin,
+          scale: face.distanceToCenter(),
+          orientation: [face.normal(), crossAxis],
+        }
+      }
+      case "right": {
+        // pick a face that *isn't* the sharpen face type
+        const faceType = facet === "vertex" ? 3 : specs.data.family
+        // console.log({ facet, faceType })
+        const face = geom.faces.find((face) => face.numSides === faceType)!
+        const crossAxis = face.vertices[0].vec.sub(face.centroid())
+        return {
+          origin,
+          // scale with respect to the sharpen face
+          scale: face.distanceToCenter(),
+          orientation: [face.normal(), crossAxis],
+        }
       }
     }
-    // Pose for intermediate polyhedron
-    if (specs.isTruncated()) {
-      const face = geom.largestFace()
-      const n = face.numSides
-      const edge = face.edges.find((e) => e.twinFace().numSides === n)!
-      const crossAxis = edge.midpoint().sub(face.centroid())
-      return {
-        origin,
-        scale: face.distanceToCenter(),
-        orientation: [face.normal(), crossAxis],
-      }
-    }
-    if (specs.isRectified()) {
-      // pick a face that *isn't* the sharpen face type
-      const face = geom.faces.find(
-        (face) =>
-          face.numSides === (facet === "vertex" ? 3 : specs.data.family),
-      )!
-      const crossAxis = face.vertices[0].vec.sub(face.centroid())
-      return {
-        origin,
-        // scale with respect to the sharpen face
-        scale: face.distanceToCenter(),
-        orientation: [face.normal(), crossAxis],
-      }
-    }
-    throw new Error("Not supported")
   },
   toLeft({ geom, specs }) {
     return truncatedToRegular(specs, geom)
@@ -192,7 +190,6 @@ export const rectify = new OperationPair<Classical, Options>({
       oldToNew[edge.v1.index] = edge.midpoint()
       oldToNew[edge.v2.index] = edge.midpoint()
     }
-    // FIXME octahedron case
     return geom.vertices.map((v, vIndex) => oldToNew[vIndex])
   },
 })

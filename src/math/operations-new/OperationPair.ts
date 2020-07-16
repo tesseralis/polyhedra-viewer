@@ -125,12 +125,13 @@ export default class OperationPair<
     const { getPose, toLeft, toRight } = this.inputs
     const entry = this.getEntry(side, solid.specs, opts)
     const middle = normalizeIntermediate(this.inputs.getIntermediate(entry))
+    const options = entry.options!
 
-    const startPose = getPose(side, solid, opts)
+    const startPose = getPose(side, solid, options)
 
     const alignedInter = alignPolyhedron(
       middle.geom,
-      getPose("middle", middle, opts),
+      getPose("middle", middle, options),
       startPose,
     )
     const alignedMiddle = { ...middle, geom: alignedInter }
@@ -140,7 +141,7 @@ export default class OperationPair<
     const endGeom = getGeom(endSpecs)
     const alignedEnd = alignPolyhedron(
       endGeom,
-      getPose(endSide, { specs: endSpecs, geom: endGeom }, opts),
+      getPose(endSide, { specs: endSpecs, geom: endGeom }, options),
       startPose,
     )
 

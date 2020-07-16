@@ -1,8 +1,9 @@
 import { Polyhedron, Cap } from "math/polyhedra"
 import { OpName, operations } from "math/operations"
-import { setupOperations } from "../operationTestUtils"
-
-setupOperations()
+import {
+  expectValidPolyhedron,
+  expectValidAnimationData,
+} from "../operationTestUtils"
 
 interface Args {
   face?: number
@@ -139,7 +140,10 @@ describe("chained tests", () => {
 
         expect(op.canApplyTo(polyhedron)).toBeTruthy()
         const result = op.apply(polyhedron, args as any)
-        expect(result).toBeValidPolyhedron()
+        expectValidPolyhedron(result)
+        if (!["augment", "diminish", "gyrate"].includes(op.name)) {
+          expectValidAnimationData(result, polyhedron)
+        }
 
         polyhedron = result.result
         expect(polyhedron.name).toBe(expected)

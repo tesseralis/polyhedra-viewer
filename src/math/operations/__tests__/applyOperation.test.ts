@@ -2,9 +2,10 @@ import { forEach } from "lodash-es"
 import { allSolidNames } from "data/common"
 import { operations } from ".."
 import { Polyhedron } from "math/polyhedra"
-import { setupOperations } from "../operationTestUtils"
-
-setupOperations()
+import {
+  expectValidPolyhedron,
+  expectValidAnimationData,
+} from "../operationTestUtils"
 
 describe("applyOperation", () => {
   const polyhedra = allSolidNames.map((name) => Polyhedron.get(name))
@@ -15,7 +16,10 @@ describe("applyOperation", () => {
           it(polyhedron.name, () => {
             for (const options of operation.allOptionCombos(polyhedron)) {
               const result = operation.apply(polyhedron, options as any)
-              expect(result).toBeValidPolyhedron()
+              expectValidPolyhedron(result)
+              if (!["augment", "diminish", "gyrate"].includes(opName)) {
+                expectValidAnimationData(result, polyhedron)
+              }
             }
           })
         }
