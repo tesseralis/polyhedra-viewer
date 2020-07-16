@@ -4,7 +4,7 @@ import { mapObject } from "utils"
 import Classical, { Facet, Family } from "data/specs/Classical"
 import OperationPair, { getGeom, Pose } from "./OperationPair"
 import { getPlane, withOrigin, Vec3D } from "math/geom"
-import { Polyhedron, Face } from "math/polyhedra"
+import { Polyhedron, Face, Edge } from "math/polyhedra"
 import { getTransformedVertices } from "../operations/operationUtils"
 import { getExpandedFaces } from "./resizeUtils"
 
@@ -52,6 +52,10 @@ function getRegularLength(family: Family, faceType: 3 | 4 | 5) {
 // Get the face type for the given facet and solid specs
 function getFaceType(specs: Classical, facet?: Facet) {
   return facet === "vertex" ? 3 : specs.data.family
+}
+
+function apothemVec(edge: Edge) {
+  return edge.midpoint().sub(edge.face.centroid())
 }
 
 /**
@@ -149,8 +153,7 @@ function getPose(geom: Polyhedron, face: Face, crossAxis: Vec3D): Pose {
 // Get the pose of a regular solid for both expand/snub
 function getRegularPose(geom: Polyhedron): Pose {
   const face = geom.getFace()
-  const crossAxis = face.edges[0].midpoint().sub(face.centroid())
-  return getPose(geom, face, crossAxis)
+  return getPose(geom, face, apothemVec(face.edges[0]))
 }
 
 function getCantellatedPose(
@@ -159,22 +162,22 @@ function getCantellatedPose(
   facet?: Facet,
 ): Pose {
   const faceType = getFaceType(specs, facet)
-  // depends on the face type given in options
+  // Use an expanded face as the face
   const face = geom.faces.find((face) => isCantellatedFace(face, faceType))!
-  const crossAxis = face.edges[0].midpoint().sub(face.centroid())
-  return getPose(geom, face, crossAxis)
+  // Pick one of the edges as cross axis
+  return getPose(geom, face, apothemVec(face.edges[0]))
 }
 
 function getSnubPose(geom: Polyhedron, specs: Classical, facet: Facet): Pose {
   const faceType = getFaceType(specs, facet)
-  // depends on the face type given in options
+  // Use an expanded face as the face
   const face = geom.faces.find((face) => isSnubFace(face, faceType))!
-  const crossAxis = face.edges[0].midpoint().sub(face.centroid())
-  return getPose(
-    geom,
-    face,
-    crossAxis.getRotatedAroundAxis(face.normal(), getSnubAngle(specs, facet)),
+  // Rotate the apothem vector to align it correctly
+  const crossAxis = apothemVec(face.edges[0]).getRotatedAroundAxis(
+    face.normal(),
+    getSnubAngle(specs, facet),
   )
+  return getPose(geom, face, crossAxis)
 }
 
 function twistOpts(specs: Classical): Twist[] {
@@ -202,12 +205,12 @@ export const semiExpand = new OperationPair<Classical, ExpandOpts>({
       const edge = face.edges.find(
         (e) => e.twinFace().numSides === face.numSides,
       )!
-      return getPose(geom, face, edge.midpoint().sub(face.centroid()))
+      return getPose(geom, face, apothemVec(edge))
     } else {
       const faceType = 2 * getFaceType(specs, facet)
       const face = geom.faceWithNumSides(faceType)
       const edge = face.edges.find((e) => e.twinFace().numSides === 4)!
-      return getPose(geom, face, edge.midpoint().sub(face.centroid()))
+      return getPose(geom, face, apothemVec(edge))
     }
   },
   toStart({ specs, geom }, { facet }) {
@@ -230,16 +233,13 @@ export const expand = new OperationPair<Classical, ExpandOpts>({
         options: { facet: entry.data.facet },
       }
     }),
+
   getIntermediate: (entry) => entry.target,
+
   getPose({ geom, specs }, { facet }) {
-    if (specs.isRegular()) {
-      return getRegularPose(geom)
-    }
-    if (specs.isCantellated()) {
-      return getCantellatedPose(geom, specs, facet)
-    }
-    // FIXME handle expanding truncated solids
-    throw new Error(`Cannot find pose`)
+    return specs.isRegular()
+      ? getRegularPose(geom)
+      : getCantellatedPose(geom, specs, facet)
   },
   toStart({ specs, geom }, { facet }) {
     const faceType = getFaceType(specs, facet)
@@ -261,6 +261,12 @@ function getOpp(twist: Twist) {
   return twist === "left" ? "right" : "left"
 }
 
+function facetFromTwist(specs: Classical, twist: Twist) {
+  // If the twist option is in the same direction as the spec,
+  // it's a face-solid. Otherwise it's a vertex solid
+  return twist === specs.data.twist ? "face" : "vertex"
+}
+
 export const snub = new OperationPair<Classical, SnubOptions>({
   graph: Classical.query
     .where((data) => data.operation === "regular")
@@ -276,22 +282,16 @@ export const snub = new OperationPair<Classical, SnubOptions>({
         options: { twist },
       }))
     }),
+
   getIntermediate: (entry) => entry.target,
-  getPose({ geom, specs }, { twist }) {
-    if (specs.isRegular()) {
-      return getRegularPose(geom)
-    }
-    if (specs.isSnub()) {
-      // If the twist option is in the same direction as the spec,
-      // it's a face-solid. Otherwise it's a vertex solid
-      const facet = specs.data.twist === twist ? "face" : "vertex"
-      return getSnubPose(geom, specs, facet)
-    }
-    // FIXME handle expanding truncated solids
-    throw new Error(`Cannot find pose`)
+
+  getPose({ geom, specs }, { twist = "left" }) {
+    return specs.isRegular()
+      ? getRegularPose(geom)
+      : getSnubPose(geom, specs, facetFromTwist(specs, twist))
   },
   toStart({ specs, geom }, { twist = "left" }) {
-    const facet = twist === specs.data.twist ? "face" : "vertex"
+    const facet = facetFromTwist(specs, twist)
     const faceType = getFaceType(specs, facet)
     // Take all the stuff and push it inwards
     return getResizedVertices(
@@ -314,7 +314,9 @@ export const twist = new OperationPair<Classical, SnubOptions>({
         options: { twist },
       }))
     }),
+
   getIntermediate: (entry) => entry.target,
+
   getPose({ specs, geom }) {
     return specs.isCantellated()
       ? getCantellatedPose(geom, specs, "face")
