@@ -33,9 +33,9 @@ interface OpPairInput<Specs extends PolyhedronSpecs, Opts> {
   // Get the post of a left, right, or middle state
   getPose(pos: Side | "middle", solid: SolidArgs<Specs>, opts: Opts): Pose
   // Move the intermediate figure to the start position
-  toLeft(solid: SolidArgs<Specs>, opts: Opts): VertexArg[]
+  toLeft(solid: SolidArgs<Specs>, opts: Opts, result: Specs): VertexArg[]
   // Move the intermediate figure to the end position
-  toRight(solid: SolidArgs<Specs>, opts: Opts): VertexArg[]
+  toRight(solid: SolidArgs<Specs>, opts: Opts, result: Specs): VertexArg[]
 }
 
 function normalizeIntermediate<Specs extends PolyhedronSpecs>(
@@ -150,8 +150,10 @@ export default class OperationPair<
 
     return {
       animationData: {
-        start: alignedInter.withVertices(startFn(alignedMiddle, opts)),
-        endVertices: endFn(alignedMiddle, opts),
+        start: alignedInter.withVertices(
+          startFn(alignedMiddle, opts, solid.specs),
+        ),
+        endVertices: endFn(alignedMiddle, opts, endSpecs),
       },
       result: alignedEnd,
     }

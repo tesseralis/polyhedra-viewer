@@ -66,21 +66,6 @@ function getCircumradius(specs: Classical) {
   return (tan(PI / q) * tanDihedralOver2(specs)) / 2
 }
 
-// FIXME replace with getInradius
-function getRegularLength(family: Family, faceType: 3 | 4 | 5) {
-  // Calculate dihedral angle
-  // https://en.wikipedia.org/wiki/Platonic_solid#Angles
-  const n = family
-  const p = faceType
-  const q = 3 + n - p
-  const h = coxeterNum[n]
-  const tanTheta2 = Math.cos(Math.PI / q) / Math.sin(Math.PI / h)
-
-  // Calculate the inradius
-  // https://en.wikipedia.org/wiki/Platonic_solid#Radii,_area,_and_volume
-  return tanTheta2 / 2 / Math.tan(Math.PI / p)
-}
-
 // Get the face type for the given facet and solid specs
 function getFaceType(specs: Classical, facet?: Facet) {
   return facet === "vertex" ? 3 : specs.data.family
@@ -290,14 +275,10 @@ export const expand = new OperationPair<Classical, ExpandOpts>({
       ? getRegularPose(geom)
       : getCantellatedPose(geom, specs, facet)
   },
-  toLeft({ specs, geom }, { facet }) {
+  toLeft({ specs, geom }, { facet }, result) {
     const faceType = getFaceType(specs, facet)
     // Take all the stuff and push it inwards
-    return getResizedVertices(
-      geom,
-      faceType,
-      getRegularLength(specs.data.family, faceType),
-    )
+    return getResizedVertices(geom, faceType, getInradius(result))
   },
   toRight: (solid) => solid.geom.vertices,
 })
@@ -310,6 +291,7 @@ function getOpp(twist: Twist) {
   return twist === "left" ? "right" : "left"
 }
 
+// Convert a twist option into a facet
 function facetFromTwist(specs: Classical, twist: Twist) {
   // If the twist option is in the same direction as the spec,
   // it's a face-solid. Otherwise it's a vertex solid
@@ -339,14 +321,14 @@ export const snub = new OperationPair<Classical, SnubOptions>({
       ? getRegularPose(geom)
       : getSnubPose(geom, specs, facetFromTwist(specs, twist))
   },
-  toLeft({ specs, geom }, { twist = "left" }) {
+  toLeft({ specs, geom }, { twist = "left" }, result) {
     const facet = facetFromTwist(specs, twist)
-    const faceType = getFaceType(specs, facet)
+    const faceType = getFaceType(specs, result.data.facet)
     // Take all the stuff and push it inwards
     return getResizedVertices(
       geom,
       faceType,
-      getRegularLength(specs.data.family, faceType),
+      getInradius(result),
       getSnubAngle(specs, facet),
     )
   },
@@ -390,6 +372,9 @@ function getCantellatedMidradius(geom: Polyhedron) {
   return edgeFace.distanceToCenter()
 }
 
+/**
+ * Take the cantellated intermediate solid and convert it to either dual
+ */
 function doDualTransform(specs: Classical, geom: Polyhedron, facet: Facet) {
   const resultSpecs = specs.withData({ operation: "regular", facet })
   const resultSideLength =
@@ -442,10 +427,6 @@ export const dual = new OperationPair({
       }
     }
   },
-  toLeft({ specs, geom }) {
-    return doDualTransform(specs, geom, "face")
-  },
-  toRight({ specs, geom }) {
-    return doDualTransform(specs, geom, "vertex")
-  },
+  toLeft: ({ specs, geom }) => doDualTransform(specs, geom, "face"),
+  toRight: ({ specs, geom }) => doDualTransform(specs, geom, "vertex"),
 })
