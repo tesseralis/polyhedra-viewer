@@ -124,11 +124,23 @@ const cantellatedDists = createObject([3, 4, 5], (family: Family) => {
   return face.distanceToCenter() / geom.edgeLength()
 })
 
-const bevelledDists = createObject([3, 4, 5], (family: Family) => {
-  const specs = Classical.query.withData({ family, operation: "bevel" })
+function calcTruncatedDist(family: Family, facet: Facet) {
+  const _facet = family === 3 ? undefined : facet
+  const specs = Classical.query.withData({
+    family,
+    operation: "truncate",
+    facet: _facet,
+  })
   const geom = getGeom(specs)
   const face = geom.largestFace()
   return face.distanceToCenter() / geom.edgeLength()
+}
+
+const bevelledDists = createObject([3, 4, 5], (family: Family) => {
+  return {
+    face: calcTruncatedDist(family, "face"),
+    vertex: calcTruncatedDist(family, "vertex"),
+  }
 })
 
 function getSnubAngle(specs: Classical, facet: Facet) {
@@ -219,11 +231,11 @@ export const semiExpand = new OperationPair<Classical, ExpandOpts>({
       return getPose(geom, face, apothemVec(edge))
     }
   },
-  toLeft({ specs, geom }, { facet }) {
+  toLeft({ specs, geom }, { facet = "face" }) {
     return getResizedVertices(
       geom,
       2 * getFaceType(specs, facet),
-      bevelledDists[specs.data.family],
+      bevelledDists[specs.data.family][facet],
     )
   },
   toRight: (solid) => solid.geom.vertices,
