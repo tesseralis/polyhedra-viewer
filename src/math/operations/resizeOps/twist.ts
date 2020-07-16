@@ -24,7 +24,7 @@ export const twist = new Operation<Options, Classical>("twist", {
     const { specs, geom } = solid
     if (specs.isSnub()) {
       const shapeTwist = getChirality(geom)
-      return metaTwist.unapply(
+      return metaTwist.applyRight(
         {
           geom,
           specs: specs.withData({ twist: shapeTwist }),
@@ -32,19 +32,19 @@ export const twist = new Operation<Options, Classical>("twist", {
         {},
       )
     }
-    return metaTwist.apply(solid, options)
+    return metaTwist.applyLeft(solid, options)
   },
 
   canApplyTo(info): info is Classical {
     if (!info.isClassical()) return false
-    return metaTwist.canApplyTo(info) || metaTwist.canUnapplyTo(info)
+    return metaTwist.canApplyLeftTo(info) || metaTwist.canApplyRightTo(info)
   },
 
   getResult(solid, options) {
     if (solid.specs.isSnub()) {
-      return metaTwist.getSource(solid.specs, options)
+      return metaTwist.getLeft(solid.specs, options)
     }
-    return metaTwist.getResult(solid.specs, options)
+    return metaTwist.getRight(solid.specs, options)
   },
 
   hasOptions(info) {

@@ -12,33 +12,33 @@ interface Options {
 export const sharpen = new Operation<Options, Classical>("sharpen", {
   apply(solid, options) {
     if (solid.specs.isRectified()) {
-      return metaRectify.unapply(solid, options)
+      return metaRectify.applyRight(solid, options)
     }
-    return metaTruncate.unapply(solid, {})
+    return metaTruncate.applyRight(solid, {})
   },
 
   canApplyTo(info): info is Classical {
-    if (metaTruncate.canUnapplyTo(info)) return true
-    if (metaRectify.canUnapplyTo(info)) return true
+    if (metaTruncate.canApplyRightTo(info)) return true
+    if (metaRectify.canApplyRightTo(info)) return true
     return false
   },
 
   getResult({ specs }, options) {
     if (specs.isRectified()) {
       // if rectified, we have to figure out the facet from the faceType
-      return metaRectify.getSource(specs, options)
+      return metaRectify.getLeft(specs, options)
     } else {
-      return metaTruncate.getSource(specs)
+      return metaTruncate.getLeft(specs)
     }
   },
 
   hasOptions(info) {
-    if (metaTruncate.canUnapplyTo(info)) return false
+    if (metaTruncate.canApplyRightTo(info)) return false
     return !info.isTetrahedral() && info.isRectified()
   },
 
   *allOptionCombos({ specs }) {
-    if (metaTruncate.canUnapplyTo(specs)) {
+    if (metaTruncate.canApplyRightTo(specs)) {
       yield {}
     } else if (specs.isRectified() && !specs.isTetrahedral()) {
       yield { facet: "face" }

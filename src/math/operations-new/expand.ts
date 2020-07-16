@@ -194,11 +194,11 @@ export const semiExpand = new OperationPair<Classical, ExpandOpts>({
   graph: Classical.query
     .where((data) => data.operation === "truncate")
     .map((entry) => ({
-      source: entry,
-      target: entry.withData({ operation: "bevel" }),
+      left: entry,
+      right: entry.withData({ operation: "bevel" }),
       options: { facet: entry.data.facet },
     })),
-  getIntermediate: (entry) => entry.target,
+  getIntermediate: (entry) => entry.right,
   getPose({ specs, geom }, { facet }) {
     if (specs.isTruncated()) {
       const face = geom.faces.find((f) => f.numSides > 5)!
@@ -213,14 +213,14 @@ export const semiExpand = new OperationPair<Classical, ExpandOpts>({
       return getPose(geom, face, apothemVec(edge))
     }
   },
-  toStart({ specs, geom }, { facet }) {
+  toLeft({ specs, geom }, { facet }) {
     return getResizedVertices(
       geom,
       2 * getFaceType(specs, facet),
       bevelledDists[specs.data.family],
     )
   },
-  toEnd: (solid) => solid.geom.vertices,
+  toRight: (solid) => solid.geom.vertices,
 })
 
 export const expand = new OperationPair<Classical, ExpandOpts>({
@@ -228,20 +228,20 @@ export const expand = new OperationPair<Classical, ExpandOpts>({
     .where((data) => data.operation === "regular")
     .map((entry) => {
       return {
-        source: entry,
-        target: entry.withData({ operation: "cantellate" }),
+        left: entry,
+        right: entry.withData({ operation: "cantellate" }),
         options: { facet: entry.data.facet },
       }
     }),
 
-  getIntermediate: (entry) => entry.target,
+  getIntermediate: (entry) => entry.right,
 
   getPose({ geom, specs }, { facet }) {
     return specs.isRegular()
       ? getRegularPose(geom)
       : getCantellatedPose(geom, specs, facet)
   },
-  toStart({ specs, geom }, { facet }) {
+  toLeft({ specs, geom }, { facet }) {
     const faceType = getFaceType(specs, facet)
     // Take all the stuff and push it inwards
     return getResizedVertices(
@@ -250,7 +250,7 @@ export const expand = new OperationPair<Classical, ExpandOpts>({
       getRegularLength(specs.data.family, faceType),
     )
   },
-  toEnd: (solid) => solid.geom.vertices,
+  toRight: (solid) => solid.geom.vertices,
 })
 
 interface SnubOptions {
@@ -272,8 +272,8 @@ export const snub = new OperationPair<Classical, SnubOptions>({
     .where((data) => data.operation === "regular")
     .flatMap((entry) => {
       return twistOpts(entry).map((twist) => ({
-        source: entry,
-        target: entry.withData({
+        left: entry,
+        right: entry.withData({
           operation: "snub",
           // If a vertex-solid, the chirality of the result
           // is *opposite* of the twist option
@@ -283,14 +283,14 @@ export const snub = new OperationPair<Classical, SnubOptions>({
       }))
     }),
 
-  getIntermediate: (entry) => entry.target,
+  getIntermediate: (entry) => entry.right,
 
   getPose({ geom, specs }, { twist = "left" }) {
     return specs.isRegular()
       ? getRegularPose(geom)
       : getSnubPose(geom, specs, facetFromTwist(specs, twist))
   },
-  toStart({ specs, geom }, { twist = "left" }) {
+  toLeft({ specs, geom }, { twist = "left" }) {
     const facet = facetFromTwist(specs, twist)
     const faceType = getFaceType(specs, facet)
     // Take all the stuff and push it inwards
@@ -301,28 +301,28 @@ export const snub = new OperationPair<Classical, SnubOptions>({
       getSnubAngle(specs, facet),
     )
   },
-  toEnd: (solid) => solid.geom.vertices,
+  toRight: (solid) => solid.geom.vertices,
 })
 
 export const twist = new OperationPair<Classical, SnubOptions>({
   graph: Classical.query
     .where((data) => data.operation === "cantellate")
-    .flatMap((source) => {
-      return twistOpts(source).map((twist) => ({
-        source,
-        target: source.withData({ operation: "snub", twist }),
+    .flatMap((entry) => {
+      return twistOpts(entry).map((twist) => ({
+        left: entry,
+        right: entry.withData({ operation: "snub", twist }),
         options: { twist },
       }))
     }),
 
-  getIntermediate: (entry) => entry.target,
+  getIntermediate: (entry) => entry.right,
 
   getPose({ specs, geom }) {
     return specs.isCantellated()
       ? getCantellatedPose(geom, specs, "face")
       : getSnubPose(geom, specs, "face")
   },
-  toStart({ specs, geom }) {
+  toLeft({ specs, geom }) {
     return getResizedVertices(
       geom,
       specs.data.family,
@@ -330,5 +330,5 @@ export const twist = new OperationPair<Classical, SnubOptions>({
       getSnubAngle(specs, "face"),
     )
   },
-  toEnd: (solid) => solid.geom.vertices,
+  toRight: (solid) => solid.geom.vertices,
 })

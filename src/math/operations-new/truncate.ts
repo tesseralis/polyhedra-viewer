@@ -49,13 +49,13 @@ export const truncate = new OperationPair<Classical, {}>({
     .where((data) => ["regular", "rectify"].includes(data.operation))
     .map((entry) => {
       return {
-        source: entry,
-        target: entry.withData({
+        left: entry,
+        right: entry.withData({
           operation: entry.isRegular() ? "truncate" : "bevel",
         }),
       }
     }),
-  getIntermediate({ target }) {
+  getIntermediate({ right: target }) {
     return target
   },
   getPose({ geom, specs }) {
@@ -109,10 +109,10 @@ export const truncate = new OperationPair<Classical, {}>({
     // Pick a cap, favoring rotunda over cupola in the case of cupolarotundae
     throw new Error(`Not implemented`)
   },
-  toStart({ geom, specs }) {
+  toLeft({ geom, specs }) {
     return truncatedToRegular(specs, geom)
   },
-  toEnd({ geom }) {
+  toRight({ geom }) {
     // truncated solids are already the intermediate
     return geom.vertices
   },
@@ -127,15 +127,15 @@ export const rectify = new OperationPair<Classical, Options>({
     // TODO support rectified as well
     .where((data) => ["regular" /*, "rectify" */].includes(data.operation))
     .map((entry) => ({
-      source: entry,
-      target: entry.withData({
+      left: entry,
+      right: entry.withData({
         operation: entry.isRegular() ? "rectify" : "cantellate",
       }),
       options: {
         facet: entry.data.facet,
       },
     })),
-  getIntermediate({ source }) {
+  getIntermediate({ left: source }) {
     return source.withData({
       operation: source.isRegular() ? "truncate" : "bevel",
     })
@@ -180,10 +180,10 @@ export const rectify = new OperationPair<Classical, Options>({
     }
     throw new Error("Not supported")
   },
-  toStart({ geom, specs }) {
+  toLeft({ geom, specs }) {
     return truncatedToRegular(specs, geom)
   },
-  toEnd({ geom }) {
+  toRight({ geom }) {
     const oldToNew: Record<number, Vec3D> = {}
     // Map each original edge to its midpoint
     for (const edge of geom.edges.filter(

@@ -26,16 +26,16 @@ function getChirality(geom: Polyhedron) {
 export const contract = new Operation<Options, Classical>("contract", {
   apply(solid, options) {
     const { specs, geom } = solid
-    if (metaExpand.canUnapplyTo(specs)) {
+    if (metaExpand.canApplyRightTo(specs)) {
       const opts = specs.isTetrahedral() ? {} : options
-      return metaExpand.unapply(solid, opts)
+      return metaExpand.applyRight(solid, opts)
     }
-    if (metaSnub.canUnapplyTo(specs)) {
+    if (metaSnub.canApplyRightTo(specs)) {
       const shapeTwist = getChirality(geom)
       const oppTwist = shapeTwist === "left" ? "right" : "left"
       const twist = options.facet === "vertex" ? oppTwist : shapeTwist
       // FIXME translate face-type args to twist
-      return metaSnub.unapply(
+      return metaSnub.applyRight(
         {
           geom,
           specs: specs.withData({ twist: shapeTwist }),
@@ -43,30 +43,30 @@ export const contract = new Operation<Options, Classical>("contract", {
         { twist },
       )
     }
-    return metaSemiExpand.unapply(solid, options)
+    return metaSemiExpand.applyRight(solid, options)
   },
 
   canApplyTo(info): info is Classical {
     if (!info.isClassical()) return false
-    if (metaExpand.canUnapplyTo(info)) return true
-    if (metaSnub.canUnapplyTo(info)) return true
-    if (metaSemiExpand.canUnapplyTo(info)) return true
+    if (metaExpand.canApplyRightTo(info)) return true
+    if (metaSnub.canApplyRightTo(info)) return true
+    if (metaSemiExpand.canApplyRightTo(info)) return true
     return false
   },
 
   getResult({ specs, geom }, options) {
-    if (metaExpand.canUnapplyTo(specs)) {
-      return metaExpand.getSource(specs, options)
+    if (metaExpand.canApplyRightTo(specs)) {
+      return metaExpand.getLeft(specs, options)
     }
-    if (metaSnub.canUnapplyTo(specs)) {
+    if (metaSnub.canApplyRightTo(specs)) {
       const shapeTwist = getChirality(geom)
       const oppTwist = shapeTwist === "left" ? "right" : "left"
       const twist = options.facet === "vertex" ? oppTwist : shapeTwist
-      return metaSnub.getSource(specs.withData({ twist: shapeTwist }), {
+      return metaSnub.getLeft(specs.withData({ twist: shapeTwist }), {
         twist,
       })
     }
-    return metaSemiExpand.getSource(specs, options)
+    return metaSemiExpand.getLeft(specs, options)
   },
 
   hasOptions(info) {

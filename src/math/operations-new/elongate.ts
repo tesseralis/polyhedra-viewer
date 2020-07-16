@@ -15,13 +15,11 @@ export default new OperationPair<Capstone, {}>({
     .where((data) => !data.elongation && data.base > 2)
     .map((entry) => {
       return {
-        source: entry,
-        target: entry.withData({ elongation: "prism" }),
+        left: entry,
+        right: entry.withData({ elongation: "prism" }),
       }
     }),
-  getIntermediate({ target }) {
-    return target
-  },
+  getIntermediate: (entry) => entry.right,
   getPose({ geom, specs }) {
     // Pick a cap, favoring rotunda over cupola in the case of cupolarotundae
     const cap = sortBy(Cap.getAll(geom), (cap) => capTypeMap[cap.type])[0]
@@ -44,7 +42,7 @@ export default new OperationPair<Capstone, {}>({
       ] as const,
     }
   },
-  toStart({ geom }) {
+  toLeft({ geom }) {
     // Shorten the solid
     // FIXME get the cap that we are aligned with and its opposite cap
     // push the caps inwards
@@ -53,7 +51,7 @@ export default new OperationPair<Capstone, {}>({
 
     return getScaledPrismVertices(adjustInfo, -scale)
   },
-  toEnd({ geom }) {
+  toRight({ geom }) {
     // Elongated solids are already the intermediate
     return geom.vertices
   },

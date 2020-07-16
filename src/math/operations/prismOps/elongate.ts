@@ -38,16 +38,16 @@ function doElongate(polyhedron: Polyhedron, twist?: Twist) {
 
 export const elongate = new Operation<{}, Capstone>("elongate", {
   apply(solid) {
-    return metaElongate.apply(solid, {})
+    return metaElongate.applyLeft(solid, {})
   },
 
   canApplyTo(info): info is Capstone {
     if (!info.isCapstone()) return false
-    return metaElongate.canApplyTo(info)
+    return metaElongate.canApplyLeftTo(info)
   },
 
   getResult({ specs }) {
-    return metaElongate.getResult(specs)
+    return metaElongate.getRight(specs)
   },
 })
 

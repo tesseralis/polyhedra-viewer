@@ -14,21 +14,23 @@ export const expand = new Operation<{}, Classical>("expand", {
   apply(solid) {
     const { specs } = solid
     if (specs.isTruncated()) {
-      return metaSemiExpand.apply(solid, { facet: specs.data.facet })
+      return metaSemiExpand.applyLeft(solid, { facet: specs.data.facet })
     }
-    return metaExpand.apply(solid, { facet: specs.data.facet })
+    return metaExpand.applyLeft(solid, { facet: specs.data.facet })
   },
 
   canApplyTo(info): info is Classical {
     if (!info.isClassical()) return false
-    return metaSemiExpand.canApplyTo(info) || metaExpand.canApplyTo(info)
+    return (
+      metaSemiExpand.canApplyLeftTo(info) || metaExpand.canApplyLeftTo(info)
+    )
   },
 
   getResult({ specs }) {
     if (specs.isTruncated()) {
-      return metaSemiExpand.getResult(specs)
+      return metaSemiExpand.getRight(specs)
     }
-    return metaExpand.getResult(specs)
+    return metaExpand.getRight(specs)
   },
 })
 
@@ -37,16 +39,16 @@ interface SnubOpts {
 }
 export const snub = new Operation<SnubOpts, Classical>("snub", {
   apply(solid, { twist = "left" }) {
-    return metaSnub.apply(solid, { twist })
+    return metaSnub.applyLeft(solid, { twist })
   },
 
   canApplyTo(info): info is Classical {
     if (!info.isClassical()) return false
-    return metaSnub.canApplyTo(info)
+    return metaSnub.canApplyLeftTo(info)
   },
 
   getResult({ specs }) {
-    return metaSnub.getResult(specs)
+    return metaSnub.getRight(specs)
   },
 
   hasOptions(info) {

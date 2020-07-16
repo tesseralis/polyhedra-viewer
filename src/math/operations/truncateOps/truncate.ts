@@ -7,28 +7,28 @@ import {
 
 export const truncate = new Operation<{}, Classical>("truncate", {
   apply(solid) {
-    return metaTruncate.apply(solid, {})
+    return metaTruncate.applyLeft(solid, {})
   },
 
   canApplyTo(info): info is Classical {
-    return metaTruncate.canApplyTo(info)
+    return metaTruncate.canApplyLeftTo(info)
   },
 
   getResult({ specs }) {
-    return metaTruncate.getResult(specs)
+    return metaTruncate.getRight(specs)
   },
 })
 
 export const rectify = new Operation<{}, Classical>("rectify", {
   apply(solid) {
-    return metaRectify.apply(solid, {})
+    return metaRectify.applyLeft(solid, {})
   },
 
   canApplyTo(info): info is Classical {
-    return metaRectify.canApplyTo(info)
+    return metaRectify.canApplyLeftTo(info)
   },
 
   getResult({ specs }) {
-    return metaRectify.getResult(specs)
+    return metaRectify.getRight(specs)
   },
 })

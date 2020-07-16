@@ -3,9 +3,11 @@ import PolyhedronSpecs from "data/specs/PolyhedronSpecs"
 import { Polyhedron, VertexArg } from "math/polyhedra"
 import { Vec3D, getOrthonormalTransform, withOrigin } from "math/geom"
 
+type Side = "left" | "right"
+
 interface GraphEntry<Specs, Opts> {
-  source: Specs
-  target: Specs
+  left: Specs
+  right: Specs
   options?: Opts
 }
 
@@ -28,12 +30,12 @@ interface OpPairInput<Specs extends PolyhedronSpecs, Opts> {
   graph: OpPairGraph<Specs, Opts>
   // Get the intermediate polyhedron for the given graph entry
   getIntermediate(entry: GraphEntry<Specs, Opts>): Specs | SolidArgs<Specs>
-  // Get the post of an input, output or intermediate solid
+  // Get the post of a left, right, or middle state
   getPose(solid: SolidArgs<Specs>, opts: Opts): Pose
   // Move the intermediate figure to the start position
-  toStart(solid: SolidArgs<Specs>, opts: Opts): VertexArg[]
+  toLeft(solid: SolidArgs<Specs>, opts: Opts): VertexArg[]
   // Move the intermediate figure to the end position
-  toEnd(solid: SolidArgs<Specs>, opts: Opts): VertexArg[]
+  toRight(solid: SolidArgs<Specs>, opts: Opts): VertexArg[]
 }
 
 function normalizeIntermediate<Specs extends PolyhedronSpecs>(
@@ -86,80 +88,79 @@ export default class OperationPair<
     this.inputs = inputs
   }
 
-  private getEntry(specs: Specs, input: "source" | "target", opts?: Opts) {
+  private findEntry(input: Side, specs: Specs, opts?: Opts) {
     return this.inputs.graph.find(
       (entry) =>
         specsEquals(entry[input], specs) &&
         isMatch(entry.options || {}, opts || {}),
-    )!
-  }
-
-  private entryFromSource(source: PolyhedronSpecs) {
-    return this.inputs.graph.find((entry) => specsEquals(entry.source, source))
-  }
-
-  private entryFromTarget(target: PolyhedronSpecs) {
-    return this.inputs.graph.find((entry) => specsEquals(entry.target, target))
-  }
-
-  canApplyTo(specs: PolyhedronSpecs) {
-    return !!this.entryFromSource(specs)
-  }
-
-  canUnapplyTo(specs: PolyhedronSpecs) {
-    return !!this.entryFromTarget(specs)
-  }
-
-  getResult(source: Specs, options?: Opts) {
-    return this.getEntry(source, "source", options).target
-  }
-
-  getSource(target: Specs, options?: Opts) {
-    return this.getEntry(target, "target", options).source
-  }
-
-  doApply(solid: SolidArgs<Specs>, input: "source" | "target", opts: Opts) {
-    const { getPose, toStart, toEnd } = this.inputs
-    const entry = this.getEntry(solid.specs, input, opts)
-    const { specs: interSpecs, geom: interSolid } = normalizeIntermediate(
-      this.inputs.getIntermediate(entry),
     )
+  }
 
-    const output = input === "source" ? "target" : "source"
-    const outputGeom = getGeom(entry[output])
-    const inputPose = getPose(solid, opts)
+  private getEntry(side: Side, specs: Specs, opts?: Opts) {
+    const entry = this.findEntry(side, specs, opts)
+    if (!entry)
+      throw new Error(
+        `Could not find ${side} entry with specs: ${specs}, opts: ${opts}`,
+      )
+    return entry
+  }
+
+  canApplyLeftTo(specs: PolyhedronSpecs) {
+    return !!this.findEntry("left", specs as Specs)
+  }
+
+  canApplyRightTo(specs: PolyhedronSpecs) {
+    return !!this.findEntry("right", specs as Specs)
+  }
+
+  getRight(source: Specs, options?: Opts) {
+    return this.getEntry("left", source, options).right
+  }
+
+  getLeft(target: Specs, options?: Opts) {
+    return this.getEntry("right", target, options).left
+  }
+
+  private doApply(side: Side, solid: SolidArgs<Specs>, opts: Opts) {
+    const { getPose, toLeft: toStart, toRight: toEnd } = this.inputs
+    const entry = this.getEntry(side, solid.specs, opts)
+    const middle = normalizeIntermediate(this.inputs.getIntermediate(entry))
+
+    const startPose = getPose(solid, opts)
 
     const alignedInter = alignPolyhedron(
-      interSolid,
-      getPose({ specs: interSpecs, geom: interSolid }, opts),
-      inputPose,
+      middle.geom,
+      getPose(middle, opts),
+      startPose,
     )
+    const alignedMiddle = { ...middle, geom: alignedInter }
 
-    const alignedOutput = alignPolyhedron(
-      outputGeom,
-      getPose({ specs: entry[output], geom: outputGeom }, opts),
-      inputPose,
+    const endSide = side === "left" ? "right" : "left"
+    const endSpecs = entry[endSide]
+    const endGeom = getGeom(endSpecs)
+    const alignedEnd = alignPolyhedron(
+      endGeom,
+      getPose({ specs: endSpecs, geom: endGeom }, opts),
+      startPose,
     )
 
     const [startFn, endFn] =
-      input === "source" ? [toStart, toEnd] : [toEnd, toStart]
+      side === "left" ? [toStart, toEnd] : [toEnd, toStart]
 
     return {
       animationData: {
-        start: alignedInter.withVertices(
-          startFn({ specs: interSpecs, geom: alignedInter }, opts),
-        ),
-        endVertices: endFn({ specs: interSpecs, geom: alignedInter }, opts),
+        start: alignedInter.withVertices(startFn(alignedMiddle, opts)),
+        endVertices: endFn(alignedMiddle, opts),
       },
-      result: alignedOutput,
+      result: alignedEnd,
     }
   }
 
-  apply(args: SolidArgs<Specs>, options: Opts) {
-    return this.doApply(args, "source", options)
+  applyLeft(args: SolidArgs<Specs>, options: Opts) {
+    return this.doApply("left", args, options)
   }
 
-  unapply(args: SolidArgs<Specs>, options: Opts) {
-    return this.doApply(args, "target", options)
+  applyRight(args: SolidArgs<Specs>, options: Opts) {
+    return this.doApply("right", args, options)
   }
 }
