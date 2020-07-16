@@ -7,6 +7,7 @@ import { getPlane, withOrigin, Vec3D } from "math/geom"
 import { Polyhedron, Face, Edge } from "math/polyhedra"
 import { getTransformedVertices } from "../operations/operationUtils"
 import { getExpandedFaces } from "./resizeUtils"
+import { Plane } from "toxiclibsjs/geom"
 
 /**
  * Return the expanded vertices of the polyhedron resized to the given distance-from-center
@@ -331,4 +332,70 @@ export const twist = new OperationPair<Classical, SnubOptions>({
     )
   },
   toRight: (solid) => solid.geom.vertices,
+})
+
+export const dual = new OperationPair({
+  graph: Classical.query
+    .where((data) => data.operation === "regular" && data.facet !== "vertex")
+    .map((specs) => ({
+      left: specs,
+      right: specs.withData({ facet: "vertex" }),
+    })),
+  getIntermediate: (entry) => entry.left.withData({ operation: "cantellate" }),
+  getPose(pos, { specs, geom }) {
+    switch (pos) {
+      case "left": {
+        return {
+          ...getRegularPose(geom),
+          // Everything is scaled with the same midradius
+          scale: geom.edges[0].distanceToCenter(),
+        }
+      }
+      case "right": {
+        // for the vertex figure, pick a vertex and align it with that edge
+        const vertex = geom.getVertex()
+        const normal = vertex.vec.sub(geom.centroid())
+        const v2 = vertex.adjacentVertices()[0]
+        const plane = new Plane(vertex.vec, normal)
+        return {
+          origin: geom.centroid(),
+          scale: geom.edges[0].distanceToCenter(),
+          orientation: [
+            normal,
+            plane.getProjectedPoint(v2.vec).sub(vertex.vec),
+          ],
+        }
+      }
+      case "middle": {
+        const edgeFace = geom.faces.find(
+          (face) =>
+            face.numSides === 4 &&
+            face.adjacentFaces().some((f) => f.numSides !== 4),
+        )!
+        return {
+          ...getCantellatedPose(geom, specs, "face"),
+          // scale to one of the lateral faces
+          scale: edgeFace.distanceToCenter(),
+        }
+      }
+    }
+  },
+  toLeft({ specs, geom }) {
+    const faceType = getFaceType(specs, "face")
+    // Take all the stuff and push it inwards
+    return getResizedVertices(
+      geom,
+      faceType,
+      getRegularLength(specs.data.family, faceType),
+    )
+  },
+  toRight({ specs, geom }) {
+    const faceType = getFaceType(specs, "vertex")
+    // Take all the stuff and push it inwards
+    return getResizedVertices(
+      geom,
+      faceType,
+      getRegularLength(specs.data.family, faceType),
+    )
+  },
 })

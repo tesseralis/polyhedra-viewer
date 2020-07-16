@@ -3,7 +3,7 @@ import { Polyhedron } from "math/polyhedra"
 import Classical from "data/specs/Classical"
 import Operation from "../Operation"
 
-import { twist as metaTwist } from "../../operations-new/expand"
+import { twist as metaTwist } from "../../operations-new/resizeOps"
 
 interface Options {
   twist?: Twist

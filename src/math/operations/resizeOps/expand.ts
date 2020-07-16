@@ -1,14 +1,12 @@
-import { take } from "lodash-es"
 import { Twist } from "types"
 import Classical from "data/specs/Classical"
-import { withOrigin } from "math/geom"
-import { getTransformedVertices, expandEdges } from "../operationUtils"
 import Operation from "../Operation"
 import {
   expand as metaExpand,
   semiExpand as metaSemiExpand,
   snub as metaSnub,
-} from "../../operations-new/expand"
+  dual as metaDual,
+} from "../../operations-new/resizeOps"
 
 export const expand = new Operation<{}, Classical>("expand", {
   apply(solid) {
@@ -66,27 +64,15 @@ export const snub = new Operation<SnubOpts, Classical>("snub", {
 })
 
 export const dual = new Operation<{}, Classical>("dual", {
-  apply({ geom }) {
-    // Scale to create a dual polyhedron with the same midradius
-    const scale = (() => {
-      const f = geom.getFace().distanceToCenter()
-      const e = geom.getEdge().distanceToCenter()
-      return (e * e) / (f * f)
-    })()
-    const duplicated = expandEdges(geom, geom.edges)
-    const faces = take(duplicated.faces, geom.numFaces())
-    const endVertices = getTransformedVertices(faces, (f) =>
-      withOrigin(geom.centroid(), (v) => v.scale(scale))(f.centroid()),
-    )
-
-    return {
-      animationData: {
-        start: duplicated,
-        endVertices,
-      },
+  apply(solid) {
+    if (solid.specs.isVertex()) {
+      return metaDual.applyRight(solid, {})
+    } else {
+      return metaDual.applyLeft(solid, {})
     }
   },
 
+  // TODO replace this with the info from the operation
   canApplyTo(info): info is Classical {
     return info.isClassical() && info.isRegular()
   },

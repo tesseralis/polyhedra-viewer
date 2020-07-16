@@ -6,7 +6,7 @@ import {
   expand as metaExpand,
   snub as metaSnub,
   semiExpand as metaSemiExpand,
-} from "../../operations-new/expand"
+} from "../../operations-new/resizeOps"
 
 interface Options {
   facet?: "vertex" | "face"
