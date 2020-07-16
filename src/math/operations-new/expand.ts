@@ -199,8 +199,8 @@ export const semiExpand = new OperationPair<Classical, ExpandOpts>({
       options: { facet: entry.data.facet },
     })),
   getIntermediate: (entry) => entry.right,
-  getPose({ specs, geom }, { facet }) {
-    if (specs.isTruncated()) {
+  getPose(pos, { specs, geom }, { facet }) {
+    if (pos === "left") {
       const face = geom.faces.find((f) => f.numSides > 5)!
       const edge = face.edges.find(
         (e) => e.twinFace().numSides === face.numSides,
@@ -236,8 +236,8 @@ export const expand = new OperationPair<Classical, ExpandOpts>({
 
   getIntermediate: (entry) => entry.right,
 
-  getPose({ geom, specs }, { facet }) {
-    return specs.isRegular()
+  getPose(pos, { geom, specs }, { facet }) {
+    return pos === "left"
       ? getRegularPose(geom)
       : getCantellatedPose(geom, specs, facet)
   },
@@ -285,8 +285,8 @@ export const snub = new OperationPair<Classical, SnubOptions>({
 
   getIntermediate: (entry) => entry.right,
 
-  getPose({ geom, specs }, { twist = "left" }) {
-    return specs.isRegular()
+  getPose(pos, { geom, specs }, { twist = "left" }) {
+    return pos === "left"
       ? getRegularPose(geom)
       : getSnubPose(geom, specs, facetFromTwist(specs, twist))
   },
@@ -317,8 +317,8 @@ export const twist = new OperationPair<Classical, SnubOptions>({
 
   getIntermediate: (entry) => entry.right,
 
-  getPose({ specs, geom }) {
-    return specs.isCantellated()
+  getPose(pos, { specs, geom }) {
+    return pos === "left"
       ? getCantellatedPose(geom, specs, "face")
       : getSnubPose(geom, specs, "face")
   },

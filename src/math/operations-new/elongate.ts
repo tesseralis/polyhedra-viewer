@@ -20,15 +20,16 @@ export default new OperationPair<Capstone, {}>({
       }
     }),
   getIntermediate: (entry) => entry.right,
-  getPose({ geom, specs }) {
+  getPose(side, { geom, specs }) {
     // Pick a cap, favoring rotunda over cupola in the case of cupolarotundae
     const cap = sortBy(Cap.getAll(geom), (cap) => capTypeMap[cap.type])[0]
     const capBoundary = cap.boundary()
     const capCenter = capBoundary.centroid()
     // If elongated, get subtract half the side length to make it the center of the prism
-    const origin = specs.isElongated()
-      ? capCenter.sub(capBoundary.normal().scale(geom.edges[0].length() / 2))
-      : capCenter
+    const origin =
+      side === "left"
+        ? capCenter
+        : capCenter.sub(capBoundary.normal().scale(geom.edges[0].length() / 2))
 
     // For the cross-axis, pick an edge connected to a triangle for consistency
     const edge = capBoundary.edges.find((e) => e.face.numSides === 3)!

@@ -58,7 +58,7 @@ export const truncate = new OperationPair<Classical, {}>({
   getIntermediate({ right: target }) {
     return target
   },
-  getPose({ geom, specs }) {
+  getPose(side, { geom, specs }) {
     const origin = geom.centroid()
     // If classical, pick any face and any vertex on that face
 
@@ -140,7 +140,7 @@ export const rectify = new OperationPair<Classical, Options>({
       operation: source.isRegular() ? "truncate" : "bevel",
     })
   },
-  getPose({ geom, specs }, { facet }) {
+  getPose(side, { geom, specs }, { facet }) {
     const origin = geom.centroid()
     // FIXME deduplicate these poses
     if (specs.isRegular()) {

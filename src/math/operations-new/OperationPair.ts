@@ -31,7 +31,7 @@ interface OpPairInput<Specs extends PolyhedronSpecs, Opts> {
   // Get the intermediate polyhedron for the given graph entry
   getIntermediate(entry: GraphEntry<Specs, Opts>): Specs | SolidArgs<Specs>
   // Get the post of a left, right, or middle state
-  getPose(solid: SolidArgs<Specs>, opts: Opts): Pose
+  getPose(pos: Side | "middle", solid: SolidArgs<Specs>, opts: Opts): Pose
   // Move the intermediate figure to the start position
   toLeft(solid: SolidArgs<Specs>, opts: Opts): VertexArg[]
   // Move the intermediate figure to the end position
@@ -47,7 +47,7 @@ function normalizeIntermediate<Specs extends PolyhedronSpecs>(
   return inter
 }
 
-// Transform the polyhedron with the transformation given by the two poses
+// Translate, rotate, and scale the polyhedron with the transformation given by the two poses
 function alignPolyhedron(solid: Polyhedron, pose1: Pose, pose2: Pose) {
   const [u1, u2] = pose1.orientation.map((x) => x.getNormalized())
   const [v1, v2] = pose2.orientation.map((x) => x.getNormalized())
@@ -126,11 +126,11 @@ export default class OperationPair<
     const entry = this.getEntry(side, solid.specs, opts)
     const middle = normalizeIntermediate(this.inputs.getIntermediate(entry))
 
-    const startPose = getPose(solid, opts)
+    const startPose = getPose(side, solid, opts)
 
     const alignedInter = alignPolyhedron(
       middle.geom,
-      getPose(middle, opts),
+      getPose("middle", middle, opts),
       startPose,
     )
     const alignedMiddle = { ...middle, geom: alignedInter }
@@ -140,7 +140,7 @@ export default class OperationPair<
     const endGeom = getGeom(endSpecs)
     const alignedEnd = alignPolyhedron(
       endGeom,
-      getPose({ specs: endSpecs, geom: endGeom }, opts),
+      getPose(endSide, { specs: endSpecs, geom: endGeom }, opts),
       startPose,
     )
 
