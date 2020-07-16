@@ -81,16 +81,27 @@ const snubAngles = {
 function getCantellatedDistance(family: Family) {
   const specs = Classical.query.withData({ family, operation: "cantellate" })
   const geom = getGeom(specs)
-  const referenceFace =
-    geom.faces.find((face) => isExpandedFace(geom, face, family)) ??
-    geom.getFace()
-  return referenceFace.distanceToCenter() / geom.edgeLength()
+  const face = geom.faces.find((face) => isExpandedFace(geom, face, family))!
+  return face.distanceToCenter() / geom.edgeLength()
 }
 
 const cantellatedDistances = {
   3: getCantellatedDistance(3),
   4: getCantellatedDistance(4),
   5: getCantellatedDistance(5),
+}
+
+function getBevelledDistance(family: Family) {
+  const specs = Classical.query.withData({ family, operation: "bevel" })
+  const geom = getGeom(specs)
+  const face = geom.largestFace()
+  return face.distanceToCenter() / geom.edgeLength()
+}
+
+const bevelledDistances = {
+  3: getBevelledDistance(3),
+  4: getBevelledDistance(4),
+  5: getBevelledDistance(5),
 }
 
 function getSnubAngle(specs: Classical, facet: Facet) {
@@ -178,7 +189,7 @@ export const semiExpand = new OperationPair<Classical, ExpandOpts>({
         orientation: [face.normal(), edge.midpoint().sub(face.centroid())],
       }
     } else {
-      const faceType = facet === "vertex" ? 6 : 2 * specs.data.family
+      const faceType = 2 * getFaceType(specs, facet)
       const face = geom.faceWithNumSides(faceType)
       const edge = face.edges.find((e) => e.twinFace().numSides === 4)!
       return {
@@ -189,13 +200,9 @@ export const semiExpand = new OperationPair<Classical, ExpandOpts>({
     }
   },
   toStart({ specs, geom }, { facet }) {
-    const reference = getGeom(specs.withData({ operation: "truncate", facet }))
     const faceType = 2 * getFaceType(specs, facet)
-    // FIXME we can cache these values too
-    const referenceFace = reference.faceWithNumSides(faceType)
     const resultLength =
-      (referenceFace.distanceToCenter() / reference.edgeLength()) *
-      geom.edgeLength()
+      geom.edgeLength() * bevelledDistances[specs.data.family]
     // Take all the stuff and push it inwards
     const contractFaces = getExpandedFaces(geom, faceType)
     return getResizedVertices(contractFaces, resultLength, 0)
