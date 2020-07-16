@@ -17,9 +17,7 @@ describe("applyOperation", () => {
             for (const options of operation.allOptionCombos(polyhedron)) {
               const result = operation.apply(polyhedron, options as any)
               expectValidPolyhedron(result)
-              if (!["augment", "diminish", "gyrate"].includes(opName)) {
-                expectValidAnimationData(result, polyhedron)
-              }
+              expectValidAnimationData(result, polyhedron, opName)
             }
           })
         }

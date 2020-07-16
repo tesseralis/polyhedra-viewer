@@ -141,9 +141,7 @@ describe("chained tests", () => {
         expect(op.canApplyTo(polyhedron)).toBeTruthy()
         const result = op.apply(polyhedron, args as any)
         expectValidPolyhedron(result)
-        if (!["augment", "diminish", "gyrate"].includes(op.name)) {
-          expectValidAnimationData(result, polyhedron)
-        }
+        expectValidAnimationData(result, polyhedron, op.name)
 
         polyhedron = result.result
         expect(polyhedron.name).toBe(expected)
