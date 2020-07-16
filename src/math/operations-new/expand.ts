@@ -2,25 +2,43 @@ import { minBy } from "lodash-es"
 import { Twist } from "types"
 import Classical, { Facet, Family } from "data/specs/Classical"
 import OperationPair, { getGeom, Pose } from "./OperationPair"
-import { getPlane } from "math/geom"
+import { getPlane, withOrigin } from "math/geom"
 import { Polyhedron } from "math/polyhedra"
-import {
-  getResizedVertices,
-  getExpandedFaces,
-  isExpandedFace,
-} from "./resizeUtils"
+import { getTransformedVertices } from "../operations/operationUtils"
+import { getExpandedFaces, isExpandedFace } from "./resizeUtils"
 
 const coxeterNum = { 3: 4, 4: 6, 5: 10 }
 
-function getContractLength(
-  family: Family,
-  polyhedron: Polyhedron,
-  faceType: 3 | 4 | 5,
+/**
+ * Return the expanded vertices of the polyhedron resized to the given distance-from-center
+ * and rotated by the given angle
+ *
+ * @param geom the polyhedron geometry to transform
+ * @param faceType the type of expanded face to act on
+ * @param distance the normalized distance from center to put those faces
+ * @param angle the angle to twist the faces by
+ */
+function getResizedVertices(
+  geom: Polyhedron,
+  faceType: number,
+  distance: number,
+  angle: number = 0,
 ) {
+  const faces = getExpandedFaces(geom, faceType)
+  const resizedLength = geom.edgeLength() * distance
+  const f0 = faces[0]
+  const scale = resizedLength - f0.distanceToCenter()
+  return getTransformedVertices(faces, (f) =>
+    withOrigin(f.centroid(), (v) =>
+      v.getRotatedAroundAxis(f.normal(), angle).add(f.normal().scale(scale)),
+    ),
+  )
+}
+
+function getContractLength(family: Family, faceType: 3 | 4 | 5) {
   // Calculate dihedral angle
   // https://en.wikipedia.org/wiki/Platonic_solid#Angles
   const n = family
-  const s = polyhedron.edgeLength()
   const p = faceType
   const q = 3 + n - p
   const h = coxeterNum[n]
@@ -28,7 +46,7 @@ function getContractLength(
 
   // Calculate the inradius
   // https://en.wikipedia.org/wiki/Platonic_solid#Radii,_area,_and_volume
-  return (s / 2 / Math.tan(Math.PI / p)) * tanTheta2
+  return tanTheta2 / 2 / Math.tan(Math.PI / p)
 }
 
 // Get the face type for the given facet and solid specs
@@ -201,8 +219,9 @@ export const semiExpand = new OperationPair<Classical, ExpandOpts>({
   },
   toStart({ specs, geom }, { facet }) {
     return getResizedVertices(
-      getExpandedFaces(geom, 2 * getFaceType(specs, facet)),
-      geom.edgeLength() * bevelledDistances[specs.data.family],
+      geom,
+      2 * getFaceType(specs, facet),
+      bevelledDistances[specs.data.family],
     )
   },
   toEnd({ geom }) {
@@ -237,8 +256,9 @@ export const expand = new OperationPair<Classical, ExpandOpts>({
     const faceType = getFaceType(specs, facet)
     // Take all the stuff and push it inwards
     return getResizedVertices(
-      getExpandedFaces(geom, faceType),
-      getContractLength(specs.data.family, geom, faceType),
+      geom,
+      faceType,
+      getContractLength(specs.data.family, faceType),
     )
   },
   toEnd({ geom }) {
@@ -294,8 +314,9 @@ export const snub = new OperationPair<Classical, SnubOptions>({
     const faceType = getFaceType(specs, facet)
     // Take all the stuff and push it inwards
     return getResizedVertices(
-      getExpandedFaces(geom, faceType),
-      getContractLength(specs.data.family, geom, faceType),
+      geom,
+      faceType,
+      getContractLength(specs.data.family, faceType),
       getSnubAngle(specs, facet),
     )
   },
@@ -330,8 +351,9 @@ export const twist = new OperationPair<Classical, SnubOptions>({
   },
   toStart({ specs, geom }) {
     return getResizedVertices(
-      getExpandedFaces(geom, specs.data.family),
-      cantellatedDistances[specs.data.family] * geom.edgeLength(),
+      geom,
+      specs.data.family,
+      cantellatedDistances[specs.data.family],
       getSnubAngle(specs, "face"),
     )
   },

@@ -1,22 +1,5 @@
 import { flatMapUniq } from "utils"
 import { Polyhedron, Face } from "math/polyhedra"
-import { withOrigin } from "math/geom"
-import { getTransformedVertices } from "../operations/operationUtils"
-
-export function getResizedVertices(
-  faces: Face[],
-  resizedLength: number,
-  angle: number = 0,
-) {
-  // Update the vertices with the expanded-out version.
-  const f0 = faces[0]
-  const scale = resizedLength - f0.distanceToCenter()
-  return getTransformedVertices(faces, (f) =>
-    withOrigin(f.centroid(), (v) =>
-      v.getRotatedAroundAxis(f.normal(), angle).add(f.normal().scale(scale)),
-    ),
-  )
-}
 
 type ExpansionType = "cantellate" | "snub"
 
