@@ -46,7 +46,7 @@ function removeCap(polyhedron: Polyhedron, cap: Cap) {
 
   const endVertices = getTransformedVertices(
     [cap],
-    (p) => boundary.centroid(),
+    () => boundary.centroid(),
     mockPolyhedron.vertices,
   )
 

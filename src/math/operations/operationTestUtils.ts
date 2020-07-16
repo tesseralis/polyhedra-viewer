@@ -1,4 +1,4 @@
-import { uniqWith, sortBy, zip, isNaN } from "lodash-es"
+import { isNaN } from "lodash-es"
 import { PRECISION, Vec3D } from "math/geom"
 import { Polyhedron } from "math/polyhedra"
 import { OpResult } from "./Operation"
@@ -48,7 +48,7 @@ function expectVerticesMatch(test: Vec3D[], ref: Vec3D[]) {
 // These operations behave badly and are banned :(
 // dual: improperly scaled
 // twist: broken on tetrahedra
-const naughtyOps = ["augment", "diminish", "gyrate", "dual", "twist"]
+const naughtyOps = ["augment", "diminish", "gyrate", "twist"]
 
 export function expectValidAnimationData(
   opResult: OpResult,

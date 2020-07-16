@@ -35,7 +35,38 @@ function getResizedVertices(
   )
 }
 
+function getSchafli(specs: Classical) {
+  return specs.isFace() ? [specs.data.family, 3] : [3, specs.data.family]
+}
+
 const coxeterNum = { 3: 4, 4: 6, 5: 10 }
+
+const { sin, cos, tan, PI } = Math
+
+// get tan(theta/2) where theta is the dihedral angle of the platonic solid
+function tanDihedralOver2(specs: Classical) {
+  const [, q] = getSchafli(specs)
+  const h = coxeterNum[specs.data.family]
+  return cos(PI / q) / sin(PI / h)
+}
+
+function getInradius(specs: Classical) {
+  const [p] = getSchafli(specs)
+  return tanDihedralOver2(specs) / tan(PI / p) / 2
+}
+
+function getMidradius(specs: Classical) {
+  const [p] = getSchafli(specs)
+  const h = coxeterNum[specs.data.family]
+  return cos(PI / p) / sin(PI / h) / 2
+}
+
+function getCircumradius(specs: Classical) {
+  const [, q] = getSchafli(specs)
+  return (tan(PI / q) * tanDihedralOver2(specs)) / 2
+}
+
+// FIXME replace with getInradius
 function getRegularLength(family: Family, faceType: 3 | 4 | 5) {
   // Calculate dihedral angle
   // https://en.wikipedia.org/wiki/Platonic_solid#Angles
@@ -351,6 +382,26 @@ export const twist = new OperationPair<Classical, SnubOptions>({
   toRight: (solid) => solid.geom.vertices,
 })
 
+function getCantellatedMidradius(geom: Polyhedron) {
+  const edgeFace = geom.faces.find(
+    (face) =>
+      face.numSides === 4 && face.adjacentFaces().some((f) => f.numSides !== 4),
+  )!
+  return edgeFace.distanceToCenter()
+}
+
+function doDualTransform(specs: Classical, geom: Polyhedron, facet: Facet) {
+  const resultSpecs = specs.withData({ operation: "regular", facet })
+  const resultSideLength =
+    getCantellatedMidradius(geom) / getMidradius(resultSpecs)
+  const scale = resultSideLength * getCircumradius(resultSpecs)
+  const faceType = getFaceType(specs, facet === "face" ? "vertex" : "face")
+  const faces = getExpandedFaces(geom, faceType, facet === "face" ? 1 : 0)
+  return getTransformedVertices(faces, (f) => {
+    return geom.centroid().add(f.normal().scale(scale))
+  })
+}
+
 export const dual = new OperationPair({
   graph: Classical.query
     .where((data) => data.operation === "regular" && data.facet !== "vertex")
@@ -384,36 +435,17 @@ export const dual = new OperationPair({
         }
       }
       case "middle": {
-        const edgeFace = geom.faces.find(
-          (face) =>
-            face.numSides === 4 &&
-            face.adjacentFaces().some((f) => f.numSides !== 4),
-        )!
         return {
           ...getCantellatedPose(geom, specs, "face"),
-          // scale to one of the lateral faces
-          scale: edgeFace.distanceToCenter(),
+          scale: getCantellatedMidradius(geom),
         }
       }
     }
   },
   toLeft({ specs, geom }) {
-    const faceType = getFaceType(specs, "face")
-    // Take all the stuff and push it inwards
-    return getResizedVertices(
-      geom,
-      faceType,
-      getRegularLength(specs.data.family, faceType),
-    )
+    return doDualTransform(specs, geom, "face")
   },
   toRight({ specs, geom }) {
-    const faceType = getFaceType(specs, "vertex")
-    // FIXME this *pushes our faces inwards*
-    // and breaks the scale we set above
-    return getResizedVertices(
-      geom,
-      faceType,
-      getRegularLength(specs.data.family, faceType),
-    )
+    return doDualTransform(specs, geom, "vertex")
   },
 })

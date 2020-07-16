@@ -50,8 +50,14 @@ function getIcosahedronContractFaces(polyhedron: Polyhedron) {
   return result
 }
 
-function getCuboctahedronContractFaces(polyhedron: Polyhedron) {
-  const f0 = polyhedron.faceWithNumSides(3)
+function getCuboctahedronContractFaces(
+  polyhedron: Polyhedron,
+  parity?: number,
+) {
+  let f0 = polyhedron.faceWithNumSides(3)
+  if (parity === 1) {
+    f0 = f0.edges[0].twin().next().twinFace()
+  }
   const rest = f0.edges.map((e) => e.twin().next().next().twinFace())
   return [f0, ...rest]
 }
@@ -65,10 +71,14 @@ function getTruncatedOctahedronContractFaces(polyhedron: Polyhedron) {
 }
 
 // FIXME split this up into multiple functions for the different operations
-export function getExpandedFaces(polyhedron: Polyhedron, faceType?: number) {
+export function getExpandedFaces(
+  polyhedron: Polyhedron,
+  faceType?: number,
+  parity?: number,
+) {
   switch (polyhedron.name) {
     case "cuboctahedron":
-      return getCuboctahedronContractFaces(polyhedron)
+      return getCuboctahedronContractFaces(polyhedron, parity)
     case "icosahedron":
       return getIcosahedronContractFaces(polyhedron)
     case "truncated octahedron":
