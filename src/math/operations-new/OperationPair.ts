@@ -103,8 +103,11 @@ export function getGeom(specs: PolyhedronSpecs) {
   return geom
 }
 
-function getEntryOpts<Specs, L, R>(side: Side, entry: GraphEntry<Specs, L, R>) {
-  return side === "left" ? entry.leftOpts : entry.rightOpts
+function getEntryOpts<S extends Side, Specs, L, R>(
+  side: S,
+  entry: GraphEntry<Specs, L, R>,
+): Opts<S, L, R> {
+  return (side === "left" ? entry.leftOpts : entry.rightOpts) ?? ({} as any)
 }
 
 export type Opts<S extends Side, LeftOpts, RightOpts> = S extends "left"
@@ -119,6 +122,10 @@ export default class OperationPair<
   inputs: OpPairInput<Specs, L, R>
   constructor(inputs: OpPairInput<Specs, L, R>) {
     this.inputs = inputs
+  }
+
+  private getEntries(side: Side, specs: Specs) {
+    return this.inputs.graph.filter((entry) => specsEquals(entry[side], specs))
   }
 
   private findEntry<S extends Side>(
@@ -149,11 +156,13 @@ export default class OperationPair<
   }
 
   hasOptions(side: Side, specs: Specs) {
-    // TODO enable overriding this function
-    const entries = this.inputs.graph.filter((entry) =>
-      specsEquals(entry[side], specs),
-    )
-    return entries.length > 1
+    return this.getEntries(side, specs).length > 1
+  }
+
+  *allOptions<S extends Side>(side: S, specs: Specs): Generator<Opts<S, L, R>> {
+    for (const entry of this.getEntries(side, specs)) {
+      yield (getEntryOpts(side, entry) ?? {}) as Opts<S, L, R>
+    }
   }
 
   canApplyTo(side: Side, specs: PolyhedronSpecs) {

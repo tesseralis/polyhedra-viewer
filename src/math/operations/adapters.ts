@@ -48,6 +48,11 @@ function _toOpArgs<Specs extends PolyhedronSpecs, L, R, S extends Side>(
       const { op, side } = combo.get(specs)
       return op.hasOptions(side, specs)
     },
+    *allOptionCombos({ specs }) {
+      const { op, side } = combo.get(specs)
+      // FIXME this is a hack...
+      yield* op.allOptions(side, specs) as any
+    },
   }
 }
 

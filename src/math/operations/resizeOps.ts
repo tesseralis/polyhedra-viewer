@@ -20,18 +20,7 @@ interface TwistOpts {
   twist?: Twist
 }
 
-export const snub = new Operation<TwistOpts, Classical>("snub", {
-  ...toOpArgs("left", [_snub]),
-
-  *allOptionCombos({ specs }) {
-    if (specs.isTetrahedral()) {
-      yield {}
-    } else {
-      yield { twist: "left" }
-      yield { twist: "right" }
-    }
-  },
-})
+export const snub = new Operation("snub", toOpArgs("left", [_snub]))
 
 export const dual = new Operation("dual", selfDualOpArgs(_dual))
 
@@ -42,15 +31,6 @@ interface FacetOpts {
 // NOTE: We are using the same operation for contracting both expanded and snub solids.
 export const contract = new Operation<FacetOpts, Classical>("contract", {
   ...toOpArgs("right", [_expand, _snub, semiExpand]),
-
-  *allOptionCombos({ specs }) {
-    if (specs.isTetrahedral()) {
-      yield {}
-    } else {
-      yield { facet: "face" }
-      yield { facet: "vertex" }
-    }
-  },
 
   hitOption: "facet",
   getHitOption({ specs, geom }, hitPoint) {
@@ -84,14 +64,7 @@ export const contract = new Operation<FacetOpts, Classical>("contract", {
   },
 })
 
-export const twist = new Operation<TwistOpts, Classical>("twist", {
-  ...selfDualOpArgs(_twist),
-
-  *allOptionCombos({ specs }) {
-    if (!specs.isSnub() && !specs.isTetrahedral()) {
-      yield { twist: "left" }
-      yield { twist: "right" }
-    }
-    yield {}
-  },
-})
+export const twist = new Operation<TwistOpts, Classical>(
+  "twist",
+  selfDualOpArgs(_twist),
+)
