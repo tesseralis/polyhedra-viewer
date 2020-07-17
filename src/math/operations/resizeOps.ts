@@ -86,20 +86,16 @@ export const contract = new Operation<Options, Classical>("contract", {
   apply(solid, options) {
     const { specs, geom } = solid
     if (_expand.canApplyRightTo(specs)) {
-      const opts = specs.isTetrahedral() ? {} : options
-      return _expand.applyRight(solid, opts)
+      return _expand.applyRight(solid, options)
     }
     if (_snub.canApplyRightTo(specs)) {
       const shapeTwist = getChirality(geom)
-      const oppTwist = shapeTwist === "left" ? "right" : "left"
-      const twist = options.facet === "vertex" ? oppTwist : shapeTwist
-      // FIXME translate face-type args to twist
       return _snub.applyRight(
         {
           geom,
           specs: specs.withData({ twist: shapeTwist }),
         },
-        { twist },
+        options,
       )
     }
     return semiExpand.applyRight(solid, options)
@@ -119,11 +115,7 @@ export const contract = new Operation<Options, Classical>("contract", {
     }
     if (_snub.canApplyRightTo(specs)) {
       const shapeTwist = getChirality(geom)
-      const oppTwist = shapeTwist === "left" ? "right" : "left"
-      const twist = options.facet === "vertex" ? oppTwist : shapeTwist
-      return _snub.getLeft(specs.withData({ twist: shapeTwist }), {
-        twist,
-      })
+      return _snub.getLeft(specs.withData({ twist: shapeTwist }), options)
     }
     return semiExpand.getLeft(specs, options)
   },

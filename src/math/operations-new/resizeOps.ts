@@ -219,12 +219,16 @@ function twistOpts(specs: Classical): Twist[] {
   return specs.isTetrahedral() ? ["left"] : ["left", "right"]
 }
 
-interface ExpandOpts {
+interface FacetOpts {
   facet?: Facet
 }
 
+interface TwistOpts {
+  twist?: Twist
+}
+
 // Expansion of truncated to bevelled solids
-export const semiExpand = new OperationPair<Classical, {}, ExpandOpts>({
+export const semiExpand = new OperationPair<Classical, {}, FacetOpts>({
   graph: Classical.query
     .where((data) => data.operation === "truncate")
     .map((entry) => ({
@@ -257,7 +261,7 @@ export const semiExpand = new OperationPair<Classical, {}, ExpandOpts>({
   toRight: (solid) => solid.geom.vertices,
 })
 
-export const expand = new OperationPair<Classical, {}, ExpandOpts>({
+export const expand = new OperationPair<Classical, {}, FacetOpts>({
   graph: Classical.query
     .where((data) => data.operation === "regular")
     .map((entry) => {
@@ -283,22 +287,11 @@ export const expand = new OperationPair<Classical, {}, ExpandOpts>({
   toRight: (solid) => solid.geom.vertices,
 })
 
-interface SnubOptions {
-  twist?: Twist
-}
-
 function getOpp(twist: Twist) {
   return twist === "left" ? "right" : "left"
 }
 
-// Convert a twist option into a facet
-function facetFromTwist(specs: Classical, twist: Twist) {
-  // If the twist option is in the same direction as the spec,
-  // it's a face-solid. Otherwise it's a vertex solid
-  return twist === specs.data.twist ? "face" : "vertex"
-}
-
-export const snub = new OperationPair<Classical, SnubOptions>({
+export const snub = new OperationPair<Classical, TwistOpts, FacetOpts>({
   graph: Classical.query
     .where((data) => data.operation === "regular")
     .flatMap((entry) => {
@@ -310,19 +303,18 @@ export const snub = new OperationPair<Classical, SnubOptions>({
           // is *opposite* of the twist option
           twist: entry.isVertex() ? getOpp(twist) : twist,
         }),
-        options: { twist },
+        options: { twist, facet: entry.data.facet },
       }))
     }),
 
   getIntermediate: (entry) => entry.right,
 
-  getPose(pos, { geom, specs }, { twist = "left" }) {
+  getPose(pos, { geom, specs }, { facet = "vertex" }) {
     return pos === "left"
       ? getRegularPose(geom)
-      : getSnubPose(geom, specs, facetFromTwist(specs, twist))
+      : getSnubPose(geom, specs, facet)
   },
-  toLeft({ specs, geom }, { twist = "left" }, result) {
-    const facet = facetFromTwist(specs, twist)
+  toLeft({ specs, geom }, { facet = "vertex" }, result) {
     const faceType = getFaceType(specs, result.data.facet)
     // Take all the stuff and push it inwards
     return getResizedVertices(
@@ -335,7 +327,7 @@ export const snub = new OperationPair<Classical, SnubOptions>({
   toRight: (solid) => solid.geom.vertices,
 })
 
-export const twist = new OperationPair<Classical, SnubOptions, {}>({
+export const twist = new OperationPair<Classical, TwistOpts, {}>({
   graph: Classical.query
     .where((data) => data.operation === "cantellate")
     .flatMap((entry) => {
