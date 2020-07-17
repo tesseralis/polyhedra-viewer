@@ -3,7 +3,11 @@ import PolyhedronSpecs from "data/specs/PolyhedronSpecs"
 import { Polyhedron, VertexArg } from "math/polyhedra"
 import { Vec3D, getOrthonormalTransform, withOrigin } from "math/geom"
 
-type Side = "left" | "right"
+export type Side = "left" | "right"
+
+function oppositeSide(side: Side) {
+  return side === "left" ? "right" : "left"
+}
 
 interface GraphEntry<Specs, Opts> {
   left: Specs
@@ -105,23 +109,31 @@ export default class OperationPair<
     return entry
   }
 
+  canApplyTo(side: Side, specs: PolyhedronSpecs) {
+    return !!this.findEntry(side, specs as Specs)
+  }
+
   canApplyLeftTo(specs: PolyhedronSpecs) {
-    return !!this.findEntry("left", specs as Specs)
+    return this.canApplyTo("left", specs)
   }
 
   canApplyRightTo(specs: PolyhedronSpecs) {
-    return !!this.findEntry("right", specs as Specs)
+    return this.canApplyTo("right", specs)
   }
 
-  getRight(source: Specs, options?: Opts) {
-    return this.getEntry("left", source, options).right
+  getOpposite(side: Side, specs: Specs, options?: Opts) {
+    return this.getEntry(side, specs, options)[oppositeSide(side)]
   }
 
-  getLeft(target: Specs, options?: Opts) {
-    return this.getEntry("right", target, options).left
+  getRight(left: Specs, options?: Opts) {
+    return this.getOpposite("left", left, options)
   }
 
-  private doApply(side: Side, solid: SolidArgs<Specs>, opts: Opts) {
+  getLeft(right: Specs, options?: Opts) {
+    return this.getOpposite("right", right, options)
+  }
+
+  apply(side: Side, solid: SolidArgs<Specs>, opts: Opts) {
     const { getPose, toLeft, toRight } = this.inputs
     const entry = this.getEntry(side, solid.specs, opts)
     const middle = normalizeIntermediate(this.inputs.getIntermediate(entry))
@@ -136,7 +148,7 @@ export default class OperationPair<
     )
     const alignedMiddle = { ...middle, geom: alignedInter }
 
-    const endSide = side === "left" ? "right" : "left"
+    const endSide = oppositeSide(side)
     const endSpecs = entry[endSide]
     const endGeom = getGeom(endSpecs)
     const alignedEnd = alignPolyhedron(
@@ -160,10 +172,10 @@ export default class OperationPair<
   }
 
   applyLeft(args: SolidArgs<Specs>, options: Opts) {
-    return this.doApply("left", args, options)
+    return this.apply("left", args, options)
   }
 
   applyRight(args: SolidArgs<Specs>, options: Opts) {
-    return this.doApply("right", args, options)
+    return this.apply("right", args, options)
   }
 }

@@ -37,7 +37,7 @@ interface SolidArgs<Specs extends PolyhedronSpecs> {
   geom: Polyhedron
 }
 
-interface OpArgs<Options extends {}, Specs extends PolyhedronSpecs> {
+export interface OpArgs<Options extends {}, Specs extends PolyhedronSpecs> {
   canApplyTo(info: PolyhedronSpecs): info is Specs
 
   hasOptions?(info: Specs): boolean

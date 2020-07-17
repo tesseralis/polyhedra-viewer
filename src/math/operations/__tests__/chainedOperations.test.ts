@@ -90,11 +90,11 @@ describe("chained tests", () => {
       ],
     },
     {
-      description: "dodecahedron -> rectify -> sharpen -> contract",
+      description: "dodecahedron -> rectify -> unrectify -> contract",
       start: "dodecahedron",
       operations: [
         ["rectify", "icosidodecahedron"],
-        { op: "sharpen", args: { facet: "vertex" }, expected: "icosahedron" },
+        { op: "unrectify", args: { facet: "vertex" }, expected: "icosahedron" },
         ["contract", "tetrahedron"],
       ],
     },
@@ -108,7 +108,7 @@ describe("chained tests", () => {
         ["rectify", "cuboctahedron"],
         ["truncate", "truncated cuboctahedron"],
         ["sharpen", "cuboctahedron"],
-        { op: "sharpen", args: { facet: "face" }, expected: "cube" },
+        { op: "unrectify", args: { facet: "face" }, expected: "cube" },
         ["truncate", "truncated cube"],
         {
           op: "augment",

@@ -44,7 +44,7 @@ describe("viewer", () => {
       .expectNoButtonWithText("ortho")
   })
 
-  it("unsets the operation when there are no more options", () => {
+  xit("unsets the operation when there are no more options", () => {
     setup("cuboctahedron")
     page
       .clickButtonWithText("sharpen")

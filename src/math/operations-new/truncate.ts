@@ -1,8 +1,8 @@
 import { meanBy } from "lodash-es"
 import { Polyhedron, Face, Edge } from "math/polyhedra"
-import Classical from "data/specs/Classical"
-import OperationPair from "./OperationPair"
-import { Vec3D } from "math/geom"
+import Classical, { Facet } from "data/specs/Classical"
+import OperationPair, { Pose } from "./OperationPair"
+import { getTransformedVertices } from "../operations/operationUtils"
 
 // Every unelongated capstone (except fastigium) can be elongated
 
@@ -29,6 +29,49 @@ function getVertexToAdd(info: Classical, face: Face) {
   return face.normalRay().getPointAtDistance(dist)
 }
 
+function regularPose(geom: Polyhedron): Pose {
+  const origin = geom.centroid()
+  const face = geom.getFace()
+  const crossAxis = face.edges[0].midpoint().sub(face.centroid())
+  return {
+    origin,
+    scale: face.distanceToCenter(),
+    orientation: [face.normal(), crossAxis],
+  }
+}
+
+function truncatedPose(geom: Polyhedron): Pose {
+  const origin = geom.centroid()
+  const face = geom.largestFace()
+  const n = face.numSides
+  const edge = face.edges.find((e) => e.twinFace().numSides === n)!
+  const crossAxis = edge.midpoint().sub(face.centroid())
+  return {
+    origin,
+    scale: face.distanceToCenter(),
+    orientation: [face.normal(), crossAxis],
+  }
+}
+
+function rectifiedPose(
+  specs: Classical,
+  geom: Polyhedron,
+  facet?: Facet,
+): Pose {
+  const origin = geom.centroid()
+  // pick a face that *isn't* the sharpen face type
+  const faceType = facet === "vertex" ? 3 : specs.data.family
+  // console.log({ facet, faceType })
+  const face = geom.faces.find((face) => face.numSides === faceType)!
+  const crossAxis = face.vertices[0].vec.sub(face.centroid())
+  return {
+    origin,
+    // scale with respect to the sharpen face
+    scale: face.distanceToCenter(),
+    orientation: [face.normal(), crossAxis],
+  }
+}
+
 // Get the regular face of a truncated solid
 function truncatedToRegular(specs: Classical, geom: Polyhedron) {
   const sharpenFaces = getSharpenFaces(geom)
@@ -42,6 +85,13 @@ function truncatedToRegular(specs: Classical, geom: Polyhedron) {
   return geom.vertices.map(
     (v, vIndex) => verticesToAdd[oldToNew[vIndex]] ?? v.vec,
   )
+}
+
+function truncatedToRectified(geom: Polyhedron) {
+  const edges = geom.edges.filter(
+    (e) => e.face.numSides > 5 && e.twinFace().numSides > 5,
+  )
+  return getTransformedVertices(edges, (e) => e.midpoint())
 }
 
 export const amboTruncate = new OperationPair<Classical, {}>({
@@ -89,28 +139,8 @@ export const truncate = new OperationPair<Classical, {}>({
       }
     }),
   getIntermediate: (entry) => entry.right,
-  getPose(side, { geom }) {
-    const origin = geom.centroid()
-    if (side === "left") {
-      const face = geom.getFace()
-      const crossAxis = face.edges[0].midpoint().sub(face.centroid())
-      return {
-        origin,
-        scale: face.distanceToCenter(),
-        orientation: [face.normal(), crossAxis],
-      }
-    } else {
-      const face = geom.largestFace()
-      const n = face.numSides
-      const edge = face.edges.find((e) => e.twinFace().numSides === n)!
-      const crossAxis = edge.midpoint().sub(face.centroid())
-      return {
-        origin,
-        scale: face.distanceToCenter(),
-        orientation: [face.normal(), crossAxis],
-      }
-    }
-  },
+  getPose: (side, { geom }) =>
+    side === "left" ? regularPose(geom) : truncatedPose(geom),
   toLeft: ({ geom, specs }) => truncatedToRegular(specs, geom),
   toRight: ({ geom }) => geom.vertices,
 })
@@ -119,72 +149,43 @@ interface Options {
   facet?: "face" | "vertex"
 }
 
+export const cotruncate = new OperationPair<Classical, Options>({
+  graph: Classical.query
+    .where((data) => data.operation === "truncate")
+    .map((entry) => {
+      return {
+        left: entry,
+        right: entry.withData({ operation: "rectify" }),
+        options: { facet: entry.data.facet },
+      }
+    }),
+  getIntermediate: (entry) => entry.left,
+  getPose: (side, { specs, geom }, { facet }) =>
+    side === "right" ? rectifiedPose(specs, geom, facet) : truncatedPose(geom),
+  toLeft: ({ geom }) => geom.vertices,
+  toRight: ({ geom }) => truncatedToRectified(geom),
+})
+
+// TODO support rectified as well
 export const rectify = new OperationPair<Classical, Options>({
   graph: Classical.query
-    // TODO support rectified as well
-    .where((data) => ["regular" /*, "rectify" */].includes(data.operation))
+    .where((data) => ["regular"].includes(data.operation))
     .map((entry) => ({
       left: entry,
-      right: entry.withData({
-        operation: entry.isRegular() ? "rectify" : "cantellate",
-      }),
-      options: {
-        facet: entry.data.facet,
-      },
+      right: entry.withData({ operation: "rectify" }),
+      options: { facet: entry.data.facet },
     })),
-  getIntermediate({ left }) {
-    return left.withData({
-      operation: left.isRegular() ? "truncate" : "bevel",
-    })
-  },
+  getIntermediate: ({ left }) => left.withData({ operation: "truncate" }),
   getPose(side, { geom, specs }, { facet }) {
-    const origin = geom.centroid()
     switch (side) {
-      case "left": {
-        const face = geom.getFace()
-        const crossAxis = face.edges[0].midpoint().sub(face.centroid())
-        return {
-          origin,
-          scale: face.distanceToCenter(),
-          orientation: [face.normal(), crossAxis],
-        }
-      }
-      case "middle": {
-        const face = geom.largestFace()
-        const n = face.numSides
-        const edge = face.edges.find((e) => e.twinFace().numSides === n)!
-        const crossAxis = edge.midpoint().sub(face.centroid())
-        return {
-          origin,
-          scale: face.distanceToCenter(),
-          orientation: [face.normal(), crossAxis],
-        }
-      }
-      case "right": {
-        // pick a face that *isn't* the sharpen face type
-        const faceType = facet === "vertex" ? 3 : specs.data.family
-        // console.log({ facet, faceType })
-        const face = geom.faces.find((face) => face.numSides === faceType)!
-        const crossAxis = face.vertices[0].vec.sub(face.centroid())
-        return {
-          origin,
-          // scale with respect to the sharpen face
-          scale: face.distanceToCenter(),
-          orientation: [face.normal(), crossAxis],
-        }
-      }
+      case "left":
+        return regularPose(geom)
+      case "middle":
+        return truncatedPose(geom)
+      case "right":
+        return rectifiedPose(specs, geom, facet)
     }
   },
   toLeft: ({ geom, specs }) => truncatedToRegular(specs, geom),
-  toRight({ geom }) {
-    const oldToNew: Record<number, Vec3D> = {}
-    // Map each original edge to its midpoint
-    for (const edge of geom.edges.filter(
-      (e) => e.face.numSides > 5 && e.twinFace().numSides > 5,
-    )) {
-      oldToNew[edge.v1.index] = edge.midpoint()
-      oldToNew[edge.v2.index] = edge.midpoint()
-    }
-    return geom.vertices.map((v, vIndex) => oldToNew[vIndex])
-  },
+  toRight: (solid) => truncatedToRectified(solid.geom),
 })
