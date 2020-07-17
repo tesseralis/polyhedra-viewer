@@ -62,9 +62,12 @@ export function toOpArgs<Specs extends PolyhedronSpecs, L, R, S extends Side>(
   return _toOpArgs(opPairs.map((op) => ({ op, side })))
 }
 
+/**
+ * Create op args for the operation pair treating it as self-dual.
+ */
 export function selfDualOpArgs<Specs extends PolyhedronSpecs, Options>(
   op: OperationPair<Specs, Options, Options>,
-) {
+): OpArgs<Options, Specs> {
   return _toOpArgs([
     { side: "left", op },
     { side: "right", op },
