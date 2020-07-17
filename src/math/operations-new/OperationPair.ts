@@ -127,7 +127,9 @@ export default class OperationPair<
     const entry = this.findEntry(side, specs, opts)
     if (!entry)
       throw new Error(
-        `Could not find ${side} entry with specs: ${specs}, opts: ${opts}`,
+        `Could not find ${side} entry with specs: ${specs.name()}, opts: ${JSON.stringify(
+          opts,
+        )}`,
       )
     return entry
   }

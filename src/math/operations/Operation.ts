@@ -157,6 +157,15 @@ function normalizeOpResult(opResult: OpResultArg, newName: string): OpResult {
   }
 }
 
+function getChirality(geom: Polyhedron) {
+  if (geom.largestFace().numSides === 3) {
+    return "left"
+  }
+  const face = geom.faces.find((f) => f.numSides !== 3)!
+  const other = face.edges[0].twin().prev().twin().next().twinFace()
+  return other.numSides !== 3 ? "right" : "left"
+}
+
 export default class Operation<
   Options extends {} = {},
   Specs extends PolyhedronSpecs = PolyhedronSpecs
@@ -174,7 +183,12 @@ export default class Operation<
   private *validSpecs(polyhedron: Polyhedron): Generator<Specs> {
     for (const specs of getAllSpecs(polyhedron.name)) {
       if (this.opArgs.canApplyTo(specs)) {
-        yield specs
+        if (specs.isClassical() && specs.isChiral()) {
+          // Hack to make the it return specs with the right chirality
+          yield specs.withData({ twist: getChirality(polyhedron) }) as any
+        } else {
+          yield specs
+        }
       }
     }
   }

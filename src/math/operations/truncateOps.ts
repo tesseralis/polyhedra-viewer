@@ -8,22 +8,19 @@ import {
 } from "../operations-new/truncate"
 import { toOpArgs } from "./adapters"
 
-export const truncate = new Operation<{}, Classical>(
+export const truncate = new Operation(
   "truncate",
   toOpArgs("left", [_truncate, amboTruncate]),
 )
 
-export const cotruncate = new Operation<{}, Classical>(
+export const cotruncate = new Operation(
   "cotruncate",
   toOpArgs("left", [_cotruncate]),
 )
 
-export const rectify = new Operation<{}, Classical>(
-  "rectify",
-  toOpArgs("left", [_rectify]),
-)
+export const rectify = new Operation("rectify", toOpArgs("left", [_rectify]))
 
-export const sharpen = new Operation<{}, Classical>(
+export const sharpen = new Operation(
   "sharpen",
   toOpArgs("right", [_truncate, amboTruncate]),
 )
