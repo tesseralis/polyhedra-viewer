@@ -1,31 +1,99 @@
 import { minBy } from "lodash-es"
 import { Twist } from "types"
-import { mapObject } from "utils"
+import { flatMapUniq, mapObject } from "utils"
 import Classical, { Facet, Family } from "data/specs/Classical"
 import OperationPair, { getGeom, Pose } from "./OperationPair"
 import { getPlane, withOrigin, Vec3D } from "math/geom"
 import { Polyhedron, Face, Edge } from "math/polyhedra"
 import { getTransformedVertices } from "../operations/operationUtils"
-import { getExpandedFaces } from "./resizeUtils"
 import { Plane } from "toxiclibsjs/geom"
+
+function getFaceDistance(face1: Face, face2: Face) {
+  let dist = 0
+  let current = [face1]
+  while (!face2.inSet(current)) {
+    dist++
+    current = flatMapUniq(current, (face) => face.adjacentFaces(), "index")
+
+    if (dist > 10) {
+      throw new Error("we went toooooo far")
+    }
+  }
+  return dist
+}
+
+function getIcosahedronSnubFaces(polyhedron: Polyhedron) {
+  const result = []
+  let toTest = polyhedron.faces
+  while (toTest.length > 0) {
+    const [next, ...rest] = toTest
+    result.push(next)
+    toTest = rest.filter((face) => getFaceDistance(face, next) === 3)
+  }
+  return result
+}
+
+function getCantellatedTetrahedronFaces(polyhedron: Polyhedron, odd?: boolean) {
+  let f0 = polyhedron.faceWithNumSides(3)
+  if (odd) {
+    f0 = f0.edges[0].twin().next().twinFace()
+  }
+  const rest = f0.edges.map((e) => e.twin().next().next().twinFace())
+  return [f0, ...rest]
+}
+
+function getBevelledTetrahedronFaces(polyhedron: Polyhedron) {
+  const f0 = polyhedron.faceWithNumSides(6)
+  const rest = f0.edges
+    .filter((e) => e.twinFace().numSides === 4)
+    .map((e) => e.twin().next().next().twinFace())
+  return [f0, ...rest]
+}
+
+function getSnubFaces(specs: Classical, polyhedron: Polyhedron, facet?: Facet) {
+  if (specs.isTetrahedral()) {
+    return getIcosahedronSnubFaces(polyhedron)
+  }
+  return polyhedron.faces.filter((face) =>
+    isSnubFace(face, getFaceType(specs, facet)),
+  )
+}
+
+function getBevelledFaces(specs: Classical, geom: Polyhedron, facet: Facet) {
+  if (specs.isTetrahedral()) {
+    return getBevelledTetrahedronFaces(geom)
+  }
+  return geom.faces.filter((f) => f.numSides === 2 * getFaceType(specs, facet))
+}
+
+function getCantellatedFaces(
+  specs: Classical,
+  geom: Polyhedron,
+  facet?: Facet,
+  odd?: boolean,
+) {
+  if (specs.isTetrahedral()) {
+    return getCantellatedTetrahedronFaces(geom, odd)
+  }
+  return geom.faces.filter((face) =>
+    isCantellatedFace(face, getFaceType(specs, facet)),
+  )
+}
 
 /**
  * Return the expanded vertices of the polyhedron resized to the given distance-from-center
  * and rotated by the given angle
  *
- * @param geom the polyhedron geometry to transform
- * @param faceType the type of expanded face to act on
+ * @param faces the faces to transform
  * @param distance the normalized distance from center to put those faces
  * @param angle the angle to twist the faces by
  */
 function getResizedVertices(
-  geom: Polyhedron,
-  faceType: number,
+  faces: Face[],
   distance: number,
   angle: number = 0,
 ) {
-  const faces = getExpandedFaces(geom, faceType)
-  const resizedLength = geom.edgeLength() * distance
+  const resizedLength = faces[0].sideLength() * distance
   const f0 = faces[0]
   const scale = resizedLength - f0.distanceToCenter()
   return getTransformedVertices(faces, (f) =>
@@ -81,7 +149,7 @@ function apothemVec(edge: Edge) {
 export function calcSnubAngle(specs: Classical, facet: Facet) {
   // Choose one of the expanded faces and get its properties
   const polyhedron = getGeom(specs)
-  const expandedFaces = getExpandedFaces(polyhedron, getFaceType(specs, facet))
+  const expandedFaces = getSnubFaces(specs, polyhedron, facet)
   const [face0, ...rest] = expandedFaces
   const faceCentroid = face0.centroid()
   const midpoint = face0.edges[0].midpoint()
@@ -253,8 +321,7 @@ export const semiExpand = new OperationPair<Classical, {}, FacetOpts>({
   },
   toLeft({ specs, geom }, { facet = "face" }) {
     return getResizedVertices(
-      geom,
-      2 * getFaceType(specs, facet),
+      getBevelledFaces(specs, geom, facet),
       bevelledDists[specs.data.family][facet],
     )
   },
@@ -280,9 +347,11 @@ export const expand = new OperationPair<Classical, {}, FacetOpts>({
       : getCantellatedPose(geom, specs, facet)
   },
   toLeft({ specs, geom }, { facet }, result) {
-    const faceType = getFaceType(specs, facet)
     // Take all the stuff and push it inwards
-    return getResizedVertices(geom, faceType, getInradius(result))
+    return getResizedVertices(
+      getCantellatedFaces(specs, geom, facet),
+      getInradius(result),
+    )
   },
   toRight: (solid) => solid.geom.vertices,
 })
@@ -316,11 +385,9 @@ export const snub = new OperationPair<Classical, TwistOpts, FacetOpts>({
       : getSnubPose(geom, specs, facet)
   },
   toLeft({ specs, geom }, { facet = "vertex" }, result) {
-    const faceType = getFaceType(specs, result.data.facet)
     // Take all the stuff and push it inwards
     return getResizedVertices(
-      geom,
-      faceType,
+      getSnubFaces(specs, geom, result.data.facet),
       getInradius(result),
       getSnubAngle(specs, facet),
     )
@@ -348,8 +415,7 @@ export const twist = new OperationPair<Classical, TwistOpts, {}>({
   },
   toLeft({ specs, geom }) {
     return getResizedVertices(
-      geom,
-      specs.data.family,
+      getSnubFaces(specs, geom, "face"),
       cantellatedDists[specs.data.family],
       getSnubAngle(specs, "face"),
     )
@@ -373,8 +439,8 @@ function doDualTransform(specs: Classical, geom: Polyhedron, facet: Facet) {
   const resultSideLength =
     getCantellatedMidradius(geom) / getMidradius(resultSpecs)
   const scale = resultSideLength * getCircumradius(resultSpecs)
-  const faceType = getFaceType(specs, facet === "face" ? "vertex" : "face")
-  const faces = getExpandedFaces(geom, faceType, facet === "face" ? 1 : 0)
+  const oppFacet = facet === "face" ? "vertex" : "face"
+  const faces = getCantellatedFaces(specs, geom, oppFacet, facet === "face")
   return getTransformedVertices(faces, (f) => {
     return geom.centroid().add(f.normal().scale(scale))
   })

@@ -1,6 +1,7 @@
 import { Twist } from "types"
 import Classical from "data/specs/Classical"
 import Operation from "./Operation"
+import { Polyhedron, Face } from "math/polyhedra"
 import {
   expand as _expand,
   semiExpand,
@@ -8,8 +9,32 @@ import {
   twist as _twist,
   dual as _dual,
 } from "../operations-new/resizeOps"
-import { isExpandedFace } from "../operations-new/resizeUtils"
 import { toOpArgs, selfDualOpArgs } from "./adapters"
+
+type ExpansionType = "cantellate" | "snub"
+
+function expansionType(polyhedron: Polyhedron): ExpansionType {
+  return polyhedron.getVertex().adjacentFaceCounts()[3] >= 3
+    ? "snub"
+    : "cantellate"
+}
+
+const edgeShape = {
+  snub: 3,
+  cantellate: 4,
+}
+
+// TODO replace with isCantellatedFace and isSnubFace
+export function isExpandedFace(
+  polyhedron: Polyhedron,
+  face: Face,
+  nSides?: number,
+) {
+  const type = expansionType(polyhedron)
+  if (typeof nSides === "number" && face.numSides !== nSides) return false
+  if (!face.isValid()) return false
+  return face.adjacentFaces().every((f) => f.numSides === edgeShape[type])
+}
 
 export const expand = new Operation(
   "expand",
