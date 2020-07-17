@@ -1,23 +1,33 @@
 import Classical from "data/specs/Classical"
 import Operation from "./Operation"
 import {
-  truncate as metaTruncate,
-  rectify as metaRectify,
+  amboTruncate,
+  truncate as _truncate,
+  rectify as _rectify,
 } from "../operations-new/truncate"
 
 export const truncate = new Operation<{}, Classical>("truncate", {
-  apply: (solid) => metaTruncate.applyLeft(solid, {}),
-  getResult: ({ specs }) => metaTruncate.getRight(specs),
+  apply(solid) {
+    if (amboTruncate.canApplyLeftTo(solid.specs))
+      return amboTruncate.applyLeft(solid, {})
+    return _truncate.applyLeft(solid, {})
+  },
+  getResult({ specs }) {
+    if (amboTruncate.canApplyLeftTo(specs)) {
+      return amboTruncate.getRight(specs)
+    }
+    return _truncate.getRight(specs)
+  },
   canApplyTo(info): info is Classical {
-    return metaTruncate.canApplyLeftTo(info)
+    return amboTruncate.canApplyLeftTo(info) || _truncate.canApplyLeftTo(info)
   },
 })
 
 export const rectify = new Operation<{}, Classical>("rectify", {
-  apply: (solid) => metaRectify.applyLeft(solid, {}),
-  getResult: ({ specs }) => metaRectify.getRight(specs),
+  apply: (solid) => _rectify.applyLeft(solid, {}),
+  getResult: ({ specs }) => _rectify.getRight(specs),
   canApplyTo(info): info is Classical {
-    return metaRectify.canApplyLeftTo(info)
+    return _rectify.canApplyLeftTo(info)
   },
 })
 
@@ -27,34 +37,40 @@ interface Options {
 
 export const sharpen = new Operation<Options, Classical>("sharpen", {
   apply(solid, options) {
-    if (solid.specs.isRectified()) {
-      return metaRectify.applyRight(solid, options)
+    if (amboTruncate.canApplyRightTo(solid.specs)) {
+      return amboTruncate.applyRight(solid, options)
     }
-    return metaTruncate.applyRight(solid, {})
+    if (_rectify.canApplyRightTo(solid.specs)) {
+      return _rectify.applyRight(solid, options)
+    }
+    return _truncate.applyRight(solid, {})
   },
 
   canApplyTo(info): info is Classical {
-    if (metaTruncate.canApplyRightTo(info)) return true
-    if (metaRectify.canApplyRightTo(info)) return true
+    if (amboTruncate.canApplyRightTo(info)) return true
+    if (_truncate.canApplyRightTo(info)) return true
+    if (_rectify.canApplyRightTo(info)) return true
     return false
   },
 
   getResult({ specs }, options) {
     if (specs.isRectified()) {
       // if rectified, we have to figure out the facet from the faceType
-      return metaRectify.getLeft(specs, options)
-    } else {
-      return metaTruncate.getLeft(specs)
+      return _rectify.getLeft(specs, options)
     }
+    if (amboTruncate.canApplyRightTo(specs)) {
+      return amboTruncate.getLeft(specs)
+    }
+    return _truncate.getLeft(specs)
   },
 
   hasOptions(info) {
-    if (metaTruncate.canApplyRightTo(info)) return false
+    if (_truncate.canApplyRightTo(info)) return false
     return !info.isTetrahedral() && info.isRectified()
   },
 
   *allOptionCombos({ specs }) {
-    if (metaTruncate.canApplyRightTo(specs)) {
+    if (_truncate.canApplyRightTo(specs)) {
       yield {}
     } else if (specs.isRectified() && !specs.isTetrahedral()) {
       yield { facet: "face" }

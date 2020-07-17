@@ -44,56 +44,25 @@ function truncatedToRegular(specs: Classical, geom: Polyhedron) {
   )
 }
 
-export const truncate = new OperationPair<Classical, {}>({
+export const amboTruncate = new OperationPair<Classical, {}>({
   graph: Classical.query
-    .where((data) => ["regular", "rectify"].includes(data.operation))
-    .map((entry) => {
-      return {
-        left: entry,
-        right: entry.withData({
-          operation: entry.isRegular() ? "truncate" : "bevel",
-        }),
-      }
-    }),
-  getIntermediate({ right: target }) {
-    return target
-  },
+    .where((data) => data.operation === "rectify")
+    .map((entry) => ({
+      left: entry,
+      right: entry.withData({ operation: "bevel" }),
+    })),
+  getIntermediate: (entry) => entry.right,
   getPose(side, { geom, specs }) {
     const origin = geom.centroid()
-    // If classical, pick any face and any vertex on that face
-
-    if (specs.isRegular()) {
-      const face = geom.getFace()
-      const crossAxis = face.edges[0].midpoint().sub(face.centroid())
-      return {
-        origin,
-        scale: geom.getVertex().vec.distanceTo(origin),
-        orientation: [face.normal(), crossAxis],
-      }
-    }
-    if (specs.isRectified()) {
+    if (side === "left") {
       const face = geom.faceWithNumSides(specs.data.family)
       const crossAxis = face.edges[0].midpoint().sub(face.centroid())
       return {
         origin,
-        scale: geom.getVertex().vec.distanceTo(origin),
+        scale: geom.getVertex().distanceToCenter(),
         orientation: [face.normal(), crossAxis],
       }
-    }
-    if (specs.isTruncated()) {
-      const face = geom.largestFace()
-      const n = face.numSides
-      const edge = face.edges.find((e) => e.twinFace().numSides === n)!
-      const crossAxis = edge.midpoint().sub(face.centroid())
-      return {
-        origin,
-        scale: getVertexToAdd(specs, getSharpenFaces(geom)[0]).distanceTo(
-          origin,
-        ),
-        orientation: [face.normal(), crossAxis],
-      }
-    }
-    if (specs.isBevelled()) {
+    } else {
       const face = geom.faceWithNumSides(specs.data.family * 2)
       const edge = face.edges.find((e) => e.twinFace().numSides !== 4)!
       const crossAxis = edge.midpoint().sub(face.centroid())
@@ -105,17 +74,45 @@ export const truncate = new OperationPair<Classical, {}>({
         orientation: [face.normal(), crossAxis],
       }
     }
-    // If rectified, pick a triangular face for ease
-    // Pick a cap, favoring rotunda over cupola in the case of cupolarotundae
-    throw new Error(`Not implemented`)
   },
-  toLeft({ geom, specs }) {
-    return truncatedToRegular(specs, geom)
+  toLeft: ({ geom, specs }) => truncatedToRegular(specs, geom),
+  toRight: ({ geom }) => geom.vertices,
+})
+
+export const truncate = new OperationPair<Classical, {}>({
+  graph: Classical.query
+    .where((data) => data.operation === "regular")
+    .map((entry) => {
+      return {
+        left: entry,
+        right: entry.withData({ operation: "truncate" }),
+      }
+    }),
+  getIntermediate: (entry) => entry.right,
+  getPose(side, { geom }) {
+    const origin = geom.centroid()
+    if (side === "left") {
+      const face = geom.getFace()
+      const crossAxis = face.edges[0].midpoint().sub(face.centroid())
+      return {
+        origin,
+        scale: face.distanceToCenter(),
+        orientation: [face.normal(), crossAxis],
+      }
+    } else {
+      const face = geom.largestFace()
+      const n = face.numSides
+      const edge = face.edges.find((e) => e.twinFace().numSides === n)!
+      const crossAxis = edge.midpoint().sub(face.centroid())
+      return {
+        origin,
+        scale: face.distanceToCenter(),
+        orientation: [face.normal(), crossAxis],
+      }
+    }
   },
-  toRight({ geom }) {
-    // truncated solids are already the intermediate
-    return geom.vertices
-  },
+  toLeft: ({ geom, specs }) => truncatedToRegular(specs, geom),
+  toRight: ({ geom }) => geom.vertices,
 })
 
 interface Options {
@@ -135,9 +132,9 @@ export const rectify = new OperationPair<Classical, Options>({
         facet: entry.data.facet,
       },
     })),
-  getIntermediate({ left: source }) {
-    return source.withData({
-      operation: source.isRegular() ? "truncate" : "bevel",
+  getIntermediate({ left }) {
+    return left.withData({
+      operation: left.isRegular() ? "truncate" : "bevel",
     })
   },
   getPose(side, { geom, specs }, { facet }) {
@@ -178,9 +175,7 @@ export const rectify = new OperationPair<Classical, Options>({
       }
     }
   },
-  toLeft({ geom, specs }) {
-    return truncatedToRegular(specs, geom)
-  },
+  toLeft: ({ geom, specs }) => truncatedToRegular(specs, geom),
   toRight({ geom }) {
     const oldToNew: Record<number, Vec3D> = {}
     // Map each original edge to its midpoint
