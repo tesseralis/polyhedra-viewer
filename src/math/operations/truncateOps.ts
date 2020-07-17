@@ -7,20 +7,17 @@ import {
   cotruncate as _cotruncate,
 } from "../operations-new/truncate"
 
+import { makeComboOp } from "./adapters"
+const truncateCombo = makeComboOp("left", [_truncate, amboTruncate])
 export const truncate = new Operation<{}, Classical>("truncate", {
   apply(solid) {
-    if (amboTruncate.canApplyLeftTo(solid.specs))
-      return amboTruncate.applyLeft(solid, {})
-    return _truncate.applyLeft(solid, {})
+    return truncateCombo.get(solid.specs).applyLeft(solid, {})
   },
   getResult({ specs }) {
-    if (amboTruncate.canApplyLeftTo(specs)) {
-      return amboTruncate.getRight(specs)
-    }
-    return _truncate.getRight(specs)
+    return truncateCombo.get(specs).getRight(specs)
   },
   canApplyTo(info): info is Classical {
-    return amboTruncate.canApplyLeftTo(info) || _truncate.canApplyLeftTo(info)
+    return truncateCombo.has(info)
   },
 })
 

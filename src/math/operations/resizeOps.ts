@@ -10,28 +10,21 @@ import {
   dual as metaDual,
 } from "../operations-new/resizeOps"
 import { isExpandedFace } from "../operations-new/resizeUtils"
+import { makeComboOp } from "./adapters"
 
+const expandCombo = makeComboOp("left", [metaSemiExpand, metaExpand])
 export const expand = new Operation<{}, Classical>("expand", {
   apply(solid) {
     const { specs } = solid
-    if (specs.isTruncated()) {
-      return metaSemiExpand.applyLeft(solid, { facet: specs.data.facet })
-    }
-    return metaExpand.applyLeft(solid, { facet: specs.data.facet })
+    return expandCombo.get(specs).applyLeft(solid, { facet: specs.data.facet })
   },
 
   canApplyTo(info): info is Classical {
-    if (!info.isClassical()) return false
-    return (
-      metaSemiExpand.canApplyLeftTo(info) || metaExpand.canApplyLeftTo(info)
-    )
+    return expandCombo.has(info)
   },
 
   getResult({ specs }) {
-    if (specs.isTruncated()) {
-      return metaSemiExpand.getRight(specs)
-    }
-    return metaExpand.getRight(specs)
+    return expandCombo.get(specs).getRight(specs)
   },
 })
 
