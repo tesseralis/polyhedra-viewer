@@ -3,16 +3,16 @@ import Classical from "data/specs/Classical"
 import { Polyhedron } from "math/polyhedra"
 import Operation from "./Operation"
 import {
-  expand as metaExpand,
-  semiExpand as metaSemiExpand,
-  snub as metaSnub,
-  twist as metaTwist,
-  dual as metaDual,
+  expand as _expand,
+  semiExpand,
+  snub as _snub,
+  twist as _twist,
+  dual as _dual,
 } from "../operations-new/resizeOps"
 import { isExpandedFace } from "../operations-new/resizeUtils"
 import { makeComboOp } from "./adapters"
 
-const expandCombo = makeComboOp("left", [metaSemiExpand, metaExpand])
+const expandCombo = makeComboOp("left", [semiExpand, _expand])
 export const expand = new Operation<{}, Classical>("expand", {
   apply(solid) {
     const { specs } = solid
@@ -33,16 +33,16 @@ interface SnubOpts {
 }
 export const snub = new Operation<SnubOpts, Classical>("snub", {
   apply(solid, { twist = "left" }) {
-    return metaSnub.applyLeft(solid, { twist })
+    return _snub.applyLeft(solid, { twist })
   },
 
   canApplyTo(info): info is Classical {
     if (!info.isClassical()) return false
-    return metaSnub.canApplyLeftTo(info)
+    return _snub.canApplyLeftTo(info)
   },
 
   getResult({ specs }) {
-    return metaSnub.getRight(specs)
+    return _snub.getRight(specs)
   },
 
   hasOptions(info) {
@@ -62,9 +62,9 @@ export const snub = new Operation<SnubOpts, Classical>("snub", {
 export const dual = new Operation<{}, Classical>("dual", {
   apply(solid) {
     if (solid.specs.isVertex()) {
-      return metaDual.applyRight(solid, {})
+      return _dual.applyRight(solid, {})
     } else {
-      return metaDual.applyLeft(solid, {})
+      return _dual.applyLeft(solid, {})
     }
   },
 
@@ -96,16 +96,16 @@ interface Options {
 export const contract = new Operation<Options, Classical>("contract", {
   apply(solid, options) {
     const { specs, geom } = solid
-    if (metaExpand.canApplyRightTo(specs)) {
+    if (_expand.canApplyRightTo(specs)) {
       const opts = specs.isTetrahedral() ? {} : options
-      return metaExpand.applyRight(solid, opts)
+      return _expand.applyRight(solid, opts)
     }
-    if (metaSnub.canApplyRightTo(specs)) {
+    if (_snub.canApplyRightTo(specs)) {
       const shapeTwist = getChirality(geom)
       const oppTwist = shapeTwist === "left" ? "right" : "left"
       const twist = options.facet === "vertex" ? oppTwist : shapeTwist
       // FIXME translate face-type args to twist
-      return metaSnub.applyRight(
+      return _snub.applyRight(
         {
           geom,
           specs: specs.withData({ twist: shapeTwist }),
@@ -113,30 +113,30 @@ export const contract = new Operation<Options, Classical>("contract", {
         { twist },
       )
     }
-    return metaSemiExpand.applyRight(solid, options)
+    return semiExpand.applyRight(solid, options)
   },
 
   canApplyTo(info): info is Classical {
     if (!info.isClassical()) return false
-    if (metaExpand.canApplyRightTo(info)) return true
-    if (metaSnub.canApplyRightTo(info)) return true
-    if (metaSemiExpand.canApplyRightTo(info)) return true
+    if (_expand.canApplyRightTo(info)) return true
+    if (_snub.canApplyRightTo(info)) return true
+    if (semiExpand.canApplyRightTo(info)) return true
     return false
   },
 
   getResult({ specs, geom }, options) {
-    if (metaExpand.canApplyRightTo(specs)) {
-      return metaExpand.getLeft(specs, options)
+    if (_expand.canApplyRightTo(specs)) {
+      return _expand.getLeft(specs, options)
     }
-    if (metaSnub.canApplyRightTo(specs)) {
+    if (_snub.canApplyRightTo(specs)) {
       const shapeTwist = getChirality(geom)
       const oppTwist = shapeTwist === "left" ? "right" : "left"
       const twist = options.facet === "vertex" ? oppTwist : shapeTwist
-      return metaSnub.getLeft(specs.withData({ twist: shapeTwist }), {
+      return _snub.getLeft(specs.withData({ twist: shapeTwist }), {
         twist,
       })
     }
-    return metaSemiExpand.getLeft(specs, options)
+    return semiExpand.getLeft(specs, options)
   },
 
   hasOptions(info) {
@@ -193,7 +193,7 @@ export const twist = new Operation<TwistOpts, Classical>("twist", {
     const { specs, geom } = solid
     if (specs.isSnub()) {
       const shapeTwist = getChirality(geom)
-      return metaTwist.applyRight(
+      return _twist.applyRight(
         {
           geom,
           specs: specs.withData({ twist: shapeTwist }),
@@ -201,19 +201,19 @@ export const twist = new Operation<TwistOpts, Classical>("twist", {
         {},
       )
     }
-    return metaTwist.applyLeft(solid, options)
+    return _twist.applyLeft(solid, options)
   },
 
   canApplyTo(info): info is Classical {
     if (!info.isClassical()) return false
-    return metaTwist.canApplyLeftTo(info) || metaTwist.canApplyRightTo(info)
+    return _twist.canApplyLeftTo(info) || _twist.canApplyRightTo(info)
   },
 
   getResult(solid, options) {
     if (solid.specs.isSnub()) {
-      return metaTwist.getLeft(solid.specs, options)
+      return _twist.getLeft(solid.specs, options)
     }
-    return metaTwist.getRight(solid.specs, options)
+    return _twist.getRight(solid.specs, options)
   },
 
   hasOptions(info) {
