@@ -4,7 +4,8 @@ import { Polyhedron, Cap, VertexList } from "math/polyhedra"
 import { expandEdges } from "../operationUtils"
 import Operation from "../Operation"
 import { antiprismHeight, getScaledPrismVertices } from "./prismUtils"
-import metaElongate from "../../operations-new/elongate"
+import _elongate from "../../operations-new/elongate"
+import { toOpArgs } from "../adapters"
 
 function doElongate(polyhedron: Polyhedron, twist?: Twist) {
   const caps = Cap.getAll(polyhedron)
@@ -36,20 +37,10 @@ function doElongate(polyhedron: Polyhedron, twist?: Twist) {
   }
 }
 
-export const elongate = new Operation<{}, Capstone>("elongate", {
-  apply(solid) {
-    return metaElongate.applyLeft(solid, {})
-  },
-
-  canApplyTo(info): info is Capstone {
-    if (!info.isCapstone()) return false
-    return metaElongate.canApplyLeftTo(info)
-  },
-
-  getResult({ specs }) {
-    return metaElongate.getRight(specs)
-  },
-})
+export const elongate = new Operation<{}, Capstone>(
+  "elongate",
+  toOpArgs("left", [_elongate]),
+)
 
 interface Options {
   twist?: Twist

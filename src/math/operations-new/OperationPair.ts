@@ -146,24 +146,8 @@ export default class OperationPair<
     return !!this.findEntry(side, specs as Specs)
   }
 
-  canApplyLeftTo(specs: PolyhedronSpecs) {
-    return this.canApplyTo("left", specs)
-  }
-
-  canApplyRightTo(specs: PolyhedronSpecs) {
-    return this.canApplyTo("right", specs)
-  }
-
   getOpposite(side: Side, specs: Specs, options?: Opts<Side, L, R>) {
     return this.getEntry(side, specs, options)[oppositeSide(side)]
-  }
-
-  getRight(left: Specs, options?: L) {
-    return this.getOpposite("left", left, options)
-  }
-
-  getLeft(right: Specs, options?: R) {
-    return this.getOpposite("right", right, options)
   }
 
   apply(side: Side, solid: SolidArgs<Specs>, opts: Opts<Side, L, R>) {
@@ -202,13 +186,5 @@ export default class OperationPair<
       },
       result: alignedEnd,
     }
-  }
-
-  applyLeft(args: SolidArgs<Specs>, options: L) {
-    return this.apply("left", args, options)
-  }
-
-  applyRight(args: SolidArgs<Specs>, options: R) {
-    return this.apply("right", args, options)
   }
 }
