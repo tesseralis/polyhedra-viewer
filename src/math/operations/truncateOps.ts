@@ -23,16 +23,16 @@ export const rectify = new Operation<{}, Classical>(
   toOpArgs("left", [_rectify]),
 )
 
-interface Options {
-  facet?: "vertex" | "face"
-}
-
 export const sharpen = new Operation<{}, Classical>(
   "sharpen",
   toOpArgs("right", [_truncate, amboTruncate]),
 )
 
-export const cosharpen = new Operation<Options, Classical>("cosharpen", {
+interface FacetOpts {
+  facet?: "vertex" | "face"
+}
+
+export const cosharpen = new Operation<FacetOpts, Classical>("cosharpen", {
   ...toOpArgs("right", [_cotruncate]),
   // FIXME deduplicate with unrectify
   hasOptions(info) {
@@ -61,7 +61,7 @@ export const cosharpen = new Operation<Options, Classical>("cosharpen", {
   },
 })
 
-export const unrectify = new Operation<Options, Classical>("unrectify", {
+export const unrectify = new Operation<FacetOpts, Classical>("unrectify", {
   ...toOpArgs("right", [_rectify]),
   hasOptions(info) {
     return !info.isTetrahedral() && info.isRectified()
