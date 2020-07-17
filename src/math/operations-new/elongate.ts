@@ -9,7 +9,7 @@ import {
 
 const capTypeMap: Record<string, number> = { rotunda: 0, cupola: 1, pyramid: 2 }
 
-export default new OperationPair<Capstone>({
+export const elongate = new OperationPair<Capstone>({
   // Every unelongated capstone (except fastigium) can be elongated
   graph: Capstone.query
     .where((data) => !data.elongation && data.base > 2)

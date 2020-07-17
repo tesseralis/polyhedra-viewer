@@ -4,7 +4,7 @@ import { Polyhedron, Cap, VertexList } from "math/polyhedra"
 import { expandEdges } from "../operationUtils"
 import Operation from "../Operation"
 import { antiprismHeight, getScaledPrismVertices } from "./prismUtils"
-import _elongate from "../../operations-new/elongate"
+import { elongate as _elongate } from "../../operations-new/elongate"
 import { toOpArgs } from "../adapters"
 
 function doElongate(polyhedron: Polyhedron, twist?: Twist) {
