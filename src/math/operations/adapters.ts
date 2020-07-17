@@ -1,9 +1,10 @@
-import OperationPair, { Side } from "../operations-new/OperationPair"
+import OperationPair, { Side, Opts } from "../operations-new/OperationPair"
 import PolyhedronSpecs from "data/specs/PolyhedronSpecs"
+import { OpArgs } from "./Operation"
 
-export function makeComboOp<Specs extends PolyhedronSpecs, Options>(
+export function makeComboOp<Specs extends PolyhedronSpecs, L, R>(
   side: Side,
-  ops: OperationPair<Specs, Options>[],
+  ops: OperationPair<Specs, L, R>[],
 ) {
   return {
     has(specs: PolyhedronSpecs) {
@@ -15,6 +16,24 @@ export function makeComboOp<Specs extends PolyhedronSpecs, Options>(
         throw new Error(`Could not apply any operations to ${specs.name}`)
       }
       return op
+    },
+  }
+}
+
+export function toOpArgs<Specs extends PolyhedronSpecs, L, R>(
+  side: Side,
+  opPairs: OperationPair<Specs, L, R>[],
+): OpArgs<Opts<Side, L, R>, Specs> {
+  const combo = makeComboOp(side, opPairs)
+  return {
+    apply(solid, opts) {
+      return combo.get(solid.specs).apply(side, solid, opts)
+    },
+    canApplyTo(specs): specs is Specs {
+      return combo.has(specs)
+    },
+    getResult(solid, opts) {
+      return combo.get(solid.specs).getOpposite(side, solid.specs, opts)
     },
   }
 }

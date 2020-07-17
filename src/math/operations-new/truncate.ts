@@ -94,7 +94,7 @@ function truncatedToRectified(geom: Polyhedron) {
   return getTransformedVertices(edges, (e) => e.midpoint())
 }
 
-export const amboTruncate = new OperationPair<Classical, {}>({
+export const amboTruncate = new OperationPair<Classical>({
   graph: Classical.query
     .where((data) => data.operation === "rectify")
     .map((entry) => ({
@@ -129,7 +129,7 @@ export const amboTruncate = new OperationPair<Classical, {}>({
   toRight: ({ geom }) => geom.vertices,
 })
 
-export const truncate = new OperationPair<Classical, {}>({
+export const truncate = new OperationPair<Classical>({
   graph: Classical.query
     .where((data) => data.operation === "regular")
     .map((entry) => {
@@ -149,7 +149,7 @@ interface Options {
   facet?: "face" | "vertex"
 }
 
-export const cotruncate = new OperationPair<Classical, Options>({
+export const cotruncate = new OperationPair<Classical, {}, Options>({
   graph: Classical.query
     .where((data) => data.operation === "truncate")
     .map((entry) => {
@@ -166,8 +166,8 @@ export const cotruncate = new OperationPair<Classical, Options>({
   toRight: ({ geom }) => truncatedToRectified(geom),
 })
 
-// TODO support rectified as well
-export const rectify = new OperationPair<Classical, Options>({
+// TODO support double rectification
+export const rectify = new OperationPair<Classical, {}, Options>({
   graph: Classical.query
     .where((data) => ["regular"].includes(data.operation))
     .map((entry) => ({

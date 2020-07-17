@@ -6,73 +6,34 @@ import {
   rectify as _rectify,
   cotruncate as _cotruncate,
 } from "../operations-new/truncate"
+import { toOpArgs } from "./adapters"
 
-import { makeComboOp } from "./adapters"
-const truncateCombo = makeComboOp("left", [_truncate, amboTruncate])
-export const truncate = new Operation<{}, Classical>("truncate", {
-  apply(solid) {
-    return truncateCombo.get(solid.specs).applyLeft(solid, {})
-  },
-  getResult({ specs }) {
-    return truncateCombo.get(specs).getRight(specs)
-  },
-  canApplyTo(info): info is Classical {
-    return truncateCombo.has(info)
-  },
-})
+export const truncate = new Operation<{}, Classical>(
+  "truncate",
+  toOpArgs("left", [_truncate, amboTruncate]),
+)
 
-export const cotruncate = new Operation<{}, Classical>("cotruncate", {
-  apply: (solid) => _cotruncate.applyLeft(solid, {}),
-  getResult: ({ specs }) => _cotruncate.getRight(specs),
-  canApplyTo(info): info is Classical {
-    return _cotruncate.canApplyLeftTo(info)
-  },
-})
+export const cotruncate = new Operation<{}, Classical>(
+  "cotruncate",
+  toOpArgs("left", [_cotruncate]),
+)
 
-export const rectify = new Operation<{}, Classical>("rectify", {
-  apply: (solid) => _rectify.applyLeft(solid, {}),
-  getResult: ({ specs }) => _rectify.getRight(specs),
-  canApplyTo(info): info is Classical {
-    return _rectify.canApplyLeftTo(info)
-  },
-})
+export const rectify = new Operation<{}, Classical>(
+  "rectify",
+  toOpArgs("left", [_rectify]),
+)
 
 interface Options {
   facet?: "vertex" | "face"
 }
 
-export const sharpen = new Operation<{}, Classical>("sharpen", {
-  apply(solid) {
-    if (amboTruncate.canApplyRightTo(solid.specs)) {
-      return amboTruncate.applyRight(solid, {})
-    }
-    return _truncate.applyRight(solid, {})
-  },
-
-  canApplyTo(info): info is Classical {
-    if (amboTruncate.canApplyRightTo(info)) return true
-    if (_truncate.canApplyRightTo(info)) return true
-    return false
-  },
-
-  getResult({ specs }) {
-    if (amboTruncate.canApplyRightTo(specs)) {
-      return amboTruncate.getLeft(specs)
-    }
-    return _truncate.getLeft(specs)
-  },
-})
+export const sharpen = new Operation<{}, Classical>(
+  "sharpen",
+  toOpArgs("right", [_truncate, amboTruncate]),
+)
 
 export const cosharpen = new Operation<Options, Classical>("cosharpen", {
-  apply(solid, options) {
-    return _cotruncate.applyRight(solid, options)
-  },
-  canApplyTo(info): info is Classical {
-    return _cotruncate.canApplyRightTo(info)
-  },
-  getResult({ specs }, options) {
-    return _cotruncate.getLeft(specs, options)
-  },
+  ...toOpArgs("right", [_cotruncate]),
   // FIXME deduplicate with unrectify
   hasOptions(info) {
     return !info.isTetrahedral() && info.isRectified()
@@ -101,15 +62,7 @@ export const cosharpen = new Operation<Options, Classical>("cosharpen", {
 })
 
 export const unrectify = new Operation<Options, Classical>("unrectify", {
-  apply(solid, options) {
-    return _rectify.applyRight(solid, options)
-  },
-  canApplyTo(info): info is Classical {
-    return _rectify.canApplyRightTo(info)
-  },
-  getResult({ specs }, options) {
-    return _rectify.getLeft(specs, options)
-  },
+  ...toOpArgs("right", [_rectify]),
   hasOptions(info) {
     return !info.isTetrahedral() && info.isRectified()
   },

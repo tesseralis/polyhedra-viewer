@@ -10,23 +10,12 @@ import {
   dual as _dual,
 } from "../operations-new/resizeOps"
 import { isExpandedFace } from "../operations-new/resizeUtils"
-import { makeComboOp } from "./adapters"
+import { toOpArgs } from "./adapters"
 
-const expandCombo = makeComboOp("left", [semiExpand, _expand])
-export const expand = new Operation<{}, Classical>("expand", {
-  apply(solid) {
-    const { specs } = solid
-    return expandCombo.get(specs).applyLeft(solid, { facet: specs.data.facet })
-  },
-
-  canApplyTo(info): info is Classical {
-    return expandCombo.has(info)
-  },
-
-  getResult({ specs }) {
-    return expandCombo.get(specs).getRight(specs)
-  },
-})
+export const expand = new Operation<{}, Classical>(
+  "expand",
+  toOpArgs("left", [semiExpand, _expand]),
+)
 
 interface SnubOpts {
   twist: Twist

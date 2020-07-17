@@ -224,7 +224,7 @@ interface ExpandOpts {
 }
 
 // Expansion of truncated to bevelled solids
-export const semiExpand = new OperationPair<Classical, ExpandOpts>({
+export const semiExpand = new OperationPair<Classical, {}, ExpandOpts>({
   graph: Classical.query
     .where((data) => data.operation === "truncate")
     .map((entry) => ({
@@ -257,7 +257,7 @@ export const semiExpand = new OperationPair<Classical, ExpandOpts>({
   toRight: (solid) => solid.geom.vertices,
 })
 
-export const expand = new OperationPair<Classical, ExpandOpts>({
+export const expand = new OperationPair<Classical, {}, ExpandOpts>({
   graph: Classical.query
     .where((data) => data.operation === "regular")
     .map((entry) => {
@@ -335,7 +335,7 @@ export const snub = new OperationPair<Classical, SnubOptions>({
   toRight: (solid) => solid.geom.vertices,
 })
 
-export const twist = new OperationPair<Classical, SnubOptions>({
+export const twist = new OperationPair<Classical, SnubOptions, {}>({
   graph: Classical.query
     .where((data) => data.operation === "cantellate")
     .flatMap((entry) => {

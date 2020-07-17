@@ -29,17 +29,35 @@ interface SolidArgs<Specs extends PolyhedronSpecs> {
   geom: Polyhedron
 }
 
-interface OpPairInput<Specs extends PolyhedronSpecs, Opts> {
+interface OpPairInput<
+  Specs extends PolyhedronSpecs,
+  LeftOpts = {},
+  RightOpts = LeftOpts
+> {
   // The graph of what polyhedron spec inputs are allowed and what maps to each other
-  graph: OpPairGraph<Specs, Opts>
+  graph: OpPairGraph<Specs, LeftOpts & RightOpts>
   // Get the intermediate polyhedron for the given graph entry
-  getIntermediate(entry: GraphEntry<Specs, Opts>): Specs | SolidArgs<Specs>
+  getIntermediate(
+    entry: GraphEntry<Specs, LeftOpts & RightOpts>,
+  ): Specs | SolidArgs<Specs>
   // Get the post of a left, right, or middle state
-  getPose(pos: Side | "middle", solid: SolidArgs<Specs>, opts: Opts): Pose
+  getPose(
+    pos: Side | "middle",
+    solid: SolidArgs<Specs>,
+    opts: LeftOpts & RightOpts,
+  ): Pose
   // Move the intermediate figure to the start position
-  toLeft(solid: SolidArgs<Specs>, opts: Opts, result: Specs): VertexArg[]
+  toLeft(
+    solid: SolidArgs<Specs>,
+    opts: LeftOpts & RightOpts,
+    result: Specs,
+  ): VertexArg[]
   // Move the intermediate figure to the end position
-  toRight(solid: SolidArgs<Specs>, opts: Opts, result: Specs): VertexArg[]
+  toRight(
+    solid: SolidArgs<Specs>,
+    opts: LeftOpts & RightOpts,
+    result: Specs,
+  ): VertexArg[]
 }
 
 function normalizeIntermediate<Specs extends PolyhedronSpecs>(
@@ -83,16 +101,21 @@ export function getGeom(specs: PolyhedronSpecs) {
   return geom
 }
 
+export type Opts<S extends Side, LeftOpts, RightOpts> = S extends "left"
+  ? LeftOpts
+  : RightOpts
+
 export default class OperationPair<
   Specs extends PolyhedronSpecs,
-  Opts extends {} = {}
+  L extends {} = {},
+  R extends {} = L
 > {
-  inputs: OpPairInput<Specs, Opts>
-  constructor(inputs: OpPairInput<Specs, Opts>) {
+  inputs: OpPairInput<Specs, L, R>
+  constructor(inputs: OpPairInput<Specs, L, R>) {
     this.inputs = inputs
   }
 
-  private findEntry(input: Side, specs: Specs, opts?: Opts) {
+  private findEntry(input: Side, specs: Specs, opts?: Opts<Side, L, R>) {
     return this.inputs.graph.find(
       (entry) =>
         specsEquals(entry[input], specs) &&
@@ -100,7 +123,7 @@ export default class OperationPair<
     )
   }
 
-  private getEntry(side: Side, specs: Specs, opts?: Opts) {
+  private getEntry(side: Side, specs: Specs, opts?: Opts<Side, L, R>) {
     const entry = this.findEntry(side, specs, opts)
     if (!entry)
       throw new Error(
@@ -121,19 +144,19 @@ export default class OperationPair<
     return this.canApplyTo("right", specs)
   }
 
-  getOpposite(side: Side, specs: Specs, options?: Opts) {
+  getOpposite(side: Side, specs: Specs, options?: Opts<Side, L, R>) {
     return this.getEntry(side, specs, options)[oppositeSide(side)]
   }
 
-  getRight(left: Specs, options?: Opts) {
+  getRight(left: Specs, options?: L) {
     return this.getOpposite("left", left, options)
   }
 
-  getLeft(right: Specs, options?: Opts) {
+  getLeft(right: Specs, options?: R) {
     return this.getOpposite("right", right, options)
   }
 
-  apply(side: Side, solid: SolidArgs<Specs>, opts: Opts) {
+  apply(side: Side, solid: SolidArgs<Specs>, opts: Opts<Side, L, R>) {
     const { getPose, toLeft, toRight } = this.inputs
     const entry = this.getEntry(side, solid.specs, opts)
     const middle = normalizeIntermediate(this.inputs.getIntermediate(entry))
@@ -163,19 +186,19 @@ export default class OperationPair<
     return {
       animationData: {
         start: alignedInter.withVertices(
-          startFn(alignedMiddle, opts, solid.specs),
+          startFn(alignedMiddle, options, solid.specs),
         ),
-        endVertices: endFn(alignedMiddle, opts, endSpecs),
+        endVertices: endFn(alignedMiddle, options, endSpecs),
       },
       result: alignedEnd,
     }
   }
 
-  applyLeft(args: SolidArgs<Specs>, options: Opts) {
+  applyLeft(args: SolidArgs<Specs>, options: L) {
     return this.apply("left", args, options)
   }
 
-  applyRight(args: SolidArgs<Specs>, options: Opts) {
+  applyRight(args: SolidArgs<Specs>, options: R) {
     return this.apply("right", args, options)
   }
 }
