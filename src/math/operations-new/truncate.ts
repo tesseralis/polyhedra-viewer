@@ -156,7 +156,7 @@ export const cotruncate = new OperationPair<Classical, {}, Options>({
       return {
         left: entry,
         right: entry.withData({ operation: "rectify" }),
-        options: { facet: entry.data.facet },
+        rightOpts: { facet: entry.data.facet },
       }
     }),
   getIntermediate: (entry) => entry.left,
@@ -173,7 +173,7 @@ export const rectify = new OperationPair<Classical, {}, Options>({
     .map((entry) => ({
       left: entry,
       right: entry.withData({ operation: "rectify" }),
-      options: { facet: entry.data.facet },
+      rightOpts: { facet: entry.data.facet },
     })),
   getIntermediate: ({ left }) => left.withData({ operation: "truncate" }),
   getPose(side, { geom, specs }, { facet }) {

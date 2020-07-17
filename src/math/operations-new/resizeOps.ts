@@ -234,7 +234,7 @@ export const semiExpand = new OperationPair<Classical, {}, FacetOpts>({
     .map((entry) => ({
       left: entry,
       right: entry.withData({ operation: "bevel" }),
-      options: { facet: entry.data.facet },
+      rightOpts: { facet: entry.data.facet },
     })),
   getIntermediate: (entry) => entry.right,
   getPose(pos, { specs, geom }, { facet }) {
@@ -268,7 +268,7 @@ export const expand = new OperationPair<Classical, {}, FacetOpts>({
       return {
         left: entry,
         right: entry.withData({ operation: "cantellate" }),
-        options: { facet: entry.data.facet },
+        rightOpts: { facet: entry.data.facet },
       }
     }),
 
@@ -303,7 +303,8 @@ export const snub = new OperationPair<Classical, TwistOpts, FacetOpts>({
           // is *opposite* of the twist option
           twist: entry.isVertex() ? getOpp(twist) : twist,
         }),
-        options: { twist, facet: entry.data.facet },
+        leftOpts: { twist },
+        rightOpts: { facet: entry.data.facet },
       }))
     }),
 
@@ -334,7 +335,7 @@ export const twist = new OperationPair<Classical, TwistOpts, {}>({
       return twistOpts(entry).map((twist) => ({
         left: entry,
         right: entry.withData({ operation: "snub", twist }),
-        options: { twist },
+        leftOpts: { twist },
       }))
     }),
 

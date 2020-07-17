@@ -9,14 +9,16 @@ function oppositeSide(side: Side) {
   return side === "left" ? "right" : "left"
 }
 
-interface GraphEntry<Specs, Opts> {
+interface GraphEntry<Specs, L, R> {
   left: Specs
   right: Specs
-  options?: Opts
+  // options?: Opts
+  leftOpts?: L
+  rightOpts?: R
 }
 
 // list of polyhedron pairs and their arguments
-type OpPairGraph<Specs, Opts> = GraphEntry<Specs, Opts>[]
+type OpPairGraph<Specs, L, R> = GraphEntry<Specs, L, R>[]
 
 export interface Pose {
   scale: number
@@ -35,10 +37,10 @@ interface OpPairInput<
   RightOpts = LeftOpts
 > {
   // The graph of what polyhedron spec inputs are allowed and what maps to each other
-  graph: OpPairGraph<Specs, LeftOpts & RightOpts>
+  graph: OpPairGraph<Specs, LeftOpts, RightOpts>
   // Get the intermediate polyhedron for the given graph entry
   getIntermediate(
-    entry: GraphEntry<Specs, LeftOpts & RightOpts>,
+    entry: GraphEntry<Specs, LeftOpts, RightOpts>,
   ): Specs | SolidArgs<Specs>
   // Get the post of a left, right, or middle state
   getPose(
@@ -101,6 +103,10 @@ export function getGeom(specs: PolyhedronSpecs) {
   return geom
 }
 
+function getEntryOpts<Specs, L, R>(side: Side, entry: GraphEntry<Specs, L, R>) {
+  return side === "left" ? entry.leftOpts : entry.rightOpts
+}
+
 export type Opts<S extends Side, LeftOpts, RightOpts> = S extends "left"
   ? LeftOpts
   : RightOpts
@@ -116,14 +122,14 @@ export default class OperationPair<
   }
 
   private findEntry<S extends Side>(
-    input: S,
+    side: S,
     specs: Specs,
     opts?: Opts<S, L, R>,
   ) {
     return this.inputs.graph.find(
       (entry) =>
-        specsEquals(entry[input], specs) &&
-        isMatch(entry.options || {}, opts || {}),
+        specsEquals(entry[side], specs) &&
+        isMatch(getEntryOpts(side, entry) || {}, opts || {}),
     )
   }
 
@@ -162,7 +168,10 @@ export default class OperationPair<
     const { getIntermediate, getPose, toLeft, toRight } = this.inputs
     const entry = this.getEntry(side, solid.specs, opts)
     const middle = normalizeIntermediate(getIntermediate(entry))
-    const options = entry.options!
+    const options = {
+      ...(entry.leftOpts || {}),
+      ...(entry.rightOpts || {}),
+    } as L & R
 
     const startPose = getPose(side, solid, options)
 
