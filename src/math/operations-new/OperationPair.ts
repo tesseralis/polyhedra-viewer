@@ -46,13 +46,13 @@ interface OpPairInput<
     solid: SolidArgs<Specs>,
     opts: LeftOpts & RightOpts,
   ): Pose
-  // Move the intermediate figure to the start position
+  // Move the intermediate figure to the left position
   toLeft(
     solid: SolidArgs<Specs>,
     opts: LeftOpts & RightOpts,
     result: Specs,
   ): VertexArg[]
-  // Move the intermediate figure to the end position
+  // Move the intermediate figure to the right position
   toRight(
     solid: SolidArgs<Specs>,
     opts: LeftOpts & RightOpts,
@@ -115,7 +115,11 @@ export default class OperationPair<
     this.inputs = inputs
   }
 
-  private findEntry(input: Side, specs: Specs, opts?: Opts<Side, L, R>) {
+  private findEntry<S extends Side>(
+    input: S,
+    specs: Specs,
+    opts?: Opts<S, L, R>,
+  ) {
     return this.inputs.graph.find(
       (entry) =>
         specsEquals(entry[input], specs) &&
@@ -123,7 +127,11 @@ export default class OperationPair<
     )
   }
 
-  private getEntry(side: Side, specs: Specs, opts?: Opts<Side, L, R>) {
+  private getEntry<S extends Side>(
+    side: S,
+    specs: Specs,
+    opts?: Opts<S, L, R>,
+  ) {
     const entry = this.findEntry(side, specs, opts)
     if (!entry)
       throw new Error(
@@ -146,14 +154,14 @@ export default class OperationPair<
     return !!this.findEntry(side, specs as Specs)
   }
 
-  getOpposite(side: Side, specs: Specs, options?: Opts<Side, L, R>) {
+  getOpposite<S extends Side>(side: S, specs: Specs, options?: Opts<S, L, R>) {
     return this.getEntry(side, specs, options)[oppositeSide(side)]
   }
 
-  apply(side: Side, solid: SolidArgs<Specs>, opts: Opts<Side, L, R>) {
-    const { getPose, toLeft, toRight } = this.inputs
+  apply<S extends Side>(side: S, solid: SolidArgs<Specs>, opts: Opts<S, L, R>) {
+    const { getIntermediate, getPose, toLeft, toRight } = this.inputs
     const entry = this.getEntry(side, solid.specs, opts)
-    const middle = normalizeIntermediate(this.inputs.getIntermediate(entry))
+    const middle = normalizeIntermediate(getIntermediate(entry))
     const options = entry.options!
 
     const startPose = getPose(side, solid, options)
