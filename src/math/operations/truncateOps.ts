@@ -36,7 +36,7 @@ export const cosharpen = new Operation<FacetOpts, Classical>("cosharpen", {
   ...toOpArgs("right", [_cotruncate]),
   // FIXME deduplicate with unrectify
   *allOptionCombos({ specs }) {
-    if (specs.isRectified() && !specs.isTetrahedral()) {
+    if (!specs.isTetrahedral()) {
       yield { facet: "face" }
       yield { facet: "vertex" }
     } else {
@@ -61,7 +61,7 @@ export const cosharpen = new Operation<FacetOpts, Classical>("cosharpen", {
 export const unrectify = new Operation<FacetOpts, Classical>("unrectify", {
   ...toOpArgs("right", [_rectify]),
   *allOptionCombos({ specs }) {
-    if (specs.isRectified() && !specs.isTetrahedral()) {
+    if (!specs.isTetrahedral()) {
       yield { facet: "face" }
       yield { facet: "vertex" }
     } else {
