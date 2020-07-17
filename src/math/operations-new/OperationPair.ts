@@ -132,6 +132,14 @@ export default class OperationPair<
     return entry
   }
 
+  hasOptions(side: Side, specs: Specs) {
+    // TODO enable overriding this function
+    const entries = this.inputs.graph.filter((entry) =>
+      specsEquals(entry[side], specs),
+    )
+    return entries.length > 1
+  }
+
   canApplyTo(side: Side, specs: PolyhedronSpecs) {
     return !!this.findEntry(side, specs as Specs)
   }

@@ -20,6 +20,10 @@ export function makeComboOp<Specs extends PolyhedronSpecs, L, R>(
   }
 }
 
+/**
+ * Convert the list of operation pairs to the necessary OpArgs to create an operation.
+ * Assumes that each op pair works on a disjoint set of polyhedra
+ */
 export function toOpArgs<Specs extends PolyhedronSpecs, L, R>(
   side: Side,
   opPairs: OperationPair<Specs, L, R>[],
@@ -34,6 +38,9 @@ export function toOpArgs<Specs extends PolyhedronSpecs, L, R>(
     },
     getResult(solid, opts) {
       return combo.get(solid.specs).getOpposite(side, solid.specs, opts)
+    },
+    hasOptions(specs) {
+      return combo.get(specs).hasOptions(side, specs)
     },
   }
 }
