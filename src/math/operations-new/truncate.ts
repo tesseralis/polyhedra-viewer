@@ -3,6 +3,7 @@ import { Polyhedron, Face, Edge } from "math/polyhedra"
 import Classical, { Facet } from "data/specs/Classical"
 import OperationPair, { Pose } from "./OperationPair"
 import { getTransformedVertices } from "../operations/operationUtils"
+import { FacetOpts } from "./opPairUtils"
 
 // Every unelongated capstone (except fastigium) can be elongated
 
@@ -144,11 +145,7 @@ export const truncate = new OperationPair<Classical>({
   toRight: ({ geom }) => geom.vertices,
 })
 
-interface Options {
-  facet?: "face" | "vertex"
-}
-
-export const cotruncate = new OperationPair<Classical, {}, Options>({
+export const cotruncate = new OperationPair<Classical, {}, FacetOpts>({
   graph: Classical.query
     .where((data) => data.operation === "truncate")
     .map((entry) => {
@@ -166,7 +163,7 @@ export const cotruncate = new OperationPair<Classical, {}, Options>({
 })
 
 // TODO support double rectification
-export const rectify = new OperationPair<Classical, {}, Options>({
+export const rectify = new OperationPair<Classical, {}, FacetOpts>({
   graph: Classical.query
     .where((data) => ["regular"].includes(data.operation))
     .map((entry) => ({

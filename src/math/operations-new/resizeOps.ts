@@ -7,6 +7,7 @@ import { getPlane, withOrigin, Vec3D } from "math/geom"
 import { Polyhedron, Face, Edge } from "math/polyhedra"
 import { getTransformedVertices } from "../operations/operationUtils"
 import { Plane } from "toxiclibsjs/geom"
+import { FacetOpts, TwistOpts } from "./opPairUtils"
 
 function getFaceDistance(face1: Face, face2: Face) {
   let dist = 0
@@ -285,14 +286,6 @@ function getSnubPose(geom: Polyhedron, specs: Classical, facet: Facet): Pose {
 function twistOpts(specs: Classical): Twist[] {
   // Snub tetrahedra aren't chiral (yet)
   return specs.isTetrahedral() ? ["left"] : ["left", "right"]
-}
-
-interface FacetOpts {
-  facet?: Facet
-}
-
-interface TwistOpts {
-  twist?: Twist
 }
 
 // Expansion of truncated to bevelled solids
