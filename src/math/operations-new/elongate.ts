@@ -8,13 +8,9 @@ import {
   getScaledPrismVertices,
   antiprismHeight,
 } from "../operations/prismOps/prismUtils"
+import { TwistOpts } from "./opPairUtils"
 
 const capTypeMap: Record<string, number> = { rotunda: 0, cupola: 1, pyramid: 2 }
-
-// FIXME deduplicate with other options
-interface TwistOpts {
-  twist?: Twist
-}
 
 export const elongate = new OperationPair<Capstone>({
   // Every unelongated capstone (except fastigium) can be elongated
