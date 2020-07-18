@@ -7,6 +7,7 @@ import { Polyhedron, Face, VertexArg, normalizeVertex } from "math/polyhedra"
 import { deduplicateVertices } from "./operationUtils"
 import { Point } from "types"
 import PolyhedronSpecs from "data/specs/PolyhedronSpecs"
+import { getChirality as getCapstoneChirality } from "./prismOps/prismUtils"
 
 type SelectState = "selected" | "selectable" | undefined
 
@@ -186,6 +187,10 @@ export default class Operation<
         if (specs.isClassical() && specs.isChiral()) {
           // Hack to make the it return specs with the right chirality
           yield specs.withData({ twist: getChirality(polyhedron) }) as any
+        } else if (specs.isCapstone() && specs.isChiral()) {
+          yield specs.withData({
+            twist: getCapstoneChirality(polyhedron),
+          }) as any
         } else {
           yield specs
         }

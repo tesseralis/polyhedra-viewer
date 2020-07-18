@@ -9,6 +9,7 @@ import {
   gyroelongPyramid,
   gyroelongCupola,
   gyroelongBipyramid,
+  gyroelongBicupola,
 } from "../../operations-new/elongate"
 import { toOpArgs } from "../adapters"
 
@@ -61,6 +62,9 @@ export const gyroelongate = new Operation<Options, Capstone>("gyroelongate", {
     if (gyroelongBipyramid.canApplyTo("left", specs)) {
       return gyroelongBipyramid.apply("left", { specs, geom }, {})
     }
+    if (gyroelongBicupola.canApplyTo("left", specs)) {
+      return gyroelongBicupola.apply("left", { specs, geom }, options)
+    }
     return doElongate(geom, options.twist)
   },
 
@@ -72,7 +76,7 @@ export const gyroelongate = new Operation<Options, Capstone>("gyroelongate", {
     return info.isShortened()
   },
 
-  getResult({ specs }) {
+  getResult({ specs }, options) {
     if (gyroelongPyramid.canApplyTo("left", specs)) {
       return gyroelongPyramid.getOpposite("left", specs, {})
     }
@@ -81,6 +85,9 @@ export const gyroelongate = new Operation<Options, Capstone>("gyroelongate", {
     }
     if (gyroelongBipyramid.canApplyTo("left", specs)) {
       return gyroelongBipyramid.getOpposite("left", specs, {})
+    }
+    if (gyroelongBicupola.canApplyTo("left", specs)) {
+      return gyroelongBicupola.getOpposite("left", specs, options)
     }
     return specs.withData({ elongation: "antiprism" })
   },
