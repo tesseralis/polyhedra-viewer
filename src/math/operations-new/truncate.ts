@@ -61,7 +61,6 @@ function rectifiedPose(
   const origin = geom.centroid()
   // pick a face that *isn't* the sharpen face type
   const faceType = facet === "vertex" ? 3 : specs.data.family
-  // console.log({ facet, faceType })
   const face = geom.faces.find((face) => face.numSides === faceType)!
   const crossAxis = face.vertices[0].vec.sub(face.centroid())
   return {

@@ -1,4 +1,4 @@
-import { Items } from "types"
+import { Items, Twist } from "types"
 import { PrimaryPolygon, primaryPolygons } from "../polygons"
 import Specs from "./PolyhedronSpecs"
 import Queries from "./Queries"
@@ -21,6 +21,7 @@ interface CapstoneData {
   elongation: null | PrismaticType
   count: Count
   gyrate?: Gyration
+  twist?: Twist
 }
 
 /**
@@ -32,6 +33,12 @@ export default class Capstone extends Specs<CapstoneData> {
     super("capstone", data)
     if (this.isGyroelongated() || this.isMono()) {
       delete this.data.gyrate
+    }
+    if (!this._isChiral()) {
+      delete this.data.twist
+    }
+    if (this._isChiral() && !this.data.twist) {
+      this.data.twist = "left"
     }
   }
 
@@ -55,6 +62,11 @@ export default class Capstone extends Specs<CapstoneData> {
   isShortened = () => !this.data.elongation
   isElongated = () => this.data.elongation === "prism"
   isGyroelongated = () => this.data.elongation === "antiprism"
+
+  // FIXME reconcile with the other isChiral?
+  private _isChiral() {
+    return this.isGyroelongated() && this.isBi() && !this.isPyramid()
+  }
 
   static *getAll() {
     for (const base of primaryPolygons) {

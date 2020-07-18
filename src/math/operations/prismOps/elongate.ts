@@ -4,7 +4,11 @@ import { Polyhedron, Cap, VertexList } from "math/polyhedra"
 import { expandEdges } from "../operationUtils"
 import Operation from "../Operation"
 import { antiprismHeight, getScaledPrismVertices } from "./prismUtils"
-import { elongate as _elongate } from "../../operations-new/elongate"
+import {
+  elongate as _elongate,
+  gyroelongPyramid,
+  gyroelongCupola,
+} from "../../operations-new/elongate"
 import { toOpArgs } from "../adapters"
 
 function doElongate(polyhedron: Polyhedron, twist?: Twist) {
@@ -46,8 +50,14 @@ interface Options {
   twist?: Twist
 }
 export const gyroelongate = new Operation<Options, Capstone>("gyroelongate", {
-  apply({ geom }, { twist = "left" }) {
-    return doElongate(geom, twist)
+  apply({ specs, geom }, options) {
+    if (gyroelongPyramid.canApplyTo("left", specs)) {
+      return gyroelongPyramid.apply("left", { specs, geom }, {})
+    }
+    if (gyroelongCupola.canApplyTo("left", specs)) {
+      return gyroelongCupola.apply("left", { specs, geom }, {})
+    }
+    return doElongate(geom, options.twist)
   },
 
   canApplyTo(info): info is Capstone {
@@ -59,6 +69,12 @@ export const gyroelongate = new Operation<Options, Capstone>("gyroelongate", {
   },
 
   getResult({ specs }) {
+    if (gyroelongPyramid.canApplyTo("left", specs)) {
+      return gyroelongPyramid.getOpposite("left", specs, {})
+    }
+    if (gyroelongCupola.canApplyTo("left", specs)) {
+      return gyroelongCupola.getOpposite("left", specs, {})
+    }
     return specs.withData({ elongation: "antiprism" })
   },
 

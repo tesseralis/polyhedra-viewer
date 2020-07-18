@@ -100,6 +100,7 @@ export function getGeom(specs: PolyhedronSpecs) {
   if (specs.isClassical() && specs.isSnub() && specs.data.twist === "left") {
     return geom.reflect()
   }
+  // FIXME do this for gyroelongated bicupolae too
   return geom
 }
 
