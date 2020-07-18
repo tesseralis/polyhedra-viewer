@@ -153,7 +153,7 @@ export const gyroelongCupola = new OperationPair<Capstone>({
   getPose(side, { geom }) {
     // Pick a cap, favoring rotunda over cupola in the case of cupolarotundae
     // FIXME pick the right cap for diminished icosahedron
-    const cap = sortBy(Cap.getAll(geom), (cap) => capTypeMap[cap.type])[0]
+    const cap = Cap.getAll(geom)[0]
     const capBoundary = cap.boundary()
     const capCenter = capBoundary.centroid()
     // If gyroelongated, get subtract half the antiprism side length to make it the center
@@ -204,10 +204,14 @@ export const gyroelongCupola = new OperationPair<Capstone>({
   toRight: (solid) => solid.geom.vertices,
 })
 
-export const gyroelongBicupola = new OperationPair<Capstone, TwistOpts>({
+export const gyroelongBipyramid = new OperationPair<Capstone>({
   graph: Capstone.query
     .where(
-      (data) => data.type !== "pyramid" && data.count === 2 && data.base > 2,
+      (data) =>
+        data.type === "pyramid" &&
+        data.count === 2 &&
+        data.base > 3 &&
+        !data.elongation,
     )
     .map((entry) => ({
       left: entry,
@@ -217,34 +221,45 @@ export const gyroelongBicupola = new OperationPair<Capstone, TwistOpts>({
   getPose(side, { geom }) {
     // Pick a cap, favoring rotunda over cupola in the case of cupolarotundae
     // FIXME pick the right cap for diminished icosahedron
-    // FIXME FUCK the angles are off
-    const cap = sortBy(Cap.getAll(geom), (cap) => capTypeMap[cap.type])[0]
+    const cap = Cap.getAll(geom)[0]
     const capBoundary = cap.boundary()
     const capCenter = capBoundary.centroid()
     // If gyroelongated, get subtract half the antiprism side length to make it the center
     const antiHeight = antiprismHeight(capBoundary.numSides)
-    const origin =
-      side === "left"
-        ? capCenter
-        : capCenter.sub(
-            capBoundary
-              .normal()
-              .scale((antiHeight * geom.edges[0].length()) / 2),
-          )
-
+    const n = capBoundary.numSides
+    const angle = Math.PI / n / 2
     // For the cross-axis, pick an edge connected to a triangle for consistency
     const edge = capBoundary.edges.find((e) => e.face.numSides === 3)!
-    return {
-      origin,
-      scale: capBoundary.sideLength(),
-      orientation: [
-        // For orientation, use the normal and one of the vertices on the boundary
-        capBoundary.normal(),
-        edge.v1.vec.sub(capCenter),
-      ] as const,
+    if (side === "left") {
+      const origin = capCenter
+      return {
+        origin,
+        scale: geom.edgeLength(),
+        orientation: [
+          // For orientation, use the normal and one of the vertices on the boundary
+          capBoundary.normal(),
+          edge.v1.vec.sub(capCenter),
+        ] as const,
+      }
+    } else {
+      const origin = capCenter.sub(
+        capBoundary.normal().scale((antiHeight * geom.edges[0].length()) / 2),
+      )
+      // For the cross-axis, pick an edge connected to a triangle for consistency
+      const crossAxis = edge.v1.vec.sub(capCenter)
+      return {
+        origin,
+        scale: geom.edgeLength(),
+        orientation: [
+          // For orientation, use the normal and one of the vertices on the boundary
+          capBoundary.normal(),
+          crossAxis.getRotatedAroundAxis(capBoundary.normal(), angle),
+        ] as const,
+      }
     }
   },
   toLeft({ geom }) {
+    // return geom.vertices
     // Shorten the solid
     // FIXME get the cap that we are aligned with and its opposite cap
     // push the caps inwards

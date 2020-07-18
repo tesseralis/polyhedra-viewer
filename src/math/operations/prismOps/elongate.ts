@@ -8,6 +8,7 @@ import {
   elongate as _elongate,
   gyroelongPyramid,
   gyroelongCupola,
+  gyroelongBipyramid,
 } from "../../operations-new/elongate"
 import { toOpArgs } from "../adapters"
 
@@ -57,6 +58,9 @@ export const gyroelongate = new Operation<Options, Capstone>("gyroelongate", {
     if (gyroelongCupola.canApplyTo("left", specs)) {
       return gyroelongCupola.apply("left", { specs, geom }, {})
     }
+    if (gyroelongBipyramid.canApplyTo("left", specs)) {
+      return gyroelongBipyramid.apply("left", { specs, geom }, {})
+    }
     return doElongate(geom, options.twist)
   },
 
@@ -74,6 +78,9 @@ export const gyroelongate = new Operation<Options, Capstone>("gyroelongate", {
     }
     if (gyroelongCupola.canApplyTo("left", specs)) {
       return gyroelongCupola.getOpposite("left", specs, {})
+    }
+    if (gyroelongBipyramid.canApplyTo("left", specs)) {
+      return gyroelongBipyramid.getOpposite("left", specs, {})
     }
     return specs.withData({ elongation: "antiprism" })
   },
