@@ -83,7 +83,6 @@ export const gyroelongPyramid = new OperationPair<Capstone>({
   getIntermediate: (entry) => entry.right,
   getPose(side, { geom, specs }) {
     // Pick a cap, favoring rotunda over cupola in the case of cupolarotundae
-    // FIXME pick the right cap for diminished icosahedron
     // const cap = sortBy(Cap.getAll(geom), (cap) => capTypeMap[cap.type])[0]
     const face = geom.largestFace()
     const capCenter = face.centroid()
@@ -152,7 +151,6 @@ export const gyroelongCupola = new OperationPair<Capstone>({
   getIntermediate: (entry) => entry.right,
   getPose(side, { geom }) {
     // Pick a cap, favoring rotunda over cupola in the case of cupolarotundae
-    // FIXME pick the right cap for diminished icosahedron
     const cap = Cap.getAll(geom)[0]
     const capBoundary = cap.boundary()
     const capCenter = capBoundary.centroid()
@@ -220,7 +218,6 @@ export const gyroelongBipyramid = new OperationPair<Capstone>({
   getIntermediate: (entry) => entry.right,
   getPose(side, { geom }) {
     // Pick a cap, favoring rotunda over cupola in the case of cupolarotundae
-    // FIXME pick the right cap for diminished icosahedron
     const cap = Cap.getAll(geom)[0]
     const capBoundary = cap.boundary()
     const capCenter = capBoundary.centroid()
@@ -268,6 +265,89 @@ export const gyroelongBipyramid = new OperationPair<Capstone>({
     const scale = geom.edgeLength() * antiprismHeight(n)
 
     return getScaledPrismVertices(adjustInfo, -scale, "left")
+  },
+  toRight: (solid) => solid.geom.vertices,
+})
+
+export const gyroelongBicupola = new OperationPair<Capstone, TwistOpts>({
+  graph: Capstone.query
+    .where(
+      (data) =>
+        data.type !== "pyramid" &&
+        data.count === 2 &&
+        data.base > 2 &&
+        !data.elongation,
+    )
+    .flatMap((entry) => {
+      // FIXME lol this is ugly
+      const [twist1, twist2]: [Twist, Twist] =
+        entry.data.gyrate === "gyro" ? ["left", "right"] : ["right", "left"]
+      return [
+        {
+          left: entry,
+          right: entry.withData({ elongation: "antiprism", twist: twist1 }),
+          leftOpts: { twist: "left" },
+          rightOpts: { twist: "right" },
+        },
+        {
+          left: entry,
+          right: entry.withData({ elongation: "antiprism", twist: twist2 }),
+          leftOpts: { twist: "right" },
+          rightOpts: { twist: "left" },
+        },
+      ]
+    }),
+  getIntermediate: (entry) => entry.right,
+  getPose(side, { geom }) {
+    // Pick a cap, favoring rotunda over cupola in the case of cupolarotundae
+    const cap = Cap.getAll(geom)[0]
+    const capBoundary = cap.boundary()
+    const capCenter = capBoundary.centroid()
+    // If gyroelongated, get subtract half the antiprism side length to make it the center
+    const antiHeight = antiprismHeight(capBoundary.numSides)
+    const n = capBoundary.numSides
+    const angle = Math.PI / n / 2
+    // For the cross-axis, pick an edge connected to a triangle for consistency
+    const edge = capBoundary.edges.find((e) => e.face.numSides === 3)!
+    if (side === "left") {
+      const origin = capCenter
+      return {
+        origin,
+        scale: geom.edgeLength(),
+        orientation: [
+          // For orientation, use the normal and one of the vertices on the boundary
+          capBoundary.normal(),
+          edge.v1.vec.sub(capCenter),
+        ] as const,
+      }
+    } else {
+      const origin = capCenter.sub(
+        capBoundary.normal().scale((antiHeight * geom.edges[0].length()) / 2),
+      )
+      // For the cross-axis, pick an edge connected to a triangle for consistency
+      const crossAxis = edge.v1.vec.sub(capCenter)
+      return {
+        origin,
+        scale: geom.edgeLength(),
+        orientation: [
+          // For orientation, use the normal and one of the vertices on the boundary
+          capBoundary.normal(),
+          crossAxis.getRotatedAroundAxis(capBoundary.normal(), angle),
+        ] as const,
+      }
+    }
+  },
+  toLeft({ geom }, { twist }) {
+    // FIXME SHIT FUCK THIS IS THE WRONG DIRECTION
+    // return geom.vertices
+    // Shorten the solid
+    // FIXME get the cap that we are aligned with and its opposite cap
+    // push the caps inwards
+    const adjustInfo = getAdjustInformation(geom)
+    const n = adjustInfo.boundary.numSides
+    const scale = geom.edgeLength() * antiprismHeight(n)
+
+    return getScaledPrismVertices(adjustInfo, -scale, twist)
   },
   toRight: (solid) => solid.geom.vertices,
 })
