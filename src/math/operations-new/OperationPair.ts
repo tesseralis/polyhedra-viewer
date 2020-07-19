@@ -132,16 +132,6 @@ export default class OperationPair<
     specs: Specs,
     opts?: Opts<S, L, R>,
   ) {
-    // for (const { left, right, options } of this.inputs.graph) {
-    //   console.log(
-    //     `left: ${left.name()}|${
-    //       (left.data as any).twist
-    //     }, right: ${right.name()}|${
-    //       (right.data as any).twist
-    //     }, options: ${JSON.stringify(options)}`,
-    //   )
-    // }
-    // console.log(`Searching for ${specs.name()}|${(specs.data as any).twist}`)
     return this.inputs.graph.find(
       (entry) =>
         specsEquals(entry[side], specs) &&
