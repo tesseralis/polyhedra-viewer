@@ -6,23 +6,20 @@ import {
   rectify as _rectify,
   cotruncate as _cotruncate,
 } from "../operations-new/truncate"
-import { toOpArgs } from "./adapters"
+import { combineOps } from "./adapters"
 
 export const truncate = new Operation(
   "truncate",
-  toOpArgs("left", [_truncate, amboTruncate]),
+  combineOps([_truncate.left, amboTruncate.left]),
 )
 
-export const cotruncate = new Operation(
-  "cotruncate",
-  toOpArgs("left", [_cotruncate]),
-)
+export const cotruncate = new Operation("cotruncate", _cotruncate.left)
 
-export const rectify = new Operation("rectify", toOpArgs("left", [_rectify]))
+export const rectify = new Operation("rectify", _rectify.left)
 
 export const sharpen = new Operation(
   "sharpen",
-  toOpArgs("right", [_truncate, amboTruncate]),
+  combineOps([_truncate.right, amboTruncate.right]),
 )
 
 interface FacetOpts {
@@ -46,11 +43,11 @@ const hitOptArgs: Partial<OpArgs<FacetOpts, Classical>> = {
 }
 
 export const cosharpen = new Operation("cosharpen", {
-  ...toOpArgs("right", [_cotruncate]),
+  ..._cotruncate.right,
   ...hitOptArgs,
 })
 
 export const unrectify = new Operation("unrectify", {
-  ...toOpArgs("right", [_rectify]),
+  ..._rectify.right,
   ...hitOptArgs,
 })

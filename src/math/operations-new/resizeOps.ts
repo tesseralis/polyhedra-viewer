@@ -2,12 +2,13 @@ import { minBy } from "lodash-es"
 import { Twist } from "types"
 import { flatMapUniq, mapObject } from "utils"
 import Classical, { Facet, Family } from "data/specs/Classical"
-import OperationPair, { getGeom, Pose } from "./OperationPair"
+import { getGeom, Pose } from "./OperationPair"
 import { getPlane, withOrigin, Vec3D } from "math/geom"
 import { Polyhedron, Face, Edge } from "math/polyhedra"
 import { getTransformedVertices } from "../operations/operationUtils"
 import { Plane } from "toxiclibsjs/geom"
 import { FacetOpts, TwistOpts } from "./opPairUtils"
+import { makeOpPair } from "../operations/adapters"
 
 function getFaceDistance(face1: Face, face2: Face) {
   let dist = 0
@@ -289,7 +290,7 @@ function twistOpts(specs: Classical): Twist[] {
 }
 
 // Expansion of truncated to bevelled solids
-export const semiExpand = new OperationPair<Classical, {}, FacetOpts>({
+export const semiExpand = makeOpPair<Classical, {}, FacetOpts>({
   graph: Classical.query
     .where((s) => s.isTruncated())
     .map((entry) => ({
@@ -321,7 +322,7 @@ export const semiExpand = new OperationPair<Classical, {}, FacetOpts>({
   toRight: (solid) => solid.geom.vertices,
 })
 
-export const expand = new OperationPair<Classical, {}, FacetOpts>({
+export const expand = makeOpPair<Classical, {}, FacetOpts>({
   graph: Classical.query
     .where((s) => s.isRegular())
     .map((entry) => {
@@ -353,7 +354,7 @@ function getOpp(twist: Twist) {
   return twist === "left" ? "right" : "left"
 }
 
-export const snub = new OperationPair<Classical, TwistOpts, FacetOpts>({
+export const snub = makeOpPair<Classical, TwistOpts, FacetOpts>({
   graph: Classical.query
     .where((s) => s.isRegular())
     .flatMap((entry) => {
@@ -387,7 +388,7 @@ export const snub = new OperationPair<Classical, TwistOpts, FacetOpts>({
   toRight: (solid) => solid.geom.vertices,
 })
 
-export const twist = new OperationPair<Classical, TwistOpts, {}>({
+export const twist = makeOpPair<Classical, TwistOpts, {}>({
   graph: Classical.query
     .where((s) => s.isCantellated())
     .flatMap((entry) => {
@@ -438,7 +439,7 @@ function doDualTransform(specs: Classical, geom: Polyhedron, facet: Facet) {
   })
 }
 
-export const dual = new OperationPair({
+export const dual = makeOpPair({
   graph: Classical.query
     .where((s) => s.isRegular() && !s.isVertex())
     .map((specs) => ({

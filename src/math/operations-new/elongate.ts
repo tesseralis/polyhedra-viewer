@@ -5,11 +5,12 @@ import { PrismaticType } from "data/specs/common"
 import PolyhedronSpecs from "data/specs/PolyhedronSpecs"
 import Capstone from "data/specs/Capstone"
 import Prismatic from "data/specs/Prismatic"
-import OperationPair, { Solid, Pose } from "./OperationPair"
+import { Solid, Pose } from "./OperationPair"
 import { getTransformedVertices } from "../operations/operationUtils"
 import { withOrigin } from "math/geom"
 import { getAdjustInformation } from "./prismUtils"
 import { TwistOpts } from "./opPairUtils"
+import { makeOpPair } from "../operations/adapters"
 
 // Get antiprism height of a unit antiprism with n sides
 export function antiprismHeight(n: number) {
@@ -125,7 +126,7 @@ function makePrismOp({
 }: PrismOpArgs) {
   const twist = rightElongation === "prism" ? undefined : "left"
   return (leftElongation: "prism" | null) => {
-    return new OperationPair({
+    return makeOpPair({
       graph: Capstone.query
         .where((s) => query(s) && s.data.elongation === rightElongation)
         .map((item) => ({
@@ -146,7 +147,7 @@ function makePrismOp({
   }
 }
 
-export const turnPrismatic = new OperationPair<Prismatic>({
+export const turnPrismatic = makeOpPair({
   // Every unelongated capstone (except fastigium) can be elongated
   graph: Prismatic.query
     .where((s) => s.isPrism() && !s.isDigonal())
@@ -212,7 +213,7 @@ export const gyroelongBipyramid = bipyramidOps(null)
 export const turnBipyramid = bipyramidOps("prism")
 
 function makeBicupolaPrismOp(leftElongation: null | "prism") {
-  return new OperationPair<Capstone, TwistOpts>({
+  return makeOpPair<Capstone, TwistOpts>({
     graph: Capstone.query
       .where(
         (s) =>

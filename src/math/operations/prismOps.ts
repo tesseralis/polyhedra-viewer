@@ -14,43 +14,47 @@ import {
   turnBipyramid,
   turnBicupola,
 } from "../operations-new/elongate"
-import { toOpArgs, multiDualOpArgs } from "./adapters"
+import { combineOps } from "./adapters"
 
-export const elongate = new Operation<{}, Capstone>(
-  "elongate",
-  toOpArgs("left", [_elongate]),
-)
+export const elongate = new Operation("elongate", _elongate.left)
 
 interface Options {
   twist?: Twist
 }
 export const gyroelongate = new Operation<Options, Capstone>(
   "gyroelongate",
-  toOpArgs("left", [
-    gyroelongPyramid,
-    gyroelongCupola,
-    gyroelongBipyramid,
-    gyroelongBicupola,
-  ]),
+  combineOps(
+    [
+      gyroelongPyramid,
+      gyroelongCupola,
+      gyroelongBipyramid,
+      gyroelongBicupola,
+    ].map((op) => op.left),
+  ),
 )
 
-export const shorten = new Operation<Options, Capstone>("shorten", {
-  ...toOpArgs("right", [
-    _elongate,
-    gyroelongPyramid,
-    gyroelongCupola,
-    gyroelongBipyramid,
-    gyroelongBicupola,
-  ]),
-})
+export const shorten = new Operation<Options, Capstone>(
+  "shorten",
+  combineOps(
+    [
+      _elongate,
+      gyroelongPyramid,
+      gyroelongCupola,
+      gyroelongBipyramid,
+      gyroelongBicupola,
+    ].map((op) => op.right),
+  ),
+)
 
 export const turn = new Operation<Options, Prismatic | Capstone>(
   "turn",
-  multiDualOpArgs([
-    turnPrismatic as any,
-    turnPyramid,
-    turnCupola,
-    turnBipyramid,
-    turnBicupola,
-  ]),
+  combineOps(
+    [
+      turnPrismatic as any,
+      turnPyramid,
+      turnCupola,
+      turnBipyramid,
+      turnBicupola,
+    ].flatMap((op) => [op.left, op.right]),
+  ),
 )

@@ -35,7 +35,7 @@ export interface Solid<Specs extends PolyhedronSpecs> {
   geom: Polyhedron
 }
 
-interface OpPairInput<Specs extends PolyhedronSpecs, L = {}, R = L> {
+export interface OpPairInput<Specs extends PolyhedronSpecs, L = {}, R = L> {
   // The graph of what polyhedron spec inputs are allowed and what maps to each other
   graph: OpPairGraph<Specs, L, R>
   // Get the intermediate polyhedron for the given graph entry

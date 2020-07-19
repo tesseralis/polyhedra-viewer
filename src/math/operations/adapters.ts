@@ -1,91 +1,76 @@
-import OperationPair, { Side, Opts } from "../operations-new/OperationPair"
+import OperationPair, {
+  OpPairInput,
+  Side,
+  Opts,
+} from "../operations-new/OperationPair"
 import PolyhedronSpecs from "data/specs/PolyhedronSpecs"
 import { OpArgs } from "./Operation"
 
-interface OpPairEntry<S extends Side, Specs extends PolyhedronSpecs, L, R> {
-  side: S
-  op: OperationPair<Specs, L, R>
-}
+type OpInput<O, S extends PolyhedronSpecs> = Required<
+  Pick<
+    OpArgs<O, S>,
+    "apply" | "canApplyTo" | "allOptionCombos" | "getResult" | "hasOptions"
+  >
+>
 
-function makeComboOp<Specs extends PolyhedronSpecs, L, R>(
-  ops: OpPairEntry<Side, Specs, L, R>[],
-) {
-  return {
-    has(specs: PolyhedronSpecs) {
-      return ops.some(({ op, side }) => op.canApplyTo(side, specs))
-    },
-    get(specs: Specs) {
-      const entry = ops.find(({ op, side }) => op.canApplyTo(side, specs))
-      if (!entry) {
-        throw new Error(`Could not apply any operations to ${specs.name}`)
-      }
-      return entry
-    },
-  }
-}
-
-/**
- * Convert the list of operation pairs to the necessary OpArgs to create an operation.
- * Assumes that each op pair works on a disjoint set of polyhedra
- */
-function _toOpArgs<Specs extends PolyhedronSpecs, L, R, S extends Side>(
-  opPairs: OpPairEntry<S, Specs, L, R>[],
-): OpArgs<Opts<S, L, R>, Specs> {
-  const combo = makeComboOp(opPairs)
+export function makeOperation<S extends Side, Sp extends PolyhedronSpecs, L, R>(
+  side: S,
+  op: OperationPair<Sp, L, R>,
+): OpInput<Opts<S, L, R>, Sp> {
   return {
     apply(solid, opts) {
-      const { op, side } = combo.get(solid.specs)
       return op.apply(side, solid, opts)
     },
     canApplyTo(specs) {
-      return combo.has(specs)
+      return op.canApplyTo(side, specs)
     },
     getResult(solid, opts) {
-      const { op, side } = combo.get(solid.specs)
       return op.getOpposite(side, solid.specs, opts)
     },
     hasOptions(specs) {
-      const { op, side } = combo.get(specs)
       return op.hasOptions(side, specs)
     },
     *allOptionCombos({ specs }) {
-      const { op, side } = combo.get(specs)
-      // FIXME this is a hack...
       yield* op.allOptions(side, specs) as any
     },
   }
 }
 
-/**
- * Convert the list of operation pairs to the necessary OpArgs to create an operation.
- * Assumes that each op pair works on a disjoint set of polyhedra
- */
-export function toOpArgs<Specs extends PolyhedronSpecs, L, R, S extends Side>(
-  side: S,
-  opPairs: OperationPair<Specs, L, R>[],
-): OpArgs<Opts<S, L, R>, Specs> {
-  return _toOpArgs(opPairs.map((op) => ({ op, side })))
-}
-
-/**
- * Create op args for the operation pair treating it as self-dual.
- */
-export function selfDualOpArgs<Specs extends PolyhedronSpecs, Options>(
-  op: OperationPair<Specs, Options, Options>,
-): OpArgs<Options, Specs> {
-  return _toOpArgs([
-    { side: "left", op },
-    { side: "right", op },
-  ])
-}
-
-export function multiDualOpArgs<Specs extends PolyhedronSpecs, Options>(
-  ops: OperationPair<Specs, Options, Options>[],
+export function makeOpPair<Specs extends PolyhedronSpecs, L = {}, R = L>(
+  opInput: OpPairInput<Specs, L, R>,
 ) {
-  return _toOpArgs(
-    ops.flatMap((op) => [
-      { side: "left", op },
-      { side: "right", op },
-    ]),
-  )
+  const op = new OperationPair(opInput)
+  return { left: makeOperation("left", op), right: makeOperation("right", op) }
+}
+
+export function combineOps<S extends PolyhedronSpecs, O>(
+  opArgs: OpInput<O, S>[],
+): OpInput<O, S> {
+  function canApplyTo(specs: S) {
+    return opArgs.some((op) => op.canApplyTo(specs))
+  }
+
+  function get(specs: S) {
+    const entry = opArgs.find((op) => op.canApplyTo(specs))
+    if (!entry) {
+      throw new Error(`Could not apply any operations to ${specs.name}`)
+    }
+    return entry
+  }
+
+  return {
+    canApplyTo,
+    apply(solid, opts) {
+      return get(solid.specs).apply(solid, opts)
+    },
+    getResult(solid, opts) {
+      return get(solid.specs).getResult(solid, opts)
+    },
+    hasOptions(specs) {
+      return get(specs).hasOptions(specs) ?? false
+    },
+    *allOptionCombos(solid) {
+      yield* get(solid.specs).allOptionCombos(solid) as any
+    },
+  }
 }

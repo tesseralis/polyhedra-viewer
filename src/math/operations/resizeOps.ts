@@ -9,7 +9,7 @@ import {
   twist as _twist,
   dual as _dual,
 } from "../operations-new/resizeOps"
-import { toOpArgs, selfDualOpArgs } from "./adapters"
+import { combineOps } from "./adapters"
 
 type ExpansionType = "cantellate" | "snub"
 
@@ -38,16 +38,16 @@ export function isExpandedFace(
 
 export const expand = new Operation(
   "expand",
-  toOpArgs("left", [semiExpand, _expand]),
+  combineOps([semiExpand.left, _expand.left]),
 )
 
 interface TwistOpts {
   twist?: Twist
 }
 
-export const snub = new Operation("snub", toOpArgs("left", [_snub]))
+export const snub = new Operation("snub", _snub.left)
 
-export const dual = new Operation("dual", selfDualOpArgs(_dual))
+export const dual = new Operation("dual", combineOps([_dual.left, _dual.right]))
 
 interface FacetOpts {
   facet?: "vertex" | "face"
@@ -55,7 +55,7 @@ interface FacetOpts {
 
 // NOTE: We are using the same operation for contracting both expanded and snub solids.
 export const contract = new Operation<FacetOpts, Classical>("contract", {
-  ...toOpArgs("right", [_expand, _snub, semiExpand]),
+  ...combineOps([_expand, _snub, semiExpand].map((op) => op.right)),
 
   hitOption: "facet",
   getHitOption({ specs, geom }, hitPoint) {
@@ -91,5 +91,5 @@ export const contract = new Operation<FacetOpts, Classical>("contract", {
 
 export const twist = new Operation<TwistOpts, Classical>(
   "twist",
-  selfDualOpArgs(_twist),
+  combineOps([_twist.left, _twist.right]),
 )

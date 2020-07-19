@@ -1,9 +1,10 @@
 import { meanBy } from "lodash-es"
 import { Polyhedron, Face, Edge } from "math/polyhedra"
 import Classical, { Facet } from "data/specs/Classical"
-import OperationPair, { Pose } from "./OperationPair"
+import { Pose } from "./OperationPair"
 import { getTransformedVertices } from "../operations/operationUtils"
 import { FacetOpts } from "./opPairUtils"
+import { makeOpPair } from "../operations/adapters"
 
 // Every unelongated capstone (except fastigium) can be elongated
 
@@ -94,7 +95,7 @@ function truncatedToRectified(geom: Polyhedron) {
   return getTransformedVertices(edges, (e) => e.midpoint())
 }
 
-export const amboTruncate = new OperationPair<Classical>({
+export const amboTruncate = makeOpPair({
   graph: Classical.query
     .where((s) => s.isRectified())
     .map((entry) => ({
@@ -129,7 +130,7 @@ export const amboTruncate = new OperationPair<Classical>({
   toRight: ({ geom }) => geom.vertices,
 })
 
-export const truncate = new OperationPair<Classical>({
+export const truncate = makeOpPair({
   graph: Classical.query
     .where((s) => s.isRegular())
     .map((entry) => {
@@ -145,7 +146,7 @@ export const truncate = new OperationPair<Classical>({
   toRight: ({ geom }) => geom.vertices,
 })
 
-export const cotruncate = new OperationPair<Classical, {}, FacetOpts>({
+export const cotruncate = makeOpPair<Classical, {}, FacetOpts>({
   graph: Classical.query
     .where((s) => s.isTruncated())
     .map((entry) => {
@@ -163,7 +164,7 @@ export const cotruncate = new OperationPair<Classical, {}, FacetOpts>({
 })
 
 // TODO support double rectification
-export const rectify = new OperationPair<Classical, {}, FacetOpts>({
+export const rectify = makeOpPair<Classical, {}, FacetOpts>({
   graph: Classical.query
     .where((s) => s.isRegular())
     .map((entry) => ({
