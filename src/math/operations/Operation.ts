@@ -7,7 +7,7 @@ import { Polyhedron, Face, VertexArg, normalizeVertex } from "math/polyhedra"
 import { deduplicateVertices } from "./operationUtils"
 import { Point } from "types"
 import PolyhedronSpecs from "data/specs/PolyhedronSpecs"
-import { getChirality as getCapstoneChirality } from "../operations-new/prismUtils"
+import { getChirality as getCapstoneChirality } from "./prismUtils"
 
 type SelectState = "selected" | "selectable" | undefined
 

@@ -2,6 +2,16 @@ import { takeRight, dropRight, invert, isEmpty, uniq } from "lodash-es"
 import { Polyhedron, Vertex, VertexList, VertexArg } from "math/polyhedra"
 import { Vec3D, Transform, PRECISION } from "math/geom"
 import { mapObject } from "utils"
+import { Facet } from "data/specs/Classical"
+import { Twist } from "types"
+
+export interface FacetOpts {
+  facet?: Facet
+}
+
+export interface TwistOpts {
+  twist?: Twist
+}
 /**
  * Remove vertices in the polyhedron that aren't connected to any faces,
  * and remap the faces to the smaller indices

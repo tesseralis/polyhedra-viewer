@@ -1,8 +1,4 @@
-import OperationPair, {
-  OpPairInput,
-  Side,
-  Opts,
-} from "../operations-new/OperationPair"
+import OperationPair, { OpPairInput, Side, Opts } from "./OperationPair"
 import PolyhedronSpecs from "data/specs/PolyhedronSpecs"
 import { OpArgs } from "./Operation"
 
