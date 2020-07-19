@@ -295,10 +295,10 @@ export const semiExpand = new OperationPair<Classical, {}, FacetOpts>({
     .map((entry) => ({
       left: entry,
       right: entry.withData({ operation: "bevel" }),
-      rightOpts: { facet: entry.data.facet },
+      options: { left: {}, right: { facet: entry.data.facet } },
     })),
   getIntermediate: (entry) => entry.right,
-  getPose(pos, { specs, geom }, { facet }) {
+  getPose(pos, { specs, geom }, { right: { facet } }) {
     if (pos === "left") {
       const face = geom.faces.find((f) => f.numSides > 5)!
       const edge = face.edges.find(
@@ -312,7 +312,7 @@ export const semiExpand = new OperationPair<Classical, {}, FacetOpts>({
       return getPose(geom, face, apothemVec(edge))
     }
   },
-  toLeft({ specs, geom }, { facet = "face" }) {
+  toLeft({ specs, geom }, { right: { facet = "face" } }) {
     return getResizedVertices(
       getBevelledFaces(specs, geom, facet),
       bevelledDists[specs.data.family][facet],
@@ -328,18 +328,18 @@ export const expand = new OperationPair<Classical, {}, FacetOpts>({
       return {
         left: entry,
         right: entry.withData({ operation: "cantellate" }),
-        rightOpts: { facet: entry.data.facet },
+        options: { left: {}, right: { facet: entry.data.facet } },
       }
     }),
 
   getIntermediate: (entry) => entry.right,
 
-  getPose(pos, { geom, specs }, { facet }) {
+  getPose(pos, { geom, specs }, { right: { facet } }) {
     return pos === "left"
       ? getRegularPose(geom)
       : getCantellatedPose(geom, specs, facet)
   },
-  toLeft({ specs, geom }, { facet }, result) {
+  toLeft({ specs, geom }, { right: { facet } }, result) {
     // Take all the stuff and push it inwards
     return getResizedVertices(
       getCantellatedFaces(specs, geom, facet),
@@ -365,19 +365,18 @@ export const snub = new OperationPair<Classical, TwistOpts, FacetOpts>({
           // is *opposite* of the twist option
           twist: entry.isVertex() ? getOpp(twist) : twist,
         }),
-        leftOpts: { twist },
-        rightOpts: { facet: entry.data.facet },
+        options: { left: { twist }, right: { facet: entry.data.facet } },
       }))
     }),
 
   getIntermediate: (entry) => entry.right,
 
-  getPose(pos, { geom, specs }, { facet = "vertex" }) {
+  getPose(pos, { geom, specs }, { right: { facet = "vertex" } }) {
     return pos === "left"
       ? getRegularPose(geom)
       : getSnubPose(geom, specs, facet)
   },
-  toLeft({ specs, geom }, { facet = "vertex" }, result) {
+  toLeft({ specs, geom }, { right: { facet = "vertex" } }, result) {
     // Take all the stuff and push it inwards
     return getResizedVertices(
       getSnubFaces(specs, geom, result.data.facet),
@@ -395,7 +394,7 @@ export const twist = new OperationPair<Classical, TwistOpts, {}>({
       return twistOpts(entry).map((twist) => ({
         left: entry,
         right: entry.withData({ operation: "snub", twist }),
-        leftOpts: { twist },
+        options: { left: { twist }, right: {} },
       }))
     }),
 

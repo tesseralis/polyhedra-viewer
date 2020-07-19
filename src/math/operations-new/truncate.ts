@@ -152,11 +152,11 @@ export const cotruncate = new OperationPair<Classical, {}, FacetOpts>({
       return {
         left: entry,
         right: entry.withData({ operation: "rectify" }),
-        rightOpts: { facet: entry.data.facet },
+        options: { left: {}, right: { facet: entry.data.facet } },
       }
     }),
   getIntermediate: (entry) => entry.left,
-  getPose: (side, { specs, geom }, { facet }) =>
+  getPose: (side, { specs, geom }, { right: { facet } }) =>
     side === "right" ? rectifiedPose(specs, geom, facet) : truncatedPose(geom),
   toLeft: ({ geom }) => geom.vertices,
   toRight: ({ geom }) => truncatedToRectified(geom),
@@ -169,10 +169,10 @@ export const rectify = new OperationPair<Classical, {}, FacetOpts>({
     .map((entry) => ({
       left: entry,
       right: entry.withData({ operation: "rectify" }),
-      rightOpts: { facet: entry.data.facet },
+      options: { left: {}, right: { facet: entry.data.facet } },
     })),
   getIntermediate: ({ left }) => left.withData({ operation: "truncate" }),
-  getPose(side, { geom, specs }, { facet }) {
+  getPose(side, { geom, specs }, { right: { facet } }) {
     switch (side) {
       case "left":
         return regularPose(geom)

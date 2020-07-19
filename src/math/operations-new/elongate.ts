@@ -282,14 +282,12 @@ export const gyroelongBicupola = new OperationPair<Capstone, TwistOpts>({
         {
           left: entry,
           right: entry.withData({ elongation: "antiprism", twist: twist1 }),
-          leftOpts: { twist: "left" },
-          rightOpts: { twist: "right" },
+          options: { left: { twist: "left" }, right: { twist: "right" } },
         },
         {
           left: entry,
           right: entry.withData({ elongation: "antiprism", twist: twist2 }),
-          leftOpts: { twist: "right" },
-          rightOpts: { twist: "left" },
+          options: { left: { twist: "right" }, right: { twist: "left" } },
         },
       ]
     }),
@@ -333,7 +331,7 @@ export const gyroelongBicupola = new OperationPair<Capstone, TwistOpts>({
       }
     }
   },
-  toLeft({ geom }, { twist }) {
+  toLeft({ geom }, { left: { twist } }) {
     // FIXME SHIT FUCK THIS IS THE WRONG DIRECTION
     // return geom.vertices
     // Shorten the solid

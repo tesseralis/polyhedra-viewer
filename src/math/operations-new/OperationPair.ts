@@ -9,12 +9,16 @@ function oppositeSide(side: Side) {
   return side === "left" ? "right" : "left"
 }
 
+interface GraphOpts<L, R> {
+  left: L
+  right: R
+}
+
+// FIXME ugh this is still ugly
 interface GraphEntry<Specs, L, R> {
   left: Specs
   right: Specs
-  // options?: Opts
-  leftOpts?: L
-  rightOpts?: R
+  options?: GraphOpts<L, R>
 }
 
 // list of polyhedron pairs and their arguments
@@ -31,33 +35,27 @@ interface SolidArgs<Specs extends PolyhedronSpecs> {
   geom: Polyhedron
 }
 
-interface OpPairInput<
-  Specs extends PolyhedronSpecs,
-  LeftOpts = {},
-  RightOpts = LeftOpts
-> {
+interface OpPairInput<Specs extends PolyhedronSpecs, L = {}, R = L> {
   // The graph of what polyhedron spec inputs are allowed and what maps to each other
-  graph: OpPairGraph<Specs, LeftOpts, RightOpts>
+  graph: OpPairGraph<Specs, L, R>
   // Get the intermediate polyhedron for the given graph entry
-  getIntermediate(
-    entry: GraphEntry<Specs, LeftOpts, RightOpts>,
-  ): Specs | SolidArgs<Specs>
+  getIntermediate(entry: GraphEntry<Specs, L, R>): Specs | SolidArgs<Specs>
   // Get the post of a left, right, or middle state
   getPose(
     pos: Side | "middle",
     solid: SolidArgs<Specs>,
-    opts: LeftOpts & RightOpts,
+    opts: GraphOpts<L, R>,
   ): Pose
   // Move the intermediate figure to the left position
   toLeft(
     solid: SolidArgs<Specs>,
-    opts: LeftOpts & RightOpts,
+    opts: GraphOpts<L, R>,
     result: Specs,
   ): VertexArg[]
   // Move the intermediate figure to the right position
   toRight(
     solid: SolidArgs<Specs>,
-    opts: LeftOpts & RightOpts,
+    opts: GraphOpts<L, R>,
     result: Specs,
   ): VertexArg[]
 }
@@ -104,13 +102,6 @@ export function getGeom(specs: PolyhedronSpecs) {
   return geom
 }
 
-function getEntryOpts<S extends Side, Specs, L, R>(
-  side: S,
-  entry: GraphEntry<Specs, L, R>,
-): Opts<S, L, R> {
-  return (side === "left" ? entry.leftOpts : entry.rightOpts) ?? ({} as any)
-}
-
 export type Opts<S extends Side, LeftOpts, RightOpts> = S extends "left"
   ? LeftOpts
   : RightOpts
@@ -137,7 +128,7 @@ export default class OperationPair<
     return this.inputs.graph.find(
       (entry) =>
         specsEquals(entry[side], specs) &&
-        isMatch(getEntryOpts(side, entry) || {}, opts || {}),
+        isMatch(entry.options?.[side] ?? {}, opts ?? {}),
     )
   }
 
@@ -162,7 +153,7 @@ export default class OperationPair<
 
   *allOptions<S extends Side>(side: S, specs: Specs): Generator<Opts<S, L, R>> {
     for (const entry of this.getEntries(side, specs)) {
-      yield (getEntryOpts(side, entry) ?? {}) as Opts<S, L, R>
+      yield (entry.options?.[side] ?? {}) as Opts<S, L, R>
     }
   }
 
@@ -178,10 +169,8 @@ export default class OperationPair<
     const { getIntermediate, getPose, toLeft, toRight } = this.inputs
     const entry = this.getEntry(side, solid.specs, opts)
     const middle = normalizeIntermediate(getIntermediate(entry))
-    const options = {
-      ...(entry.leftOpts || {}),
-      ...(entry.rightOpts || {}),
-    } as L & R
+    const options =
+      entry.options ?? ({ left: {}, right: {} } as GraphOpts<L, R>)
 
     const startPose = getPose(side, solid, options)
 
