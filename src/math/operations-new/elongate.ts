@@ -1,14 +1,62 @@
 import { sortBy } from "lodash-es"
 import { Twist } from "types"
-import { Cap } from "math/polyhedra"
+import { Cap, FaceLike, Edge } from "math/polyhedra"
+import { PrismaticType } from "data/specs/common"
 import Capstone from "data/specs/Capstone"
-import OperationPair from "./OperationPair"
+// import Prismatic from "data/specs/Prismatic"
+import OperationPair, { Pose } from "./OperationPair"
 import {
   getAdjustInformation,
   getScaledPrismVertices,
   antiprismHeight,
 } from "../operations/prismOps/prismUtils"
 import { TwistOpts } from "./opPairUtils"
+
+function getPrismaticHeight(n: number, elongation: PrismaticType | null) {
+  switch (elongation) {
+    case "prism":
+      return 1
+    case "antiprism":
+      return antiprismHeight(n)
+    default:
+      return 0
+  }
+}
+
+function getTwistMult(twist?: Twist) {
+  switch (twist) {
+    case "left":
+      return 1
+    case "right":
+      return -1
+    default:
+      return 0
+  }
+}
+
+function getPose(
+  face: FaceLike,
+  edge: Edge,
+  elongation: PrismaticType | null,
+  twist?: Twist,
+): Pose {
+  const faceCenter = face.centroid()
+  const length = face.sideLength()
+  const n = face.numSides
+  const origin = faceCenter.sub(
+    face.normal().scale((length * getPrismaticHeight(n, elongation)) / 2),
+  )
+  const angle = (elongation ? 1 : 0) * getTwistMult(twist) * (Math.PI / n / 2)
+
+  return {
+    origin,
+    scale: length,
+    orientation: [
+      face.normal(),
+      edge.v1.vec.sub(faceCenter).getRotatedAroundAxis(face.normal(), angle),
+    ],
+  }
+}
 
 const capTypeMap: Record<string, number> = { rotunda: 0, cupola: 1, pyramid: 2 }
 
@@ -23,29 +71,14 @@ export const elongate = new OperationPair<Capstone>({
       }
     }),
   getIntermediate: (entry) => entry.right,
-  getPose(side, { geom }) {
+  getPose(side, { specs, geom }) {
     // Pick a cap, favoring rotunda over cupola in the case of cupolarotundae
+    // FIXME this is annoying lol
     const cap = sortBy(Cap.getAll(geom), (cap) => capTypeMap[cap.type])[0]
-    const capBoundary = cap.boundary()
-    const capCenter = capBoundary.centroid()
-    // If elongated, get subtract half the side length to make it the center of the prism
-    const origin =
-      side === "left"
-        ? capCenter
-        : capCenter.sub(capBoundary.normal().scale(geom.edges[0].length() / 2))
+    const face = cap.boundary()
+    const edge = face.edges.find((e) => e.face.numSides === 3)!
 
-    // For the cross-axis, pick an edge connected to a triangle for consistency
-    // FIXME need to adjust a bit by the angle...
-    const edge = capBoundary.edges.find((e) => e.face.numSides === 3)!
-    return {
-      origin,
-      scale: capBoundary.sideLength(),
-      orientation: [
-        // For orientation, use the normal and one of the vertices on the boundary
-        capBoundary.normal(),
-        edge.v1.vec.sub(capCenter),
-      ] as const,
-    }
+    return getPose(face, edge, specs.data.elongation)
   },
   toLeft({ geom }) {
     // Shorten the solid
@@ -81,39 +114,8 @@ export const gyroelongPyramid = new OperationPair<Capstone>({
     // Pick a cap, favoring rotunda over cupola in the case of cupolarotundae
     // const cap = sortBy(Cap.getAll(geom), (cap) => capTypeMap[cap.type])[0]
     const face = geom.largestFace()
-    const capCenter = face.centroid()
-    const n = face.numSides
-    const angle = Math.PI / n / 2
-    // If gyroelongated, get subtract half the antiprism side length to make it the center
-    const antiHeight = antiprismHeight(n)
     const edge = face.edges.find((e) => e.twinFace().numSides === 3)!
-    if (side === "left") {
-      const origin = capCenter
-      return {
-        origin,
-        scale: geom.edgeLength(),
-        orientation: [
-          // For orientation, use the normal and one of the vertices on the boundary
-          face.normal(),
-          edge.v1.vec.sub(capCenter),
-        ] as const,
-      }
-    } else {
-      const origin = capCenter.sub(
-        face.normal().scale((antiHeight * geom.edges[0].length()) / 2),
-      )
-      // For the cross-axis, pick an edge connected to a triangle for consistency
-      const crossAxis = edge.v1.vec.sub(capCenter)
-      return {
-        origin,
-        scale: geom.edgeLength(),
-        orientation: [
-          // For orientation, use the normal and one of the vertices on the boundary
-          face.normal(),
-          crossAxis.getRotatedAroundAxis(face.normal(), angle),
-        ] as const,
-      }
-    }
+    return getPose(face, edge, specs.data.elongation, "left")
   },
   toLeft({ geom }) {
     // Shorten the solid
@@ -145,44 +147,11 @@ export const gyroelongCupola = new OperationPair<Capstone>({
       right: entry.withData({ elongation: "antiprism" }),
     })),
   getIntermediate: (entry) => entry.right,
-  getPose(side, { geom }) {
+  getPose(side, { geom, specs }) {
     // Pick a cap, favoring rotunda over cupola in the case of cupolarotundae
-    const cap = Cap.getAll(geom)[0]
-    const capBoundary = cap.boundary()
-    const capCenter = capBoundary.centroid()
-    // If gyroelongated, get subtract half the antiprism side length to make it the center
-    const antiHeight = antiprismHeight(capBoundary.numSides)
-    const n = capBoundary.numSides
-    const angle = Math.PI / n / 2
-    // For the cross-axis, pick an edge connected to a triangle for consistency
+    const capBoundary = Cap.getAll(geom)[0].boundary()
     const edge = capBoundary.edges.find((e) => e.face.numSides === 3)!
-    if (side === "left") {
-      const origin = capCenter
-      return {
-        origin,
-        scale: geom.edgeLength(),
-        orientation: [
-          // For orientation, use the normal and one of the vertices on the boundary
-          capBoundary.normal(),
-          edge.v1.vec.sub(capCenter),
-        ] as const,
-      }
-    } else {
-      const origin = capCenter.sub(
-        capBoundary.normal().scale((antiHeight * geom.edges[0].length()) / 2),
-      )
-      // For the cross-axis, pick an edge connected to a triangle for consistency
-      const crossAxis = edge.v1.vec.sub(capCenter)
-      return {
-        origin,
-        scale: geom.edgeLength(),
-        orientation: [
-          // For orientation, use the normal and one of the vertices on the boundary
-          capBoundary.normal(),
-          crossAxis.getRotatedAroundAxis(capBoundary.normal(), angle),
-        ] as const,
-      }
-    }
+    return getPose(capBoundary, edge, specs.data.elongation, "left")
   },
   toLeft({ geom }) {
     // return geom.vertices
@@ -212,44 +181,11 @@ export const gyroelongBipyramid = new OperationPair<Capstone>({
       right: entry.withData({ elongation: "antiprism" }),
     })),
   getIntermediate: (entry) => entry.right,
-  getPose(side, { geom }) {
+  getPose(side, { specs, geom }) {
     // Pick a cap, favoring rotunda over cupola in the case of cupolarotundae
-    const cap = Cap.getAll(geom)[0]
-    const capBoundary = cap.boundary()
-    const capCenter = capBoundary.centroid()
-    // If gyroelongated, get subtract half the antiprism side length to make it the center
-    const antiHeight = antiprismHeight(capBoundary.numSides)
-    const n = capBoundary.numSides
-    const angle = Math.PI / n / 2
-    // For the cross-axis, pick an edge connected to a triangle for consistency
-    const edge = capBoundary.edges.find((e) => e.face.numSides === 3)!
-    if (side === "left") {
-      const origin = capCenter
-      return {
-        origin,
-        scale: geom.edgeLength(),
-        orientation: [
-          // For orientation, use the normal and one of the vertices on the boundary
-          capBoundary.normal(),
-          edge.v1.vec.sub(capCenter),
-        ] as const,
-      }
-    } else {
-      const origin = capCenter.sub(
-        capBoundary.normal().scale((antiHeight * geom.edges[0].length()) / 2),
-      )
-      // For the cross-axis, pick an edge connected to a triangle for consistency
-      const crossAxis = edge.v1.vec.sub(capCenter)
-      return {
-        origin,
-        scale: geom.edgeLength(),
-        orientation: [
-          // For orientation, use the normal and one of the vertices on the boundary
-          capBoundary.normal(),
-          crossAxis.getRotatedAroundAxis(capBoundary.normal(), angle),
-        ] as const,
-      }
-    }
+    const face = Cap.getAll(geom)[0].boundary()
+    const edge = face.edges.find((e) => e.face.numSides === 3)!
+    return getPose(face, edge, specs.data.elongation, "left")
   },
   toLeft({ geom }) {
     // return geom.vertices
@@ -298,41 +234,9 @@ export const gyroelongBicupola = new OperationPair<Capstone, TwistOpts>({
     const cap = specs.isCupolaRotunda()
       ? caps.find((cap) => cap.type === "rotunda")!
       : caps[0]
-    const capBoundary = cap.boundary()
-    const capCenter = capBoundary.centroid()
-    // If gyroelongated, get subtract half the antiprism side length to make it the center
-    const antiHeight = antiprismHeight(capBoundary.numSides)
-    const n = capBoundary.numSides
-    const angle = (Math.PI / n / 2) * (twist === "left" ? 1 : -1)
-    // For the cross-axis, pick an edge connected to a triangle for consistency
-    const edge = capBoundary.edges.find((e) => e.face.numSides === 3)!
-    if (side === "left") {
-      const origin = capCenter
-      return {
-        origin,
-        scale: geom.edgeLength(),
-        orientation: [
-          // For orientation, use the normal and one of the vertices on the boundary
-          capBoundary.normal(),
-          edge.v1.vec.sub(capCenter),
-        ] as const,
-      }
-    } else {
-      const origin = capCenter.sub(
-        capBoundary.normal().scale((antiHeight * geom.edges[0].length()) / 2),
-      )
-      // For the cross-axis, pick an edge connected to a triangle for consistency
-      const crossAxis = edge.v1.vec.sub(capCenter)
-      return {
-        origin,
-        scale: geom.edgeLength(),
-        orientation: [
-          // For orientation, use the normal and one of the vertices on the boundary
-          capBoundary.normal(),
-          crossAxis.getRotatedAroundAxis(capBoundary.normal(), angle),
-        ] as const,
-      }
-    }
+    const face = cap.boundary()
+    const edge = face.edges.find((e) => e.face.numSides === 3)!
+    return getPose(face, edge, specs.data.elongation, twist)
   },
   toLeft({ geom }, { right: { twist } }) {
     // Shorten the solid
