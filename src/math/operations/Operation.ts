@@ -20,19 +20,18 @@ export interface AnimationData {
 
 export interface OpResult {
   result: Polyhedron
-  animationData?: AnimationData
+  animationData: AnimationData
 }
 
 interface PartialOpResult {
   result?: Polyhedron
-  animationData?: {
+  animationData: {
     start: Polyhedron
     endVertices: VertexArg[]
   }
 }
 
-type OpResultArg = PartialOpResult | Polyhedron
-
+// FIXME deduplicate with OperationPair
 interface SolidArgs<Specs extends PolyhedronSpecs> {
   specs: Specs
   geom: Polyhedron
@@ -49,7 +48,7 @@ export interface OpArgs<Options extends {}, Specs extends PolyhedronSpecs> {
     solid: SolidArgs<Specs>,
     options: Options,
     result: Polyhedron,
-  ): OpResultArg
+  ): PartialOpResult
 
   allOptions?(
     solid: SolidArgs<Specs>,
@@ -133,12 +132,12 @@ function arrayDefaults<T>(first: T[], second: T[]) {
   return first.map((item, i) => item ?? second[i])
 }
 
-function normalizeOpResult(opResult: OpResultArg, newName: string): OpResult {
-  if (opResult instanceof Polyhedron) {
-    return { result: deduplicateVertices(opResult).withName(newName) }
-  }
+function normalizeOpResult(
+  opResult: PartialOpResult,
+  newName: string,
+): OpResult {
   const { result, animationData } = opResult
-  const { start, endVertices } = animationData!
+  const { start, endVertices } = animationData
 
   const end = start.withVertices(endVertices)
   const normedResult = result ?? deduplicateVertices(end)
