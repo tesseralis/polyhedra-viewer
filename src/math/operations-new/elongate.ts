@@ -292,15 +292,18 @@ export const gyroelongBicupola = new OperationPair<Capstone, TwistOpts>({
       ]
     }),
   getIntermediate: (entry) => entry.right,
-  getPose(side, { geom }) {
+  getPose(side, { specs, geom }, { right: { twist } }) {
     // Pick a cap, favoring rotunda over cupola in the case of cupolarotundae
-    const cap = Cap.getAll(geom)[0]
+    const caps = Cap.getAll(geom)
+    const cap = specs.isCupolaRotunda()
+      ? caps.find((cap) => cap.type === "rotunda")!
+      : caps[0]
     const capBoundary = cap.boundary()
     const capCenter = capBoundary.centroid()
     // If gyroelongated, get subtract half the antiprism side length to make it the center
     const antiHeight = antiprismHeight(capBoundary.numSides)
     const n = capBoundary.numSides
-    const angle = Math.PI / n / 2
+    const angle = (Math.PI / n / 2) * (twist === "left" ? 1 : -1)
     // For the cross-axis, pick an edge connected to a triangle for consistency
     const edge = capBoundary.edges.find((e) => e.face.numSides === 3)!
     if (side === "left") {
@@ -331,11 +334,8 @@ export const gyroelongBicupola = new OperationPair<Capstone, TwistOpts>({
       }
     }
   },
-  toLeft({ geom }, { left: { twist } }) {
-    // FIXME SHIT FUCK THIS IS THE WRONG DIRECTION
-    // return geom.vertices
+  toLeft({ geom }, { right: { twist } }) {
     // Shorten the solid
-    // FIXME get the cap that we are aligned with and its opposite cap
     // push the caps inwards
     const adjustInfo = getAdjustInformation(geom)
     const n = adjustInfo.boundary.numSides

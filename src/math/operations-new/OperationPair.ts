@@ -98,7 +98,14 @@ export function getGeom(specs: PolyhedronSpecs) {
   if (specs.isClassical() && specs.isSnub() && specs.data.twist === "left") {
     return geom.reflect()
   }
-  // FIXME do this for gyroelongated bicupolae too
+
+  if (specs.isCapstone() && specs.isChiral()) {
+    if (specs.isCupolaRotunda() && specs.data.twist === "left") {
+      return geom.reflect()
+    } else if (!specs.isCupolaRotunda() && specs.data.twist === "right") {
+      return geom.reflect()
+    }
+  }
   return geom
 }
 
