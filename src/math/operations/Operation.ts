@@ -44,11 +44,7 @@ export interface OpArgs<Options extends {}, Specs extends PolyhedronSpecs> {
 
   isPreferredSpec?(info: Specs, options: Options): boolean
 
-  apply(
-    solid: SolidArgs<Specs>,
-    options: Options,
-    result: Polyhedron,
-  ): PartialOpResult
+  apply(solid: SolidArgs<Specs>, options: Options): PartialOpResult
 
   allOptions?(
     solid: SolidArgs<Specs>,
@@ -210,30 +206,22 @@ export default class Operation<
     const specs = this.getValidSpecs(geom).find((info) =>
       this.opArgs.isPreferredSpec(info, options),
     )
-    if (!specs)
+    if (!specs) {
       throw new Error(`Could not find specs for polyhedron ${geom.name}`)
+    }
+    const solid = { specs, geom }
 
     // get the next polyhedron name
-    const next = this.opArgs.getResult!(
-      { specs, geom },
-      options ?? {},
-    ).canonicalName()
+    const next = this.opArgs.getResult!(solid, options ?? {}).canonicalName()
 
     // Get the actual operation result
-    const opResult = this.opArgs.apply(
-      { specs, geom },
-      options ?? {},
-      Polyhedron.get(next),
-    )
+    const opResult = this.opArgs.apply(solid, options ?? {})
     return normalizeOpResult(opResult, next)
   }
 
   getHitOption(geom: Polyhedron, hitPnt: Point, options: Options) {
-    return this.opArgs.getHitOption(
-      this.getSolidArgs(geom),
-      vec(hitPnt),
-      options,
-    )
+    const { getHitOption } = this.opArgs
+    return getHitOption(this.getSolidArgs(geom), vec(hitPnt), options)
   }
 
   canApplyTo(polyhedron: Polyhedron) {
