@@ -5,7 +5,7 @@ import { PrismaticType } from "data/specs/common"
 import PolyhedronSpecs from "data/specs/PolyhedronSpecs"
 import Capstone from "data/specs/Capstone"
 import Prismatic from "data/specs/Prismatic"
-import OperationPair, { SolidArgs, Pose } from "./OperationPair"
+import OperationPair, { Solid, Pose } from "./OperationPair"
 import { getTransformedVertices } from "../operations/operationUtils"
 import { withOrigin } from "math/geom"
 import { getAdjustInformation } from "./prismUtils"
@@ -115,7 +115,7 @@ interface PrismOpArgs {
   // The list of *right* args
   query(data: Capstone): boolean
   rightElongation?: "prism" | "antiprism"
-  getOrientation(solid: SolidArgs<Capstone>): [FaceLike, Edge]
+  getOrientation(solid: Solid<Capstone>): [FaceLike, Edge]
 }
 
 function makePrismOp({

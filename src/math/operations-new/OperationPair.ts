@@ -9,7 +9,7 @@ function oppositeSide(side: Side) {
   return side === "left" ? "right" : "left"
 }
 
-interface GraphOpts<L, R> {
+interface GOpts<L, R> {
   left: L
   right: R
 }
@@ -18,7 +18,7 @@ interface GraphOpts<L, R> {
 interface GraphEntry<Specs, L, R> {
   left: Specs
   right: Specs
-  options?: GraphOpts<L, R>
+  options?: GOpts<L, R>
 }
 
 // list of polyhedron pairs and their arguments
@@ -30,7 +30,7 @@ export interface Pose {
   orientation: readonly [Vec3D, Vec3D]
 }
 
-export interface SolidArgs<Specs extends PolyhedronSpecs> {
+export interface Solid<Specs extends PolyhedronSpecs> {
   specs: Specs
   geom: Polyhedron
 }
@@ -39,29 +39,17 @@ interface OpPairInput<Specs extends PolyhedronSpecs, L = {}, R = L> {
   // The graph of what polyhedron spec inputs are allowed and what maps to each other
   graph: OpPairGraph<Specs, L, R>
   // Get the intermediate polyhedron for the given graph entry
-  getIntermediate(entry: GraphEntry<Specs, L, R>): Specs | SolidArgs<Specs>
+  getIntermediate(entry: GraphEntry<Specs, L, R>): Specs | Solid<Specs>
   // Get the post of a left, right, or middle state
-  getPose(
-    pos: Side | "middle",
-    solid: SolidArgs<Specs>,
-    opts: GraphOpts<L, R>,
-  ): Pose
+  getPose(pos: Side | "middle", solid: Solid<Specs>, opts: GOpts<L, R>): Pose
   // Move the intermediate figure to the left position
-  toLeft(
-    solid: SolidArgs<Specs>,
-    opts: GraphOpts<L, R>,
-    result: Specs,
-  ): VertexArg[]
+  toLeft(solid: Solid<Specs>, opts: GOpts<L, R>, result: Specs): VertexArg[]
   // Move the intermediate figure to the right position
-  toRight(
-    solid: SolidArgs<Specs>,
-    opts: GraphOpts<L, R>,
-    result: Specs,
-  ): VertexArg[]
+  toRight(solid: Solid<Specs>, opts: GOpts<L, R>, result: Specs): VertexArg[]
 }
 
 function normalizeIntermediate<Specs extends PolyhedronSpecs>(
-  inter: Specs | SolidArgs<Specs>,
+  inter: Specs | Solid<Specs>,
 ) {
   if (inter instanceof PolyhedronSpecs) {
     return { specs: inter, geom: getGeom(inter) }
@@ -109,9 +97,7 @@ export function getGeom(specs: PolyhedronSpecs) {
   return geom
 }
 
-export type Opts<S extends Side, LeftOpts, RightOpts> = S extends "left"
-  ? LeftOpts
-  : RightOpts
+export type Opts<S extends Side, L, R> = S extends "left" ? L : R
 
 export default class OperationPair<
   Specs extends PolyhedronSpecs,
@@ -127,11 +113,7 @@ export default class OperationPair<
     return this.inputs.graph.filter((entry) => specsEquals(entry[side], specs))
   }
 
-  private findEntry<S extends Side>(
-    side: S,
-    specs: Specs,
-    opts?: Opts<S, L, R>,
-  ) {
+  findEntry<S extends Side>(side: S, specs: Specs, opts?: Opts<S, L, R>) {
     return this.inputs.graph.find(
       (entry) =>
         specsEquals(entry[side], specs) &&
@@ -139,11 +121,7 @@ export default class OperationPair<
     )
   }
 
-  private getEntry<S extends Side>(
-    side: S,
-    specs: Specs,
-    opts?: Opts<S, L, R>,
-  ) {
+  getEntry<S extends Side>(side: S, specs: Specs, opts?: Opts<S, L, R>) {
     const entry = this.findEntry(side, specs, opts)
     if (!entry)
       throw new Error(
@@ -172,12 +150,11 @@ export default class OperationPair<
     return this.getEntry(side, specs, options)[oppositeSide(side)]
   }
 
-  apply<S extends Side>(side: S, solid: SolidArgs<Specs>, opts: Opts<S, L, R>) {
+  apply<S extends Side>(side: S, solid: Solid<Specs>, opts: Opts<S, L, R>) {
     const { getIntermediate, getPose, toLeft, toRight } = this.inputs
     const entry = this.getEntry(side, solid.specs, opts)
     const middle = normalizeIntermediate(getIntermediate(entry))
-    const options =
-      entry.options ?? ({ left: {}, right: {} } as GraphOpts<L, R>)
+    const options = entry.options ?? ({ left: {}, right: {} } as GOpts<L, R>)
 
     const startPose = getPose(side, solid, options)
 
