@@ -30,7 +30,7 @@ export interface Pose {
   orientation: readonly [Vec3D, Vec3D]
 }
 
-interface SolidArgs<Specs extends PolyhedronSpecs> {
+export interface SolidArgs<Specs extends PolyhedronSpecs> {
   specs: Specs
   geom: Polyhedron
 }
