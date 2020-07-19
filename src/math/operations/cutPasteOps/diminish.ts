@@ -71,7 +71,7 @@ export const diminish = new Operation<Options, CutPasteSpecs>("diminish", {
     return removeCap(geom, cap)
   },
 
-  canApplyTo(info): info is CutPasteSpecs {
+  canApplyTo(info) {
     if (info.isCapstone()) {
       return !(info.isMono() && info.isShortened())
     }

@@ -351,7 +351,7 @@ export const augment = new Operation<Options, AugmentSpecs>("augment", {
     return doAugment(specs, geom, face, augmentType, gyrate)
   },
 
-  canApplyTo(info): info is AugmentSpecs {
+  canApplyTo(info) {
     if (info.isPrismatic()) {
       const { base } = info.data
       if (info.isAntiprism() && base === 3) return false

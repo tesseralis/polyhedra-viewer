@@ -37,7 +37,7 @@ function _toOpArgs<Specs extends PolyhedronSpecs, L, R, S extends Side>(
       const { op, side } = combo.get(solid.specs)
       return op.apply(side, solid, opts)
     },
-    canApplyTo(specs): specs is Specs {
+    canApplyTo(specs) {
       return combo.has(specs)
     },
     getResult(solid, opts) {

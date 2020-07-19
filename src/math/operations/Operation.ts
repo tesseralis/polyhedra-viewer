@@ -38,7 +38,7 @@ interface SolidArgs<Specs extends PolyhedronSpecs> {
 }
 
 export interface OpArgs<Options extends {}, Specs extends PolyhedronSpecs> {
-  canApplyTo(info: PolyhedronSpecs): info is Specs
+  canApplyTo(info: PolyhedronSpecs): boolean
 
   hasOptions?(info: Specs): boolean
 
@@ -187,7 +187,7 @@ export default class Operation<
             twist: getCapstoneChirality(polyhedron),
           }) as any
         } else {
-          yield specs
+          yield specs as any
         }
       }
     }

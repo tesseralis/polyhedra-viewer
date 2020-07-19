@@ -68,7 +68,7 @@ export const gyrate = new Operation<{ cap: Cap }, Capstone | Composite>(
       return applyGyrate(geom, options)
     },
 
-    canApplyTo(info): info is Capstone | Composite {
+    canApplyTo(info) {
       if (info.isCapstone()) {
         return info.isBi() && !info.isPyramid() && info.data.base > 2
       }
