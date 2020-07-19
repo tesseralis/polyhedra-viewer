@@ -109,14 +109,15 @@ interface PrismOpArgs {
   // The list of *right* args
   query(data: Capstone["data"]): boolean
   rightElongation?: "prism" | "antiprism"
-  getPose(solid: SolidArgs<Capstone>): Pose
+  getOrientation(solid: SolidArgs<Capstone>): [FaceLike, Edge]
 }
 
 function makePrismOp({
   query,
   rightElongation = "antiprism",
-  getPose,
+  getOrientation,
 }: PrismOpArgs) {
+  const twist = rightElongation === "prism" ? undefined : "left"
   return (leftElongation: "prism" | null) => {
     return new OperationPair({
       graph: Capstone.query
@@ -126,10 +127,12 @@ function makePrismOp({
           right: item,
         })),
       getIntermediate: (entry) => entry.right,
-      getPose: (side, solid) => getPose(solid),
+      getPose(side, solid) {
+        const [face, edge] = getOrientation(solid)
+        return getPose(face, edge, solid.specs.data.elongation, twist)
+      },
       toLeft({ geom, specs }) {
         const fn = leftElongation === "prism" ? doTurn : doShorten
-        const twist = rightElongation === "prism" ? undefined : "left"
         return fn(specs, geom, twist)
       },
       toRight: (solid) => solid.geom.vertices,
@@ -157,20 +160,21 @@ export const turnPrismatic = new OperationPair<Prismatic>({
 export const elongate = makePrismOp({
   query: (data) => data.base > 2,
   rightElongation: "prism",
-  getPose({ specs, geom }) {
-    const cap = sortBy(Cap.getAll(geom), (cap) => capTypeMap[cap.type])[0]
-    const face = cap.boundary()
+  getOrientation({ geom }) {
+    const face = sortBy(
+      Cap.getAll(geom),
+      (cap) => capTypeMap[cap.type],
+    )[0].boundary()
     const edge = face.edges.find((e) => e.face.numSides === 3)!
-
-    return getPose(face, edge, specs.data.elongation)
+    return [face, edge]
   },
 })(null)
 
 const pyramidOps = makePrismOp({
   query: (data) => data.type === "pyramid" && data.count === 1 && data.base > 3,
-  getPose({ geom, specs }) {
+  getOrientation({ geom }) {
     const face = geom.largestFace()
-    return getPose(face, face.edges[0], specs.data.elongation, "left")
+    return [face, face.edges[0]]
   },
 })
 export const gyroelongPyramid = pyramidOps(null)
@@ -178,11 +182,11 @@ export const turnPyramid = pyramidOps("prism")
 
 const cupolaOps = makePrismOp({
   query: (data) => data.type !== "pyramid" && data.count === 1 && data.base > 2,
-  getPose({ geom, specs }) {
+  getOrientation({ geom }) {
     // Pick a cap, favoring rotunda over cupola in the case of cupolarotundae
     const face = Cap.getAll(geom)[0].boundary()
     const edge = face.edges.find((e) => e.face.numSides === 3)!
-    return getPose(face, edge, specs.data.elongation, "left")
+    return [face, edge]
   },
 })
 
@@ -191,11 +195,10 @@ export const turnCupola = cupolaOps("prism")
 
 const bipyramidOps = makePrismOp({
   query: (data) => data.type === "pyramid" && data.count === 2 && data.base > 3,
-  getPose({ geom, specs }) {
+  getOrientation({ geom }) {
     // Pick a cap, favoring rotunda over cupola in the case of cupolarotundae
     const face = Cap.getAll(geom)[0].boundary()
-    const edge = face.edges[0]
-    return getPose(face, edge, specs.data.elongation, "left")
+    return [face, face.edges[0]]
   },
 })
 
