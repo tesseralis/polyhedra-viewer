@@ -1,8 +1,6 @@
 import { maxBy, isEqual, uniqBy, countBy } from "lodash-es"
-import { Twist } from "types"
 import { Polyhedron, Cap, FaceLike } from "math/polyhedra"
-import { withOrigin, isInverse } from "math/geom"
-import { getTwistSign, getTransformedVertices } from "../operationUtils"
+import { isInverse } from "math/geom"
 
 // Get antiprism height of a unit antiprism with n sides
 export function antiprismHeight(n: number) {
@@ -60,8 +58,13 @@ function getOppositePrismFaces(polyhedron: Polyhedron) {
   return undefined
 }
 
+interface AdjustInfo {
+  vertexSets: any
+  readonly boundary: FaceLike
+}
+
 // Get information for figuring out how to twist or shorten a polyhedron
-export function getAdjustInformation(polyhedron: Polyhedron) {
+export function getAdjustInformation(polyhedron: Polyhedron): AdjustInfo {
   const oppositePrismFaces = getOppositePrismFaces(polyhedron)
   if (oppositePrismFaces) {
     return {
@@ -92,27 +95,4 @@ export function getAdjustInformation(polyhedron: Polyhedron) {
     vertexSets: [face, cap],
     boundary: face,
   }
-}
-
-interface AdjustInfo {
-  vertexSets: any
-  readonly boundary: FaceLike
-}
-
-export function getScaledPrismVertices(
-  adjustInfo: AdjustInfo,
-  scale: number,
-  twist?: Twist,
-) {
-  const { vertexSets, boundary } = adjustInfo
-  const n = boundary.numSides
-  const angle = (getTwistSign(twist) * Math.PI) / n
-
-  return getTransformedVertices<FaceLike>(vertexSets, (set) =>
-    withOrigin(set.normalRay(), (v) =>
-      v
-        .add(set.normal().scale(scale / 2))
-        .getRotatedAroundAxis(set.normal(), angle / 2),
-    ),
-  )
 }

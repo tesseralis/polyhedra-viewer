@@ -1,5 +1,4 @@
 import { takeRight, dropRight, invert, isEmpty, uniq } from "lodash-es"
-import { Twist } from "types"
 import { Polyhedron, Vertex, VertexList, VertexArg } from "math/polyhedra"
 import { Vec3D, Transform, PRECISION } from "math/geom"
 import { mapObject } from "utils"
@@ -67,17 +66,6 @@ export function deduplicateVertices(polyhedron: Polyhedron) {
 
   // remove extraneous vertices
   return removeExtraneousVertices(polyhedron.withFaces(newFaces))
-}
-
-export function getTwistSign(twist?: Twist) {
-  switch (twist) {
-    case "left":
-      return 1
-    case "right":
-      return -1
-    default:
-      return 0
-  }
 }
 
 /**

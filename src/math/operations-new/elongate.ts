@@ -6,9 +6,10 @@ import PolyhedronSpecs from "data/specs/PolyhedronSpecs"
 import Capstone from "data/specs/Capstone"
 import Prismatic from "data/specs/Prismatic"
 import OperationPair, { SolidArgs, Pose } from "./OperationPair"
+import { getTransformedVertices } from "../operations/operationUtils"
+import { withOrigin } from "math/geom"
 import {
   getAdjustInformation,
-  getScaledPrismVertices,
   antiprismHeight,
 } from "../operations/prismOps/prismUtils"
 import { TwistOpts } from "./opPairUtils"
@@ -72,21 +73,37 @@ function getNumSides(specs: PolyhedronSpecs) {
   throw new Error(`Invalid specs: ${specs.name()}`)
 }
 
+function getScaledPrismVertices(
+  geom: Polyhedron,
+  scale: number,
+  twist?: Twist,
+) {
+  const { vertexSets, boundary } = getAdjustInformation(geom)
+  const n = boundary.numSides
+  const angle = (getTwistMult(twist) * Math.PI) / n
+
+  return getTransformedVertices<FaceLike>(vertexSets, (set) =>
+    withOrigin(set.normalRay(), (v) =>
+      v
+        .add(set.normal().scale(scale / 2))
+        .getRotatedAroundAxis(set.normal(), angle / 2),
+    ),
+  )
+}
+
 /**
  * Shorten the given polyhedron with the optional twist
  */
 function doShorten(specs: Capstone, geom: Polyhedron, twist?: Twist) {
-  const adjustInformation = getAdjustInformation(geom)
   const scale =
     -geom.edgeLength() *
     getPrismaticHeight(getNumSides(specs), specs.data.elongation)
-  return getScaledPrismVertices(adjustInformation, scale, twist)
+  return getScaledPrismVertices(geom, scale, twist)
 }
 
 function doTurn(specs: PolyhedronSpecs, geom: Polyhedron, twist?: Twist) {
-  const adjustInformation = getAdjustInformation(geom)
   const scale = -geom.edgeLength() * (antiprismHeight(getNumSides(specs)) - 1)
-  return getScaledPrismVertices(adjustInformation, scale, twist)
+  return getScaledPrismVertices(geom, scale, twist)
 }
 
 const capTypeMap: Record<string, number> = { rotunda: 0, cupola: 1, pyramid: 2 }
