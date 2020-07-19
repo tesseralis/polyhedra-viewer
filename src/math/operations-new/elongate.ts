@@ -1,6 +1,6 @@
 import { sortBy } from "lodash-es"
 import { Twist } from "types"
-import { Cap, FaceLike, Edge } from "math/polyhedra"
+import { Cap, FaceLike, Edge, Polyhedron } from "math/polyhedra"
 import { PrismaticType } from "data/specs/common"
 import Capstone from "data/specs/Capstone"
 // import Prismatic from "data/specs/Prismatic"
@@ -58,6 +58,22 @@ function getPose(
   }
 }
 
+function getNumSides(specs: Capstone) {
+  if (specs.isPyramid()) return specs.data.base
+  return 2 * specs.data.base
+}
+
+/**
+ * Shorten the given polyhedron with the optional twist
+ */
+function doShorten(specs: Capstone, geom: Polyhedron, twist?: Twist) {
+  const adjustInformation = getAdjustInformation(geom)
+  const scale =
+    -geom.edgeLength() *
+    getPrismaticHeight(getNumSides(specs), specs.data.elongation)
+  return getScaledPrismVertices(adjustInformation, scale, twist)
+}
+
 const capTypeMap: Record<string, number> = { rotunda: 0, cupola: 1, pyramid: 2 }
 
 export const elongate = new OperationPair<Capstone>({
@@ -80,19 +96,8 @@ export const elongate = new OperationPair<Capstone>({
 
     return getPose(face, edge, specs.data.elongation)
   },
-  toLeft({ geom }) {
-    // Shorten the solid
-    // FIXME get the cap that we are aligned with and its opposite cap
-    // push the caps inwards
-    const adjustInfo = getAdjustInformation(geom)
-    const scale = geom.edgeLength()
-
-    return getScaledPrismVertices(adjustInfo, -scale)
-  },
-  toRight({ geom }) {
-    // Elongated solids are already the intermediate
-    return geom.vertices
-  },
+  toLeft: ({ geom, specs }) => doShorten(specs, geom),
+  toRight: ({ geom }) => geom.vertices,
 })
 
 export const gyroelongPyramid = new OperationPair<Capstone>({
@@ -117,20 +122,8 @@ export const gyroelongPyramid = new OperationPair<Capstone>({
     const edge = face.edges.find((e) => e.twinFace().numSides === 3)!
     return getPose(face, edge, specs.data.elongation, "left")
   },
-  toLeft({ geom }) {
-    // Shorten the solid
-    // FIXME get the cap that we are aligned with and its opposite cap
-    // push the caps inwards
-    const adjustInfo = getAdjustInformation(geom)
-    const n = adjustInfo.boundary.numSides
-    const scale = geom.edgeLength() * antiprismHeight(n)
-
-    return getScaledPrismVertices(adjustInfo, -scale, "left")
-  },
-  toRight({ geom }) {
-    // Elongated solids are already the intermediate
-    return geom.vertices
-  },
+  toLeft: ({ geom, specs }) => doShorten(specs, geom, "left"),
+  toRight: ({ geom }) => geom.vertices,
 })
 
 export const gyroelongCupola = new OperationPair<Capstone>({
@@ -153,17 +146,7 @@ export const gyroelongCupola = new OperationPair<Capstone>({
     const edge = capBoundary.edges.find((e) => e.face.numSides === 3)!
     return getPose(capBoundary, edge, specs.data.elongation, "left")
   },
-  toLeft({ geom }) {
-    // return geom.vertices
-    // Shorten the solid
-    // FIXME get the cap that we are aligned with and its opposite cap
-    // push the caps inwards
-    const adjustInfo = getAdjustInformation(geom)
-    const n = adjustInfo.boundary.numSides
-    const scale = geom.edgeLength() * antiprismHeight(n)
-
-    return getScaledPrismVertices(adjustInfo, -scale, "left")
-  },
+  toLeft: ({ geom, specs }) => doShorten(specs, geom, "left"),
   toRight: (solid) => solid.geom.vertices,
 })
 
@@ -187,17 +170,7 @@ export const gyroelongBipyramid = new OperationPair<Capstone>({
     const edge = face.edges.find((e) => e.face.numSides === 3)!
     return getPose(face, edge, specs.data.elongation, "left")
   },
-  toLeft({ geom }) {
-    // return geom.vertices
-    // Shorten the solid
-    // FIXME get the cap that we are aligned with and its opposite cap
-    // push the caps inwards
-    const adjustInfo = getAdjustInformation(geom)
-    const n = adjustInfo.boundary.numSides
-    const scale = geom.edgeLength() * antiprismHeight(n)
-
-    return getScaledPrismVertices(adjustInfo, -scale, "left")
-  },
+  toLeft: ({ geom, specs }) => doShorten(specs, geom, "left"),
   toRight: (solid) => solid.geom.vertices,
 })
 
@@ -238,14 +211,7 @@ export const gyroelongBicupola = new OperationPair<Capstone, TwistOpts>({
     const edge = face.edges.find((e) => e.face.numSides === 3)!
     return getPose(face, edge, specs.data.elongation, twist)
   },
-  toLeft({ geom }, { right: { twist } }) {
-    // Shorten the solid
-    // push the caps inwards
-    const adjustInfo = getAdjustInformation(geom)
-    const n = adjustInfo.boundary.numSides
-    const scale = geom.edgeLength() * antiprismHeight(n)
-
-    return getScaledPrismVertices(adjustInfo, -scale, twist)
-  },
+  toLeft: ({ geom, specs }, { right: { twist } }) =>
+    doShorten(specs, geom, twist),
   toRight: (solid) => solid.geom.vertices,
 })
