@@ -273,3 +273,92 @@ export const turnPyramid = new OperationPair<Capstone>({
   toLeft: ({ geom, specs }) => doTurn(specs, geom, "left"),
   toRight: ({ geom }) => geom.vertices,
 })
+
+export const turnCupola = new OperationPair<Capstone>({
+  graph: Capstone.query
+    .where(
+      (data) =>
+        data.type !== "pyramid" &&
+        data.count === 1 &&
+        data.base > 2 &&
+        data.elongation === "prism",
+    )
+    .map((entry) => ({
+      left: entry,
+      right: entry.withData({ elongation: "antiprism" }),
+    })),
+  getIntermediate: (entry) => entry.right,
+  getPose(side, { geom, specs }) {
+    // Pick a cap, favoring rotunda over cupola in the case of cupolarotundae
+    const capBoundary = Cap.getAll(geom)[0].boundary()
+    const edge = capBoundary.edges.find((e) => e.face.numSides === 3)!
+    return getPose(capBoundary, edge, specs.data.elongation, "left")
+  },
+  toLeft: ({ geom, specs }) => doTurn(specs, geom, "left"),
+  toRight: (solid) => solid.geom.vertices,
+})
+
+export const turnBipyramid = new OperationPair<Capstone>({
+  graph: Capstone.query
+    .where(
+      (data) =>
+        data.type === "pyramid" &&
+        data.count === 2 &&
+        data.base > 3 &&
+        data.elongation === "prism",
+    )
+    .map((entry) => ({
+      left: entry,
+      right: entry.withData({ elongation: "antiprism" }),
+    })),
+  getIntermediate: (entry) => entry.right,
+  getPose(side, { specs, geom }) {
+    // Pick a cap, favoring rotunda over cupola in the case of cupolarotundae
+    const face = Cap.getAll(geom)[0].boundary()
+    const edge = face.edges.find((e) => e.face.numSides === 3)!
+    return getPose(face, edge, specs.data.elongation, "left")
+  },
+  toLeft: ({ geom, specs }) => doTurn(specs, geom, "left"),
+  toRight: (solid) => solid.geom.vertices,
+})
+
+export const turnBicupola = new OperationPair<Capstone, TwistOpts>({
+  graph: Capstone.query
+    .where(
+      (data) =>
+        data.type !== "pyramid" &&
+        data.count === 2 &&
+        data.base > 2 &&
+        data.elongation === "prism",
+    )
+    .flatMap((entry) => {
+      // FIXME lol this is ugly
+      const [twist1, twist2]: [Twist, Twist] =
+        entry.data.gyrate === "gyro" ? ["left", "right"] : ["right", "left"]
+      return [
+        {
+          left: entry,
+          right: entry.withData({ elongation: "antiprism", twist: twist1 }),
+          options: { left: { twist: "left" }, right: { twist: "right" } },
+        },
+        {
+          left: entry,
+          right: entry.withData({ elongation: "antiprism", twist: twist2 }),
+          options: { left: { twist: "right" }, right: { twist: "left" } },
+        },
+      ]
+    }),
+  getIntermediate: (entry) => entry.right,
+  getPose(side, { specs, geom }, { right: { twist } }) {
+    // Pick a cap, favoring rotunda over cupola in the case of cupolarotundae
+    const caps = Cap.getAll(geom)
+    const cap = specs.isCupolaRotunda()
+      ? caps.find((cap) => cap.type === "rotunda")!
+      : caps[0]
+    const face = cap.boundary()
+    const edge = face.edges.find((e) => e.face.numSides === 3)!
+    return getPose(face, edge, specs.data.elongation, twist)
+  },
+  toLeft: ({ geom, specs }, { right: { twist } }) => doTurn(specs, geom, twist),
+  toRight: (solid) => solid.geom.vertices,
+})

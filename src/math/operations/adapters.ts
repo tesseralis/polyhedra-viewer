@@ -78,3 +78,14 @@ export function selfDualOpArgs<Specs extends PolyhedronSpecs, Options>(
     { side: "right", op },
   ])
 }
+
+export function multiDualOpArgs<Specs extends PolyhedronSpecs, Options>(
+  ops: OperationPair<Specs, Options, Options>[],
+) {
+  return _toOpArgs(
+    ops.flatMap((op) => [
+      { side: "left", op },
+      { side: "right", op },
+    ]),
+  )
+}
