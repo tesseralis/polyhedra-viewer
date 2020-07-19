@@ -1,5 +1,5 @@
 import Classical from "data/specs/Classical"
-import Operation from "./Operation"
+import Operation, { OpArgs } from "./Operation"
 import {
   amboTruncate,
   truncate as _truncate,
@@ -29,8 +29,7 @@ interface FacetOpts {
   facet?: "vertex" | "face"
 }
 
-export const cosharpen = new Operation<FacetOpts, Classical>("cosharpen", {
-  ...toOpArgs("right", [_cotruncate]),
+const hitOptArgs: Partial<OpArgs<FacetOpts, Classical>> = {
   hitOption: "facet",
   getHitOption({ geom }, hitPoint) {
     const n = geom.hitFace(hitPoint).numSides
@@ -44,21 +43,14 @@ export const cosharpen = new Operation<FacetOpts, Classical>("cosharpen", {
       return "selectable"
     })
   },
+}
+
+export const cosharpen = new Operation("cosharpen", {
+  ...toOpArgs("right", [_cotruncate]),
+  ...hitOptArgs,
 })
 
-export const unrectify = new Operation<FacetOpts, Classical>("unrectify", {
+export const unrectify = new Operation("unrectify", {
   ...toOpArgs("right", [_rectify]),
-  hitOption: "facet",
-  getHitOption({ geom }, hitPoint) {
-    const n = geom.hitFace(hitPoint).numSides
-    return n <= 5 ? { facet: n === 3 ? "face" : "vertex" } : {}
-  },
-
-  faceSelectionStates({ specs, geom }, { facet }) {
-    const faceType = !facet ? null : facet === "face" ? 3 : specs.data.family
-    return geom.faces.map((face) => {
-      if (face.numSides === faceType) return "selected"
-      return "selectable"
-    })
-  },
+  ...hitOptArgs,
 })

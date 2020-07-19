@@ -8,10 +8,7 @@ import Prismatic from "data/specs/Prismatic"
 import OperationPair, { SolidArgs, Pose } from "./OperationPair"
 import { getTransformedVertices } from "../operations/operationUtils"
 import { withOrigin } from "math/geom"
-import {
-  getAdjustInformation,
-  antiprismHeight,
-} from "../operations/prismOps/prismUtils"
+import { getAdjustInformation, antiprismHeight } from "./prismUtils"
 import { TwistOpts } from "./opPairUtils"
 
 function getPrismaticHeight(n: number, elongation: PrismaticType | null) {
@@ -183,9 +180,9 @@ const cupolaOps = makePrismOp({
   query: (data) => data.type !== "pyramid" && data.count === 1 && data.base > 2,
   getPose({ geom, specs }) {
     // Pick a cap, favoring rotunda over cupola in the case of cupolarotundae
-    const capBoundary = Cap.getAll(geom)[0].boundary()
-    const edge = capBoundary.edges.find((e) => e.face.numSides === 3)!
-    return getPose(capBoundary, edge, specs.data.elongation, "left")
+    const face = Cap.getAll(geom)[0].boundary()
+    const edge = face.edges.find((e) => e.face.numSides === 3)!
+    return getPose(face, edge, specs.data.elongation, "left")
   },
 })
 
@@ -197,7 +194,7 @@ const bipyramidOps = makePrismOp({
   getPose({ geom, specs }) {
     // Pick a cap, favoring rotunda over cupola in the case of cupolarotundae
     const face = Cap.getAll(geom)[0].boundary()
-    const edge = face.edges.find((e) => e.face.numSides === 3)!
+    const edge = face.edges[0]
     return getPose(face, edge, specs.data.elongation, "left")
   },
 })
