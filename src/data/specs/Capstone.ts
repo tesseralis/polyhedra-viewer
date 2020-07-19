@@ -34,10 +34,10 @@ export default class Capstone extends Specs<CapstoneData> {
     if (this.isGyroelongated() || this.isMono()) {
       delete this.data.gyrate
     }
-    if (!this._isChiral()) {
+    if (!this.isChiral()) {
       delete this.data.twist
     }
-    if (this._isChiral() && !this.data.twist) {
+    if (this.isChiral() && !this.data.twist) {
       this.data.twist = "left"
     }
   }
@@ -63,10 +63,8 @@ export default class Capstone extends Specs<CapstoneData> {
   isElongated = () => this.data.elongation === "prism"
   isGyroelongated = () => this.data.elongation === "antiprism"
 
-  // FIXME reconcile with the other isChiral?
-  private _isChiral() {
-    return this.isGyroelongated() && this.isBi() && !this.isPyramid()
-  }
+  // Overwrite from PolyhedronSpec
+  isChiral = () => this.isGyroelongated() && this.isBi() && !this.isPyramid()
 
   static *getAll() {
     for (const base of primaryPolygons) {

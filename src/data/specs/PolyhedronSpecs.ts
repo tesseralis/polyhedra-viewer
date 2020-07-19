@@ -63,12 +63,7 @@ export default abstract class PolyhedronSpecs<Data extends {} = {}> {
   }
 
   isChiral() {
-    if (this.isClassical()) {
-      return this.isSnub()
-    }
-    if (this.isCapstone()) {
-      return this.isGyroelongated() && this.isBi() && !this.isPyramid()
-    }
+    // Should be overwritten by things that are chiral
     return false
   }
 

@@ -35,11 +35,11 @@ export default class Classical extends Specs<ClassicalData> {
     if (this.isTetrahedral() || !this.hasFacet()) {
       delete this.data.facet
     }
-    if (!this.isSnub() || this.isTetrahedral()) {
+    if (!this.isChiral()) {
       delete this.data.twist
     }
     // Set a default twist for snub solids
-    if (this.isSnub() && !this.isTetrahedral() && !this.data.twist) {
+    if (this.isChiral() && !this.data.twist) {
       this.data.twist = "left"
     }
   }
@@ -63,6 +63,8 @@ export default class Classical extends Specs<ClassicalData> {
 
   isFace = () => this.data.facet === "face"
   isVertex = () => this.data.facet === "vertex"
+
+  isChiral = () => this.isSnub() && !this.isTetrahedral()
 
   static *getAll() {
     for (const operation of operations) {
