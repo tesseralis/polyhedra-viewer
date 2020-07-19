@@ -1,12 +1,8 @@
-import { maxBy, isEqual, uniqBy, countBy } from "lodash-es"
-import { Polyhedron, Cap, FaceLike } from "math/polyhedra"
+import { maxBy, uniqBy } from "lodash-es"
+import { Polyhedron, Cap } from "math/polyhedra"
 import { isInverse } from "math/geom"
-
-// Get antiprism height of a unit antiprism with n sides
-export function antiprismHeight(n: number) {
-  const sec = 1 / Math.cos(Math.PI / (2 * n))
-  return Math.sqrt(1 - (sec * sec) / 4)
-}
+import PolyhedronSpecs from "data/specs/PolyhedronSpecs"
+import Prismatic from "data/specs/Prismatic"
 
 // TODO deduplicate with snub polyhedra if possible
 export function getChirality(polyhedron: Polyhedron) {
@@ -30,55 +26,32 @@ function getOppositeCaps(polyhedron: Polyhedron) {
     const cap2 = caps.find((cap2) => isInverse(cap.normal(), cap2.normal()))
     if (cap2) return [cap, cap2]
   }
-  return undefined
+  throw new Error(`Could not find opposite caps`)
 }
 
-function getOppositePrismFaces(polyhedron: Polyhedron) {
-  const face1 = maxBy(
-    polyhedron.faces.filter((face) => {
-      const faceCounts = countBy(
-        face.vertexAdjacentFaces().filter((f) => !f.equals(face)),
-        "numSides",
-      )
-      return (
-        isEqual(faceCounts, { "4": face.numSides }) ||
-        isEqual(faceCounts, { "3": 2 * face.numSides })
-      )
-    }),
-    "numSides",
-  )
-  if (!face1) return undefined
-
+function getOppositePrismFaces(specs: Prismatic, polyhedron: Polyhedron) {
+  const face1 = polyhedron.faceWithNumSides(specs.data.base)
   const face2 = polyhedron.faces.find(
-    (face2) =>
-      face1.numSides === face2.numSides &&
-      isInverse(face1.normal(), face2.normal()),
-  )
-  if (face2) return [face1, face2]
-  return undefined
-}
-
-interface AdjustInfo {
-  vertexSets: any
-  readonly boundary: FaceLike
+    (f) =>
+      f.numSides === face1.numSides && isInverse(face1.normal(), f.normal()),
+  )!
+  return [face1, face2]
 }
 
 // Get information for figuring out how to twist or shorten a polyhedron
-export function getAdjustInformation(polyhedron: Polyhedron): AdjustInfo {
-  const oppositePrismFaces = getOppositePrismFaces(polyhedron)
-  if (oppositePrismFaces) {
-    return {
-      vertexSets: oppositePrismFaces,
-      boundary: oppositePrismFaces[0],
-    }
+export function getAdjustInformation(
+  specs: PolyhedronSpecs,
+  polyhedron: Polyhedron,
+) {
+  if (specs.isPrismatic()) {
+    return getOppositePrismFaces(specs, polyhedron)
   }
-  const oppositeCaps = getOppositeCaps(polyhedron)
-  if (oppositeCaps) {
-    // This is an elongated bi-cap
-    return {
-      vertexSets: oppositeCaps,
-      boundary: oppositeCaps[0].boundary(),
-    }
+  if (!specs.isCapstone()) {
+    throw new Error(`Invalid spec provided: ${specs.name()}`)
+  }
+
+  if (specs.isBi()) {
+    return getOppositeCaps(polyhedron)
   }
 
   // Otherwise it's an elongated single cap.
@@ -90,9 +63,6 @@ export function getAdjustInformation(polyhedron: Polyhedron): AdjustInfo {
   const face = maxBy(faces, "numSides")!
   const cap = Cap.getAll(polyhedron).find((cap) =>
     isInverse(cap.normal(), face.normal()),
-  )
-  return {
-    vertexSets: [face, cap],
-    boundary: face,
-  }
+  )!
+  return [face, cap]
 }

@@ -8,8 +8,14 @@ import Prismatic from "data/specs/Prismatic"
 import OperationPair, { SolidArgs, Pose } from "./OperationPair"
 import { getTransformedVertices } from "../operations/operationUtils"
 import { withOrigin } from "math/geom"
-import { getAdjustInformation, antiprismHeight } from "./prismUtils"
+import { getAdjustInformation } from "./prismUtils"
 import { TwistOpts } from "./opPairUtils"
+
+// Get antiprism height of a unit antiprism with n sides
+export function antiprismHeight(n: number) {
+  const sec = 1 / Math.cos(Math.PI / (2 * n))
+  return Math.sqrt(1 - (sec * sec) / 4)
+}
 
 function getPrismaticHeight(n: number, elongation: PrismaticType | null) {
   switch (elongation) {
@@ -71,15 +77,15 @@ function getNumSides(specs: PolyhedronSpecs) {
 }
 
 function getScaledPrismVertices(
+  specs: PolyhedronSpecs,
   geom: Polyhedron,
   scale: number,
   twist?: Twist,
 ) {
-  const { vertexSets, boundary } = getAdjustInformation(geom)
-  const n = boundary.numSides
-  const angle = (getTwistMult(twist) * Math.PI) / n
+  const vertexSets = getAdjustInformation(specs, geom)
+  const angle = (getTwistMult(twist) * Math.PI) / getNumSides(specs)
 
-  return getTransformedVertices<FaceLike>(vertexSets, (set) =>
+  return getTransformedVertices(vertexSets, (set) =>
     withOrigin(set.normalRay(), (v) =>
       v
         .add(set.normal().scale(scale / 2))
@@ -95,12 +101,12 @@ function doShorten(specs: Capstone, geom: Polyhedron, twist?: Twist) {
   const scale =
     -geom.edgeLength() *
     getPrismaticHeight(getNumSides(specs), specs.data.elongation)
-  return getScaledPrismVertices(geom, scale, twist)
+  return getScaledPrismVertices(specs, geom, scale, twist)
 }
 
 function doTurn(specs: PolyhedronSpecs, geom: Polyhedron, twist?: Twist) {
   const scale = -geom.edgeLength() * (antiprismHeight(getNumSides(specs)) - 1)
-  return getScaledPrismVertices(geom, scale, twist)
+  return getScaledPrismVertices(specs, geom, scale, twist)
 }
 
 const capTypeMap: Record<string, number> = { rotunda: 0, cupola: 1, pyramid: 2 }
