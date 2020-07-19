@@ -2,8 +2,9 @@ import { sortBy } from "lodash-es"
 import { Twist } from "types"
 import { Cap, FaceLike, Edge, Polyhedron } from "math/polyhedra"
 import { PrismaticType } from "data/specs/common"
+import PolyhedronSpecs from "data/specs/PolyhedronSpecs"
 import Capstone from "data/specs/Capstone"
-// import Prismatic from "data/specs/Prismatic"
+import Prismatic from "data/specs/Prismatic"
 import OperationPair, { Pose } from "./OperationPair"
 import {
   getAdjustInformation,
@@ -46,7 +47,10 @@ function getPose(
   const origin = faceCenter.sub(
     face.normal().scale((length * getPrismaticHeight(n, elongation)) / 2),
   )
-  const angle = (elongation ? 1 : 0) * getTwistMult(twist) * (Math.PI / n / 2)
+  const angle =
+    (elongation === "antiprism" ? 1 : 0) *
+    getTwistMult(twist) *
+    (Math.PI / n / 2)
 
   return {
     origin,
@@ -58,9 +62,14 @@ function getPose(
   }
 }
 
-function getNumSides(specs: Capstone) {
-  if (specs.isPyramid()) return specs.data.base
-  return 2 * specs.data.base
+function getNumSides(specs: PolyhedronSpecs) {
+  if (specs.isPrismatic()) {
+    return specs.data.base
+  } else if (specs.isCapstone()) {
+    if (specs.isPyramid()) return specs.data.base
+    return 2 * specs.data.base
+  }
+  throw new Error(`Invalid specs: ${specs.name()}`)
 }
 
 /**
@@ -71,6 +80,12 @@ function doShorten(specs: Capstone, geom: Polyhedron, twist?: Twist) {
   const scale =
     -geom.edgeLength() *
     getPrismaticHeight(getNumSides(specs), specs.data.elongation)
+  return getScaledPrismVertices(adjustInformation, scale, twist)
+}
+
+function doTurn(specs: PolyhedronSpecs, geom: Polyhedron, twist?: Twist) {
+  const adjustInformation = getAdjustInformation(geom)
+  const scale = -geom.edgeLength() * (antiprismHeight(getNumSides(specs)) - 1)
   return getScaledPrismVertices(adjustInformation, scale, twist)
 }
 
@@ -116,11 +131,8 @@ export const gyroelongPyramid = new OperationPair<Capstone>({
     })),
   getIntermediate: (entry) => entry.right,
   getPose(side, { geom, specs }) {
-    // Pick a cap, favoring rotunda over cupola in the case of cupolarotundae
-    // const cap = sortBy(Cap.getAll(geom), (cap) => capTypeMap[cap.type])[0]
     const face = geom.largestFace()
-    const edge = face.edges.find((e) => e.twinFace().numSides === 3)!
-    return getPose(face, edge, specs.data.elongation, "left")
+    return getPose(face, face.edges[0], specs.data.elongation, "left")
   },
   toLeft: ({ geom, specs }) => doShorten(specs, geom, "left"),
   toRight: ({ geom }) => geom.vertices,
@@ -214,4 +226,50 @@ export const gyroelongBicupola = new OperationPair<Capstone, TwistOpts>({
   toLeft: ({ geom, specs }, { right: { twist } }) =>
     doShorten(specs, geom, twist),
   toRight: (solid) => solid.geom.vertices,
+})
+
+export const turnPrismatic = new OperationPair<Prismatic>({
+  // Every unelongated capstone (except fastigium) can be elongated
+  graph: Prismatic.query
+    .where((data) => data.type === "prism" && data.base > 2)
+    .map((entry) => ({
+      left: entry,
+      right: entry.withData({ type: "antiprism" }),
+    })),
+  getIntermediate: (entry) => entry.right,
+  getPose(side, { geom, specs }) {
+    const face = geom.faceWithNumSides(specs.data.base)
+    return getPose(face, face.edges[0], specs.data.type, "left")
+  },
+  toLeft: ({ geom, specs }) => doTurn(specs, geom, "left"),
+  toRight: ({ geom }) => geom.vertices,
+})
+
+export const turnPyramid = new OperationPair<Capstone>({
+  // Every unelongated capstone (except fastigium) can be elongated
+  graph: Capstone.query
+    .where(
+      (data) =>
+        data.type === "pyramid" &&
+        data.count === 1 &&
+        data.elongation === "prism" &&
+        data.base > 3,
+    )
+    .map((entry) => ({
+      left: entry,
+      right: entry.withData({ elongation: "antiprism" }),
+    })),
+  getIntermediate: (entry) => entry.right,
+  getPose(side, { geom, specs }) {
+    const nbrFace = side === "left" ? 4 : 3
+    const face = geom.faces.find(
+      (face) =>
+        face.numSides === specs.data.base &&
+        // Make sure we don't get the wrong cube face
+        face.adjacentFaces().every((f) => f.numSides === nbrFace),
+    )!
+    return getPose(face, face.edges[0], specs.data.elongation, "left")
+  },
+  toLeft: ({ geom, specs }) => doTurn(specs, geom, "left"),
+  toRight: ({ geom }) => geom.vertices,
 })

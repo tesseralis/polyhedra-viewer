@@ -11,6 +11,7 @@ import {
   getAdjustInformation,
   getScaledPrismVertices,
 } from "./prismUtils"
+import { turnPrismatic, turnPyramid } from "../../operations-new/elongate"
 
 function bisectPrismFaces(
   polyhedron: Polyhedron,
@@ -96,7 +97,19 @@ function doTurn(polyhedron: Polyhedron, { twist = "left" }: Options) {
 }
 
 export const turn = new Operation<Options, Prismatic | Capstone>("turn", {
-  apply({ geom }, options) {
+  apply({ specs, geom }, options) {
+    if (turnPrismatic.canApplyTo("left", specs)) {
+      return turnPrismatic.apply("left", { specs: specs as any, geom }, {})
+    }
+    if (turnPrismatic.canApplyTo("right", specs)) {
+      return turnPrismatic.apply("right", { specs: specs as any, geom }, {})
+    }
+    if (turnPyramid.canApplyTo("left", specs)) {
+      return turnPyramid.apply("left", { specs: specs as any, geom }, {})
+    }
+    if (turnPyramid.canApplyTo("right", specs)) {
+      return turnPyramid.apply("right", { specs: specs as any, geom }, {})
+    }
     return doTurn(geom, options)
   },
 
