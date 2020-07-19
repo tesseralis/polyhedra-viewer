@@ -2,7 +2,7 @@ import { pickBy, isMatch } from "lodash-es"
 import { getSingle } from "utils"
 import type Specs from "./PolyhedronSpecs"
 
-type QueryFilter<Data extends {}> = (data: Data) => boolean
+type Predicate<T> = (arg: T) => boolean
 
 export default class Queries<S extends Specs> {
   entries: S[]
@@ -46,11 +46,11 @@ export default class Queries<S extends Specs> {
     return this.nameMapping.get(name)!
   }
 
-  where(filter: QueryFilter<S["data"]>) {
-    return this.entries.filter((entry) => filter(entry.data))
+  where(filter: Predicate<S>) {
+    return this.entries.filter((entry) => filter(entry))
   }
 
-  hasNameWhere(name: string, filter: QueryFilter<S["data"]>) {
+  hasNameWhere(name: string, filter: Predicate<S["data"]>) {
     const entries = this.nameMapping.get(name)
     if (!entries) return false
     return entries.some(

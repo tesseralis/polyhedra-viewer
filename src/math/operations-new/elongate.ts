@@ -113,7 +113,7 @@ const capTypeMap: Record<string, number> = { rotunda: 0, cupola: 1, pyramid: 2 }
 
 interface PrismOpArgs {
   // The list of *right* args
-  query(data: Capstone["data"]): boolean
+  query(data: Capstone): boolean
   rightElongation?: "prism" | "antiprism"
   getOrientation(solid: SolidArgs<Capstone>): [FaceLike, Edge]
 }
@@ -127,7 +127,7 @@ function makePrismOp({
   return (leftElongation: "prism" | null) => {
     return new OperationPair({
       graph: Capstone.query
-        .where((data) => query(data) && data.elongation === rightElongation)
+        .where((s) => query(s) && s.data.elongation === rightElongation)
         .map((item) => ({
           left: item.withData({ elongation: leftElongation }),
           right: item,
@@ -149,7 +149,7 @@ function makePrismOp({
 export const turnPrismatic = new OperationPair<Prismatic>({
   // Every unelongated capstone (except fastigium) can be elongated
   graph: Prismatic.query
-    .where((data) => data.type === "prism" && data.base > 2)
+    .where((s) => s.isPrism() && !s.isDigonal())
     .map((entry) => ({
       left: entry,
       right: entry.withData({ type: "antiprism" }),
@@ -164,7 +164,7 @@ export const turnPrismatic = new OperationPair<Prismatic>({
 })
 
 export const elongate = makePrismOp({
-  query: (data) => data.base > 2,
+  query: (s) => !s.isDigonal(),
   rightElongation: "prism",
   getOrientation({ geom }) {
     const face = sortBy(
@@ -177,7 +177,7 @@ export const elongate = makePrismOp({
 })(null)
 
 const pyramidOps = makePrismOp({
-  query: (data) => data.type === "pyramid" && data.count === 1 && data.base > 3,
+  query: (s) => s.isPyramid() && s.isMono() && s.data.base > 3,
   getOrientation({ geom }) {
     const face = geom.largestFace()
     return [face, face.edges[0]]
@@ -187,7 +187,7 @@ export const gyroelongPyramid = pyramidOps(null)
 export const turnPyramid = pyramidOps("prism")
 
 const cupolaOps = makePrismOp({
-  query: (data) => data.type !== "pyramid" && data.count === 1 && data.base > 2,
+  query: (s) => !s.isPyramid() && s.isMono() && !s.isDigonal(),
   getOrientation({ geom }) {
     // Pick a cap, favoring rotunda over cupola in the case of cupolarotundae
     const face = Cap.getAll(geom)[0].boundary()
@@ -200,7 +200,7 @@ export const gyroelongCupola = cupolaOps(null)
 export const turnCupola = cupolaOps("prism")
 
 const bipyramidOps = makePrismOp({
-  query: (data) => data.type === "pyramid" && data.count === 2 && data.base > 3,
+  query: (s) => s.isPyramid() && s.isBi() && s.data.base > 3,
   getOrientation({ geom }) {
     // Pick a cap, favoring rotunda over cupola in the case of cupolarotundae
     const face = Cap.getAll(geom)[0].boundary()
@@ -215,11 +215,11 @@ function makeBicupolaPrismOp(leftElongation: null | "prism") {
   return new OperationPair<Capstone, TwistOpts>({
     graph: Capstone.query
       .where(
-        (data) =>
-          data.type !== "pyramid" &&
-          data.count === 2 &&
-          data.base > 2 &&
-          data.elongation === leftElongation,
+        (s) =>
+          !s.isPyramid() &&
+          s.isBi() &&
+          !s.isDigonal() &&
+          s.data.elongation === leftElongation,
       )
       .flatMap((entry) => {
         // FIXME lol this is ugly

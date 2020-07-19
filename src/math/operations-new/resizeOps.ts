@@ -291,7 +291,7 @@ function twistOpts(specs: Classical): Twist[] {
 // Expansion of truncated to bevelled solids
 export const semiExpand = new OperationPair<Classical, {}, FacetOpts>({
   graph: Classical.query
-    .where((data) => data.operation === "truncate")
+    .where((s) => s.isTruncated())
     .map((entry) => ({
       left: entry,
       right: entry.withData({ operation: "bevel" }),
@@ -323,7 +323,7 @@ export const semiExpand = new OperationPair<Classical, {}, FacetOpts>({
 
 export const expand = new OperationPair<Classical, {}, FacetOpts>({
   graph: Classical.query
-    .where((data) => data.operation === "regular")
+    .where((s) => s.isRegular())
     .map((entry) => {
       return {
         left: entry,
@@ -355,7 +355,7 @@ function getOpp(twist: Twist) {
 
 export const snub = new OperationPair<Classical, TwistOpts, FacetOpts>({
   graph: Classical.query
-    .where((data) => data.operation === "regular")
+    .where((s) => s.isRegular())
     .flatMap((entry) => {
       return twistOpts(entry).map((twist) => ({
         left: entry,
@@ -389,7 +389,7 @@ export const snub = new OperationPair<Classical, TwistOpts, FacetOpts>({
 
 export const twist = new OperationPair<Classical, TwistOpts, {}>({
   graph: Classical.query
-    .where((data) => data.operation === "cantellate")
+    .where((s) => s.isCantellated())
     .flatMap((entry) => {
       return twistOpts(entry).map((twist) => ({
         left: entry,
@@ -440,7 +440,7 @@ function doDualTransform(specs: Classical, geom: Polyhedron, facet: Facet) {
 
 export const dual = new OperationPair({
   graph: Classical.query
-    .where((data) => data.operation === "regular" && data.facet !== "vertex")
+    .where((s) => s.isRegular() && !s.isVertex())
     .map((specs) => ({
       left: specs,
       right: specs.withData({ facet: "vertex" }),

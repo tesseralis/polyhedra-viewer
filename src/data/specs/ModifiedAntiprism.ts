@@ -4,7 +4,7 @@ import Queries from "./Queries"
 import Prismatic from "./Prismatic"
 
 const sources = Prismatic.query.where(
-  ({ base, type }) => type === "antiprism" && base <= 5,
+  (s) => s.isAntiprism() && !s.isSecondary(),
 )
 const operations = [null, "snub"] as const
 type Operation = Items<typeof operations>

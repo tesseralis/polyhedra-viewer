@@ -96,7 +96,7 @@ function truncatedToRectified(geom: Polyhedron) {
 
 export const amboTruncate = new OperationPair<Classical>({
   graph: Classical.query
-    .where((data) => data.operation === "rectify")
+    .where((s) => s.isRectified())
     .map((entry) => ({
       left: entry,
       right: entry.withData({ operation: "bevel" }),
@@ -131,7 +131,7 @@ export const amboTruncate = new OperationPair<Classical>({
 
 export const truncate = new OperationPair<Classical>({
   graph: Classical.query
-    .where((data) => data.operation === "regular")
+    .where((s) => s.isRegular())
     .map((entry) => {
       return {
         left: entry,
@@ -147,7 +147,7 @@ export const truncate = new OperationPair<Classical>({
 
 export const cotruncate = new OperationPair<Classical, {}, FacetOpts>({
   graph: Classical.query
-    .where((data) => data.operation === "truncate")
+    .where((s) => s.isTruncated())
     .map((entry) => {
       return {
         left: entry,
@@ -165,7 +165,7 @@ export const cotruncate = new OperationPair<Classical, {}, FacetOpts>({
 // TODO support double rectification
 export const rectify = new OperationPair<Classical, {}, FacetOpts>({
   graph: Classical.query
-    .where((data) => ["regular"].includes(data.operation))
+    .where((s) => s.isRegular())
     .map((entry) => ({
       left: entry,
       right: entry.withData({ operation: "rectify" }),
