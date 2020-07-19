@@ -226,11 +226,13 @@ function makeBicupolaPrismOp(leftElongation: null | "prism") {
       const edge = face.edges.find((e) => e.face.numSides === 3)!
       return getPose(face, edge, specs.data.elongation, twist)
     },
-    toLeft: ({ geom, specs }, { right: { twist } }) =>
-      doShorten(specs, geom, twist),
+    toLeft: ({ geom, specs }, { right: { twist } }) => {
+      const fn = leftElongation === "prism" ? doTurn : doShorten
+      return fn(specs, geom, twist)
+    },
     toRight: (solid) => solid.geom.vertices,
   })
 }
 
 export const gyroelongBicupola = makeBicupolaPrismOp(null)
-export const turnBicupola = makeBicupolaPrismOp(null)
+export const turnBicupola = makeBicupolaPrismOp("prism")
