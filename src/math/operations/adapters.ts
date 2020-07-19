@@ -50,7 +50,7 @@ export function combineOps<S extends PolyhedronSpecs, O>(
     return opArgs.some((op) => op.canApplyTo(specs))
   }
 
-  function get(specs: S) {
+  function getOp(specs: S) {
     const entry = opArgs.find((op) => op.canApplyTo(specs))
     if (!entry) {
       throw new Error(`Could not apply any operations to ${specs.name}`)
@@ -61,16 +61,16 @@ export function combineOps<S extends PolyhedronSpecs, O>(
   return {
     canApplyTo,
     apply(solid, opts) {
-      return get(solid.specs).apply(solid, opts)
+      return getOp(solid.specs).apply(solid, opts)
     },
     getResult(solid, opts) {
-      return get(solid.specs).getResult(solid, opts)
+      return getOp(solid.specs).getResult(solid, opts)
     },
     hasOptions(specs) {
-      return get(specs).hasOptions(specs) ?? false
+      return getOp(specs).hasOptions(specs) ?? false
     },
     *allOptionCombos(solid) {
-      yield* get(solid.specs).allOptionCombos(solid) as any
+      yield* getOp(solid.specs).allOptionCombos(solid) as any
     },
   }
 }
