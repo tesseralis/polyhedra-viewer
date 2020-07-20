@@ -8,7 +8,7 @@ import { isInverse, getOrthonormalTransform, PRECISION } from "math/geom"
 import { repeat, getCyclic, getSingle } from "utils"
 import { makeOperation } from "../Operation"
 import { withOrigin } from "../../geom"
-import { deduplicateVertices } from "../operationUtils"
+import { oppositeFace, deduplicateVertices } from "../operationUtils"
 import { inc, dec, CutPasteSpecs } from "./cutPasteUtils"
 
 type AugmentSpecs = Prismatic | CutPasteSpecs
@@ -127,10 +127,6 @@ function getBaseType(base: Face) {
   }
 }
 
-function getOppositePrismFace(base: Face) {
-  return base.edges[0].twin().next().next().twinFace()
-}
-
 function isCupolaRotunda(baseType: string, augmentType: string) {
   return setEquals(["cupola", "rotunda"], [baseType, augmentType])
 }
@@ -159,7 +155,7 @@ function isAligned(
   }
 
   const adjFace =
-    baseType === "prism" ? getOppositePrismFace(base) : base.adjacentFaces()[0]
+    baseType === "prism" ? oppositeFace(base.edges[0]) : base.adjacentFaces()[0]
   const alignedFace = getCyclic(underside.adjacentFaces(), -1)
 
   if (baseType === "rhombicosidodecahedron") {

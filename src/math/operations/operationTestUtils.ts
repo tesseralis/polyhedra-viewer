@@ -46,9 +46,7 @@ function expectVerticesMatch(test: Vec3D[], ref: Vec3D[]) {
 }
 
 // These operations behave badly and are banned :(
-// dual: improperly scaled
-// twist: broken on tetrahedra
-const naughtyOps = ["augment", "diminish", "gyrate", "twist"]
+const naughtyOps = ["augment", "diminish", "gyrate"]
 
 export function expectValidAnimationData(
   opResult: OpResult,

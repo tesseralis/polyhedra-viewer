@@ -1,12 +1,13 @@
 import { minBy } from "lodash-es"
 import { Twist } from "types"
-import { flatMapUniq, mapObject } from "utils"
+import { mapObject } from "utils"
 import Classical, { Facet, Family } from "data/specs/Classical"
 import { makeOpPair, combineOps, Pose } from "./operationPairs"
 import { getPlane, withOrigin, Vec3D } from "math/geom"
 import { Polyhedron, Face, Edge } from "math/polyhedra"
 import {
   getOppTwist,
+  oppositeFace,
   getTransformedVertices,
   FacetOpts,
   TwistOpts,
@@ -15,29 +16,10 @@ import {
 import { Plane } from "toxiclibsjs/geom"
 import Operation, { makeOperation } from "./Operation"
 
-function getFaceDistance(face1: Face, face2: Face) {
-  let dist = 0
-  let current = [face1]
-  while (!face2.inSet(current)) {
-    dist++
-    current = flatMapUniq(current, (face) => face.adjacentFaces(), "index")
-
-    if (dist > 10) {
-      throw new Error("we went toooooo far")
-    }
-  }
-  return dist
-}
-
 function getIcosahedronSnubFaces(polyhedron: Polyhedron) {
-  const result = []
-  let toTest = polyhedron.faces
-  while (toTest.length > 0) {
-    const [next, ...rest] = toTest
-    result.push(next)
-    toTest = rest.filter((face) => getFaceDistance(face, next) === 3)
-  }
-  return result
+  const f0 = polyhedron.faceWithNumSides(3)
+  const rest = f0.edges.map((e) => e.twin().prev().twin().next().twinFace())
+  return [f0, ...rest]
 }
 
 function getCantellatedTetrahedronFaces(polyhedron: Polyhedron, odd?: boolean) {
@@ -45,7 +27,7 @@ function getCantellatedTetrahedronFaces(polyhedron: Polyhedron, odd?: boolean) {
   if (odd) {
     f0 = f0.edges[0].twin().next().twinFace()
   }
-  const rest = f0.edges.map((e) => e.twin().next().next().twinFace())
+  const rest = f0.edges.map((e) => oppositeFace(e))
   return [f0, ...rest]
 }
 
@@ -53,7 +35,7 @@ function getBevelledTetrahedronFaces(polyhedron: Polyhedron) {
   const f0 = polyhedron.faceWithNumSides(6)
   const rest = f0.edges
     .filter((e) => e.twinFace().numSides === 4)
-    .map((e) => e.twin().next().next().twinFace())
+    .map((e) => oppositeFace(e))
   return [f0, ...rest]
 }
 
@@ -237,8 +219,6 @@ const bevelledDists = createObject([3, 4, 5], (family: Family) => {
 function getSnubAngle(specs: Classical, facet: Facet) {
   const sign = specs.data.twist === "left" ? -1 : 1
   // if vertex-solid, reverse the sign
-  // FIXME I think this is twisting in a weird way for icosahedron
-  // (e.g. pose is picking one thing but x another)
   const sign2 = facet === "vertex" ? -1 : 1
   const angle = snubAngles[specs.data.family][facet]
   return sign2 * sign * angle
@@ -368,15 +348,14 @@ const _snub = makeOpPair<Classical, TwistOpts, FacetOpts>({
       }))
     }),
 
-  // FIXME this breaks a chained augment -> contract somehow??
-  middle: (entry) => entry.right,
+  middle: "right",
 
-  getPose(pos, { geom, specs }, { right: { facet = "vertex" } }) {
+  getPose(pos, { geom, specs }, { right: { facet = "face" } }) {
     return pos === "left"
       ? getRegularPose(geom)
       : getSnubPose(geom, specs, facet)
   },
-  toLeft({ specs, geom }, { right: { facet = "vertex" } }, result) {
+  toLeft({ specs, geom }, { right: { facet = "face" } }, result) {
     // Take all the stuff and push it inwards
     return getResizedVertices(
       getSnubFaces(specs, geom, result.data.facet),

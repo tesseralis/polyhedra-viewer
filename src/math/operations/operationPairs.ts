@@ -16,7 +16,7 @@ interface GraphOpts<L, R> {
   right: R
 }
 
-// FIXME ugh this is still ugly
+// TODO ugh this is still ugly
 interface GraphEntry<Specs, L, R> {
   left: Specs
   right: Specs

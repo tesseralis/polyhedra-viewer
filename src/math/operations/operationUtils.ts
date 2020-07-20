@@ -1,5 +1,12 @@
 import { takeRight, dropRight, invert, isEmpty, uniq } from "lodash-es"
-import { Cap, Polyhedron, Vertex, VertexList, VertexArg } from "math/polyhedra"
+import {
+  Cap,
+  Polyhedron,
+  Edge,
+  Vertex,
+  VertexList,
+  VertexArg,
+} from "math/polyhedra"
 import { Vec3D, Transform, PRECISION } from "math/geom"
 import { mapObject } from "utils"
 import PolyhedronSpecs from "data/specs/PolyhedronSpecs"
@@ -20,6 +27,21 @@ export function getOppTwist(twist: Twist) {
 }
 
 /**
+ * Get the face opposite of the given edge, using the given "twist" option
+ */
+export function oppositeFace(edge: Edge, twist?: Twist) {
+  switch (twist) {
+    case "left":
+      return edge.twin().next().twin().prev().twinFace()
+    case "right":
+      return edge.twin().prev().twin().next().twinFace()
+    default:
+      // If no twist is provided, assume a square
+      return edge.twin().next().next().twinFace()
+  }
+}
+
+/**
  * Get the chirality of the snub polyhedron
  */
 export function snubChirality(geom: Polyhedron) {
@@ -28,7 +50,7 @@ export function snubChirality(geom: Polyhedron) {
     return "left"
   }
   const face = geom.faces.find((f) => f.numSides !== 3)!
-  const other = face.edges[0].twin().prev().twin().next().twinFace()
+  const other = oppositeFace(face.edges[0], "right")
   return other.numSides !== 3 ? "right" : "left"
 }
 
@@ -40,9 +62,8 @@ export function capstoneChirality(geom: Polyhedron) {
   const boundary = cap1.boundary()
   const isCupolaRotunda = cap1.type !== cap2.type
 
-  const nonTriangleFace = boundary.edges.find((e) => e.face.numSides !== 3)!
-  const rightFaceAcross = nonTriangleFace.twin().prev().twin().next().twin()
-    .face
+  const nonTriangleFaceEdge = boundary.edges.find((e) => e.face.numSides !== 3)!
+  const rightFaceAcross = oppositeFace(nonTriangleFaceEdge, "right")
   // I'm pretty sure this is the same logic as in augment
   if (isCupolaRotunda) {
     return rightFaceAcross.numSides !== 3 ? "right" : "left"
