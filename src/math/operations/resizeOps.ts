@@ -16,7 +16,7 @@ import {
 import { Plane } from "toxiclibsjs/geom"
 import Operation, { makeOperation } from "./Operation"
 
-function getIcosahedronSnubFaces(polyhedron: Polyhedron) {
+function getSnubTetrahedronFaces(polyhedron: Polyhedron) {
   const f0 = polyhedron.faceWithNumSides(3)
   return [f0, ...f0.edges.map((e) => oppositeFace(e, "right"))]
 }
@@ -39,7 +39,7 @@ function getBevelledTetrahedronFaces(polyhedron: Polyhedron) {
 
 function getSnubFaces(specs: Classical, polyhedron: Polyhedron, facet?: Facet) {
   if (specs.isTetrahedral()) {
-    return getIcosahedronSnubFaces(polyhedron)
+    return getSnubTetrahedronFaces(polyhedron)
   }
   return polyhedron.faces.filter((face) =>
     isSnubFace(face, getFaceType(specs, facet)),
