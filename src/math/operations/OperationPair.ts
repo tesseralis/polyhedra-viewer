@@ -2,7 +2,7 @@ import { isEqual, isMatch } from "lodash-es"
 import PolyhedronSpecs from "data/specs/PolyhedronSpecs"
 import { Polyhedron, VertexArg } from "math/polyhedra"
 import { Vec3D, getOrthonormalTransform, withOrigin } from "math/geom"
-import { OpArgs } from "./Operation"
+import { OpArgs, SolidArgs } from "./Operation"
 
 export type Side = "left" | "right"
 
@@ -31,26 +31,29 @@ export interface Pose {
   orientation: readonly [Vec3D, Vec3D]
 }
 
-export interface Solid<Specs extends PolyhedronSpecs> {
-  specs: Specs
-  geom: Polyhedron
-}
-
 export interface OpPairInput<Specs extends PolyhedronSpecs, L = {}, R = L> {
   // The graph of what polyhedron spec inputs are allowed and what maps to each other
   graph: OpPairGraph<Specs, L, R>
   // Get the intermediate polyhedron for the given graph entry
-  getIntermediate(entry: GraphEntry<Specs, L, R>): Specs | Solid<Specs>
+  getIntermediate(entry: GraphEntry<Specs, L, R>): Specs | SolidArgs<Specs>
   // Get the post of a left, right, or middle state
-  getPose(pos: Side | "middle", solid: Solid<Specs>, opts: GOpts<L, R>): Pose
+  getPose(
+    pos: Side | "middle",
+    solid: SolidArgs<Specs>,
+    opts: GOpts<L, R>,
+  ): Pose
   // Move the intermediate figure to the left position
-  toLeft(solid: Solid<Specs>, opts: GOpts<L, R>, result: Specs): VertexArg[]
+  toLeft(solid: SolidArgs<Specs>, opts: GOpts<L, R>, result: Specs): VertexArg[]
   // Move the intermediate figure to the right position
-  toRight(solid: Solid<Specs>, opts: GOpts<L, R>, result: Specs): VertexArg[]
+  toRight(
+    solid: SolidArgs<Specs>,
+    opts: GOpts<L, R>,
+    result: Specs,
+  ): VertexArg[]
 }
 
 function normalizeIntermediate<Specs extends PolyhedronSpecs>(
-  inter: Specs | Solid<Specs>,
+  inter: Specs | SolidArgs<Specs>,
 ) {
   if (inter instanceof PolyhedronSpecs) {
     return { specs: inter, geom: getGeom(inter) }
@@ -151,7 +154,7 @@ export default class OperationPair<
     return this.getEntry(side, specs, options)[oppositeSide(side)]
   }
 
-  apply<S extends Side>(side: S, solid: Solid<Specs>, opts: Opts<S, L, R>) {
+  apply<S extends Side>(side: S, solid: SolidArgs<Specs>, opts: Opts<S, L, R>) {
     const { getIntermediate, getPose, toLeft, toRight } = this.inputs
     const entry = this.getEntry(side, solid.specs, opts)
     const middle = normalizeIntermediate(getIntermediate(entry))

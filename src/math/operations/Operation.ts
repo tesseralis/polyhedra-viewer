@@ -31,8 +31,7 @@ interface PartialOpResult {
   }
 }
 
-// FIXME deduplicate with OperationPair
-interface SolidArgs<Specs extends PolyhedronSpecs> {
+export interface SolidArgs<Specs extends PolyhedronSpecs> {
   specs: Specs
   geom: Polyhedron
 }

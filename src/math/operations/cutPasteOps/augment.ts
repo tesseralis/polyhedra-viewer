@@ -295,7 +295,7 @@ function hasRotunda(info: AugmentSpecs) {
     return info.data.base === 10
   }
   if (info.isCapstone()) {
-    return info.isMono() && !info.isPyramid() && info.data.base === 5
+    return info.isMono() && !info.isPyramid() && info.isPentagonal()
   }
   return false
 }

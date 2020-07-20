@@ -63,6 +63,9 @@ export default class Capstone extends Specs<CapstoneData> {
   isElongated = () => this.data.elongation === "prism"
   isGyroelongated = () => this.data.elongation === "antiprism"
 
+  isGyro = () => this.data.gyrate === "gyro"
+  isOrtho = () => this.data.gyrate === "ortho"
+
   // Overwrite from PolyhedronSpec
   isChiral = () => this.isGyroelongated() && this.isBi() && !this.isPyramid()
 

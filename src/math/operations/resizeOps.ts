@@ -5,7 +5,12 @@ import Classical, { Facet, Family } from "data/specs/Classical"
 import { makeOpPair, combineOps, getGeom, Pose } from "./OperationPair"
 import { getPlane, withOrigin, Vec3D } from "math/geom"
 import { Polyhedron, Face, Edge } from "math/polyhedra"
-import { getTransformedVertices, FacetOpts, TwistOpts } from "./operationUtils"
+import {
+  getOppTwist,
+  getTransformedVertices,
+  FacetOpts,
+  TwistOpts,
+} from "./operationUtils"
 import { Plane } from "toxiclibsjs/geom"
 import Operation from "./Operation"
 
@@ -348,10 +353,6 @@ const _expand = makeOpPair<Classical, {}, FacetOpts>({
   toRight: (solid) => solid.geom.vertices,
 })
 
-function getOpp(twist: Twist) {
-  return twist === "left" ? "right" : "left"
-}
-
 const _snub = makeOpPair<Classical, TwistOpts, FacetOpts>({
   graph: Classical.query
     .where((s) => s.isRegular())
@@ -362,7 +363,7 @@ const _snub = makeOpPair<Classical, TwistOpts, FacetOpts>({
           operation: "snub",
           // If a vertex-solid, the chirality of the result
           // is *opposite* of the twist option
-          twist: entry.isVertex() ? getOpp(twist) : twist,
+          twist: entry.isVertex() ? getOppTwist(twist) : twist,
         }),
         options: { left: { twist }, right: { facet: entry.data.facet } },
       }))

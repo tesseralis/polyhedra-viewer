@@ -5,9 +5,13 @@ import { PrismaticType } from "data/specs/common"
 import PolyhedronSpecs from "data/specs/PolyhedronSpecs"
 import Capstone from "data/specs/Capstone"
 import Prismatic from "data/specs/Prismatic"
-import { combineOps, makeOpPair, Solid, Pose } from "./OperationPair"
-import Operation from "./Operation"
-import { TwistOpts, getTransformedVertices } from "./operationUtils"
+import { combineOps, makeOpPair, Pose } from "./OperationPair"
+import Operation, { SolidArgs } from "./Operation"
+import {
+  getOppTwist,
+  TwistOpts,
+  getTransformedVertices,
+} from "./operationUtils"
 import { withOrigin } from "math/geom"
 import { getAdjustInformation } from "./prismUtils"
 
@@ -115,7 +119,7 @@ interface PrismOpArgs {
   // The list of *right* args
   query(data: Capstone): boolean
   rightElongation?: "prism" | "antiprism"
-  getOrientation(solid: Solid<Capstone>): [FaceLike, Edge]
+  getOrientation(solid: SolidArgs<Capstone>): [FaceLike, Edge]
 }
 
 function makePrismOp({
@@ -176,8 +180,11 @@ const _elongate = makePrismOp({
   },
 })(null)
 
+const canGyroelongPyramid = (s: Capstone) => s.isPyramid() && s.data.base > 3
+const canGyroelongCupola = (s: Capstone) => !s.isPyramid() && !s.isDigonal()
+
 const pyramidOps = makePrismOp({
-  query: (s) => s.isPyramid() && s.isMono() && s.data.base > 3,
+  query: (s) => canGyroelongPyramid(s) && s.isMono(),
   getOrientation({ geom }) {
     const face = geom.largestFace()
     return [face, face.edges[0]]
@@ -187,7 +194,7 @@ const gyroelongPyramid = pyramidOps(null)
 const turnPyramid = pyramidOps("prism")
 
 const cupolaOps = makePrismOp({
-  query: (s) => !s.isPyramid() && s.isMono() && !s.isDigonal(),
+  query: (s) => canGyroelongCupola(s) && s.isMono(),
   getOrientation({ geom }) {
     // Pick a cap, favoring rotunda over cupola in the case of cupolarotundae
     const face = Cap.getAll(geom)[0].boundary()
@@ -200,7 +207,7 @@ const gyroelongCupola = cupolaOps(null)
 const turnCupola = cupolaOps("prism")
 
 const bipyramidOps = makePrismOp({
-  query: (s) => s.isPyramid() && s.isBi() && s.data.base > 3,
+  query: (s) => canGyroelongPyramid(s) && s.isBi(),
   getOrientation({ geom }) {
     // Pick a cap, favoring rotunda over cupola in the case of cupolarotundae
     const face = Cap.getAll(geom)[0].boundary()
@@ -216,27 +223,24 @@ function makeBicupolaPrismOp(leftElongation: null | "prism") {
     graph: Capstone.query
       .where(
         (s) =>
-          !s.isPyramid() &&
+          canGyroelongCupola(s) &&
           s.isBi() &&
-          !s.isDigonal() &&
           s.data.elongation === leftElongation,
       )
       .flatMap((entry) => {
-        // FIXME lol this is ugly
-        const [twist1, twist2]: [Twist, Twist] =
-          entry.data.gyrate === "gyro" ? ["left", "right"] : ["right", "left"]
-        return [
-          {
+        return (["left", "right"] as Twist[]).map((twist) => {
+          return {
             left: entry,
-            right: entry.withData({ elongation: "antiprism", twist: twist1 }),
-            options: { left: { twist: "left" }, right: { twist: "right" } },
-          },
-          {
-            left: entry,
-            right: entry.withData({ elongation: "antiprism", twist: twist2 }),
-            options: { left: { twist: "right" }, right: { twist: "left" } },
-          },
-        ]
+            right: entry.withData({
+              elongation: "antiprism",
+              // left twisting a gyro bicupola makes it be *left* twisted
+              // but the opposite for ortho bicupolae
+              twist: entry.isGyro() ? twist : getOppTwist(twist),
+            }),
+            // Left and right options are opposites of each other
+            options: { left: { twist }, right: { twist: getOppTwist(twist) } },
+          }
+        })
       }),
     getIntermediate: (entry) => entry.right,
     getPose(side, { specs, geom }, { right: { twist } }) {

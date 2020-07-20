@@ -12,6 +12,11 @@ export interface FacetOpts {
 export interface TwistOpts {
   twist?: Twist
 }
+
+export function getOppTwist(twist: Twist) {
+  return twist === "left" ? "right" : "left"
+}
+
 /**
  * Remove vertices in the polyhedron that aren't connected to any faces,
  * and remap the faces to the smaller indices
