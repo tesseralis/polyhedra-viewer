@@ -1,14 +1,9 @@
 import { mapValues } from "lodash-es"
 
-import { getAllSpecs } from "data/specs/getSpecs"
 import { Polygon } from "data/polygons"
 import { Vec3D, vec, PRECISION } from "math/geom"
 import { Polyhedron, Face, VertexArg, normalizeVertex } from "math/polyhedra"
-import {
-  snubChirality,
-  capstoneChirality,
-  deduplicateVertices,
-} from "./operationUtils"
+import { deduplicateVertices, getValidSpecs } from "./operationUtils"
 import { Point } from "types"
 import PolyhedronSpecs from "data/specs/PolyhedronSpecs"
 
@@ -170,18 +165,9 @@ export default class Operation<
   }
 
   private *validSpecs(polyhedron: Polyhedron): Generator<Specs> {
-    for (const specs of getAllSpecs(polyhedron.name)) {
+    for (const specs of getValidSpecs(polyhedron)) {
       if (this.opArgs.canApplyTo(specs)) {
-        if (specs.isClassical() && specs.isChiral()) {
-          // Hack to make the it return specs with the right chirality
-          yield specs.withData({ twist: snubChirality(polyhedron) }) as any
-        } else if (specs.isCapstone() && specs.isChiral()) {
-          yield specs.withData({
-            twist: capstoneChirality(polyhedron),
-          }) as any
-        } else {
-          yield specs as any
-        }
+        yield specs as any
       }
     }
   }
