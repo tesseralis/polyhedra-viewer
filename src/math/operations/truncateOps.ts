@@ -127,62 +127,50 @@ const amboTruncate = makeOpPair({
   toRight: ({ geom }) => geom.vertices,
 })
 
-const _truncate = makeOpPair({
-  graph: Classical.query
-    .where((s) => s.isRegular())
-    .map((entry) => {
-      return {
-        left: entry,
-        right: entry.withData({ operation: "truncate" }),
-      }
-    }),
-  getIntermediate: (entry) => entry.right,
-  getPose: (side, { geom }) =>
-    side === "left" ? regularPose(geom) : truncatedPose(geom),
-  toLeft: ({ geom, specs }) => truncatedToRegular(specs, geom),
-  toRight: ({ geom }) => geom.vertices,
-})
+interface TruncateOpPairInputs {
+  left: "regular" | "truncate"
+  right: "truncate" | "rectify"
+}
 
-const _cotruncate = makeOpPair<Classical, {}, FacetOpts>({
-  graph: Classical.query
-    .where((s) => s.isTruncated())
-    .map((entry) => {
-      return {
-        left: entry,
-        right: entry.withData({ operation: "rectify" }),
-        options: { left: {}, right: { facet: entry.data.facet } },
+function makeTruncateOpPair({ left, right }: TruncateOpPairInputs) {
+  return makeOpPair({
+    graph: Classical.query
+      .where((s) => s.isTruncated())
+      .map((entry) => {
+        return {
+          left: entry.withData({ operation: left }),
+          right: entry.withData({ operation: right }),
+          options:
+            right === "rectify"
+              ? { left: {}, right: { facet: entry.data.facet } }
+              : undefined,
+        }
+      }),
+    // The "middle" data is always going to be the truncated polyhedron
+    getIntermediate: (entry) => entry.left.withData({ operation: "truncate" }),
+    getPose: (side, { geom, specs }, options) => {
+      switch (specs.data.operation) {
+        case "regular":
+          return regularPose(geom)
+        case "truncate":
+          return truncatedPose(geom)
+        case "rectify":
+          return rectifiedPose(specs, geom, options?.right?.facet)
       }
-    }),
-  getIntermediate: (entry) => entry.left,
-  getPose: (side, { specs, geom }, { right: { facet } }) =>
-    side === "right" ? rectifiedPose(specs, geom, facet) : truncatedPose(geom),
-  toLeft: ({ geom }) => geom.vertices,
-  toRight: ({ geom }) => truncatedToRectified(geom),
-})
+      throw new Error(`Unknown operation: ${specs.data.operation}`)
+    },
+    toLeft: ({ geom, specs }) =>
+      left === "regular" ? truncatedToRegular(specs, geom) : geom.vertices,
+    toRight: ({ geom }) =>
+      right === "rectify" ? truncatedToRectified(geom) : geom.vertices,
+  })
+}
 
-// TODO support double rectification
-const _rectify = makeOpPair<Classical, {}, FacetOpts>({
-  graph: Classical.query
-    .where((s) => s.isRegular())
-    .map((entry) => ({
-      left: entry,
-      right: entry.withData({ operation: "rectify" }),
-      options: { left: {}, right: { facet: entry.data.facet } },
-    })),
-  getIntermediate: ({ left }) => left.withData({ operation: "truncate" }),
-  getPose(side, { geom, specs }, { right: { facet } }) {
-    switch (side) {
-      case "left":
-        return regularPose(geom)
-      case "middle":
-        return truncatedPose(geom)
-      case "right":
-        return rectifiedPose(specs, geom, facet)
-    }
-  },
-  toLeft: ({ geom, specs }) => truncatedToRegular(specs, geom),
-  toRight: (solid) => truncatedToRectified(solid.geom),
-})
+const _truncate = makeTruncateOpPair({ left: "regular", right: "truncate" })
+
+const _cotruncate = makeTruncateOpPair({ left: "truncate", right: "rectify" })
+
+const _rectify = makeTruncateOpPair({ left: "regular", right: "rectify" })
 
 // Exported operations
 
