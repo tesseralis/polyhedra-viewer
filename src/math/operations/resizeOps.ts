@@ -230,7 +230,6 @@ const bevelledDists = createObject([3, 4, 5], (family: Family) => {
 })
 
 function getSnubAngle(specs: Classical, facet: Facet) {
-  // FIXME this is getting me really inconsistent results
   const sign = specs.data.twist === "left" ? -1 : 1
   // if vertex-solid, reverse the sign
   // FIXME I think this is twisting in a weird way for icosahedron
