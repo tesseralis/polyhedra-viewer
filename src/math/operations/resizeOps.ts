@@ -18,8 +18,7 @@ import Operation, { makeOperation } from "./Operation"
 
 function getIcosahedronSnubFaces(polyhedron: Polyhedron) {
   const f0 = polyhedron.faceWithNumSides(3)
-  const rest = f0.edges.map((e) => e.twin().prev().twin().next().twinFace())
-  return [f0, ...rest]
+  return [f0, ...f0.edges.map((e) => oppositeFace(e, "right"))]
 }
 
 function getCantellatedTetrahedronFaces(polyhedron: Polyhedron, odd?: boolean) {
@@ -27,8 +26,7 @@ function getCantellatedTetrahedronFaces(polyhedron: Polyhedron, odd?: boolean) {
   if (odd) {
     f0 = f0.edges[0].twin().next().twinFace()
   }
-  const rest = f0.edges.map((e) => oppositeFace(e))
-  return [f0, ...rest]
+  return [f0, ...f0.edges.map((e) => oppositeFace(e))]
 }
 
 function getBevelledTetrahedronFaces(polyhedron: Polyhedron) {
