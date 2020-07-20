@@ -1,6 +1,6 @@
-import { sum, meanBy, findKey } from "lodash-es"
-import { Polyhedron, Face, Edge } from "math/polyhedra"
-import Classical, { Facet } from "data/specs/Classical"
+import { sum, findKey } from "lodash-es"
+import { Polyhedron, Face } from "math/polyhedra"
+import Classical, { Operation as OpName, Facet } from "data/specs/Classical"
 import { makeOpPair, combineOps, Pose } from "./operationPairs"
 import Operation, { OpArgs } from "./Operation"
 import {
@@ -8,27 +8,21 @@ import {
   FacetOpts,
   getTransformedVertices,
 } from "./operationUtils"
+// FIXME move this to a util
+import { getCantellatedFace } from "./resizeOps"
 
 function getSharpenFaces(polyhedron: Polyhedron) {
   const faceType = polyhedron.smallestFace().numSides
   return polyhedron.faces.filter((f) => f.numSides === faceType)
 }
 
-function calculateSharpenDist(face: Face, edge: Edge) {
-  const apothem = face.apothem()
-  const theta = Math.PI - edge.dihedralAngle()
-  return apothem * Math.tan(theta)
+function getSharpenDist(face: Face) {
+  const theta = Math.PI - face.edges[0].dihedralAngle()
+  return face.apothem() * Math.tan(theta)
 }
 
-function getSharpenDist(info: Classical, face: Face) {
-  if (info.isBevelled()) {
-    return meanBy(face.edges, (edge) => calculateSharpenDist(face, edge))
-  }
-  return calculateSharpenDist(face, face.edges[0])
-}
-
-function getVertexToAdd(info: Classical, face: Face) {
-  const dist = getSharpenDist(info, face)
+function getVertexToAdd(face: Face) {
+  const dist = getSharpenDist(face)
   return face.normalRay().getPointAtDistance(dist)
 }
 
@@ -42,14 +36,9 @@ function getAvgInradius(specs: Classical, geom: Polyhedron) {
       geom.faceWithNumSides(2 * specs.data.family),
     ]
   } else if (specs.isCantellated()) {
-    // FIXME use isCantellatedFace from resizeOps
     faces = [
       geom.faceWithNumSides(3),
-      geom.faces.find(
-        (f) =>
-          f.numSides === specs.data.family &&
-          f.adjacentFaces().every((f) => f.numSides === 4),
-      )!,
+      getCantellatedFace(geom, specs.data.family),
     ]
   } else {
     throw new Error(`Invalid specs: ${specs.name()}`)
@@ -100,9 +89,9 @@ function rectifiedPose(
 }
 
 // Get the regular face of a truncated solid
-function truncToReg(specs: Classical, geom: Polyhedron) {
+function truncToReg(geom: Polyhedron) {
   const sharpenFaces = getSharpenFaces(geom)
-  const verticesToAdd = sharpenFaces.map((face) => getVertexToAdd(specs, face))
+  const verticesToAdd = sharpenFaces.map((face) => getVertexToAdd(face))
   const oldToNew: Record<number, number> = {}
   sharpenFaces.forEach((face, i) => {
     face.vertices.forEach((v) => {
@@ -119,11 +108,6 @@ function truncToRect(geom: Polyhedron) {
     (e) => e.face.numSides > 5 && e.twinFace().numSides > 5,
   )
   return getTransformedVertices(edges, (e) => e.midpoint())
-}
-
-interface AmboTruncateOpPairInputs {
-  left: "rectify" | "bevel"
-  right: "bevel" | "cantellate"
 }
 
 function bevToRect(specs: Classical, geom: Polyhedron, resultSpec: Classical) {
@@ -166,147 +150,155 @@ function bevToCant(specs: Classical, geom: Polyhedron, resultSpec: Classical) {
   })
 }
 
-function makeAmboTruncateOpPair(args: AmboTruncateOpPairInputs) {
-  const { left, right } = args
-  return makeOpPair({
-    graph: Classical.query
-      .where((s) => s.isBevelled())
-      .map((entry) => {
-        return {
-          left: entry.withData({ operation: left }),
-          right: entry.withData({ operation: right }),
-        }
-      }),
-    // The "middle" data is always going to be the truncated polyhedron
-    middle:
-      (findKey(args, "bevel") as "left" | "right" | undefined) ??
-      ((entry: any) => entry.left.withData({ operation: "bevel" })),
-    getPose: (side, { geom, specs }, options) => {
+interface Trio<L, M = L, R = M> {
+  left: L
+  middle: M
+  right: R
+}
+
+interface TruncateTrioArgs<L, M, R> {
+  operations: Trio<L, M, R>
+  poses: Trio<(...args: any[]) => Pose>
+  transformers: Omit<Trio<(...args: any[]) => any[]>, "middle">
+  options?: Partial<Omit<Trio<(entry: Classical) => any>, "middle">>
+}
+
+function makeTruncateTrio<L extends OpName, M extends OpName, R extends OpName>(
+  args: TruncateTrioArgs<L, M, R>,
+) {
+  interface Inputs {
+    left: L | M
+    right: M | R
+  }
+  const { operations, poses, transformers, options } = args
+  const { left: leftOp, middle: middleOp, right: rightOp } = operations
+  function _makeTruncateOpPair(args: Inputs) {
+    const { left, right } = args
+    return makeOpPair({
+      graph: Classical.query
+        .where((s) => s.data.operation === middleOp)
+        .map((entry) => {
+          return {
+            left: entry.withData({ operation: left }),
+            right: entry.withData({ operation: right }),
+            options: {
+              left: options?.left?.(entry),
+              right: options?.right?.(entry),
+            },
+          }
+        }),
+      // The "middle" data is always going to be the truncated polyhedron
+      middle:
+        (findKey(args, middleOp) as "left" | "right" | undefined) ??
+        ((entry: any) => entry.left.withData({ operation: middleOp })),
+      getPose: ($, { geom, specs }, options) => {
+        const side = findKey(operations, (val) => val === specs.data.operation)!
+        const poseFn = (poses as any)[side]
+        return poseFn(side, { geom, specs }, options)
+      },
+      toLeft: left === leftOp ? transformers.left : undefined,
+      toRight: right === rightOp ? transformers.right : undefined,
+    })
+  }
+
+  return {
+    truncate: _makeTruncateOpPair({ left: leftOp, right: middleOp }),
+    cotruncate: _makeTruncateOpPair({ left: middleOp, right: rightOp }),
+    rectify: _makeTruncateOpPair({ left: leftOp, right: rightOp }),
+  }
+}
+
+const ambos = makeTruncateTrio({
+  operations: {
+    left: "rectify",
+    middle: "bevel",
+    right: "cantellate",
+  },
+  poses: {
+    left(side, { geom, specs }) {
       const origin = geom.centroid()
-      switch (specs.data.operation) {
-        case "rectify": {
-          const face = geom.faceWithNumSides(specs.data.family)
-          const crossAxis = face.edges[0].midpoint().sub(face.centroid())
-          return {
-            origin,
-            scale: getAvgInradius(specs, geom),
-            orientation: [face.normal(), crossAxis],
-          }
-        }
-        case "bevel": {
-          const face = geom.faceWithNumSides(specs.data.family * 2)
-          const edge = face.edges.find((e) => e.twinFace().numSides !== 4)!
-          const crossAxis = edge.midpoint().sub(face.centroid())
-          return {
-            origin,
-            scale: getAvgInradius(specs, geom),
-            orientation: [face.normal(), crossAxis],
-          }
-        }
-        case "cantellate": {
-          const face = geom.faces.find(
-            (f) =>
-              f.numSides === specs.data.family &&
-              f.adjacentFaces().every((f) => f.numSides === 4),
-          )!
-          const crossAxis = face.vertices[0].vec.sub(face.centroid())
-          return {
-            origin,
-            scale: getAvgInradius(specs, geom),
-            orientation: [face.normal(), crossAxis],
-          }
-        }
+      const face = geom.faceWithNumSides(specs.data.family)
+      const crossAxis = face.edges[0].midpoint().sub(face.centroid())
+      return {
+        origin,
+        scale: getAvgInradius(specs, geom),
+        orientation: [face.normal(), crossAxis],
       }
-      throw new Error(`Unknown operation: ${specs.data.operation}`)
     },
-    toLeft:
-      left === "rectify"
-        ? ({ geom, specs }, $, result) => bevToRect(specs, geom, result)
-        : undefined,
-    toRight:
-      right === "cantellate"
-        ? ({ geom, specs }, $, result) => bevToCant(specs, geom, result)
-        : undefined,
-  })
-}
-
-const amboTruncate = makeAmboTruncateOpPair({ left: "rectify", right: "bevel" })
-const amboCotruncate = makeAmboTruncateOpPair({
-  left: "bevel",
-  right: "cantellate",
-})
-const amboRectify = makeAmboTruncateOpPair({
-  left: "rectify",
-  right: "cantellate",
+    middle(side, { geom, specs }) {
+      const origin = geom.centroid()
+      const face = geom.faceWithNumSides(specs.data.family * 2)
+      const edge = face.edges.find((e: any) => e.twinFace().numSides !== 4)!
+      const crossAxis = edge.midpoint().sub(face.centroid())
+      return {
+        origin,
+        scale: getAvgInradius(specs, geom),
+        orientation: [face.normal(), crossAxis],
+      }
+    },
+    right(side, { geom, specs }) {
+      const origin = geom.centroid()
+      const face = getCantellatedFace(geom, specs.data.family)
+      const crossAxis = face.vertices[0].vec.sub(face.centroid())
+      return {
+        origin,
+        scale: getAvgInradius(specs, geom),
+        orientation: [face.normal(), crossAxis],
+      }
+    },
+  },
+  transformers: {
+    left: ({ geom, specs }, $, result) => bevToRect(specs, geom, result),
+    right: ({ geom, specs }, $, result) => bevToCant(specs, geom, result),
+  },
 })
 
-interface TruncateOpPairInputs {
-  left: "regular" | "truncate"
-  right: "truncate" | "rectify"
-}
-
-function makeTruncateOpPair(args: TruncateOpPairInputs) {
-  const { left, right } = args
-  return makeOpPair({
-    graph: Classical.query
-      .where((s) => s.isTruncated())
-      .map((entry) => {
-        return {
-          left: entry.withData({ operation: left }),
-          right: entry.withData({ operation: right }),
-          options:
-            right === "rectify"
-              ? { left: {}, right: { facet: entry.data.facet } }
-              : undefined,
-        }
-      }),
-    // The "middle" data is always going to be the truncated polyhedron
-    middle:
-      (findKey(args, "truncate") as "left" | "right" | undefined) ??
-      ((entry: any) => entry.left.withData({ operation: "truncate" })),
-    getPose: (side, { geom, specs }, options) => {
-      switch (specs.data.operation) {
-        case "regular":
-          return regularPose(geom)
-        case "truncate":
-          return truncatedPose(geom)
-        case "rectify":
-          return rectifiedPose(specs, geom, options?.right?.facet)
-      }
-      throw new Error(`Unknown operation: ${specs.data.operation}`)
+const regs = makeTruncateTrio({
+  operations: {
+    left: "regular",
+    middle: "truncate",
+    right: "rectify",
+  },
+  options: {
+    right: (entry) => ({ facet: entry.data.facet }),
+  },
+  poses: {
+    left($, { geom }) {
+      return regularPose(geom)
     },
-    toLeft:
-      left === "regular"
-        ? ({ geom, specs }) => truncToReg(specs, geom)
-        : undefined,
-    toRight: right === "rectify" ? ({ geom }) => truncToRect(geom) : undefined,
-  })
-}
-
-const _truncate = makeTruncateOpPair({ left: "regular", right: "truncate" })
-const _cotruncate = makeTruncateOpPair({ left: "truncate", right: "rectify" })
-const _rectify = makeTruncateOpPair({ left: "regular", right: "rectify" })
+    middle($, { geom }) {
+      return truncatedPose(geom)
+    },
+    right($, { specs, geom }, options) {
+      return rectifiedPose(specs, geom, options?.right?.facet)
+    },
+  },
+  transformers: {
+    left: ({ geom }) => truncToReg(geom),
+    right: ({ geom }) => truncToRect(geom),
+  },
+})
 
 // Exported operations
 
 export const truncate = new Operation(
   "truncate",
-  combineOps([_truncate.left, amboTruncate.left]),
+  combineOps([regs.truncate.left, ambos.truncate.left]),
 )
 
 export const cotruncate = new Operation(
   "cotruncate",
-  combineOps([_cotruncate.left, amboCotruncate.left]),
+  combineOps([regs.cotruncate.left, ambos.cotruncate.left]),
 )
 
 export const rectify = new Operation(
   "rectify",
-  combineOps([_rectify.left, amboRectify.left]),
+  combineOps([regs.rectify.left, ambos.rectify.left]),
 )
 
 export const sharpen = new Operation(
   "sharpen",
-  combineOps([_truncate.right, amboTruncate.right]),
+  combineOps([regs.truncate.right, ambos.truncate.right]),
 )
 
 const hitOptArgs: Partial<OpArgs<FacetOpts, Classical>> = {
@@ -327,13 +319,16 @@ const hitOptArgs: Partial<OpArgs<FacetOpts, Classical>> = {
 
 export const cosharpen = new Operation("cosharpen", {
   ...combineOps<Classical, FacetOpts>([
-    _cotruncate.right,
-    amboCotruncate.right,
+    regs.cotruncate.right,
+    ambos.cotruncate.right,
   ]),
   ...hitOptArgs,
 })
 
 export const unrectify = new Operation("unrectify", {
-  ...combineOps<Classical, FacetOpts>([_rectify.right, amboRectify.right]),
+  ...combineOps<Classical, FacetOpts>([
+    regs.rectify.right,
+    ambos.rectify.right,
+  ]),
   ...hitOptArgs,
 })

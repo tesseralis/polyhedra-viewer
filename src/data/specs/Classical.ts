@@ -17,7 +17,7 @@ const operations = [
   "cantellate",
   "snub",
 ] as const
-type Operation = Items<typeof operations>
+export type Operation = Items<typeof operations>
 
 interface ClassicalData {
   family: Family

@@ -173,11 +173,17 @@ const snubAngles = createObject([3, 4, 5], (family: Family) => {
   }
 })
 
-function isCantellatedFace(face: Face, faceType: number) {
+export function isCantellatedFace(face: Face, faceType: number) {
   return (
     face.numSides === faceType &&
     face.adjacentFaces().every((f) => f.numSides === 4)
   )
+}
+
+export function getCantellatedFace(geom: Polyhedron, faceType: number) {
+  const face = geom.faces.find((f) => isCantellatedFace(f, faceType))
+  if (!face) throw new Error(`Could not find cantellated face for ${geom.name}`)
+  return face
 }
 
 function isSnubFace(face: Face, faceType: number) {
@@ -191,7 +197,7 @@ function isSnubFace(face: Face, faceType: number) {
 const cantellatedDists = createObject([3, 4, 5], (family: Family) => {
   const specs = Classical.query.withData({ family, operation: "cantellate" })
   const geom = getGeometry(specs)
-  const face = geom.faces.find((face) => isCantellatedFace(face, family))!
+  const face = getCantellatedFace(geom, family)
   return face.distanceToCenter() / geom.edgeLength()
 })
 
@@ -249,7 +255,7 @@ function getCantellatedPose(
 ): Pose {
   const faceType = getFaceType(specs, facet)
   // Use an expanded face as the face
-  const face = geom.faces.find((face) => isCantellatedFace(face, faceType))!
+  const face = getCantellatedFace(geom, faceType)
   // Pick one of the edges as cross axis
   return getPose(geom, face, apothemVec(face.edges[0]))
 }
