@@ -4,10 +4,13 @@ import { getAllSpecs } from "data/specs/getSpecs"
 import { Polygon } from "data/polygons"
 import { Vec3D, vec, PRECISION } from "math/geom"
 import { Polyhedron, Face, VertexArg, normalizeVertex } from "math/polyhedra"
-import { deduplicateVertices } from "./operationUtils"
+import {
+  snubChirality,
+  capstoneChirality,
+  deduplicateVertices,
+} from "./operationUtils"
 import { Point } from "types"
 import PolyhedronSpecs from "data/specs/PolyhedronSpecs"
-import { getChirality as getCapstoneChirality } from "./prismUtils"
 
 type SelectState = "selected" | "selectable" | undefined
 
@@ -152,15 +155,6 @@ function normalizeOpResult(
   }
 }
 
-function getChirality(geom: Polyhedron) {
-  if (geom.largestFace().numSides === 3) {
-    return "left"
-  }
-  const face = geom.faces.find((f) => f.numSides !== 3)!
-  const other = face.edges[0].twin().prev().twin().next().twinFace()
-  return other.numSides !== 3 ? "right" : "left"
-}
-
 export default class Operation<
   Options extends {} = {},
   Specs extends PolyhedronSpecs = PolyhedronSpecs
@@ -180,10 +174,10 @@ export default class Operation<
       if (this.opArgs.canApplyTo(specs)) {
         if (specs.isClassical() && specs.isChiral()) {
           // Hack to make the it return specs with the right chirality
-          yield specs.withData({ twist: getChirality(polyhedron) }) as any
+          yield specs.withData({ twist: snubChirality(polyhedron) }) as any
         } else if (specs.isCapstone() && specs.isChiral()) {
           yield specs.withData({
-            twist: getCapstoneChirality(polyhedron),
+            twist: capstoneChirality(polyhedron),
           }) as any
         } else {
           yield specs as any

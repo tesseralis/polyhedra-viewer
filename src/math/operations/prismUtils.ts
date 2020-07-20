@@ -4,22 +4,6 @@ import { isInverse } from "math/geom"
 import PolyhedronSpecs from "data/specs/PolyhedronSpecs"
 import Prismatic from "data/specs/Prismatic"
 
-// TODO deduplicate with snub polyhedra if possible
-export function getChirality(polyhedron: Polyhedron) {
-  const [cap1, cap2] = Cap.getAll(polyhedron)
-  const boundary = cap1.boundary()
-  const isCupolaRotunda = cap1.type !== cap2.type
-
-  const nonTriangleFace = boundary.edges.find((e) => e.face.numSides !== 3)!
-  const rightFaceAcross = nonTriangleFace.twin().prev().twin().next().twin()
-    .face
-  // I'm pretty sure this is the same logic as in augment
-  if (isCupolaRotunda) {
-    return rightFaceAcross.numSides !== 3 ? "right" : "left"
-  }
-  return rightFaceAcross.numSides !== 3 ? "left" : "right"
-}
-
 function getOppositeCaps(polyhedron: Polyhedron) {
   const caps = Cap.getAll(polyhedron)
   for (const cap of caps) {
