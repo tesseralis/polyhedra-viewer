@@ -323,7 +323,6 @@ const semiExpand = makeOpPair<Classical, {}, FacetOpts>({
       bevelledDists[specs.data.family][facet],
     )
   },
-  toRight: (solid) => solid.geom.vertices,
 })
 
 const _expand = makeOpPair<Classical, {}, FacetOpts>({
@@ -351,7 +350,6 @@ const _expand = makeOpPair<Classical, {}, FacetOpts>({
       getInradius(result),
     )
   },
-  toRight: (solid) => solid.geom.vertices,
 })
 
 const _snub = makeOpPair<Classical, TwistOpts, FacetOpts>({
@@ -386,7 +384,6 @@ const _snub = makeOpPair<Classical, TwistOpts, FacetOpts>({
       getSnubAngle(specs, facet),
     )
   },
-  toRight: (solid) => solid.geom.vertices,
 })
 
 const _twist = makeOpPair<Classical, TwistOpts, {}>({
@@ -414,7 +411,6 @@ const _twist = makeOpPair<Classical, TwistOpts, {}>({
       getSnubAngle(specs, "face"),
     )
   },
-  toRight: (solid) => solid.geom.vertices,
 })
 
 function getCantellatedMidradius(geom: Polyhedron) {

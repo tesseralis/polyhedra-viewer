@@ -48,9 +48,13 @@ interface OpPairInput<Specs extends PolyhedronSpecs, L = {}, R = L> {
     opts: GOpts<L, R>,
   ): Pose
   // Move the intermediate figure to the left position
-  toLeft(solid: SolidArgs<Specs>, opts: GOpts<L, R>, result: Specs): VertexArg[]
+  toLeft?(
+    solid: SolidArgs<Specs>,
+    opts: GOpts<L, R>,
+    result: Specs,
+  ): VertexArg[]
   // Move the intermediate figure to the right position
-  toRight(
+  toRight?(
     solid: SolidArgs<Specs>,
     opts: GOpts<L, R>,
     result: Specs,
@@ -85,6 +89,12 @@ function alignPolyhedron(solid: Polyhedron, pose1: Pose, pose2: Pose) {
 
 function specsEquals(spec1: PolyhedronSpecs, spec2: PolyhedronSpecs) {
   return isEqual(spec1.data, spec2.data)
+}
+
+function defaultGetter<Specs extends PolyhedronSpecs>({
+  geom,
+}: SolidArgs<Specs>) {
+  return geom.vertices
 }
 
 type Opts<S extends Side, L, R> = S extends "left" ? L : R
@@ -141,7 +151,12 @@ class OpPair<
   }
 
   apply<S extends Side>(side: S, solid: SolidArgs<Specs>, opts: Opts<S, L, R>) {
-    const { middle: getMiddle, getPose, toLeft, toRight } = this.inputs
+    const {
+      middle: getMiddle,
+      getPose,
+      toLeft = defaultGetter,
+      toRight = defaultGetter,
+    } = this.inputs
     const entry = this.getEntry(side, solid.specs, opts)
     const options = entry.options ?? ({ left: {}, right: {} } as GOpts<L, R>)
     const startPose = getPose(side, solid, options)

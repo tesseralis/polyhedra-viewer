@@ -71,7 +71,7 @@ function rectifiedPose(
 }
 
 // Get the regular face of a truncated solid
-function truncatedToRegular(specs: Classical, geom: Polyhedron) {
+function truncToReg(specs: Classical, geom: Polyhedron) {
   const sharpenFaces = getSharpenFaces(geom)
   const verticesToAdd = sharpenFaces.map((face) => getVertexToAdd(specs, face))
   const oldToNew: Record<number, number> = {}
@@ -85,7 +85,7 @@ function truncatedToRegular(specs: Classical, geom: Polyhedron) {
   )
 }
 
-function truncatedToRectified(geom: Polyhedron) {
+function truncToRect(geom: Polyhedron) {
   const edges = geom.edges.filter(
     (e) => e.face.numSides > 5 && e.twinFace().numSides > 5,
   )
@@ -123,8 +123,7 @@ const amboTruncate = makeOpPair({
       }
     }
   },
-  toLeft: ({ geom, specs }) => truncatedToRegular(specs, geom),
-  toRight: ({ geom }) => geom.vertices,
+  toLeft: ({ geom, specs }) => truncToReg(specs, geom),
 })
 
 interface TruncateOpPairInputs {
@@ -162,10 +161,11 @@ function makeTruncateOpPair(args: TruncateOpPairInputs) {
       }
       throw new Error(`Unknown operation: ${specs.data.operation}`)
     },
-    toLeft: ({ geom, specs }) =>
-      left === "regular" ? truncatedToRegular(specs, geom) : geom.vertices,
-    toRight: ({ geom }) =>
-      right === "rectify" ? truncatedToRectified(geom) : geom.vertices,
+    toLeft:
+      left === "regular"
+        ? ({ geom, specs }) => truncToReg(specs, geom)
+        : undefined,
+    toRight: right === "rectify" ? ({ geom }) => truncToRect(geom) : undefined,
   })
 }
 

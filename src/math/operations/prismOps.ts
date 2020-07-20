@@ -145,7 +145,6 @@ function makePrismOp({
         const fn = leftElongation === "prism" ? doTurn : doShorten
         return fn(specs, geom, twist)
       },
-      toRight: (solid) => solid.geom.vertices,
     })
   }
 }
@@ -164,7 +163,6 @@ const turnPrismatic = makeOpPair({
     return getPose(face, face.edges[0], specs.data.type, "left")
   },
   toLeft: ({ geom, specs }) => doTurn(specs, geom, "left"),
-  toRight: ({ geom }) => geom.vertices,
 })
 
 const _elongate = makePrismOp({
@@ -257,7 +255,6 @@ function makeBicupolaPrismOp(leftElongation: null | "prism") {
       const fn = leftElongation === "prism" ? doTurn : doShorten
       return fn(specs, geom, twist)
     },
-    toRight: (solid) => solid.geom.vertices,
   })
 }
 
