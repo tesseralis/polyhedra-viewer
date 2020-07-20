@@ -23,7 +23,7 @@ function getOppositePrismFaces(specs: Prismatic, polyhedron: Polyhedron) {
 }
 
 // Get information for figuring out how to twist or shorten a polyhedron
-export function getAdjustInformation(
+export function getOppositeFacets(
   specs: PolyhedronSpecs,
   polyhedron: Polyhedron,
 ) {
@@ -33,7 +33,6 @@ export function getAdjustInformation(
   if (!specs.isCapstone()) {
     throw new Error(`Invalid spec provided: ${specs.name()}`)
   }
-
   if (specs.isBi()) {
     return getOppositeCaps(polyhedron)
   }

@@ -66,6 +66,28 @@ export function* getValidSpecs(geom: Polyhedron): Generator<PolyhedronSpecs> {
 }
 
 /**
+ * Return the Polyhedron geometry matching the given specs
+ */
+export function getGeometry(specs: PolyhedronSpecs) {
+  const geom = Polyhedron.get(specs.canonicalName())
+  // The reference models are always right-handed,
+  // so flip 'em if not
+  // TODO don't rely on this and make it more general
+  if (specs.isClassical() && specs.isSnub() && specs.data.twist === "left") {
+    return geom.reflect()
+  }
+
+  if (specs.isCapstone() && specs.isChiral()) {
+    if (specs.isCupolaRotunda() && specs.data.twist === "left") {
+      return geom.reflect()
+    } else if (!specs.isCupolaRotunda() && specs.data.twist === "right") {
+      return geom.reflect()
+    }
+  }
+  return geom
+}
+
+/**
  * Remove vertices in the polyhedron that aren't connected to any faces,
  * and remap the faces to the smaller indices
  */

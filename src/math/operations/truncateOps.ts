@@ -1,7 +1,7 @@
 import { meanBy } from "lodash-es"
 import { Polyhedron, Face, Edge } from "math/polyhedra"
 import Classical, { Facet } from "data/specs/Classical"
-import { makeOpPair, combineOps, Pose } from "./OperationPair"
+import { makeOpPair, combineOps, Pose } from "./operationPairs"
 import Operation, { OpArgs } from "./Operation"
 import { FacetOpts, getTransformedVertices } from "./operationUtils"
 

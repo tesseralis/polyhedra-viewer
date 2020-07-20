@@ -5,7 +5,7 @@ import { PrismaticType } from "data/specs/common"
 import PolyhedronSpecs from "data/specs/PolyhedronSpecs"
 import Capstone from "data/specs/Capstone"
 import Prismatic from "data/specs/Prismatic"
-import { combineOps, makeOpPair, Pose } from "./OperationPair"
+import { combineOps, makeOpPair, Pose } from "./operationPairs"
 import Operation, { SolidArgs } from "./Operation"
 import {
   getOppTwist,
@@ -13,7 +13,7 @@ import {
   getTransformedVertices,
 } from "./operationUtils"
 import { withOrigin } from "math/geom"
-import { getAdjustInformation } from "./prismUtils"
+import { getOppositeFacets } from "./prismUtils"
 
 const { cos, PI, sqrt } = Math
 
@@ -86,7 +86,7 @@ function getScaledPrismVertices(
   scale: number,
   twist?: Twist,
 ) {
-  const vertexSets = getAdjustInformation(specs, geom)
+  const vertexSets = getOppositeFacets(specs, geom)
   const angle = (getTwistMult(twist) * PI) / getNumSides(specs)
 
   return getTransformedVertices(vertexSets, (set) =>

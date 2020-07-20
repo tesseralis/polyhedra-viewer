@@ -3,6 +3,7 @@ import PolyhedronSpecs from "data/specs/PolyhedronSpecs"
 import { Polyhedron, VertexArg } from "math/polyhedra"
 import { Vec3D, getOrthonormalTransform, withOrigin } from "math/geom"
 import { OpArgs, SolidArgs } from "./Operation"
+import { getGeometry } from "./operationUtils"
 
 export type Side = "left" | "right"
 
@@ -31,7 +32,7 @@ export interface Pose {
   orientation: readonly [Vec3D, Vec3D]
 }
 
-export interface OpPairInput<Specs extends PolyhedronSpecs, L = {}, R = L> {
+interface OpPairInput<Specs extends PolyhedronSpecs, L = {}, R = L> {
   // The graph of what polyhedron spec inputs are allowed and what maps to each other
   graph: OpPairGraph<Specs, L, R>
   // Get the intermediate polyhedron for the given graph entry
@@ -56,7 +57,7 @@ function normalizeIntermediate<Specs extends PolyhedronSpecs>(
   inter: Specs | SolidArgs<Specs>,
 ) {
   if (inter instanceof PolyhedronSpecs) {
-    return { specs: inter, geom: getGeom(inter) }
+    return { specs: inter, geom: getGeometry(inter) }
   }
   return inter
 }
@@ -82,28 +83,9 @@ function specsEquals(spec1: PolyhedronSpecs, spec2: PolyhedronSpecs) {
   return isEqual(spec1.data, spec2.data)
 }
 
-export function getGeom(specs: PolyhedronSpecs) {
-  const geom = Polyhedron.get(specs.canonicalName())
-  // The reference models are always right-handed,
-  // so flip 'em if not
-  // TODO don't rely on this and make it more general
-  if (specs.isClassical() && specs.isSnub() && specs.data.twist === "left") {
-    return geom.reflect()
-  }
+type Opts<S extends Side, L, R> = S extends "left" ? L : R
 
-  if (specs.isCapstone() && specs.isChiral()) {
-    if (specs.isCupolaRotunda() && specs.data.twist === "left") {
-      return geom.reflect()
-    } else if (!specs.isCupolaRotunda() && specs.data.twist === "right") {
-      return geom.reflect()
-    }
-  }
-  return geom
-}
-
-export type Opts<S extends Side, L, R> = S extends "left" ? L : R
-
-export default class OperationPair<
+class OperationPair<
   Specs extends PolyhedronSpecs,
   L extends {} = {},
   R extends {} = L
@@ -171,7 +153,7 @@ export default class OperationPair<
 
     const endSide = oppositeSide(side)
     const endSpecs = entry[endSide]
-    const endGeom = getGeom(endSpecs)
+    const endGeom = getGeometry(endSpecs)
     const alignedEnd = alignPolyhedron(
       endGeom,
       getPose(endSide, { specs: endSpecs, geom: endGeom }, options),
@@ -200,7 +182,7 @@ type OpInput<O, S extends PolyhedronSpecs> = Required<
   >
 >
 
-export function makeOperation<S extends Side, Sp extends PolyhedronSpecs, L, R>(
+function makeOperation<S extends Side, Sp extends PolyhedronSpecs, L, R>(
   side: S,
   op: OperationPair<Sp, L, R>,
 ): OpInput<Opts<S, L, R>, Sp> {
@@ -223,6 +205,9 @@ export function makeOperation<S extends Side, Sp extends PolyhedronSpecs, L, R>(
   }
 }
 
+/**
+ * Takes the given input and creates a pair of inverse operations.
+ */
 export function makeOpPair<Specs extends PolyhedronSpecs, L = {}, R = L>(
   opInput: OpPairInput<Specs, L, R>,
 ) {

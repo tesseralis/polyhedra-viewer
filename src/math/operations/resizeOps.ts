@@ -2,7 +2,7 @@ import { minBy } from "lodash-es"
 import { Twist } from "types"
 import { flatMapUniq, mapObject } from "utils"
 import Classical, { Facet, Family } from "data/specs/Classical"
-import { makeOpPair, combineOps, getGeom, Pose } from "./OperationPair"
+import { makeOpPair, combineOps, Pose } from "./operationPairs"
 import { getPlane, withOrigin, Vec3D } from "math/geom"
 import { Polyhedron, Face, Edge } from "math/polyhedra"
 import {
@@ -10,6 +10,7 @@ import {
   getTransformedVertices,
   FacetOpts,
   TwistOpts,
+  getGeometry,
 } from "./operationUtils"
 import { Plane } from "toxiclibsjs/geom"
 import Operation from "./Operation"
@@ -154,7 +155,7 @@ function apothemVec(edge: Edge) {
  */
 export function calcSnubAngle(specs: Classical, facet: Facet) {
   // Choose one of the expanded faces and get its properties
-  const polyhedron = getGeom(specs)
+  const polyhedron = getGeometry(specs)
   const expandedFaces = getSnubFaces(specs, polyhedron, facet)
   const [face0, ...rest] = expandedFaces
   const faceCentroid = face0.centroid()
@@ -209,7 +210,7 @@ function isSnubFace(face: Face, faceType: number) {
 // TODO deduplicate these (note: bevel has a different criterion for getting face)
 const cantellatedDists = createObject([3, 4, 5], (family: Family) => {
   const specs = Classical.query.withData({ family, operation: "cantellate" })
-  const geom = getGeom(specs)
+  const geom = getGeometry(specs)
   const face = geom.faces.find((face) => isCantellatedFace(face, family))!
   return face.distanceToCenter() / geom.edgeLength()
 })
@@ -221,7 +222,7 @@ function calcTruncatedDist(family: Family, facet: Facet) {
     operation: "truncate",
     facet: _facet,
   })
-  const geom = getGeom(specs)
+  const geom = getGeometry(specs)
   const face = geom.largestFace()
   return face.distanceToCenter() / geom.edgeLength()
 }
