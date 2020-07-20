@@ -13,7 +13,7 @@ import {
   getGeometry,
 } from "./operationUtils"
 import { Plane } from "toxiclibsjs/geom"
-import Operation from "./Operation"
+import Operation, { makeOperation } from "./Operation"
 
 function getFaceDistance(face1: Face, face2: Face) {
   let dist = 0
@@ -514,15 +514,15 @@ export const expand = new Operation(
   combineOps([semiExpand.left, _expand.left]),
 )
 
-export const snub = new Operation("snub", _snub.left)
+export const snub = makeOperation("snub", _snub.left)
 
-export const twist = new Operation<TwistOpts, Classical>(
+export const twist = makeOperation(
   "twist",
   combineOps([_twist.left, _twist.right]),
 )
 
 // NOTE: We are using the same operation for contracting both expanded and snub solids.
-export const contract = new Operation<FacetOpts, Classical>("contract", {
+export const contract = makeOperation<FacetOpts, Classical>("contract", {
   ...combineOps([_expand, _snub, semiExpand].map((op) => op.right)),
 
   hitOption: "facet",

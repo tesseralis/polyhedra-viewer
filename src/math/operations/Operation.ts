@@ -150,24 +150,21 @@ function normalizeOpResult(
   }
 }
 
-export default class Operation<
-  Options extends {} = {},
-  Specs extends PolyhedronSpecs = PolyhedronSpecs
-> {
+export default class Operation<Options extends {} = {}> {
   name: string
   hitOption: keyof Options
-  private opArgs: Required<OpArgs<Options, Specs>>
+  private opArgs: Required<OpArgs<Options, PolyhedronSpecs>>
 
-  constructor(name: string, opArgs: OpArgs<Options, Specs>) {
+  constructor(name: string, opArgs: OpArgs<Options, PolyhedronSpecs>) {
     this.name = name
     this.opArgs = fillDefaults(opArgs)
     this.hitOption = this.opArgs.hitOption
   }
 
-  private *validSpecs(polyhedron: Polyhedron): Generator<Specs> {
+  private *validSpecs(polyhedron: Polyhedron) {
     for (const specs of getValidSpecs(polyhedron)) {
       if (this.opArgs.canApplyTo(specs)) {
-        yield specs as any
+        yield specs
       }
     }
   }
@@ -228,4 +225,11 @@ export default class Operation<
   faceSelectionStates(geom: Polyhedron, options: Options) {
     return this.opArgs.faceSelectionStates(this.getSolidArgs(geom), options)
   }
+}
+
+export function makeOperation<
+  Options extends {} = {},
+  Specs extends PolyhedronSpecs = PolyhedronSpecs
+>(name: string, opArgs: OpArgs<Options, Specs>) {
+  return new Operation(name, opArgs)
 }

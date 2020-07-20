@@ -7,7 +7,7 @@ import {
   getTransformedVertices,
   removeExtraneousVertices,
 } from "../operationUtils"
-import Operation from "../Operation"
+import { makeOperation } from "../Operation"
 import { Polyhedron, Cap } from "math/polyhedra"
 import {
   inc,
@@ -66,7 +66,7 @@ function removeCap(polyhedron: Polyhedron, cap: Cap) {
 interface Options {
   cap: Cap
 }
-export const diminish = new Operation<Options, CutPasteSpecs>("diminish", {
+export const diminish = makeOperation<Options, CutPasteSpecs>("diminish", {
   apply({ geom }, { cap }) {
     return removeCap(geom, cap)
   },

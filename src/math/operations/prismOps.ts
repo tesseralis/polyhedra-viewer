@@ -6,7 +6,7 @@ import PolyhedronSpecs from "data/specs/PolyhedronSpecs"
 import Capstone from "data/specs/Capstone"
 import Prismatic from "data/specs/Prismatic"
 import { combineOps, makeOpPair, Pose } from "./operationPairs"
-import Operation, { SolidArgs } from "./Operation"
+import { makeOperation, SolidArgs } from "./Operation"
 import {
   getOppTwist,
   TwistOpts,
@@ -263,9 +263,9 @@ const turnBicupola = makeBicupolaPrismOp("prism")
 
 // Exported operations
 
-export const elongate = new Operation("elongate", _elongate.left)
+export const elongate = makeOperation("elongate", _elongate.left)
 
-export const gyroelongate = new Operation<TwistOpts, Capstone>(
+export const gyroelongate = makeOperation(
   "gyroelongate",
   combineOps(
     [
@@ -277,7 +277,7 @@ export const gyroelongate = new Operation<TwistOpts, Capstone>(
   ),
 )
 
-export const shorten = new Operation<TwistOpts, Capstone>(
+export const shorten = makeOperation(
   "shorten",
   combineOps(
     [
@@ -290,11 +290,11 @@ export const shorten = new Operation<TwistOpts, Capstone>(
   ),
 )
 
-export const turn = new Operation<TwistOpts, Prismatic | Capstone>(
+export const turn = makeOperation(
   "turn",
-  combineOps(
+  combineOps<Capstone | Prismatic, TwistOpts>(
     [
-      turnPrismatic as any,
+      turnPrismatic,
       turnPyramid,
       turnCupola,
       turnBipyramid,

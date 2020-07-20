@@ -11,7 +11,7 @@ function oppositeSide(side: Side) {
   return side === "left" ? "right" : "left"
 }
 
-interface GOpts<L, R> {
+interface GraphOpts<L, R> {
   left: L
   right: R
 }
@@ -20,7 +20,7 @@ interface GOpts<L, R> {
 interface GraphEntry<Specs, L, R> {
   left: Specs
   right: Specs
-  options?: GOpts<L, R>
+  options?: GraphOpts<L, R>
 }
 
 // list of polyhedron pairs and their arguments
@@ -45,18 +45,18 @@ interface OpPairInput<Specs extends PolyhedronSpecs, L = {}, R = L> {
   getPose(
     pos: Side | "middle",
     solid: SolidArgs<Specs>,
-    opts: GOpts<L, R>,
+    opts: GraphOpts<L, R>,
   ): Pose
   // Move the intermediate figure to the left position
   toLeft?(
     solid: SolidArgs<Specs>,
-    opts: GOpts<L, R>,
+    opts: GraphOpts<L, R>,
     result: Specs,
   ): VertexArg[]
   // Move the intermediate figure to the right position
   toRight?(
     solid: SolidArgs<Specs>,
-    opts: GOpts<L, R>,
+    opts: GraphOpts<L, R>,
     result: Specs,
   ): VertexArg[]
 }
@@ -158,7 +158,8 @@ class OpPair<
       toRight = defaultGetter,
     } = this.inputs
     const entry = this.getEntry(side, solid.specs, opts)
-    const options = entry.options ?? ({ left: {}, right: {} } as GOpts<L, R>)
+    const options =
+      entry.options ?? ({ left: {}, right: {} } as GraphOpts<L, R>)
     const startPose = getPose(side, solid, options)
 
     const endSide = oppositeSide(side)
