@@ -89,7 +89,7 @@ function specsEquals(spec1: PolyhedronSpecs, spec2: PolyhedronSpecs) {
 
 type Opts<S extends Side, L, R> = S extends "left" ? L : R
 
-class OperationPair<
+class OpPair<
   Specs extends PolyhedronSpecs,
   L extends {} = {},
   R extends {} = L
@@ -192,9 +192,12 @@ type OpInput<O, S extends PolyhedronSpecs> = Required<
   >
 >
 
+/**
+ * Turn an operation pair into the one-way operation corresponding to the given side
+ */
 function makeOperation<S extends Side, Sp extends PolyhedronSpecs, L, R>(
   side: S,
-  op: OperationPair<Sp, L, R>,
+  op: OpPair<Sp, L, R>,
 ): OpInput<Opts<S, L, R>, Sp> {
   return {
     apply(solid, opts) {
@@ -210,7 +213,7 @@ function makeOperation<S extends Side, Sp extends PolyhedronSpecs, L, R>(
       return op.hasOptions(side, specs)
     },
     *allOptionCombos({ specs }) {
-      yield* op.allOptions(side, specs) as any
+      yield* op.allOptions(side, specs)
     },
   }
 }
@@ -221,7 +224,7 @@ function makeOperation<S extends Side, Sp extends PolyhedronSpecs, L, R>(
 export function makeOpPair<Specs extends PolyhedronSpecs, L = {}, R = L>(
   opInput: OpPairInput<Specs, L, R>,
 ) {
-  const op = new OperationPair(opInput)
+  const op = new OpPair(opInput)
   return { left: makeOperation("left", op), right: makeOperation("right", op) }
 }
 
@@ -252,7 +255,7 @@ export function combineOps<S extends PolyhedronSpecs, O>(
       return getOp(specs).hasOptions(specs) ?? false
     },
     *allOptionCombos(solid) {
-      yield* getOp(solid.specs).allOptionCombos(solid) as any
+      yield* getOp(solid.specs).allOptionCombos(solid)
     },
   }
 }
