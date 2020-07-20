@@ -1,11 +1,9 @@
 import { meanBy } from "lodash-es"
 import { Polyhedron, Face, Edge } from "math/polyhedra"
 import Classical, { Facet } from "data/specs/Classical"
-import { Pose } from "./OperationPair"
+import { makeOpPair, combineOps, Pose } from "./OperationPair"
 import Operation, { OpArgs } from "./Operation"
 import { FacetOpts, getTransformedVertices } from "./operationUtils"
-import { makeOpPair } from "./adapters"
-import { combineOps } from "./adapters"
 
 function getSharpenFaces(polyhedron: Polyhedron) {
   const faceType = polyhedron.smallestFace().numSides

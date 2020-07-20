@@ -2,13 +2,12 @@ import { minBy } from "lodash-es"
 import { Twist } from "types"
 import { flatMapUniq, mapObject } from "utils"
 import Classical, { Facet, Family } from "data/specs/Classical"
-import { getGeom, Pose } from "./OperationPair"
+import { makeOpPair, combineOps, getGeom, Pose } from "./OperationPair"
 import { getPlane, withOrigin, Vec3D } from "math/geom"
 import { Polyhedron, Face, Edge } from "math/polyhedra"
 import { getTransformedVertices, FacetOpts, TwistOpts } from "./operationUtils"
 import { Plane } from "toxiclibsjs/geom"
 import Operation from "./Operation"
-import { makeOpPair, combineOps } from "./adapters"
 
 function getFaceDistance(face1: Face, face2: Face) {
   let dist = 0

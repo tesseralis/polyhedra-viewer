@@ -5,12 +5,11 @@ import { PrismaticType } from "data/specs/common"
 import PolyhedronSpecs from "data/specs/PolyhedronSpecs"
 import Capstone from "data/specs/Capstone"
 import Prismatic from "data/specs/Prismatic"
-import { Solid, Pose } from "./OperationPair"
+import { combineOps, makeOpPair, Solid, Pose } from "./OperationPair"
 import Operation from "./Operation"
 import { TwistOpts, getTransformedVertices } from "./operationUtils"
 import { withOrigin } from "math/geom"
 import { getAdjustInformation } from "./prismUtils"
-import { combineOps, makeOpPair } from "./adapters"
 
 // Get antiprism height of a unit antiprism with n sides
 export function antiprismHeight(n: number) {
