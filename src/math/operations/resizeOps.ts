@@ -510,6 +510,8 @@ export function isExpandedFace(
   return face.adjacentFaces().every((f) => f.numSides === edgeShape[type])
 }
 
+export const dual = new Operation("dual", combineOps([_dual.left, _dual.right]))
+
 export const expand = new Operation(
   "expand",
   combineOps([semiExpand.left, _expand.left]),
@@ -517,7 +519,10 @@ export const expand = new Operation(
 
 export const snub = new Operation("snub", _snub.left)
 
-export const dual = new Operation("dual", combineOps([_dual.left, _dual.right]))
+export const twist = new Operation<TwistOpts, Classical>(
+  "twist",
+  combineOps([_twist.left, _twist.right]),
+)
 
 // NOTE: We are using the same operation for contracting both expanded and snub solids.
 export const contract = new Operation<FacetOpts, Classical>("contract", {
@@ -554,8 +559,3 @@ export const contract = new Operation<FacetOpts, Classical>("contract", {
     })
   },
 })
-
-export const twist = new Operation<TwistOpts, Classical>(
-  "twist",
-  combineOps([_twist.left, _twist.right]),
-)
