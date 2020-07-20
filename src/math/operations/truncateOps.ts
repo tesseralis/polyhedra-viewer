@@ -1,4 +1,4 @@
-import { meanBy } from "lodash-es"
+import { meanBy, findKey } from "lodash-es"
 import { Polyhedron, Face, Edge } from "math/polyhedra"
 import Classical, { Facet } from "data/specs/Classical"
 import { makeOpPair, combineOps, Pose } from "./operationPairs"
@@ -99,7 +99,7 @@ const amboTruncate = makeOpPair({
       left: entry,
       right: entry.withData({ operation: "bevel" }),
     })),
-  getIntermediate: (entry) => entry.right,
+  middle: "right",
   getPose(side, { geom, specs }) {
     const origin = geom.centroid()
     if (side === "left") {
@@ -132,7 +132,8 @@ interface TruncateOpPairInputs {
   right: "truncate" | "rectify"
 }
 
-function makeTruncateOpPair({ left, right }: TruncateOpPairInputs) {
+function makeTruncateOpPair(args: TruncateOpPairInputs) {
+  const { left, right } = args
   return makeOpPair({
     graph: Classical.query
       .where((s) => s.isTruncated())
@@ -147,7 +148,9 @@ function makeTruncateOpPair({ left, right }: TruncateOpPairInputs) {
         }
       }),
     // The "middle" data is always going to be the truncated polyhedron
-    getIntermediate: (entry) => entry.left.withData({ operation: "truncate" }),
+    middle:
+      (findKey(args, "truncate") as "left" | "right" | undefined) ??
+      ((entry: any) => entry.left.withData({ operation: "truncate" })),
     getPose: (side, { geom, specs }, options) => {
       switch (specs.data.operation) {
         case "regular":
@@ -167,9 +170,7 @@ function makeTruncateOpPair({ left, right }: TruncateOpPairInputs) {
 }
 
 const _truncate = makeTruncateOpPair({ left: "regular", right: "truncate" })
-
 const _cotruncate = makeTruncateOpPair({ left: "truncate", right: "rectify" })
-
 const _rectify = makeTruncateOpPair({ left: "regular", right: "rectify" })
 
 // Exported operations

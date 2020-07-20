@@ -136,7 +136,7 @@ function makePrismOp({
           left: item.withData({ elongation: leftElongation }),
           right: item,
         })),
-      getIntermediate: (entry) => entry.right,
+      middle: "right",
       getPose(side, solid) {
         const [face, edge] = getOrientation(solid)
         return getPose(face, edge, solid.specs.data.elongation, twist)
@@ -158,7 +158,7 @@ const turnPrismatic = makeOpPair({
       left: entry,
       right: entry.withData({ type: "antiprism" }),
     })),
-  getIntermediate: (entry) => entry.right,
+  middle: "right",
   getPose(side, { geom, specs }) {
     const face = geom.faceWithNumSides(specs.data.base)
     return getPose(face, face.edges[0], specs.data.type, "left")
@@ -242,7 +242,7 @@ function makeBicupolaPrismOp(leftElongation: null | "prism") {
           }
         })
       }),
-    getIntermediate: (entry) => entry.right,
+    middle: "right",
     getPose(side, { specs, geom }, { right: { twist } }) {
       // Pick a cap, favoring rotunda over cupola in the case of cupolarotundae
       const caps = Cap.getAll(geom)

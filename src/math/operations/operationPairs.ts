@@ -32,11 +32,15 @@ export interface Pose {
   orientation: readonly [Vec3D, Vec3D]
 }
 
+type MiddleGetter<Specs extends PolyhedronSpecs, L, R> = (
+  entry: GraphEntry<Specs, L, R>,
+) => Specs | SolidArgs<Specs>
+
 interface OpPairInput<Specs extends PolyhedronSpecs, L = {}, R = L> {
   // The graph of what polyhedron spec inputs are allowed and what maps to each other
   graph: OpPairGraph<Specs, L, R>
   // Get the intermediate polyhedron for the given graph entry
-  getIntermediate(entry: GraphEntry<Specs, L, R>): Specs | SolidArgs<Specs>
+  middle: Side | MiddleGetter<Specs, L, R>
   // Get the post of a left, right, or middle state
   getPose(
     pos: Side | "middle",
@@ -137,19 +141,10 @@ class OperationPair<
   }
 
   apply<S extends Side>(side: S, solid: SolidArgs<Specs>, opts: Opts<S, L, R>) {
-    const { getIntermediate, getPose, toLeft, toRight } = this.inputs
+    const { middle: getMiddle, getPose, toLeft, toRight } = this.inputs
     const entry = this.getEntry(side, solid.specs, opts)
-    const middle = normalizeIntermediate(getIntermediate(entry))
     const options = entry.options ?? ({ left: {}, right: {} } as GOpts<L, R>)
-
     const startPose = getPose(side, solid, options)
-
-    const alignedInter = alignPolyhedron(
-      middle.geom,
-      getPose("middle", middle, options),
-      startPose,
-    )
-    const alignedMiddle = { ...middle, geom: alignedInter }
 
     const endSide = oppositeSide(side)
     const endSpecs = entry[endSide]
@@ -160,15 +155,30 @@ class OperationPair<
       startPose,
     )
 
+    let middle
+    if (typeof getMiddle === "string") {
+      // If we receive a Side argument, set the middle to whichever end polyhedron
+      // matches the side
+      middle =
+        getMiddle === side ? solid : { specs: endSpecs, geom: alignedEnd }
+    } else {
+      // Otherwise, we have to fetch the intermediate solid ourselves
+      const middleSolid = normalizeIntermediate(getMiddle(entry))
+      const alignedInter = alignPolyhedron(
+        middleSolid.geom,
+        getPose("middle", middleSolid, options),
+        startPose,
+      )
+      middle = { ...middleSolid, geom: alignedInter }
+    }
+
     const [startFn, endFn] =
       side === "left" ? [toLeft, toRight] : [toRight, toLeft]
 
     return {
       animationData: {
-        start: alignedInter.withVertices(
-          startFn(alignedMiddle, options, solid.specs),
-        ),
-        endVertices: endFn(alignedMiddle, options, endSpecs),
+        start: middle.geom.withVertices(startFn(middle, options, solid.specs)),
+        endVertices: endFn(middle, options, endSpecs),
       },
       result: alignedEnd,
     }

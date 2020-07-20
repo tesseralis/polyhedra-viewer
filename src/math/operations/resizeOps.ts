@@ -302,7 +302,7 @@ const semiExpand = makeOpPair<Classical, {}, FacetOpts>({
       right: entry.withData({ operation: "bevel" }),
       options: { left: {}, right: { facet: entry.data.facet } },
     })),
-  getIntermediate: (entry) => entry.right,
+  middle: "right",
   getPose(pos, { specs, geom }, { right: { facet } }) {
     if (pos === "left") {
       const face = geom.faces.find((f) => f.numSides > 5)!
@@ -337,7 +337,7 @@ const _expand = makeOpPair<Classical, {}, FacetOpts>({
       }
     }),
 
-  getIntermediate: (entry) => entry.right,
+  middle: "right",
 
   getPose(pos, { geom, specs }, { right: { facet } }) {
     return pos === "left"
@@ -370,7 +370,8 @@ const _snub = makeOpPair<Classical, TwistOpts, FacetOpts>({
       }))
     }),
 
-  getIntermediate: (entry) => entry.right,
+  // FIXME this breaks a chained augment -> contract somehow??
+  middle: (entry) => entry.right,
 
   getPose(pos, { geom, specs }, { right: { facet = "vertex" } }) {
     return pos === "left"
@@ -399,7 +400,7 @@ const _twist = makeOpPair<Classical, TwistOpts, {}>({
       }))
     }),
 
-  getIntermediate: (entry) => entry.right,
+  middle: "right",
 
   getPose(pos, { specs, geom }) {
     return pos === "left"
@@ -446,7 +447,7 @@ const _dual = makeOpPair({
       left: specs,
       right: specs.withData({ facet: "vertex" }),
     })),
-  getIntermediate: (entry) => entry.left.withData({ operation: "cantellate" }),
+  middle: (entry) => entry.left.withData({ operation: "cantellate" }),
   getPose(pos, { specs, geom }) {
     switch (pos) {
       case "left": {
