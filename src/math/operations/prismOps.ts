@@ -15,10 +15,12 @@ import {
 import { withOrigin } from "math/geom"
 import { getAdjustInformation } from "./prismUtils"
 
+const { cos, PI, sqrt } = Math
+
 // Get antiprism height of a unit antiprism with n sides
 export function antiprismHeight(n: number) {
-  const sec = 1 / Math.cos(Math.PI / (2 * n))
-  return Math.sqrt(1 - (sec * sec) / 4)
+  const sec = 1 / cos(PI / (2 * n))
+  return sqrt(1 - (sec * sec) / 4)
 }
 
 function getPrismaticHeight(n: number, elongation: PrismaticType | null) {
@@ -56,9 +58,7 @@ function getPose(
     face.normal().scale((length * getPrismaticHeight(n, elongation)) / 2),
   )
   const angle =
-    (elongation === "antiprism" ? 1 : 0) *
-    getTwistMult(twist) *
-    (Math.PI / n / 2)
+    (elongation === "antiprism" ? 1 : 0) * getTwistMult(twist) * (PI / n / 2)
 
   return {
     origin,
@@ -87,7 +87,7 @@ function getScaledPrismVertices(
   twist?: Twist,
 ) {
   const vertexSets = getAdjustInformation(specs, geom)
-  const angle = (getTwistMult(twist) * Math.PI) / getNumSides(specs)
+  const angle = (getTwistMult(twist) * PI) / getNumSides(specs)
 
   return getTransformedVertices(vertexSets, (set) =>
     withOrigin(set.normalRay(), (v) =>
