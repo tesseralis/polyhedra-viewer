@@ -59,6 +59,10 @@ export default class FaceLike implements VertexList {
     return this.sideLength() / (2 * Math.tan(Math.PI / this.numSides))
   }
 
+  radius() {
+    return this.sideLength() / (2 * Math.sin(Math.PI / this.numSides))
+  }
+
   /** Get the area of a *regular* polygon */
   area() {
     return (this.numSides * this.sideLength() * this.apothem()) / 2

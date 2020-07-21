@@ -1,15 +1,16 @@
-import { sum, findKey } from "lodash-es"
-import { Polyhedron, Face } from "math/polyhedra"
-import Classical, { Operation as OpName, Facet } from "data/specs/Classical"
+import { sum } from "lodash-es"
+import { Polyhedron, Face, VertexArg } from "math/polyhedra"
+import Classical, { Operation as OpName } from "data/specs/Classical"
 import { makeOpPair, combineOps, Pose } from "./operationPairs"
-import Operation, { OpArgs } from "./Operation"
+import Operation, { SolidArgs, OpArgs } from "./Operation"
+import { Vec3D } from "math/geom"
 import {
   getGeometry,
   FacetOpts,
   getTransformedVertices,
 } from "./operationUtils"
-// FIXME move this to a util
-import { getCantellatedFace } from "./resizeOps"
+// TODO move this to a util
+import { getCantellatedFace, getCantellatedEdgeFace } from "./resizeOps"
 
 function getSharpenFaces(polyhedron: Polyhedron) {
   const faceType = polyhedron.smallestFace().numSides
@@ -46,236 +47,213 @@ function getAvgInradius(specs: Classical, geom: Polyhedron) {
   return sum(faces.map((f) => f.distanceToCenter())) / faces.length
 }
 
-function regularPose(geom: Polyhedron): Pose {
-  const origin = geom.centroid()
-  const face = geom.getFace()
-  const crossAxis = face.edges[0].midpoint().sub(face.centroid())
-  return {
-    origin,
-    scale: face.distanceToCenter(),
-    orientation: [face.normal(), crossAxis],
-  }
+interface TrioOpArgs<Op, Opts = any> {
+  operation: Op
+  pose(solid: SolidArgs<Classical>, opts: Opts): Pose
+  transformer(
+    solid: SolidArgs<Classical>,
+    opts: Opts,
+    result: Classical,
+  ): VertexArg[]
+  options?(entry: Classical): Opts
 }
 
-function truncatedPose(geom: Polyhedron): Pose {
-  const origin = geom.centroid()
-  const face = geom.largestFace()
-  const n = face.numSides
-  const edge = face.edges.find((e) => e.twinFace().numSides === n)!
-  const crossAxis = edge.midpoint().sub(face.centroid())
-  return {
-    origin,
-    scale: face.distanceToCenter(),
-    orientation: [face.normal(), crossAxis],
-  }
+interface TrioArgs<L, M, R> {
+  left: TrioOpArgs<L>
+  middle: Omit<TrioOpArgs<M>, "transformer">
+  right: TrioOpArgs<R>
 }
 
-function rectifiedPose(
-  specs: Classical,
-  geom: Polyhedron,
-  facet?: Facet,
-): Pose {
-  const origin = geom.centroid()
-  // pick a face that *isn't* the sharpen face type
-  const faceType = facet === "vertex" ? 3 : specs.data.family
-  const face = geom.faces.find((face) => face.numSides === faceType)!
-  const crossAxis = face.vertices[0].vec.sub(face.centroid())
-  return {
-    origin,
-    // scale with respect to the sharpen face
-    scale: face.distanceToCenter(),
-    orientation: [face.normal(), crossAxis],
-  }
-}
-
-// Get the regular face of a truncated solid
-function truncToReg(geom: Polyhedron) {
-  const sharpenFaces = getSharpenFaces(geom)
-  const verticesToAdd = sharpenFaces.map((face) => getVertexToAdd(face))
-  const oldToNew: Record<number, number> = {}
-  sharpenFaces.forEach((face, i) => {
-    face.vertices.forEach((v) => {
-      oldToNew[v.index] = i
-    })
-  })
-  return geom.vertices.map(
-    (v, vIndex) => verticesToAdd[oldToNew[vIndex]] ?? v.vec,
-  )
-}
-
-function truncToRect(geom: Polyhedron) {
-  const edges = geom.edges.filter(
-    (e) => e.face.numSides > 5 && e.twinFace().numSides > 5,
-  )
-  return getTransformedVertices(edges, (e) => e.midpoint())
-}
-
-function bevToRect(specs: Classical, geom: Polyhedron, resultSpec: Classical) {
-  const ref = getGeometry(resultSpec)
-  const refInradius = getAvgInradius(resultSpec, ref)
-  const refCircumradius = ref.getVertex().distanceToCenter()
-  const inradius = getAvgInradius(specs, geom)
-  const faces = geom.faces.filter((f) => f.numSides === 4)
-  return getTransformedVertices(faces, (f) => {
-    return geom
-      .centroid()
-      .add(f.normal().scale((refCircumradius / refInradius) * inradius))
-  })
-}
-
-function bevToCant(specs: Classical, geom: Polyhedron, resultSpec: Classical) {
-  const ref = getGeometry(resultSpec)
-  const refInradius = getAvgInradius(resultSpec, ref)
-  const refFace = ref.faces.find(
-    (f) => f.numSides === 4 && f.adjacentFaces().some((f) => f.numSides !== 4),
-  )!
-  const refMidradius = refFace.distanceToCenter()
-  const refFaceRadius = refFace.vertices[0].vec.distanceTo(refFace.centroid())
-  const inradius = getAvgInradius(specs, geom)
-  const scale = inradius / refInradius
-  const faces = geom.faces.filter((f) => f.numSides === 4)
-  return getTransformedVertices(faces, (f) => {
-    const faceCentroid = geom
-      .centroid()
-      .add(f.normal().scale(refMidradius * scale))
-
-    return (v) => {
-      return faceCentroid.add(
-        v
-          .sub(f.centroid())
-          .getNormalized()
-          .scale(refFaceRadius * scale),
-      )
-    }
-  })
-}
-
-interface Trio<L, M = L, R = M> {
-  left: L
-  middle: M
-  right: R
-}
-
-interface TruncateTrioArgs<L, M, R> {
-  operations: Trio<L, M, R>
-  poses: Trio<(...args: any[]) => Pose>
-  transformers: Omit<Trio<(...args: any[]) => any[]>, "middle">
-  options?: Partial<Omit<Trio<(entry: Classical) => any>, "middle">>
-}
-
+/**
+ * Create a trio of truncation OpPairs: truncate, cotruncate, and rectify.
+ * Given the functions to use for operations, poses, and transformers,
+ * generate the triplet of OpPairs to use.
+ */
 function makeTruncateTrio<L extends OpName, M extends OpName, R extends OpName>(
-  args: TruncateTrioArgs<L, M, R>,
+  args: TrioArgs<L, M, R>,
 ) {
-  interface Inputs {
-    left: L | M
-    right: M | R
-  }
-  const { operations, poses, transformers, options } = args
-  const { left: leftOp, middle: middleOp, right: rightOp } = operations
-  function _makeTruncateOpPair(args: Inputs) {
-    const { left, right } = args
+  const { left, right, middle } = args
+  function makePair(leftOp: "left" | "middle", rightOp: "middle" | "right") {
+    // Choose which side is the "middle" in order to short-circuit getting the intermediate
+    const middleArg =
+      leftOp === "middle" ? "left" : rightOp === "middle" ? "right" : null
+
     return makeOpPair({
       graph: Classical.query
-        .where((s) => s.data.operation === middleOp)
+        .where((s) => s.data.operation === middle.operation)
         .map((entry) => {
           return {
-            left: entry.withData({ operation: left }),
-            right: entry.withData({ operation: right }),
+            left: entry.withData({ operation: args[leftOp].operation }),
+            right: entry.withData({ operation: args[rightOp].operation }),
             options: {
-              left: options?.left?.(entry),
-              right: options?.right?.(entry),
+              left: args[leftOp].options?.(entry),
+              right: args[rightOp].options?.(entry),
             },
           }
         }),
-      // The "middle" data is always going to be the truncated polyhedron
+      // If this is the left-right operation, then the intermediate
+      // is going to be the middle operation
       middle:
-        (findKey(args, middleOp) as "left" | "right" | undefined) ??
-        ((entry: any) => entry.left.withData({ operation: middleOp })),
-      getPose: ($, { geom, specs }, options) => {
-        const side = findKey(operations, (val) => val === specs.data.operation)!
-        const poseFn = (poses as any)[side]
-        return poseFn(side, { geom, specs }, options)
+        middleArg ??
+        ((entry) => entry.left.withData({ operation: middle.operation })),
+      getPose: ($, solid, options) => {
+        // Use the pose function for the side that matches the op name of the solid
+        const side = Object.values(args).find(
+          (arg) => arg.operation === solid.specs.data.operation,
+        )
+        return side.pose(solid, options)
       },
-      toLeft: left === leftOp ? transformers.left : undefined,
-      toRight: right === rightOp ? transformers.right : undefined,
+      toLeft: leftOp === "left" ? left.transformer : undefined,
+      toRight: rightOp === "right" ? right.transformer : undefined,
     })
   }
 
   return {
-    truncate: _makeTruncateOpPair({ left: leftOp, right: middleOp }),
-    cotruncate: _makeTruncateOpPair({ left: middleOp, right: rightOp }),
-    rectify: _makeTruncateOpPair({ left: leftOp, right: rightOp }),
+    truncate: makePair("left", "middle"),
+    cotruncate: makePair("middle", "right"),
+    rectify: makePair("left", "right"),
   }
 }
 
-const ambos = makeTruncateTrio({
-  operations: {
-    left: "rectify",
-    middle: "bevel",
-    right: "cantellate",
-  },
-  poses: {
-    left(side, { geom, specs }) {
-      const origin = geom.centroid()
-      const face = geom.faceWithNumSides(specs.data.family)
-      const crossAxis = face.edges[0].midpoint().sub(face.centroid())
-      return {
-        origin,
-        scale: getAvgInradius(specs, geom),
-        orientation: [face.normal(), crossAxis],
-      }
+function getRegularPose(geom: Polyhedron, face: Face, crossPoint: Vec3D): Pose {
+  return {
+    origin: geom.centroid(),
+    // scale on the inradius of the truncated face
+    scale: face.distanceToCenter(),
+    orientation: [face.normal(), crossPoint.sub(face.centroid())],
+  }
+}
+
+/**
+ * Describes the truncation operations on a Platonic solid.
+ */
+const regs = makeTruncateTrio({
+  left: {
+    operation: "regular",
+    pose({ geom }) {
+      const face = geom.getFace()
+      return getRegularPose(geom, geom.getFace(), face.edges[0].midpoint())
     },
-    middle(side, { geom, specs }) {
-      const origin = geom.centroid()
-      const face = geom.faceWithNumSides(specs.data.family * 2)
-      const edge = face.edges.find((e: any) => e.twinFace().numSides !== 4)!
-      const crossAxis = edge.midpoint().sub(face.centroid())
-      return {
-        origin,
-        scale: getAvgInradius(specs, geom),
-        orientation: [face.normal(), crossAxis],
-      }
-    },
-    right(side, { geom, specs }) {
-      const origin = geom.centroid()
-      const face = getCantellatedFace(geom, specs.data.family)
-      const crossAxis = face.vertices[0].vec.sub(face.centroid())
-      return {
-        origin,
-        scale: getAvgInradius(specs, geom),
-        orientation: [face.normal(), crossAxis],
-      }
+    transformer({ geom }) {
+      return getTransformedVertices(getSharpenFaces(geom), (face) =>
+        getVertexToAdd(face),
+      )
     },
   },
-  transformers: {
-    left: ({ geom, specs }, $, result) => bevToRect(specs, geom, result),
-    right: ({ geom, specs }, $, result) => bevToCant(specs, geom, result),
+  middle: {
+    operation: "truncate",
+    pose({ geom }) {
+      const face = geom.largestFace()
+      const n = face.numSides
+      // pick an edge connected to another truncated face
+      const edge = face.edges.find((e) => e.twinFace().numSides === n)!
+      return getRegularPose(geom, face, edge.midpoint())
+    },
+  },
+  right: {
+    operation: "rectify",
+    // The rectified version is the only thing we need to choose an option for
+    // when we move out of it
+    options: (entry) => ({ facet: entry.data.facet }),
+    pose({ specs, geom }, options) {
+      // pick a face that *isn't* the sharpen face type
+      const faceType = options.right.facet === "vertex" ? 3 : specs.data.family
+      const face = geom.faceWithNumSides(faceType)
+      return getRegularPose(geom, face, face.vertices[0].vec)
+    },
+    transformer({ geom }) {
+      // All edges that between two truncated faces
+      const edges = geom.edges.filter(
+        (e) => e.face.numSides > 5 && e.twinFace().numSides > 5,
+      )
+      // Move each edge to its midpoint
+      return getTransformedVertices(edges, (e) => e.midpoint())
+    },
   },
 })
 
-const regs = makeTruncateTrio({
-  operations: {
-    left: "regular",
-    middle: "truncate",
-    right: "rectify",
-  },
-  options: {
-    right: (entry) => ({ facet: entry.data.facet }),
-  },
-  poses: {
-    left($, { geom }) {
-      return regularPose(geom)
+function getAmboPose(
+  specs: Classical,
+  geom: Polyhedron,
+  face: Face,
+  point: Vec3D,
+): Pose {
+  return {
+    origin: geom.centroid(),
+    scale: getAvgInradius(specs, geom),
+    orientation: [face.normal(), point.sub(face.centroid())],
+  }
+}
+
+/**
+ * A trio of operations that describe the truncation behavior on a quasi-regular polyhedron
+ * (tetratetrahedron, cuboctahedron, and icosidodecahedron).
+ *
+ * A raw truncation on one of these doesn't yield a CRF solid. We need to do some fudging
+ * in order to everything to align correctly.
+ *
+ * We calculate the average inradius between the face-facet faces and the vertex-facet faces
+ * and use that as a scale. For both, we use a reference polyhedron and calculate the vertex
+ * transformations based on them.
+ */
+const ambos = makeTruncateTrio({
+  left: {
+    operation: "rectify",
+    pose({ geom, specs }) {
+      const face = geom.faceWithNumSides(specs.data.family)
+      return getAmboPose(specs, geom, face, face.edges[0].midpoint())
     },
-    middle($, { geom }) {
-      return truncatedPose(geom)
-    },
-    right($, { specs, geom }, options) {
-      return rectifiedPose(specs, geom, options?.right?.facet)
+    transformer({ geom, specs }, $, resultSpec) {
+      const ref = getGeometry(resultSpec)
+      const refInradius = getAvgInradius(resultSpec, ref)
+      const refCircumradius = ref.getVertex().distanceToCenter()
+      const inradius = getAvgInradius(specs, geom)
+      const scale = (refCircumradius / refInradius) * inradius
+      const faces = geom.faces.filter((f) => f.numSides === 4)
+      // Sharpen each of the faces to a point aligning with the vertices
+      // of the rectified solid
+      return getTransformedVertices(faces, (f) =>
+        geom.centroid().add(f.normal().scale(scale)),
+      )
     },
   },
-  transformers: {
-    left: ({ geom }) => truncToReg(geom),
-    right: ({ geom }) => truncToRect(geom),
+  middle: {
+    operation: "bevel",
+    pose({ geom, specs }) {
+      const face = geom.faceWithNumSides(specs.data.family * 2)
+      const edge = face.edges.find((e) => e.twinFace().numSides !== 4)!
+      return getAmboPose(specs, geom, face, edge.midpoint())
+    },
+  },
+  right: {
+    operation: "cantellate",
+    pose({ geom, specs }) {
+      const face = getCantellatedFace(geom, specs.data.family)
+      return getAmboPose(specs, geom, face, face.vertices[0].vec)
+    },
+    transformer({ geom, specs }, $, resultSpec) {
+      const ref = getGeometry(resultSpec)
+      const refInradius = getAvgInradius(resultSpec, ref)
+      const refFace = getCantellatedEdgeFace(ref)
+      const refMidradius = refFace.distanceToCenter()
+      const refFaceRadius = refFace.radius()
+      const inradius = getAvgInradius(specs, geom)
+      const scale = inradius / refInradius
+      const faces = geom.faces.filter((f) => f.numSides === 4)
+      return getTransformedVertices(faces, (f) => {
+        const faceCentroid = geom
+          .centroid()
+          .add(f.normal().scale(refMidradius * scale))
+
+        return (v) =>
+          faceCentroid.add(
+            v
+              .sub(f.centroid())
+              .getNormalized()
+              .scale(refFaceRadius * scale),
+          )
+      })
+    },
   },
 })
 

@@ -173,11 +173,23 @@ const snubAngles = createObject([3, 4, 5], (family: Family) => {
   }
 })
 
-export function isCantellatedFace(face: Face, faceType: number) {
+function isCantellatedFace(face: Face, faceType: number) {
   return (
     face.numSides === faceType &&
     face.adjacentFaces().every((f) => f.numSides === 4)
   )
+}
+
+function isCantellatedEdgeFace(face: Face) {
+  return (
+    face.numSides === 4 && face.adjacentFaces().some((f) => f.numSides !== 4)
+  )
+}
+
+export function getCantellatedEdgeFace(geom: Polyhedron) {
+  const face = geom.faces.find(isCantellatedEdgeFace)
+  if (!face) throw new Error(`Could not find edge face for ${geom.name}`)
+  return face
 }
 
 export function getCantellatedFace(geom: Polyhedron, faceType: number) {
@@ -397,11 +409,7 @@ const _twist = makeOpPair<Classical, TwistOpts, {}>({
 })
 
 function getCantellatedMidradius(geom: Polyhedron) {
-  const edgeFace = geom.faces.find(
-    (face) =>
-      face.numSides === 4 && face.adjacentFaces().some((f) => f.numSides !== 4),
-  )!
-  return edgeFace.distanceToCenter()
+  return getCantellatedEdgeFace(geom).distanceToCenter()
 }
 
 /**
