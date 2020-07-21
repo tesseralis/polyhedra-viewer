@@ -1,9 +1,10 @@
 import { sum } from "lodash-es"
-import { Polyhedron, Face, VertexArg } from "math/polyhedra"
+import { Polyhedron, Face, Edge, VertexArg, Cap } from "math/polyhedra"
 import Classical, { Operation as OpName } from "data/specs/Classical"
+import Composite from "data/specs/Composite"
 import { makeOpPair, combineOps, Pose } from "./operationPairs"
 import Operation, { SolidArgs, OpArgs } from "./Operation"
-import { Vec3D } from "math/geom"
+import { Vec3D, getCentroid, angleBetween } from "math/geom"
 import {
   getGeometry,
   FacetOpts,
@@ -17,14 +18,26 @@ function getSharpenFaces(polyhedron: Polyhedron) {
   return polyhedron.faces.filter((f) => f.numSides === faceType)
 }
 
-function getSharpenDist(face: Face) {
-  const theta = Math.PI - face.edges[0].dihedralAngle()
-  return face.apothem() * Math.tan(theta)
+/**
+ * Returns the point to sharpen given parameters in the following setup:
+ *      result
+ *      / ^
+ *     /  |
+ *   p2___f.normal
+ *   /
+ * p1
+ *
+ */
+function getSharpenPoint(face: Face, p1: Vec3D, p2: Vec3D) {
+  const ray = face.normalRay()
+  const theta1 = angleBetween(p1, p2, ray)
+  const theta2 = Math.PI - theta1
+  const dist = ray.distanceTo(p1) * Math.tan(theta2)
+  return ray.getPointAtDistance(dist)
 }
 
-function getVertexToAdd(face: Face) {
-  const dist = getSharpenDist(face)
-  return face.normalRay().getPointAtDistance(dist)
+function getSharpenPointEdge(face: Face, edge: Edge) {
+  return getSharpenPoint(face, edge.midpoint(), edge.twinFace().centroid())
 }
 
 function getAvgInradius(specs: Classical, geom: Polyhedron) {
@@ -136,7 +149,7 @@ const regs = makeTruncateTrio({
     },
     transformer({ geom }) {
       return getTransformedVertices(getSharpenFaces(geom), (face) =>
-        getVertexToAdd(face),
+        getSharpenPointEdge(face, face.edges[0]),
       )
     },
   },
@@ -257,11 +270,114 @@ const ambos = makeTruncateTrio({
   },
 })
 
+const augTruncate = makeOpPair({
+  graph: Composite.query
+    .where((s) => {
+      const source = s.data.source
+      return (
+        s.isAugmented() &&
+        !s.isDiminished() &&
+        source.isClassical() &&
+        source.isRegular()
+      )
+    })
+    .map((entry) => ({
+      left: entry,
+      right: entry.withData({
+        source: entry.data.source.withData({ operation: "truncate" }),
+      }),
+    })),
+  middle: "right",
+  getPose($, { geom, specs }) {
+    const source = specs.data.source
+    const isTetrahedron =
+      source.isClassical() && source.isTetrahedral() && source.isRegular()
+
+    // If source is a tetrahedron, take only the first cap (the other is the base)
+    let caps = Cap.getAll(geom)
+    if (isTetrahedron) {
+      caps = [caps[0]]
+    }
+    const capVertIndices = caps.flatMap((cap) =>
+      cap.innerVertices().map((v) => v.index),
+    )
+    const sourceVerts = geom.vertices.filter(
+      (v) => !capVertIndices.includes(v.index),
+    )
+    // Calculate the centroid *only* for the source polyhedra
+    const centroid = getCentroid(sourceVerts.map((v) => v.vec))
+    function isSourceFace(face: Face) {
+      return face.vertices.every((v) => !capVertIndices.includes(v.index))
+    }
+    function isBaseFace(face: Face) {
+      return isTetrahedron || face.numSides > 3
+    }
+    const scaleFace = geom.faces.find((f) => isSourceFace(f) && isBaseFace(f))!
+    const cap = caps[0]
+    const mainAxis = cap.normal()
+    const boundary = cap.boundary()
+
+    let crossAxis
+    if (specs.isTri()) {
+      // Use the midpoin of the normals of the two other caps
+      crossAxis = getCentroid([caps[1].normal(), caps[2].normal()])
+    } else if (specs.isBi() && specs.isMeta()) {
+      // If metabiaugmented, use the normal of the other cap
+      crossAxis = caps[1].normal()
+    } else {
+      crossAxis = boundary.edges
+        .find((e) => isBaseFace(e.twinFace()))!
+        .midpoint()
+        .sub(boundary.centroid())
+    }
+
+    return {
+      origin: centroid,
+      scale: scaleFace.centroid().distanceTo(centroid),
+      orientation: [mainAxis, crossAxis],
+    }
+  },
+  toLeft({ geom }) {
+    const capVertIndices = Cap.getAll(geom).flatMap((cap) =>
+      cap.innerVertices().map((v) => v.index),
+    )
+    const sourceFaces = geom.faces.filter((f) =>
+      f.vertices.every((v) => !capVertIndices.includes(v.index)),
+    )
+    const truncatedFaces = sourceFaces.filter((f) => f.numSides === 3)
+    const cupolaFaces = geom.faces.filter((f) =>
+      f.vertices.every((v) => capVertIndices.includes(v.index)),
+    )
+    return getTransformedVertices(
+      [...truncatedFaces, ...cupolaFaces],
+      (face) => {
+        if (cupolaFaces.some((f) => f.equals(face))) {
+          // Sharpen the cupola faces
+          const v = face.vertices[0]
+          // Find a triangular cupola face
+          const otherFace = v
+            .adjacentFaces()
+            .find((f) => f.numSides === 3 && !f.equals(face))!
+
+          return getSharpenPoint(face, v.vec, otherFace.centroid())
+        } else {
+          const edge = face.edges.find((e) => e.twinFace().numSides > 5)!
+          return getSharpenPointEdge(face, edge)
+        }
+      },
+    )
+  },
+})
+
 // Exported operations
 
 export const truncate = new Operation(
   "truncate",
-  combineOps([regs.truncate.left, ambos.truncate.left]),
+  combineOps<Classical | Composite, any>([
+    regs.truncate.left,
+    ambos.truncate.left,
+    augTruncate.left,
+  ]),
 )
 
 export const cotruncate = new Operation(
@@ -291,9 +407,10 @@ const hitOptArgs: Partial<OpArgs<FacetOpts, Classical>> = {
 }
 
 export const sharpen = new Operation("sharpen", {
-  ...combineOps<Classical, FacetOpts>([
+  ...combineOps<Classical | Composite, FacetOpts>([
     regs.truncate.right,
     ambos.truncate.right,
+    augTruncate.right,
     regs.rectify.right,
     ambos.rectify.right,
   ]),

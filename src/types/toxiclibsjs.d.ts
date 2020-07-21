@@ -1,5 +1,6 @@
 declare module "toxiclibsjs/geom" {
   export class Vec3D {
+    static ZERO: Vec3D
     constructor()
     constructor(x: number, y: number, z: number)
     constructor(v: Vec3D)

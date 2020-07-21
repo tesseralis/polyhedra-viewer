@@ -1,4 +1,4 @@
-import { getMidpoint } from "math/geom"
+import { angleBetween, getMidpoint } from "math/geom"
 import type Polyhedron from "./Polyhedron"
 import type Vertex from "./Vertex"
 import type { VertexList } from "./Vertex"
@@ -67,16 +67,11 @@ export default class Edge implements VertexList {
   }
 
   dihedralAngle() {
-    const midpoint = this.midpoint()
-    const [c1, c2] = this.adjacentFaces().map((face) =>
-      face.centroid().sub(midpoint),
-    )
-
+    const [c1, c2] = this.adjacentFaces().map((face) => face.centroid())
     if (!c1 || !c2) {
       throw new Error(`This edge is not connected to two faces.`)
     }
-
-    return c1.angleBetween(c2, true)
+    return angleBetween(this.midpoint(), c1, c2)
   }
 
   equals(edge: Edge) {

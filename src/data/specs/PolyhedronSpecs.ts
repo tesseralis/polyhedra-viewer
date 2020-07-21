@@ -1,4 +1,4 @@
-import { capitalize } from "lodash-es"
+import { isEqual, capitalize } from "lodash-es"
 import type Classical from "./Classical"
 import type Prismatic from "./Prismatic"
 import type Capstone from "./Capstone"
@@ -65,6 +65,10 @@ export default abstract class PolyhedronSpecs<Data extends {} = {}> {
   isChiral() {
     // Should be overwritten by things that are chiral
     return false
+  }
+
+  equals(s2: PolyhedronSpecs) {
+    return this.type === s2.type && isEqual(this.data, s2.data)
   }
 
   isHoneycomb() {

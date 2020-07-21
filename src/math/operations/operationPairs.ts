@@ -1,7 +1,7 @@
-import { isEqual, isMatch } from "lodash-es"
+import { isMatch } from "lodash-es"
 import PolyhedronSpecs from "data/specs/PolyhedronSpecs"
 import { Polyhedron, VertexArg } from "math/polyhedra"
-import { Vec3D, getOrthonormalTransform, withOrigin } from "math/geom"
+import { Plane, Vec3D, getOrthonormalTransform, withOrigin } from "math/geom"
 import { OpArgs, SolidArgs } from "./Operation"
 import { getGeometry } from "./operationUtils"
 
@@ -26,10 +26,12 @@ interface GraphEntry<Specs, L, R> {
 // list of polyhedron pairs and their arguments
 type OpPairGraph<Specs, L, R> = GraphEntry<Specs, L, R>[]
 
+type Orientation = readonly [Vec3D, Vec3D]
+
 export interface Pose {
   scale: number
   origin: Vec3D
-  orientation: readonly [Vec3D, Vec3D]
+  orientation: Orientation
 }
 
 type MiddleGetter<Specs extends PolyhedronSpecs, L, R> = (
@@ -70,10 +72,15 @@ function normalizeIntermediate<Specs extends PolyhedronSpecs>(
   return inter
 }
 
+function normalizeOrientation([u1, u2]: Orientation) {
+  const _u2 = new Plane(Vec3D.ZERO, u1).getProjectedPoint(u2)
+  return [u1.getNormalized(), _u2.getNormalized()]
+}
+
 // Translate, rotate, and scale the polyhedron with the transformation given by the two poses
 function alignPolyhedron(solid: Polyhedron, pose1: Pose, pose2: Pose) {
-  const [u1, u2] = pose1.orientation.map((x) => x.getNormalized())
-  const [v1, v2] = pose2.orientation.map((x) => x.getNormalized())
+  const [u1, u2] = normalizeOrientation(pose1.orientation)
+  const [v1, v2] = normalizeOrientation(pose2.orientation)
   const matrix = getOrthonormalTransform(u1, u2, v1, v2)
   const rotate = withOrigin(pose2.origin, (u) => matrix.applyTo(u))
   const newVertices = solid.vertices.map((v) =>
@@ -85,10 +92,6 @@ function alignPolyhedron(solid: Polyhedron, pose1: Pose, pose2: Pose) {
     ),
   )
   return solid.withVertices(newVertices)
-}
-
-function specsEquals(spec1: PolyhedronSpecs, spec2: PolyhedronSpecs) {
-  return isEqual(spec1.data, spec2.data)
 }
 
 function defaultGetter<Specs extends PolyhedronSpecs>({
@@ -110,13 +113,13 @@ class OpPair<
   }
 
   private getEntries(side: Side, specs: Specs) {
-    return this.inputs.graph.filter((entry) => specsEquals(entry[side], specs))
+    return this.inputs.graph.filter((entry) => entry[side].equals(specs))
   }
 
   findEntry<S extends Side>(side: S, specs: Specs, opts?: Opts<S, L, R>) {
     return this.inputs.graph.find(
       (entry) =>
-        specsEquals(entry[side], specs) &&
+        entry[side].equals(specs) &&
         isMatch(entry.options?.[side] ?? {}, opts ?? {}),
     )
   }
