@@ -3,7 +3,7 @@ import { Twist } from "types"
 import { mapObject } from "utils"
 import Classical, { Facet, Family } from "data/specs/Classical"
 import { makeOpPair, combineOps, Pose } from "./operationPairs"
-import { getPlane, withOrigin, Vec3D } from "math/geom"
+import { angleBetween, getPlane, withOrigin, Vec3D } from "math/geom"
 import { Polyhedron, Face, Edge } from "math/polyhedra"
 import {
   getOppTwist,
@@ -151,10 +151,7 @@ export function calcSnubAngle(specs: Classical, facet: Facet) {
   ])
 
   // Calculate the absolute angle between the two midpoints
-  const normMidpoint = midpoint.sub(faceCentroid)
-  const projected = plane.getProjectedPoint(midpoint).sub(faceCentroid)
-  // Use `||` and not `??` because this can return NaN
-  return normMidpoint.angleBetween(projected, true) || 0
+  return angleBetween(faceCentroid, midpoint, plane.getProjectedPoint(midpoint))
 }
 
 function createObject<T extends string | number, U>(

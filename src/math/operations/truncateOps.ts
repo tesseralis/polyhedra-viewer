@@ -5,7 +5,7 @@ import Composite from "data/specs/Composite"
 import { makeOpPair, combineOps, Pose } from "./operationPairs"
 import Operation, { SolidArgs, OpArgs } from "./Operation"
 import { Plane } from "toxiclibsjs/geom"
-import { Vec3D, getCentroid } from "math/geom"
+import { Vec3D, getCentroid, angleBetween } from "math/geom"
 import {
   getGeometry,
   FacetOpts,
@@ -259,10 +259,6 @@ const ambos = makeTruncateTrio({
   },
 })
 
-function getDirection(v1: Vec3D, v2: Vec3D) {
-  return v2.sub(v1).getNormalized()
-}
-
 const augTruncate = makeOpPair({
   graph: Composite.query
     .where((s) => {
@@ -355,8 +351,10 @@ const augTruncate = makeOpPair({
           const otherFace = v
             .adjacentFaces()
             .find((f) => f.numSides === 3 && !f.equals(face))!
-          const theta = getDirection(v.vec, face.centroid()).angleBetween(
-            getDirection(v.vec, otherFace.centroid()),
+          const theta = angleBetween(
+            v.vec,
+            face.centroid(),
+            otherFace.centroid(),
           )
           const theta2 = Math.PI - theta
           const sharpenDist = face.radius() * Math.tan(theta2)
