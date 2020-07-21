@@ -276,7 +276,12 @@ export const rectify = new Operation(
 
 export const sharpen = new Operation(
   "sharpen",
-  combineOps([regs.truncate.right, ambos.truncate.right]),
+  combineOps<Classical, FacetOpts>([
+    regs.truncate.right,
+    ambos.truncate.right,
+    regs.rectify.right,
+    ambos.rectify.right,
+  ]),
 )
 
 const hitOptArgs: Partial<OpArgs<FacetOpts, Classical>> = {

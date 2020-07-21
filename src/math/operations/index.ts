@@ -2,9 +2,9 @@ import {
   truncate,
   cotruncate,
   sharpen,
-  cosharpen,
+  // cosharpen,
   rectify,
-  unrectify,
+  // unrectify,
 } from "./truncateOps"
 import { dual, expand, snub, contract, twist } from "./resizeOps"
 import { elongate, gyroelongate, shorten, turn } from "./prismOps"
@@ -17,9 +17,9 @@ export const operations = {
   truncate,
   cotruncate,
   sharpen,
-  cosharpen,
+  // cosharpen,
   rectify,
-  unrectify,
+  // unrectify,
   expand,
   snub,
   contract,

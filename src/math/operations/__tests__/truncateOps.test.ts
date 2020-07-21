@@ -27,6 +27,11 @@ describe("rectify", () => {
       expectApplyTo("cube")
       expectApplyTo("icosahedron")
     })
+
+    it("works on quasiregular polyhedra", () => {
+      expectApplyTo("cuboctahedron")
+      expectApplyTo("icosidodecahedron")
+    })
   })
 })
 
@@ -51,21 +56,26 @@ describe("sharpen", () => {
       expectApplyTo("truncated icosidodecahedron")
     })
 
-    // it("works on rectified polyhedra", () => {
-    //   expectApplyTo("octahedron")
-    //   expectApplyTo("cuboctahedron")
-    //   expectApplyTo("icosidodecahedron")
-    // })
+    it("works on rectified polyhedra", () => {
+      expectApplyTo("octahedron")
+      expectApplyTo("cuboctahedron")
+      expectApplyTo("icosidodecahedron")
+    })
+
+    it("works on cantellated polyhera", () => {
+      expectApplyTo("rhombicuboctahedron")
+      expectApplyTo("rhombicosidodecahedron")
+    })
   })
 
-  // describe("hasOptions", () => {
-  //   it("is true only on rectified", () => {
-  //     expectHasOptions("cuboctahedron")
-  //     expectHasOptions("icosidodecahedron")
+  describe("hasOptions", () => {
+    it("is true only on rectified", () => {
+      expectHasOptions("cuboctahedron")
+      expectHasOptions("icosidodecahedron")
 
-  //     expectHasOptions("octahedron", false)
-  //     expectHasOptions("truncated cuboctahedron", false)
-  //     expectHasOptions("truncated icosahedron", false)
-  //   })
-  // })
+      expectHasOptions("octahedron", false)
+      expectHasOptions("truncated cuboctahedron", false)
+      expectHasOptions("truncated icosahedron", false)
+    })
+  })
 })

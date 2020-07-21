@@ -268,16 +268,16 @@ function drawIcon(name: OpName) {
           innerAngle={90}
         />
       )
-    case "unrectify":
-      return (
-        <TruncateIcon
-          styled="added"
-          innerSides={3}
-          innerScale={1 / 2}
-          innerAngle={90}
-        />
-      )
-    case "cosharpen":
+    // case "unrectify":
+    //   return (
+    //     <TruncateIcon
+    //       styled="added"
+    //       innerSides={3}
+    //       innerScale={1 / 2}
+    //       innerAngle={90}
+    //     />
+    //   )
+    // case "cosharpen":
     case "sharpen":
       return <TruncateIcon styled="added" />
     case "dual":
