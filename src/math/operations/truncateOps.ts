@@ -274,16 +274,6 @@ export const rectify = new Operation(
   combineOps([regs.rectify.left, ambos.rectify.left]),
 )
 
-export const sharpen = new Operation(
-  "sharpen",
-  combineOps<Classical, FacetOpts>([
-    regs.truncate.right,
-    ambos.truncate.right,
-    regs.rectify.right,
-    ambos.rectify.right,
-  ]),
-)
-
 const hitOptArgs: Partial<OpArgs<FacetOpts, Classical>> = {
   hitOption: "facet",
   getHitOption({ geom }, hitPoint) {
@@ -299,6 +289,20 @@ const hitOptArgs: Partial<OpArgs<FacetOpts, Classical>> = {
     })
   },
 }
+
+export const sharpen = new Operation("sharpen", {
+  ...combineOps<Classical, FacetOpts>([
+    regs.truncate.right,
+    ambos.truncate.right,
+    regs.rectify.right,
+    ambos.rectify.right,
+  ]),
+  // TODO split up sharpening rectified and sharpening truncated
+  ...hitOptArgs,
+})
+
+// TODO the following operators are unused right now
+// and need to be integrated into the app
 
 export const cosharpen = new Operation("cosharpen", {
   ...combineOps<Classical, FacetOpts>([
