@@ -209,6 +209,17 @@ export default class Polyhedron {
     return this.withChanges((s) => s.addPolyhedron(other))
   }
 
+  /**
+   * Returns the reflection of this polyhedron on an axis
+   */
+  reflect() {
+    return this.withChanges((s) =>
+      s
+        .mapVertices((v) => new Vec3D(-v.vec.x, v.vec.y, v.vec.z))
+        .mapFaces((f) => [...f.vertices.map((v) => v.index)].reverse()),
+    )
+  }
+
   /** Center the polyhedron on its centroid. */
   center() {
     const centroid = this.centroid()

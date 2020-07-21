@@ -20,11 +20,10 @@ interface CompositeData {
 }
 
 const prismaticBases = Prismatic.query.where(
-  ({ type, base }) => type === "prism" && base <= 6,
+  (s) => s.isPrism() && s.data.base <= 6,
 )
 const augmentedClassicalBases = Classical.query.where(
-  ({ operation, facet }) =>
-    ["regular", "truncate"].includes(operation) && facet !== "vertex",
+  (s) => s.hasFacet() && !s.isVertex(),
 )
 const icosahedron = Classical.query.withName("icosahedron")
 const rhombicosidodecahedron = Classical.query.withName(

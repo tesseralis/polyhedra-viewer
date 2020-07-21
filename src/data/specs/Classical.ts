@@ -1,13 +1,13 @@
-import { Items } from "types"
+import { Items, Twist } from "types"
 import { PrimaryPolygon, primaryPolygons } from "../polygons"
 import Specs from "./PolyhedronSpecs"
 import Queries from "./Queries"
 
 const families = primaryPolygons
-type Family = PrimaryPolygon
+export type Family = PrimaryPolygon
 
 const facets = ["face", "vertex"] as const
-type Facet = Items<typeof facets>
+export type Facet = Items<typeof facets>
 
 const operations = [
   "regular",
@@ -17,12 +17,13 @@ const operations = [
   "cantellate",
   "snub",
 ] as const
-type Operation = Items<typeof operations>
+export type Operation = Items<typeof operations>
 
 interface ClassicalData {
   family: Family
   facet?: Facet
   operation: Operation
+  twist?: Twist
 }
 
 /**
@@ -33,6 +34,13 @@ export default class Classical extends Specs<ClassicalData> {
     super("classical", data)
     if (this.isTetrahedral() || !this.hasFacet()) {
       delete this.data.facet
+    }
+    if (!this.isChiral()) {
+      delete this.data.twist
+    }
+    // Set a default twist for snub solids
+    if (this.isChiral() && !this.data.twist) {
+      this.data.twist = "left"
     }
   }
 
@@ -55,6 +63,8 @@ export default class Classical extends Specs<ClassicalData> {
 
   isFace = () => this.data.facet === "face"
   isVertex = () => this.data.facet === "vertex"
+
+  isChiral = () => this.isSnub() && !this.isTetrahedral()
 
   static *getAll() {
     for (const operation of operations) {

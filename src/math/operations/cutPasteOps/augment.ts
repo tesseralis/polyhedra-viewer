@@ -6,9 +6,9 @@ import Elementary from "data/specs/Elementary"
 import { Polyhedron, Face, Cap } from "math/polyhedra"
 import { isInverse, getOrthonormalTransform, PRECISION } from "math/geom"
 import { repeat, getCyclic, getSingle } from "utils"
-import Operation from "../Operation"
+import { makeOperation } from "../Operation"
 import { withOrigin } from "../../geom"
-import { deduplicateVertices } from "../operationUtils"
+import { oppositeFace, deduplicateVertices } from "../operationUtils"
 import { inc, dec, CutPasteSpecs } from "./cutPasteUtils"
 
 type AugmentSpecs = Prismatic | CutPasteSpecs
@@ -127,10 +127,6 @@ function getBaseType(base: Face) {
   }
 }
 
-function getOppositePrismFace(base: Face) {
-  return base.edges[0].twin().next().next().twinFace()
-}
-
 function isCupolaRotunda(baseType: string, augmentType: string) {
   return setEquals(["cupola", "rotunda"], [baseType, augmentType])
 }
@@ -159,7 +155,7 @@ function isAligned(
   }
 
   const adjFace =
-    baseType === "prism" ? getOppositePrismFace(base) : base.adjacentFaces()[0]
+    baseType === "prism" ? oppositeFace(base.edges[0]) : base.adjacentFaces()[0]
   const alignedFace = getCyclic(underside.adjacentFaces(), -1)
 
   if (baseType === "rhombicosidodecahedron") {
@@ -295,7 +291,7 @@ function hasRotunda(info: AugmentSpecs) {
     return info.data.base === 10
   }
   if (info.isCapstone()) {
-    return info.isMono() && !info.isPyramid() && info.data.base === 5
+    return info.isMono() && !info.isPyramid() && info.isPentagonal()
   }
   return false
 }
@@ -343,7 +339,7 @@ interface Options {
   gyrate?: GyrateOpts
   using?: string
 }
-export const augment = new Operation<Options, AugmentSpecs>("augment", {
+export const augment = makeOperation<Options, AugmentSpecs>("augment", {
   apply({ specs, geom }, { face, gyrate, using }) {
     const augmentType = using
       ? getUsingType(using)
@@ -351,7 +347,7 @@ export const augment = new Operation<Options, AugmentSpecs>("augment", {
     return doAugment(specs, geom, face, augmentType, gyrate)
   },
 
-  canApplyTo(info): info is AugmentSpecs {
+  canApplyTo(info) {
     if (info.isPrismatic()) {
       const { base } = info.data
       if (info.isAntiprism() && base === 3) return false
