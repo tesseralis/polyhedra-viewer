@@ -1,4 +1,4 @@
-import { isEqual, isMatch } from "lodash-es"
+import { isMatch } from "lodash-es"
 import PolyhedronSpecs from "data/specs/PolyhedronSpecs"
 import { Polyhedron, VertexArg } from "math/polyhedra"
 import { Vec3D, getOrthonormalTransform, withOrigin } from "math/geom"
@@ -87,15 +87,6 @@ function alignPolyhedron(solid: Polyhedron, pose1: Pose, pose2: Pose) {
   return solid.withVertices(newVertices)
 }
 
-function specsEquals(spec1: PolyhedronSpecs, spec2: PolyhedronSpecs): boolean {
-  if (spec1.isComposite() && spec2.isComposite()) {
-    const { source: source1, ...data1 } = spec1.data
-    const { source: source2, ...data2 } = spec2.data
-    return specsEquals(source1, source2) && isEqual(data1, data2)
-  }
-  return isEqual(spec1.data, spec2.data)
-}
-
 function defaultGetter<Specs extends PolyhedronSpecs>({
   geom,
 }: SolidArgs<Specs>) {
@@ -115,13 +106,13 @@ class OpPair<
   }
 
   private getEntries(side: Side, specs: Specs) {
-    return this.inputs.graph.filter((entry) => specsEquals(entry[side], specs))
+    return this.inputs.graph.filter((entry) => entry[side].equals(specs))
   }
 
   findEntry<S extends Side>(side: S, specs: Specs, opts?: Opts<S, L, R>) {
     return this.inputs.graph.find(
       (entry) =>
-        specsEquals(entry[side], specs) &&
+        entry[side].equals(specs) &&
         isMatch(entry.options?.[side] ?? {}, opts ?? {}),
     )
   }

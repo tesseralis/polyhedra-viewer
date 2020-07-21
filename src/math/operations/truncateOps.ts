@@ -308,7 +308,6 @@ const augTruncate = makeOpPair({
 
     const boundary = cap.boundary()
     let crossAxis
-    // FIXME something's wrong if we do this as part of a chain
     if (specs.isTri()) {
       const cap1 = caps[1]
       const cap2 = caps[2]
