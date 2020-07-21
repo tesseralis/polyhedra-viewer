@@ -4,7 +4,6 @@ import Classical, { Operation as OpName } from "data/specs/Classical"
 import Composite from "data/specs/Composite"
 import { makeOpPair, combineOps, Pose } from "./operationPairs"
 import Operation, { SolidArgs, OpArgs } from "./Operation"
-import { Plane } from "toxiclibsjs/geom"
 import { Vec3D, getCentroid, angleBetween } from "math/geom"
 import {
   getGeometry,
@@ -307,16 +306,9 @@ const augTruncate = makeOpPair({
     if (specs.isTri()) {
       const cap1 = caps[1]
       const cap2 = caps[2]
-      const midpoint = getCentroid([cap1.normal(), cap2.normal()])
-      crossAxis = new Plane(Vec3D.ZERO, boundary.normal()).getProjectedPoint(
-        midpoint,
-      )
+      crossAxis = getCentroid([cap1.normal(), cap2.normal()])
     } else if (specs.isBi() && specs.isMeta()) {
-      const cap1 = caps[1]
-      // FIXME Maybe we should just have a getPlane for FaceLike
-      crossAxis = new Plane(Vec3D.ZERO, boundary.normal()).getProjectedPoint(
-        cap1.normal(),
-      )
+      crossAxis = caps[1].normal()
     } else {
       crossAxis = boundary.edges
         .find((e) => isTetrahedron || e.twinFace().numSides > 3)!

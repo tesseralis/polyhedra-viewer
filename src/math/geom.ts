@@ -2,7 +2,7 @@ import { Vec3D, Ray3D, Triangle3D, Plane, Matrix4x4 } from "toxiclibsjs/geom"
 import { Point } from "types"
 
 // Re-export Vec3D so its easier to switch
-export { Vec3D }
+export { Vec3D, Plane }
 
 export const PRECISION_DIGITS = 3
 export const PRECISION = 10 ** -PRECISION_DIGITS

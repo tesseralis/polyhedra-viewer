@@ -13,7 +13,6 @@ import {
   TwistOpts,
   getGeometry,
 } from "./operationUtils"
-import { Plane } from "toxiclibsjs/geom"
 import Operation, { makeOperation } from "./Operation"
 
 function getSnubTetrahedronFaces(polyhedron: Polyhedron) {
@@ -446,14 +445,10 @@ const _dual = makeOpPair({
         const vertex = geom.getVertex()
         const normal = vertex.vec.sub(geom.centroid())
         const v2 = vertex.adjacentVertices()[0]
-        const plane = new Plane(vertex.vec, normal)
         return {
           origin: geom.centroid(),
           scale: geom.edges[0].distanceToCenter(),
-          orientation: [
-            normal,
-            plane.getProjectedPoint(v2.vec).sub(vertex.vec),
-          ],
+          orientation: [normal, v2.vec.sub(vertex.vec)],
         }
       }
       case "middle": {

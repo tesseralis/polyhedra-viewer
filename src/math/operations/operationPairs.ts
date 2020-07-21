@@ -1,7 +1,7 @@
 import { isMatch } from "lodash-es"
 import PolyhedronSpecs from "data/specs/PolyhedronSpecs"
 import { Polyhedron, VertexArg } from "math/polyhedra"
-import { Vec3D, getOrthonormalTransform, withOrigin } from "math/geom"
+import { Plane, Vec3D, getOrthonormalTransform, withOrigin } from "math/geom"
 import { OpArgs, SolidArgs } from "./Operation"
 import { getGeometry } from "./operationUtils"
 
@@ -26,10 +26,12 @@ interface GraphEntry<Specs, L, R> {
 // list of polyhedron pairs and their arguments
 type OpPairGraph<Specs, L, R> = GraphEntry<Specs, L, R>[]
 
+type Orientation = readonly [Vec3D, Vec3D]
+
 export interface Pose {
   scale: number
   origin: Vec3D
-  orientation: readonly [Vec3D, Vec3D]
+  orientation: Orientation
 }
 
 type MiddleGetter<Specs extends PolyhedronSpecs, L, R> = (
@@ -70,10 +72,15 @@ function normalizeIntermediate<Specs extends PolyhedronSpecs>(
   return inter
 }
 
+function normalizeOrientation([u1, u2]: Orientation) {
+  const _u2 = new Plane(Vec3D.ZERO, u1).getProjectedPoint(u2)
+  return [u1.getNormalized(), _u2.getNormalized()]
+}
+
 // Translate, rotate, and scale the polyhedron with the transformation given by the two poses
 function alignPolyhedron(solid: Polyhedron, pose1: Pose, pose2: Pose) {
-  const [u1, u2] = pose1.orientation.map((x) => x.getNormalized())
-  const [v1, v2] = pose2.orientation.map((x) => x.getNormalized())
+  const [u1, u2] = normalizeOrientation(pose1.orientation)
+  const [v1, v2] = normalizeOrientation(pose2.orientation)
   const matrix = getOrthonormalTransform(u1, u2, v1, v2)
   const rotate = withOrigin(pose2.origin, (u) => matrix.applyTo(u))
   const newVertices = solid.vertices.map((v) =>

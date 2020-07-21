@@ -2,8 +2,8 @@ import { Vec3D } from "math/geom"
 
 import {
   PRECISION,
+  Plane,
   isPlanar,
-  getPlane,
   getCentroid,
   getNormal,
   getNormalRay,
@@ -52,7 +52,7 @@ export default class FaceLike implements VertexList {
   }
 
   plane() {
-    return getPlane(this.vectors)
+    return new Plane(this.centroid(), this.normal())
   }
 
   apothem() {
