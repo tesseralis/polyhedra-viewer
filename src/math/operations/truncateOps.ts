@@ -313,15 +313,15 @@ const augTruncate = makeOpPair({
       const cap1 = caps[1]
       const cap2 = caps[2]
       const midpoint = getCentroid([cap1.normal(), cap2.normal()])
-      crossAxis = new Plane(boundary.centroid(), boundary.normal())
-        .getProjectedPoint(midpoint)
-        .sub(boundary.centroid())
+      crossAxis = new Plane(Vec3D.ZERO, boundary.normal()).getProjectedPoint(
+        midpoint,
+      )
     } else if (specs.isBi() && specs.isMeta()) {
       const cap1 = caps[1]
       // FIXME Maybe we should just have a getPlane for FaceLike
-      crossAxis = new Plane(boundary.centroid(), boundary.normal())
-        .getProjectedPoint(cap1.normal())
-        .sub(boundary.centroid())
+      crossAxis = new Plane(Vec3D.ZERO, boundary.normal()).getProjectedPoint(
+        cap1.normal(),
+      )
     } else {
       crossAxis = boundary.edges
         .find((e) => isTetrahedron || e.twinFace().numSides > 3)!
