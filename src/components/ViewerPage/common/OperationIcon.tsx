@@ -257,7 +257,6 @@ function AugmentIcon({ styled }: { styled: string }) {
 function drawIcon(name: OpName) {
   switch (name) {
     case "truncate":
-    case "cotruncate":
       return <TruncateIcon styled="subtracted" />
     case "rectify":
       return (
@@ -268,16 +267,6 @@ function drawIcon(name: OpName) {
           innerAngle={90}
         />
       )
-    // case "unrectify":
-    //   return (
-    //     <TruncateIcon
-    //       styled="added"
-    //       innerSides={3}
-    //       innerScale={1 / 2}
-    //       innerAngle={90}
-    //     />
-    //   )
-    // case "cosharpen":
     case "sharpen":
       return <TruncateIcon styled="added" />
     case "dual":

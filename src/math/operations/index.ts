@@ -1,6 +1,6 @@
 import {
   truncate,
-  cotruncate,
+  // cotruncate,
   sharpen,
   // cosharpen,
   rectify,
@@ -15,7 +15,7 @@ export type { default as Operation, AnimationData } from "./Operation"
 export const operations = {
   dual,
   truncate,
-  cotruncate,
+  // cotruncate,
   sharpen,
   // cosharpen,
   rectify,

@@ -44,17 +44,13 @@ describe("viewer", () => {
       .expectNoButtonWithText("ortho")
   })
 
-  // TODO this test is broken anyways... remake it when we move to react-testing-library
-  xit("unsets the operation when there are no more options", () => {
-    setup("augmented triangular prism")
+  it("unsets the operation when there are no more options", () => {
+    setup("cuboctahedron")
     page
-      .clickButtonWithText("augment")
+      .clickButtonWithText("sharpen")
       .clickFaceWithNumSides(4)
-      .expectTransitionTo("biaugmented triangular prism")
-      .expectElementWithText("p", "Select a face")
-      .clickFaceWithNumSides(4)
-      .expectTransitionTo("triaugmented triangular prism")
-      .expectNoElementWithText("p", "Select a face")
+      .expectTransitionTo("octahedron")
+      .expectOperation("")
   })
 
   it("unsets the operation when clicking a different tab", () => {
