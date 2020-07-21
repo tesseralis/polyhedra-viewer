@@ -87,7 +87,12 @@ function alignPolyhedron(solid: Polyhedron, pose1: Pose, pose2: Pose) {
   return solid.withVertices(newVertices)
 }
 
-function specsEquals(spec1: PolyhedronSpecs, spec2: PolyhedronSpecs) {
+function specsEquals(spec1: PolyhedronSpecs, spec2: PolyhedronSpecs): boolean {
+  if (spec1.isComposite() && spec2.isComposite()) {
+    const { source: source1, ...data1 } = spec1.data
+    const { source: source2, ...data2 } = spec2.data
+    return specsEquals(source1, source2) && isEqual(data1, data2)
+  }
   return isEqual(spec1.data, spec2.data)
 }
 

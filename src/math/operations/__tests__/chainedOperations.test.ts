@@ -129,6 +129,19 @@ describe("chained tests", () => {
         },
       ],
     },
+    {
+      // Make sure the Pose is fine in a chained operation
+      description: "truncating/sharpening augmented classicals",
+      start: "triaugmented truncated dodecahedron",
+      operations: [
+        {
+          op: "diminish",
+          args: { cap: true },
+          expected: "metabiaugmented truncated dodecahedron",
+        },
+        ["sharpen", "metabiaugmented dodecahedron"],
+      ],
+    },
   ]
 
   for (const test of tests) {

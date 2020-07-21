@@ -1,9 +1,11 @@
 import { sum } from "lodash-es"
-import { Polyhedron, Face, VertexArg } from "math/polyhedra"
+import { Polyhedron, Face, VertexArg, Cap } from "math/polyhedra"
 import Classical, { Operation as OpName } from "data/specs/Classical"
+import Composite from "data/specs/Composite"
 import { makeOpPair, combineOps, Pose } from "./operationPairs"
 import Operation, { SolidArgs, OpArgs } from "./Operation"
-import { Vec3D } from "math/geom"
+import { Plane } from "toxiclibsjs/geom"
+import { Vec3D, getCentroid } from "math/geom"
 import {
   getGeometry,
   FacetOpts,
@@ -257,11 +259,131 @@ const ambos = makeTruncateTrio({
   },
 })
 
+function getDirection(v1: Vec3D, v2: Vec3D) {
+  return v2.sub(v1).getNormalized()
+}
+
+const augTruncate = makeOpPair({
+  graph: Composite.query
+    .where((s) => {
+      const source = s.data.source
+      return (
+        s.isAugmented() &&
+        !s.isDiminished() &&
+        source.isClassical() &&
+        source.isRegular()
+      )
+    })
+    .map((entry) => ({
+      left: entry,
+      right: entry.withData({
+        source: entry.data.source.withData({ operation: "truncate" }),
+      }),
+    })),
+  middle: "right",
+  getPose($, { geom, specs }) {
+    const source = specs.data.source
+    let caps = Cap.getAll(geom)
+    const isTetrahedron =
+      source.isClassical() && source.isTetrahedral() && source.isRegular()
+    // If source is a tetrahedron, take only the first cap (the other is the base)
+    if (isTetrahedron) {
+      caps = [caps[0]]
+    }
+    const capVertIndices = caps.flatMap((cap) =>
+      cap.innerVertices().map((v) => v.index),
+    )
+    const sourceVerts = geom.vertices.filter(
+      (v) => !capVertIndices.includes(v.index),
+    )
+    const centroid = getCentroid(sourceVerts.map((v) => v.vec))
+    const sourceFaces = geom.faces.filter((f) =>
+      f.vertices.every((v) => !capVertIndices.includes(v.index)),
+    )
+    const scaleFace = sourceFaces.find(
+      (face) => isTetrahedron || face.numSides > 3,
+    )!
+    const cap = caps[0]
+    const mainAxis = cap.normal()
+
+    const boundary = cap.boundary()
+    let crossAxis
+    // FIXME something's wrong if we do this as part of a chain
+    if (specs.isTri()) {
+      const cap1 = caps[1]
+      const cap2 = caps[2]
+      const midpoint = getCentroid([cap1.normal(), cap2.normal()])
+      crossAxis = new Plane(boundary.centroid(), boundary.normal())
+        .getProjectedPoint(midpoint)
+        .sub(boundary.centroid())
+    } else if (specs.isBi() && specs.isMeta()) {
+      const cap1 = caps[1]
+      // FIXME Maybe we should just have a getPlane for FaceLike
+      crossAxis = new Plane(boundary.centroid(), boundary.normal())
+        .getProjectedPoint(cap1.normal())
+        .sub(boundary.centroid())
+    } else {
+      crossAxis = boundary.edges
+        .find((e) => isTetrahedron || e.twinFace().numSides > 3)!
+        .midpoint()
+        .sub(boundary.centroid())
+    }
+
+    return {
+      origin: centroid,
+      scale: scaleFace.centroid().distanceTo(centroid),
+      orientation: [mainAxis, crossAxis],
+    }
+  },
+  toLeft({ geom }) {
+    const caps = Cap.getAll(geom)
+    const capVertIndices = caps.flatMap((cap) =>
+      cap.innerVertices().map((v) => v.index),
+    )
+    const sourceFaces = geom.faces.filter((f) =>
+      f.vertices.every((v) => !capVertIndices.includes(v.index)),
+    )
+    const truncatedFaces = sourceFaces.filter((f) => f.numSides === 3)
+    const innerCapFaces = geom.faces.filter((f) =>
+      f.vertices.every((v) => capVertIndices.includes(v.index)),
+    )
+    const innerFaceIndices = innerCapFaces.map((f) => f.index)
+    return getTransformedVertices(
+      [...truncatedFaces, ...innerCapFaces],
+      (face) => {
+        if (innerFaceIndices.includes(face.index)) {
+          const v = face.vertices[0]
+          const otherFace = v
+            .adjacentFaces()
+            .find((f) => f.numSides === 3 && !f.equals(face))!
+          const theta = getDirection(v.vec, face.centroid()).angleBetween(
+            getDirection(v.vec, otherFace.centroid()),
+          )
+          const theta2 = Math.PI - theta
+          const sharpenDist = face.radius() * Math.tan(theta2)
+          return face.normalRay().getPointAtDistance(sharpenDist)
+        } else {
+          // Sharpen the source faces
+          // FIXME this is duplicated from getSharpenDist
+          const edge = face.edges.find((e) => e.twinFace().numSides > 5)!
+          const theta = Math.PI - edge.dihedralAngle()
+          const sharpenDist = face.apothem() * Math.tan(theta)
+          return face.normalRay().getPointAtDistance(sharpenDist)
+        }
+      },
+    )
+  },
+})
+
 // Exported operations
 
 export const truncate = new Operation(
   "truncate",
-  combineOps([regs.truncate.left, ambos.truncate.left]),
+  combineOps<Classical | Composite, any>([
+    regs.truncate.left,
+    ambos.truncate.left,
+    augTruncate.left,
+  ]),
 )
 
 export const cotruncate = new Operation(
@@ -291,9 +413,10 @@ const hitOptArgs: Partial<OpArgs<FacetOpts, Classical>> = {
 }
 
 export const sharpen = new Operation("sharpen", {
-  ...combineOps<Classical, FacetOpts>([
+  ...combineOps<Classical | Composite, FacetOpts>([
     regs.truncate.right,
     ambos.truncate.right,
+    augTruncate.right,
     regs.rectify.right,
     ambos.rectify.right,
   ]),
