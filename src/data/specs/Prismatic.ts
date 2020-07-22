@@ -26,6 +26,10 @@ export default class Prismatic extends Specs<PrismaticData> {
   isPrism = () => this.data.type === "prism"
   isAntiprism = () => this.data.type === "antiprism"
 
+  isDigonal = () => this.data.base === 2
+  isPrimary = () => this.data.base > 2 && this.data.base <= 5
+  isSecondary = () => this.data.base >= 6
+
   static *getAll() {
     for (const base of bases) {
       for (const type of prismaticTypes) {

@@ -81,6 +81,10 @@ export default class Vertex {
   adjacentFaceCounts() {
     return countBy(this.adjacentFaces(), "numSides")
   }
+
+  distanceToCenter() {
+    return this.vec.distanceTo(this.polyhedron.centroid())
+  }
 }
 
 export interface VertexList {

@@ -7,7 +7,7 @@ import {
   getTransformedVertices,
   removeExtraneousVertices,
 } from "../operationUtils"
-import Operation from "../Operation"
+import { makeOperation } from "../Operation"
 import { Polyhedron, Cap } from "math/polyhedra"
 import {
   inc,
@@ -46,7 +46,7 @@ function removeCap(polyhedron: Polyhedron, cap: Cap) {
 
   const endVertices = getTransformedVertices(
     [cap],
-    (p) => boundary.centroid(),
+    () => boundary.centroid(),
     mockPolyhedron.vertices,
   )
 
@@ -66,12 +66,12 @@ function removeCap(polyhedron: Polyhedron, cap: Cap) {
 interface Options {
   cap: Cap
 }
-export const diminish = new Operation<Options, CutPasteSpecs>("diminish", {
+export const diminish = makeOperation<Options, CutPasteSpecs>("diminish", {
   apply({ geom }, { cap }) {
     return removeCap(geom, cap)
   },
 
-  canApplyTo(info): info is CutPasteSpecs {
+  canApplyTo(info) {
     if (info.isCapstone()) {
       return !(info.isMono() && info.isShortened())
     }
