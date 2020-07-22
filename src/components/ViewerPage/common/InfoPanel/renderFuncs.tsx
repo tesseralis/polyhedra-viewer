@@ -102,7 +102,7 @@ export function displayFaceTypes({ polyhedron }: RenderProps) {
     <ul>
       {map(faceCounts, (count, type) => (
         <li key={type}>
-          {count} {polygonNames.get(type as any)}
+          {count} {polygonNames.get(parseInt(type) as any)}
           {count !== 1 ? "s" : ""}
         </li>
       ))}
