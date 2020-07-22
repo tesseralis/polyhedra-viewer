@@ -66,7 +66,9 @@ export default class ViewerPage extends AppPage {
   expectTransitionTo(expected: string) {
     this.wrapper.update()
     this.expectPath(`/${escape(expected)}/operations`)
-    expect(this.getPolyhedron().isSame(Polyhedron.get(expected))).toBe(true)
+    expect(Polyhedron.get(expected)).toSatisfy((p) =>
+      this.getPolyhedron().isSame(p),
+    )
     return this
   }
 }
