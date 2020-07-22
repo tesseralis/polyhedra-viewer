@@ -1,8 +1,9 @@
 import React from "react"
 import { render, screen, fireEvent, cleanup } from "@testing-library/react"
 
-import { BrowserRouter } from "react-router-dom"
-import Viewer from "../Viewer"
+import { MemoryRouter, Routes, Route } from "react-router-dom"
+// import Viewer from "../Viewer"
+import ViewerPage from "../ViewerPage"
 
 jest.mock("transition")
 
@@ -11,9 +12,11 @@ jest.mock("transition")
 
 function renderViewer(solid: string) {
   return render(
-    <BrowserRouter>
-      <Viewer solid={solid} />
-    </BrowserRouter>,
+    <MemoryRouter initialEntries={[`/${solid}/operations`]}>
+      <Routes>
+        <Route path=":solid/*" element={<ViewerPage />} />
+      </Routes>
+    </MemoryRouter>,
   )
 }
 
@@ -67,12 +70,11 @@ describe("Viewer operations panel", () => {
     //   .expectOperation("")
   })
 
-  xit("unsets the operation when clicking on a different tab", () => {
+  it("unsets the operation when clicking on a different tab", () => {
     renderViewer("tetrahedron")
     clickOperation("augment")
     fireEvent.click(screen.getByText("Options"))
-    // FIXME
-    // fireEvent.click(screen.getByText("Operations"))
+    fireEvent.click(screen.getByText("Operations"))
     expect(screen.queryByText("Select a face")).not.toBeInTheDocument()
   })
 
