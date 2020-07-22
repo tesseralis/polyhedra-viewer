@@ -1,20 +1,24 @@
 version: 2.1
 orbs:
-  node: circleci/node@2.0.1
+  node: circleci/node@3.0.1
 jobs:
   lint:
     executor:
       name: node/default
     steps:
       - checkout
-      - node/install-packages
+      - node/install:
+          install-yarn: true
+          node-version: latest
       - run: yarn lint
   test:
     executor:
       name: node/default
     steps:
       - checkout
-      - node/install-packages
+      - node/install:
+          install-yarn: true
+          node-version: latest
       - run: yarn test --runInBand
 workflows:
   build-and-test:
