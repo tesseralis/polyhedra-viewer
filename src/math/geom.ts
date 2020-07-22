@@ -1,8 +1,8 @@
 import { Vec3D, Ray3D, Triangle3D, Plane, Matrix4x4 } from "toxiclibsjs/geom"
 import { Point } from "types"
 
-// Re-export Vec3D so its easier to switch
-export { Vec3D }
+// Re-export useful things so its easier to switch
+export { Ray3D, Vec3D, Plane }
 
 export const PRECISION_DIGITS = 3
 export const PRECISION = 10 ** -PRECISION_DIGITS
@@ -14,6 +14,11 @@ export const getMidpoint = (v1: Vec3D, v2: Vec3D) => v1.add(v2).scale(0.5)
 
 export function isInverse(v1: Vec3D, v2: Vec3D) {
   return v1.getInverted().equalsWithTolerance(v2, PRECISION)
+}
+
+export function angleBetween(o: Vec3D, a: Vec3D, b: Vec3D) {
+  // colinear points return NaN, so return 0 instead
+  return a.sub(o).angleBetween(b.sub(o), true) || 0
 }
 
 // Get the plane containing the given points
@@ -62,7 +67,7 @@ export function getOrientation(v1: Vec3D, v2: Vec3D) {
     v1.y, v2.y, v3.y, 0,
     v1.z, v2.z, v3.z, 0,
     0,    0,    0,    1,
-  );
+  )
 }
 
 /**

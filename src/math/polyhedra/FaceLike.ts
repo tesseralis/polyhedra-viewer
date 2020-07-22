@@ -2,8 +2,8 @@ import { Vec3D } from "math/geom"
 
 import {
   PRECISION,
+  Plane,
   isPlanar,
-  getPlane,
   getCentroid,
   getNormal,
   getNormalRay,
@@ -52,11 +52,15 @@ export default class FaceLike implements VertexList {
   }
 
   plane() {
-    return getPlane(this.vectors)
+    return new Plane(this.centroid(), this.normal())
   }
 
   apothem() {
     return this.sideLength() / (2 * Math.tan(Math.PI / this.numSides))
+  }
+
+  radius() {
+    return this.sideLength() / (2 * Math.sin(Math.PI / this.numSides))
   }
 
   /** Get the area of a *regular* polygon */

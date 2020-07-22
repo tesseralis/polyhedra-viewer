@@ -1,6 +1,7 @@
 import { isNaN } from "lodash-es"
-import { PRECISION } from "math/geom"
+import { PRECISION, Vec3D } from "math/geom"
 import { Polyhedron } from "math/polyhedra"
+import { OpResult } from "./Operation"
 
 function isProperPolyhedron(polyhedron: Polyhedron) {
   const expectedSideLength = polyhedron.edgeLength()
@@ -11,14 +12,14 @@ function isProperPolyhedron(polyhedron: Polyhedron) {
       return false
     }
     if (Math.abs(sideLength - expectedSideLength) > PRECISION) {
-      console.log(
+      console.error(
         `edge ${edge} has length ${sideLength} which is different from ${expectedSideLength}`,
       )
       return false
     }
     // Make sure the whole thing is convex
     if (edge.dihedralAngle() > Math.PI - PRECISION) {
-      console.log(`polyhedron concave at edge ${edge}`)
+      console.error(`polyhedron concave at edge ${edge}`)
       return false
     }
   }
@@ -30,31 +31,49 @@ function isProperPolyhedron(polyhedron: Polyhedron) {
     const normal = face.normal()
     const expectedNormal = faceCentroid.sub(centroid)
     if (normal.angleBetween(expectedNormal, true) > Math.PI / 2) {
-      console.log(`polyhedron inside out at ${face.index}`)
+      console.error(`polyhedron inside out at ${face.index}`)
       return false
     }
   }
   return true
 }
 
-export function setupOperations() {
-  expect.extend({
-    toBeValidPolyhedron(received) {
-      const { result } = received
-      const isProper = isProperPolyhedron(result)
-      const matchesName = result.isSame(Polyhedron.get(result.name))
-      return {
-        message: () => {
-          if (!isProper)
-            return `expected ${
-              this.isNot ? "an improper" : "a proper"
-            } CRF polyhedron`
-          return `expected polyhedron to ${this.isNot ? "not be" : "be"} a ${
-            result.name
-          }`
-        },
-        pass: isProper && matchesName,
-      }
-    },
-  })
+// TODO figure out some not n-squared test for this
+function expectVerticesMatch(test: Vec3D[], ref: Vec3D[]) {
+  for (const vec of test) {
+    expect(ref.some((v) => v.equalsWithTolerance(vec, PRECISION))).toEqual(true)
+  }
+}
+
+// These operations behave badly and are banned :(
+const naughtyOps = ["augment", "diminish", "gyrate"]
+
+export function expectValidAnimationData(
+  opResult: OpResult,
+  original: Polyhedron,
+  operation: string,
+) {
+  // don't do it if it's one of the banned operations
+  if (naughtyOps.includes(operation)) return
+
+  const { result, animationData } = opResult
+  expect(animationData).toBeDefined()
+  const { start, endVertices } = animationData!
+  const startVertices = start.vertices
+    .filter((v) => !v.adjacentEdges().every((e) => e.length() < PRECISION))
+    .map((v) => v.vec)
+  expectVerticesMatch(
+    startVertices,
+    original.vertices.map((v) => v.vec),
+  )
+  expectVerticesMatch(
+    endVertices.map((v) => new Vec3D(...v)),
+    result.vertices.map((v) => v.vec),
+  )
+}
+
+export function expectValidPolyhedron(opResult: OpResult) {
+  const { result } = opResult
+  expect(isProperPolyhedron(result)).toBeTruthy()
+  expect(result.isSame(Polyhedron.get(result.name))).toBeTruthy()
 }

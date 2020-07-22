@@ -68,6 +68,10 @@ export default class Builder {
     return this.withFaces((this.solidData.faces as FaceArg[]).concat(faces))
   }
 
+  mapVertices(iteratee: (v: Vertex) => VertexArg) {
+    return this.withVertices(this.polyhedron.vertices.map(iteratee))
+  }
+
   /** Map the faces of the *original* solid to new ones */
   mapFaces(iteratee: (f: Face) => FaceArg) {
     return this.withFaces(this.polyhedron.faces.map(iteratee))

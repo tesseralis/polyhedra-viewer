@@ -1,12 +1,13 @@
 import { Polyhedron, Cap } from "math/polyhedra"
 import { OpName, operations } from "math/operations"
-import { setupOperations } from "../operationTestUtils"
-
-setupOperations()
+import {
+  expectValidPolyhedron,
+  expectValidAnimationData,
+} from "../operationTestUtils"
 
 interface Args {
-  faceType?: number
   face?: number
+  facet?: "vertex" | "face"
   cap?: boolean
 }
 
@@ -83,17 +84,17 @@ describe("chained tests", () => {
       start: "cube",
       operations: [
         ["expand", "rhombicuboctahedron"],
-        { op: "contract", args: { faceType: 4 }, expected: "cube" },
+        { op: "contract", args: { facet: "face" }, expected: "cube" },
         ["expand", "rhombicuboctahedron"],
-        { op: "contract", args: { faceType: 3 }, expected: "octahedron" },
+        { op: "contract", args: { facet: "vertex" }, expected: "octahedron" },
       ],
     },
     {
-      description: "dodecahedron -> rectify -> sharpen -> contract",
+      description: "dodecahedron -> rectify -> unrectify -> contract",
       start: "dodecahedron",
       operations: [
         ["rectify", "icosidodecahedron"],
-        { op: "sharpen", args: { faceType: 5 }, expected: "icosahedron" },
+        { op: "sharpen", args: { facet: "vertex" }, expected: "icosahedron" },
         ["contract", "tetrahedron"],
       ],
     },
@@ -107,7 +108,7 @@ describe("chained tests", () => {
         ["rectify", "cuboctahedron"],
         ["truncate", "truncated cuboctahedron"],
         ["sharpen", "cuboctahedron"],
-        { op: "sharpen", args: { faceType: 3 }, expected: "cube" },
+        { op: "sharpen", args: { facet: "face" }, expected: "cube" },
         ["truncate", "truncated cube"],
         {
           op: "augment",
@@ -128,6 +129,19 @@ describe("chained tests", () => {
         },
       ],
     },
+    {
+      // Make sure the Pose is fine in a chained operation
+      description: "truncating/sharpening augmented classicals",
+      start: "triaugmented truncated dodecahedron",
+      operations: [
+        {
+          op: "diminish",
+          args: { cap: true },
+          expected: "metabiaugmented truncated dodecahedron",
+        },
+        ["sharpen", "metabiaugmented dodecahedron"],
+      ],
+    },
   ]
 
   for (const test of tests) {
@@ -139,7 +153,8 @@ describe("chained tests", () => {
 
         expect(op.canApplyTo(polyhedron)).toBeTruthy()
         const result = op.apply(polyhedron, args as any)
-        expect(result).toBeValidPolyhedron()
+        expectValidPolyhedron(result)
+        expectValidAnimationData(result, polyhedron, op.name)
 
         polyhedron = result.result
         expect(polyhedron.name).toBe(expected)

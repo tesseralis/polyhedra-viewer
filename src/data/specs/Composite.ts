@@ -1,3 +1,4 @@
+import { omit, isEqual } from "lodash-es"
 import { Items } from "types"
 
 import Specs from "./PolyhedronSpecs"
@@ -20,11 +21,10 @@ interface CompositeData {
 }
 
 const prismaticBases = Prismatic.query.where(
-  ({ type, base }) => type === "prism" && base <= 6,
+  (s) => s.isPrism() && s.data.base <= 6,
 )
 const augmentedClassicalBases = Classical.query.where(
-  ({ operation, facet }) =>
-    ["regular", "truncate"].includes(operation) && facet !== "vertex",
+  (s) => s.hasFacet() && !s.isVertex(),
 )
 const icosahedron = Classical.query.withName("icosahedron")
 const rhombicosidodecahedron = Classical.query.withName(
@@ -66,8 +66,21 @@ export default class Composite extends Specs<CompositeData> {
   isBi = () => this.totalCount() === 2
   isTri = () => this.totalCount() === 3
 
+  isAugmented = () => this.data.augmented > 0
+  isDiminished = () => this.data.diminished > 0
+  isGyrate = () => this.data.gyrate > 0
+
   isPara = () => this.data.align === "para"
   isMeta = () => this.data.align === "meta"
+
+  equals(s2: Specs) {
+    if (!s2.isComposite()) return false
+    // Recursively compare the source data and other data
+    const { source, ...data } = this.data
+    const source2: Specs = s2.data.source
+    const data2: Omit<CompositeData, "source"> = omit(s2.data, "source")
+    return source.equals(source2) && isEqual(data, data2)
+  }
 
   static *getAll() {
     // Augmented prisms

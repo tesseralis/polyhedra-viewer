@@ -80,6 +80,8 @@ const OpButton = memo(function ({ name, disabled }: Props) {
   )
 })
 
+const templateString = opLayout.map((line) => `"${line.join(" ")}"`).join("\n")
+
 export default function OpGrid() {
   const { unsetOperation } = OperationCtx.useActions()
   const { isTransitioning } = TransitionCtx.useState()
@@ -95,9 +97,7 @@ export default function OpGrid() {
       justifyContent: "space-between",
       gridColumnGap: scales.spacing[1],
       gridRowGap: scales.spacing[2],
-      gridTemplateAreas: opLayout
-        .map((line) => `"${line.join(" ")}"`)
-        .join("\n"),
+      gridTemplateAreas: templateString,
     },
     [media.mobile]: {
       ...flexRow(),

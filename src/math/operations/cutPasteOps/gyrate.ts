@@ -5,7 +5,7 @@ import Capstone from "data/specs/Capstone"
 import Composite from "data/specs/Composite"
 import { inc, dec, getCapAlignment, getCupolaGyrate } from "./cutPasteUtils"
 import { getTransformedVertices } from "../operationUtils"
-import Operation from "../Operation"
+import { makeOperation } from "../Operation"
 
 const TAU = 2 * Math.PI
 
@@ -61,14 +61,14 @@ function applyGyrate(polyhedron: Polyhedron, { cap }: Options) {
   }
 }
 
-export const gyrate = new Operation<{ cap: Cap }, Capstone | Composite>(
+export const gyrate = makeOperation<{ cap: Cap }, Capstone | Composite>(
   "gyrate",
   {
     apply({ geom }, options) {
       return applyGyrate(geom, options)
     },
 
-    canApplyTo(info): info is Capstone | Composite {
+    canApplyTo(info) {
       if (info.isCapstone()) {
         return info.isBi() && !info.isPyramid() && info.data.base > 2
       }

@@ -1,10 +1,9 @@
 import { mapValues } from "lodash-es"
 
-import { getAllSpecs } from "data/specs/getSpecs"
 import { Polygon } from "data/polygons"
 import { Vec3D, vec, PRECISION } from "math/geom"
 import { Polyhedron, Face, VertexArg, normalizeVertex } from "math/polyhedra"
-import { deduplicateVertices } from "./operationUtils"
+import { deduplicateVertices, getValidSpecs } from "./operationUtils"
 import { Point } from "types"
 import PolyhedronSpecs from "data/specs/PolyhedronSpecs"
 
@@ -17,38 +16,32 @@ export interface AnimationData {
   endColors: Polygon[]
 }
 
-interface OpResult {
+export interface OpResult {
   result: Polyhedron
-  animationData?: AnimationData
+  animationData: AnimationData
 }
 
 interface PartialOpResult {
   result?: Polyhedron
-  animationData?: {
+  animationData: {
     start: Polyhedron
     endVertices: VertexArg[]
   }
 }
 
-type OpResultArg = PartialOpResult | Polyhedron
-
-interface SolidArgs<Specs extends PolyhedronSpecs> {
+export interface SolidArgs<Specs extends PolyhedronSpecs> {
   specs: Specs
   geom: Polyhedron
 }
 
-interface OpArgs<Options extends {}, Specs extends PolyhedronSpecs> {
-  canApplyTo(info: PolyhedronSpecs): info is Specs
+export interface OpArgs<Options extends {}, Specs extends PolyhedronSpecs> {
+  canApplyTo(info: PolyhedronSpecs): boolean
 
   hasOptions?(info: Specs): boolean
 
   isPreferredSpec?(info: Specs, options: Options): boolean
 
-  apply(
-    solid: SolidArgs<Specs>,
-    options: Options,
-    result: Polyhedron,
-  ): OpResultArg
+  apply(solid: SolidArgs<Specs>, options: Options): PartialOpResult
 
   allOptions?(
     solid: SolidArgs<Specs>,
@@ -132,12 +125,12 @@ function arrayDefaults<T>(first: T[], second: T[]) {
   return first.map((item, i) => item ?? second[i])
 }
 
-function normalizeOpResult(opResult: OpResultArg, newName: string): OpResult {
-  if (opResult instanceof Polyhedron) {
-    return { result: deduplicateVertices(opResult).withName(newName) }
-  }
+function normalizeOpResult(
+  opResult: PartialOpResult,
+  newName: string,
+): OpResult {
   const { result, animationData } = opResult
-  const { start, endVertices } = animationData!
+  const { start, endVertices } = animationData
 
   const end = start.withVertices(endVertices)
   const normedResult = result ?? deduplicateVertices(end)
@@ -157,22 +150,19 @@ function normalizeOpResult(opResult: OpResultArg, newName: string): OpResult {
   }
 }
 
-export default class Operation<
-  Options extends {} = {},
-  Specs extends PolyhedronSpecs = PolyhedronSpecs
-> {
+export default class Operation<Options extends {} = {}> {
   name: string
   hitOption: keyof Options
-  private opArgs: Required<OpArgs<Options, Specs>>
+  private opArgs: Required<OpArgs<Options, PolyhedronSpecs>>
 
-  constructor(name: string, opArgs: OpArgs<Options, Specs>) {
+  constructor(name: string, opArgs: OpArgs<Options, PolyhedronSpecs>) {
     this.name = name
     this.opArgs = fillDefaults(opArgs)
     this.hitOption = this.opArgs.hitOption
   }
 
-  private *validSpecs(polyhedron: Polyhedron): Generator<Specs> {
-    for (const specs of getAllSpecs(polyhedron.name)) {
+  private *validSpecs(polyhedron: Polyhedron) {
+    for (const specs of getValidSpecs(polyhedron)) {
       if (this.opArgs.canApplyTo(specs)) {
         yield specs
       }
@@ -192,30 +182,22 @@ export default class Operation<
     const specs = this.getValidSpecs(geom).find((info) =>
       this.opArgs.isPreferredSpec(info, options),
     )
-    if (!specs)
+    if (!specs) {
       throw new Error(`Could not find specs for polyhedron ${geom.name}`)
+    }
+    const solid = { specs, geom }
 
     // get the next polyhedron name
-    const next = this.opArgs.getResult!(
-      { specs, geom },
-      options ?? {},
-    ).canonicalName()
+    const next = this.opArgs.getResult!(solid, options ?? {}).canonicalName()
 
     // Get the actual operation result
-    const opResult = this.opArgs.apply(
-      { specs, geom },
-      options ?? {},
-      Polyhedron.get(next),
-    )
+    const opResult = this.opArgs.apply(solid, options ?? {})
     return normalizeOpResult(opResult, next)
   }
 
   getHitOption(geom: Polyhedron, hitPnt: Point, options: Options) {
-    return this.opArgs.getHitOption(
-      this.getSolidArgs(geom),
-      vec(hitPnt),
-      options,
-    )
+    const { getHitOption } = this.opArgs
+    return getHitOption(this.getSolidArgs(geom), vec(hitPnt), options)
   }
 
   canApplyTo(polyhedron: Polyhedron) {
@@ -243,4 +225,11 @@ export default class Operation<
   faceSelectionStates(geom: Polyhedron, options: Options) {
     return this.opArgs.faceSelectionStates(this.getSolidArgs(geom), options)
   }
+}
+
+export function makeOperation<
+  Options extends {} = {},
+  Specs extends PolyhedronSpecs = PolyhedronSpecs
+>(name: string, opArgs: OpArgs<Options, Specs>) {
+  return new Operation(name, opArgs)
 }
