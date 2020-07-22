@@ -10,7 +10,6 @@ import { Polyhedron, Face } from "math/polyhedra"
 import { Point } from "types"
 
 import { MemoryRouter, Routes, Route } from "react-router-dom"
-// import Viewer from "../Viewer"
 import ViewerPage from "../ViewerPage"
 
 jest.mock("transition")
@@ -20,9 +19,6 @@ function splitListOfLists(listStr: string, outerSep: string, innerSep: string) {
     .split(outerSep)
     .map((inner) => inner.split(innerSep).map(parseFloat))
 }
-
-// FIXME wait for transition to occur
-// FIXME enable clicking on a face
 
 function renderViewer(solid: string) {
   return render(
@@ -172,9 +168,5 @@ describe("Viewer operations panel", () => {
       expect(screen.queryByText("cupola")).not.toBeInTheDocument()
       expect(screen.queryByText("rotunda")).not.toBeInTheDocument()
     })
-  })
-
-  describe("viewer options", () => {
-    //
   })
 })
