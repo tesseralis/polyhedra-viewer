@@ -10,7 +10,13 @@ function joinListOfLists<T>(list: T[][], outerSep: string, innerSep: string) {
 }
 
 const Coordinates = ({ points }: { points: Point[] }) => {
-  return <coordinate is="x3d" point={joinListOfLists(points, ", ", " ")} />
+  return (
+    <coordinate
+      is="x3d"
+      data-testid="x3d-vertices"
+      point={joinListOfLists(points, ", ", " ")}
+    />
+  )
 }
 
 /* Edges */
@@ -110,12 +116,13 @@ export default function X3dPolyhedron({
   return (
     <>
       {showFaces && (
-        <shape is="x3d" data-testid="polyhedron-faces" ref={shape}>
+        <shape is="x3d" data-testid="x3d-shape" ref={shape}>
           <appearance is="x3d">
             <material is="x3d" transparency={1 - opacity} />
           </appearance>
           <indexedfaceset
             is="x3d"
+            data-testid="x3d-faces"
             solid={(!showInnerFaces).toString()}
             colorpervertex="false"
             coordindex={joinListOfLists(faces, " -1 ", " ")}

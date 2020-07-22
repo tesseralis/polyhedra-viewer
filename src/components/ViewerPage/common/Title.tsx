@@ -27,7 +27,11 @@ function Title({ name }: { name: string }) {
       textAlign: "center",
     },
   })
-  return <h1 {...css()}>{capitalize(name)}</h1>
+  return (
+    <h1 data-testid="viewer-title" {...css()}>
+      {capitalize(name)}
+    </h1>
+  )
 }
 
 export default Title

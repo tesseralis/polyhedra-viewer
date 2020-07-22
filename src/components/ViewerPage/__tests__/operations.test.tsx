@@ -1,11 +1,25 @@
 import React from "react"
-import { render, screen, fireEvent, cleanup } from "@testing-library/react"
+import {
+  render,
+  screen,
+  fireEvent,
+  createEvent,
+  getByTestId,
+} from "@testing-library/react"
+import { Polyhedron, Face } from "math/polyhedra"
+import { Point } from "types"
 
 import { MemoryRouter, Routes, Route } from "react-router-dom"
 // import Viewer from "../Viewer"
 import ViewerPage from "../ViewerPage"
 
 jest.mock("transition")
+
+function splitListOfLists(listStr: string, outerSep: string, innerSep: string) {
+  return listStr
+    .split(outerSep)
+    .map((inner) => inner.split(innerSep).map(parseFloat))
+}
 
 // FIXME wait for transition to occur
 // FIXME enable clicking on a face
@@ -24,8 +38,39 @@ function clickOperation(operation: string) {
   fireEvent.click(screen.getByText(operation))
 }
 
-function clickFaceWithNumSides() {
-  //
+function getPolyhedron() {
+  const shapeNode = screen.getByTestId("x3d-shape")
+  const faceStr = getByTestId(shapeNode, "x3d-faces").getAttribute(
+    "coordindex",
+  )!
+  const vertexStr = getByTestId(shapeNode, "x3d-vertices").getAttribute(
+    "point",
+  )!
+  const vertices = splitListOfLists(vertexStr, ", ", " ") as Point[]
+  const faces = splitListOfLists(faceStr, " -1 ", " ")
+  const name = screen.getByTestId("viewer-title").textContent!.toLowerCase()
+  return new Polyhedron({ name, vertices, faces })
+}
+
+function fireX3dEvent(
+  node: HTMLElement,
+  eventName: keyof typeof createEvent,
+  hitPnt: Point,
+) {
+  const event: any = createEvent[eventName](node)
+  event.hitPnt = hitPnt
+  fireEvent(node, event)
+}
+
+function clickFace(face: Face) {
+  const hitPnt = face.centroid().toArray()
+  const shapeNode = screen.getByTestId("x3d-shape")
+  fireX3dEvent(shapeNode, "mouseDown", hitPnt)
+  fireX3dEvent(shapeNode, "mouseUp", hitPnt)
+}
+
+function clickFaceWithNumSides(n: number) {
+  clickFace(getPolyhedron().faceWithNumSides(n))
 }
 
 describe("Viewer operations panel", () => {
@@ -57,17 +102,18 @@ describe("Viewer operations panel", () => {
   })
 
   it("does not apply the operation when clicking an invalid face", () => {
-    // setup("augmented-truncated-tetrahedron")
-    // page.clickButtonWithText("diminish").clickFaceWithNumSides(6)
+    renderViewer("augmented-truncated-tetrahedron")
+    clickOperation("diminish")
+    clickFaceWithNumSides(6)
+    expect(screen.queryByText("Select a component")).toBeInTheDocument()
   })
 
   it("unsets the operation and options when there are no more valid options", () => {
-    // setup("cuboctahedron")
-    // page
-    //   .clickButtonWithText("sharpen")
-    //   .clickFaceWithNumSides(4)
-    //   .expectTransitionTo("octahedron")
-    //   .expectOperation("")
+    renderViewer("cuboctahedron")
+    clickOperation("sharpen")
+    clickFaceWithNumSides(4)
+    expect(screen.queryByText("Octahedron")).toBeInTheDocument()
+    expect(screen.queryByText("Select a type of face")).not.toBeInTheDocument()
   })
 
   it("unsets the operation when clicking on a different tab", () => {

@@ -32,7 +32,7 @@ describe("X3dPolyhedron", () => {
 
   it("doesn't fire a click if the mouse has been moved", () => {
     renderPolyhedron()
-    const faces = screen.getByTestId("polyhedron-faces")
+    const faces = screen.getByTestId("x3d-shape")
     fireX3dEvent(faces, "mouseDown", [0, 0, 0])
     fireX3dEvent(faces, "mouseUp", [0, 0, 1])
     expect(onClick).not.toHaveBeenCalled()
