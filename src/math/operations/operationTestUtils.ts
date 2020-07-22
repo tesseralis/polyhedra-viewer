@@ -1,4 +1,3 @@
-import { isNaN } from "lodash-es"
 import { PRECISION, PRECISION_DIGITS, Vec3D } from "math/geom"
 import { Polyhedron } from "math/polyhedra"
 import { OpResult } from "./Operation"

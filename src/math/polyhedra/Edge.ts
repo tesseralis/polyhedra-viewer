@@ -67,11 +67,11 @@ export default class Edge implements VertexList {
   }
 
   dihedralAngle() {
-    const [c1, c2] = this.adjacentFaces().map((face) => face.centroid())
-    if (!c1 || !c2) {
-      throw new Error(`This edge is not connected to two faces.`)
-    }
-    return angleBetween(this.midpoint(), c1, c2)
+    return angleBetween(
+      this.midpoint(),
+      this.face.centroid(),
+      this.twinFace().centroid(),
+    )
   }
 
   equals(edge: Edge) {
