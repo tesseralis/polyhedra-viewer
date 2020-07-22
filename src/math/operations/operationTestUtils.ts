@@ -1,27 +1,17 @@
-import { isNaN } from "lodash-es"
-import { PRECISION, Vec3D } from "math/geom"
+import { PRECISION, PRECISION_DIGITS, Vec3D } from "math/geom"
 import { Polyhedron } from "math/polyhedra"
 import { OpResult } from "./Operation"
 
-function isProperPolyhedron(polyhedron: Polyhedron) {
+function expectCRFPolyhedron(polyhedron: Polyhedron) {
   const expectedSideLength = polyhedron.edgeLength()
   for (const edge of polyhedron.edges) {
     const sideLength: number = edge.length()
-    if (isNaN(sideLength)) {
-      console.log(`edge ${edge} has length NaN`)
-      return false
-    }
-    if (Math.abs(sideLength - expectedSideLength) > PRECISION) {
-      console.error(
-        `edge ${edge} has length ${sideLength} which is different from ${expectedSideLength}`,
-      )
-      return false
-    }
+    // Check that all side lengths are defined
+    expect(sideLength).not.toBeNaN()
+    // Check that side lengths are all equal
+    expect(sideLength).toBeCloseTo(expectedSideLength, PRECISION_DIGITS)
     // Make sure the whole thing is convex
-    if (edge.dihedralAngle() > Math.PI - PRECISION) {
-      console.error(`polyhedron concave at edge ${edge}`)
-      return false
-    }
+    expect(edge.dihedralAngle()).toBeLessThan(Math.PI)
   }
 
   // Make sure all faces are facing the right way
@@ -30,19 +20,19 @@ function isProperPolyhedron(polyhedron: Polyhedron) {
     const faceCentroid = face.centroid()
     const normal = face.normal()
     const expectedNormal = faceCentroid.sub(centroid)
-    if (normal.angleBetween(expectedNormal, true) > Math.PI / 2) {
-      console.error(`polyhedron inside out at ${face.index}`)
-      return false
-    }
+    expect(normal.angleBetween(expectedNormal, true) || 0).toBeLessThan(
+      Math.PI / 2,
+    )
   }
-  return true
+}
+
+function includesToPrecision(array: Vec3D[], value: Vec3D) {
+  return array.some((v) => v.equalsWithTolerance(value, PRECISION))
 }
 
 // TODO figure out some not n-squared test for this
 function expectVerticesMatch(test: Vec3D[], ref: Vec3D[]) {
-  for (const vec of test) {
-    expect(ref.some((v) => v.equalsWithTolerance(vec, PRECISION))).toEqual(true)
-  }
+  expect(test).toSatisfyAll((vec) => includesToPrecision(ref, vec))
 }
 
 // These operations behave badly and are banned :(
@@ -74,6 +64,6 @@ export function expectValidAnimationData(
 
 export function expectValidPolyhedron(opResult: OpResult) {
   const { result } = opResult
-  expect(isProperPolyhedron(result)).toBeTruthy()
-  expect(result.isSame(Polyhedron.get(result.name))).toBeTruthy()
+  expectCRFPolyhedron(result)
+  expect(result).toSatisfy((res) => res.isSame(Polyhedron.get(result.name)))
 }

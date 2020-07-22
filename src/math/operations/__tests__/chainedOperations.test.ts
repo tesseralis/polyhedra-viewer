@@ -151,13 +151,13 @@ describe("chained tests", () => {
       operations.forEach((opInfo) => {
         const { op, args, expected } = getOpInfo(opInfo, polyhedron)
 
-        expect(op.canApplyTo(polyhedron)).toBeTruthy()
+        expect(polyhedron).toSatisfy((p) => op.canApplyTo(p))
         const result = op.apply(polyhedron, args as any)
         expectValidPolyhedron(result)
         expectValidAnimationData(result, polyhedron, op.name)
 
         polyhedron = result.result
-        expect(polyhedron.name).toBe(expected)
+        expect(polyhedron.name).toEqual(expected)
       })
     })
   }

@@ -69,7 +69,9 @@ describe("Polyhedron", () => {
 
     for (const [p1, p2] of testCases) {
       it(`differentiates between ${p1} and ${p2}`, () => {
-        expect(Polyhedron.get(p1).isSame(Polyhedron.get(p2))).toBe(false)
+        expect(Polyhedron.get(p2)).not.toSatisfy((p) =>
+          Polyhedron.get(p1).isSame(p),
+        )
       })
     }
   })

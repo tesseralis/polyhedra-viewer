@@ -1,20 +1,30 @@
 version: 2.1
 orbs:
-  node: circleci/node@2.0.1
+  node: circleci/node@3.0.1
+commands:
+  init:
+    description: "Initialize node and install packages"
+    steps:
+      - checkout
+      # TODO do we actually need to do the install step?
+      - node/install:
+          install-yarn: true
+          install-npm: false
+          node-version: latest
+      - node/install-packages:
+          pkg-manager: yarn
 jobs:
   lint:
     executor:
       name: node/default
     steps:
-      - checkout
-      - node/install-packages
+      - init
       - run: yarn lint
   test:
     executor:
       name: node/default
     steps:
-      - checkout
-      - node/install-packages
+      - init
       - run: yarn test --runInBand
 workflows:
   build-and-test:
