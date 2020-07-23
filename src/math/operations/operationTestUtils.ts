@@ -1,6 +1,6 @@
 import { PRECISION, PRECISION_DIGITS, Vec3D } from "math/geom"
 import { Polyhedron } from "math/polyhedra"
-import { OpResult } from "./Operation"
+import Operation, { OpResult } from "./Operation"
 
 function expectCRFPolyhedron(polyhedron: Polyhedron) {
   const expectedSideLength = polyhedron.edgeLength()
@@ -38,14 +38,7 @@ function expectVerticesMatch(test: Vec3D[], ref: Vec3D[]) {
 // These operations behave badly and are banned :(
 const naughtyOps = ["augment", "diminish", "gyrate"]
 
-export function expectValidAnimationData(
-  opResult: OpResult,
-  original: Polyhedron,
-  operation: string,
-) {
-  // don't do it if it's one of the banned operations
-  if (naughtyOps.includes(operation)) return
-
+function expectValidAnimationData(opResult: OpResult, original: Polyhedron) {
   const { result, animationData } = opResult
   expect(animationData).toBeDefined()
   const { start, endVertices } = animationData!
@@ -62,8 +55,28 @@ export function expectValidAnimationData(
   )
 }
 
-export function expectValidPolyhedron(opResult: OpResult) {
-  const { result } = opResult
+function expectValidPolyhedron(result: Polyhedron) {
   expectCRFPolyhedron(result)
   expect(result).toSatisfy((res) => res.isSame(Polyhedron.get(result.name)))
+}
+
+/**
+ * Assert that the given operation applied to the given polyhedron returns
+ * a valid polyhedron and valid intermediate forms.
+ */
+export function validateOperationApplication(
+  op: Operation<any>,
+  original: Polyhedron,
+  args: any,
+) {
+  const opResult = op.apply(original, args)
+  if (naughtyOps.includes(op.name)) {
+    // For augment, diminish, and gyrate, check if the end result is valid
+    expectValidPolyhedron(opResult.result)
+  } else {
+    // All other operations are implemented as OpPairs that use a reference,
+    // so the results are guaranteed to be valid
+    expectValidAnimationData(opResult, original)
+  }
+  return opResult
 }
