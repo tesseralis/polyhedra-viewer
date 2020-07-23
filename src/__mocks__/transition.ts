@@ -6,7 +6,6 @@ export default <T extends object>(
   { startValue, endValue, onFinish }: TransitionOptions<T>,
   onUpdate: Callback<T>,
 ) => {
-  console.log("calling mock transition")
   const interp = interpolate(startValue, endValue)
   onUpdate(interp(0))
   onUpdate(interp(0.5))

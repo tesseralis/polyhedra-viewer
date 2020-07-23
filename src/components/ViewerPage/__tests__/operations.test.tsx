@@ -1,3 +1,4 @@
+import { capitalize } from "lodash-es"
 import React from "react"
 import {
   render,
@@ -20,6 +21,8 @@ function splitListOfLists(listStr: string, outerSep: string, innerSep: string) {
     .map((inner) => inner.split(innerSep).map(parseFloat))
 }
 
+// TODO the fact that we have to recreate a route here is awkward.
+// Try to figure out if there's a more reasonable way to separate these routes?
 function renderViewer(solid: string) {
   return render(
     <MemoryRouter initialEntries={[`/${solid}/operations`]}>
@@ -69,6 +72,10 @@ function clickFaceWithNumSides(n: number) {
   clickFace(getPolyhedron().faceWithNumSides(n))
 }
 
+function expectSolid(name: string) {
+  expect(screen.queryByText(capitalize(name))).toBeInTheDocument()
+}
+
 describe("Viewer operations panel", () => {
   it("disables operations that cannot be applied to the current polyhedron", () => {
     renderViewer("tetrahedron")
@@ -85,9 +92,7 @@ describe("Viewer operations panel", () => {
   it("immediately applies operations without options", () => {
     renderViewer("tetrahedron")
     clickOperation("elongate")
-    expect(
-      screen.queryByText("Elongated triangular pyramid"),
-    ).toBeInTheDocument()
+    expectSolid("elongated triangular pyramid")
   })
 
   it("unsets the operation and options when choosing a different operation without options", () => {
@@ -98,7 +103,7 @@ describe("Viewer operations panel", () => {
   })
 
   it("does not apply the operation when clicking an invalid face", () => {
-    renderViewer("augmented-truncated-tetrahedron")
+    renderViewer("augmented truncated tetrahedron")
     clickOperation("diminish")
     clickFaceWithNumSides(6)
     expect(screen.queryByText("Select a component")).toBeInTheDocument()
@@ -108,7 +113,7 @@ describe("Viewer operations panel", () => {
     renderViewer("cuboctahedron")
     clickOperation("sharpen")
     clickFaceWithNumSides(4)
-    expect(screen.queryByText("Octahedron")).toBeInTheDocument()
+    expectSolid("octahedron")
     expect(screen.queryByText("Select a type of face")).not.toBeInTheDocument()
   })
 
@@ -122,12 +127,13 @@ describe("Viewer operations panel", () => {
 
   // should just be a test that twist options appear
   it("correctly displays twist operations", () => {
-    renderViewer("icosahedron")
-    clickOperation("snub")
+    renderViewer("gyroelongated triangular bicupola")
+    clickOperation("turn")
     expect(screen.queryByText("left")).toBeInTheDocument()
     expect(screen.queryByText("right")).toBeInTheDocument()
-    // TODO apply the operation
-    // TODO better for `turn` which gives different polyhedra options
+    // Make sure it turns in the right direction
+    fireEvent.click(screen.getByText("right"))
+    expectSolid("elongated triangular gyrobicupola")
   })
 
   describe("augment options", () => {
@@ -136,7 +142,9 @@ describe("Viewer operations panel", () => {
       clickOperation("augment")
       expect(screen.queryByText("ortho")).toBeInTheDocument()
       expect(screen.queryByText("gyro")).toBeInTheDocument()
-      // TODO click on one of them and make sure it's selected
+      fireEvent.click(screen.getByText("ortho"))
+      clickFaceWithNumSides(6)
+      expectSolid("triangular orthobicupola")
     })
 
     it("does not display gyrate options when unavailable", () => {
@@ -151,7 +159,10 @@ describe("Viewer operations panel", () => {
       clickOperation("augment")
       expect(screen.queryByText("cupola")).toBeInTheDocument()
       expect(screen.queryByText("rotunda")).toBeInTheDocument()
-      // TODO apply operation
+      // TODO verify the initial option
+      fireEvent.click(screen.getByText("rotunda"))
+      clickFaceWithNumSides(10)
+      expectSolid("pentagonal gyrocupolarotunda")
     })
 
     it("correctly displays using options for the fastigium", () => {
@@ -159,7 +170,9 @@ describe("Viewer operations panel", () => {
       clickOperation("augment")
       expect(screen.queryByText("pyramid")).toBeInTheDocument()
       expect(screen.queryByText("fastigium")).toBeInTheDocument()
-      // TODO apply operation
+      fireEvent.click(screen.getByText("fastigium"))
+      clickFaceWithNumSides(4)
+      expectSolid("gyrobifastigium")
     })
 
     it("does not display using options when unavailable", () => {
