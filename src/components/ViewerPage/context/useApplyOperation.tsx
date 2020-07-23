@@ -36,9 +36,7 @@ export default function useApplyOperation() {
       }
 
       transition(result, animationData)
-      if (typeof callback === "function") {
-        callback(result)
-      }
+      callback?.(result)
     },
     [polyhedron, transition, setOperation, unsetOperation],
   )
