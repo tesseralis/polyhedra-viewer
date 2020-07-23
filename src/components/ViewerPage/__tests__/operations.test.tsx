@@ -79,7 +79,7 @@ function expectSolid(name: string) {
 // TODO do a test of this on the mobile view?
 // (or just do it once for each view)
 
-// FIXME test that going back in the URL takes you to the previous polyhedron
+// TODO test that going back in the URL takes you to the previous polyhedron
 
 describe("Viewer operations panel", () => {
   it("disables operations that cannot be applied to the current polyhedron", () => {
