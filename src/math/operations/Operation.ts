@@ -3,7 +3,7 @@ import { mapValues } from "lodash-es"
 import { Polygon } from "data/polygons"
 import { Vec3D, vec, PRECISION } from "math/geom"
 import { Polyhedron, Face, VertexArg, normalizeVertex } from "math/polyhedra"
-import { deduplicateVertices, getValidSpecs } from "./operationUtils"
+import { deduplicateVertices } from "./operationUtils"
 import { Point } from "types"
 import PolyhedronSpecs from "data/specs/PolyhedronSpecs"
 
@@ -166,32 +166,7 @@ export default class Operation<Options extends {} = {}> {
     this.hitOption = this.opArgs.hitOption
   }
 
-  private *validSpecs(polyhedron: Polyhedron) {
-    for (const specs of getValidSpecs(polyhedron)) {
-      if (this.opArgs.canApplyTo(specs)) {
-        yield specs
-      }
-    }
-  }
-
-  private getValidSpecs(polyhedron: Polyhedron) {
-    return [...this.validSpecs(polyhedron)]
-  }
-
-  // private getSolidArgs(polyhedron: Polyhedron) {
-  //   // TODO think of situations where just using the first entry won't work
-  //   return { specs: this.getValidSpecs(polyhedron)[0], geom: polyhedron }
-  // }
-
   apply(solid: PolyhedronForme, options: Options) {
-    // const specs = this.getValidSpecs(geom).find((info) =>
-    //   this.opArgs.isPreferredSpec(info, options),
-    // )
-    // if (!specs) {
-    //   throw new Error(`Could not find specs for polyhedron ${geom.name}`)
-    // }
-    // const solid = { specs, geom }
-
     // get the next polyhedron name
     const next = this.opArgs.getResult!(solid, options ?? {})
 
