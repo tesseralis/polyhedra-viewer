@@ -224,8 +224,8 @@ export default class Operation<Options extends {} = {}> {
     // }
   }
 
-  defaultOptions(polyhedron: Polyhedron) {
-    return this.opArgs.defaultOptions(this.getValidSpecs(polyhedron)[0])
+  defaultOptions(solid: PolyhedronForme) {
+    return this.opArgs.defaultOptions(solid.specs)
   }
 
   faceSelectionStates(solid: PolyhedronForme, options: Options) {
