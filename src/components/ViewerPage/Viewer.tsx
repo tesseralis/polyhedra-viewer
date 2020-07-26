@@ -3,7 +3,6 @@ import React, { useEffect } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 
 import { escape } from "utils"
-import { Polyhedron } from "math/polyhedra"
 import { wrapProviders } from "components/common"
 import { OperationCtx, TransitionCtx, PolyhedronCtx } from "./context"
 import DesktopViewer from "./DesktopViewer"
@@ -18,7 +17,7 @@ interface InnerProps {
 
 function InnerViewer({ solid, panel }: InnerProps) {
   const { unsetOperation } = OperationCtx.useActions()
-  const { setPolyhedron } = PolyhedronCtx.useActions()
+  const { setPolyhedronToName } = PolyhedronCtx.useActions()
   const polyhedron = PolyhedronCtx.useState()
   const navigate = useNavigate()
   // Use a buffer variable to keep the two states in sync
@@ -39,7 +38,7 @@ function InnerViewer({ solid, panel }: InnerProps) {
       // If the route has changed (and it wasn't from an operation)
       // cancel the current operation and set the polyhedorn model
       unsetOperation()
-      setPolyhedron(Polyhedron.get(solid))
+      setPolyhedronToName(solidSync)
     } else if (solid !== solidSync) {
       // If an operation was executed, update the URL
       navigate(`/${escape(polyhedron.geom.name)}/operations`)
@@ -48,7 +47,7 @@ function InnerViewer({ solid, panel }: InnerProps) {
     // this is how the two states get synced with each other
     // Also don't depend on `navigate` because it's not memoized
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [solidSync, setPolyhedron, unsetOperation])
+  }, [solidSync, setPolyhedronToName, unsetOperation])
 
   const { device } = useMediaInfo()
 

@@ -23,6 +23,15 @@ export default function getSpecs(name: string) {
   throw new Error(`Could not find structure with canonical name ${name}`)
 }
 
+export function getSpecs2(name: string) {
+  for (const Subclass of subclasses) {
+    if (Subclass.query.hasName2(name)) {
+      return Subclass.query.withName2(name)
+    }
+  }
+  throw new Error(`Could not find structure with name ${name}`)
+}
+
 export function* getAllSpecs(name: string) {
   for (const Subclass of subclasses) {
     if (Subclass.query.hasName(name)) {

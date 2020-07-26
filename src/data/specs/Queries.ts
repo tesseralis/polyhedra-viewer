@@ -23,6 +23,15 @@ export default class Queries<S extends Specs> {
     return this.nameMapping.has(name)
   }
 
+  // FIXME replace the other functions with this when we're ready
+  hasName2(name: string) {
+    return this.entries.some((entry) => entry.name() === name)
+  }
+
+  withName2(name: string) {
+    return this.entries.find((entry) => entry.name() === name)!
+  }
+
   withData(data: S["data"]) {
     // Remove nullish elements from the filter
     const compact = pickBy(data)
