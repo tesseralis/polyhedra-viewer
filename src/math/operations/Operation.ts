@@ -181,12 +181,10 @@ export default class Operation<Options extends {} = {}> {
 
   canApplyTo(solid: PolyhedronForme) {
     return this.opArgs.canApplyTo(solid.specs)
-    // return this.getValidSpecs(polyhedron).length > 0
   }
 
   hasOptions(solid: PolyhedronForme) {
     return this.opArgs.hasOptions(solid.specs)
-    // return solid.specs.some(this.opArgs.hasOptions!)
   }
 
   allOptions(solid: PolyhedronForme, optionName: keyof Options) {
@@ -194,9 +192,7 @@ export default class Operation<Options extends {} = {}> {
   }
 
   *allOptionCombos(solid: PolyhedronForme) {
-    // for (const specs of this.getValidSpecs(geom)) {
     yield* this.opArgs.allOptionCombos(solid)
-    // }
   }
 
   defaultOptions(solid: PolyhedronForme) {
