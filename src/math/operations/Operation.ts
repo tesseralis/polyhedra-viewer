@@ -17,7 +17,7 @@ export interface AnimationData {
 }
 
 export interface OpResult {
-  result: Polyhedron
+  result: PolyhedronForme
   animationData: AnimationData
 }
 
@@ -33,6 +33,8 @@ export interface SolidArgs<Specs extends PolyhedronSpecs> {
   specs: Specs
   geom: Polyhedron
 }
+
+export type PolyhedronForme = SolidArgs<PolyhedronSpecs>
 
 export interface OpArgs<Options extends {}, Specs extends PolyhedronSpecs> {
   canApplyTo(info: PolyhedronSpecs): boolean
@@ -127,7 +129,7 @@ function arrayDefaults<T>(first: T[], second: T[]) {
 
 function normalizeOpResult(
   opResult: PartialOpResult,
-  newName: string,
+  newSpecs: PolyhedronSpecs,
 ): OpResult {
   const { result, animationData } = opResult
   const { start, endVertices } = animationData
@@ -140,7 +142,10 @@ function normalizeOpResult(
   const endColors = getFaceColors(end)
 
   return {
-    result: normedResult.withName(newName),
+    result: {
+      geom: normedResult.withName(newSpecs.name()),
+      specs: newSpecs,
+    },
     animationData: {
       start,
       endVertices: endVertices.map(normalizeVertex),
@@ -173,57 +178,58 @@ export default class Operation<Options extends {} = {}> {
     return [...this.validSpecs(polyhedron)]
   }
 
-  private getSolidArgs(polyhedron: Polyhedron) {
-    // TODO think of situations where just using the first entry won't work
-    return { specs: this.getValidSpecs(polyhedron)[0], geom: polyhedron }
-  }
+  // private getSolidArgs(polyhedron: Polyhedron) {
+  //   // TODO think of situations where just using the first entry won't work
+  //   return { specs: this.getValidSpecs(polyhedron)[0], geom: polyhedron }
+  // }
 
-  apply(geom: Polyhedron, options: Options) {
-    const specs = this.getValidSpecs(geom).find((info) =>
-      this.opArgs.isPreferredSpec(info, options),
-    )
-    if (!specs) {
-      throw new Error(`Could not find specs for polyhedron ${geom.name}`)
-    }
-    const solid = { specs, geom }
+  apply(solid: PolyhedronForme, options: Options) {
+    // const specs = this.getValidSpecs(geom).find((info) =>
+    //   this.opArgs.isPreferredSpec(info, options),
+    // )
+    // if (!specs) {
+    //   throw new Error(`Could not find specs for polyhedron ${geom.name}`)
+    // }
+    // const solid = { specs, geom }
 
     // get the next polyhedron name
-    const next = this.opArgs.getResult!(solid, options ?? {}).canonicalName()
+    const next = this.opArgs.getResult!(solid, options ?? {})
 
     // Get the actual operation result
     const opResult = this.opArgs.apply(solid, options ?? {})
     return normalizeOpResult(opResult, next)
   }
 
-  getHitOption(geom: Polyhedron, hitPnt: Point, options: Options) {
-    const { getHitOption } = this.opArgs
-    return getHitOption(this.getSolidArgs(geom), vec(hitPnt), options)
+  getHitOption(solid: PolyhedronForme, hitPnt: Point, options: Options) {
+    return this.opArgs.getHitOption(solid, vec(hitPnt), options)
   }
 
-  canApplyTo(polyhedron: Polyhedron) {
-    return this.getValidSpecs(polyhedron).length > 0
+  canApplyTo(solid: PolyhedronForme) {
+    return this.opArgs.canApplyTo(solid.specs)
+    // return this.getValidSpecs(polyhedron).length > 0
   }
 
-  hasOptions(polyhedron: Polyhedron) {
-    return this.getValidSpecs(polyhedron).some(this.opArgs.hasOptions!)
+  hasOptions(solid: PolyhedronForme) {
+    return this.opArgs.hasOptions(solid.specs)
+    // return solid.specs.some(this.opArgs.hasOptions!)
   }
 
-  allOptions(polyhedron: Polyhedron, optionName: keyof Options) {
-    return this.opArgs.allOptions(this.getSolidArgs(polyhedron), optionName)
+  allOptions(solid: PolyhedronForme, optionName: keyof Options) {
+    return this.opArgs.allOptions(solid, optionName)
   }
 
-  *allOptionCombos(geom: Polyhedron) {
-    for (const specs of this.getValidSpecs(geom)) {
-      yield* this.opArgs.allOptionCombos({ specs, geom })
-    }
+  *allOptionCombos(solid: PolyhedronForme) {
+    // for (const specs of this.getValidSpecs(geom)) {
+    yield* this.opArgs.allOptionCombos(solid)
+    // }
   }
 
   defaultOptions(polyhedron: Polyhedron) {
     return this.opArgs.defaultOptions(this.getValidSpecs(polyhedron)[0])
   }
 
-  faceSelectionStates(geom: Polyhedron, options: Options) {
-    return this.opArgs.faceSelectionStates(this.getSolidArgs(geom), options)
+  faceSelectionStates(solid: PolyhedronForme, options: Options) {
+    return this.opArgs.faceSelectionStates(solid, options)
   }
 }
 

@@ -35,7 +35,7 @@ export default function useSolidContext() {
   const operationColors = useMemo(() => {
     if (!operation) return
     const selectState = operation.faceSelectionStates(polyhedron, options)
-    return polyhedron.faces.map((face, i) => {
+    return polyhedron.geom.faces.map((face, i) => {
       switch (selectState[i]) {
         case "selected":
           return tinycolor.mix(colors[face.numSides], "lime")
@@ -51,12 +51,12 @@ export default function useSolidContext() {
     const rawColors =
       transitionColors ||
       operationColors ||
-      polyhedron.faces.map((f) => colors[f.numSides])
+      polyhedron.geom.faces.map((f) => colors[f.numSides])
     return rawColors.map(toRgb)
   }, [transitionColors, operationColors, polyhedron, colors])
 
   return {
     colors: normalizedColors,
-    solidData: isTransitioning ? solidData! : polyhedron.solidData,
+    solidData: isTransitioning ? solidData! : polyhedron.geom.solidData,
   }
 }

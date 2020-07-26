@@ -47,7 +47,9 @@ export default function ResizeButtons() {
         <ResetButton
           key={name}
           disabled={isTransitioning}
-          onClick={() => setPolyhedron(handler(polyhedron))}
+          onClick={() =>
+            setPolyhedron({ ...polyhedron, geom: handler(polyhedron.geom) })
+          }
         >
           {name}
         </ResetButton>

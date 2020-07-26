@@ -36,7 +36,7 @@ export default function useApplyOperation() {
       }
 
       transition(result, animationData)
-      callback?.(result)
+      callback?.(result.geom)
     },
     [polyhedron, transition, setOperation, unsetOperation],
   )

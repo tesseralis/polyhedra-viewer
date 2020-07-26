@@ -1,6 +1,6 @@
 import { PRECISION, PRECISION_DIGITS, Vec3D } from "math/geom"
 import { Polyhedron } from "math/polyhedra"
-import Operation, { OpResult } from "./Operation"
+import Operation, { PolyhedronForme, OpResult } from "./Operation"
 
 function expectCRFPolyhedron(polyhedron: Polyhedron) {
   const expectedSideLength = polyhedron.edgeLength()
@@ -51,7 +51,7 @@ function expectValidAnimationData(opResult: OpResult, original: Polyhedron) {
   )
   expectVerticesMatch(
     endVertices.map((v) => new Vec3D(...v)),
-    result.vertices.map((v) => v.vec),
+    result.geom.vertices.map((v) => v.vec),
   )
 }
 
@@ -66,17 +66,17 @@ function expectValidPolyhedron(result: Polyhedron) {
  */
 export function validateOperationApplication(
   op: Operation<any>,
-  original: Polyhedron,
+  original: PolyhedronForme,
   args: any,
 ) {
   const opResult = op.apply(original, args)
   if (naughtyOps.includes(op.name)) {
     // For augment, diminish, and gyrate, check if the end result is valid
-    expectValidPolyhedron(opResult.result)
+    expectValidPolyhedron(opResult.result.geom)
   } else {
     // All other operations are implemented as OpPairs that use a reference,
     // so the results are guaranteed to be valid
-    expectValidAnimationData(opResult, original)
+    expectValidAnimationData(opResult, original.geom)
   }
   return opResult
 }
