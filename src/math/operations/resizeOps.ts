@@ -7,65 +7,13 @@ import { angleBetween, getPlane, withOrigin, Vec3D } from "math/geom"
 import { Polyhedron, Face, Edge } from "math/polyhedra"
 import {
   getOppTwist,
-  oppositeFace,
   getTransformedVertices,
   FacetOpts,
   TwistOpts,
   getGeometry,
 } from "./operationUtils"
 import Operation, { makeOperation } from "./Operation"
-import PolyhedronForme from "math/formes/PolyhedronForme"
-
-function getSnubTetrahedronFaces(polyhedron: Polyhedron) {
-  const f0 = polyhedron.faceWithNumSides(3)
-  return [f0, ...f0.edges.map((e) => oppositeFace(e, "right"))]
-}
-
-function getCantellatedTetrahedronFaces(polyhedron: Polyhedron, odd?: boolean) {
-  let f0 = polyhedron.faceWithNumSides(3)
-  if (odd) {
-    f0 = f0.edges[0].twin().next().twinFace()
-  }
-  return [f0, ...f0.edges.map((e) => oppositeFace(e))]
-}
-
-function getBevelledTetrahedronFaces(polyhedron: Polyhedron) {
-  const f0 = polyhedron.faceWithNumSides(6)
-  const rest = f0.edges
-    .filter((e) => e.twinFace().numSides === 4)
-    .map((e) => oppositeFace(e))
-  return [f0, ...rest]
-}
-
-function getSnubFaces(specs: Classical, polyhedron: Polyhedron, facet?: Facet) {
-  if (specs.isTetrahedral()) {
-    return getSnubTetrahedronFaces(polyhedron)
-  }
-  return polyhedron.faces.filter((face) =>
-    isSnubFace(face, getFaceType(specs, facet)),
-  )
-}
-
-function getBevelledFaces(specs: Classical, geom: Polyhedron, facet: Facet) {
-  if (specs.isTetrahedral()) {
-    return getBevelledTetrahedronFaces(geom)
-  }
-  return geom.faces.filter((f) => f.numSides === 2 * getFaceType(specs, facet))
-}
-
-function getCantellatedFaces(
-  specs: Classical,
-  geom: Polyhedron,
-  facet?: Facet,
-  odd?: boolean,
-) {
-  if (specs.isTetrahedral()) {
-    return getCantellatedTetrahedronFaces(geom, odd)
-  }
-  return geom.faces.filter((face) =>
-    isCantellatedFace(face, getFaceType(specs, facet)),
-  )
-}
+import ClassicalForme from "math/formes/ClassicalForme"
 
 /**
  * Return the expanded vertices of the polyhedron resized to the given distance-from-center
@@ -136,8 +84,8 @@ function apothemVec(edge: Edge) {
 export function calcSnubAngle(specs: Classical, facet: Facet) {
   // Choose one of the expanded faces and get its properties
   const polyhedron = getGeometry(specs)
-  const expandedFaces = getSnubFaces(specs, polyhedron, facet)
-  const [face0, ...rest] = expandedFaces
+  const forme = ClassicalForme.create(specs, polyhedron)
+  const [face0, ...rest] = forme.facetFaces(facet)
   const faceCentroid = face0.centroid()
   const midpoint = face0.edges[0].midpoint()
 
@@ -287,12 +235,7 @@ function twistOpts(specs: Classical): Twist[] {
 }
 
 // Expansion of truncated to bevelled solids
-const semiExpand = makeOpPair<
-  Classical,
-  PolyhedronForme<Classical>,
-  {},
-  FacetOpts
->({
+const semiExpand = makeOpPair<Classical, ClassicalForme, {}, FacetOpts>({
   graph: Classical.query
     .where((s) => s.isTruncated())
     .map((entry) => ({
@@ -315,21 +258,16 @@ const semiExpand = makeOpPair<
       return getPose(geom, face, apothemVec(edge))
     }
   },
-  toLeft({ specs, geom }, { right: { facet = "face" } }) {
+  toLeft(forme, { right: { facet = "face" } }) {
     return getResizedVertices(
-      getBevelledFaces(specs, geom, facet),
-      bevelledDists[specs.data.family][facet],
+      forme.facetFaces(facet),
+      bevelledDists[forme.specs.data.family][facet],
     )
   },
-  createForme: (specs, geom) => new PolyhedronForme(specs, geom),
+  createForme: (specs, geom) => ClassicalForme.create(specs, geom),
 })
 
-const _expand = makeOpPair<
-  Classical,
-  PolyhedronForme<Classical>,
-  {},
-  FacetOpts
->({
+const _expand = makeOpPair<Classical, ClassicalForme, {}, FacetOpts>({
   graph: Classical.query
     .where((s) => s.isRegular())
     .map((entry) => {
@@ -347,22 +285,18 @@ const _expand = makeOpPair<
       ? getRegularPose(geom)
       : getCantellatedPose(geom, specs, facet)
   },
-  toLeft({ specs, geom }, { right: { facet } }, result) {
+  toLeft(forme, { right: { facet } }, result) {
     // Take all the stuff and push it inwards
     return getResizedVertices(
-      getCantellatedFaces(specs, geom, facet),
+      // FIXME get rid of the adjustment
+      forme.facetFaces(facet || "vertex"),
       getInradius(result),
     )
   },
-  createForme: (specs, geom) => new PolyhedronForme(specs, geom),
+  createForme: (specs, geom) => ClassicalForme.create(specs, geom),
 })
 
-const _snub = makeOpPair<
-  Classical,
-  PolyhedronForme<Classical>,
-  TwistOpts,
-  FacetOpts
->({
+const _snub = makeOpPair<Classical, ClassicalForme, TwistOpts, FacetOpts>({
   graph: Classical.query
     .where((s) => s.isRegular())
     .flatMap((entry) => {
@@ -385,46 +319,45 @@ const _snub = makeOpPair<
       ? getRegularPose(geom)
       : getSnubPose(geom, specs, facet)
   },
-  toLeft({ specs, geom }, { right: { facet = "face" } }, result) {
+  toLeft(forme, { right: { facet = "face" } }, result) {
     // Take all the stuff and push it inwards
     return getResizedVertices(
-      getSnubFaces(specs, geom, result.data.facet),
+      // FIXME get rid of this side thing
+      forme.facetFaces(result.data.facet || "face"),
       getInradius(result),
-      getSnubAngle(specs, facet),
+      getSnubAngle(forme.specs, facet),
     )
   },
-  createForme: (specs, geom) => new PolyhedronForme(specs, geom),
+  createForme: (specs, geom) => ClassicalForme.create(specs, geom),
 })
 
-const _twist = makeOpPair<Classical, PolyhedronForme<Classical>, TwistOpts, {}>(
-  {
-    graph: Classical.query
-      .where((s) => s.isCantellated())
-      .flatMap((entry) => {
-        return twistOpts(entry).map((twist) => ({
-          left: entry,
-          right: entry.withData({ operation: "snub", twist }),
-          options: { left: { twist }, right: {} },
-        }))
-      }),
+const _twist = makeOpPair<Classical, ClassicalForme, TwistOpts, {}>({
+  graph: Classical.query
+    .where((s) => s.isCantellated())
+    .flatMap((entry) => {
+      return twistOpts(entry).map((twist) => ({
+        left: entry,
+        right: entry.withData({ operation: "snub", twist }),
+        options: { left: { twist }, right: {} },
+      }))
+    }),
 
-    middle: "right",
+  middle: "right",
 
-    getPose(pos, { specs, geom }) {
-      return pos === "left"
-        ? getCantellatedPose(geom, specs, "face")
-        : getSnubPose(geom, specs, "face")
-    },
-    toLeft({ specs, geom }) {
-      return getResizedVertices(
-        getSnubFaces(specs, geom, "face"),
-        cantellatedDists[specs.data.family],
-        getSnubAngle(specs, "face"),
-      )
-    },
-    createForme: (specs, geom) => new PolyhedronForme(specs, geom),
+  getPose(pos, { specs, geom }) {
+    return pos === "left"
+      ? getCantellatedPose(geom, specs, "face")
+      : getSnubPose(geom, specs, "face")
   },
-)
+  toLeft(forme) {
+    return getResizedVertices(
+      forme.facetFaces("face"),
+      cantellatedDists[forme.specs.data.family],
+      getSnubAngle(forme.specs, "face"),
+    )
+  },
+  createForme: (specs, geom) => ClassicalForme.create(specs, geom),
+})
 
 function getCantellatedMidradius(geom: Polyhedron) {
   return getCantellatedEdgeFace(geom).distanceToCenter()
@@ -433,19 +366,20 @@ function getCantellatedMidradius(geom: Polyhedron) {
 /**
  * Take the cantellated intermediate solid and convert it to either dual
  */
-function doDualTransform(specs: Classical, geom: Polyhedron, facet: Facet) {
+function doDualTransform(forme: ClassicalForme, facet: Facet) {
+  const { specs, geom } = forme
   const resultSpecs = specs.withData({ operation: "regular", facet })
   const resultSideLength =
     getCantellatedMidradius(geom) / getMidradius(resultSpecs)
   const scale = resultSideLength * getCircumradius(resultSpecs)
   const oppFacet = facet === "face" ? "vertex" : "face"
-  const faces = getCantellatedFaces(specs, geom, oppFacet, facet === "face")
+  const faces = forme.facetFaces(oppFacet)
   return getTransformedVertices(faces, (f) => {
     return geom.centroid().add(f.normal().scale(scale))
   })
 }
 
-const _dual = makeOpPair({
+const _dual = makeOpPair<Classical, ClassicalForme>({
   graph: Classical.query
     .where((s) => s.isRegular() && !s.isVertex())
     .map((specs) => ({
@@ -481,9 +415,9 @@ const _dual = makeOpPair({
       }
     }
   },
-  toLeft: ({ specs, geom }) => doDualTransform(specs, geom, "face"),
-  toRight: ({ specs, geom }) => doDualTransform(specs, geom, "vertex"),
-  createForme: (specs, geom) => new PolyhedronForme(specs, geom),
+  toLeft: (forme) => doDualTransform(forme, "face"),
+  toRight: (forme) => doDualTransform(forme, "vertex"),
+  createForme: (specs, geom) => ClassicalForme.create(specs, geom),
 })
 
 // Exported members
