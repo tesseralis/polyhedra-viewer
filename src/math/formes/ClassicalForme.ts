@@ -26,7 +26,7 @@ export default abstract class ClassicalForme extends PolyhedronForme<
       case "truncate":
         return new TruncatedForme(specs, geom)
       case "rectify":
-        throw new Error("Not implemented yet")
+        return new RectifiedForme(specs, geom)
       case "bevel":
         return new BevelledForme(specs, geom)
       case "cantellate":
@@ -60,11 +60,34 @@ export default abstract class ClassicalForme extends PolyhedronForme<
     return this.geom.faces.filter((face) => this.isFacetFace(face, facet))
   }
 
-  mainFacetFace() {
+  mainFacet() {
     if (!this.specs.data.facet) {
       throw new Error(`Polyhedron has no main facet`)
     }
-    return this.facetFace(this.specs.data.facet)
+    return this.specs.data.facet
+  }
+
+  minorFacet() {
+    if (!this.specs.data.facet) {
+      throw new Error(`Polyhedron has no main facet`)
+    }
+    return this.specs.data.facet === "vertex" ? "face" : "vertex"
+  }
+
+  mainFacetFace() {
+    return this.facetFace(this.mainFacet())
+  }
+
+  mainFacetFaces() {
+    return this.facetFaces(this.mainFacet())
+  }
+
+  minorFacetFace() {
+    return this.facetFace(this.minorFacet())
+  }
+
+  minorFacetFaces() {
+    return this.facetFaces(this.minorFacet())
   }
 
   isEdgeFace(face: Face) {
@@ -98,7 +121,7 @@ class TruncatedForme extends ClassicalForme {
   }
 }
 
-// class RectifiedForme
+class RectifiedForme extends ClassicalForme {}
 
 class BevelledForme extends ClassicalForme {
   faceType(facet: Facet) {

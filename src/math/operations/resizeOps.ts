@@ -122,6 +122,7 @@ const snubAngles = createObject([3, 4, 5], (family: Family) => {
 })
 
 // TODO deduplicate these (note: bevel has a different criterion for getting face)
+// FIXME move all these to a function on the Forme
 const cantellatedDists = createObject([3, 4, 5], (family: Family) => {
   const specs = Classical.query.withData({ family, operation: "cantellate" })
   const geom = getGeometry(specs)
@@ -217,12 +218,12 @@ const semiExpand = makeOpPair<Classical, ClassicalForme, {}, FacetOpts>({
       )!
       return getPose(geom, face, apothemVec(edge))
     } else {
-      const face = forme.facetFace(facet || "face")
+      const face = forme.facetFace(facet)
       const edge = face.edges.find((e) => e.twinFace().numSides === 4)!
       return getPose(geom, face, apothemVec(edge))
     }
   },
-  toLeft(forme, { right: { facet = "face" } }) {
+  toLeft(forme, { right: { facet } }) {
     return getResizedVertices(
       forme.facetFaces(facet),
       bevelledDists[forme.specs.data.family][facet],
@@ -253,7 +254,7 @@ const _expand = makeOpPair<Classical, ClassicalForme, {}, FacetOpts>({
     // Take all the stuff and push it inwards
     return getResizedVertices(
       // FIXME get rid of the adjustment
-      forme.facetFaces(facet || "vertex"),
+      forme.facetFaces(facet),
       getInradius(result),
     )
   },
@@ -278,12 +279,12 @@ const _snub = makeOpPair<Classical, ClassicalForme, TwistOpts, FacetOpts>({
 
   middle: "right",
 
-  getPose(pos, forme, { right: { facet = "face" } }) {
+  getPose(pos, forme, { right: { facet } }) {
     return pos === "left"
       ? getRegularPose(forme.geom)
       : getSnubPose(forme, facet)
   },
-  toLeft(forme, { right: { facet = "face" } }, result) {
+  toLeft(forme, { right: { facet } }, result) {
     // Take all the stuff and push it inwards
     return getResizedVertices(
       // FIXME get rid of this side thing

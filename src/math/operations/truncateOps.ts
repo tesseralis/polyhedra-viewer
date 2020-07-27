@@ -13,11 +13,6 @@ import {
 import PolyhedronForme from "math/formes/PolyhedronForme"
 import ClassicalForme from "math/formes/ClassicalForme"
 
-function getSharpenFaces(polyhedron: Polyhedron) {
-  const faceType = polyhedron.smallestFace().numSides
-  return polyhedron.faces.filter((f) => f.numSides === faceType)
-}
-
 /**
  * Returns the point to sharpen given parameters in the following setup:
  *      result
@@ -129,8 +124,8 @@ const regs = makeTruncateTrio({
       const face = geom.getFace()
       return getRegularPose(geom, geom.getFace(), face.edges[0].midpoint())
     },
-    transformer({ geom }) {
-      return getTransformedVertices(getSharpenFaces(geom), (face) =>
+    transformer(forme) {
+      return getTransformedVertices(forme.minorFacetFaces(), (face) =>
         getSharpenPointEdge(face, face.edges[0]),
       )
     },
