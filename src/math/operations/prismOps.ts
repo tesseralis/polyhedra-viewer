@@ -14,6 +14,7 @@ import {
 } from "./operationUtils"
 import { withOrigin } from "math/geom"
 import { getOppositeFacets } from "./prismUtils"
+import PolyhedronForme from "math/formes/PolyhedronForme"
 
 const { cos, PI, sqrt } = Math
 
@@ -145,6 +146,7 @@ function makePrismOp({
         const fn = leftElongation === "prism" ? doTurn : doShorten
         return fn(specs, geom, twist)
       },
+      createForme: (specs, geom) => new PolyhedronForme(specs, geom),
     })
   }
 }
@@ -163,6 +165,7 @@ const turnPrismatic = makeOpPair({
     return getPose(face, face.edges[0], specs.data.type, "left")
   },
   toLeft: ({ geom, specs }) => doTurn(specs, geom, "left"),
+  createForme: (specs, geom) => new PolyhedronForme(specs, geom),
 })
 
 const _elongate = makePrismOp({
@@ -217,7 +220,7 @@ const gyroelongBipyramid = bipyramidOps(null)
 const turnBipyramid = bipyramidOps("prism")
 
 function makeBicupolaPrismOp(leftElongation: null | "prism") {
-  return makeOpPair<Capstone, TwistOpts>({
+  return makeOpPair<Capstone, PolyhedronForme<Capstone>, TwistOpts>({
     graph: Capstone.query
       .where(
         (s) =>
@@ -255,6 +258,7 @@ function makeBicupolaPrismOp(leftElongation: null | "prism") {
       const fn = leftElongation === "prism" ? doTurn : doShorten
       return fn(specs, geom, twist)
     },
+    createForme: (specs, geom) => new PolyhedronForme(specs, geom),
   })
 }
 

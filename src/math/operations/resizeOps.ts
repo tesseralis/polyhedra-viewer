@@ -14,6 +14,7 @@ import {
   getGeometry,
 } from "./operationUtils"
 import Operation, { makeOperation } from "./Operation"
+import PolyhedronForme from "math/formes/PolyhedronForme"
 
 function getSnubTetrahedronFaces(polyhedron: Polyhedron) {
   const f0 = polyhedron.faceWithNumSides(3)
@@ -286,7 +287,12 @@ function twistOpts(specs: Classical): Twist[] {
 }
 
 // Expansion of truncated to bevelled solids
-const semiExpand = makeOpPair<Classical, {}, FacetOpts>({
+const semiExpand = makeOpPair<
+  Classical,
+  PolyhedronForme<Classical>,
+  {},
+  FacetOpts
+>({
   graph: Classical.query
     .where((s) => s.isTruncated())
     .map((entry) => ({
@@ -315,9 +321,15 @@ const semiExpand = makeOpPair<Classical, {}, FacetOpts>({
       bevelledDists[specs.data.family][facet],
     )
   },
+  createForme: (specs, geom) => new PolyhedronForme(specs, geom),
 })
 
-const _expand = makeOpPair<Classical, {}, FacetOpts>({
+const _expand = makeOpPair<
+  Classical,
+  PolyhedronForme<Classical>,
+  {},
+  FacetOpts
+>({
   graph: Classical.query
     .where((s) => s.isRegular())
     .map((entry) => {
@@ -342,9 +354,15 @@ const _expand = makeOpPair<Classical, {}, FacetOpts>({
       getInradius(result),
     )
   },
+  createForme: (specs, geom) => new PolyhedronForme(specs, geom),
 })
 
-const _snub = makeOpPair<Classical, TwistOpts, FacetOpts>({
+const _snub = makeOpPair<
+  Classical,
+  PolyhedronForme<Classical>,
+  TwistOpts,
+  FacetOpts
+>({
   graph: Classical.query
     .where((s) => s.isRegular())
     .flatMap((entry) => {
@@ -375,34 +393,38 @@ const _snub = makeOpPair<Classical, TwistOpts, FacetOpts>({
       getSnubAngle(specs, facet),
     )
   },
+  createForme: (specs, geom) => new PolyhedronForme(specs, geom),
 })
 
-const _twist = makeOpPair<Classical, TwistOpts, {}>({
-  graph: Classical.query
-    .where((s) => s.isCantellated())
-    .flatMap((entry) => {
-      return twistOpts(entry).map((twist) => ({
-        left: entry,
-        right: entry.withData({ operation: "snub", twist }),
-        options: { left: { twist }, right: {} },
-      }))
-    }),
+const _twist = makeOpPair<Classical, PolyhedronForme<Classical>, TwistOpts, {}>(
+  {
+    graph: Classical.query
+      .where((s) => s.isCantellated())
+      .flatMap((entry) => {
+        return twistOpts(entry).map((twist) => ({
+          left: entry,
+          right: entry.withData({ operation: "snub", twist }),
+          options: { left: { twist }, right: {} },
+        }))
+      }),
 
-  middle: "right",
+    middle: "right",
 
-  getPose(pos, { specs, geom }) {
-    return pos === "left"
-      ? getCantellatedPose(geom, specs, "face")
-      : getSnubPose(geom, specs, "face")
+    getPose(pos, { specs, geom }) {
+      return pos === "left"
+        ? getCantellatedPose(geom, specs, "face")
+        : getSnubPose(geom, specs, "face")
+    },
+    toLeft({ specs, geom }) {
+      return getResizedVertices(
+        getSnubFaces(specs, geom, "face"),
+        cantellatedDists[specs.data.family],
+        getSnubAngle(specs, "face"),
+      )
+    },
+    createForme: (specs, geom) => new PolyhedronForme(specs, geom),
   },
-  toLeft({ specs, geom }) {
-    return getResizedVertices(
-      getSnubFaces(specs, geom, "face"),
-      cantellatedDists[specs.data.family],
-      getSnubAngle(specs, "face"),
-    )
-  },
-})
+)
 
 function getCantellatedMidradius(geom: Polyhedron) {
   return getCantellatedEdgeFace(geom).distanceToCenter()
@@ -461,6 +483,7 @@ const _dual = makeOpPair({
   },
   toLeft: ({ specs, geom }) => doDualTransform(specs, geom, "face"),
   toRight: ({ specs, geom }) => doDualTransform(specs, geom, "vertex"),
+  createForme: (specs, geom) => new PolyhedronForme(specs, geom),
 })
 
 // Exported members

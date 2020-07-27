@@ -12,6 +12,7 @@ import {
 } from "./operationUtils"
 // TODO move this to a util
 import { getCantellatedFace, getCantellatedEdgeFace } from "./resizeOps"
+import PolyhedronForme from "math/formes/PolyhedronForme"
 
 function getSharpenFaces(polyhedron: Polyhedron) {
   const faceType = polyhedron.smallestFace().numSides
@@ -118,6 +119,7 @@ function makeTruncateTrio<L extends OpName, M extends OpName, R extends OpName>(
       },
       toLeft: leftOp === "left" ? left.transformer : undefined,
       toRight: rightOp === "right" ? right.transformer : undefined,
+      createForme: (specs, geom) => new PolyhedronForme(specs, geom),
     })
   }
 
@@ -367,6 +369,7 @@ const augTruncate = makeOpPair({
       },
     )
   },
+  createForme: (specs, geom) => new PolyhedronForme(specs, geom),
 })
 
 // Exported operations
