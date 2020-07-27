@@ -66,6 +66,18 @@ export default abstract class ClassicalForme extends PolyhedronForme<
     }
     return this.facetFace(this.specs.data.facet)
   }
+
+  isEdgeFace(face: Face) {
+    return false
+  }
+
+  edgeFace() {
+    const face = this.geom.faces.find((face) => this.isEdgeFace(face))
+    if (!face) {
+      throw new Error(`Could not find edge face`)
+    }
+    return face
+  }
 }
 
 class RegularForme extends ClassicalForme {
@@ -122,6 +134,12 @@ class CantellatedForme extends ClassicalForme {
     }
     return [f0, ...f0.edges.map((e) => oppositeFace(e))]
   }
+
+  isEdgeFace(face: Face) {
+    return (
+      face.numSides === 4 && face.adjacentFaces().some((f) => f.numSides !== 4)
+    )
+  }
 }
 
 class SnubForme extends ClassicalForme {
@@ -139,4 +157,6 @@ class SnubForme extends ClassicalForme {
     const f0 = this.geom.faceWithNumSides(3)
     return [f0, ...f0.edges.map((e) => oppositeFace(e, "right"))]
   }
+
+  // FIXME implement isEdgeFace
 }

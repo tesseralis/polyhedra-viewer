@@ -121,18 +121,6 @@ const snubAngles = createObject([3, 4, 5], (family: Family) => {
   }
 })
 
-function isCantellatedEdgeFace(face: Face) {
-  return (
-    face.numSides === 4 && face.adjacentFaces().some((f) => f.numSides !== 4)
-  )
-}
-
-export function getCantellatedEdgeFace(geom: Polyhedron) {
-  const face = geom.faces.find(isCantellatedEdgeFace)
-  if (!face) throw new Error(`Could not find edge face for ${geom.name}`)
-  return face
-}
-
 // TODO deduplicate these (note: bevel has a different criterion for getting face)
 const cantellatedDists = createObject([3, 4, 5], (family: Family) => {
   const specs = Classical.query.withData({ family, operation: "cantellate" })
@@ -335,8 +323,8 @@ const _twist = makeOpPair<Classical, ClassicalForme, TwistOpts, {}>({
   createForme: (specs, geom) => ClassicalForme.create(specs, geom),
 })
 
-function getCantellatedMidradius(geom: Polyhedron) {
-  return getCantellatedEdgeFace(geom).distanceToCenter()
+function getCantellatedMidradius(forme: ClassicalForme) {
+  return forme.edgeFace().distanceToCenter()
 }
 
 /**
@@ -346,7 +334,7 @@ function doDualTransform(forme: ClassicalForme, facet: Facet) {
   const { specs, geom } = forme
   const resultSpecs = specs.withData({ operation: "regular", facet })
   const resultSideLength =
-    getCantellatedMidradius(geom) / getMidradius(resultSpecs)
+    getCantellatedMidradius(forme) / getMidradius(resultSpecs)
   const scale = resultSideLength * getCircumradius(resultSpecs)
   const oppFacet = facet === "face" ? "vertex" : "face"
   const faces = forme.facetFaces(oppFacet)
@@ -387,7 +375,7 @@ const _dual = makeOpPair<Classical, ClassicalForme>({
       case "middle": {
         return {
           ...getCantellatedPose(forme, "face"),
-          scale: getCantellatedMidradius(geom),
+          scale: getCantellatedMidradius(forme),
         }
       }
     }

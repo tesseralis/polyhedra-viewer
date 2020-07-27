@@ -10,8 +10,6 @@ import {
   FacetOpts,
   getTransformedVertices,
 } from "./operationUtils"
-// TODO move this to a util
-import { getCantellatedEdgeFace } from "./resizeOps"
 import PolyhedronForme from "math/formes/PolyhedronForme"
 import ClassicalForme from "math/formes/ClassicalForme"
 
@@ -152,11 +150,10 @@ const regs = makeTruncateTrio({
     // The rectified version is the only thing we need to choose an option for
     // when we move out of it
     options: (entry) => ({ facet: entry.data.facet }),
-    pose({ specs, geom }, options) {
+    pose(forme, options) {
       // pick a face that *isn't* the sharpen face type
-      const faceType = options.right.facet === "vertex" ? 3 : specs.data.family
-      const face = geom.faceWithNumSides(faceType)
-      return getRegularPose(geom, face, face.vertices[0].vec)
+      const face = forme.facetFace(options.right.facet)
+      return getRegularPose(forme.geom, face, face.vertices[0].vec)
     },
     transformer({ geom }) {
       // All edges that between two truncated faces
@@ -228,7 +225,7 @@ const ambos = makeTruncateTrio({
       const ref = getGeometry(resultSpec)
       const refForme = ClassicalForme.create(resultSpec, ref)
       const refInradius = getAvgInradius(refForme)
-      const refFace = getCantellatedEdgeFace(ref)
+      const refFace = refForme.edgeFace()
       const refMidradius = refFace.distanceToCenter()
       const refFaceRadius = refFace.radius()
       const inradius = getAvgInradius(forme)
