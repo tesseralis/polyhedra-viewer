@@ -347,11 +347,11 @@ const augTruncate = makeOpPair({
 
 export const truncate = new Operation(
   "truncate",
-  combineOps<Classical | Composite, any>([
-    regs.truncate.left,
-    ambos.truncate.left,
-    augTruncate.left,
-  ]),
+  combineOps<
+    Classical | Composite,
+    ClassicalForme | PolyhedronForme<Composite>,
+    any
+  >([regs.truncate.left, ambos.truncate.left, augTruncate.left]),
 )
 
 export const cotruncate = new Operation(
@@ -364,7 +364,7 @@ export const rectify = new Operation(
   combineOps([regs.rectify.left, ambos.rectify.left]),
 )
 
-const hitOptArgs: Partial<OpArgs<FacetOpts, Classical>> = {
+const hitOptArgs: Partial<OpArgs<FacetOpts, Classical, ClassicalForme>> = {
   hitOption: "facet",
   getHitOption({ geom }, hitPoint) {
     const n = geom.hitFace(hitPoint).numSides
@@ -381,7 +381,11 @@ const hitOptArgs: Partial<OpArgs<FacetOpts, Classical>> = {
 }
 
 export const sharpen = new Operation("sharpen", {
-  ...combineOps<Classical | Composite, FacetOpts>([
+  ...combineOps<
+    Classical | Composite,
+    ClassicalForme | PolyhedronForme<Composite>,
+    FacetOpts
+  >([
     regs.truncate.right,
     ambos.truncate.right,
     augTruncate.right,
@@ -396,7 +400,7 @@ export const sharpen = new Operation("sharpen", {
 // and need to be integrated into the app
 
 export const cosharpen = new Operation("cosharpen", {
-  ...combineOps<Classical, FacetOpts>([
+  ...combineOps<Classical, ClassicalForme, FacetOpts>([
     regs.cotruncate.right,
     ambos.cotruncate.right,
   ]),
@@ -404,7 +408,7 @@ export const cosharpen = new Operation("cosharpen", {
 })
 
 export const unrectify = new Operation("unrectify", {
-  ...combineOps<Classical, FacetOpts>([
+  ...combineOps<Classical, ClassicalForme, FacetOpts>([
     regs.rectify.right,
     ambos.rectify.right,
   ]),

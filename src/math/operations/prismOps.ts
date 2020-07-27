@@ -304,7 +304,11 @@ export const shorten = makeOperation(
 
 export const turn = makeOperation(
   "turn",
-  combineOps<Capstone | Prismatic, TwistOpts>(
+  combineOps<
+    Capstone | Prismatic,
+    PolyhedronForme<Capstone | Prismatic>,
+    TwistOpts
+  >(
     [
       turnPrismatic,
       turnPyramid,

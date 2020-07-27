@@ -203,9 +203,13 @@ class OpPair<
   }
 }
 
-type OpInput<O, S extends PolyhedronSpecs> = Required<
+type OpInput<
+  O,
+  S extends PolyhedronSpecs,
+  F extends PolyhedronForme<S>
+> = Required<
   Pick<
-    OpArgs<O, S>,
+    OpArgs<O, S, F>,
     "apply" | "canApplyTo" | "allOptionCombos" | "getResult" | "hasOptions"
   >
 >
@@ -219,7 +223,7 @@ function makeOperation<
   Forme extends PolyhedronForme<Sp>,
   L,
   R
->(side: S, op: OpPair<Sp, Forme, L, R>): OpInput<Opts<S, L, R>, Sp> {
+>(side: S, op: OpPair<Sp, Forme, L, R>): OpInput<Opts<S, L, R>, Sp, Forme> {
   return {
     apply(solid, opts) {
       return op.apply(side, solid, opts)
@@ -252,9 +256,11 @@ export function makeOpPair<
   return { left: makeOperation("left", op), right: makeOperation("right", op) }
 }
 
-export function combineOps<S extends PolyhedronSpecs, O>(
-  opArgs: OpInput<O, S>[],
-): OpInput<O, S> {
+export function combineOps<
+  S extends PolyhedronSpecs,
+  F extends PolyhedronForme<S>,
+  O
+>(opArgs: OpInput<O, S, F>[]): OpInput<O, S, F> {
   function canApplyTo(specs: S) {
     return opArgs.some((op) => op.canApplyTo(specs))
   }

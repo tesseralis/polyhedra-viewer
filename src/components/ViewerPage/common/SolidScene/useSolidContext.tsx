@@ -2,6 +2,7 @@ import { useMemo } from "react"
 import tinycolor from "tinycolor2"
 import Config from "components/ConfigCtx"
 import { PolyhedronCtx, OperationCtx, TransitionCtx } from "../../context"
+import { Polyhedron } from "math/polyhedra"
 
 function toRgb(hex: string) {
   const { r, g, b } = tinycolor(hex).toRgb()
@@ -30,12 +31,13 @@ export default function useSolidContext() {
       solidData!.faces.map((face, i) => faceColors[i] || colors[face.length]),
     [solidData, faceColors, colors, isTransitioning],
   )
+  const geom: Polyhedron = polyhedron.geom
 
   // Colors when in operation mode and hit options are being selected
   const operationColors = useMemo(() => {
     if (!operation) return
     const selectState = operation.faceSelectionStates(polyhedron, options)
-    return polyhedron.geom.faces.map((face, i) => {
+    return geom.faces.map((face, i) => {
       switch (selectState[i]) {
         case "selected":
           return tinycolor.mix(colors[face.numSides], "lime")
@@ -45,15 +47,15 @@ export default function useSolidContext() {
           return colors[face.numSides]
       }
     })
-  }, [polyhedron, operation, options, colors])
+  }, [polyhedron, geom, operation, options, colors])
 
   const normalizedColors = useMemo(() => {
     const rawColors =
       transitionColors ||
       operationColors ||
-      polyhedron.geom.faces.map((f) => colors[f.numSides])
+      geom.faces.map((f) => colors[f.numSides])
     return rawColors.map(toRgb)
-  }, [transitionColors, operationColors, polyhedron, colors])
+  }, [transitionColors, operationColors, geom, colors])
 
   return {
     colors: normalizedColors,

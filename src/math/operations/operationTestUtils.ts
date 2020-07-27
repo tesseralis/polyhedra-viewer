@@ -1,6 +1,7 @@
 import { PRECISION, PRECISION_DIGITS, Vec3D } from "math/geom"
 import { Polyhedron } from "math/polyhedra"
-import Operation, { PolyhedronForme, OpResult } from "./Operation"
+import Operation, { OpResult } from "./Operation"
+import PolyhedronForme from "math/formes/PolyhedronForme"
 
 function expectCRFPolyhedron(polyhedron: Polyhedron) {
   const expectedSideLength = polyhedron.edgeLength()
@@ -66,7 +67,7 @@ function expectValidPolyhedron(result: Polyhedron) {
  */
 export function validateOperationApplication(
   op: Operation<any>,
-  original: PolyhedronForme,
+  original: PolyhedronForme<any>,
   args: any,
 ) {
   const opResult = op.apply(original, args)
