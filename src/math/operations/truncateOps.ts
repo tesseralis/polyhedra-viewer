@@ -366,15 +366,16 @@ export const rectify = new Operation(
 
 const hitOptArgs: Partial<OpArgs<FacetOpts, Classical, ClassicalForme>> = {
   hitOption: "facet",
-  getHitOption({ geom }, hitPoint) {
-    const n = geom.hitFace(hitPoint).numSides
-    return n <= 5 ? { facet: n === 3 ? "face" : "vertex" } : {}
+  getHitOption(forme, hitPoint) {
+    const face = forme.geom.hitFace(hitPoint)
+    const facet = forme.getFacet(face)
+    return facet ? { facet: facet === "vertex" ? "face" : "vertex" } : {}
   },
 
-  faceSelectionStates({ specs, geom }, { facet }) {
-    const faceType = !facet ? null : facet === "face" ? 3 : specs.data.family
-    return geom.faces.map((face) => {
-      if (face.numSides === faceType) return "selected"
+  faceSelectionStates(forme, { facet }) {
+    const oppFacet = facet === "vertex" ? "face" : "vertex"
+    return forme.geom.faces.map((face) => {
+      if (forme.isFacetFace(face, oppFacet)) return "selected"
       return "selectable"
     })
   },
