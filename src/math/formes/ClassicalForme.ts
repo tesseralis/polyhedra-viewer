@@ -48,6 +48,12 @@ export default abstract class ClassicalForme extends PolyhedronForme<
     return face.numSides === this.faceType(facet)
   }
 
+  getFacet(face: Face) {
+    if (this.isFacetFace(face, "vertex")) return "vertex"
+    if (this.isFacetFace(face, "face")) return "face"
+    return null
+  }
+
   facetFace(facet: Facet) {
     const face = this.geom.faces.find((face) => this.isFacetFace(face, facet))
     if (!face) {
