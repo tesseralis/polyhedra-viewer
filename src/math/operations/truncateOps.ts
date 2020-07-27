@@ -3,7 +3,7 @@ import { Polyhedron, Face, Edge, VertexArg, Cap } from "math/polyhedra"
 import Classical, { Operation as OpName } from "data/specs/Classical"
 import Composite from "data/specs/Composite"
 import { makeOpPair, combineOps, Pose } from "./operationPairs"
-import Operation, { SolidArgs, OpArgs } from "./Operation"
+import Operation, { OpArgs } from "./Operation"
 import { Vec3D, getCentroid, angleBetween } from "math/geom"
 import {
   getGeometry,
@@ -11,8 +11,9 @@ import {
   getTransformedVertices,
 } from "./operationUtils"
 // TODO move this to a util
-import { getCantellatedFace, getCantellatedEdgeFace } from "./resizeOps"
+import { getCantellatedEdgeFace } from "./resizeOps"
 import PolyhedronForme from "math/formes/PolyhedronForme"
+import ClassicalForme from "math/formes/ClassicalForme"
 
 function getSharpenFaces(polyhedron: Polyhedron) {
   const faceType = polyhedron.smallestFace().numSides
@@ -41,34 +42,15 @@ function getSharpenPointEdge(face: Face, edge: Edge) {
   return getSharpenPoint(face, edge.midpoint(), edge.twinFace().centroid())
 }
 
-function getAvgInradius(specs: Classical, geom: Polyhedron) {
-  let faces: Face[]
-  if (specs.isRectified()) {
-    faces = [geom.faceWithNumSides(3), geom.faceWithNumSides(specs.data.family)]
-  } else if (specs.isBevelled()) {
-    faces = [
-      geom.faceWithNumSides(6),
-      geom.faceWithNumSides(2 * specs.data.family),
-    ]
-  } else if (specs.isCantellated()) {
-    faces = [
-      geom.faceWithNumSides(3),
-      getCantellatedFace(geom, specs.data.family),
-    ]
-  } else {
-    throw new Error(`Invalid specs: ${specs.name()}`)
-  }
+function getAvgInradius(forme: ClassicalForme) {
+  const faces = [forme.facetFace("vertex"), forme.facetFace("face")]
   return sum(faces.map((f) => f.distanceToCenter())) / faces.length
 }
 
 interface TrioOpArgs<Op, Opts = any> {
   operation: Op
-  pose(solid: SolidArgs<Classical>, opts: Opts): Pose
-  transformer(
-    solid: SolidArgs<Classical>,
-    opts: Opts,
-    result: Classical,
-  ): VertexArg[]
+  pose(solid: ClassicalForme, opts: Opts): Pose
+  transformer(solid: ClassicalForme, opts: Opts, result: Classical): VertexArg[]
   options?(entry: Classical): Opts
 }
 
@@ -119,7 +101,7 @@ function makeTruncateTrio<L extends OpName, M extends OpName, R extends OpName>(
       },
       toLeft: leftOp === "left" ? left.transformer : undefined,
       toRight: rightOp === "right" ? right.transformer : undefined,
-      createForme: (specs, geom) => new PolyhedronForme(specs, geom),
+      createForme: (specs, geom) => ClassicalForme.create(specs, geom),
     })
   }
 
@@ -187,15 +169,10 @@ const regs = makeTruncateTrio({
   },
 })
 
-function getAmboPose(
-  specs: Classical,
-  geom: Polyhedron,
-  face: Face,
-  point: Vec3D,
-): Pose {
+function getAmboPose(forme: ClassicalForme, face: Face, point: Vec3D): Pose {
   return {
-    origin: geom.centroid(),
-    scale: getAvgInradius(specs, geom),
+    origin: forme.geom.centroid(),
+    scale: getAvgInradius(forme),
     orientation: [face.normal(), point.sub(face.centroid())],
   }
 }
@@ -214,49 +191,51 @@ function getAmboPose(
 const ambos = makeTruncateTrio({
   left: {
     operation: "rectify",
-    pose({ geom, specs }) {
-      const face = geom.faceWithNumSides(specs.data.family)
-      return getAmboPose(specs, geom, face, face.edges[0].midpoint())
+    pose(forme) {
+      const face = forme.geom.faceWithNumSides(forme.specs.data.family)
+      return getAmboPose(forme, face, face.edges[0].midpoint())
     },
-    transformer({ geom, specs }, $, resultSpec) {
+    transformer(forme, $, resultSpec) {
       const ref = getGeometry(resultSpec)
-      const refInradius = getAvgInradius(resultSpec, ref)
+      const refForme = ClassicalForme.create(resultSpec, ref)
+      const refInradius = getAvgInradius(refForme)
       const refCircumradius = ref.getVertex().distanceToCenter()
-      const inradius = getAvgInradius(specs, geom)
+      const inradius = getAvgInradius(forme)
       const scale = (refCircumradius / refInradius) * inradius
-      const faces = geom.faces.filter((f) => f.numSides === 4)
+      const faces = forme.geom.faces.filter((f) => f.numSides === 4)
       // Sharpen each of the faces to a point aligning with the vertices
       // of the rectified solid
       return getTransformedVertices(faces, (f) =>
-        geom.centroid().add(f.normal().scale(scale)),
+        forme.geom.centroid().add(f.normal().scale(scale)),
       )
     },
   },
   middle: {
     operation: "bevel",
-    pose({ geom, specs }) {
-      const face = geom.faceWithNumSides(specs.data.family * 2)
+    pose(forme) {
+      const face = forme.geom.faceWithNumSides(forme.specs.data.family * 2)
       const edge = face.edges.find((e) => e.twinFace().numSides !== 4)!
-      return getAmboPose(specs, geom, face, edge.midpoint())
+      return getAmboPose(forme, face, edge.midpoint())
     },
   },
   right: {
     operation: "cantellate",
-    pose({ geom, specs }) {
-      const face = getCantellatedFace(geom, specs.data.family)
-      return getAmboPose(specs, geom, face, face.vertices[0].vec)
+    pose(forme) {
+      const face = forme.facetFace("face")
+      return getAmboPose(forme, face, face.vertices[0].vec)
     },
-    transformer({ geom, specs }, $, resultSpec) {
+    transformer(forme, $, resultSpec) {
       const ref = getGeometry(resultSpec)
-      const refInradius = getAvgInradius(resultSpec, ref)
+      const refForme = ClassicalForme.create(resultSpec, ref)
+      const refInradius = getAvgInradius(refForme)
       const refFace = getCantellatedEdgeFace(ref)
       const refMidradius = refFace.distanceToCenter()
       const refFaceRadius = refFace.radius()
-      const inradius = getAvgInradius(specs, geom)
+      const inradius = getAvgInradius(forme)
       const scale = inradius / refInradius
-      const faces = geom.faces.filter((f) => f.numSides === 4)
+      const faces = forme.geom.faces.filter((f) => f.numSides === 4)
       return getTransformedVertices(faces, (f) => {
-        const faceCentroid = geom
+        const faceCentroid = forme.geom
           .centroid()
           .add(f.normal().scale(refMidradius * scale))
 

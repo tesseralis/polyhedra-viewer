@@ -24,6 +24,7 @@ export default abstract class ClassicalForme extends PolyhedronForme<
       case "regular":
         return new RegularForme(specs, geom)
       case "truncate":
+        return new TruncatedForme(specs, geom)
       case "rectify":
         throw new Error("Not implemented yet")
       case "bevel":
@@ -47,8 +48,23 @@ export default abstract class ClassicalForme extends PolyhedronForme<
     return face.numSides === this.faceType(facet)
   }
 
+  facetFace(facet: Facet) {
+    const face = this.geom.faces.find((face) => this.isFacetFace(face, facet))
+    if (!face) {
+      throw new Error(`Could not find facet face for ${facet}`)
+    }
+    return face
+  }
+
   facetFaces(facet: Facet) {
     return this.geom.faces.filter((face) => this.isFacetFace(face, facet))
+  }
+
+  mainFacetFace() {
+    if (!this.specs.data.facet) {
+      throw new Error(`Polyhedron has no main facet`)
+    }
+    return this.facetFace(this.specs.data.facet)
   }
 }
 
@@ -59,12 +75,16 @@ class RegularForme extends ClassicalForme {
   }
 }
 
-// class TruncatedForme extends ClassicalForme {
-//   // TODO deal with tetrahedral
-//   isFacetFace(face: Face, facet: Facet) {
-
-//   }
-// }
+class TruncatedForme extends ClassicalForme {
+  // TODO deal with tetrahedral
+  isFacetFace(face: Face, facet: Facet) {
+    if (this.specs.data.facet === facet) {
+      return face.numSides > 5
+    } else {
+      return face.numSides <= 5
+    }
+  }
+}
 
 // class RectifiedForme
 
