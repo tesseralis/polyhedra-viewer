@@ -1,9 +1,9 @@
 import { forEach } from "lodash-es"
 import { allSolidNames } from "data/common"
 import { operations } from ".."
-import { Polyhedron } from "math/polyhedra"
 import getSpecs from "data/specs/getSpecs"
 import { validateOperationApplication } from "../operationTestUtils"
+import { getGeometry } from "math/operations/operationUtils"
 
 const goodOperations = [
   "truncate",
@@ -13,13 +13,18 @@ const goodOperations = [
   "expand",
   "snub",
   "contract",
+  "twist",
 ]
 
 describe("applyOperation", () => {
-  const polyhedra = allSolidNames.map((name) => ({
-    geom: Polyhedron.get(name),
-    specs: getSpecs(name),
-  }))
+  // FIXME this needs to look at all alternates too
+  const polyhedra = allSolidNames.map((name) => {
+    const specs = getSpecs(name)
+    return {
+      specs,
+      geom: getGeometry(specs),
+    }
+  })
 
   forEach(operations, (operation, opName) => {
     if (!goodOperations.includes(opName)) return
