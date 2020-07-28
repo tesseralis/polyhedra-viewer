@@ -48,8 +48,6 @@ export interface OpArgs<
 
   hasOptions?(info: Specs): boolean
 
-  isPreferredSpec?(info: Specs, options: Options): boolean
-
   apply(solid: Forme, options: Options): PartialOpResult
 
   allOptions?(
@@ -79,7 +77,6 @@ const methodDefaults = {
   getHitOption: {},
   hasOptions: false,
   allOptionCombos: [null],
-  isPreferredSpec: true,
   faceSelectionStates: [],
   defaultOptions: {},
 }

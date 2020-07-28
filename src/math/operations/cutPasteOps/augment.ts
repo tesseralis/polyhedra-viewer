@@ -379,20 +379,6 @@ export const augment = makeOperation<Options, AugmentSpecs>("augment", {
     return false
   },
 
-  isPreferredSpec(info, { face, using }) {
-    const n = face.numSides
-    const { type, base } = getUsingData(getUsingOpt(n, using))
-    if (base === 4 && type === "pyramid") {
-      if (info.isPrismatic() && info.isPrism()) return false
-    }
-    // for the fastigium, depend on what the using option is
-    if (info.canonicalName() === "triangular prism") {
-      if (type === "cupola") return info.isCapstone()
-      return base === 3 ? info.isPrismatic() : info.isComposite()
-    }
-    return true
-  },
-
   getResult({ specs, geom }, { face, using, gyrate }) {
     const n = face.numSides
     const { type, base } = getUsingData(getUsingOpt(n, using))
