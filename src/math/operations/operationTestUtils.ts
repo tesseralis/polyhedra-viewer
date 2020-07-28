@@ -2,6 +2,28 @@ import { PRECISION, PRECISION_DIGITS, Vec3D } from "math/geom"
 import { Polyhedron } from "math/polyhedra"
 import Operation, { OpResult } from "./Operation"
 import PolyhedronForme from "math/formes/PolyhedronForme"
+import { getGeometry } from "math/operations/operationUtils"
+import { getSpecs2 } from "data/specs/getSpecs"
+import createForme from "math/formes/createForme"
+
+// FIXME rename and consolidate these functions
+export function makeApplyTo(operation: Operation<any>) {
+  return function (name: string, value: boolean = true) {
+    const specs = getSpecs2(name)
+    const geom = getGeometry(specs)
+    const forme = createForme(specs, geom)
+    expect(operation.canApplyTo(forme)).toEqual(value)
+  }
+}
+
+export function makeHasOptions(operation: Operation<any>) {
+  return function (name: string, value: boolean = true) {
+    const specs = getSpecs2(name)
+    const geom = getGeometry(specs)
+    const forme = createForme(specs, geom)
+    expect(operation.hasOptions(forme)).toEqual(value)
+  }
+}
 
 function expectCRFPolyhedron(polyhedron: Polyhedron) {
   const expectedSideLength = polyhedron.edgeLength()
