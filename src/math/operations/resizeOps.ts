@@ -2,7 +2,7 @@ import { minBy } from "lodash-es"
 import { Twist } from "types"
 import { mapObject } from "utils"
 import Classical, { Facet, Family } from "data/specs/Classical"
-import { makeOpPair, combineOps, Pose } from "./operationPairs"
+import { makeOpPair, combineOps } from "./operationPairs"
 import { angleBetween, getPlane, withOrigin, Vec3D } from "math/geom"
 import { Polyhedron, Face, Edge } from "math/polyhedra"
 import {
@@ -11,6 +11,7 @@ import {
   // FacetOpts,
   // TwistOpts,
   getGeometry,
+  Pose,
 } from "./operationUtils"
 import Operation, { makeOperation } from "./Operation"
 import ClassicalForme from "math/formes/ClassicalForme"

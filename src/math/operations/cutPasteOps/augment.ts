@@ -5,11 +5,15 @@ import Capstone from "data/specs/Capstone"
 import Composite from "data/specs/Composite"
 import Elementary from "data/specs/Elementary"
 import { Polyhedron, Face, Cap } from "math/polyhedra"
-import { isInverse, getOrthonormalTransform, PRECISION } from "math/geom"
+import { isInverse, PRECISION } from "math/geom"
 import { repeat, getCyclic, getSingle } from "utils"
 import { makeOperation } from "../Operation"
-import { withOrigin } from "../../geom"
-import { oppositeFace, deduplicateVertices } from "../operationUtils"
+import {
+  oppositeFace,
+  deduplicateVertices,
+  alignPolyhedron,
+  Pose,
+} from "../operationUtils"
 import {
   inc,
   dec,
@@ -227,39 +231,29 @@ function doAugment(
     .sub(base.centroid())
     .getNormalized()
 
-  // https://math.stackexchange.com/questions/624348/finding-rotation-axis-and-angle-to-align-two-oriented-vectors
-  // Determine the transformation that rotates the underside orientation to the base orientation
-  // TODO we probably want this as some sort of generic method
-  const transformMatrix = getOrthonormalTransform(
-    undersideRadius,
-    underside.normal().getInverted(),
-    baseRadius,
-    base.normal(),
-  )
-  const transform = withOrigin(base.centroid(), (u) =>
-    transformMatrix.applyTo(u),
-  )
+  const augmenteePose: Pose = {
+    origin: underside.centroid(),
+    scale: augmentee.edgeLength(),
+    orientation: [underside.normal().getInverted(), undersideRadius],
+  }
 
-  // Scale and position the augmentee so that it lines up with the base
-  const alignedVertices = augmentee.vertices.map((v) => {
-    return v.vec
-      .sub(underside.centroid())
-      .scale(base.sideLength() / augmentee.edgeLength())
-      .add(base.centroid())
-  })
+  const basePose: Pose = {
+    origin: base.centroid(),
+    scale: base.sideLength(),
+    orientation: [base.normal(), baseRadius],
+  }
 
-  // Rotate the vertices so that they align with the base
-  const rotatedVertices = alignedVertices.map((v) => transform(v))
-
-  const newAugmentee = augmentee.withChanges((s) =>
-    s.withVertices(rotatedVertices).withoutFaces([underside]),
-  )
+  const alignedAugmentee = alignPolyhedron(
+    augmentee,
+    augmenteePose,
+    basePose,
+  ).withoutFaces([underside])
 
   const augmenteeInitial = augmentee.withVertices(
     repeat(base.centroid(), augmentee.numVertices()),
   )
 
-  const endResult = polyhedron.addPolyhedron(newAugmentee)
+  const endResult = polyhedron.addPolyhedron(alignedAugmentee)
 
   return {
     animationData: {

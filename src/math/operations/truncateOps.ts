@@ -2,13 +2,14 @@ import { sum } from "lodash-es"
 import { Polyhedron, Face, Edge, VertexArg } from "math/polyhedra"
 import Classical, { Operation as OpName } from "data/specs/Classical"
 import Composite from "data/specs/Composite"
-import { makeOpPair, combineOps, Pose } from "./operationPairs"
+import { makeOpPair, combineOps } from "./operationPairs"
 import Operation, { OpArgs } from "./Operation"
 import { Vec3D, getCentroid, angleBetween } from "math/geom"
 import {
   getGeometry,
   FacetOpts,
   getTransformedVertices,
+  Pose,
 } from "./operationUtils"
 import ClassicalForme from "math/formes/ClassicalForme"
 import CompositeForme, {

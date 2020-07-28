@@ -7,7 +7,14 @@ import {
   VertexList,
   VertexArg,
 } from "math/polyhedra"
-import { Vec3D, Transform, PRECISION } from "math/geom"
+import {
+  Plane,
+  Vec3D,
+  Transform,
+  PRECISION,
+  getOrthonormalTransform,
+  withOrigin,
+} from "math/geom"
 import { mapObject } from "utils"
 import PolyhedronSpecs from "data/specs/PolyhedronSpecs"
 import { Facet } from "data/specs/Classical"
@@ -39,6 +46,43 @@ export function oppositeFace(edge: Edge, twist?: Twist) {
       // If no twist is provided, assume a square
       return edge.twin().next().next().twinFace()
   }
+}
+
+/**
+ * Defines an orthonormal orientation.
+ * An orientation [u, v] defineds the basis [u, v, u x v]
+ */
+type Orientation = readonly [Vec3D, Vec3D]
+
+/**
+ * Defines a scale, origin, and orientation used to transform one polyhedron to another.
+ */
+export interface Pose {
+  scale: number
+  origin: Vec3D
+  orientation: Orientation
+}
+
+function normalizeOrientation([u1, u2]: Orientation) {
+  const _u2 = new Plane(Vec3D.ZERO, u1).getProjectedPoint(u2)
+  return [u1.getNormalized(), _u2.getNormalized()]
+}
+
+// Translate, rotate, and scale the polyhedron with the transformation given by the two poses
+export function alignPolyhedron(solid: Polyhedron, pose1: Pose, pose2: Pose) {
+  const [u1, u2] = normalizeOrientation(pose1.orientation)
+  const [v1, v2] = normalizeOrientation(pose2.orientation)
+  const matrix = getOrthonormalTransform(u1, u2, v1, v2)
+  const rotate = withOrigin(pose2.origin, (u) => matrix.applyTo(u))
+  const newVertices = solid.vertices.map((v) =>
+    rotate(
+      v.vec
+        .sub(pose1.origin)
+        .scale(pose2.scale / pose1.scale)
+        .add(pose2.origin),
+    ),
+  )
+  return solid.withVertices(newVertices)
 }
 
 /**

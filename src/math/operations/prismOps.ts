@@ -4,9 +4,10 @@ import { PrismaticType } from "data/specs/common"
 import PolyhedronSpecs from "data/specs/PolyhedronSpecs"
 import Capstone from "data/specs/Capstone"
 import Prismatic from "data/specs/Prismatic"
-import { combineOps, makeOpPair, Pose } from "./operationPairs"
+import { combineOps, makeOpPair } from "./operationPairs"
 import { makeOperation } from "./Operation"
 import {
+  Pose,
   getOppTwist,
   TwistOpts,
   getTransformedVertices,

@@ -1,9 +1,8 @@
 import { isMatch } from "lodash-es"
 import PolyhedronSpecs from "data/specs/PolyhedronSpecs"
-import { Polyhedron, VertexArg } from "math/polyhedra"
-import { Plane, Vec3D, getOrthonormalTransform, withOrigin } from "math/geom"
+import { VertexArg } from "math/polyhedra"
 import { OpArgs, SolidArgs } from "./Operation"
-import { getGeometry } from "./operationUtils"
+import { Pose, alignPolyhedron, getGeometry } from "./operationUtils"
 import PolyhedronForme from "math/formes/PolyhedronForme"
 import createForme from "math/formes/createForme"
 
@@ -28,14 +27,6 @@ interface GraphEntry<Specs, L, R> {
 // list of polyhedron pairs and their arguments
 type OpPairGraph<Specs, L, R> = GraphEntry<Specs, L, R>[]
 
-type Orientation = readonly [Vec3D, Vec3D]
-
-export interface Pose {
-  scale: number
-  origin: Vec3D
-  orientation: Orientation
-}
-
 type MiddleGetter<
   Specs extends PolyhedronSpecs,
   Forme extends PolyhedronForme<Specs>,
@@ -59,28 +50,6 @@ interface OpPairInput<
   toLeft?(solid: Forme, opts: GraphOpts<L, R>, result: Specs): VertexArg[]
   // Move the intermediate figure to the right position
   toRight?(solid: Forme, opts: GraphOpts<L, R>, result: Specs): VertexArg[]
-}
-
-function normalizeOrientation([u1, u2]: Orientation) {
-  const _u2 = new Plane(Vec3D.ZERO, u1).getProjectedPoint(u2)
-  return [u1.getNormalized(), _u2.getNormalized()]
-}
-
-// Translate, rotate, and scale the polyhedron with the transformation given by the two poses
-function alignPolyhedron(solid: Polyhedron, pose1: Pose, pose2: Pose) {
-  const [u1, u2] = normalizeOrientation(pose1.orientation)
-  const [v1, v2] = normalizeOrientation(pose2.orientation)
-  const matrix = getOrthonormalTransform(u1, u2, v1, v2)
-  const rotate = withOrigin(pose2.origin, (u) => matrix.applyTo(u))
-  const newVertices = solid.vertices.map((v) =>
-    rotate(
-      v.vec
-        .sub(pose1.origin)
-        .scale(pose2.scale / pose1.scale)
-        .add(pose2.origin),
-    ),
-  )
-  return solid.withVertices(newVertices)
 }
 
 function defaultGetter<Specs extends PolyhedronSpecs>({
