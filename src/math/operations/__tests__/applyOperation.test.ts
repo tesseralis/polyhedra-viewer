@@ -5,23 +5,12 @@ import getSpecs from "data/specs/getSpecs"
 import { validateOperationApplication } from "../operationTestUtils"
 import { getGeometry } from "math/operations/operationUtils"
 
-const goodOperations = [
-  "truncate",
-  "rectify",
-  "sharpen",
-  "dual",
-  "expand",
-  "snub",
-  "contract",
-  "twist",
-  "elongate",
-  "gyroelongate",
-  "contract",
-  "turn",
-  // "augment",
-  // "diminish",
-  "gyrate",
-]
+const badOptions: any = {
+  // These appear in two "sequences": capstone and augmented
+  augment: ["triangular prism", "pentagonal prism", "hexagonal prism"],
+  // This tries to apply to *all* caps, not just the bases
+  diminish: ["gyroelongated pentagonal pyramid"],
+}
 
 describe("applyOperation", () => {
   // FIXME this needs to look at all alternates too
@@ -34,10 +23,12 @@ describe("applyOperation", () => {
   })
 
   forEach(operations, (operation, opName) => {
-    if (!goodOperations.includes(opName)) return
     describe(opName, () => {
       for (const polyhedron of polyhedra) {
-        if (operation.canApplyTo(polyhedron)) {
+        if (
+          operation.canApplyTo(polyhedron) &&
+          !badOptions[opName]?.includes?.(polyhedron.geom.name)
+        ) {
           it(polyhedron.geom.name, () => {
             for (const options of operation.allOptionCombos(polyhedron)) {
               validateOperationApplication(operation, polyhedron, options)

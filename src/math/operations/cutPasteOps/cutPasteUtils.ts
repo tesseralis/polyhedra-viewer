@@ -95,6 +95,7 @@ export const capOptionArgs: CapOptionArgs<PolyhedronSpecs> = {
   },
 
   *allOptionCombos({ geom }) {
+    // FIXME this should be restricted (e.g. for diminished icosahedron)
     for (const cap of Cap.getAll(geom)) yield { cap }
   },
 
