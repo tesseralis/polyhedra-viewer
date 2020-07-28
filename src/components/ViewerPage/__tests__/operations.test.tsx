@@ -95,7 +95,7 @@ describe("Viewer operations panel", () => {
   })
 
   it("immediately applies operations without options", () => {
-    renderViewer("tetrahedron")
+    renderViewer("triangular pyramid")
     clickOperation("elongate")
     expectSolid("elongated triangular pyramid")
   })
@@ -170,7 +170,8 @@ describe("Viewer operations panel", () => {
       expectSolid("pentagonal gyrocupolarotunda")
     })
 
-    it("correctly displays using options for the fastigium", () => {
+    // FIXME this doesn't apply any more
+    xit("correctly displays using options for the fastigium", () => {
       renderViewer("triangular prism")
       clickOperation("augment")
       expect(screen.queryByText("pyramid")).toBeInTheDocument()
