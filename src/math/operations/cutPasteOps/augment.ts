@@ -1,10 +1,10 @@
-import { mapValues, compact, xor, uniq, pickBy } from "lodash-es"
+import { mapValues, compact, pickBy } from "lodash-es"
 
 import Prismatic from "data/specs/Prismatic"
 import Capstone from "data/specs/Capstone"
 import Composite from "data/specs/Composite"
 import Elementary from "data/specs/Elementary"
-import { Polyhedron, Face, Cap } from "math/polyhedra"
+import { Polyhedron, Face, Cap, Edge } from "math/polyhedra"
 import { isInverse, PRECISION } from "math/geom"
 import { repeat, getCyclic, getSingle } from "utils"
 import { makeOperation } from "../Operation"
@@ -117,80 +117,6 @@ function canAugment(base: Face) {
   return false
 }
 
-// Computes the set equality of two arrays
-const setEquals = <T>(array1: T[], array2: T[]) =>
-  xor(array1, array2).length === 0
-
-function getBaseType(base: Face) {
-  const adjacentFaces = base.adjacentFaces()
-  const adjacentFaceCounts = uniq(adjacentFaces.map((f) => f.numSides))
-  if (setEquals(adjacentFaceCounts, [3, 4])) {
-    return "cupola"
-  } else if (setEquals(adjacentFaceCounts, [4])) {
-    return "prism"
-  } else if (setEquals(adjacentFaceCounts, [3])) {
-    return "pyramidOrAntiprism"
-  } else if (setEquals(adjacentFaceCounts, [3, 5])) {
-    return "rotunda"
-  } else if (setEquals(adjacentFaceCounts, [4, 5])) {
-    return "rhombicosidodecahedron"
-  } else {
-    return "truncated"
-  }
-}
-
-function isCupolaRotunda(baseType: string, augmentType: string) {
-  return setEquals(["cupola", "rotunda"], [baseType, augmentType])
-}
-
-// TODO redo this function to rely on tableUtils instead
-// Return true if the base and augmentee are aligned
-function isAligned(
-  polyhedron: Polyhedron,
-  base: Face,
-  underside: Face,
-  gyrate: string | undefined,
-  augmentType: string,
-) {
-  if (augmentType === "pyramid") return true
-  const baseType = getBaseType(base)
-  if (baseType === "pyramidOrAntiprism") {
-    return true
-  }
-
-  if (baseType === "prism" && Cap.getAll(polyhedron).length === 0) {
-    return true
-  }
-
-  if (baseType !== "truncated" && !gyrate) {
-    throw new Error(`Must define 'gyrate' for augmenting ${baseType} `)
-  }
-
-  const adjFace =
-    baseType === "prism" ? oppositeFace(base.edges[0]) : base.adjacentFaces()[0]
-  const alignedFace = getCyclic(underside.adjacentFaces(), -1)
-
-  if (baseType === "rhombicosidodecahedron") {
-    const isOrtho = (adjFace.numSides !== 4) === (alignedFace.numSides !== 4)
-    return isOrtho === (gyrate === "ortho")
-  }
-
-  // It's orthogonal if triangle faces are aligned or non-triangle faces are aligned
-  const isOrtho = (adjFace.numSides !== 3) === (alignedFace.numSides !== 3)
-
-  if (baseType === "truncated") {
-    return !isOrtho
-  }
-
-  // "ortho" or "gyro" is actually determined by whether the *tops* are aligned, not the bottoms
-  // So for a cupola-rotunda, it's actually the opposite of everything else
-  if (isCupolaRotunda(Cap.getAll(polyhedron)[0].type, augmentType)) {
-    return isOrtho !== (gyrate === "ortho")
-  }
-
-  return isOrtho === (gyrate === "ortho")
-}
-
 function getAugmentee(augmentType: AugmentType, numSides: number) {
   const index = ["cupola", "rotunda"].includes(augmentType)
     ? numSides / 2
@@ -198,8 +124,8 @@ function getAugmentee(augmentType: AugmentType, numSides: number) {
   return augmentData[augmentType][index]
 }
 
-function isFastigium(augmentType: string, numSides: number) {
-  return augmentType === "cupola" && numSides === 4
+function defaultCrossAxis(edge: Edge) {
+  return true
 }
 
 // Augment the following
@@ -208,39 +134,32 @@ function doAugment(
   polyhedron: Polyhedron,
   base: Face,
   augmentType: AugmentType,
-  gyrate?: string,
+  baseCrossAxis: (edge: Edge) => boolean = defaultCrossAxis,
+  augmenteeCrossAxis: (edge: Edge) => boolean = defaultCrossAxis,
 ) {
   const numSides = base.numSides
   const augmentee = getAugmentee(augmentType, numSides)
   const underside = augmentee.faceWithNumSides(base.numSides)
 
-  // Determine the orientations of the underside and the base
-  const undersideRadius = underside.vertices[0].vec
-    .sub(underside.centroid())
-    .getNormalized()
-
-  const baseIsAligned = isAligned(
-    polyhedron,
-    base,
-    underside,
-    isFastigium(augmentType, numSides) ? "gyro" : gyrate,
-    augmentType,
-  )
-  const offset = baseIsAligned ? 0 : 1
-  const baseRadius = base.vertices[offset].vec
-    .sub(base.centroid())
-    .getNormalized()
-
   const augmenteePose: Pose = {
     origin: underside.centroid(),
     scale: augmentee.edgeLength(),
-    orientation: [underside.normal().getInverted(), undersideRadius],
+    orientation: [
+      underside.normal().getInverted(),
+      underside.edges
+        .find(augmenteeCrossAxis)!
+        .midpoint()
+        .sub(underside.centroid()),
+    ],
   }
 
   const basePose: Pose = {
     origin: base.centroid(),
     scale: base.sideLength(),
-    orientation: [base.normal(), baseRadius],
+    orientation: [
+      base.normal(),
+      base.edges.find(baseCrossAxis)!.midpoint().sub(base.centroid()),
+    ],
   }
 
   const alignedAugmentee = alignPolyhedron(
@@ -377,7 +296,31 @@ const augmentCapstone: CutPasteOpArgs<
     const augmentType = using
       ? getUsingType(using)
       : defaultAugmentType(face.numSides)
-    return doAugment(specs, geom, face, augmentType, gyrate)
+    let baseAxis, augAxis
+    // only matter if it's a bicupola that isn't gyroelongated
+    // FIXME simplify this
+    if (!specs.isPyramid() && !specs.isGyroelongated()) {
+      baseAxis = (edge: Edge) => {
+        if (specs.isShortened()) {
+          return edge.twinFace().numSides === 3
+        } else {
+          return oppositeFace(edge).numSides === 3
+        }
+      }
+      const isCupolaRotunda = new Set([specs.data.type, augmentType]).size === 2
+      if (gyrate === "ortho") {
+        augAxis = (edge: Edge) =>
+          isCupolaRotunda
+            ? edge.twinFace().numSides !== 3
+            : edge.twinFace().numSides === 3
+      } else {
+        augAxis = (edge: Edge) =>
+          isCupolaRotunda
+            ? edge.twinFace().numSides === 3
+            : edge.twinFace().numSides !== 3
+      }
+    }
+    return doAugment(specs, geom, face, augmentType, baseAxis, augAxis)
   },
 
   canApplyTo(specs) {
@@ -402,8 +345,14 @@ const augmentAugmentedSolids: CutPasteOpArgs<
   PolyhedronForme<Composite>
 > = {
   apply({ specs, geom }, { face }) {
+    let baseAxis, augAxis
+    const { source } = specs.data
+    if (source.isClassical() && source.isTruncated()) {
+      baseAxis = (edge: Edge) => edge.twinFace().numSides !== 3
+      augAxis = (edge: Edge) => edge.twinFace().numSides === 3
+    }
     const augmentType = defaultAugmentType(face.numSides)
-    return doAugment(specs, geom, face, augmentType)
+    return doAugment(specs, geom, face, augmentType, baseAxis, augAxis)
   },
 
   canApplyTo(specs) {
@@ -462,7 +411,17 @@ const augmentRhombicosidodecahedron: CutPasteOpArgs<
 > = {
   apply({ specs, geom }, { face, gyrate }) {
     const augmentType = defaultAugmentType(face.numSides)
-    return doAugment(specs, geom, face, augmentType, gyrate)
+    return doAugment(
+      specs,
+      geom,
+      face,
+      augmentType,
+      (edge) => edge.twinFace().numSides === 4,
+      (edge) =>
+        gyrate === "ortho"
+          ? edge.twinFace().numSides === 4
+          : edge.twinFace().numSides !== 4,
+    )
   },
 
   canApplyTo(specs) {
