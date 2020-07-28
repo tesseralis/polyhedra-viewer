@@ -132,11 +132,10 @@ const cantellatedDists = createObject([3, 4, 5], (family: Family) => {
 })
 
 function calcTruncatedDist(family: Family, facet: Facet) {
-  const _facet = family === 3 ? undefined : facet
   const specs = Classical.query.withData({
     family,
     operation: "truncate",
-    facet: _facet,
+    facet,
   })
   const geom = getGeometry(specs)
   const face = geom.largestFace()
