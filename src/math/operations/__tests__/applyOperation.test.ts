@@ -12,6 +12,7 @@ const goodOperations = [
   "dual",
   "expand",
   "snub",
+  "contract",
 ]
 
 describe("applyOperation", () => {

@@ -64,8 +64,8 @@ describe("contract", () => {
 
     it("works on snub polyhedra", () => {
       expectApplyTo("icosahedron")
-      expectApplyTo("snub cube")
-      expectApplyTo("snub dodecahedron")
+      expectApplyTo("snub cuboctahedron")
+      expectApplyTo("snub icosidodecahedron")
     })
 
     it("works on bevelled polyhedra", () => {
@@ -93,8 +93,8 @@ describe("twist", () => {
 
       // snub
       expectApplyTo("icosahedron")
-      expectApplyTo("snub cube")
-      expectApplyTo("snub dodecahedron")
+      expectApplyTo("snub cuboctahedron")
+      expectApplyTo("snub icosidodecahedron")
     })
   })
 
@@ -105,8 +105,8 @@ describe("twist", () => {
 
       expectHasOptions("cuboctahedron", false)
       expectHasOptions("icosahedron", false)
-      expectHasOptions("snub cube", false)
-      expectHasOptions("snub dodecahedron", false)
+      expectHasOptions("snub cuboctahedron", false)
+      expectHasOptions("snub icosidodecahedron", false)
     })
   })
 })
