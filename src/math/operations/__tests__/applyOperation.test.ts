@@ -8,8 +8,10 @@ import { validateOperationApplication } from "../operationTestUtils"
 const goodOperations = [
   "truncate",
   "rectify",
-  // "sharpen",
+  "sharpen",
   "dual",
+  "expand",
+  // "snub",
 ]
 
 describe("applyOperation", () => {
