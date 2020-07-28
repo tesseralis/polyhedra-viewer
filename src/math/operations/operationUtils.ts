@@ -185,7 +185,7 @@ export function deduplicateVertices(polyhedron: Polyhedron) {
  * This defaults to the vertices of the polyhedron attached to the first `VertexList`.
  */
 export function getTransformedVertices<T extends VertexList>(
-  vLists: T[],
+  vLists: readonly T[],
   iteratee: (key: T) => Transform | Vec3D,
   vertices: Vertex[] = vLists[0].polyhedron.vertices,
 ) {
