@@ -7,6 +7,7 @@ import { deduplicateVertices } from "./operationUtils"
 import { Point } from "types"
 import PolyhedronSpecs from "data/specs/PolyhedronSpecs"
 import PolyhedronForme from "math/formes/PolyhedronForme"
+import createForme from "math/formes/createForme"
 
 type SelectState = "selected" | "selectable" | undefined
 
@@ -148,10 +149,7 @@ function normalizeOpResult(
   const endColors = getFaceColors(end)
 
   return {
-    result: {
-      geom: normedResult.withName(newSpecs.name()),
-      specs: newSpecs,
-    },
+    result: createForme(newSpecs, normedResult.withName(newSpecs.name())),
     animationData: {
       start,
       endVertices: endVertices.map(normalizeVertex),

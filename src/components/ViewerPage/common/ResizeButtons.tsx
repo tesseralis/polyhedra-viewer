@@ -3,6 +3,7 @@ import { useStyle, scales } from "styles"
 
 import { TransitionCtx, PolyhedronCtx } from "components/ViewerPage/context"
 
+import createForme from "math/formes/createForme"
 import { Polyhedron } from "math/polyhedra"
 import { andaleMono } from "styles/fonts"
 import { hover } from "styles/common"
@@ -48,7 +49,9 @@ export default function ResizeButtons() {
           key={name}
           disabled={isTransitioning}
           onClick={() =>
-            setPolyhedron({ ...polyhedron, geom: handler(polyhedron.geom) })
+            setPolyhedron(
+              createForme(polyhedron.specs, handler(polyhedron.geom)),
+            )
           }
         >
           {name}
