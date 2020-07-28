@@ -1,5 +1,5 @@
 import { sum } from "lodash-es"
-import { Polyhedron, Face, Edge, VertexArg, Cap } from "math/polyhedra"
+import { Polyhedron, Face, Edge, VertexArg } from "math/polyhedra"
 import Classical, { Operation as OpName } from "data/specs/Classical"
 import Composite from "data/specs/Composite"
 import { makeOpPair, combineOps, Pose } from "./operationPairs"
@@ -10,8 +10,10 @@ import {
   FacetOpts,
   getTransformedVertices,
 } from "./operationUtils"
-import PolyhedronForme from "math/formes/PolyhedronForme"
 import ClassicalForme from "math/formes/ClassicalForme"
+import CompositeForme, {
+  AugmentedClassicalForme,
+} from "math/formes/CompositeForme"
 
 /**
  * Returns the point to sharpen given parameters in the following setup:
@@ -243,7 +245,7 @@ const ambos = makeTruncateTrio({
   },
 })
 
-const augTruncate = makeOpPair({
+const augTruncate = makeOpPair<Composite, AugmentedClassicalForme>({
   graph: Composite.query
     .where((s) => {
       const source = s.data.source
@@ -261,33 +263,12 @@ const augTruncate = makeOpPair({
       }),
     })),
   middle: "right",
-  getPose($, { geom, specs }) {
-    const source = specs.data.source
-    const isTetrahedron =
-      source.isClassical() && source.isTetrahedral() && source.isRegular()
-
-    // If source is a tetrahedron, take only the first cap (the other is the base)
-    let caps = Cap.getAll(geom)
-    if (isTetrahedron) {
-      caps = [caps[0]]
-    }
-    const capVertIndices = caps.flatMap((cap) =>
-      cap.innerVertices().map((v) => v.index),
-    )
-    const sourceVerts = geom.vertices.filter(
-      (v) => !capVertIndices.includes(v.index),
-    )
+  getPose($, forme) {
+    const { specs } = forme
+    const caps = forme.caps()
     // Calculate the centroid *only* for the source polyhedra
-    const centroid = getCentroid(sourceVerts.map((v) => v.vec))
-    function isSourceFace(face: Face) {
-      return face.vertices.every((v) => !capVertIndices.includes(v.index))
-    }
-    function isBaseFace(face: Face) {
-      return isTetrahedron || face.numSides > 3
-    }
-    const scaleFace = geom.faces.find((f) => isSourceFace(f) && isBaseFace(f))!
+    const centroid = forme.sourceCentroid()
     const cap = caps[0]
-    const mainAxis = cap.normal()
     const boundary = cap.boundary()
 
     let crossAxis
@@ -299,28 +280,21 @@ const augTruncate = makeOpPair({
       crossAxis = caps[1].normal()
     } else {
       crossAxis = boundary.edges
-        .find((e) => isBaseFace(e.twinFace()))!
+        .find((e) => forme.isMainFace(e.twinFace()))!
         .midpoint()
         .sub(boundary.centroid())
     }
 
     return {
       origin: centroid,
-      scale: scaleFace.centroid().distanceTo(centroid),
-      orientation: [mainAxis, crossAxis],
+      scale: forme.mainFace().centroid().distanceTo(centroid),
+      orientation: [cap.normal(), crossAxis],
     }
   },
-  toLeft({ geom }) {
-    const capVertIndices = Cap.getAll(geom).flatMap((cap) =>
-      cap.innerVertices().map((v) => v.index),
-    )
-    const sourceFaces = geom.faces.filter((f) =>
-      f.vertices.every((v) => !capVertIndices.includes(v.index)),
-    )
-    const truncatedFaces = sourceFaces.filter((f) => f.numSides === 3)
-    const cupolaFaces = geom.faces.filter((f) =>
-      f.vertices.every((v) => capVertIndices.includes(v.index)),
-    )
+  toLeft(forme) {
+    const truncatedFaces = forme.minorFaces()
+    // the inner faces of the caps
+    const cupolaFaces = forme.innerCapFaces()
     return getTransformedVertices(
       [...truncatedFaces, ...cupolaFaces],
       (face) => {
@@ -334,24 +308,24 @@ const augTruncate = makeOpPair({
 
           return getSharpenPoint(face, v.vec, otherFace.centroid())
         } else {
-          const edge = face.edges.find((e) => e.twinFace().numSides > 5)!
+          const edge = face.edges.find((e) => forme.isMainFace(e.twinFace()))!
           return getSharpenPointEdge(face, edge)
         }
       },
     )
   },
-  createForme: (specs, geom) => new PolyhedronForme(specs, geom),
+  createForme: (specs, geom) => new AugmentedClassicalForme(specs, geom),
 })
 
 // Exported operations
 
 export const truncate = new Operation(
   "truncate",
-  combineOps<
-    Classical | Composite,
-    ClassicalForme | PolyhedronForme<Composite>,
-    any
-  >([regs.truncate.left, ambos.truncate.left, augTruncate.left]),
+  combineOps<Classical | Composite, ClassicalForme | CompositeForme, any>([
+    regs.truncate.left,
+    ambos.truncate.left,
+    augTruncate.left,
+  ]),
 )
 
 export const cotruncate = new Operation(
@@ -384,7 +358,7 @@ const hitOptArgs: Partial<OpArgs<FacetOpts, Classical, ClassicalForme>> = {
 export const sharpen = new Operation("sharpen", {
   ...combineOps<
     Classical | Composite,
-    ClassicalForme | PolyhedronForme<Composite>,
+    ClassicalForme | CompositeForme,
     FacetOpts
   >([
     regs.truncate.right,
