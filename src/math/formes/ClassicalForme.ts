@@ -110,7 +110,6 @@ export default abstract class ClassicalForme extends PolyhedronForme<
 }
 
 class RegularForme extends ClassicalForme {
-  // TODO deal with tetrahedral
   isFacetFace(face: Face, facet: Facet) {
     return facet === this.specs.data.facet
   }
@@ -155,7 +154,7 @@ class CantellatedForme extends ClassicalForme {
     )
   }
 
-  facetfaces(facet: Facet) {
+  facetFaces(facet: Facet) {
     if (!this.specs.isTetrahedral()) return super.facetFaces(facet)
     let f0 = this.geom.faceWithNumSides(3)
     if (facet === "vertex") {

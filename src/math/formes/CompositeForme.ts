@@ -1,3 +1,4 @@
+import { once } from "lodash-es"
 import PolyhedronForme from "./PolyhedronForme"
 import Composite from "data/specs/Composite"
 import { Polyhedron, Face, Cap } from "math/polyhedra"
@@ -16,12 +17,11 @@ export default class CompositeForme extends PolyhedronForme<Composite> {
     return new CompositeForme(specs, geom)
   }
 
-  protected capInnerVertIndices() {
-    // FIXME memoize this
+  protected capInnerVertIndices = once(() => {
     return new Set(
       this.caps().flatMap((cap) => cap.innerVertices().map((v) => v.index)),
     )
-  }
+  })
 
   private sourceVertices() {
     return this.geom.vertices.filter(

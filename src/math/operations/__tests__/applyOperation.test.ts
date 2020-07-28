@@ -5,6 +5,13 @@ import { Polyhedron } from "math/polyhedra"
 import getSpecs from "data/specs/getSpecs"
 import { validateOperationApplication } from "../operationTestUtils"
 
+const goodOperations = [
+  "truncate",
+  "rectify",
+  // "sharpen",
+  "dual",
+]
+
 describe("applyOperation", () => {
   const polyhedra = allSolidNames.map((name) => ({
     geom: Polyhedron.get(name),
@@ -12,6 +19,7 @@ describe("applyOperation", () => {
   }))
 
   forEach(operations, (operation, opName) => {
+    if (!goodOperations.includes(opName)) return
     describe(opName, () => {
       for (const polyhedron of polyhedra) {
         if (operation.canApplyTo(polyhedron)) {
