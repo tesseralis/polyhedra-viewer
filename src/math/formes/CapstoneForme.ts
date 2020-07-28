@@ -1,7 +1,7 @@
 import { maxBy, uniqBy } from "lodash-es"
 import PolyhedronForme from "./PolyhedronForme"
 import Capstone from "data/specs/Capstone"
-import { Polyhedron, Face, Cap } from "math/polyhedra"
+import { Polyhedron, Face, Cap, FaceLike } from "math/polyhedra"
 import { isInverse } from "math/geom"
 
 type Base = Face | Cap
@@ -15,6 +15,12 @@ export default abstract class CapstoneForme extends PolyhedronForme<Capstone> {
   }
 
   abstract bases(): readonly [Base, Base]
+
+  baseFaces(): [FaceLike, FaceLike] {
+    return this.bases().map((base) =>
+      base instanceof Cap ? base.boundary() : base,
+    ) as [FaceLike, FaceLike]
+  }
 }
 
 class MonoCapstoneForme extends CapstoneForme {

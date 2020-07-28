@@ -1,6 +1,5 @@
-import { sortBy } from "lodash-es"
 import { Twist } from "types"
-import { Cap, FaceLike, Edge } from "math/polyhedra"
+import { FaceLike, Edge } from "math/polyhedra"
 import { PrismaticType } from "data/specs/common"
 import PolyhedronSpecs from "data/specs/PolyhedronSpecs"
 import Capstone from "data/specs/Capstone"
@@ -116,20 +115,13 @@ function doTurn(forme: CapstoneForme | PrismaticForme, twist?: Twist) {
   return getScaledPrismVertices(forme, scale, twist)
 }
 
-const capTypeMap: Record<string, number> = { rotunda: 0, cupola: 1, pyramid: 2 }
-
 interface PrismOpArgs {
   // The list of *right* args
   query(data: Capstone): boolean
   rightElongation?: "prism" | "antiprism"
-  getOrientation(solid: CapstoneForme): [FaceLike, Edge]
 }
 
-function makePrismOp({
-  query,
-  rightElongation = "antiprism",
-  getOrientation,
-}: PrismOpArgs) {
+function makePrismOp({ query, rightElongation = "antiprism" }: PrismOpArgs) {
   const twist = rightElongation === "prism" ? undefined : "left"
   return (leftElongation: "prism" | null) => {
     return makeOpPair<Capstone, CapstoneForme>({
@@ -140,9 +132,10 @@ function makePrismOp({
           right: item,
         })),
       middle: "right",
-      getPose(side, solid) {
-        const [face, edge] = getOrientation(solid)
-        return getPose(face, edge, solid.specs.data.elongation, twist)
+      getPose(side, forme) {
+        const face = forme.baseFaces()[0]
+        const edge = face.edges.find((e) => e.face.numSides === 3)!
+        return getPose(face, edge, forme.specs.data.elongation, twist)
       },
       toLeft(forme) {
         const fn = leftElongation === "prism" ? doTurn : doShorten
@@ -173,53 +166,23 @@ const turnPrismatic = makeOpPair<Prismatic, PrismaticForme>({
 const _elongate = makePrismOp({
   query: (s) => !s.isDigonal(),
   rightElongation: "prism",
-  getOrientation(forme) {
-    const face = sortBy(
-      Cap.getAll(forme.geom),
-      (cap) => capTypeMap[cap.type],
-    )[0].boundary()
-    const edge = face.edges.find((e) => e.face.numSides === 3)!
-    return [face, edge]
-  },
 })(null)
 
 const canGyroelongPyramid = (s: Capstone) => s.isPyramid() && s.data.base > 3
 const canGyroelongCupola = (s: Capstone) => !s.isPyramid() && !s.isDigonal()
 
 const pyramidOps = makePrismOp({
-  query: (s) => canGyroelongPyramid(s) && s.isMono(),
-  getOrientation({ geom }) {
-    const face = geom.largestFace()
-    return [face, face.edges[0]]
-  },
+  query: (s) => canGyroelongPyramid(s),
 })
 const gyroelongPyramid = pyramidOps(null)
 const turnPyramid = pyramidOps("prism")
 
 const cupolaOps = makePrismOp({
   query: (s) => canGyroelongCupola(s) && s.isMono(),
-  getOrientation({ geom }) {
-    // Pick a cap, favoring rotunda over cupola in the case of cupolarotundae
-    const face = Cap.getAll(geom)[0].boundary()
-    const edge = face.edges.find((e) => e.face.numSides === 3)!
-    return [face, edge]
-  },
 })
 
 const gyroelongCupola = cupolaOps(null)
 const turnCupola = cupolaOps("prism")
-
-const bipyramidOps = makePrismOp({
-  query: (s) => canGyroelongPyramid(s) && s.isBi(),
-  getOrientation({ geom }) {
-    // Pick a cap, favoring rotunda over cupola in the case of cupolarotundae
-    const face = Cap.getAll(geom)[0].boundary()
-    return [face, face.edges[0]]
-  },
-})
-
-const gyroelongBipyramid = bipyramidOps(null)
-const turnBipyramid = bipyramidOps("prism")
 
 function makeBicupolaPrismOp(leftElongation: null | "prism") {
   return makeOpPair<Capstone, CapstoneForme, TwistOpts>({
@@ -246,15 +209,11 @@ function makeBicupolaPrismOp(leftElongation: null | "prism") {
         })
       }),
     middle: "right",
-    getPose(side, { specs, geom }, { right: { twist } }) {
+    getPose(side, forme, { right: { twist } }) {
       // Pick a cap, favoring rotunda over cupola in the case of cupolarotundae
-      const caps = Cap.getAll(geom)
-      const cap = specs.isCupolaRotunda()
-        ? caps.find((cap) => cap.type === "rotunda")!
-        : caps[0]
-      const face = cap.boundary()
+      const face = forme.baseFaces()[0]
       const edge = face.edges.find((e) => e.face.numSides === 3)!
-      return getPose(face, edge, specs.data.elongation, twist)
+      return getPose(face, edge, forme.specs.data.elongation, twist)
     },
     toLeft: (forme, { right: { twist } }) => {
       const fn = leftElongation === "prism" ? doTurn : doShorten
@@ -274,25 +233,16 @@ export const elongate = makeOperation("elongate", _elongate.left)
 export const gyroelongate = makeOperation(
   "gyroelongate",
   combineOps(
-    [
-      gyroelongPyramid,
-      gyroelongCupola,
-      gyroelongBipyramid,
-      gyroelongBicupola,
-    ].map((op) => op.left),
+    [gyroelongPyramid, gyroelongCupola, gyroelongBicupola].map((op) => op.left),
   ),
 )
 
 export const shorten = makeOperation(
   "shorten",
   combineOps(
-    [
-      _elongate,
-      gyroelongPyramid,
-      gyroelongCupola,
-      gyroelongBipyramid,
-      gyroelongBicupola,
-    ].map((op) => op.right),
+    [_elongate, gyroelongPyramid, gyroelongCupola, gyroelongBicupola].map(
+      (op) => op.right,
+    ),
   ),
 )
 
@@ -303,12 +253,9 @@ export const turn = makeOperation(
     PolyhedronForme<Capstone | Prismatic>,
     TwistOpts
   >(
-    [
-      turnPrismatic,
-      turnPyramid,
-      turnCupola,
-      turnBipyramid,
-      turnBicupola,
-    ].flatMap((op) => [op.left, op.right]),
+    [turnPrismatic, turnPyramid, turnCupola, turnBicupola].flatMap((op) => [
+      op.left,
+      op.right,
+    ]),
   ),
 )
