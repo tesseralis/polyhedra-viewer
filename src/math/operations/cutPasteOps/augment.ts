@@ -1,4 +1,4 @@
-import { mapValues, compact, pickBy } from "lodash-es"
+import { pickBy } from "lodash-es"
 
 import Prismatic from "data/specs/Prismatic"
 import Capstone from "data/specs/Capstone"
@@ -13,6 +13,7 @@ import {
   deduplicateVertices,
   alignPolyhedron,
   Pose,
+  getGeometry,
 } from "../operationUtils"
 import {
   inc,
@@ -26,30 +27,6 @@ import PolyhedronForme from "math/formes/PolyhedronForme"
 type AugmentSpecs = Prismatic | CutPasteSpecs
 
 type AugmentType = "pyramid" | "cupola" | "rotunda"
-
-// TODO simplify using Specs
-const augmentees: Record<AugmentType, Record<number, string>> = {
-  pyramid: {
-    3: "tetrahedron",
-    4: "square pyramid",
-    5: "pentagonal pyramid",
-  },
-
-  cupola: {
-    2: "triangular prism",
-    3: "triangular cupola",
-    4: "square cupola",
-    5: "pentagonal cupola",
-  },
-
-  rotunda: {
-    5: "pentagonal rotunda",
-  },
-}
-
-const augmentData = mapValues(augmentees, (type) =>
-  mapValues(type, Polyhedron.get),
-)
 
 const augmentTypes: Record<string, AugmentType> = {
   Y: "pyramid",
@@ -73,8 +50,13 @@ function getAugmentAlignment(polyhedron: Polyhedron, face: Face) {
 }
 
 function getPossibleAugmentees(n: number) {
-  const { pyramid, cupola, rotunda } = augmentData
-  return compact([pyramid[n], cupola[n / 2], rotunda[n / 2]])
+  if (n <= 5) {
+    return [getAugmentee("pyramid", n)]
+  } else if (n < 10) {
+    return [getAugmentee("cupola", n / 2)]
+  } else {
+    return [getAugmentee("cupola", n / 2), getAugmentee("rotunda", n / 2)]
+  }
 }
 
 // Checks to see if the polyhedron can be augmented at the base while remaining convex
@@ -96,8 +78,11 @@ function canAugmentWith(base: Face, augmentee: Polyhedron, offset: number) {
 function canAugmentWithType(base: Face, using: string) {
   const augmentType = getUsingType(using)
   const n = augmentType === "pyramid" ? base.numSides : base.numSides / 2
+  // FIXME maybe this should rely on Forme functions instead of dihedral angles
+  if (![2, 3, 4, 5].includes(n)) return false
+  if (augmentType === "rotunda" && n !== 5) return false
   for (const offset of [0, 1]) {
-    if (canAugmentWith(base, augmentData[augmentType][n], offset)) {
+    if (canAugmentWith(base, getAugmentee(augmentType, n), offset)) {
       return true
     }
   }
@@ -117,11 +102,17 @@ function canAugment(base: Face) {
   return false
 }
 
-function getAugmentee(augmentType: AugmentType, numSides: number) {
-  const index = ["cupola", "rotunda"].includes(augmentType)
-    ? numSides / 2
-    : numSides
-  return augmentData[augmentType][index]
+function getAugmentee(type: AugmentType, base: number) {
+  // FIXME withData doesn't work because of the null value
+  return getGeometry(
+    Capstone.query.where(
+      (s) =>
+        s.isMono() &&
+        s.isShortened() &&
+        s.data.base === base &&
+        s.data.type === type,
+    )[0],
+  )
 }
 
 function defaultCrossAxis(edge: Edge) {
@@ -138,7 +129,10 @@ function doAugment(
   augmenteeCrossAxis: (edge: Edge) => boolean = defaultCrossAxis,
 ) {
   const numSides = base.numSides
-  const augmentee = getAugmentee(augmentType, numSides)
+  const index = ["cupola", "rotunda"].includes(augmentType)
+    ? numSides / 2
+    : numSides
+  const augmentee = getAugmentee(augmentType, index)
   const underside = augmentee.faceWithNumSides(base.numSides)
 
   const augmenteePose: Pose = {
