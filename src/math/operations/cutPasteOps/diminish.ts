@@ -104,6 +104,30 @@ const diminishCapstone: CutPasteOpArgs<
   },
 }
 
+const diminishAugmentedSolids: CutPasteOpArgs<
+  CapOptions,
+  Composite,
+  PolyhedronForme<Composite>
+> = {
+  apply({ geom }, { cap }) {
+    return removeCap(geom, cap)
+  },
+  canApplyTo(specs) {
+    if (!specs.isComposite()) return false
+    return specs.isAugmented() && !specs.isDiminished()
+  },
+  getResult({ specs }) {
+    const { source, augmented } = specs.data
+    return specs.withData({
+      augmented: dec(augmented),
+      align:
+        augmented === 3 && source.canonicalName() !== "triangular prism"
+          ? "meta"
+          : undefined,
+    })
+  },
+}
+
 // FIXME do octahedron and rhombicuboctahedron as well
 const diminishIcosahedron: CutPasteOpArgs<
   CapOptions,
@@ -183,6 +207,7 @@ const diminishElementary: CutPasteOpArgs<
 export const diminish = makeOperation("diminish", {
   ...combineOps<CapOptions, CutPasteSpecs, PolyhedronForme<CutPasteSpecs>>([
     diminishCapstone,
+    diminishAugmentedSolids,
     diminishIcosahedron,
     diminishIcosidodecahedron,
     diminishElementary,
