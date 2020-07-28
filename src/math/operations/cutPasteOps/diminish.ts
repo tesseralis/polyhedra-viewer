@@ -92,13 +92,6 @@ export const diminish = makeOperation<Options, CutPasteSpecs>("diminish", {
     return false
   },
 
-  isPreferredSpec(info) {
-    if (info.canonicalName() === "gyroelongated pentagonal pyramid") {
-      return info.isComposite()
-    }
-    return true
-  },
-
   getResult({ specs, geom }, { cap }) {
     if (specs.isCapstone()) {
       const { count, elongation, base, type } = specs.data
