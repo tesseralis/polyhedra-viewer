@@ -281,8 +281,7 @@ const _snub = makeOpPair<Classical, ClassicalForme, TwistOpts, FacetOpts>({
   toLeft(forme, { right: { facet } }, result) {
     // Take all the stuff and push it inwards
     return getResizedVertices(
-      // FIXME get rid of this side thing
-      forme.facetFaces(result.data.facet || "face"),
+      forme.facetFaces(result.data.facet!),
       getInradius(result),
       getSnubAngle(forme.specs, facet),
     )
