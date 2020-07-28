@@ -306,11 +306,6 @@ function getUsingType(using: string) {
 }
 
 function getUsingOpts(info: AugmentSpecs) {
-  // Triangular prism or fastigium
-  if (info.canonicalName() === "triangular prism") {
-    return ["Y4", "U2"]
-  }
-
   if (hasRotunda(info)) {
     return ["U5", "R5"]
   }

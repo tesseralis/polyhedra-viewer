@@ -15,6 +15,8 @@ import {
   CutPasteSpecs,
   getCapAlignment,
   getCupolaGyrate,
+  CapOptions,
+  capOptionArgs,
 } from "./cutPasteUtils"
 
 function removeCap(polyhedron: Polyhedron, cap: Cap) {
@@ -63,10 +65,7 @@ function removeCap(polyhedron: Polyhedron, cap: Cap) {
   }
 }
 
-interface Options {
-  cap: Cap
-}
-export const diminish = makeOperation<Options, CutPasteSpecs>("diminish", {
+export const diminish = makeOperation<CapOptions, CutPasteSpecs>("diminish", {
   apply({ geom }, { cap }) {
     return removeCap(geom, cap)
   },
@@ -151,26 +150,5 @@ export const diminish = makeOperation<Options, CutPasteSpecs>("diminish", {
     throw new Error()
   },
 
-  hasOptions() {
-    return true
-  },
-
-  *allOptionCombos({ geom }) {
-    for (const cap of Cap.getAll(geom)) yield { cap }
-  },
-
-  hitOption: "cap",
-  getHitOption({ geom }, hitPnt) {
-    const cap = Cap.find(geom, hitPnt)
-    return cap ? { cap } : {}
-  },
-
-  faceSelectionStates({ geom }, { cap }) {
-    const allCapFaces = Cap.getAll(geom).flatMap((cap) => cap.faces())
-    return geom.faces.map((face) => {
-      if (cap instanceof Cap && face.inSet(cap.faces())) return "selected"
-      if (face.inSet(allCapFaces)) return "selectable"
-      return undefined
-    })
-  },
+  ...capOptionArgs,
 })

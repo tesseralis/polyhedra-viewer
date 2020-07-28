@@ -3,21 +3,24 @@ import { Polyhedron, Cap } from "math/polyhedra"
 import { mapObject } from "utils"
 import Capstone from "data/specs/Capstone"
 import Composite from "data/specs/Composite"
-import { inc, dec, getCapAlignment, getCupolaGyrate } from "./cutPasteUtils"
+import {
+  inc,
+  dec,
+  getCapAlignment,
+  getCupolaGyrate,
+  CapOptions,
+  capOptionArgs,
+} from "./cutPasteUtils"
 import { getTransformedVertices } from "../operationUtils"
 import { makeOperation } from "../Operation"
 
 const TAU = 2 * Math.PI
 
-interface Options {
-  cap: Cap
-}
-
 export function isGyrated(cap: Cap) {
   return getCupolaGyrate(cap) === "ortho"
 }
 
-function applyGyrate(polyhedron: Polyhedron, { cap }: Options) {
+function applyGyrate(polyhedron: Polyhedron, { cap }: CapOptions) {
   // get adjacent faces
   const boundary = cap.boundary()
 
@@ -97,27 +100,6 @@ export const gyrate = makeOperation<{ cap: Cap }, Capstone | Composite>(
       }
     },
 
-    hasOptions() {
-      return true
-    },
-
-    *allOptionCombos({ geom }) {
-      for (const cap of Cap.getAll(geom)) yield { cap }
-    },
-
-    hitOption: "cap",
-    getHitOption({ geom }, hitPnt) {
-      const cap = Cap.find(geom, hitPnt)
-      return cap ? { cap } : {}
-    },
-
-    faceSelectionStates({ geom }, { cap }) {
-      const allCapFaces = Cap.getAll(geom).flatMap((cap) => cap.faces())
-      return geom.faces.map((face) => {
-        if (cap instanceof Cap && face.inSet(cap.faces())) return "selected"
-        if (face.inSet(allCapFaces)) return "selectable"
-        return undefined
-      })
-    },
+    ...capOptionArgs,
   },
 )

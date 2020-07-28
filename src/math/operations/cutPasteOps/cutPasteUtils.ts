@@ -4,6 +4,9 @@ import { isInverse } from "math/geom"
 import Capstone from "data/specs/Capstone"
 import Composite from "data/specs/Composite"
 import Elementary from "data/specs/Elementary"
+import { OpArgs } from "../Operation"
+import PolyhedronSpecs from "data/specs/PolyhedronSpecs"
+import PolyhedronForme from "math/formes/PolyhedronForme"
 
 export type CutPasteSpecs = Capstone | Composite | Elementary
 
@@ -39,4 +42,37 @@ export function getCapAlignment(polyhedron: Polyhedron, cap: Cap) {
       : polyhedron.largestFace().normal()
 
   return isInverse(cap.normal(), otherNormal) ? "para" : "meta"
+}
+
+export interface CapOptions {
+  cap: Cap
+}
+
+export const capOptionArgs: Partial<OpArgs<
+  CapOptions,
+  PolyhedronSpecs,
+  PolyhedronForme<PolyhedronSpecs>
+>> = {
+  hasOptions() {
+    return true
+  },
+
+  *allOptionCombos({ geom }) {
+    for (const cap of Cap.getAll(geom)) yield { cap }
+  },
+
+  hitOption: "cap",
+  getHitOption({ geom }, hitPnt) {
+    const cap = Cap.find(geom, hitPnt)
+    return cap ? { cap } : {}
+  },
+
+  faceSelectionStates({ geom }, { cap }) {
+    const allCapFaces = Cap.getAll(geom).flatMap((cap) => cap.faces())
+    return geom.faces.map((face) => {
+      if (cap instanceof Cap && face.inSet(cap.faces())) return "selected"
+      if (face.inSet(allCapFaces)) return "selectable"
+      return undefined
+    })
+  },
 }
