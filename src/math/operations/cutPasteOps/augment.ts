@@ -2,6 +2,7 @@ import { mapValues, compact, xor, uniq, pickBy } from "lodash-es"
 
 import Prismatic from "data/specs/Prismatic"
 import Capstone from "data/specs/Capstone"
+import Composite from "data/specs/Composite"
 import Elementary from "data/specs/Elementary"
 import { Polyhedron, Face, Cap } from "math/polyhedra"
 import { isInverse, getOrthonormalTransform, PRECISION } from "math/geom"
@@ -9,7 +10,14 @@ import { repeat, getCyclic, getSingle } from "utils"
 import { makeOperation } from "../Operation"
 import { withOrigin } from "../../geom"
 import { oppositeFace, deduplicateVertices } from "../operationUtils"
-import { inc, dec, CutPasteSpecs } from "./cutPasteUtils"
+import {
+  inc,
+  dec,
+  CutPasteSpecs,
+  CutPasteOpArgs,
+  combineOps,
+} from "./cutPasteUtils"
+import PolyhedronForme from "math/formes/PolyhedronForme"
 
 type AugmentSpecs = Prismatic | CutPasteSpecs
 
@@ -334,7 +342,43 @@ interface Options {
   gyrate?: GyrateOpts
   using?: string
 }
-export const augment = makeOperation<Options, AugmentSpecs>("augment", {
+
+const augmentPrismatic: CutPasteOpArgs<
+  Options,
+  Prismatic,
+  PolyhedronForme<Prismatic>
+> = {
+  apply({ specs, geom }, { face, using }) {
+    const augmentType = using
+      ? getUsingType(using)
+      : defaultAugmentType(face.numSides)
+    return doAugment(specs, geom, face, augmentType)
+  },
+
+  canApplyTo(specs) {
+    if (!specs.isPrismatic()) return false
+    const { base } = specs.data
+    if (specs.isAntiprism() && base === 3) return false
+    return base > 2
+  },
+
+  getResult({ specs }, { face, using }) {
+    const n = face.numSides
+    const { type, base } = getUsingData(getUsingOpt(n, using))
+    return Capstone.query.withData({
+      count: 1,
+      elongation: specs.data.type,
+      type,
+      base: base as any,
+    })
+  },
+}
+
+const augmentCapstone: CutPasteOpArgs<
+  Options,
+  Capstone,
+  PolyhedronForme<Capstone>
+> = {
   apply({ specs, geom }, { face, gyrate, using }) {
     const augmentType = using
       ? getUsingType(using)
@@ -342,86 +386,139 @@ export const augment = makeOperation<Options, AugmentSpecs>("augment", {
     return doAugment(specs, geom, face, augmentType, gyrate)
   },
 
-  canApplyTo(info) {
-    if (info.isPrismatic()) {
-      const { base } = info.data
-      if (info.isAntiprism() && base === 3) return false
-      return base > 2
-    }
-    if (info.isCapstone()) {
-      return info.isMono()
-    }
-    if (info.isComposite()) {
-      const { source, diminished, augmented } = info.data
-      if (source.canonicalName() === "rhombicosidodecahedron") {
-        return diminished > 0
-      }
-      if (source.canonicalName() === "icosahedron") {
-        return diminished > 0 && augmented === 0
-      }
-      if (source.isPrismatic()) {
-        return (
-          augmented < (source.data.base % 3 === 0 ? 3 : 2) && !info.isPara()
-        )
-      }
-      if (source.isClassical()) {
-        return augmented < source.data.family - 2 && !info.isPara()
-      }
-    }
-    if (info.isElementary()) {
-      return info.canonicalName() === "sphenocorona"
-    }
-    return false
+  canApplyTo(specs) {
+    if (!specs.isCapstone()) return false
+    return specs.isMono()
   },
 
-  getResult({ specs, geom }, { face, using, gyrate }) {
+  getResult({ specs }, { face, using, gyrate }) {
     const n = face.numSides
     const { type, base } = getUsingData(getUsingOpt(n, using))
-    if (specs.isPrismatic()) {
-      return Capstone.query.withData({
-        count: 1,
-        elongation: specs.data.type,
-        type,
-        base: base as any,
-      })
-    }
-    if (specs.isCapstone()) {
-      return specs.withData({
-        count: 2,
-        gyrate: base === 2 ? "gyro" : gyrate,
-        type: type === specs.data.type ? type : "cupolarotunda",
-      })
-    }
-    if (specs.isComposite()) {
-      const { source, augmented, diminished, gyrate: gyrated } = specs.data
-      if (source.canonicalName() === "rhombicosidodecahedron") {
-        if (gyrate === "ortho") {
-          return specs.withData({
-            gyrate: inc(gyrated),
-            diminished: dec(diminished),
-          })
-        } else {
-          return specs.withData({ diminished: dec(diminished), align: "meta" })
-        }
-      }
-      if (source.canonicalName() === "icosahedron") {
-        if (base === 3) {
-          return specs.withData({ augmented: 1 })
-        }
-        return specs.withData({ diminished: dec(diminished), align: "meta" })
-      }
-      return specs.withData({
-        augmented: inc(augmented),
-        align: hasAugmentAlignment(specs)
-          ? getAugmentAlignment(geom, face)
-          : undefined,
-      })
-    }
-    if (specs.isElementary()) {
-      return Elementary.query.withName("augmented sphenocorona")
-    }
-    throw new Error()
+    return specs.withData({
+      count: 2,
+      gyrate: base === 2 ? "gyro" : gyrate,
+      type: type === specs.data.type ? type : "cupolarotunda",
+    })
   },
+}
+
+const augmentAugmentedSolids: CutPasteOpArgs<
+  Options,
+  Composite,
+  PolyhedronForme<Composite>
+> = {
+  apply({ specs, geom }, { face }) {
+    const augmentType = defaultAugmentType(face.numSides)
+    return doAugment(specs, geom, face, augmentType)
+  },
+
+  canApplyTo(specs) {
+    if (!specs.isComposite()) return false
+    const { source, augmented } = specs.data
+    if (source.isPrismatic()) {
+      return augmented < (source.data.base % 3 === 0 ? 3 : 2) && !specs.isPara()
+    }
+    return augmented < source.data.family - 2 && !specs.isPara()
+  },
+
+  getResult({ specs, geom }, { face }) {
+    return specs.withData({
+      augmented: inc(specs.data.augmented),
+      align: hasAugmentAlignment(specs)
+        ? getAugmentAlignment(geom, face)
+        : undefined,
+    })
+  },
+}
+
+// FIXME deal with augmented octahedron and rhombicuboctahedron
+const augmentIcosahedron: CutPasteOpArgs<
+  Options,
+  Composite,
+  PolyhedronForme<Composite>
+> = {
+  apply({ specs, geom }, { face }) {
+    const augmentType = defaultAugmentType(face.numSides)
+    return doAugment(specs, geom, face, augmentType)
+  },
+
+  canApplyTo(specs) {
+    if (!specs.isComposite()) return false
+    const { source, diminished, augmented } = specs.data
+    if (source.canonicalName() !== "icosahedron") return false
+    return diminished > 0 && augmented === 0
+  },
+
+  getResult({ specs }, { face }) {
+    const n = face.numSides
+    if (n === 3) {
+      return specs.withData({ augmented: 1 })
+    }
+    return specs.withData({
+      diminished: dec(specs.data.diminished),
+      align: "meta",
+    })
+  },
+}
+
+const augmentRhombicosidodecahedron: CutPasteOpArgs<
+  Options,
+  Composite,
+  PolyhedronForme<Composite>
+> = {
+  apply({ specs, geom }, { face, gyrate }) {
+    const augmentType = defaultAugmentType(face.numSides)
+    return doAugment(specs, geom, face, augmentType, gyrate)
+  },
+
+  canApplyTo(specs) {
+    if (!specs.isComposite()) return false
+    const { source, diminished } = specs.data
+    if (source.canonicalName() !== "rhombicosidodecahedron") return false
+    return diminished > 0
+  },
+
+  getResult({ specs }, { gyrate }) {
+    const { diminished, gyrate: gyrated } = specs.data
+    if (gyrate === "ortho") {
+      return specs.withData({
+        gyrate: inc(gyrated),
+        diminished: dec(diminished),
+      })
+    } else {
+      return specs.withData({ diminished: dec(diminished), align: "meta" })
+    }
+  },
+}
+
+const augmentElementary: CutPasteOpArgs<
+  Options,
+  Elementary,
+  PolyhedronForme<Elementary>
+> = {
+  apply({ specs, geom }, { face }) {
+    const augmentType = defaultAugmentType(face.numSides)
+    return doAugment(specs, geom, face, augmentType)
+  },
+
+  canApplyTo(specs) {
+    return specs.canonicalName() === "sphenocorona"
+  },
+
+  getResult() {
+    return Elementary.query.withName("augmented sphenocorona")
+  },
+}
+
+export const augment = makeOperation<Options, CutPasteSpecs>("augment", {
+  ...combineOps<Options, CutPasteSpecs, PolyhedronForme<CutPasteSpecs>>([
+    augmentPrismatic,
+    augmentCapstone,
+    augmentIcosahedron,
+    augmentRhombicosidodecahedron,
+    augmentAugmentedSolids,
+    augmentElementary,
+  ]),
 
   hasOptions() {
     return true
