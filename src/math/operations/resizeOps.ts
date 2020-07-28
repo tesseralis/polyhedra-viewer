@@ -211,14 +211,11 @@ const semiExpand = makeOpPair<Classical, ClassicalForme, {}, FacetOpts>({
     const { geom } = forme
     if (pos === "left") {
       const face = forme.mainFacetFace()
-      // FIXME see if we can move this to a Forme method?
-      const edge = face.edges.find(
-        (e) => e.twinFace().numSides === face.numSides,
-      )!
+      const edge = face.edges.find((e) => forme.isMainFacetFace(e.twinFace()))!
       return getPose(geom, face, apothemVec(edge))
     } else {
       const face = forme.facetFace(facet)
-      const edge = face.edges.find((e) => e.twinFace().numSides === 4)!
+      const edge = face.edges.find((e) => forme.isEdgeFace(e.twinFace()))!
       return getPose(geom, face, apothemVec(edge))
     }
   },

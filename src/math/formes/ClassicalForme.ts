@@ -3,7 +3,7 @@ import PolyhedronForme from "./PolyhedronForme"
 import Classical, { Facet } from "data/specs/Classical"
 import { Polyhedron, Face, Edge } from "math/polyhedra"
 
-// FIXME dedupe
+// FIXME dedupe with operationUtils
 export function oppositeFace(edge: Edge, twist?: Twist) {
   switch (twist) {
     case "left":
@@ -80,6 +80,14 @@ export default abstract class ClassicalForme extends PolyhedronForme<
     return this.specs.data.facet === "vertex" ? "face" : "vertex"
   }
 
+  isMainFacetFace(face: Face) {
+    return this.isFacetFace(face, this.mainFacet())
+  }
+
+  isMinorFacetFace(face: Face) {
+    return this.isFacetFace(face, this.minorFacet())
+  }
+
   mainFacetFace() {
     return this.facetFace(this.mainFacet())
   }
@@ -142,6 +150,10 @@ class BevelledForme extends ClassicalForme {
       .filter((e) => e.twinFace().numSides === 4)
       .map((e) => oppositeFace(e))
     return [f0, ...rest]
+  }
+
+  isEdgeFace(face: Face) {
+    return face.numSides === 4
   }
 }
 
