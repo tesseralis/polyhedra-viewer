@@ -229,7 +229,6 @@ const semiExpand = makeOpPair<Classical, ClassicalForme, {}, FacetOpts>({
       bevelledDists[forme.specs.data.family][facet],
     )
   },
-  createForme: (specs, geom) => ClassicalForme.create(specs, geom),
 })
 
 const _expand = makeOpPair<Classical, ClassicalForme, {}, FacetOpts>({
@@ -258,7 +257,6 @@ const _expand = makeOpPair<Classical, ClassicalForme, {}, FacetOpts>({
       getInradius(result),
     )
   },
-  createForme: (specs, geom) => ClassicalForme.create(specs, geom),
 })
 
 const _snub = makeOpPair<Classical, ClassicalForme, TwistOpts, FacetOpts>({
@@ -293,7 +291,6 @@ const _snub = makeOpPair<Classical, ClassicalForme, TwistOpts, FacetOpts>({
       getSnubAngle(forme.specs, facet),
     )
   },
-  createForme: (specs, geom) => ClassicalForme.create(specs, geom),
 })
 
 const _twist = makeOpPair<Classical, ClassicalForme, TwistOpts, {}>({
@@ -321,7 +318,6 @@ const _twist = makeOpPair<Classical, ClassicalForme, TwistOpts, {}>({
       getSnubAngle(forme.specs, "face"),
     )
   },
-  createForme: (specs, geom) => ClassicalForme.create(specs, geom),
 })
 
 function getCantellatedMidradius(forme: ClassicalForme) {
@@ -383,7 +379,6 @@ const _dual = makeOpPair<Classical, ClassicalForme>({
   },
   toLeft: (forme) => doDualTransform(forme, "face"),
   toRight: (forme) => doDualTransform(forme, "vertex"),
-  createForme: (specs, geom) => ClassicalForme.create(specs, geom),
 })
 
 // Exported members

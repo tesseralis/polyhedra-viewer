@@ -96,7 +96,6 @@ function makeTruncateTrio<L extends OpName, M extends OpName, R extends OpName>(
       },
       toLeft: leftOp === "left" ? left.transformer : undefined,
       toRight: rightOp === "right" ? right.transformer : undefined,
-      createForme: (specs, geom) => ClassicalForme.create(specs, geom),
     })
   }
 
@@ -314,7 +313,6 @@ const augTruncate = makeOpPair<Composite, AugmentedClassicalForme>({
       },
     )
   },
-  createForme: (specs, geom) => new AugmentedClassicalForme(specs, geom),
 })
 
 // Exported operations

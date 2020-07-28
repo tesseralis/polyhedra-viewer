@@ -5,6 +5,7 @@ import { Plane, Vec3D, getOrthonormalTransform, withOrigin } from "math/geom"
 import { OpArgs, SolidArgs } from "./Operation"
 import { getGeometry } from "./operationUtils"
 import PolyhedronForme from "math/formes/PolyhedronForme"
+import createForme from "math/formes/createForme"
 
 export type Side = "left" | "right"
 
@@ -58,8 +59,6 @@ interface OpPairInput<
   toLeft?(solid: Forme, opts: GraphOpts<L, R>, result: Specs): VertexArg[]
   // Move the intermediate figure to the right position
   toRight?(solid: Forme, opts: GraphOpts<L, R>, result: Specs): VertexArg[]
-  // construct a new Forme
-  createForme(specs: Specs, geom: Polyhedron): Forme
 }
 
 function normalizeOrientation([u1, u2]: Orientation) {
@@ -150,12 +149,11 @@ class OpPair<
       getPose,
       toLeft = defaultGetter,
       toRight = defaultGetter,
-      createForme,
     } = this.inputs
     const entry = this.getEntry(side, solid.specs, opts)
     const options =
       entry.options ?? ({ left: {}, right: {} } as GraphOpts<L, R>)
-    const solidForme = createForme(solid.specs, solid.geom)
+    const solidForme = createForme(solid.specs, solid.geom) as Forme
     const startPose = getPose(side, solidForme, options)
 
     const endSide = oppositeSide(side)
@@ -163,7 +161,7 @@ class OpPair<
     const endGeom = getGeometry(endSpecs)
     const alignedEnd = alignPolyhedron(
       endGeom,
-      getPose(endSide, createForme(endSpecs, endGeom), options),
+      getPose(endSide, createForme(endSpecs, endGeom) as Forme, options),
       startPose,
     )
 
@@ -172,14 +170,16 @@ class OpPair<
       // If we receive a Side argument, set the middle to whichever end polyhedron
       // matches the side
       middle =
-        getMiddle === side ? solidForme : createForme(endSpecs, alignedEnd)
+        getMiddle === side
+          ? solidForme
+          : (createForme(endSpecs, alignedEnd) as Forme)
     } else {
       // Otherwise, we have to fetch the intermediate solid ourselves
       // const middleSolid = normalizeIntermediate(getMiddle(entry))
       const inter = getMiddle(entry)
       const middleSolid =
         inter instanceof PolyhedronSpecs
-          ? createForme(inter, getGeometry(inter))
+          ? (createForme(inter, getGeometry(inter)) as Forme)
           : inter
 
       const alignedInter = alignPolyhedron(
@@ -187,7 +187,7 @@ class OpPair<
         getPose("middle", middleSolid, options),
         startPose,
       )
-      middle = createForme(middleSolid.specs, alignedInter)
+      middle = createForme(middleSolid.specs, alignedInter) as Forme
     }
 
     const [startFn, endFn] =

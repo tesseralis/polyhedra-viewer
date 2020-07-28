@@ -141,7 +141,6 @@ function makePrismOp({ query, rightElongation = "antiprism" }: PrismOpArgs) {
         const fn = leftElongation === "prism" ? doTurn : doShorten
         return fn(forme, twist)
       },
-      createForme: (specs, geom) => CapstoneForme.create(specs, geom),
     })
   }
 }
@@ -160,7 +159,6 @@ const turnPrismatic = makeOpPair<Prismatic, PrismaticForme>({
     return getPose(face, face.edges[0], specs.data.type, "left")
   },
   toLeft: (forme) => doTurn(forme, "left"),
-  createForme: (specs, geom) => PrismaticForme.create(specs, geom),
 })
 
 const _elongate = makePrismOp({
@@ -219,7 +217,6 @@ function makeBicupolaPrismOp(leftElongation: null | "prism") {
       const fn = leftElongation === "prism" ? doTurn : doShorten
       return fn(forme, twist)
     },
-    createForme: (specs, geom) => CapstoneForme.create(specs, geom),
   })
 }
 
