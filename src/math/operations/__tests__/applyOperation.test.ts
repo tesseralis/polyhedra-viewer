@@ -14,6 +14,8 @@ const goodOperations = [
   "snub",
   "contract",
   "twist",
+  "elongate",
+  "gyroelongate",
 ]
 
 describe("applyOperation", () => {

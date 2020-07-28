@@ -1,4 +1,3 @@
-import { maxBy, uniqBy } from "lodash-es"
 import PolyhedronForme from "./PolyhedronForme"
 import Capstone from "data/specs/Capstone"
 import { Polyhedron, Face, Cap, FaceLike } from "math/polyhedra"
@@ -25,10 +24,10 @@ export default abstract class CapstoneForme extends PolyhedronForme<Capstone> {
 
 class MonoCapstoneForme extends CapstoneForme {
   bases() {
-    const faces = this.geom.faces.filter((face) => {
-      return uniqBy(face.adjacentFaces(), "numSides").length === 1
-    })
-    const face = maxBy(faces, "numSides")!
+    const base = this.specs.isPyramid()
+      ? this.specs.data.base
+      : this.specs.data.base * 2
+    const face = this.geom.faceWithNumSides(base)
     const cap = Cap.getAll(this.geom).find((cap) =>
       isInverse(cap.normal(), face.normal()),
     )!
