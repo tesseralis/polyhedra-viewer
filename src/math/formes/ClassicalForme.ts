@@ -183,7 +183,7 @@ class SnubForme extends ClassicalForme {
     if (!this.specs.isTetrahedral()) return super.facetFaces(facet)
     // FIXME return a different set on facet faces and twist
     const f0 = this.geom.faceWithNumSides(3)
-    return [f0, ...f0.edges.map((e) => oppositeFace(e, "right"))]
+    return [f0, ...f0.edges.map((e) => oppositeFace(e, this.specs.data.twist))]
   }
 
   // FIXME implement isEdgeFace

@@ -11,7 +11,7 @@ const goodOperations = [
   "sharpen",
   "dual",
   "expand",
-  // "snub",
+  "snub",
 ]
 
 describe("applyOperation", () => {
