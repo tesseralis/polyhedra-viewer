@@ -149,7 +149,10 @@ function normalizeOpResult(
   const endColors = getFaceColors(end)
 
   return {
-    result: createForme(newSpecs, normedResult.withName(newSpecs.name())),
+    result: createForme(
+      newSpecs,
+      normedResult.withName(newSpecs.canonicalName()),
+    ),
     animationData: {
       start,
       endVertices: endVertices.map(normalizeVertex),

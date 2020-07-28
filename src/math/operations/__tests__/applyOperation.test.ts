@@ -16,6 +16,11 @@ const goodOperations = [
   "twist",
   "elongate",
   "gyroelongate",
+  "contract",
+  "turn",
+  // "augment",
+  // "diminish",
+  "gyrate",
 ]
 
 describe("applyOperation", () => {
