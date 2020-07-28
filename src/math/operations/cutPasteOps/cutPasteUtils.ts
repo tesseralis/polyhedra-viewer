@@ -48,11 +48,47 @@ export interface CapOptions {
   cap: Cap
 }
 
-export const capOptionArgs: Partial<OpArgs<
-  CapOptions,
-  PolyhedronSpecs,
-  PolyhedronForme<PolyhedronSpecs>
->> = {
+export type CutPasteOpArgs<
+  Opts,
+  Specs extends PolyhedronSpecs,
+  Forme extends PolyhedronForme<Specs>
+> = Pick<OpArgs<Opts, Specs, Forme>, "apply" | "canApplyTo" | "getResult">
+
+export function combineOps<
+  Opts,
+  Specs extends PolyhedronSpecs,
+  Forme extends PolyhedronForme<Specs>
+>(
+  ops: CutPasteOpArgs<Opts, Specs, Forme>[],
+): CutPasteOpArgs<Opts, Specs, Forme> {
+  function canApplyTo(specs: Specs) {
+    return ops.some((op) => op.canApplyTo(specs))
+  }
+  function getOp(specs: Specs) {
+    const entry = ops.find((op) => op.canApplyTo(specs))
+    if (!entry) {
+      throw new Error(`Could not apply any operations to ${specs.name}`)
+    }
+    return entry
+  }
+
+  // TODO deduplicate this with the other combineOps
+  return {
+    canApplyTo,
+    apply(forme, options) {
+      return getOp(forme.specs).apply(forme, options)
+    },
+    getResult(forme, options) {
+      return getOp(forme.specs).getResult(forme, options)
+    },
+  }
+}
+
+type CapOptionArgs<Specs extends PolyhedronSpecs> = Partial<
+  OpArgs<CapOptions, Specs, PolyhedronForme<Specs>>
+>
+
+export const capOptionArgs: CapOptionArgs<PolyhedronSpecs> = {
   hasOptions() {
     return true
   },

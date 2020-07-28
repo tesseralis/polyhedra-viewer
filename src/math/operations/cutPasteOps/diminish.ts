@@ -1,5 +1,7 @@
 import { range } from "lodash-es"
 
+import Capstone from "data/specs/Capstone"
+import Composite from "data/specs/Composite"
 import Prismatic from "data/specs/Prismatic"
 import Elementary from "data/specs/Elementary"
 import { mapObject } from "utils"
@@ -17,7 +19,10 @@ import {
   getCupolaGyrate,
   CapOptions,
   capOptionArgs,
+  CutPasteOpArgs,
+  combineOps,
 } from "./cutPasteUtils"
+import PolyhedronForme from "math/formes/PolyhedronForme"
 
 function removeCap(polyhedron: Polyhedron, cap: Cap) {
   const boundary = cap.boundary()
@@ -65,90 +70,122 @@ function removeCap(polyhedron: Polyhedron, cap: Cap) {
   }
 }
 
-export const diminish = makeOperation<CapOptions, CutPasteSpecs>("diminish", {
+const diminishCapstone: CutPasteOpArgs<
+  CapOptions,
+  Capstone,
+  PolyhedronForme<Capstone>
+> = {
+  apply({ geom }, { cap }) {
+    return removeCap(geom, cap)
+  },
+  canApplyTo(info) {
+    if (!info.isCapstone()) return false
+    return !(info.isMono() && info.isShortened())
+  },
+  getResult({ specs }, { cap }) {
+    const { count, elongation, base, type } = specs.data
+    if (count === 1) {
+      return Prismatic.query.withData({
+        type: elongation as any,
+        base: specs.isPyramid() ? base : ((base * 2) as any),
+      })
+    } else {
+      const capType = cap.type
+      return specs.withData({
+        count: 1,
+        type:
+          type === "cupolarotunda"
+            ? capType === "rotunda"
+              ? "cupola"
+              : "rotunda"
+            : type,
+      })
+    }
+  },
+}
+
+// FIXME do octahedron and rhombicuboctahedron as well
+const diminishIcosahedron: CutPasteOpArgs<
+  CapOptions,
+  Composite,
+  PolyhedronForme<Composite>
+> = {
   apply({ geom }, { cap }) {
     return removeCap(geom, cap)
   },
 
-  canApplyTo(info) {
-    if (info.isCapstone()) {
-      return !(info.isMono() && info.isShortened())
-    }
-    if (info.isComposite()) {
-      const { source, augmented, diminished, gyrate } = info.data
-      if (source.canonicalName() === "rhombicosidodecahedron") {
-        if (diminished === 2 && gyrate === 0) return !info.isPara()
-        return diminished < 3
-      }
-      if (source.canonicalName() === "icosahedron") {
-        return (diminished < 3 || augmented === 1) && !info.isPara()
-      }
-      return augmented > 0
-    }
-    if (info.isElementary()) {
-      return info.canonicalName() === "augmented sphenocorona"
-    }
-    return false
+  canApplyTo(specs) {
+    if (!specs.isComposite()) return false
+    const { source, diminished, augmented } = specs.data
+    if (source.canonicalName() !== "icosahedron") return false
+    return (diminished < 3 || augmented === 1) && !specs.isPara()
   },
 
   getResult({ specs, geom }, { cap }) {
-    if (specs.isCapstone()) {
-      const { count, elongation, base, type } = specs.data
-      if (count === 1) {
-        return Prismatic.query.withData({
-          type: elongation as any,
-          base: specs.isPyramid() ? base : ((base * 2) as any),
-        })
-      } else {
-        const capType = cap.type
-        return specs.withData({
-          count: 1,
-          type:
-            type === "cupolarotunda"
-              ? capType === "rotunda"
-                ? "cupola"
-                : "rotunda"
-              : type,
-        })
-      }
-    }
-    if (specs.isComposite()) {
-      const { source, augmented, diminished, gyrate } = specs.data
-      if (source.canonicalName() === "rhombicosidodecahedron") {
-        const gyration = getCupolaGyrate(cap)
-        if (gyration === "ortho") {
-          // we're just removing a gyrated cap in this case
-          return specs.withData({
-            gyrate: dec(gyrate),
-            diminished: inc(diminished),
-          })
-        } else {
-          return specs.withData({
-            diminished: inc(diminished),
-            align: specs.isMono() ? getCapAlignment(geom, cap) : undefined,
-          })
-        }
-      }
-      if (source.canonicalName() === "icosahedron") {
-        if (augmented === 1) return specs.withData({ augmented: 0 })
-        return specs.withData({
-          diminished: inc(diminished),
-          align: diminished === 1 ? getCapAlignment(geom, cap) : undefined,
-        })
-      }
+    const { augmented, diminished } = specs.data
+    if (augmented === 1) return specs.withData({ augmented: 0 })
+    return specs.withData({
+      diminished: inc(diminished),
+      align: diminished === 1 ? getCapAlignment(geom, cap) : undefined,
+    })
+  },
+}
+
+const diminishIcosidodecahedron: CutPasteOpArgs<
+  CapOptions,
+  Composite,
+  PolyhedronForme<Composite>
+> = {
+  apply({ geom }, { cap }) {
+    return removeCap(geom, cap)
+  },
+  canApplyTo(specs) {
+    if (!specs.isComposite()) return false
+    const { source, diminished, gyrate } = specs.data
+    if (source.canonicalName() !== "rhombicosidodecahedron") return false
+    if (diminished === 2 && gyrate === 0) return !specs.isPara()
+    return diminished < 3
+  },
+  getResult({ specs, geom }, { cap }) {
+    const { diminished, gyrate } = specs.data
+    if (getCupolaGyrate(cap) === "ortho") {
+      // we're just removing a gyrated cap in this case
       return specs.withData({
-        augmented: dec(augmented),
-        align:
-          augmented === 3 && source.canonicalName() !== "triangular prism"
-            ? "meta"
-            : undefined,
+        gyrate: dec(gyrate),
+        diminished: inc(diminished),
+      })
+    } else {
+      return specs.withData({
+        diminished: inc(diminished),
+        align: specs.isMono() ? getCapAlignment(geom, cap) : undefined,
       })
     }
-    if (specs.isElementary()) {
-      return Elementary.query.withName("sphenocorona")
-    }
-    throw new Error()
+  },
+}
+
+const diminishElementary: CutPasteOpArgs<
+  CapOptions,
+  Elementary,
+  PolyhedronForme<Elementary>
+> = {
+  apply({ geom }, { cap }) {
+    return removeCap(geom, cap)
   },
 
+  canApplyTo(specs) {
+    return specs.canonicalName() === "augmented sphenocorona"
+  },
+  getResult() {
+    return Elementary.query.withName("sphenocorona")
+  },
+}
+
+export const diminish = makeOperation("diminish", {
+  ...combineOps<CapOptions, CutPasteSpecs, PolyhedronForme<CutPasteSpecs>>([
+    diminishCapstone,
+    diminishIcosahedron,
+    diminishIcosidodecahedron,
+    diminishElementary,
+  ]),
   ...capOptionArgs,
 })
