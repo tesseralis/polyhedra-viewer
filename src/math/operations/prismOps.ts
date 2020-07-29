@@ -1,5 +1,4 @@
 import { Twist } from "types"
-import { FaceLike, Edge } from "math/polyhedra"
 import { PrismaticType } from "data/specs/common"
 import PolyhedronSpecs from "data/specs/PolyhedronSpecs"
 import Capstone from "data/specs/Capstone"
@@ -12,7 +11,7 @@ import {
   TwistOpts,
   getTransformedVertices,
 } from "./operationUtils"
-import { withOrigin } from "math/geom"
+import { withOrigin, getCentroid } from "math/geom"
 import PolyhedronForme from "math/formes/PolyhedronForme"
 import CapstoneForme from "math/formes/CapstoneForme"
 import PrismaticForme from "math/formes/PrismaticForme"
@@ -47,28 +46,36 @@ function getTwistMult(twist?: Twist) {
   }
 }
 
-function getPose(
-  face: FaceLike,
-  edge: Edge,
-  elongation: PrismaticType | null,
-  twist?: Twist,
-): Pose {
-  const faceCenter = face.centroid()
-  const length = face.sideLength()
-  const n = face.numSides
-  // FIXME can just take the average of the bases
-  const origin = faceCenter.sub(
-    face.normal().scale((length * getPrismaticHeight(n, elongation)) / 2),
-  )
+// FIXME deduplicate these...
+function getCapstonePose(forme: CapstoneForme, twist?: Twist): Pose {
+  const [top, bottom] = forme.baseFaces()
+  const edge = top.edges.find((e) => e.face.numSides === 3)!
+  const n = top.numSides
   const angle =
-    (elongation === "antiprism" ? 1 : 0) * getTwistMult(twist) * (PI / n / 2)
-
+    (forme.specs.isGyroelongated() ? 1 : 0) * getTwistMult(twist) * (PI / n / 2)
   return {
-    origin,
-    scale: length,
+    origin: getCentroid([top.centroid(), bottom.centroid()]),
+    scale: forme.geom.edgeLength(),
     orientation: [
-      face.normal(),
-      edge.v1.vec.sub(faceCenter).getRotatedAroundAxis(face.normal(), angle),
+      top.normal(),
+      edge.v1.vec.sub(top.centroid()).getRotatedAroundAxis(top.normal(), angle),
+    ],
+  }
+}
+
+function getPrismaticPose(forme: PrismaticForme): Pose {
+  const [top, bottom] = forme.bases()
+  const n = top.numSides
+  const angle =
+    (forme.specs.isAntiprism() ? 1 : 0) * getTwistMult("left") * (PI / n / 2)
+  return {
+    origin: getCentroid([top.centroid(), bottom.centroid()]),
+    scale: forme.geom.edgeLength(),
+    orientation: [
+      top.normal(),
+      top.edges[0].v1.vec
+        .sub(top.centroid())
+        .getRotatedAroundAxis(top.normal(), angle),
     ],
   }
 }
@@ -135,9 +142,7 @@ function makePrismOp({ query, rightElongation = "antiprism" }: PrismOpArgs) {
         })),
       middle: "right",
       getPose(side, forme) {
-        const face = forme.baseFaces()[0]
-        const edge = face.edges.find((e) => e.face.numSides === 3)!
-        return getPose(face, edge, forme.specs.data.elongation, twist)
+        return getCapstonePose(forme, twist)
       },
       toLeft(forme) {
         const fn = leftElongation === "prism" ? doTurn : doShorten
@@ -156,9 +161,8 @@ const turnPrismatic = makeOpPair<Prismatic, PrismaticForme>({
       right: entry.withData({ type: "antiprism" }),
     })),
   middle: "right",
-  getPose(side, { geom, specs }) {
-    const face = geom.faceWithNumSides(specs.data.base)
-    return getPose(face, face.edges[0], specs.data.type, "left")
+  getPose(side, forme) {
+    return getPrismaticPose(forme)
   },
   toLeft: (forme) => doTurn(forme, "left"),
 })
@@ -210,10 +214,7 @@ function makeBicupolaPrismOp(leftElongation: null | "prism") {
       }),
     middle: "right",
     getPose(side, forme, { right: { twist } }) {
-      // Pick a cap, favoring rotunda over cupola in the case of cupolarotundae
-      const face = forme.baseFaces()[0]
-      const edge = face.edges.find((e) => e.face.numSides === 3)!
-      return getPose(face, edge, forme.specs.data.elongation, twist)
+      return getCapstonePose(forme, twist)
     },
     toLeft: (forme, { right: { twist } }) => {
       const fn = leftElongation === "prism" ? doTurn : doShorten
