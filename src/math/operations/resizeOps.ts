@@ -1,9 +1,8 @@
-import { minBy } from "lodash-es"
 import { Twist } from "types"
 import { mapObject } from "utils"
 import Classical, { Facet, Family } from "data/specs/Classical"
 import { makeOpPair, combineOps } from "./operationPairs"
-import { angleBetween, getPlane, withOrigin } from "math/geom"
+import { withOrigin } from "math/geom"
 import { Face } from "math/polyhedra"
 import {
   getOppTwist,
@@ -78,45 +77,12 @@ function getCircumradius(specs: Classical) {
   return (tan(PI / q) * tanDihedralOver2(specs)) / 2
 }
 
-/**
- * Return the snub angle of the given polyhedron, given the list of expanded faces
- */
-export function calcSnubAngle(specs: Classical, facet: Facet) {
-  // Choose one of the expanded faces and get its properties
-  const polyhedron = getGeometry(specs)
-  const forme = ClassicalForme.create(specs, polyhedron)
-  const [face0, ...rest] = forme.facetFaces(facet)
-  const faceCentroid = face0.centroid()
-  const midpoint = face0.edges[0].midpoint()
-
-  // Choose one of the closest faces
-  const face1 = minBy(rest, (face) => midpoint.distanceTo(face.centroid()))!
-
-  const plane = getPlane([
-    faceCentroid,
-    face1.centroid(),
-    polyhedron.centroid(),
-  ])
-
-  // Calculate the absolute angle between the two midpoints
-  return angleBetween(faceCentroid, midpoint, plane.getProjectedPoint(midpoint))
-}
-
 function createObject<T extends string | number, U>(
   items: T[],
   iter: (item: T) => U,
 ) {
   return mapObject(items, (item) => [item, iter(item)])
 }
-
-// Cache snub angles, since they're always the same
-const snubAngles = createObject([3, 4, 5], (family: Family) => {
-  const specs = Classical.query.withData({ family, operation: "snub" })
-  return {
-    face: calcSnubAngle(specs, "face"),
-    vertex: calcSnubAngle(specs, "vertex"),
-  }
-})
 
 // TODO deduplicate these (note: bevel has a different criterion for getting face)
 // FIXME move all these to a function on the Forme
@@ -145,14 +111,6 @@ const bevelledDists = createObject([3, 4, 5], (family: Family) => {
     vertex: calcTruncatedDist(family, "vertex"),
   }
 })
-
-function getSnubAngle(specs: Classical, facet: Facet) {
-  const twistSign = specs.data.twist === "left" ? -1 : 1
-  // if vertex-solid, reverse the sign
-  const facetSign = facet === "vertex" ? -1 : 1
-  const angle = snubAngles[specs.data.family][facet]
-  return twistSign * facetSign * angle
-}
 
 function getClassicalPose(forme: ClassicalForme, facet: Facet): Pose {
   const { geom } = forme
@@ -242,7 +200,7 @@ const _snub = makeOpPair<Classical, ClassicalForme, TwistOpts, FacetOpts>({
     return getResizedVertices(
       forme.facetFaces(result.data.facet!),
       getInradius(result),
-      getSnubAngle(forme.specs, facet),
+      forme.snubAngle(facet),
     )
   },
 })
@@ -267,7 +225,7 @@ const _twist = makeOpPair<Classical, ClassicalForme, TwistOpts, {}>({
     return getResizedVertices(
       forme.facetFaces("face"),
       cantellatedDists[forme.specs.data.family],
-      getSnubAngle(forme.specs, "face"),
+      forme.snubAngle("face"),
     )
   },
 })

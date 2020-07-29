@@ -2,6 +2,7 @@ import { Twist } from "types"
 import PolyhedronForme from "./PolyhedronForme"
 import Classical, { Facet, facets } from "data/specs/Classical"
 import { Polyhedron, Face, Edge } from "math/polyhedra"
+import { angleBetween } from "math/geom"
 
 // FIXME dedupe with operationUtils
 export function oppositeFace(edge: Edge, twist?: Twist) {
@@ -144,6 +145,13 @@ export default abstract class ClassicalForme extends PolyhedronForme<
     }
     return face
   }
+
+  /**
+   * Return the amount that this forme's faces are twisted
+   */
+  snubAngle(facet: Facet) {
+    return 0
+  }
 }
 
 class RegularForme extends ClassicalForme {
@@ -266,5 +274,22 @@ class SnubForme extends ClassicalForme {
     let twist = this.specs.data.twist
     if (facet === "vertex") twist = twist === "left" ? "right" : "left"
     return oppositeFace(face.edges[0], twist)
+  }
+
+  snubAngle(facet: Facet) {
+    const [face0, face1] = this.adjacentFacetFaces(facet)
+
+    // TODO this is fragile and relies on face1 being attached to face0.edges[0]
+    // Calculate the angle between the nearest apothem and the projected center of face1
+    const angle = angleBetween(
+      face0.centroid(),
+      face0.edges[0].midpoint(),
+      face0.plane().getProjectedPoint(face1.centroid()),
+    )
+
+    const twistSign = this.specs.data.twist === "left" ? -1 : 1
+    // if vertex-solid, reverse the sign
+    const facetSign = facet === "vertex" ? -1 : 1
+    return twistSign * facetSign * angle
   }
 }
