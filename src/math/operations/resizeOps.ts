@@ -3,7 +3,6 @@ import { mapObject } from "utils"
 import Classical, { Facet, Family } from "data/specs/Classical"
 import { makeOpPair, combineOps } from "./operationPairs"
 import { withOrigin } from "math/geom"
-import { Face } from "math/polyhedra"
 import {
   getOppTwist,
   getTransformedVertices,
@@ -32,10 +31,12 @@ interface TwistOpts {
  * @param angle the angle to twist the faces by
  */
 function getResizedVertices(
-  faces: Face[],
+  forme: ClassicalForme,
+  facet: Facet,
   distance: number,
-  angle: number = 0,
 ) {
+  const faces = forme.facetFaces(facet)
+  const angle = forme.snubAngle(facet)
   const resizedLength = faces[0].sideLength() * distance
   const f0 = faces[0]
   const scale = resizedLength - f0.distanceToCenter()
@@ -142,7 +143,8 @@ const semiExpand = makeOpPair<Classical, ClassicalForme, {}, FacetOpts>({
   },
   toLeft(forme, { right: { facet } }) {
     return getResizedVertices(
-      forme.facetFaces(facet),
+      forme,
+      facet,
       bevelledDists[forme.specs.data.family][facet],
     )
   },
@@ -168,7 +170,8 @@ const _expand = makeOpPair<Classical, ClassicalForme, {}, FacetOpts>({
     // Take all the stuff and push it inwards
     return getResizedVertices(
       // FIXME get rid of the adjustment
-      forme.facetFaces(facet),
+      forme,
+      facet,
       getInradius(result),
     )
   },
@@ -197,11 +200,7 @@ const _snub = makeOpPair<Classical, ClassicalForme, TwistOpts, FacetOpts>({
   },
   toLeft(forme, { right: { facet } }, result) {
     // Take all the stuff and push it inwards
-    return getResizedVertices(
-      forme.facetFaces(result.data.facet!),
-      getInradius(result),
-      forme.snubAngle(facet),
-    )
+    return getResizedVertices(forme, facet, getInradius(result))
   },
 })
 
@@ -223,9 +222,9 @@ const _twist = makeOpPair<Classical, ClassicalForme, TwistOpts, {}>({
   },
   toLeft(forme) {
     return getResizedVertices(
-      forme.facetFaces("face"),
+      forme,
+      "face",
       cantellatedDists[forme.specs.data.family],
-      forme.snubAngle("face"),
     )
   },
 })
