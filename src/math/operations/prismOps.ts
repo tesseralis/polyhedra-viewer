@@ -56,6 +56,7 @@ function getPose(
   const faceCenter = face.centroid()
   const length = face.sideLength()
   const n = face.numSides
+  // FIXME can just take the average of the bases
   const origin = faceCenter.sub(
     face.normal().scale((length * getPrismaticHeight(n, elongation)) / 2),
   )

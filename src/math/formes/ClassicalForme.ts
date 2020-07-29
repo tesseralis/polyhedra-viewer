@@ -1,6 +1,6 @@
 import { Twist } from "types"
 import PolyhedronForme from "./PolyhedronForme"
-import Classical, { Facet } from "data/specs/Classical"
+import Classical, { Facet, facets } from "data/specs/Classical"
 import { Polyhedron, Face, Edge } from "math/polyhedra"
 
 // FIXME dedupe with operationUtils
@@ -48,6 +48,10 @@ export default abstract class ClassicalForme extends PolyhedronForme<
     return face.numSides === this.faceType(facet)
   }
 
+  isAnyFacetFace(face: Face) {
+    return facets.some((facet) => this.isFacetFace(face, facet))
+  }
+
   getFacet(face: Face) {
     if (this.isFacetFace(face, "vertex")) return "vertex"
     if (this.isFacetFace(face, "face")) return "face"
@@ -64,6 +68,13 @@ export default abstract class ClassicalForme extends PolyhedronForme<
 
   facetFaces(facet: Facet) {
     return this.geom.faces.filter((face) => this.isFacetFace(face, facet))
+  }
+
+  protected abstract adjacentFacetFace(face: Face, facet: Facet): Face
+
+  adjacentFacetFaces(facet: Facet) {
+    const f0 = this.facetFace(facet)
+    return [f0, this.adjacentFacetFace(f0, facet)]
   }
 
   mainFacet() {
@@ -105,7 +116,7 @@ export default abstract class ClassicalForme extends PolyhedronForme<
   }
 
   isEdgeFace(face: Face) {
-    return false
+    return !this.isAnyFacetFace(face)
   }
 
   edgeFace() {
@@ -121,6 +132,11 @@ class RegularForme extends ClassicalForme {
   isFacetFace(face: Face, facet: Facet) {
     return facet === this.specs.data.facet
   }
+
+  adjacentFacetFace(face: Face, facet: Facet) {
+    // NOTE this doesn't account for when the face isn't a facet face
+    return face.adjacentFaces()[0]
+  }
 }
 
 class TruncatedForme extends ClassicalForme {
@@ -132,9 +148,20 @@ class TruncatedForme extends ClassicalForme {
       return face.numSides <= 5
     }
   }
+
+  adjacentFacetFace(face: Face, facet: Facet) {
+    // FIXME assert valid
+    return face.adjacentFaces().find((f) => this.isFacetFace(f, facet))!
+  }
 }
 
-class RectifiedForme extends ClassicalForme {}
+class RectifiedForme extends ClassicalForme {
+  adjacentFacetFace(face: Face, facet: Facet) {
+    return face.vertices[0]
+      .adjacentFaces()
+      .find((f) => this.isFacetFace(f, facet) && !f.equals(face))!
+  }
+}
 
 class BevelledForme extends ClassicalForme {
   faceType(facet: Facet) {
@@ -152,8 +179,10 @@ class BevelledForme extends ClassicalForme {
     return [f0, ...rest]
   }
 
-  isEdgeFace(face: Face) {
-    return face.numSides === 4
+  adjacentFacetFace(face: Face, facet: Facet) {
+    return oppositeFace(
+      face.edges.filter((e) => this.isEdgeFace(e.twinFace()))[0],
+    )
   }
 }
 
@@ -175,16 +204,16 @@ class CantellatedForme extends ClassicalForme {
     return [f0, ...f0.edges.map((e) => oppositeFace(e))]
   }
 
-  isEdgeFace(face: Face) {
-    return (
-      face.numSides === 4 && face.adjacentFaces().some((f) => f.numSides !== 4)
+  adjacentFacetFace(face: Face, facet: Facet) {
+    return oppositeFace(
+      face.edges.filter((e) => this.isEdgeFace(e.twinFace()))[0],
     )
   }
 }
 
 class SnubForme extends ClassicalForme {
-  // FIXME deal with tetrahedral
   isFacetFace(face: Face, facet: Facet) {
+    if (this.specs.isTetrahedral()) return face.inSet(this.facetFaces(facet))
     return (
       super.isFacetFace(face, facet) &&
       face.adjacentFaces().every((f) => f.numSides === 3)
@@ -193,10 +222,17 @@ class SnubForme extends ClassicalForme {
 
   facetFaces(facet: Facet) {
     if (!this.specs.isTetrahedral()) return super.facetFaces(facet)
-    // FIXME return a different set on facet faces and twist
+    // FIXME return a different set on facet faces
     const f0 = this.geom.faceWithNumSides(3)
     return [f0, ...f0.edges.map((e) => oppositeFace(e, this.specs.data.twist))]
   }
 
-  // FIXME implement isEdgeFace
+  adjacentFacetFace(face: Face, facet: Facet) {
+    let twist = this.specs.data.twist
+    if (facet === "vertex") twist = twist === "left" ? "right" : "left"
+    return oppositeFace(
+      face.edges.filter((e) => this.isEdgeFace(e.twinFace()))[0],
+      twist,
+    )
+  }
 }

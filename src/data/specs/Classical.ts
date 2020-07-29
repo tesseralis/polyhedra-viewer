@@ -6,7 +6,7 @@ import Queries from "./Queries"
 const families = primaryPolygons
 export type Family = PrimaryPolygon
 
-const facets = ["face", "vertex"] as const
+export const facets = ["face", "vertex"] as const
 export type Facet = Items<typeof facets>
 
 const operations = [

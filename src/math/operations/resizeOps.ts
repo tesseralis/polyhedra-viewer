@@ -3,8 +3,8 @@ import { Twist } from "types"
 import { mapObject } from "utils"
 import Classical, { Facet, Family } from "data/specs/Classical"
 import { makeOpPair, combineOps } from "./operationPairs"
-import { angleBetween, getPlane, withOrigin, Vec3D } from "math/geom"
-import { Polyhedron, Face, Edge } from "math/polyhedra"
+import { angleBetween, getPlane, withOrigin } from "math/geom"
+import { Face } from "math/polyhedra"
 import {
   getOppTwist,
   getTransformedVertices,
@@ -78,10 +78,6 @@ function getCircumradius(specs: Classical) {
   return (tan(PI / q) * tanDihedralOver2(specs)) / 2
 }
 
-function apothemVec(edge: Edge) {
-  return edge.midpoint().sub(edge.face.centroid())
-}
-
 /**
  * Return the snub angle of the given polyhedron, given the list of expanded faces
  */
@@ -151,49 +147,24 @@ const bevelledDists = createObject([3, 4, 5], (family: Family) => {
 })
 
 function getSnubAngle(specs: Classical, facet: Facet) {
-  const sign = specs.data.twist === "left" ? -1 : 1
+  const twistSign = specs.data.twist === "left" ? -1 : 1
   // if vertex-solid, reverse the sign
-  const sign2 = facet === "vertex" ? -1 : 1
+  const facetSign = facet === "vertex" ? -1 : 1
   const angle = snubAngles[specs.data.family][facet]
-  return sign2 * sign * angle
+  return twistSign * facetSign * angle
 }
 
-/**
- * Get the common properties of a resize operation's pose.
- */
-function getPose(geom: Polyhedron, face: Face, crossAxis: Vec3D): Pose {
+function getClassicalPose(forme: ClassicalForme, facet: Facet): Pose {
+  const { geom } = forme
   return {
     // Always centered on centroid
     origin: geom.centroid(),
-    // Always scale to side length
-    scale: geom.edgeLength(),
     // Use the normal of the given face as the first axis
-    orientation: [face.normal(), crossAxis],
+    scale: geom.edgeLength(),
+    orientation: forme
+      .adjacentFacetFaces(facet)
+      .map((face) => face.normal()) as any,
   }
-}
-
-// Get the pose of a regular solid for both expand/snub
-function getRegularPose(geom: Polyhedron): Pose {
-  const face = geom.getFace()
-  return getPose(geom, face, apothemVec(face.edges[0]))
-}
-
-function getCantellatedPose(forme: ClassicalForme, facet: Facet): Pose {
-  // Use an expanded face as the face
-  const face = forme.facetFace(facet)
-  // Pick one of the edges as cross axis
-  return getPose(forme.geom, face, apothemVec(face.edges[0]))
-}
-
-function getSnubPose(forme: ClassicalForme, facet: Facet): Pose {
-  // Use an expanded face as the face
-  const face = forme.facetFace(facet)
-  // Rotate the apothem vector to align it correctly
-  const crossAxis = apothemVec(face.edges[0]).getRotatedAroundAxis(
-    face.normal(),
-    getSnubAngle(forme.specs, facet),
-  )
-  return getPose(forme.geom, face, crossAxis)
 }
 
 const twistOpts: Twist[] = ["left", "right"]
@@ -209,16 +180,7 @@ const semiExpand = makeOpPair<Classical, ClassicalForme, {}, FacetOpts>({
     })),
   middle: "right",
   getPose(pos, forme, { right: { facet } }) {
-    const { geom } = forme
-    if (pos === "left") {
-      const face = forme.mainFacetFace()
-      const edge = face.edges.find((e) => forme.isMainFacetFace(e.twinFace()))!
-      return getPose(geom, face, apothemVec(edge))
-    } else {
-      const face = forme.facetFace(facet)
-      const edge = face.edges.find((e) => forme.isEdgeFace(e.twinFace()))!
-      return getPose(geom, face, apothemVec(edge))
-    }
+    return getClassicalPose(forme, facet)
   },
   toLeft(forme, { right: { facet } }) {
     return getResizedVertices(
@@ -242,9 +204,7 @@ const _expand = makeOpPair<Classical, ClassicalForme, {}, FacetOpts>({
   middle: "right",
 
   getPose(pos, forme, { right: { facet } }) {
-    return pos === "left"
-      ? getRegularPose(forme.geom)
-      : getCantellatedPose(forme, facet)
+    return getClassicalPose(forme, facet)
   },
   toLeft(forme, { right: { facet } }, result) {
     // Take all the stuff and push it inwards
@@ -275,9 +235,7 @@ const _snub = makeOpPair<Classical, ClassicalForme, TwistOpts, FacetOpts>({
   middle: "right",
 
   getPose(pos, forme, { right: { facet } }) {
-    return pos === "left"
-      ? getRegularPose(forme.geom)
-      : getSnubPose(forme, facet)
+    return getClassicalPose(forme, facet)
   },
   toLeft(forme, { right: { facet } }, result) {
     // Take all the stuff and push it inwards
@@ -303,9 +261,7 @@ const _twist = makeOpPair<Classical, ClassicalForme, TwistOpts, {}>({
   middle: "right",
 
   getPose(pos, forme) {
-    return pos === "left"
-      ? getCantellatedPose(forme, "face")
-      : getSnubPose(forme, "face")
+    return getClassicalPose(forme, "face")
   },
   toLeft(forme) {
     return getResizedVertices(
@@ -349,7 +305,7 @@ const _dual = makeOpPair<Classical, ClassicalForme>({
     switch (pos) {
       case "left": {
         return {
-          ...getRegularPose(geom),
+          ...getClassicalPose(forme, "face"),
           // Everything is scaled with the same midradius
           scale: geom.edges[0].distanceToCenter(),
         }
@@ -367,7 +323,7 @@ const _dual = makeOpPair<Classical, ClassicalForme>({
       }
       case "middle": {
         return {
-          ...getCantellatedPose(forme, "face"),
+          ...getClassicalPose(forme, "face"),
           scale: getCantellatedMidradius(forme),
         }
       }
@@ -409,12 +365,7 @@ export const contract = makeOperation<FacetOpts, Classical, ClassicalForme>(
     faceSelectionStates(forme, { facet }) {
       return forme.geom.faces.map((face) => {
         if (forme.isFacetFace(face, facet)) return "selected"
-        // FIXME make this a method?
-        if (
-          forme.isFacetFace(face, "vertex") ||
-          forme.isFacetFace(face, "face")
-        )
-          return "selectable"
+        if (forme.isAnyFacetFace(face)) return "selectable"
         return undefined
       })
     },
