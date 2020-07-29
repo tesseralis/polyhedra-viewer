@@ -22,11 +22,11 @@ import { Twist } from "types"
 import { getAllSpecs } from "data/specs/getSpecs"
 
 export interface FacetOpts {
-  facet?: Facet
+  facet: Facet
 }
 
 export interface TwistOpts {
-  twist?: Twist
+  twist: Twist
 }
 
 export function getOppTwist(twist: Twist) {

@@ -1,3 +1,4 @@
+import { Facet } from "data/specs/Classical"
 import { Polyhedron, Cap } from "math/polyhedra"
 import { OpName, operations } from "math/operations"
 import { validateOperationApplication } from "../operationTestUtils"
@@ -7,7 +8,7 @@ import createForme from "math/formes/createForme"
 
 interface Args {
   face?: number
-  facet?: "vertex" | "face"
+  facet?: Facet
   cap?: boolean
 }
 

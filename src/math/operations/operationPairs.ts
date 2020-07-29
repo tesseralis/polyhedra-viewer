@@ -12,7 +12,7 @@ function oppositeSide(side: Side) {
   return side === "left" ? "right" : "left"
 }
 
-interface GraphOpts<L, R> {
+export interface GraphOpts<L, R> {
   left: L
   right: R
 }
@@ -34,7 +34,7 @@ type MiddleGetter<
   R
 > = (entry: GraphEntry<Specs, L, R>) => Specs | Forme
 
-interface OpPairInput<
+export interface OpPairInput<
   Specs extends PolyhedronSpecs,
   Forme extends PolyhedronForme<Specs>,
   L = {},

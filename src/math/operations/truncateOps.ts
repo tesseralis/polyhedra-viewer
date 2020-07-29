@@ -1,6 +1,11 @@
 import { sum } from "lodash-es"
 import { Face, Edge, VertexArg } from "math/polyhedra"
-import Classical, { Facet, Operation as OpName } from "data/specs/Classical"
+import Classical, {
+  facets,
+  Facet,
+  oppositeFacet,
+  Operation as OpName,
+} from "data/specs/Classical"
 import Composite from "data/specs/Composite"
 import { makeOpPair, combineOps } from "./operationPairs"
 import Operation, { OpArgs } from "./Operation"
@@ -39,8 +44,7 @@ function getSharpenPointEdge(face: Face, edge: Edge) {
 }
 
 function getAvgInradius(forme: ClassicalForme) {
-  const faces = [forme.facetFace("vertex"), forme.facetFace("face")]
-  return sum(faces.map((f) => f.distanceToCenter())) / faces.length
+  return sum(facets.map((f) => forme.inradius(f))) / facets.length
 }
 
 interface TrioOpArgs<Op, Opts = any> {
@@ -124,7 +128,7 @@ const regs = makeTruncateTrio({
   left: {
     operation: "regular",
     pose(forme) {
-      return getRegularPose(forme, forme.specs.data.facet!)
+      return getRegularPose(forme, forme.specs.facet())
     },
     transformer(forme) {
       return getTransformedVertices(forme.minorFacetFaces(), (face) =>
@@ -135,14 +139,14 @@ const regs = makeTruncateTrio({
   middle: {
     operation: "truncate",
     pose(forme) {
-      return getRegularPose(forme, forme.specs.data.facet!)
+      return getRegularPose(forme, forme.specs.facet())
     },
   },
   right: {
     operation: "rectify",
     // The rectified version is the only thing we need to choose an option for
     // when we move out of it
-    options: (entry) => ({ facet: entry.data.facet }),
+    options: (entry) => ({ facet: entry.facet() }),
     pose(forme, options) {
       return getRegularPose(forme, options.right.facet)
     },
@@ -334,13 +338,12 @@ const hitOptArgs: Partial<OpArgs<FacetOpts, Classical, ClassicalForme>> = {
   getHitOption(forme, hitPoint) {
     const face = forme.geom.hitFace(hitPoint)
     const facet = forme.getFacet(face)
-    return facet ? { facet: facet === "vertex" ? "face" : "vertex" } : {}
+    return facet ? { facet: oppositeFacet(facet) } : {}
   },
 
   faceSelectionStates(forme, { facet }) {
-    const oppFacet = facet === "vertex" ? "face" : "vertex"
     return forme.geom.faces.map((face) => {
-      if (forme.isFacetFace(face, oppFacet)) return "selected"
+      if (forme.isFacetFace(face, oppositeFacet(facet))) return "selected"
       return "selectable"
     })
   },
@@ -350,7 +353,7 @@ export const sharpen = new Operation("sharpen", {
   ...combineOps<
     Classical | Composite,
     ClassicalForme | CompositeForme,
-    FacetOpts
+    Partial<FacetOpts>
   >([
     regs.truncate.right,
     ambos.truncate.right,

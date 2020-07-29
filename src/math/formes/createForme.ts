@@ -6,6 +6,7 @@ import CompositeForme from "./CompositeForme"
 
 import PolyhedronSpecs from "data/specs/PolyhedronSpecs"
 import { Polyhedron } from "math/polyhedra"
+import { getGeometry } from "math/operations/operationUtils"
 
 export default function createForme<Specs extends PolyhedronSpecs>(
   specs: Specs,
@@ -17,4 +18,10 @@ export default function createForme<Specs extends PolyhedronSpecs>(
   if (specs.isComposite()) return CompositeForme.create(specs, geom)
   // TODO ElementaryForme and others
   return new PolyhedronForme(specs, geom)
+}
+
+export function createFormeFromSpecs<Specs extends PolyhedronSpecs>(
+  specs: Specs,
+): PolyhedronForme<Specs> {
+  return createForme(specs, getGeometry(specs))
 }

@@ -251,7 +251,7 @@ export const turn = makeOperation(
   combineOps<
     Capstone | Prismatic,
     PolyhedronForme<Capstone | Prismatic>,
-    TwistOpts
+    Partial<TwistOpts>
   >(
     [turnPrismatic, turnPyramid, turnCupola, turnBicupola].flatMap((op) => [
       op.left,

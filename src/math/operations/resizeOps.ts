@@ -1,26 +1,22 @@
 import { Twist } from "types"
-import { mapObject } from "utils"
-import Classical, { Facet, Family } from "data/specs/Classical"
-import { makeOpPair, combineOps } from "./operationPairs"
+import Classical, { Facet, oppositeFacet } from "data/specs/Classical"
+import {
+  makeOpPair,
+  combineOps,
+  OpPairInput,
+  GraphOpts,
+} from "./operationPairs"
 import { withOrigin } from "math/geom"
 import {
   getOppTwist,
   getTransformedVertices,
-  // FacetOpts,
-  // TwistOpts,
-  getGeometry,
+  FacetOpts,
+  TwistOpts,
   Pose,
 } from "./operationUtils"
 import Operation, { makeOperation } from "./Operation"
 import ClassicalForme from "math/formes/ClassicalForme"
-
-interface FacetOpts {
-  facet: Facet
-}
-
-interface TwistOpts {
-  twist: Twist
-}
+import { createFormeFromSpecs } from "math/formes/createForme"
 
 /**
  * Return the expanded vertices of the polyhedron resized to the given distance-from-center
@@ -33,85 +29,18 @@ interface TwistOpts {
 function getResizedVertices(
   forme: ClassicalForme,
   facet: Facet,
-  distance: number,
+  result: Classical,
 ) {
-  const faces = forme.facetFaces(facet)
+  const resultForme = createFormeFromSpecs(result) as ClassicalForme
   const angle = forme.snubAngle(facet)
-  const resizedLength = faces[0].sideLength() * distance
-  const f0 = faces[0]
-  const scale = resizedLength - f0.distanceToCenter()
-  return getTransformedVertices(faces, (f) =>
+  const distance = resultForme.inradius(facet) / resultForme.geom.edgeLength()
+  const scale = forme.geom.edgeLength() * distance - forme.inradius(facet)
+  return getTransformedVertices(forme.facetFaces(facet), (f) =>
     withOrigin(f.centroid(), (v) =>
       v.getRotatedAroundAxis(f.normal(), angle).add(f.normal().scale(scale)),
     ),
   )
 }
-
-function getSchafli(specs: Classical) {
-  return specs.isFace() ? [specs.data.family, 3] : [3, specs.data.family]
-}
-
-const coxeterNum = { 3: 4, 4: 6, 5: 10 }
-
-const { sin, cos, tan, PI } = Math
-
-// get tan(theta/2) where theta is the dihedral angle of the platonic solid
-function tanDihedralOver2(specs: Classical) {
-  const [, q] = getSchafli(specs)
-  const h = coxeterNum[specs.data.family]
-  return cos(PI / q) / sin(PI / h)
-}
-
-function getInradius(specs: Classical) {
-  const [p] = getSchafli(specs)
-  return tanDihedralOver2(specs) / tan(PI / p) / 2
-}
-
-function getMidradius(specs: Classical) {
-  const [p] = getSchafli(specs)
-  const h = coxeterNum[specs.data.family]
-  return cos(PI / p) / sin(PI / h) / 2
-}
-
-function getCircumradius(specs: Classical) {
-  const [, q] = getSchafli(specs)
-  return (tan(PI / q) * tanDihedralOver2(specs)) / 2
-}
-
-function createObject<T extends string | number, U>(
-  items: T[],
-  iter: (item: T) => U,
-) {
-  return mapObject(items, (item) => [item, iter(item)])
-}
-
-// TODO deduplicate these (note: bevel has a different criterion for getting face)
-// FIXME move all these to a function on the Forme
-const cantellatedDists = createObject([3, 4, 5], (family: Family) => {
-  const specs = Classical.query.withData({ family, operation: "cantellate" })
-  const geom = getGeometry(specs)
-  const forme = ClassicalForme.create(specs, geom)
-  const face = forme.facetFace("face")
-  return face.distanceToCenter() / geom.edgeLength()
-})
-
-function calcTruncatedDist(family: Family, facet: Facet) {
-  const specs = Classical.query.withData({
-    family,
-    operation: "truncate",
-    facet,
-  })
-  const geom = getGeometry(specs)
-  const face = geom.largestFace()
-  return face.distanceToCenter() / geom.edgeLength()
-}
-
-const bevelledDists = createObject([3, 4, 5], (family: Family) => {
-  return {
-    face: calcTruncatedDist(family, "face"),
-    vertex: calcTruncatedDist(family, "vertex"),
-  }
-})
 
 function getClassicalPose(forme: ClassicalForme, facet: Facet): Pose {
   const { geom } = forme
@@ -128,56 +57,54 @@ function getClassicalPose(forme: ClassicalForme, facet: Facet): Pose {
 
 const twistOpts: Twist[] = ["left", "right"]
 
+type ResizeArgs<L, R> = Omit<
+  OpPairInput<Classical, ClassicalForme, L, R>,
+  "graph"
+>
+
+function getResizeArgs<L, R>(
+  getFacet: (opts: GraphOpts<L, R>) => Facet,
+): ResizeArgs<L, R> {
+  return {
+    middle: "right",
+    getPose(pos, forme, options) {
+      return getClassicalPose(forme, getFacet(options))
+    },
+    toLeft(forme, options, result) {
+      return getResizedVertices(forme, getFacet(options), result)
+    },
+  }
+}
+
+const resizeArgs = getResizeArgs<{}, FacetOpts>((opts) => opts.right.facet)
+
 // Expansion of truncated to bevelled solids
 const semiExpand = makeOpPair<Classical, ClassicalForme, {}, FacetOpts>({
+  ...resizeArgs,
   graph: Classical.query
     .where((s) => s.isTruncated())
     .map((entry) => ({
       left: entry,
       right: entry.withData({ operation: "bevel" }),
-      options: { left: {}, right: { facet: entry.data.facet! } },
+      options: { left: {}, right: { facet: entry.facet() } },
     })),
-  middle: "right",
-  getPose(pos, forme, { right: { facet } }) {
-    return getClassicalPose(forme, facet)
-  },
-  toLeft(forme, { right: { facet } }) {
-    return getResizedVertices(
-      forme,
-      facet,
-      bevelledDists[forme.specs.data.family][facet],
-    )
-  },
 })
 
 const _expand = makeOpPair<Classical, ClassicalForme, {}, FacetOpts>({
+  ...resizeArgs,
   graph: Classical.query
     .where((s) => s.isRegular())
     .map((entry) => {
       return {
         left: entry,
         right: entry.withData({ operation: "cantellate" }),
-        options: { left: {}, right: { facet: entry.data.facet! } },
+        options: { left: {}, right: { facet: entry.facet() } },
       }
     }),
-
-  middle: "right",
-
-  getPose(pos, forme, { right: { facet } }) {
-    return getClassicalPose(forme, facet)
-  },
-  toLeft(forme, { right: { facet } }, result) {
-    // Take all the stuff and push it inwards
-    return getResizedVertices(
-      // FIXME get rid of the adjustment
-      forme,
-      facet,
-      getInradius(result),
-    )
-  },
 })
 
 const _snub = makeOpPair<Classical, ClassicalForme, TwistOpts, FacetOpts>({
+  ...resizeArgs,
   graph: Classical.query
     .where((s) => s.isRegular())
     .flatMap((entry) => {
@@ -189,22 +116,13 @@ const _snub = makeOpPair<Classical, ClassicalForme, TwistOpts, FacetOpts>({
           // is *opposite* of the twist option
           twist: entry.isVertex() ? getOppTwist(twist) : twist,
         }),
-        options: { left: { twist }, right: { facet: entry.data.facet! } },
+        options: { left: { twist }, right: { facet: entry.facet() } },
       }))
     }),
-
-  middle: "right",
-
-  getPose(pos, forme, { right: { facet } }) {
-    return getClassicalPose(forme, facet)
-  },
-  toLeft(forme, { right: { facet } }, result) {
-    // Take all the stuff and push it inwards
-    return getResizedVertices(forme, facet, getInradius(result))
-  },
 })
 
 const _twist = makeOpPair<Classical, ClassicalForme, TwistOpts, {}>({
+  ...getResizeArgs(() => "face"),
   graph: Classical.query
     .where((s) => s.isCantellated())
     .flatMap((entry) => {
@@ -214,19 +132,6 @@ const _twist = makeOpPair<Classical, ClassicalForme, TwistOpts, {}>({
         options: { left: { twist }, right: {} },
       }))
     }),
-
-  middle: "right",
-
-  getPose(pos, forme) {
-    return getClassicalPose(forme, "face")
-  },
-  toLeft(forme) {
-    return getResizedVertices(
-      forme,
-      "face",
-      cantellatedDists[forme.specs.data.family],
-    )
-  },
 })
 
 function getCantellatedMidradius(forme: ClassicalForme) {
@@ -236,16 +141,14 @@ function getCantellatedMidradius(forme: ClassicalForme) {
 /**
  * Take the cantellated intermediate solid and convert it to either dual
  */
-function doDualTransform(forme: ClassicalForme, facet: Facet) {
-  const { specs, geom } = forme
-  const resultSpecs = specs.withData({ operation: "regular", facet })
+function doDualTransform(forme: ClassicalForme, result: Classical) {
+  const resultForme = createFormeFromSpecs(result) as ClassicalForme
   const resultSideLength =
-    getCantellatedMidradius(forme) / getMidradius(resultSpecs)
-  const scale = resultSideLength * getCircumradius(resultSpecs)
-  const oppFacet = facet === "face" ? "vertex" : "face"
-  const faces = forme.facetFaces(oppFacet)
+    getCantellatedMidradius(forme) / resultForme.midradius()
+  const scale = resultSideLength * resultForme.circumradius()
+  const faces = forme.facetFaces(oppositeFacet(result.facet()))
   return getTransformedVertices(faces, (f) => {
-    return geom.centroid().add(f.normal().scale(scale))
+    return forme.geom.centroid().add(f.normal().scale(scale))
   })
 }
 
@@ -264,7 +167,7 @@ const _dual = makeOpPair<Classical, ClassicalForme>({
         return {
           ...getClassicalPose(forme, "face"),
           // Everything is scaled with the same midradius
-          scale: geom.edges[0].distanceToCenter(),
+          scale: forme.midradius(),
         }
       }
       case "right": {
@@ -274,7 +177,7 @@ const _dual = makeOpPair<Classical, ClassicalForme>({
         const v2 = vertex.adjacentVertices()[0]
         return {
           origin: geom.centroid(),
-          scale: geom.edges[0].distanceToCenter(),
+          scale: forme.midradius(),
           orientation: [normal, v2.vec.sub(vertex.vec)],
         }
       }
@@ -286,8 +189,8 @@ const _dual = makeOpPair<Classical, ClassicalForme>({
       }
     }
   },
-  toLeft: (forme) => doDualTransform(forme, "face"),
-  toRight: (forme) => doDualTransform(forme, "vertex"),
+  toLeft: (forme, _, result) => doDualTransform(forme, result),
+  toRight: (forme, _, result) => doDualTransform(forme, result),
 })
 
 // Exported members

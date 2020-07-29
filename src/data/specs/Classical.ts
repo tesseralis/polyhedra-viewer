@@ -8,6 +8,9 @@ export type Family = PrimaryPolygon
 
 export const facets = ["face", "vertex"] as const
 export type Facet = Items<typeof facets>
+export function oppositeFacet(facet: Facet) {
+  return facet === "face" ? "vertex" : "face"
+}
 
 const operations = [
   "regular",
@@ -60,6 +63,10 @@ export default class Classical extends Specs<ClassicalData> {
   isSnub = () => this.data.operation === "snub"
 
   hasFacet = () => this.isRegular() || this.isTruncated()
+  facet() {
+    if (!this.data.facet) throw new Error(`Spec ${this.name()} has no facet`)
+    return this.data.facet
+  }
 
   isFace = () => this.data.facet === "face"
   isVertex = () => this.data.facet === "vertex"

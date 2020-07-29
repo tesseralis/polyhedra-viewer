@@ -1,6 +1,6 @@
 import { Twist } from "types"
 import PolyhedronForme from "./PolyhedronForme"
-import Classical, { Facet, facets } from "data/specs/Classical"
+import Classical, { Facet, facets, oppositeFacet } from "data/specs/Classical"
 import { Polyhedron, Face, Edge } from "math/polyhedra"
 import { angleBetween } from "math/geom"
 
@@ -97,17 +97,11 @@ export default abstract class ClassicalForme extends PolyhedronForme<
   }
 
   mainFacet() {
-    if (!this.specs.data.facet) {
-      throw new Error(`Polyhedron has no main facet`)
-    }
-    return this.specs.data.facet
+    return this.specs.facet()
   }
 
   minorFacet() {
-    if (!this.specs.data.facet) {
-      throw new Error(`Polyhedron has no main facet`)
-    }
-    return this.specs.data.facet === "vertex" ? "face" : "vertex"
+    return oppositeFacet(this.specs.facet())
   }
 
   isMainFacetFace(face: Face) {
@@ -146,6 +140,21 @@ export default abstract class ClassicalForme extends PolyhedronForme<
     return face
   }
 
+  /** Return the inradius of the given type of face */
+  inradius(facet: Facet) {
+    return this.facetFace(facet).distanceToCenter()
+  }
+
+  midradius(): number {
+    throw new Error(
+      `Polyhedron ${this.specs.name()} does not have consistent midradius`,
+    )
+  }
+
+  circumradius() {
+    return this.geom.getVertex().distanceToCenter()
+  }
+
   /**
    * Return the amount that this forme's faces are twisted
    */
@@ -156,31 +165,31 @@ export default abstract class ClassicalForme extends PolyhedronForme<
 
 class RegularForme extends ClassicalForme {
   _isFacetFace(face: Face, facet: Facet) {
-    return facet === this.specs.data.facet
+    return facet === this.specs.facet()
   }
 
   tetrahedralFacetFaces(facet: Facet) {
-    return facet === this.specs.data.facet ? this.geom.faces : []
+    return facet === this.specs.facet() ? this.geom.faces : []
   }
 
   adjacentFacetFace(face: Face, facet: Facet) {
     // NOTE this doesn't account for when the face isn't a facet face
     return face.adjacentFaces()[0]
   }
+
+  midradius() {
+    return this.geom.getEdge().distanceToCenter()
+  }
 }
 
 class TruncatedForme extends ClassicalForme {
   _isFacetFace(face: Face, facet: Facet) {
-    if (this.specs.data.facet === facet) {
-      return face.numSides > 5
-    } else {
-      return face.numSides <= 5
-    }
+    return this.specs.facet() === facet ? face.numSides > 5 : face.numSides <= 5
   }
 
   tetrahedralFacetFaces(facet: Facet) {
     return this.geom.faces.filter(
-      (f) => f.numSides === (this.specs.data.facet === facet ? 6 : 3),
+      (f) => f.numSides === (this.specs.facet() === facet ? 6 : 3),
     )
   }
 
