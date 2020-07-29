@@ -1,5 +1,4 @@
 import { Twist, twists, oppositeTwist } from "types"
-import { PrismaticType } from "data/specs/common"
 import PolyhedronSpecs from "data/specs/PolyhedronSpecs"
 import Capstone from "data/specs/Capstone"
 import Prismatic from "data/specs/Prismatic"
@@ -10,6 +9,7 @@ import { withOrigin, getCentroid } from "math/geom"
 import PolyhedronForme from "math/formes/PolyhedronForme"
 import CapstoneForme from "math/formes/CapstoneForme"
 import PrismaticForme from "math/formes/PrismaticForme"
+import { createFormeFromSpecs } from "math/formes/createForme"
 
 const { cos, PI, sqrt } = Math
 
@@ -17,17 +17,6 @@ const { cos, PI, sqrt } = Math
 export function antiprismHeight(n: number) {
   const sec = 1 / cos(PI / (2 * n))
   return sqrt(1 - (sec * sec) / 4)
-}
-
-function getPrismaticHeight(n: number, elongation: PrismaticType | null) {
-  switch (elongation) {
-    case "prism":
-      return 1
-    case "antiprism":
-      return antiprismHeight(n)
-    default:
-      return 0
-  }
 }
 
 function getTwistMult(twist?: Twist) {
@@ -102,20 +91,16 @@ function getScaledPrismVertices(
   )
 }
 
-/**
- * Shorten the given polyhedron with the optional twist
- */
-function doShorten(forme: CapstoneForme, twist?: Twist) {
-  const { specs, geom } = forme
-  const scale =
-    -geom.edgeLength() *
-    getPrismaticHeight(getNumSides(specs), specs.data.elongation)
-  return getScaledPrismVertices(forme, scale, twist)
-}
-
-function doTurn(forme: CapstoneForme | PrismaticForme, twist?: Twist) {
-  const { specs, geom } = forme
-  const scale = -geom.edgeLength() * (antiprismHeight(getNumSides(specs)) - 1)
+function doPrismTransform(
+  forme: CapstoneForme | PrismaticForme,
+  result: any,
+  twist?: Twist,
+) {
+  const resultForme = createFormeFromSpecs(result) as any
+  const resultHeight =
+    (resultForme.prismaticHeight() / resultForme.geom.edgeLength()) *
+    forme.geom.edgeLength()
+  const scale = resultHeight - forme.prismaticHeight()
   return getScaledPrismVertices(forme, scale, twist)
 }
 
@@ -139,9 +124,8 @@ function makePrismOp({ query, rightElongation = "antiprism" }: PrismOpArgs) {
       getPose(side, forme) {
         return getCapstonePose(forme, twist)
       },
-      toLeft(forme) {
-        const fn = leftElongation === "prism" ? doTurn : doShorten
-        return fn(forme, twist)
+      toLeft(forme, $, result) {
+        return doPrismTransform(forme, result, twist)
       },
     })
   }
@@ -159,7 +143,7 @@ const turnPrismatic = makeOpPair<Prismatic, PrismaticForme>({
   getPose(side, forme) {
     return getPrismaticPose(forme)
   },
-  toLeft: (forme) => doTurn(forme, "left"),
+  toLeft: (forme, $, result) => doPrismTransform(forme, result, "left"),
 })
 
 const _elongate = makePrismOp({
@@ -214,9 +198,8 @@ function makeBicupolaPrismOp(leftElongation: null | "prism") {
     getPose(side, forme, { right: { twist } }) {
       return getCapstonePose(forme, twist)
     },
-    toLeft: (forme, { right: { twist } }) => {
-      const fn = leftElongation === "prism" ? doTurn : doShorten
-      return fn(forme, twist)
+    toLeft: (forme, { right: { twist } }, result) => {
+      return doPrismTransform(forme, result, twist)
     },
   })
 }

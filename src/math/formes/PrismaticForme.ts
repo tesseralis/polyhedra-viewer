@@ -15,4 +15,9 @@ export default class PrismaticForme extends PolyhedronForme<Prismatic> {
     )!
     return [face1, face2]
   }
+
+  prismaticHeight() {
+    const [top, bot] = this.bases()
+    return top.centroid().distanceTo(bot.centroid())
+  }
 }

@@ -20,6 +20,11 @@ export default abstract class CapstoneForme extends PolyhedronForme<Capstone> {
       base instanceof Cap ? base.boundary() : base,
     ) as [FaceLike, FaceLike]
   }
+
+  prismaticHeight() {
+    const [top, bot] = this.baseFaces()
+    return top.centroid().distanceTo(bot.centroid())
+  }
 }
 
 class MonoCapstoneForme extends CapstoneForme {
