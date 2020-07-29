@@ -28,12 +28,6 @@ type AugmentSpecs = Prismatic | CutPasteSpecs
 
 type AugmentType = "pyramid" | "cupola" | "rotunda"
 
-const augmentTypes: Record<string, AugmentType> = {
-  Y: "pyramid",
-  U: "cupola",
-  R: "rotunda",
-}
-
 function hasAugmentAlignment(info: AugmentSpecs) {
   if (!info.isComposite()) return false
   const { source, augmented } = info.data
@@ -75,8 +69,7 @@ function canAugmentWith(base: Face, augmentee: Polyhedron, offset: number) {
   })
 }
 
-function canAugmentWithType(base: Face, using: string) {
-  const augmentType = getUsingType(using)
+function canAugmentWithType(base: Face, augmentType: AugmentType) {
   const n = augmentType === "pyramid" ? base.numSides : base.numSides / 2
   // FIXME maybe this should rely on Forme functions instead of dihedral angles
   if (![2, 3, 4, 5].includes(n)) return false
@@ -181,24 +174,9 @@ function defaultAugmentType(numSides: number) {
   return numSides <= 5 ? "pyramid" : "cupola"
 }
 
-const defaultAugmentees: Record<number, string> = {
-  3: "Y3",
-  4: "Y4",
-  5: "Y5",
-  6: "U3",
-  8: "U4",
-  10: "U5",
-}
-
-function getAugmenteeNumSides(using: string) {
-  const { type, base } = getUsingData(using)
-  return ["rotunda", "cupola"].includes(type) ? base * 2 : base
-}
-
-function getUsingOpt(numSides: number, using?: string) {
-  return !!using && getAugmenteeNumSides(using) === numSides
-    ? using
-    : defaultAugmentees[numSides]
+function getUsingOpt(numSides: number, using?: AugmentType) {
+  using = using ?? (numSides > 5 ? "cupola" : "pyramid")
+  return { type: using, base: numSides > 5 ? numSides / 2 : numSides }
 }
 
 function hasRotunda(info: AugmentSpecs) {
@@ -211,18 +189,9 @@ function hasRotunda(info: AugmentSpecs) {
   return false
 }
 
-function getUsingData(using: string) {
-  const [prefix, baseStr] = using
-  return { type: augmentTypes[prefix], base: parseInt(baseStr) }
-}
-
-function getUsingType(using: string) {
-  return getUsingData(using).type
-}
-
-function getUsingOpts(info: AugmentSpecs) {
+function getUsingOpts(info: AugmentSpecs): AugmentType[] | null {
   if (hasRotunda(info)) {
-    return ["U5", "R5"]
+    return ["cupola", "rotunda"]
   }
   return null
 }
@@ -247,7 +216,7 @@ const allGyrateOpts: GyrateOpts[] = ["ortho", "gyro"]
 interface Options {
   face: Face
   gyrate?: GyrateOpts
-  using?: string
+  using?: AugmentType
 }
 
 const augmentPrismatic: CutPasteOpArgs<
@@ -256,9 +225,7 @@ const augmentPrismatic: CutPasteOpArgs<
   PolyhedronForme<Prismatic>
 > = {
   apply({ specs, geom }, { face, using }) {
-    const augmentType = using
-      ? getUsingType(using)
-      : defaultAugmentType(face.numSides)
+    const augmentType = using ?? defaultAugmentType(face.numSides)
     return doAugment(specs, geom, face, augmentType)
   },
 
@@ -271,7 +238,7 @@ const augmentPrismatic: CutPasteOpArgs<
 
   getResult({ specs }, { face, using }) {
     const n = face.numSides
-    const { type, base } = getUsingData(getUsingOpt(n, using))
+    const { type, base } = getUsingOpt(n, using)
     return Capstone.query.withData({
       count: 1,
       elongation: specs.data.type,
@@ -287,9 +254,7 @@ const augmentCapstone: CutPasteOpArgs<
   PolyhedronForme<Capstone>
 > = {
   apply({ specs, geom }, { face, gyrate, using }) {
-    const augmentType = using
-      ? getUsingType(using)
-      : defaultAugmentType(face.numSides)
+    const augmentType = using ?? defaultAugmentType(face.numSides)
     let baseAxis, augAxis
     // only matter if it's a bicupola that isn't gyroelongated
     // FIXME simplify this
@@ -324,7 +289,7 @@ const augmentCapstone: CutPasteOpArgs<
 
   getResult({ specs }, { face, using, gyrate }) {
     const n = face.numSides
-    const { type, base } = getUsingData(getUsingOpt(n, using))
+    const { type, base } = getUsingOpt(n, using)
     return specs.withData({
       count: 2,
       gyrate: base === 2 ? "gyro" : gyrate,
