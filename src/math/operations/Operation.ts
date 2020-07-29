@@ -6,8 +6,12 @@ import { Polyhedron, Face, VertexArg, normalizeVertex } from "math/polyhedra"
 import { deduplicateVertices } from "./operationUtils"
 import { Point } from "types"
 import PolyhedronSpecs from "data/specs/PolyhedronSpecs"
+import PolyhedronForme from "math/formes/PolyhedronForme"
+import createForme from "math/formes/createForme"
 
 type SelectState = "selected" | "selectable" | undefined
+
+type SolidForme = PolyhedronForme<PolyhedronSpecs>
 
 export interface AnimationData {
   start: Polyhedron
@@ -17,7 +21,7 @@ export interface AnimationData {
 }
 
 export interface OpResult {
-  result: PolyhedronForme
+  result: SolidForme
   animationData: AnimationData
 }
 
@@ -34,60 +38,63 @@ export interface SolidArgs<Specs extends PolyhedronSpecs> {
   geom: Polyhedron
 }
 
-export type PolyhedronForme = SolidArgs<PolyhedronSpecs>
+// export type PolyhedronForme = SolidArgs<PolyhedronSpecs>
 
-export interface OpArgs<Options extends {}, Specs extends PolyhedronSpecs> {
+export interface OpArgs<
+  Options extends {},
+  Specs extends PolyhedronSpecs,
+  Forme extends PolyhedronForme<Specs>
+> {
   canApplyTo(info: PolyhedronSpecs): boolean
 
   hasOptions?(info: Specs): boolean
 
-  isPreferredSpec?(info: Specs, options: Options): boolean
-
-  apply(solid: SolidArgs<Specs>, options: Options): PartialOpResult
+  apply(solid: Forme, options: Options): PartialOpResult
 
   allOptions?(
-    solid: SolidArgs<Specs>,
+    solid: Forme,
     optionName: keyof Options,
   ): Options[typeof optionName][]
 
-  allOptionCombos?(solid: SolidArgs<Specs>): Generator<Options>
+  allOptionCombos?(solid: Forme): Generator<Options>
 
-  getResult(solid: SolidArgs<Specs>, options: Options): PolyhedronSpecs
+  getResult(solid: Forme, options: Options): PolyhedronSpecs
 
   hitOption?: keyof Options
 
   getHitOption?(
-    solid: SolidArgs<Specs>,
+    solid: Forme,
     hitPnt: Vec3D,
     options: Partial<Options>,
   ): Partial<Options>
 
   defaultOptions?(info: Specs): Partial<Options>
 
-  faceSelectionStates?(solid: SolidArgs<Specs>, options: Options): SelectState[]
+  faceSelectionStates?(solid: Forme, options: Options): SelectState[]
 }
 
-type OperationArg = keyof OpArgs<any, any>
+type OperationArg = keyof OpArgs<any, any, any>
 const methodDefaults = {
   getHitOption: {},
   hasOptions: false,
   allOptionCombos: [null],
-  isPreferredSpec: true,
   faceSelectionStates: [],
   defaultOptions: {},
 }
 
 // TODO get this to return the correct type
-function fillDefaults<Options extends {}, Specs extends PolyhedronSpecs>(
-  op: OpArgs<Options, Specs>,
-): Required<OpArgs<Options, Specs>> {
+function fillDefaults<
+  Options extends {},
+  Specs extends PolyhedronSpecs,
+  Forme extends PolyhedronForme<Specs>
+>(op: OpArgs<Options, Specs, Forme>): Required<OpArgs<Options, Specs, Forme>> {
   return {
     ...mapValues(
       methodDefaults,
       (fnDefault, fn: OperationArg) => op[fn] ?? (() => fnDefault),
     ),
     ...op,
-  } as Required<OpArgs<Options, Specs>>
+  } as Required<OpArgs<Options, Specs, Forme>>
 }
 
 function getCoplanarFaces(polyhedron: Polyhedron) {
@@ -142,10 +149,10 @@ function normalizeOpResult(
   const endColors = getFaceColors(end)
 
   return {
-    result: {
-      geom: normedResult.withName(newSpecs.name()),
-      specs: newSpecs,
-    },
+    result: createForme(
+      newSpecs,
+      normedResult.withName(newSpecs.canonicalName()),
+    ),
     animationData: {
       start,
       endVertices: endVertices.map(normalizeVertex),
@@ -158,15 +165,18 @@ function normalizeOpResult(
 export default class Operation<Options extends {} = {}> {
   name: string
   hitOption: keyof Options
-  private opArgs: Required<OpArgs<Options, PolyhedronSpecs>>
+  private opArgs: Required<OpArgs<Options, PolyhedronSpecs, SolidForme>>
 
-  constructor(name: string, opArgs: OpArgs<Options, PolyhedronSpecs>) {
+  constructor(
+    name: string,
+    opArgs: OpArgs<Options, PolyhedronSpecs, SolidForme>,
+  ) {
     this.name = name
     this.opArgs = fillDefaults(opArgs)
     this.hitOption = this.opArgs.hitOption
   }
 
-  apply(solid: PolyhedronForme, options: Options) {
+  apply(solid: SolidForme, options: Options) {
     // get the next polyhedron name
     const next = this.opArgs.getResult!(solid, options ?? {})
 
@@ -175,38 +185,39 @@ export default class Operation<Options extends {} = {}> {
     return normalizeOpResult(opResult, next)
   }
 
-  getHitOption(solid: PolyhedronForme, hitPnt: Point, options: Options) {
+  getHitOption(solid: SolidForme, hitPnt: Point, options: Options) {
     return this.opArgs.getHitOption(solid, vec(hitPnt), options)
   }
 
-  canApplyTo(solid: PolyhedronForme) {
+  canApplyTo(solid: SolidForme) {
     return this.opArgs.canApplyTo(solid.specs)
   }
 
-  hasOptions(solid: PolyhedronForme) {
+  hasOptions(solid: SolidForme) {
     return this.opArgs.hasOptions(solid.specs)
   }
 
-  allOptions(solid: PolyhedronForme, optionName: keyof Options) {
+  allOptions(solid: SolidForme, optionName: keyof Options) {
     return this.opArgs.allOptions(solid, optionName)
   }
 
-  *allOptionCombos(solid: PolyhedronForme) {
+  *allOptionCombos(solid: SolidForme) {
     yield* this.opArgs.allOptionCombos(solid)
   }
 
-  defaultOptions(solid: PolyhedronForme) {
+  defaultOptions(solid: SolidForme) {
     return this.opArgs.defaultOptions(solid.specs)
   }
 
-  faceSelectionStates(solid: PolyhedronForme, options: Options) {
+  faceSelectionStates(solid: SolidForme, options: Options) {
     return this.opArgs.faceSelectionStates(solid, options)
   }
 }
 
 export function makeOperation<
   Options extends {} = {},
-  Specs extends PolyhedronSpecs = PolyhedronSpecs
->(name: string, opArgs: OpArgs<Options, Specs>) {
+  Specs extends PolyhedronSpecs = PolyhedronSpecs,
+  Forme extends PolyhedronForme<Specs> = PolyhedronForme<Specs>
+>(name: string, opArgs: OpArgs<Options, Specs, Forme>) {
   return new Operation(name, opArgs)
 }

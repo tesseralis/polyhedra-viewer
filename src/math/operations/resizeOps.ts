@@ -2,68 +2,26 @@ import { minBy } from "lodash-es"
 import { Twist } from "types"
 import { mapObject } from "utils"
 import Classical, { Facet, Family } from "data/specs/Classical"
-import { makeOpPair, combineOps, Pose } from "./operationPairs"
-import { angleBetween, getPlane, withOrigin, Vec3D } from "math/geom"
-import { Polyhedron, Face, Edge } from "math/polyhedra"
+import { makeOpPair, combineOps } from "./operationPairs"
+import { angleBetween, getPlane, withOrigin } from "math/geom"
+import { Face } from "math/polyhedra"
 import {
   getOppTwist,
-  oppositeFace,
   getTransformedVertices,
-  FacetOpts,
-  TwistOpts,
+  // FacetOpts,
+  // TwistOpts,
   getGeometry,
+  Pose,
 } from "./operationUtils"
 import Operation, { makeOperation } from "./Operation"
+import ClassicalForme from "math/formes/ClassicalForme"
 
-function getSnubTetrahedronFaces(polyhedron: Polyhedron) {
-  const f0 = polyhedron.faceWithNumSides(3)
-  return [f0, ...f0.edges.map((e) => oppositeFace(e, "right"))]
+interface FacetOpts {
+  facet: Facet
 }
 
-function getCantellatedTetrahedronFaces(polyhedron: Polyhedron, odd?: boolean) {
-  let f0 = polyhedron.faceWithNumSides(3)
-  if (odd) {
-    f0 = f0.edges[0].twin().next().twinFace()
-  }
-  return [f0, ...f0.edges.map((e) => oppositeFace(e))]
-}
-
-function getBevelledTetrahedronFaces(polyhedron: Polyhedron) {
-  const f0 = polyhedron.faceWithNumSides(6)
-  const rest = f0.edges
-    .filter((e) => e.twinFace().numSides === 4)
-    .map((e) => oppositeFace(e))
-  return [f0, ...rest]
-}
-
-function getSnubFaces(specs: Classical, polyhedron: Polyhedron, facet?: Facet) {
-  if (specs.isTetrahedral()) {
-    return getSnubTetrahedronFaces(polyhedron)
-  }
-  return polyhedron.faces.filter((face) =>
-    isSnubFace(face, getFaceType(specs, facet)),
-  )
-}
-
-function getBevelledFaces(specs: Classical, geom: Polyhedron, facet: Facet) {
-  if (specs.isTetrahedral()) {
-    return getBevelledTetrahedronFaces(geom)
-  }
-  return geom.faces.filter((f) => f.numSides === 2 * getFaceType(specs, facet))
-}
-
-function getCantellatedFaces(
-  specs: Classical,
-  geom: Polyhedron,
-  facet?: Facet,
-  odd?: boolean,
-) {
-  if (specs.isTetrahedral()) {
-    return getCantellatedTetrahedronFaces(geom, odd)
-  }
-  return geom.faces.filter((face) =>
-    isCantellatedFace(face, getFaceType(specs, facet)),
-  )
+interface TwistOpts {
+  twist: Twist
 }
 
 /**
@@ -120,23 +78,14 @@ function getCircumradius(specs: Classical) {
   return (tan(PI / q) * tanDihedralOver2(specs)) / 2
 }
 
-// Get the face type for the given facet and solid specs
-function getFaceType(specs: Classical, facet?: Facet) {
-  return facet === "vertex" ? 3 : specs.data.family
-}
-
-function apothemVec(edge: Edge) {
-  return edge.midpoint().sub(edge.face.centroid())
-}
-
 /**
  * Return the snub angle of the given polyhedron, given the list of expanded faces
  */
 export function calcSnubAngle(specs: Classical, facet: Facet) {
   // Choose one of the expanded faces and get its properties
   const polyhedron = getGeometry(specs)
-  const expandedFaces = getSnubFaces(specs, polyhedron, facet)
-  const [face0, ...rest] = expandedFaces
+  const forme = ClassicalForme.create(specs, polyhedron)
+  const [face0, ...rest] = forme.facetFaces(facet)
   const faceCentroid = face0.centroid()
   const midpoint = face0.edges[0].midpoint()
 
@@ -169,52 +118,21 @@ const snubAngles = createObject([3, 4, 5], (family: Family) => {
   }
 })
 
-function isCantellatedFace(face: Face, faceType: number) {
-  return (
-    face.numSides === faceType &&
-    face.adjacentFaces().every((f) => f.numSides === 4)
-  )
-}
-
-function isCantellatedEdgeFace(face: Face) {
-  return (
-    face.numSides === 4 && face.adjacentFaces().some((f) => f.numSides !== 4)
-  )
-}
-
-export function getCantellatedEdgeFace(geom: Polyhedron) {
-  const face = geom.faces.find(isCantellatedEdgeFace)
-  if (!face) throw new Error(`Could not find edge face for ${geom.name}`)
-  return face
-}
-
-export function getCantellatedFace(geom: Polyhedron, faceType: number) {
-  const face = geom.faces.find((f) => isCantellatedFace(f, faceType))
-  if (!face) throw new Error(`Could not find cantellated face for ${geom.name}`)
-  return face
-}
-
-function isSnubFace(face: Face, faceType: number) {
-  return (
-    face.numSides === faceType &&
-    face.adjacentFaces().every((f) => f.numSides === 3)
-  )
-}
-
 // TODO deduplicate these (note: bevel has a different criterion for getting face)
+// FIXME move all these to a function on the Forme
 const cantellatedDists = createObject([3, 4, 5], (family: Family) => {
   const specs = Classical.query.withData({ family, operation: "cantellate" })
   const geom = getGeometry(specs)
-  const face = getCantellatedFace(geom, family)
+  const forme = ClassicalForme.create(specs, geom)
+  const face = forme.facetFace("face")
   return face.distanceToCenter() / geom.edgeLength()
 })
 
 function calcTruncatedDist(family: Family, facet: Facet) {
-  const _facet = family === 3 ? undefined : facet
   const specs = Classical.query.withData({
     family,
     operation: "truncate",
-    facet: _facet,
+    facet,
   })
   const geom = getGeometry(specs)
   const face = geom.largestFace()
@@ -229,126 +147,80 @@ const bevelledDists = createObject([3, 4, 5], (family: Family) => {
 })
 
 function getSnubAngle(specs: Classical, facet: Facet) {
-  const sign = specs.data.twist === "left" ? -1 : 1
+  const twistSign = specs.data.twist === "left" ? -1 : 1
   // if vertex-solid, reverse the sign
-  const sign2 = facet === "vertex" ? -1 : 1
+  const facetSign = facet === "vertex" ? -1 : 1
   const angle = snubAngles[specs.data.family][facet]
-  return sign2 * sign * angle
+  return twistSign * facetSign * angle
 }
 
-/**
- * Get the common properties of a resize operation's pose.
- */
-function getPose(geom: Polyhedron, face: Face, crossAxis: Vec3D): Pose {
+function getClassicalPose(forme: ClassicalForme, facet: Facet): Pose {
+  const { geom } = forme
   return {
     // Always centered on centroid
     origin: geom.centroid(),
-    // Always scale to side length
-    scale: geom.edgeLength(),
     // Use the normal of the given face as the first axis
-    orientation: [face.normal(), crossAxis],
+    scale: geom.edgeLength(),
+    orientation: forme
+      .adjacentFacetFaces(facet)
+      .map((face) => face.normal()) as any,
   }
 }
 
-// Get the pose of a regular solid for both expand/snub
-function getRegularPose(geom: Polyhedron): Pose {
-  const face = geom.getFace()
-  return getPose(geom, face, apothemVec(face.edges[0]))
-}
-
-function getCantellatedPose(
-  geom: Polyhedron,
-  specs: Classical,
-  facet?: Facet,
-): Pose {
-  const faceType = getFaceType(specs, facet)
-  // Use an expanded face as the face
-  const face = getCantellatedFace(geom, faceType)
-  // Pick one of the edges as cross axis
-  return getPose(geom, face, apothemVec(face.edges[0]))
-}
-
-function getSnubPose(geom: Polyhedron, specs: Classical, facet: Facet): Pose {
-  const faceType = getFaceType(specs, facet)
-  // Use an expanded face as the face
-  const face = geom.faces.find((face) => isSnubFace(face, faceType))!
-  // Rotate the apothem vector to align it correctly
-  const crossAxis = apothemVec(face.edges[0]).getRotatedAroundAxis(
-    face.normal(),
-    getSnubAngle(specs, facet),
-  )
-  return getPose(geom, face, crossAxis)
-}
-
-function twistOpts(specs: Classical): Twist[] {
-  // Snub tetrahedra aren't chiral (yet)
-  return specs.isTetrahedral() ? ["left"] : ["left", "right"]
-}
+const twistOpts: Twist[] = ["left", "right"]
 
 // Expansion of truncated to bevelled solids
-const semiExpand = makeOpPair<Classical, {}, FacetOpts>({
+const semiExpand = makeOpPair<Classical, ClassicalForme, {}, FacetOpts>({
   graph: Classical.query
     .where((s) => s.isTruncated())
     .map((entry) => ({
       left: entry,
       right: entry.withData({ operation: "bevel" }),
-      options: { left: {}, right: { facet: entry.data.facet } },
+      options: { left: {}, right: { facet: entry.data.facet! } },
     })),
   middle: "right",
-  getPose(pos, { specs, geom }, { right: { facet } }) {
-    if (pos === "left") {
-      const face = geom.faces.find((f) => f.numSides > 5)!
-      const edge = face.edges.find(
-        (e) => e.twinFace().numSides === face.numSides,
-      )!
-      return getPose(geom, face, apothemVec(edge))
-    } else {
-      const faceType = 2 * getFaceType(specs, facet)
-      const face = geom.faceWithNumSides(faceType)
-      const edge = face.edges.find((e) => e.twinFace().numSides === 4)!
-      return getPose(geom, face, apothemVec(edge))
-    }
+  getPose(pos, forme, { right: { facet } }) {
+    return getClassicalPose(forme, facet)
   },
-  toLeft({ specs, geom }, { right: { facet = "face" } }) {
+  toLeft(forme, { right: { facet } }) {
     return getResizedVertices(
-      getBevelledFaces(specs, geom, facet),
-      bevelledDists[specs.data.family][facet],
+      forme.facetFaces(facet),
+      bevelledDists[forme.specs.data.family][facet],
     )
   },
 })
 
-const _expand = makeOpPair<Classical, {}, FacetOpts>({
+const _expand = makeOpPair<Classical, ClassicalForme, {}, FacetOpts>({
   graph: Classical.query
     .where((s) => s.isRegular())
     .map((entry) => {
       return {
         left: entry,
         right: entry.withData({ operation: "cantellate" }),
-        options: { left: {}, right: { facet: entry.data.facet } },
+        options: { left: {}, right: { facet: entry.data.facet! } },
       }
     }),
 
   middle: "right",
 
-  getPose(pos, { geom, specs }, { right: { facet } }) {
-    return pos === "left"
-      ? getRegularPose(geom)
-      : getCantellatedPose(geom, specs, facet)
+  getPose(pos, forme, { right: { facet } }) {
+    return getClassicalPose(forme, facet)
   },
-  toLeft({ specs, geom }, { right: { facet } }, result) {
+  toLeft(forme, { right: { facet } }, result) {
     // Take all the stuff and push it inwards
     return getResizedVertices(
-      getCantellatedFaces(specs, geom, facet),
+      // FIXME get rid of the adjustment
+      forme.facetFaces(facet),
       getInradius(result),
     )
   },
 })
 
-const _snub = makeOpPair<Classical, TwistOpts, FacetOpts>({
+const _snub = makeOpPair<Classical, ClassicalForme, TwistOpts, FacetOpts>({
   graph: Classical.query
     .where((s) => s.isRegular())
     .flatMap((entry) => {
-      return twistOpts(entry).map((twist) => ({
+      return twistOpts.map((twist) => ({
         left: entry,
         right: entry.withData({
           operation: "snub",
@@ -356,32 +228,30 @@ const _snub = makeOpPair<Classical, TwistOpts, FacetOpts>({
           // is *opposite* of the twist option
           twist: entry.isVertex() ? getOppTwist(twist) : twist,
         }),
-        options: { left: { twist }, right: { facet: entry.data.facet } },
+        options: { left: { twist }, right: { facet: entry.data.facet! } },
       }))
     }),
 
   middle: "right",
 
-  getPose(pos, { geom, specs }, { right: { facet = "face" } }) {
-    return pos === "left"
-      ? getRegularPose(geom)
-      : getSnubPose(geom, specs, facet)
+  getPose(pos, forme, { right: { facet } }) {
+    return getClassicalPose(forme, facet)
   },
-  toLeft({ specs, geom }, { right: { facet = "face" } }, result) {
+  toLeft(forme, { right: { facet } }, result) {
     // Take all the stuff and push it inwards
     return getResizedVertices(
-      getSnubFaces(specs, geom, result.data.facet),
+      forme.facetFaces(result.data.facet!),
       getInradius(result),
-      getSnubAngle(specs, facet),
+      getSnubAngle(forme.specs, facet),
     )
   },
 })
 
-const _twist = makeOpPair<Classical, TwistOpts, {}>({
+const _twist = makeOpPair<Classical, ClassicalForme, TwistOpts, {}>({
   graph: Classical.query
     .where((s) => s.isCantellated())
     .flatMap((entry) => {
-      return twistOpts(entry).map((twist) => ({
+      return twistOpts.map((twist) => ({
         left: entry,
         right: entry.withData({ operation: "snub", twist }),
         options: { left: { twist }, right: {} },
@@ -390,40 +260,39 @@ const _twist = makeOpPair<Classical, TwistOpts, {}>({
 
   middle: "right",
 
-  getPose(pos, { specs, geom }) {
-    return pos === "left"
-      ? getCantellatedPose(geom, specs, "face")
-      : getSnubPose(geom, specs, "face")
+  getPose(pos, forme) {
+    return getClassicalPose(forme, "face")
   },
-  toLeft({ specs, geom }) {
+  toLeft(forme) {
     return getResizedVertices(
-      getSnubFaces(specs, geom, "face"),
-      cantellatedDists[specs.data.family],
-      getSnubAngle(specs, "face"),
+      forme.facetFaces("face"),
+      cantellatedDists[forme.specs.data.family],
+      getSnubAngle(forme.specs, "face"),
     )
   },
 })
 
-function getCantellatedMidradius(geom: Polyhedron) {
-  return getCantellatedEdgeFace(geom).distanceToCenter()
+function getCantellatedMidradius(forme: ClassicalForme) {
+  return forme.edgeFace().distanceToCenter()
 }
 
 /**
  * Take the cantellated intermediate solid and convert it to either dual
  */
-function doDualTransform(specs: Classical, geom: Polyhedron, facet: Facet) {
+function doDualTransform(forme: ClassicalForme, facet: Facet) {
+  const { specs, geom } = forme
   const resultSpecs = specs.withData({ operation: "regular", facet })
   const resultSideLength =
-    getCantellatedMidradius(geom) / getMidradius(resultSpecs)
+    getCantellatedMidradius(forme) / getMidradius(resultSpecs)
   const scale = resultSideLength * getCircumradius(resultSpecs)
   const oppFacet = facet === "face" ? "vertex" : "face"
-  const faces = getCantellatedFaces(specs, geom, oppFacet, facet === "face")
+  const faces = forme.facetFaces(oppFacet)
   return getTransformedVertices(faces, (f) => {
     return geom.centroid().add(f.normal().scale(scale))
   })
 }
 
-const _dual = makeOpPair({
+const _dual = makeOpPair<Classical, ClassicalForme>({
   graph: Classical.query
     .where((s) => s.isRegular() && !s.isVertex())
     .map((specs) => ({
@@ -431,11 +300,12 @@ const _dual = makeOpPair({
       right: specs.withData({ facet: "vertex" }),
     })),
   middle: (entry) => entry.left.withData({ operation: "cantellate" }),
-  getPose(pos, { specs, geom }) {
+  getPose(pos, forme) {
+    const { geom } = forme
     switch (pos) {
       case "left": {
         return {
-          ...getRegularPose(geom),
+          ...getClassicalPose(forme, "face"),
           // Everything is scaled with the same midradius
           scale: geom.edges[0].distanceToCenter(),
         }
@@ -453,42 +323,17 @@ const _dual = makeOpPair({
       }
       case "middle": {
         return {
-          ...getCantellatedPose(geom, specs, "face"),
-          scale: getCantellatedMidradius(geom),
+          ...getClassicalPose(forme, "face"),
+          scale: getCantellatedMidradius(forme),
         }
       }
     }
   },
-  toLeft: ({ specs, geom }) => doDualTransform(specs, geom, "face"),
-  toRight: ({ specs, geom }) => doDualTransform(specs, geom, "vertex"),
+  toLeft: (forme) => doDualTransform(forme, "face"),
+  toRight: (forme) => doDualTransform(forme, "vertex"),
 })
 
 // Exported members
-
-type ExpansionType = "cantellate" | "snub"
-
-function expansionType(polyhedron: Polyhedron): ExpansionType {
-  return polyhedron.getVertex().adjacentFaceCounts()[3] >= 3
-    ? "snub"
-    : "cantellate"
-}
-
-const edgeShape = {
-  snub: 3,
-  cantellate: 4,
-}
-
-// TODO replace with isCantellatedFace and isSnubFace
-export function isExpandedFace(
-  polyhedron: Polyhedron,
-  face: Face,
-  nSides?: number,
-) {
-  const type = expansionType(polyhedron)
-  if (typeof nSides === "number" && face.numSides !== nSides) return false
-  if (!face.isValid()) return false
-  return face.adjacentFaces().every((f) => f.numSides === edgeShape[type])
-}
 
 export const dual = new Operation("dual", combineOps([_dual.left, _dual.right]))
 
@@ -505,37 +350,24 @@ export const twist = makeOperation(
 )
 
 // NOTE: We are using the same operation for contracting both expanded and snub solids.
-export const contract = makeOperation<FacetOpts, Classical>("contract", {
-  ...combineOps([_expand, _snub, semiExpand].map((op) => op.right)),
+export const contract = makeOperation<FacetOpts, Classical, ClassicalForme>(
+  "contract",
+  {
+    ...combineOps([_expand, _snub, semiExpand].map((op) => op.right)),
 
-  hitOption: "facet",
-  getHitOption({ specs, geom }, hitPoint) {
-    const hitFace = geom.hitFace(hitPoint)
-    const faceType = hitFace.numSides
-    if (specs.isBevelled()) {
-      const isValid = hitFace.numSides > 4
-      return isValid ? { facet: faceType === 6 ? "vertex" : "face" } : {}
-    }
-    const isValid = isExpandedFace(geom, hitFace)
-    return isValid ? { facet: faceType === 3 ? "vertex" : "face" } : {}
-  },
+    hitOption: "facet",
+    getHitOption(forme, hitPoint) {
+      const hitFace = forme.geom.hitFace(hitPoint)
+      const facet = forme.getFacet(hitFace)
+      return facet ? { facet } : {}
+    },
 
-  faceSelectionStates({ specs, geom }, { facet }) {
-    if (specs.isBevelled()) {
-      return geom.faces.map((face) => {
-        const faceType = facet === "vertex" ? 6 : specs.data.family * 2
-        if (facet && face.numSides === faceType) {
-          return "selected"
-        }
-        if (face.numSides !== 4) return "selectable"
+    faceSelectionStates(forme, { facet }) {
+      return forme.geom.faces.map((face) => {
+        if (forme.isFacetFace(face, facet)) return "selected"
+        if (forme.isAnyFacetFace(face)) return "selectable"
         return undefined
       })
-    }
-    const faceType = !facet ? null : facet === "vertex" ? 3 : specs.data.family
-    return geom.faces.map((face) => {
-      if (faceType && isExpandedFace(geom, face, faceType)) return "selected"
-      if (isExpandedFace(geom, face)) return "selectable"
-      return undefined
-    })
+    },
   },
-})
+)

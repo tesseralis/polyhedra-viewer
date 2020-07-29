@@ -6,7 +6,7 @@ import Queries from "./Queries"
 const families = primaryPolygons
 export type Family = PrimaryPolygon
 
-const facets = ["face", "vertex"] as const
+export const facets = ["face", "vertex"] as const
 export type Facet = Items<typeof facets>
 
 const operations = [
@@ -32,7 +32,7 @@ interface ClassicalData {
 export default class Classical extends Specs<ClassicalData> {
   private constructor(data: ClassicalData) {
     super("classical", data)
-    if (this.isTetrahedral() || !this.hasFacet()) {
+    if (!this.hasFacet()) {
       delete this.data.facet
     }
     if (!this.isChiral()) {
@@ -64,12 +64,12 @@ export default class Classical extends Specs<ClassicalData> {
   isFace = () => this.data.facet === "face"
   isVertex = () => this.data.facet === "vertex"
 
-  isChiral = () => this.isSnub() && !this.isTetrahedral()
+  isChiral = () => this.isSnub()
 
   static *getAll() {
     for (const operation of operations) {
       for (const family of families) {
-        if (family !== 3 && ["regular", "truncate"].includes(operation)) {
+        if (["regular", "truncate"].includes(operation)) {
           for (const facet of facets) {
             yield new Classical({ family, operation, facet })
           }

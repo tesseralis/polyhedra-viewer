@@ -13,9 +13,9 @@ export const alternateNamesMapping: Record<string, string[]> = {
   cuboctahedron: ["rhombitetratetrahedron", "triangular gyrobicupola"],
   "truncated octahedron": ["truncated tetratetrahedron"],
   rhombicuboctahedron: ["elongated square orthobicupola"],
-  "snub cube": ["snub cuboctahedron"],
+  "snub cuboctahedron": ["snub cube"],
   icosidodecahedron: ["pentagonal gyrobirotunda"],
-  "snub dodecahedron": ["snub icosidodecahedron"],
+  "snub icosidodecahedron": ["snub dodecahedron"],
 
   // fastigium
   "triangular prism": ["fastigium", "digonal cupola"],

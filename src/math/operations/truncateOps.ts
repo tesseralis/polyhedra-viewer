@@ -1,22 +1,20 @@
 import { sum } from "lodash-es"
-import { Polyhedron, Face, Edge, VertexArg, Cap } from "math/polyhedra"
-import Classical, { Operation as OpName } from "data/specs/Classical"
+import { Face, Edge, VertexArg } from "math/polyhedra"
+import Classical, { Facet, Operation as OpName } from "data/specs/Classical"
 import Composite from "data/specs/Composite"
-import { makeOpPair, combineOps, Pose } from "./operationPairs"
-import Operation, { SolidArgs, OpArgs } from "./Operation"
+import { makeOpPair, combineOps } from "./operationPairs"
+import Operation, { OpArgs } from "./Operation"
 import { Vec3D, getCentroid, angleBetween } from "math/geom"
 import {
   getGeometry,
   FacetOpts,
   getTransformedVertices,
+  Pose,
 } from "./operationUtils"
-// TODO move this to a util
-import { getCantellatedFace, getCantellatedEdgeFace } from "./resizeOps"
-
-function getSharpenFaces(polyhedron: Polyhedron) {
-  const faceType = polyhedron.smallestFace().numSides
-  return polyhedron.faces.filter((f) => f.numSides === faceType)
-}
+import ClassicalForme from "math/formes/ClassicalForme"
+import CompositeForme, {
+  AugmentedClassicalForme,
+} from "math/formes/CompositeForme"
 
 /**
  * Returns the point to sharpen given parameters in the following setup:
@@ -40,34 +38,15 @@ function getSharpenPointEdge(face: Face, edge: Edge) {
   return getSharpenPoint(face, edge.midpoint(), edge.twinFace().centroid())
 }
 
-function getAvgInradius(specs: Classical, geom: Polyhedron) {
-  let faces: Face[]
-  if (specs.isRectified()) {
-    faces = [geom.faceWithNumSides(3), geom.faceWithNumSides(specs.data.family)]
-  } else if (specs.isBevelled()) {
-    faces = [
-      geom.faceWithNumSides(6),
-      geom.faceWithNumSides(2 * specs.data.family),
-    ]
-  } else if (specs.isCantellated()) {
-    faces = [
-      geom.faceWithNumSides(3),
-      getCantellatedFace(geom, specs.data.family),
-    ]
-  } else {
-    throw new Error(`Invalid specs: ${specs.name()}`)
-  }
+function getAvgInradius(forme: ClassicalForme) {
+  const faces = [forme.facetFace("vertex"), forme.facetFace("face")]
   return sum(faces.map((f) => f.distanceToCenter())) / faces.length
 }
 
 interface TrioOpArgs<Op, Opts = any> {
   operation: Op
-  pose(solid: SolidArgs<Classical>, opts: Opts): Pose
-  transformer(
-    solid: SolidArgs<Classical>,
-    opts: Opts,
-    result: Classical,
-  ): VertexArg[]
+  pose(solid: ClassicalForme, opts: Opts): Pose
+  transformer(solid: ClassicalForme, opts: Opts, result: Classical): VertexArg[]
   options?(entry: Classical): Opts
 }
 
@@ -128,12 +107,13 @@ function makeTruncateTrio<L extends OpName, M extends OpName, R extends OpName>(
   }
 }
 
-function getRegularPose(geom: Polyhedron, face: Face, crossPoint: Vec3D): Pose {
+function getRegularPose(forme: ClassicalForme, facet: Facet): Pose {
   return {
-    origin: geom.centroid(),
-    // scale on the inradius of the truncated face
-    scale: face.distanceToCenter(),
-    orientation: [face.normal(), crossPoint.sub(face.centroid())],
+    origin: forme.geom.centroid(),
+    scale: forme.facetFace(facet).distanceToCenter(),
+    orientation: forme
+      .adjacentFacetFaces(facet)
+      .map((face) => face.normal()) as any,
   }
 }
 
@@ -143,24 +123,19 @@ function getRegularPose(geom: Polyhedron, face: Face, crossPoint: Vec3D): Pose {
 const regs = makeTruncateTrio({
   left: {
     operation: "regular",
-    pose({ geom }) {
-      const face = geom.getFace()
-      return getRegularPose(geom, geom.getFace(), face.edges[0].midpoint())
+    pose(forme) {
+      return getRegularPose(forme, forme.specs.data.facet!)
     },
-    transformer({ geom }) {
-      return getTransformedVertices(getSharpenFaces(geom), (face) =>
+    transformer(forme) {
+      return getTransformedVertices(forme.minorFacetFaces(), (face) =>
         getSharpenPointEdge(face, face.edges[0]),
       )
     },
   },
   middle: {
     operation: "truncate",
-    pose({ geom }) {
-      const face = geom.largestFace()
-      const n = face.numSides
-      // pick an edge connected to another truncated face
-      const edge = face.edges.find((e) => e.twinFace().numSides === n)!
-      return getRegularPose(geom, face, edge.midpoint())
+    pose(forme) {
+      return getRegularPose(forme, forme.specs.data.facet!)
     },
   },
   right: {
@@ -168,11 +143,8 @@ const regs = makeTruncateTrio({
     // The rectified version is the only thing we need to choose an option for
     // when we move out of it
     options: (entry) => ({ facet: entry.data.facet }),
-    pose({ specs, geom }, options) {
-      // pick a face that *isn't* the sharpen face type
-      const faceType = options.right.facet === "vertex" ? 3 : specs.data.family
-      const face = geom.faceWithNumSides(faceType)
-      return getRegularPose(geom, face, face.vertices[0].vec)
+    pose(forme, options) {
+      return getRegularPose(forme, options.right.facet)
     },
     transformer({ geom }) {
       // All edges that between two truncated faces
@@ -185,16 +157,13 @@ const regs = makeTruncateTrio({
   },
 })
 
-function getAmboPose(
-  specs: Classical,
-  geom: Polyhedron,
-  face: Face,
-  point: Vec3D,
-): Pose {
+function getAmboPose(forme: ClassicalForme): Pose {
   return {
-    origin: geom.centroid(),
-    scale: getAvgInradius(specs, geom),
-    orientation: [face.normal(), point.sub(face.centroid())],
+    origin: forme.geom.centroid(),
+    scale: getAvgInradius(forme),
+    orientation: forme
+      .adjacentFacetFaces("face")
+      .map((face) => face.normal()) as any,
   }
 }
 
@@ -212,49 +181,47 @@ function getAmboPose(
 const ambos = makeTruncateTrio({
   left: {
     operation: "rectify",
-    pose({ geom, specs }) {
-      const face = geom.faceWithNumSides(specs.data.family)
-      return getAmboPose(specs, geom, face, face.edges[0].midpoint())
+    pose(forme) {
+      return getAmboPose(forme)
     },
-    transformer({ geom, specs }, $, resultSpec) {
+    transformer(forme, $, resultSpec) {
       const ref = getGeometry(resultSpec)
-      const refInradius = getAvgInradius(resultSpec, ref)
+      const refForme = ClassicalForme.create(resultSpec, ref)
+      const refInradius = getAvgInradius(refForme)
       const refCircumradius = ref.getVertex().distanceToCenter()
-      const inradius = getAvgInradius(specs, geom)
+      const inradius = getAvgInradius(forme)
       const scale = (refCircumradius / refInradius) * inradius
-      const faces = geom.faces.filter((f) => f.numSides === 4)
+      const faces = forme.geom.faces.filter((f) => f.numSides === 4)
       // Sharpen each of the faces to a point aligning with the vertices
       // of the rectified solid
       return getTransformedVertices(faces, (f) =>
-        geom.centroid().add(f.normal().scale(scale)),
+        forme.geom.centroid().add(f.normal().scale(scale)),
       )
     },
   },
   middle: {
     operation: "bevel",
-    pose({ geom, specs }) {
-      const face = geom.faceWithNumSides(specs.data.family * 2)
-      const edge = face.edges.find((e) => e.twinFace().numSides !== 4)!
-      return getAmboPose(specs, geom, face, edge.midpoint())
+    pose(forme) {
+      return getAmboPose(forme)
     },
   },
   right: {
     operation: "cantellate",
-    pose({ geom, specs }) {
-      const face = getCantellatedFace(geom, specs.data.family)
-      return getAmboPose(specs, geom, face, face.vertices[0].vec)
+    pose(forme) {
+      return getAmboPose(forme)
     },
-    transformer({ geom, specs }, $, resultSpec) {
+    transformer(forme, $, resultSpec) {
       const ref = getGeometry(resultSpec)
-      const refInradius = getAvgInradius(resultSpec, ref)
-      const refFace = getCantellatedEdgeFace(ref)
+      const refForme = ClassicalForme.create(resultSpec, ref)
+      const refInradius = getAvgInradius(refForme)
+      const refFace = refForme.edgeFace()
       const refMidradius = refFace.distanceToCenter()
       const refFaceRadius = refFace.radius()
-      const inradius = getAvgInradius(specs, geom)
+      const inradius = getAvgInradius(forme)
       const scale = inradius / refInradius
-      const faces = geom.faces.filter((f) => f.numSides === 4)
+      const faces = forme.geom.faces.filter((f) => f.numSides === 4)
       return getTransformedVertices(faces, (f) => {
-        const faceCentroid = geom
+        const faceCentroid = forme.geom
           .centroid()
           .add(f.normal().scale(refMidradius * scale))
 
@@ -270,7 +237,7 @@ const ambos = makeTruncateTrio({
   },
 })
 
-const augTruncate = makeOpPair({
+const augTruncate = makeOpPair<Composite, AugmentedClassicalForme>({
   graph: Composite.query
     .where((s) => {
       const source = s.data.source
@@ -288,33 +255,12 @@ const augTruncate = makeOpPair({
       }),
     })),
   middle: "right",
-  getPose($, { geom, specs }) {
-    const source = specs.data.source
-    const isTetrahedron =
-      source.isClassical() && source.isTetrahedral() && source.isRegular()
-
-    // If source is a tetrahedron, take only the first cap (the other is the base)
-    let caps = Cap.getAll(geom)
-    if (isTetrahedron) {
-      caps = [caps[0]]
-    }
-    const capVertIndices = caps.flatMap((cap) =>
-      cap.innerVertices().map((v) => v.index),
-    )
-    const sourceVerts = geom.vertices.filter(
-      (v) => !capVertIndices.includes(v.index),
-    )
+  getPose($, forme) {
+    const { specs } = forme
+    const caps = forme.caps()
     // Calculate the centroid *only* for the source polyhedra
-    const centroid = getCentroid(sourceVerts.map((v) => v.vec))
-    function isSourceFace(face: Face) {
-      return face.vertices.every((v) => !capVertIndices.includes(v.index))
-    }
-    function isBaseFace(face: Face) {
-      return isTetrahedron || face.numSides > 3
-    }
-    const scaleFace = geom.faces.find((f) => isSourceFace(f) && isBaseFace(f))!
+    const centroid = forme.sourceCentroid()
     const cap = caps[0]
-    const mainAxis = cap.normal()
     const boundary = cap.boundary()
 
     let crossAxis
@@ -326,28 +272,21 @@ const augTruncate = makeOpPair({
       crossAxis = caps[1].normal()
     } else {
       crossAxis = boundary.edges
-        .find((e) => isBaseFace(e.twinFace()))!
+        .find((e) => forme.isMainFace(e.twinFace()))!
         .midpoint()
         .sub(boundary.centroid())
     }
 
     return {
       origin: centroid,
-      scale: scaleFace.centroid().distanceTo(centroid),
-      orientation: [mainAxis, crossAxis],
+      scale: forme.mainFace().centroid().distanceTo(centroid),
+      orientation: [cap.normal(), crossAxis],
     }
   },
-  toLeft({ geom }) {
-    const capVertIndices = Cap.getAll(geom).flatMap((cap) =>
-      cap.innerVertices().map((v) => v.index),
-    )
-    const sourceFaces = geom.faces.filter((f) =>
-      f.vertices.every((v) => !capVertIndices.includes(v.index)),
-    )
-    const truncatedFaces = sourceFaces.filter((f) => f.numSides === 3)
-    const cupolaFaces = geom.faces.filter((f) =>
-      f.vertices.every((v) => capVertIndices.includes(v.index)),
-    )
+  toLeft(forme) {
+    const truncatedFaces = forme.minorFaces()
+    // the inner faces of the caps
+    const cupolaFaces = forme.innerCapFaces()
     return getTransformedVertices(
       [...truncatedFaces, ...cupolaFaces],
       (face) => {
@@ -361,7 +300,7 @@ const augTruncate = makeOpPair({
 
           return getSharpenPoint(face, v.vec, otherFace.centroid())
         } else {
-          const edge = face.edges.find((e) => e.twinFace().numSides > 5)!
+          const edge = face.edges.find((e) => forme.isMainFace(e.twinFace()))!
           return getSharpenPointEdge(face, edge)
         }
       },
@@ -373,7 +312,7 @@ const augTruncate = makeOpPair({
 
 export const truncate = new Operation(
   "truncate",
-  combineOps<Classical | Composite, any>([
+  combineOps<Classical | Composite, ClassicalForme | CompositeForme, any>([
     regs.truncate.left,
     ambos.truncate.left,
     augTruncate.left,
@@ -390,24 +329,29 @@ export const rectify = new Operation(
   combineOps([regs.rectify.left, ambos.rectify.left]),
 )
 
-const hitOptArgs: Partial<OpArgs<FacetOpts, Classical>> = {
+const hitOptArgs: Partial<OpArgs<FacetOpts, Classical, ClassicalForme>> = {
   hitOption: "facet",
-  getHitOption({ geom }, hitPoint) {
-    const n = geom.hitFace(hitPoint).numSides
-    return n <= 5 ? { facet: n === 3 ? "face" : "vertex" } : {}
+  getHitOption(forme, hitPoint) {
+    const face = forme.geom.hitFace(hitPoint)
+    const facet = forme.getFacet(face)
+    return facet ? { facet: facet === "vertex" ? "face" : "vertex" } : {}
   },
 
-  faceSelectionStates({ specs, geom }, { facet }) {
-    const faceType = !facet ? null : facet === "face" ? 3 : specs.data.family
-    return geom.faces.map((face) => {
-      if (face.numSides === faceType) return "selected"
+  faceSelectionStates(forme, { facet }) {
+    const oppFacet = facet === "vertex" ? "face" : "vertex"
+    return forme.geom.faces.map((face) => {
+      if (forme.isFacetFace(face, oppFacet)) return "selected"
       return "selectable"
     })
   },
 }
 
 export const sharpen = new Operation("sharpen", {
-  ...combineOps<Classical | Composite, FacetOpts>([
+  ...combineOps<
+    Classical | Composite,
+    ClassicalForme | CompositeForme,
+    FacetOpts
+  >([
     regs.truncate.right,
     ambos.truncate.right,
     augTruncate.right,
@@ -422,7 +366,7 @@ export const sharpen = new Operation("sharpen", {
 // and need to be integrated into the app
 
 export const cosharpen = new Operation("cosharpen", {
-  ...combineOps<Classical, FacetOpts>([
+  ...combineOps<Classical, ClassicalForme, FacetOpts>([
     regs.cotruncate.right,
     ambos.cotruncate.right,
   ]),
@@ -430,7 +374,7 @@ export const cosharpen = new Operation("cosharpen", {
 })
 
 export const unrectify = new Operation("unrectify", {
-  ...combineOps<Classical, FacetOpts>([
+  ...combineOps<Classical, ClassicalForme, FacetOpts>([
     regs.rectify.right,
     ambos.rectify.right,
   ]),

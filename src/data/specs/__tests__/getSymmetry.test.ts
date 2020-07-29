@@ -7,8 +7,8 @@ describe("getSymmetry", () => {
 
   describe("Platonic and Archimedean solids", () => {
     it("returns chiral on snub polyhedra", () => {
-      expectSymmetry("snub cube", "O")
-      expectSymmetry("snub dodecahedron", "I")
+      expectSymmetry("snub cuboctahedron", "O")
+      expectSymmetry("snub icosidodecahedron", "I")
     })
     it("returns full symmetry on other solids", () => {
       expectSymmetry("tetrahedron", "T_d")

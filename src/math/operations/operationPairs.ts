@@ -1,9 +1,10 @@
 import { isMatch } from "lodash-es"
 import PolyhedronSpecs from "data/specs/PolyhedronSpecs"
-import { Polyhedron, VertexArg } from "math/polyhedra"
-import { Plane, Vec3D, getOrthonormalTransform, withOrigin } from "math/geom"
+import { VertexArg } from "math/polyhedra"
 import { OpArgs, SolidArgs } from "./Operation"
-import { getGeometry } from "./operationUtils"
+import { Pose, alignPolyhedron, getGeometry } from "./operationUtils"
+import PolyhedronForme from "math/formes/PolyhedronForme"
+import createForme from "math/formes/createForme"
 
 export type Side = "left" | "right"
 
@@ -26,72 +27,29 @@ interface GraphEntry<Specs, L, R> {
 // list of polyhedron pairs and their arguments
 type OpPairGraph<Specs, L, R> = GraphEntry<Specs, L, R>[]
 
-type Orientation = readonly [Vec3D, Vec3D]
+type MiddleGetter<
+  Specs extends PolyhedronSpecs,
+  Forme extends PolyhedronForme<Specs>,
+  L,
+  R
+> = (entry: GraphEntry<Specs, L, R>) => Specs | Forme
 
-export interface Pose {
-  scale: number
-  origin: Vec3D
-  orientation: Orientation
-}
-
-type MiddleGetter<Specs extends PolyhedronSpecs, L, R> = (
-  entry: GraphEntry<Specs, L, R>,
-) => Specs | SolidArgs<Specs>
-
-interface OpPairInput<Specs extends PolyhedronSpecs, L = {}, R = L> {
+interface OpPairInput<
+  Specs extends PolyhedronSpecs,
+  Forme extends PolyhedronForme<Specs>,
+  L = {},
+  R = L
+> {
   // The graph of what polyhedron spec inputs are allowed and what maps to each other
   graph: OpPairGraph<Specs, L, R>
   // Get the intermediate polyhedron for the given graph entry
-  middle: Side | MiddleGetter<Specs, L, R>
+  middle: Side | MiddleGetter<Specs, Forme, L, R>
   // Get the post of a left, right, or middle state
-  getPose(
-    pos: Side | "middle",
-    solid: SolidArgs<Specs>,
-    opts: GraphOpts<L, R>,
-  ): Pose
+  getPose(pos: Side | "middle", solid: Forme, opts: GraphOpts<L, R>): Pose
   // Move the intermediate figure to the left position
-  toLeft?(
-    solid: SolidArgs<Specs>,
-    opts: GraphOpts<L, R>,
-    result: Specs,
-  ): VertexArg[]
+  toLeft?(solid: Forme, opts: GraphOpts<L, R>, result: Specs): VertexArg[]
   // Move the intermediate figure to the right position
-  toRight?(
-    solid: SolidArgs<Specs>,
-    opts: GraphOpts<L, R>,
-    result: Specs,
-  ): VertexArg[]
-}
-
-function normalizeIntermediate<Specs extends PolyhedronSpecs>(
-  inter: Specs | SolidArgs<Specs>,
-) {
-  if (inter instanceof PolyhedronSpecs) {
-    return { specs: inter, geom: getGeometry(inter) }
-  }
-  return inter
-}
-
-function normalizeOrientation([u1, u2]: Orientation) {
-  const _u2 = new Plane(Vec3D.ZERO, u1).getProjectedPoint(u2)
-  return [u1.getNormalized(), _u2.getNormalized()]
-}
-
-// Translate, rotate, and scale the polyhedron with the transformation given by the two poses
-function alignPolyhedron(solid: Polyhedron, pose1: Pose, pose2: Pose) {
-  const [u1, u2] = normalizeOrientation(pose1.orientation)
-  const [v1, v2] = normalizeOrientation(pose2.orientation)
-  const matrix = getOrthonormalTransform(u1, u2, v1, v2)
-  const rotate = withOrigin(pose2.origin, (u) => matrix.applyTo(u))
-  const newVertices = solid.vertices.map((v) =>
-    rotate(
-      v.vec
-        .sub(pose1.origin)
-        .scale(pose2.scale / pose1.scale)
-        .add(pose2.origin),
-    ),
-  )
-  return solid.withVertices(newVertices)
+  toRight?(solid: Forme, opts: GraphOpts<L, R>, result: Specs): VertexArg[]
 }
 
 function defaultGetter<Specs extends PolyhedronSpecs>({
@@ -104,11 +62,12 @@ type Opts<S extends Side, L, R> = S extends "left" ? L : R
 
 class OpPair<
   Specs extends PolyhedronSpecs,
+  Forme extends PolyhedronForme<Specs>,
   L extends {} = {},
   R extends {} = L
 > {
-  inputs: OpPairInput<Specs, L, R>
-  constructor(inputs: OpPairInput<Specs, L, R>) {
+  inputs: OpPairInput<Specs, Forme, L, R>
+  constructor(inputs: OpPairInput<Specs, Forme, L, R>) {
     this.inputs = inputs
   }
 
@@ -163,14 +122,15 @@ class OpPair<
     const entry = this.getEntry(side, solid.specs, opts)
     const options =
       entry.options ?? ({ left: {}, right: {} } as GraphOpts<L, R>)
-    const startPose = getPose(side, solid, options)
+    const solidForme = createForme(solid.specs, solid.geom) as Forme
+    const startPose = getPose(side, solidForme, options)
 
     const endSide = oppositeSide(side)
     const endSpecs = entry[endSide]
     const endGeom = getGeometry(endSpecs)
     const alignedEnd = alignPolyhedron(
       endGeom,
-      getPose(endSide, { specs: endSpecs, geom: endGeom }, options),
+      getPose(endSide, createForme(endSpecs, endGeom) as Forme, options),
       startPose,
     )
 
@@ -179,16 +139,24 @@ class OpPair<
       // If we receive a Side argument, set the middle to whichever end polyhedron
       // matches the side
       middle =
-        getMiddle === side ? solid : { specs: endSpecs, geom: alignedEnd }
+        getMiddle === side
+          ? solidForme
+          : (createForme(endSpecs, alignedEnd) as Forme)
     } else {
       // Otherwise, we have to fetch the intermediate solid ourselves
-      const middleSolid = normalizeIntermediate(getMiddle(entry))
+      // const middleSolid = normalizeIntermediate(getMiddle(entry))
+      const inter = getMiddle(entry)
+      const middleSolid =
+        inter instanceof PolyhedronSpecs
+          ? (createForme(inter, getGeometry(inter)) as Forme)
+          : inter
+
       const alignedInter = alignPolyhedron(
         middleSolid.geom,
         getPose("middle", middleSolid, options),
         startPose,
       )
-      middle = { ...middleSolid, geom: alignedInter }
+      middle = createForme(middleSolid.specs, alignedInter) as Forme
     }
 
     const [startFn, endFn] =
@@ -204,9 +172,13 @@ class OpPair<
   }
 }
 
-type OpInput<O, S extends PolyhedronSpecs> = Required<
+type OpInput<
+  O,
+  S extends PolyhedronSpecs,
+  F extends PolyhedronForme<S>
+> = Required<
   Pick<
-    OpArgs<O, S>,
+    OpArgs<O, S, F>,
     "apply" | "canApplyTo" | "allOptionCombos" | "getResult" | "hasOptions"
   >
 >
@@ -214,10 +186,13 @@ type OpInput<O, S extends PolyhedronSpecs> = Required<
 /**
  * Turn an operation pair into the one-way operation corresponding to the given side
  */
-function makeOperation<S extends Side, Sp extends PolyhedronSpecs, L, R>(
-  side: S,
-  op: OpPair<Sp, L, R>,
-): OpInput<Opts<S, L, R>, Sp> {
+function makeOperation<
+  S extends Side,
+  Sp extends PolyhedronSpecs,
+  Forme extends PolyhedronForme<Sp>,
+  L,
+  R
+>(side: S, op: OpPair<Sp, Forme, L, R>): OpInput<Opts<S, L, R>, Sp, Forme> {
   return {
     apply(solid, opts) {
       return op.apply(side, solid, opts)
@@ -240,16 +215,21 @@ function makeOperation<S extends Side, Sp extends PolyhedronSpecs, L, R>(
 /**
  * Takes the given input and creates a pair of inverse operations.
  */
-export function makeOpPair<Specs extends PolyhedronSpecs, L = {}, R = L>(
-  opInput: OpPairInput<Specs, L, R>,
-) {
+export function makeOpPair<
+  Specs extends PolyhedronSpecs,
+  Forme extends PolyhedronForme<Specs>,
+  L = {},
+  R = L
+>(opInput: OpPairInput<Specs, Forme, L, R>) {
   const op = new OpPair(opInput)
   return { left: makeOperation("left", op), right: makeOperation("right", op) }
 }
 
-export function combineOps<S extends PolyhedronSpecs, O>(
-  opArgs: OpInput<O, S>[],
-): OpInput<O, S> {
+export function combineOps<
+  S extends PolyhedronSpecs,
+  F extends PolyhedronForme<S>,
+  O
+>(opArgs: OpInput<O, S, F>[]): OpInput<O, S, F> {
   function canApplyTo(specs: S) {
     return opArgs.some((op) => op.canApplyTo(specs))
   }

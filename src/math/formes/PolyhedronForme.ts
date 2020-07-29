@@ -1,0 +1,12 @@
+import PolyhedronSpecs from "data/specs/PolyhedronSpecs"
+import { Polyhedron } from "math/polyhedra"
+
+export default class PolyhedronForme<Specs extends PolyhedronSpecs> {
+  specs: Specs
+  geom: Polyhedron
+
+  constructor(specs: Specs, geom: Polyhedron) {
+    this.specs = specs
+    this.geom = geom
+  }
+}

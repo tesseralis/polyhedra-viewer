@@ -1,15 +1,13 @@
 import { elongate, gyroelongate, shorten, turn } from "../prismOps"
-import { Polyhedron } from "math/polyhedra"
+import { makeApplyTo, makeHasOptions } from "../operationTestUtils"
 
 describe("elongate", () => {
   describe("canApplyTo", () => {
-    function expectApplyTo(name: string, value: boolean = true) {
-      expect(elongate.canApplyTo(Polyhedron.get(name))).toEqual(value)
-    }
+    const expectApplyTo = makeApplyTo(elongate)
 
     it("works on capstones", () => {
       // only works on shortened capstones
-      expectApplyTo("tetrahedron")
+      expectApplyTo("triangular pyramid")
       expectApplyTo("square cupola")
       expectApplyTo("pentagonal rotunda")
       expectApplyTo("pentagonal bipyramid")
@@ -20,17 +18,15 @@ describe("elongate", () => {
       expectApplyTo("gyroelongated pentagonal bicupola", false)
 
       // doesn't work on fastigium
-      expectApplyTo("triangular prism", false)
-      expectApplyTo("gyrobifastigium", false)
+      // expectApplyTo("triangular prism", false)
+      expectApplyTo("digonal gyrobicupola", false)
     })
   })
 })
 
 describe("gyroelongate", () => {
   describe("canApplyTo", () => {
-    function expectApplyTo(name: string, value: boolean = true) {
-      expect(gyroelongate.canApplyTo(Polyhedron.get(name))).toEqual(value)
-    }
+    const expectApplyTo = makeApplyTo(gyroelongate)
 
     it("works on capstones", () => {
       expectApplyTo("square cupola")
@@ -43,24 +39,22 @@ describe("gyroelongate", () => {
       expectApplyTo("gyroelongated pentagonal bicupola", false)
 
       // doesn't work on fastigium
-      expectApplyTo("triangular prism", false)
-      expectApplyTo("gyrobifastigium", false)
+      // expectApplyTo("triangular prism", false)
+      expectApplyTo("digonal gyrobicupola", false)
 
-      // doesn't work on tetrahedra
-      expectApplyTo("tetrahedron", false)
+      // doesn't work on triangular pyramids
+      expectApplyTo("triangular pyramid", false)
       expectApplyTo("triangular bipyramid", false)
     })
   })
 
   describe("hasOptions", () => {
-    function expectHasOptions(name: string, value: boolean = true) {
-      expect(gyroelongate.hasOptions(Polyhedron.get(name))).toEqual(value)
-    }
+    const expectHasOptions = makeHasOptions(gyroelongate)
 
     describe("works on capstones", () => {
       // only works on bicupolae/birotundae
       expectHasOptions("square orthobicupola")
-      expectHasOptions("icosidodecahedron")
+      expectHasOptions("pentagonal gyrobirotunda")
       expectHasOptions("pentagonal orthocupolarotunda")
 
       // false cases
@@ -71,13 +65,8 @@ describe("gyroelongate", () => {
 })
 
 describe("shorten", () => {
-  function expectApplyTo(name: string, value: boolean = true) {
-    expect(shorten.canApplyTo(Polyhedron.get(name))).toEqual(value)
-  }
-
-  function expectHasOptions(name: string, value: boolean = true) {
-    expect(shorten.hasOptions(Polyhedron.get(name))).toEqual(value)
-  }
+  const expectApplyTo = makeApplyTo(shorten)
+  const expectHasOptions = makeHasOptions(shorten)
 
   describe("canApplyTo", () => {
     it("works on nonshortened capstones", () => {
@@ -110,23 +99,17 @@ describe("shorten", () => {
 })
 
 describe("turn", () => {
-  function expectApplyTo(name: string, value: boolean = true) {
-    expect(turn.canApplyTo(Polyhedron.get(name))).toEqual(value)
-  }
-
-  function expectHasOptions(name: string, value: boolean = true) {
-    expect(turn.hasOptions(Polyhedron.get(name))).toEqual(value)
-  }
+  const expectApplyTo = makeApplyTo(turn)
+  const expectHasOptions = makeHasOptions(turn)
 
   describe("canApplyTo", () => {
     it("works on prismatics", () => {
-      expectApplyTo("cube")
-      expectApplyTo("octahedron")
+      expectApplyTo("square prism")
+      expectApplyTo("triangular antiprism")
       expectApplyTo("pentagonal prism")
       expectApplyTo("octagonal antiprism")
 
-      // false on digonal antiprism
-      expectApplyTo("tetrahedron", false)
+      expectApplyTo("digonal antiprism", false)
     })
 
     it("works on nonshortened capstones", () => {

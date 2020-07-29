@@ -1,11 +1,9 @@
 import { truncate, rectify, sharpen } from "../truncateOps"
-import { Polyhedron } from "math/polyhedra"
+import { makeApplyTo, makeHasOptions } from "../operationTestUtils"
 
 describe("truncate", () => {
   describe("canApplyTo", () => {
-    function expectApplyTo(name: string, value: boolean = true) {
-      expect(truncate.canApplyTo(Polyhedron.get(name))).toEqual(value)
-    }
+    const expectApplyTo = makeApplyTo(truncate)
     it("works on regular and rectified polyhedra", () => {
       expectApplyTo("tetrahedron")
       expectApplyTo("cube")
@@ -19,9 +17,7 @@ describe("truncate", () => {
 
 describe("rectify", () => {
   describe("canApplyTo", () => {
-    function expectApplyTo(name: string, value: boolean = true) {
-      expect(rectify.canApplyTo(Polyhedron.get(name))).toEqual(value)
-    }
+    const expectApplyTo = makeApplyTo(rectify)
     it("works on regular polyhedra", () => {
       expectApplyTo("tetrahedron")
       expectApplyTo("cube")
@@ -36,13 +32,8 @@ describe("rectify", () => {
 })
 
 describe("sharpen", () => {
-  function expectApplyTo(name: string, value: boolean = true) {
-    expect(sharpen.canApplyTo(Polyhedron.get(name))).toEqual(value)
-  }
-
-  function expectHasOptions(name: string, value: boolean = true) {
-    expect(sharpen.hasOptions(Polyhedron.get(name))).toEqual(value)
-  }
+  const expectApplyTo = makeApplyTo(sharpen)
+  const expectHasOptions = makeHasOptions(sharpen)
 
   describe("canApplyTo", () => {
     it("works on truncated polyhedra", () => {
@@ -57,7 +48,7 @@ describe("sharpen", () => {
     })
 
     it("works on rectified polyhedra", () => {
-      expectApplyTo("octahedron")
+      expectApplyTo("tetratetrahedron")
       expectApplyTo("cuboctahedron")
       expectApplyTo("icosidodecahedron")
     })
@@ -73,7 +64,7 @@ describe("sharpen", () => {
       expectHasOptions("cuboctahedron")
       expectHasOptions("icosidodecahedron")
 
-      expectHasOptions("octahedron", false)
+      expectHasOptions("truncated tetratetrahedron", false)
       expectHasOptions("truncated cuboctahedron", false)
       expectHasOptions("truncated icosahedron", false)
     })
