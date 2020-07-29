@@ -16,6 +16,13 @@ export function oppositeFace(edge: Edge, twist?: Twist) {
   }
 }
 
+// FIXME reorganize the hierarchy on how facet faces are calculated:
+// For tetrahedral, we usually want to make an entire set of facet faces
+// then derive isFacetFace() from that,
+// but for everything else, everything is derived from isFacetFace()
+// I think I'll have two abstract subfunctions and implement the other two
+// based on them
+
 export default abstract class ClassicalForme extends PolyhedronForme<
   Classical
 > {
