@@ -79,6 +79,8 @@ export default abstract class ClassicalForme extends PolyhedronForme<
   /**
    * Define the set of facet faces for a solid with tetrahedral symmetry.
    */
+  // TODO I think there's another optimization here: tetrahedral faces can always be found
+  // using `adjacentFacetFace` so maybe we can use that instead?
   protected abstract tetrahedralFacetFaces(facet: Facet): Face[]
 
   facetFaces(facet: Facet) {
@@ -236,9 +238,7 @@ class CantellatedForme extends ClassicalForme {
   }
 
   adjacentFacetFace(face: Face, facet: Facet) {
-    return oppositeFace(
-      face.edges.filter((e) => this.isEdgeFace(e.twinFace()))[0],
-    )
+    return oppositeFace(face.edges[0])
   }
 }
 
@@ -251,17 +251,20 @@ class SnubForme extends ClassicalForme {
   }
 
   tetrahedralFacetFaces(facet: Facet) {
-    // FIXME return a different set on facet faces
-    const f0 = this.geom.faceWithNumSides(3)
+    let f0 = this.geom.faceWithNumSides(3)
+    const edge = f0.edges[0].twin()
+    if (facet === "vertex") {
+      f0 =
+        this.specs.data.twist === "left"
+          ? edge.next().twinFace()
+          : edge.prev().twinFace()
+    }
     return [f0, ...f0.edges.map((e) => oppositeFace(e, this.specs.data.twist))]
   }
 
   adjacentFacetFace(face: Face, facet: Facet) {
     let twist = this.specs.data.twist
     if (facet === "vertex") twist = twist === "left" ? "right" : "left"
-    return oppositeFace(
-      face.edges.filter((e) => this.isEdgeFace(e.twinFace()))[0],
-      twist,
-    )
+    return oppositeFace(face.edges[0], twist)
   }
 }
