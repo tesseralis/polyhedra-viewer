@@ -47,12 +47,19 @@ export default abstract class ClassicalForme extends PolyhedronForme<
     return facet === "vertex" ? 3 : this.specs.data.family
   }
 
+  protected _isFacetFace(face: Face, facet: Facet) {
+    return face.numSides === this.faceType(facet)
+  }
+
   /**
    * Return whether the given face corresponds to the given facet
    */
   isFacetFace(face: Face, facet: Facet) {
+    if (this.specs.isTetrahedral()) {
+      return face.inSet(this.tetrahedralFacetFaces(facet))
+    }
     // This should be overriden by subclasses
-    return face.numSides === this.faceType(facet)
+    return this._isFacetFace(face, facet)
   }
 
   isAnyFacetFace(face: Face) {
@@ -73,7 +80,13 @@ export default abstract class ClassicalForme extends PolyhedronForme<
     return face
   }
 
+  /**
+   * Define the set of facet faces for a solid with tetrahedral symmetry.
+   */
+  protected abstract tetrahedralFacetFaces(facet: Facet): Face[]
+
   facetFaces(facet: Facet) {
+    if (this.specs.isTetrahedral()) return this.tetrahedralFacetFaces(facet)
     return this.geom.faces.filter((face) => this.isFacetFace(face, facet))
   }
 
@@ -136,8 +149,12 @@ export default abstract class ClassicalForme extends PolyhedronForme<
 }
 
 class RegularForme extends ClassicalForme {
-  isFacetFace(face: Face, facet: Facet) {
+  _isFacetFace(face: Face, facet: Facet) {
     return facet === this.specs.data.facet
+  }
+
+  tetrahedralFacetFaces(facet: Facet) {
+    return facet === this.specs.data.facet ? this.geom.faces : []
   }
 
   adjacentFacetFace(face: Face, facet: Facet) {
@@ -147,13 +164,18 @@ class RegularForme extends ClassicalForme {
 }
 
 class TruncatedForme extends ClassicalForme {
-  // TODO deal with tetrahedral
-  isFacetFace(face: Face, facet: Facet) {
+  _isFacetFace(face: Face, facet: Facet) {
     if (this.specs.data.facet === facet) {
       return face.numSides > 5
     } else {
       return face.numSides <= 5
     }
+  }
+
+  tetrahedralFacetFaces(facet: Facet) {
+    return this.geom.faces.filter(
+      (f) => f.numSides === (this.specs.data.facet === facet ? 6 : 3),
+    )
   }
 
   adjacentFacetFace(face: Face, facet: Facet) {
@@ -163,14 +185,11 @@ class TruncatedForme extends ClassicalForme {
 }
 
 class RectifiedForme extends ClassicalForme {
-  isFacetFace(face: Face, facet: Facet) {
-    if (this.specs.isTetrahedral()) return face.inSet(this.facetFaces(facet))
-    return super.isFacetFace(face, facet)
-  }
-
-  facetFaces(facet: Facet) {
-    if (!this.specs.isTetrahedral()) return super.facetFaces(facet)
-    const f0 = this.geom.getFace()
+  tetrahedralFacetFaces(facet: Facet) {
+    let f0 = this.geom.getFace()
+    if (facet === "vertex") {
+      f0 = f0.adjacentFaces()[0]
+    }
     return [f0, ...f0.edges.map((e) => e.twin().prev().twinFace())]
   }
 
@@ -186,11 +205,11 @@ class BevelledForme extends ClassicalForme {
     return 2 * super.faceType(facet)
   }
 
-  // FIXME override isFacetFace as well
-  facetFaces(facet: Facet) {
-    if (!this.specs.isTetrahedral()) return super.facetFaces(facet)
-    // FIXME return a different set of faces if facet === 'vertex'
-    const f0 = this.geom.faceWithNumSides(6)
+  tetrahedralFacetFaces(facet: Facet) {
+    let f0 = this.geom.faceWithNumSides(6)
+    if (facet === "vertex") {
+      f0 = f0.adjacentFaces().find((f) => f.numSides === 6)!
+    }
     const rest = f0.edges
       .filter((e) => e.twinFace().numSides === 4)
       .map((e) => oppositeFace(e))
@@ -205,16 +224,14 @@ class BevelledForme extends ClassicalForme {
 }
 
 class CantellatedForme extends ClassicalForme {
-  // FIXME deal with tetrahedral
-  isFacetFace(face: Face, facet: Facet) {
+  _isFacetFace(face: Face, facet: Facet) {
     return (
-      super.isFacetFace(face, facet) &&
+      super._isFacetFace(face, facet) &&
       face.adjacentFaces().every((f) => f.numSides === 4)
     )
   }
 
-  facetFaces(facet: Facet) {
-    if (!this.specs.isTetrahedral()) return super.facetFaces(facet)
+  tetrahedralFacetFaces(facet: Facet) {
     let f0 = this.geom.faceWithNumSides(3)
     if (facet === "vertex") {
       f0 = f0.edges[0].twin().next().twinFace()
@@ -230,16 +247,14 @@ class CantellatedForme extends ClassicalForme {
 }
 
 class SnubForme extends ClassicalForme {
-  isFacetFace(face: Face, facet: Facet) {
-    if (this.specs.isTetrahedral()) return face.inSet(this.facetFaces(facet))
+  _isFacetFace(face: Face, facet: Facet) {
     return (
-      super.isFacetFace(face, facet) &&
+      super._isFacetFace(face, facet) &&
       face.adjacentFaces().every((f) => f.numSides === 3)
     )
   }
 
-  facetFaces(facet: Facet) {
-    if (!this.specs.isTetrahedral()) return super.facetFaces(facet)
+  tetrahedralFacetFaces(facet: Facet) {
     // FIXME return a different set on facet faces
     const f0 = this.geom.faceWithNumSides(3)
     return [f0, ...f0.edges.map((e) => oppositeFace(e, this.specs.data.twist))]
