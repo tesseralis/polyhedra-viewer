@@ -1,4 +1,4 @@
-import { Twist } from "types"
+import { twists, oppositeTwist } from "types"
 import Classical, { Facet, oppositeFacet } from "data/specs/Classical"
 import {
   makeOpPair,
@@ -8,7 +8,6 @@ import {
 } from "./operationPairs"
 import { withOrigin } from "math/geom"
 import {
-  getOppTwist,
   getTransformedVertices,
   FacetOpts,
   TwistOpts,
@@ -54,8 +53,6 @@ function getClassicalPose(forme: ClassicalForme, facet: Facet): Pose {
       .map((face) => face.normal()) as any,
   }
 }
-
-const twistOpts: Twist[] = ["left", "right"]
 
 type ResizeArgs<L, R> = Omit<
   OpPairInput<Classical, ClassicalForme, L, R>,
@@ -108,13 +105,13 @@ const _snub = makeOpPair<Classical, ClassicalForme, TwistOpts, FacetOpts>({
   graph: Classical.query
     .where((s) => s.isRegular())
     .flatMap((entry) => {
-      return twistOpts.map((twist) => ({
+      return twists.map((twist) => ({
         left: entry,
         right: entry.withData({
           operation: "snub",
           // If a vertex-solid, the chirality of the result
           // is *opposite* of the twist option
-          twist: entry.isVertex() ? getOppTwist(twist) : twist,
+          twist: entry.isVertex() ? oppositeTwist(twist) : twist,
         }),
         options: { left: { twist }, right: { facet: entry.facet() } },
       }))
@@ -126,7 +123,7 @@ const _twist = makeOpPair<Classical, ClassicalForme, TwistOpts, {}>({
   graph: Classical.query
     .where((s) => s.isCantellated())
     .flatMap((entry) => {
-      return twistOpts.map((twist) => ({
+      return twists.map((twist) => ({
         left: entry,
         right: entry.withData({ operation: "snub", twist }),
         options: { left: { twist }, right: {} },

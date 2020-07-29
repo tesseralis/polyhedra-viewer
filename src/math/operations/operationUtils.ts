@@ -21,10 +21,6 @@ export interface TwistOpts {
   twist: Twist
 }
 
-export function getOppTwist(twist: Twist) {
-  return twist === "left" ? "right" : "left"
-}
-
 /**
  * Get the face opposite of the given edge, using the given "twist" option
  */

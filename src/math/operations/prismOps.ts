@@ -1,16 +1,11 @@
-import { Twist } from "types"
+import { Twist, twists, oppositeTwist } from "types"
 import { PrismaticType } from "data/specs/common"
 import PolyhedronSpecs from "data/specs/PolyhedronSpecs"
 import Capstone from "data/specs/Capstone"
 import Prismatic from "data/specs/Prismatic"
 import { combineOps, makeOpPair } from "./operationPairs"
 import { makeOperation } from "./Operation"
-import {
-  Pose,
-  getOppTwist,
-  TwistOpts,
-  getTransformedVertices,
-} from "./operationUtils"
+import { Pose, TwistOpts, getTransformedVertices } from "./operationUtils"
 import { withOrigin, getCentroid } from "math/geom"
 import PolyhedronForme from "math/formes/PolyhedronForme"
 import CapstoneForme from "math/formes/CapstoneForme"
@@ -198,17 +193,20 @@ function makeBicupolaPrismOp(leftElongation: null | "prism") {
           s.data.elongation === leftElongation,
       )
       .flatMap((entry) => {
-        return (["left", "right"] as Twist[]).map((twist) => {
+        return twists.map((twist) => {
           return {
             left: entry,
             right: entry.withData({
               elongation: "antiprism",
               // left twisting a gyro bicupola makes it be *left* twisted
               // but the opposite for ortho bicupolae
-              twist: entry.isGyro() ? twist : getOppTwist(twist),
+              twist: entry.isGyro() ? twist : oppositeTwist(twist),
             }),
             // Left and right options are opposites of each other
-            options: { left: { twist }, right: { twist: getOppTwist(twist) } },
+            options: {
+              left: { twist },
+              right: { twist: oppositeTwist(twist) },
+            },
           }
         })
       }),

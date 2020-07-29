@@ -1,4 +1,4 @@
-import { Twist } from "types"
+import { Twist, oppositeTwist } from "types"
 import PolyhedronForme from "./PolyhedronForme"
 import Classical, { Facet, facets, oppositeFacet } from "data/specs/Classical"
 import { Polyhedron, Face, Edge } from "math/polyhedra"
@@ -281,7 +281,7 @@ class SnubForme extends ClassicalForme {
 
   adjacentFacetFace(face: Face, facet: Facet) {
     let twist = this.specs.data.twist
-    if (facet === "vertex") twist = twist === "left" ? "right" : "left"
+    if (facet === "vertex") twist = oppositeTwist(twist!)
     return oppositeFace(face.edges[0], twist)
   }
 
