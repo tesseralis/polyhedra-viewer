@@ -1,12 +1,5 @@
 import { takeRight, dropRight, invert, isEmpty, uniq } from "lodash-es"
-import {
-  Cap,
-  Polyhedron,
-  Edge,
-  Vertex,
-  VertexList,
-  VertexArg,
-} from "math/polyhedra"
+import { Polyhedron, Edge, Vertex, VertexList, VertexArg } from "math/polyhedra"
 import {
   Plane,
   Vec3D,
@@ -19,7 +12,6 @@ import { mapObject } from "utils"
 import PolyhedronSpecs from "data/specs/PolyhedronSpecs"
 import { Facet } from "data/specs/Classical"
 import { Twist } from "types"
-import { getAllSpecs } from "data/specs/getSpecs"
 
 export interface FacetOpts {
   facet: Facet
@@ -83,51 +75,6 @@ export function alignPolyhedron(solid: Polyhedron, pose1: Pose, pose2: Pose) {
     ),
   )
   return solid.withVertices(newVertices)
-}
-
-/**
- * Get the chirality of the snub polyhedron
- */
-export function snubChirality(geom: Polyhedron) {
-  // Special case for icosahedron
-  if (geom.largestFace().numSides === 3) {
-    return "left"
-  }
-  const face = geom.faces.find((f) => f.numSides !== 3)!
-  const other = oppositeFace(face.edges[0], "right")
-  return other.numSides !== 3 ? "right" : "left"
-}
-
-/**
- * Get the chirality of the gyroelongated bicupola/rotunda
- */
-export function capstoneChirality(geom: Polyhedron) {
-  const [cap1, cap2] = Cap.getAll(geom)
-  const boundary = cap1.boundary()
-  const isCupolaRotunda = cap1.type !== cap2.type
-
-  const nonTriangleFaceEdge = boundary.edges.find((e) => e.face.numSides !== 3)!
-  const rightFaceAcross = oppositeFace(nonTriangleFaceEdge, "right")
-  // I'm pretty sure this is the same logic as in augment
-  if (isCupolaRotunda) {
-    return rightFaceAcross.numSides !== 3 ? "right" : "left"
-  }
-  return rightFaceAcross.numSides !== 3 ? "left" : "right"
-}
-
-/**
- * Return all matching specs for the Polyhedron, with the right chiralities.
- */
-export function* getValidSpecs(geom: Polyhedron): Generator<PolyhedronSpecs> {
-  for (const specs of getAllSpecs(geom.name)) {
-    if (!specs.isChiral()) {
-      yield specs
-    } else if (specs.isClassical()) {
-      yield specs.withData({ twist: snubChirality(geom) })
-    } else if (specs.isCapstone()) {
-      yield specs.withData({ twist: capstoneChirality(geom) })
-    }
-  }
 }
 
 /**
