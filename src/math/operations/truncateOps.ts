@@ -1,6 +1,6 @@
 import { sum } from "lodash-es"
-import { Polyhedron, Face, Edge, VertexArg } from "math/polyhedra"
-import Classical, { Operation as OpName } from "data/specs/Classical"
+import { Face, Edge, VertexArg } from "math/polyhedra"
+import Classical, { Facet, Operation as OpName } from "data/specs/Classical"
 import Composite from "data/specs/Composite"
 import { makeOpPair, combineOps } from "./operationPairs"
 import Operation, { OpArgs } from "./Operation"
@@ -107,12 +107,13 @@ function makeTruncateTrio<L extends OpName, M extends OpName, R extends OpName>(
   }
 }
 
-function getRegularPose(geom: Polyhedron, face: Face, crossPoint: Vec3D): Pose {
+function getRegularPose(forme: ClassicalForme, facet: Facet): Pose {
   return {
-    origin: geom.centroid(),
-    // scale on the inradius of the truncated face
-    scale: face.distanceToCenter(),
-    orientation: [face.normal(), crossPoint.sub(face.centroid())],
+    origin: forme.geom.centroid(),
+    scale: forme.facetFace(facet).distanceToCenter(),
+    orientation: forme
+      .adjacentFacetFaces(facet)
+      .map((face) => face.normal()) as any,
   }
 }
 
@@ -122,9 +123,8 @@ function getRegularPose(geom: Polyhedron, face: Face, crossPoint: Vec3D): Pose {
 const regs = makeTruncateTrio({
   left: {
     operation: "regular",
-    pose({ geom }) {
-      const face = geom.getFace()
-      return getRegularPose(geom, geom.getFace(), face.edges[0].midpoint())
+    pose(forme) {
+      return getRegularPose(forme, forme.specs.data.facet!)
     },
     transformer(forme) {
       return getTransformedVertices(forme.minorFacetFaces(), (face) =>
@@ -134,12 +134,8 @@ const regs = makeTruncateTrio({
   },
   middle: {
     operation: "truncate",
-    pose({ geom }) {
-      const face = geom.largestFace()
-      const n = face.numSides
-      // pick an edge connected to another truncated face
-      const edge = face.edges.find((e) => e.twinFace().numSides === n)!
-      return getRegularPose(geom, face, edge.midpoint())
+    pose(forme) {
+      return getRegularPose(forme, forme.specs.data.facet!)
     },
   },
   right: {
@@ -148,9 +144,7 @@ const regs = makeTruncateTrio({
     // when we move out of it
     options: (entry) => ({ facet: entry.data.facet }),
     pose(forme, options) {
-      // pick a face that *isn't* the sharpen face type
-      const face = forme.facetFace(options.right.facet)
-      return getRegularPose(forme.geom, face, face.vertices[0].vec)
+      return getRegularPose(forme, options.right.facet)
     },
     transformer({ geom }) {
       // All edges that between two truncated faces
@@ -163,11 +157,13 @@ const regs = makeTruncateTrio({
   },
 })
 
-function getAmboPose(forme: ClassicalForme, face: Face, point: Vec3D): Pose {
+function getAmboPose(forme: ClassicalForme): Pose {
   return {
     origin: forme.geom.centroid(),
     scale: getAvgInradius(forme),
-    orientation: [face.normal(), point.sub(face.centroid())],
+    orientation: forme
+      .adjacentFacetFaces("face")
+      .map((face) => face.normal()) as any,
   }
 }
 
@@ -186,8 +182,7 @@ const ambos = makeTruncateTrio({
   left: {
     operation: "rectify",
     pose(forme) {
-      const face = forme.geom.faceWithNumSides(forme.specs.data.family)
-      return getAmboPose(forme, face, face.edges[0].midpoint())
+      return getAmboPose(forme)
     },
     transformer(forme, $, resultSpec) {
       const ref = getGeometry(resultSpec)
@@ -207,16 +202,13 @@ const ambos = makeTruncateTrio({
   middle: {
     operation: "bevel",
     pose(forme) {
-      const face = forme.geom.faceWithNumSides(forme.specs.data.family * 2)
-      const edge = face.edges.find((e) => e.twinFace().numSides !== 4)!
-      return getAmboPose(forme, face, edge.midpoint())
+      return getAmboPose(forme)
     },
   },
   right: {
     operation: "cantellate",
     pose(forme) {
-      const face = forme.facetFace("face")
-      return getAmboPose(forme, face, face.vertices[0].vec)
+      return getAmboPose(forme)
     },
     transformer(forme, $, resultSpec) {
       const ref = getGeometry(resultSpec)

@@ -156,6 +156,17 @@ class TruncatedForme extends ClassicalForme {
 }
 
 class RectifiedForme extends ClassicalForme {
+  isFacetFace(face: Face, facet: Facet) {
+    if (this.specs.isTetrahedral()) return face.inSet(this.facetFaces(facet))
+    return super.isFacetFace(face, facet)
+  }
+
+  facetFaces(facet: Facet) {
+    if (!this.specs.isTetrahedral()) return super.facetFaces(facet)
+    const f0 = this.geom.getFace()
+    return [f0, ...f0.edges.map((e) => e.twin().prev().twinFace())]
+  }
+
   adjacentFacetFace(face: Face, facet: Facet) {
     return face.vertices[0]
       .adjacentFaces()
