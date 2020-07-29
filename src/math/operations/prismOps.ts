@@ -11,13 +11,7 @@ import CapstoneForme from "math/formes/CapstoneForme"
 import PrismaticForme from "math/formes/PrismaticForme"
 import { createFormeFromSpecs } from "math/formes/createForme"
 
-const { cos, PI, sqrt } = Math
-
-// Get antiprism height of a unit antiprism with n sides
-export function antiprismHeight(n: number) {
-  const sec = 1 / cos(PI / (2 * n))
-  return sqrt(1 - (sec * sec) / 4)
-}
+const { PI } = Math
 
 function getTwistMult(twist?: Twist) {
   switch (twist) {
