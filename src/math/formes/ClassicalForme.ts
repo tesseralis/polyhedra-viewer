@@ -1,21 +1,9 @@
-import { Twist, oppositeTwist } from "types"
+import { oppositeTwist } from "types"
 import PolyhedronForme from "./PolyhedronForme"
 import Classical, { Facet, facets, oppositeFacet } from "data/specs/Classical"
-import { Polyhedron, Face, Edge } from "math/polyhedra"
+import { Polyhedron, Face } from "math/polyhedra"
 import { angleBetween } from "math/geom"
-
-// FIXME dedupe with operationUtils
-export function oppositeFace(edge: Edge, twist?: Twist) {
-  switch (twist) {
-    case "left":
-      return edge.twin().next().twin().prev().twinFace()
-    case "right":
-      return edge.twin().prev().twin().next().twinFace()
-    default:
-      // If no twist is provided, assume a square
-      return edge.twin().next().next().twinFace()
-  }
-}
+import { getGeometry, oppositeFace } from "math/operations/operationUtils"
 
 export default abstract class ClassicalForme extends PolyhedronForme<
   Classical
@@ -35,6 +23,10 @@ export default abstract class ClassicalForme extends PolyhedronForme<
       case "snub":
         return new SnubForme(specs, geom)
     }
+  }
+
+  static fromSpecs(specs: Classical) {
+    return this.create(specs, getGeometry(specs))
   }
 
   faceType(facet: Facet): number {

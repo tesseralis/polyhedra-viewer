@@ -15,7 +15,6 @@ import {
 } from "./operationUtils"
 import Operation, { makeOperation } from "./Operation"
 import ClassicalForme from "math/formes/ClassicalForme"
-import { createFormeFromSpecs } from "math/formes/createForme"
 
 /**
  * Return the expanded vertices of the polyhedron resized to the given distance-from-center
@@ -30,7 +29,7 @@ function getResizedVertices(
   facet: Facet,
   result: Classical,
 ) {
-  const resultForme = createFormeFromSpecs(result) as ClassicalForme
+  const resultForme = ClassicalForme.fromSpecs(result)
   const angle = forme.snubAngle(facet)
   const distance = resultForme.inradius(facet) / resultForme.geom.edgeLength()
   const scale = forme.geom.edgeLength() * distance - forme.inradius(facet)
@@ -139,7 +138,7 @@ function getCantellatedMidradius(forme: ClassicalForme) {
  * Take the cantellated intermediate solid and convert it to either dual
  */
 function doDualTransform(forme: ClassicalForme, result: Classical) {
-  const resultForme = createFormeFromSpecs(result) as ClassicalForme
+  const resultForme = ClassicalForme.fromSpecs(result)
   const resultSideLength =
     getCantellatedMidradius(forme) / resultForme.midradius()
   const scale = resultSideLength * resultForme.circumradius()

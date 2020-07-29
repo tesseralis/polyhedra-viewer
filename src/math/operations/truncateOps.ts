@@ -15,7 +15,6 @@ import ClassicalForme from "math/formes/ClassicalForme"
 import CompositeForme, {
   AugmentedClassicalForme,
 } from "math/formes/CompositeForme"
-import { createFormeFromSpecs } from "math/formes/createForme"
 
 /**
  * Returns the point to sharpen given parameters in the following setup:
@@ -172,7 +171,7 @@ const ambos = makeTruncateTrio(getAmboPose, {
   left: {
     operation: "rectify",
     transformer(forme, $, result) {
-      const refForme = createFormeFromSpecs(result) as ClassicalForme
+      const refForme = ClassicalForme.fromSpecs(result)
       const refInradius = avgInradius(refForme)
       const inradius = avgInradius(forme)
       const scale = (refForme.circumradius() / refInradius) * inradius
@@ -187,7 +186,7 @@ const ambos = makeTruncateTrio(getAmboPose, {
   right: {
     operation: "cantellate",
     transformer(forme, $, result) {
-      const refForme = createFormeFromSpecs(result) as ClassicalForme
+      const refForme = ClassicalForme.fromSpecs(result)
       const edgeFace = refForme.edgeFace()
       const refMidradius = edgeFace.distanceToCenter()
       const scale = avgInradius(forme) / avgInradius(refForme)
