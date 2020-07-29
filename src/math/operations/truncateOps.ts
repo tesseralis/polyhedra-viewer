@@ -10,16 +10,12 @@ import Composite from "data/specs/Composite"
 import { makeOpPair, combineOps } from "./operationPairs"
 import Operation, { OpArgs } from "./Operation"
 import { Vec3D, getCentroid, angleBetween } from "math/geom"
-import {
-  getGeometry,
-  FacetOpts,
-  getTransformedVertices,
-  Pose,
-} from "./operationUtils"
+import { FacetOpts, getTransformedVertices, Pose } from "./operationUtils"
 import ClassicalForme from "math/formes/ClassicalForme"
 import CompositeForme, {
   AugmentedClassicalForme,
 } from "math/formes/CompositeForme"
+import { createFormeFromSpecs } from "math/formes/createForme"
 
 /**
  * Returns the point to sharpen given parameters in the following setup:
@@ -43,13 +39,13 @@ function getSharpenPointEdge(face: Face, edge: Edge) {
   return getSharpenPoint(face, edge.midpoint(), edge.twinFace().centroid())
 }
 
-function getAvgInradius(forme: ClassicalForme) {
+function avgInradius(forme: ClassicalForme) {
   return sum(facets.map((f) => forme.inradius(f))) / facets.length
 }
 
 interface TrioOpArgs<Op, Opts = any> {
   operation: Op
-  pose(solid: ClassicalForme, opts: Opts): Pose
+  // pose(solid: ClassicalForme, opts: Opts): Pose
   transformer(solid: ClassicalForme, opts: Opts, result: Classical): VertexArg[]
   options?(entry: Classical): Opts
 }
@@ -66,6 +62,7 @@ interface TrioArgs<L, M, R> {
  * generate the triplet of OpPairs to use.
  */
 function makeTruncateTrio<L extends OpName, M extends OpName, R extends OpName>(
+  getPose: (forme: ClassicalForme, options: any) => Pose,
   args: TrioArgs<L, M, R>,
 ) {
   const { left, right, middle } = args
@@ -92,13 +89,7 @@ function makeTruncateTrio<L extends OpName, M extends OpName, R extends OpName>(
       middle:
         middleArg ??
         ((entry) => entry.left.withData({ operation: middle.operation })),
-      getPose: ($, solid, options) => {
-        // Use the pose function for the side that matches the op name of the solid
-        const side = Object.values(args).find(
-          (arg) => arg.operation === solid.specs.data.operation,
-        )
-        return side.pose(solid, options)
-      },
+      getPose: ($, solid, options) => getPose(solid, options),
       toLeft: leftOp === "left" ? left.transformer : undefined,
       toRight: rightOp === "right" ? right.transformer : undefined,
     })
@@ -111,7 +102,10 @@ function makeTruncateTrio<L extends OpName, M extends OpName, R extends OpName>(
   }
 }
 
-function getRegularPose(forme: ClassicalForme, facet: Facet): Pose {
+function getRegularPose(
+  forme: ClassicalForme,
+  facet: Facet = forme.specs.facet(),
+): Pose {
   return {
     origin: forme.geom.centroid(),
     scale: forme.facetFace(facet).distanceToCenter(),
@@ -124,47 +118,39 @@ function getRegularPose(forme: ClassicalForme, facet: Facet): Pose {
 /**
  * Describes the truncation operations on a Platonic solid.
  */
-const regs = makeTruncateTrio({
-  left: {
-    operation: "regular",
-    pose(forme) {
-      return getRegularPose(forme, forme.specs.facet())
+const regs = makeTruncateTrio(
+  (forme, options) => getRegularPose(forme, options?.right?.facet),
+  {
+    left: {
+      operation: "regular",
+      transformer(forme) {
+        return getTransformedVertices(forme.minorFacetFaces(), (face) =>
+          getSharpenPointEdge(face, face.edges[0]),
+        )
+      },
     },
-    transformer(forme) {
-      return getTransformedVertices(forme.minorFacetFaces(), (face) =>
-        getSharpenPointEdge(face, face.edges[0]),
-      )
-    },
-  },
-  middle: {
-    operation: "truncate",
-    pose(forme) {
-      return getRegularPose(forme, forme.specs.facet())
-    },
-  },
-  right: {
-    operation: "rectify",
-    // The rectified version is the only thing we need to choose an option for
-    // when we move out of it
-    options: (entry) => ({ facet: entry.facet() }),
-    pose(forme, options) {
-      return getRegularPose(forme, options.right.facet)
-    },
-    transformer({ geom }) {
-      // All edges that between two truncated faces
-      const edges = geom.edges.filter(
-        (e) => e.face.numSides > 5 && e.twinFace().numSides > 5,
-      )
-      // Move each edge to its midpoint
-      return getTransformedVertices(edges, (e) => e.midpoint())
+    middle: { operation: "truncate" },
+    right: {
+      operation: "rectify",
+      // The rectified version is the only thing we need to choose an option for
+      // when we move out of it
+      options: (entry) => ({ facet: entry.facet() }),
+      transformer(forme) {
+        // All edges that between two truncated faces
+        const edges = forme.geom.edges.filter((e) =>
+          e.adjacentFaces().every((f) => forme.isMainFacetFace(f)),
+        )
+        // Move each edge to its midpoint
+        return getTransformedVertices(edges, (e) => e.midpoint())
+      },
     },
   },
-})
+)
 
 function getAmboPose(forme: ClassicalForme): Pose {
   return {
     origin: forme.geom.centroid(),
-    scale: getAvgInradius(forme),
+    scale: avgInradius(forme),
     orientation: forme
       .adjacentFacetFaces("face")
       .map((face) => face.normal()) as any,
@@ -182,49 +168,30 @@ function getAmboPose(forme: ClassicalForme): Pose {
  * and use that as a scale. For both, we use a reference polyhedron and calculate the vertex
  * transformations based on them.
  */
-const ambos = makeTruncateTrio({
+const ambos = makeTruncateTrio(getAmboPose, {
   left: {
     operation: "rectify",
-    pose(forme) {
-      return getAmboPose(forme)
-    },
-    transformer(forme, $, resultSpec) {
-      const ref = getGeometry(resultSpec)
-      const refForme = ClassicalForme.create(resultSpec, ref)
-      const refInradius = getAvgInradius(refForme)
-      const refCircumradius = ref.getVertex().distanceToCenter()
-      const inradius = getAvgInradius(forme)
-      const scale = (refCircumradius / refInradius) * inradius
-      const faces = forme.geom.faces.filter((f) => f.numSides === 4)
+    transformer(forme, $, result) {
+      const refForme = createFormeFromSpecs(result) as ClassicalForme
+      const refInradius = avgInradius(refForme)
+      const inradius = avgInradius(forme)
+      const scale = (refForme.circumradius() / refInradius) * inradius
       // Sharpen each of the faces to a point aligning with the vertices
       // of the rectified solid
-      return getTransformedVertices(faces, (f) =>
+      return getTransformedVertices(forme.edgeFaces(), (f) =>
         forme.geom.centroid().add(f.normal().scale(scale)),
       )
     },
   },
-  middle: {
-    operation: "bevel",
-    pose(forme) {
-      return getAmboPose(forme)
-    },
-  },
+  middle: { operation: "bevel" },
   right: {
     operation: "cantellate",
-    pose(forme) {
-      return getAmboPose(forme)
-    },
-    transformer(forme, $, resultSpec) {
-      const ref = getGeometry(resultSpec)
-      const refForme = ClassicalForme.create(resultSpec, ref)
-      const refInradius = getAvgInradius(refForme)
-      const refFace = refForme.edgeFace()
-      const refMidradius = refFace.distanceToCenter()
-      const refFaceRadius = refFace.radius()
-      const inradius = getAvgInradius(forme)
-      const scale = inradius / refInradius
-      const faces = forme.geom.faces.filter((f) => f.numSides === 4)
-      return getTransformedVertices(faces, (f) => {
+    transformer(forme, $, result) {
+      const refForme = createFormeFromSpecs(result) as ClassicalForme
+      const edgeFace = refForme.edgeFace()
+      const refMidradius = edgeFace.distanceToCenter()
+      const scale = avgInradius(forme) / avgInradius(refForme)
+      return getTransformedVertices(forme.edgeFaces(), (f) => {
         const faceCentroid = forme.geom
           .centroid()
           .add(f.normal().scale(refMidradius * scale))
@@ -234,7 +201,7 @@ const ambos = makeTruncateTrio({
             v
               .sub(f.centroid())
               .getNormalized()
-              .scale(refFaceRadius * scale),
+              .scale(edgeFace.radius() * scale),
           )
       })
     },

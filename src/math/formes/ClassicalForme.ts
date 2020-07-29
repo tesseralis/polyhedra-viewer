@@ -140,6 +140,10 @@ export default abstract class ClassicalForme extends PolyhedronForme<
     return face
   }
 
+  edgeFaces() {
+    return this.geom.faces.filter((f) => this.isEdgeFace(f))
+  }
+
   /** Return the inradius of the given type of face */
   inradius(facet: Facet) {
     return this.facetFace(facet).distanceToCenter()
