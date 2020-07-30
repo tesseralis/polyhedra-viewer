@@ -56,7 +56,7 @@ function createMapper<T>(mapper: (p: Polyhedron) => T[], Base: Constructor<T>) {
 
 export default abstract class Cap implements VertexList {
   polyhedron: Polyhedron
-  type: string
+  type: CapType
   private _innerVertices: Vertex[]
   private topPoint: Vec3D
   private faceConfiguration: FaceConfiguration

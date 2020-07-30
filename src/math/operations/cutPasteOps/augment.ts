@@ -7,7 +7,6 @@ import { Vec3D } from "math/geom"
 import { repeat } from "utils"
 import { makeOperation } from "../Operation"
 import {
-  oppositeFace,
   deduplicateVertices,
   alignPolyhedron,
   Pose,
@@ -54,6 +53,17 @@ function getAugmentee(type: AugmentType, base: number) {
 
 type CrossAxis = (edge: Edge) => boolean
 
+function capOrientation(type: AugmentType): CrossAxis {
+  switch (type) {
+    case "pyramid":
+      return () => true
+    case "cupola":
+      return (e) => e.twinFace().numSides === 4
+    case "rotunda":
+      return (e) => e.twinFace().numSides === 3
+  }
+}
+
 function defaultCrossAxis(edge: Edge) {
   return true
 }
@@ -74,7 +84,6 @@ function doAugment(
   polyhedron: Polyhedron,
   base: Face,
   baseCrossAxis: CrossAxis = defaultCrossAxis,
-  augmenteeCrossAxis: CrossAxis = defaultCrossAxis,
   augmentType: AugmentType = defaultAugmentType(base.numSides),
 ) {
   const numSides = base.numSides
@@ -87,7 +96,7 @@ function doAugment(
   const augmenteePose = getPose(
     underside,
     underside.normal().getInverted(),
-    augmenteeCrossAxis,
+    capOrientation(augmentType),
   )
 
   const basePose = getPose(base, base.normal(), baseCrossAxis)
@@ -152,9 +161,10 @@ interface Options {
 }
 
 const augmentCapstone: CutPasteOpArgs<Options, CapstoneForme> = {
-  apply({ specs, geom }, { face, gyrate, using }) {
+  apply(forme, { face, gyrate, using }) {
+    const { specs, geom } = forme
     const augmentType = using ?? defaultAugmentType(face.numSides)
-    let baseAxis, augAxis
+    let baseAxis
     // only matter if it's a bicupola that isn't gyroelongated
     // FIXME simplify this
     if (
@@ -163,28 +173,14 @@ const augmentCapstone: CutPasteOpArgs<Options, CapstoneForme> = {
       !specs.isGyroelongated()
     ) {
       baseAxis = (edge: Edge) => {
-        if (specs.isShortened()) {
-          return edge.twinFace().numSides === 3
-        } else {
-          return oppositeFace(edge).numSides === 3
-        }
-      }
-      const hasRotunda = specs.data.rotundaCount! > 0
-      const augmentRotunda = augmentType === "rotunda"
-      const isCupolaRotunda = hasRotunda !== augmentRotunda
-      if (gyrate === "ortho") {
-        augAxis = (edge: Edge) =>
-          isCupolaRotunda
-            ? edge.twinFace().numSides !== 3
-            : edge.twinFace().numSides === 3
-      } else {
-        augAxis = (edge: Edge) =>
-          isCupolaRotunda
-            ? edge.twinFace().numSides === 3
-            : edge.twinFace().numSides !== 3
+        const orientationFn = capOrientation(
+          forme.baseCaps()[0].type as AugmentType,
+        )
+        if (!specs.isShortened()) edge = edge.twin().next().next()
+        return gyrate === "ortho" ? orientationFn(edge) : !orientationFn(edge)
       }
     }
-    return doAugment(specs, geom, face, baseAxis, augAxis, using)
+    return doAugment(specs, geom, face, baseAxis, augmentType)
   },
 
   canApplyTo(specs) {
@@ -206,13 +202,12 @@ const augmentCapstone: CutPasteOpArgs<Options, CapstoneForme> = {
 
 const augmentAugmentedSolids: CutPasteOpArgs<Options, CompositeForme> = {
   apply({ specs, geom }, { face }) {
-    let baseAxis, augAxis
+    let baseAxis
     const { source } = specs.data
     if (source.isClassical() && source.isTruncated()) {
-      baseAxis = (edge: Edge) => edge.twinFace().numSides !== 3
-      augAxis = (edge: Edge) => edge.twinFace().numSides === 3
+      baseAxis = (edge: Edge) => edge.twinFace().numSides === 3
     }
-    return doAugment(specs, geom, face, baseAxis, augAxis)
+    return doAugment(specs, geom, face, baseAxis)
   },
 
   canApplyTo(specs) {
@@ -266,11 +261,7 @@ const augmentRhombicosidodecahedron: CutPasteOpArgs<
       specs,
       geom,
       face,
-      (edge) => edge.twinFace().numSides === 4,
-      (edge) =>
-        gyrate === "ortho"
-          ? edge.twinFace().numSides === 4
-          : edge.twinFace().numSides !== 4,
+      (edge) => edge.twinFace().numSides === (gyrate === "ortho" ? 4 : 5),
     )
   },
 
