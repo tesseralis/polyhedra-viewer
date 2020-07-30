@@ -86,6 +86,8 @@ export default class Capstone extends Specs<CapstoneData> {
   isPrism = () => this.isPrismatic() && this.isElongated()
   isAntiprism = () => this.isPrismatic() && this.isGyroelongated()
 
+  isCupola = () => this.isSecondary() && this.data.rotundaCount === 0
+  isRotunda = () => this.data.count === this.data.rotundaCount
   isCupolaRotunda = () => this.isBi() && this.data.rotundaCount === 1
 
   baseSides = () => (this.data.base * (this.isPrimary() ? 1 : 2)) as Polygon

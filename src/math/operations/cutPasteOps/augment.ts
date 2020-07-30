@@ -40,38 +40,26 @@ function canAugment(forme: PolyhedronForme, face: Face) {
   }
 }
 
-function getAugmentee(type: AugmentType, base: number) {
-  // FIXME make this simpler with more utility functions
-  if (type === "pyramid") {
-    return getGeometry(
-      Capstone.query.where(
-        (s) =>
-          s.isMono() &&
-          s.isShortened() &&
-          s.data.base === base &&
-          s.isPrimary(),
-      )[0],
-    )
-  } else if (type === "cupola") {
-    return getGeometry(
-      Capstone.query.where(
-        (s) =>
-          s.isMono() &&
-          s.isShortened() &&
-          s.data.base === base &&
-          s.isSecondary() &&
-          s.data.rotundaCount === 0,
-      )[0],
-    )
+type Query = (s: Capstone) => boolean
+function getQuery(type: AugmentType): Query {
+  switch (type) {
+    case "pyramid":
+      return (s) => s.isPrimary()
+    case "cupola":
+      return (s) => s.isCupola()
+    case "rotunda":
+      return (s) => s.isRotunda()
   }
+}
+
+function getAugmentee(type: AugmentType, base: number) {
   return getGeometry(
     Capstone.query.where(
       (s) =>
         s.isMono() &&
         s.isShortened() &&
         s.data.base === base &&
-        s.isSecondary() &&
-        s.data.rotundaCount === 1,
+        getQuery(type)(s),
     )[0],
   )
 }
