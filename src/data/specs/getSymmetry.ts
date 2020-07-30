@@ -14,7 +14,7 @@ const elementaryMapping = {
 }
 
 function getCapstoneSymmetry(capstone: Capstone) {
-  const { gyrate, base } = capstone.data
+  const { base } = capstone.data
 
   // Prismatic symmetry is simple
   if (capstone.isPrismatic()) {
@@ -39,7 +39,7 @@ function getCapstoneSymmetry(capstone: Capstone) {
     // Gyroelongated bicupolae and birotundae are chiral
     return Dihedral.get(base)
   }
-  return Dihedral.get(base, gyrate === "gyro" ? "antiprism" : "prism")
+  return Dihedral.get(base, capstone.isGyro() ? "antiprism" : "prism")
 }
 
 function getCompositeSymmetry(composite: Composite) {

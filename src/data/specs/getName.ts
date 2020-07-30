@@ -27,6 +27,7 @@ const regularNames: Record<
   PrimaryPolygon,
   (facet?: "face" | "vertex") => string
 > = {
+  // FIXME distinguish tetrahedron dual
   3: () => "tetrahedron",
   4: (facet) => (facet === "face" ? "cube" : "octahedron"),
   5: (facet) => (facet === "face" ? "dodecahedron" : "icosahedron"),
@@ -40,7 +41,7 @@ function getExpandedString(base: string, operation: string) {
 export default function getName(solid: Specs): string {
   if (solid.isClassical()) {
     const { operation, family, facet } = solid.data
-    const base = ["regular", "truncate"].includes(operation)
+    const base = solid.hasFacet()
       ? regularNames[family](facet)
       : rectifiedNames[family]
     return wordJoin(
