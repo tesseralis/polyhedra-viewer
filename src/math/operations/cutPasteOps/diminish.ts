@@ -1,7 +1,5 @@
 import { range } from "lodash-es"
 
-import Capstone from "data/specs/Capstone"
-import Composite from "data/specs/Composite"
 import Elementary from "data/specs/Elementary"
 import { mapObject } from "utils"
 import {
@@ -20,10 +18,11 @@ import {
   combineOps,
 } from "./cutPasteUtils"
 import PolyhedronForme from "math/formes/PolyhedronForme"
-import {
+import CompositeForme, {
   DiminishedSolidForme,
   GyrateSolidForme,
 } from "math/formes/CompositeForme"
+import CapstoneForme from "math/formes/CapstoneForme"
 
 function removeCap(polyhedron: Polyhedron, cap: Cap) {
   const boundary = cap.boundary()
@@ -71,11 +70,7 @@ function removeCap(polyhedron: Polyhedron, cap: Cap) {
   }
 }
 
-const diminishCapstone: CutPasteOpArgs<
-  CapOptions,
-  Capstone,
-  PolyhedronForme<Capstone>
-> = {
+const diminishCapstone: CutPasteOpArgs<CapOptions, CapstoneForme> = {
   apply({ geom }, { cap }) {
     return removeCap(geom, cap)
   },
@@ -95,11 +90,7 @@ const diminishCapstone: CutPasteOpArgs<
   },
 }
 
-const diminishAugmentedSolids: CutPasteOpArgs<
-  CapOptions,
-  Composite,
-  PolyhedronForme<Composite>
-> = {
+const diminishAugmentedSolids: CutPasteOpArgs<CapOptions, CompositeForme> = {
   apply({ geom }, { cap }) {
     return removeCap(geom, cap)
   },
@@ -121,7 +112,6 @@ const diminishAugmentedSolids: CutPasteOpArgs<
 // FIXME do octahedron and rhombicuboctahedron as well
 const diminishDiminishedSolid: CutPasteOpArgs<
   CapOptions,
-  Composite,
   DiminishedSolidForme
 > = {
   apply({ geom }, { cap }) {
@@ -145,11 +135,7 @@ const diminishDiminishedSolid: CutPasteOpArgs<
   },
 }
 
-const diminishGyrateSolid: CutPasteOpArgs<
-  CapOptions,
-  Composite,
-  GyrateSolidForme
-> = {
+const diminishGyrateSolid: CutPasteOpArgs<CapOptions, GyrateSolidForme> = {
   apply({ geom }, { cap }) {
     return removeCap(geom, cap)
   },
@@ -180,7 +166,6 @@ const diminishGyrateSolid: CutPasteOpArgs<
 
 const diminishElementary: CutPasteOpArgs<
   CapOptions,
-  Elementary,
   PolyhedronForme<Elementary>
 > = {
   apply({ geom }, { cap }) {
@@ -196,7 +181,7 @@ const diminishElementary: CutPasteOpArgs<
 }
 
 export const diminish = makeOperation("diminish", {
-  ...combineOps<CapOptions, CutPasteSpecs, PolyhedronForme<CutPasteSpecs>>([
+  ...combineOps<CapOptions, PolyhedronForme<CutPasteSpecs>>([
     diminishCapstone,
     diminishAugmentedSolids,
     diminishDiminishedSolid,

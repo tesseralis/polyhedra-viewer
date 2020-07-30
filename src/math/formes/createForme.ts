@@ -9,7 +9,7 @@ import { Polyhedron } from "math/polyhedra"
 export default function createForme<Specs extends PolyhedronSpecs>(
   specs: Specs,
   geom: Polyhedron,
-): PolyhedronForme<any> {
+): PolyhedronForme {
   if (specs.isClassical()) return ClassicalForme.create(specs, geom)
   if (specs.isCapstone()) return CapstoneForme.create(specs, geom)
   if (specs.isComposite()) return CompositeForme.create(specs, geom)

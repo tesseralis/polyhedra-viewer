@@ -27,29 +27,29 @@ interface GraphEntry<Specs, L, R> {
 // list of polyhedron pairs and their arguments
 type OpPairGraph<Specs, L, R> = GraphEntry<Specs, L, R>[]
 
-type MiddleGetter<
-  Specs extends PolyhedronSpecs,
-  Forme extends PolyhedronForme<Specs>,
-  L,
-  R
-> = (entry: GraphEntry<Specs, L, R>) => Specs | Forme
+type MiddleGetter<Forme extends PolyhedronForme, L, R> = (
+  entry: GraphEntry<Forme["specs"], L, R>,
+) => Forme["specs"] | Forme
 
-export interface OpPairInput<
-  Specs extends PolyhedronSpecs,
-  Forme extends PolyhedronForme<Specs>,
-  L = {},
-  R = L
-> {
+export interface OpPairInput<Forme extends PolyhedronForme, L = {}, R = L> {
   // The graph of what polyhedron spec inputs are allowed and what maps to each other
-  graph: OpPairGraph<Specs, L, R>
+  graph: OpPairGraph<Forme["specs"], L, R>
   // Get the intermediate polyhedron for the given graph entry
-  middle: Side | MiddleGetter<Specs, Forme, L, R>
+  middle: Side | MiddleGetter<Forme, L, R>
   // Get the post of a left, right, or middle state
   getPose(pos: Side | "middle", solid: Forme, opts: GraphOpts<L, R>): Pose
   // Move the intermediate figure to the left position
-  toLeft?(solid: Forme, opts: GraphOpts<L, R>, result: Specs): VertexArg[]
+  toLeft?(
+    solid: Forme,
+    opts: GraphOpts<L, R>,
+    result: Forme["specs"],
+  ): VertexArg[]
   // Move the intermediate figure to the right position
-  toRight?(solid: Forme, opts: GraphOpts<L, R>, result: Specs): VertexArg[]
+  toRight?(
+    solid: Forme,
+    opts: GraphOpts<L, R>,
+    result: Forme["specs"],
+  ): VertexArg[]
 }
 
 function defaultGetter<Specs extends PolyhedronSpecs>({
@@ -61,21 +61,24 @@ function defaultGetter<Specs extends PolyhedronSpecs>({
 type Opts<S extends Side, L, R> = S extends "left" ? L : R
 
 class OpPair<
-  Specs extends PolyhedronSpecs,
-  Forme extends PolyhedronForme<Specs>,
+  Forme extends PolyhedronForme,
   L extends {} = {},
   R extends {} = L
 > {
-  inputs: OpPairInput<Specs, Forme, L, R>
-  constructor(inputs: OpPairInput<Specs, Forme, L, R>) {
+  inputs: OpPairInput<Forme, L, R>
+  constructor(inputs: OpPairInput<Forme, L, R>) {
     this.inputs = inputs
   }
 
-  private getEntries(side: Side, specs: Specs) {
+  private getEntries(side: Side, specs: Forme["specs"]) {
     return this.inputs.graph.filter((entry) => entry[side].equals(specs))
   }
 
-  findEntry<S extends Side>(side: S, specs: Specs, opts?: Opts<S, L, R>) {
+  findEntry<S extends Side>(
+    side: S,
+    specs: Forme["specs"],
+    opts?: Opts<S, L, R>,
+  ) {
     return this.inputs.graph.find(
       (entry) =>
         entry[side].equals(specs) &&
@@ -83,7 +86,11 @@ class OpPair<
     )
   }
 
-  getEntry<S extends Side>(side: S, specs: Specs, opts?: Opts<S, L, R>) {
+  getEntry<S extends Side>(
+    side: S,
+    specs: Forme["specs"],
+    opts?: Opts<S, L, R>,
+  ) {
     const entry = this.findEntry(side, specs, opts)
     if (!entry)
       throw new Error(
@@ -94,25 +101,32 @@ class OpPair<
     return entry
   }
 
-  hasOptions(side: Side, specs: Specs) {
+  hasOptions(side: Side, specs: Forme["specs"]) {
     return this.getEntries(side, specs).length > 1
   }
 
-  *allOptions<S extends Side>(side: S, specs: Specs): Generator<Opts<S, L, R>> {
+  *allOptions<S extends Side>(
+    side: S,
+    specs: Forme["specs"],
+  ): Generator<Opts<S, L, R>> {
     for (const entry of this.getEntries(side, specs)) {
       yield (entry.options?.[side] ?? {}) as Opts<S, L, R>
     }
   }
 
   canApplyTo(side: Side, specs: PolyhedronSpecs) {
-    return !!this.findEntry(side, specs as Specs)
+    return !!this.findEntry(side, specs as Forme["specs"])
   }
 
-  getOpposite<S extends Side>(side: S, specs: Specs, options?: Opts<S, L, R>) {
+  getOpposite<S extends Side>(
+    side: S,
+    specs: Forme["specs"],
+    options?: Opts<S, L, R>,
+  ) {
     return this.getEntry(side, specs, options)[oppositeSide(side)]
   }
 
-  apply<S extends Side>(side: S, solid: SolidArgs<Specs>, opts: Opts<S, L, R>) {
+  apply<S extends Side>(side: S, solid: Forme, opts: Opts<S, L, R>) {
     const {
       middle: getMiddle,
       getPose,
@@ -172,13 +186,9 @@ class OpPair<
   }
 }
 
-type OpInput<
-  O,
-  S extends PolyhedronSpecs,
-  F extends PolyhedronForme<S>
-> = Required<
+type OpInput<O, F extends PolyhedronForme> = Required<
   Pick<
-    OpArgs<O, S, F>,
+    OpArgs<O, F>,
     "apply" | "canApplyTo" | "allOptionCombos" | "getResult" | "hasOptions"
   >
 >
@@ -186,13 +196,10 @@ type OpInput<
 /**
  * Turn an operation pair into the one-way operation corresponding to the given side
  */
-function makeOperation<
-  S extends Side,
-  Sp extends PolyhedronSpecs,
-  Forme extends PolyhedronForme<Sp>,
-  L,
-  R
->(side: S, op: OpPair<Sp, Forme, L, R>): OpInput<Opts<S, L, R>, Sp, Forme> {
+function makeOperation<S extends Side, Forme extends PolyhedronForme, L, R>(
+  side: S,
+  op: OpPair<Forme, L, R>,
+): OpInput<Opts<S, L, R>, Forme> {
   return {
     apply(solid, opts) {
       return op.apply(side, solid, opts)
@@ -215,26 +222,21 @@ function makeOperation<
 /**
  * Takes the given input and creates a pair of inverse operations.
  */
-export function makeOpPair<
-  Specs extends PolyhedronSpecs,
-  Forme extends PolyhedronForme<Specs>,
-  L = {},
-  R = L
->(opInput: OpPairInput<Specs, Forme, L, R>) {
+export function makeOpPair<Forme extends PolyhedronForme, L = {}, R = L>(
+  opInput: OpPairInput<Forme, L, R>,
+) {
   const op = new OpPair(opInput)
   return { left: makeOperation("left", op), right: makeOperation("right", op) }
 }
 
-export function combineOps<
-  S extends PolyhedronSpecs,
-  F extends PolyhedronForme<S>,
-  O
->(opArgs: OpInput<O, S, F>[]): OpInput<O, S, F> {
-  function canApplyTo(specs: S) {
+export function combineOps<F extends PolyhedronForme, O>(
+  opArgs: OpInput<O, F>[],
+): OpInput<O, F> {
+  function canApplyTo(specs: F["specs"]) {
     return opArgs.some((op) => op.canApplyTo(specs))
   }
 
-  function getOp(specs: S) {
+  function getOp(specs: F["specs"]) {
     const entry = opArgs.find((op) => op.canApplyTo(specs))
     if (!entry) {
       throw new Error(`Could not apply any operations to ${specs.name}`)

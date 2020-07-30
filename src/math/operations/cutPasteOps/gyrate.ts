@@ -1,8 +1,6 @@
 import { withOrigin } from "math/geom"
 import { Polyhedron } from "math/polyhedra"
 import { mapObject } from "utils"
-import Capstone from "data/specs/Capstone"
-import Composite from "data/specs/Composite"
 import {
   inc,
   dec,
@@ -62,7 +60,7 @@ function applyGyrate(polyhedron: Polyhedron, { cap }: CapOptions) {
   }
 }
 
-const gyrateCapstone: CutPasteOpArgs<CapOptions, Capstone, CapstoneForme> = {
+const gyrateCapstone: CutPasteOpArgs<CapOptions, CapstoneForme> = {
   apply({ geom }, options) {
     return applyGyrate(geom, options)
   },
@@ -77,11 +75,7 @@ const gyrateCapstone: CutPasteOpArgs<CapOptions, Capstone, CapstoneForme> = {
   },
 }
 
-const gyrateComposite: CutPasteOpArgs<
-  CapOptions,
-  Composite,
-  GyrateSolidForme
-> = {
+const gyrateComposite: CutPasteOpArgs<CapOptions, GyrateSolidForme> = {
   apply({ geom }, options) {
     return applyGyrate(geom, options)
   },
@@ -108,10 +102,9 @@ const gyrateComposite: CutPasteOpArgs<
 }
 
 export const gyrate = makeOperation("gyrate", {
-  ...combineOps<
-    CapOptions,
-    Capstone | Composite,
-    CapstoneForme | CompositeForme
-  >([gyrateCapstone, gyrateComposite]),
+  ...combineOps<CapOptions, CapstoneForme | CompositeForme>([
+    gyrateCapstone,
+    gyrateComposite,
+  ]),
   ...capOptionArgs,
 })

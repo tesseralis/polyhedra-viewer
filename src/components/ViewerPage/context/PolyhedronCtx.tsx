@@ -6,7 +6,7 @@ import { getGeometry } from "math/operations/operationUtils"
 
 const defaultProps = { name: "tetrahedron" }
 export default createHookedContext<
-  PolyhedronForme<any>,
+  PolyhedronForme,
   "setPolyhedron" | "setPolyhedronToName"
 >(
   {

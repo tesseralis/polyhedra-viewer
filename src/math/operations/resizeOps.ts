@@ -53,10 +53,7 @@ function getClassicalPose(forme: ClassicalForme, facet: Facet): Pose {
   }
 }
 
-type ResizeArgs<L, R> = Omit<
-  OpPairInput<Classical, ClassicalForme, L, R>,
-  "graph"
->
+type ResizeArgs<L, R> = Omit<OpPairInput<ClassicalForme, L, R>, "graph">
 
 function getResizeArgs<L, R>(
   getFacet: (opts: GraphOpts<L, R>) => Facet,
@@ -75,7 +72,7 @@ function getResizeArgs<L, R>(
 const resizeArgs = getResizeArgs<{}, FacetOpts>((opts) => opts.right.facet)
 
 // Expansion of truncated to bevelled solids
-const semiExpand = makeOpPair<Classical, ClassicalForme, {}, FacetOpts>({
+const semiExpand = makeOpPair<ClassicalForme, {}, FacetOpts>({
   ...resizeArgs,
   graph: Classical.query
     .where((s) => s.isTruncated())
@@ -86,7 +83,7 @@ const semiExpand = makeOpPair<Classical, ClassicalForme, {}, FacetOpts>({
     })),
 })
 
-const _expand = makeOpPair<Classical, ClassicalForme, {}, FacetOpts>({
+const _expand = makeOpPair<ClassicalForme, {}, FacetOpts>({
   ...resizeArgs,
   graph: Classical.query
     .where((s) => s.isRegular())
@@ -99,7 +96,7 @@ const _expand = makeOpPair<Classical, ClassicalForme, {}, FacetOpts>({
     }),
 })
 
-const _snub = makeOpPair<Classical, ClassicalForme, TwistOpts, FacetOpts>({
+const _snub = makeOpPair<ClassicalForme, TwistOpts, FacetOpts>({
   ...resizeArgs,
   graph: Classical.query
     .where((s) => s.isRegular())
@@ -117,7 +114,7 @@ const _snub = makeOpPair<Classical, ClassicalForme, TwistOpts, FacetOpts>({
     }),
 })
 
-const _twist = makeOpPair<Classical, ClassicalForme, TwistOpts, {}>({
+const _twist = makeOpPair<ClassicalForme, TwistOpts, {}>({
   ...getResizeArgs(() => "face"),
   graph: Classical.query
     .where((s) => s.isCantellated())
@@ -148,7 +145,7 @@ function doDualTransform(forme: ClassicalForme, result: Classical) {
   })
 }
 
-const _dual = makeOpPair<Classical, ClassicalForme>({
+const _dual = makeOpPair<ClassicalForme>({
   graph: Classical.query
     .where((s) => s.isRegular() && !s.isVertex())
     .map((specs) => ({
@@ -206,24 +203,21 @@ export const twist = makeOperation(
 )
 
 // NOTE: We are using the same operation for contracting both expanded and snub solids.
-export const contract = makeOperation<FacetOpts, Classical, ClassicalForme>(
-  "contract",
-  {
-    ...combineOps([_expand, _snub, semiExpand].map((op) => op.right)),
+export const contract = makeOperation<FacetOpts, ClassicalForme>("contract", {
+  ...combineOps([_expand, _snub, semiExpand].map((op) => op.right)),
 
-    hitOption: "facet",
-    getHitOption(forme, hitPoint) {
-      const hitFace = forme.geom.hitFace(hitPoint)
-      const facet = forme.getFacet(hitFace)
-      return facet ? { facet } : {}
-    },
-
-    faceSelectionStates(forme, { facet }) {
-      return forme.geom.faces.map((face) => {
-        if (forme.isFacetFace(face, facet)) return "selected"
-        if (forme.isAnyFacetFace(face)) return "selectable"
-        return undefined
-      })
-    },
+  hitOption: "facet",
+  getHitOption(forme, hitPoint) {
+    const hitFace = forme.geom.hitFace(hitPoint)
+    const facet = forme.getFacet(hitFace)
+    return facet ? { facet } : {}
   },
-)
+
+  faceSelectionStates(forme, { facet }) {
+    return forme.geom.faces.map((face) => {
+      if (forme.isFacetFace(face, facet)) return "selected"
+      if (forme.isAnyFacetFace(face)) return "selectable"
+      return undefined
+    })
+  },
+})

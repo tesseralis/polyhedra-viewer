@@ -3,7 +3,6 @@ import Capstone from "data/specs/Capstone"
 import Composite from "data/specs/Composite"
 import Elementary from "data/specs/Elementary"
 import { OpArgs } from "../Operation"
-import PolyhedronSpecs from "data/specs/PolyhedronSpecs"
 import PolyhedronForme from "math/formes/PolyhedronForme"
 import CapstoneForme from "math/formes/CapstoneForme"
 
@@ -25,23 +24,18 @@ export interface CapOptions {
   cap: Cap
 }
 
-export type CutPasteOpArgs<
-  Opts,
-  Specs extends PolyhedronSpecs,
-  Forme extends PolyhedronForme<Specs>
-> = Pick<OpArgs<Opts, Specs, Forme>, "apply" | "canApplyTo" | "getResult">
+export type CutPasteOpArgs<Opts, Forme extends PolyhedronForme> = Pick<
+  OpArgs<Opts, Forme>,
+  "apply" | "canApplyTo" | "getResult"
+>
 
-export function combineOps<
-  Opts,
-  Specs extends PolyhedronSpecs,
-  Forme extends PolyhedronForme<Specs>
->(
-  ops: CutPasteOpArgs<Opts, Specs, Forme>[],
-): CutPasteOpArgs<Opts, Specs, Forme> {
-  function canApplyTo(specs: Specs) {
+export function combineOps<Opts, Forme extends PolyhedronForme>(
+  ops: CutPasteOpArgs<Opts, Forme>[],
+): CutPasteOpArgs<Opts, Forme> {
+  function canApplyTo(specs: Forme["specs"]) {
     return ops.some((op) => op.canApplyTo(specs))
   }
-  function getOp(specs: Specs) {
+  function getOp(specs: Forme["specs"]) {
     const entry = ops.find((op) => op.canApplyTo(specs))
     if (!entry) {
       throw new Error(`Could not apply any operations to ${specs.name}`)
@@ -61,7 +55,7 @@ export function combineOps<
   }
 }
 
-function getCaps(forme: PolyhedronForme<any>) {
+function getCaps(forme: PolyhedronForme) {
   if (forme instanceof CapstoneForme) {
     return forme.baseCaps()
   } else {
@@ -69,11 +63,9 @@ function getCaps(forme: PolyhedronForme<any>) {
   }
 }
 
-type CapOptionArgs<Specs extends PolyhedronSpecs> = Partial<
-  OpArgs<CapOptions, Specs, PolyhedronForme<Specs>>
->
+type CapOptionArgs = Partial<OpArgs<CapOptions, PolyhedronForme>>
 
-export const capOptionArgs: CapOptionArgs<PolyhedronSpecs> = {
+export const capOptionArgs: CapOptionArgs = {
   hasOptions() {
     return true
   },

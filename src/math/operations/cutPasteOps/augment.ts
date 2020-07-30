@@ -1,7 +1,6 @@
 import { pickBy } from "lodash-es"
 
 import Capstone, { gyrations, Gyration } from "data/specs/Capstone"
-import Composite from "data/specs/Composite"
 import Elementary from "data/specs/Elementary"
 import { Polyhedron, Face, Edge } from "math/polyhedra"
 import { Vec3D } from "math/geom"
@@ -22,12 +21,15 @@ import {
   combineOps,
 } from "./cutPasteUtils"
 import PolyhedronForme from "math/formes/PolyhedronForme"
-import CompositeForme from "math/formes/CompositeForme"
+import CompositeForme, {
+  GyrateSolidForme,
+  DiminishedSolidForme,
+} from "math/formes/CompositeForme"
 import CapstoneForme from "math/formes/CapstoneForme"
 
 type AugmentType = "pyramid" | "cupola" | "rotunda"
 
-function canAugment(forme: PolyhedronForme<any>, face: Face) {
+function canAugment(forme: PolyhedronForme, face: Face) {
   if (forme instanceof CapstoneForme) {
     return forme.baseFaces().some((base) => base.equals(face))
   } else if (forme instanceof CompositeForme) {
@@ -173,7 +175,7 @@ interface Options {
   using?: AugmentType
 }
 
-const augmentCapstone: CutPasteOpArgs<Options, Capstone, CapstoneForme> = {
+const augmentCapstone: CutPasteOpArgs<Options, CapstoneForme> = {
   apply({ specs, geom }, { face, gyrate, using }) {
     const augmentType = using ?? defaultAugmentType(face.numSides)
     let baseAxis, augAxis
@@ -226,11 +228,7 @@ const augmentCapstone: CutPasteOpArgs<Options, Capstone, CapstoneForme> = {
   },
 }
 
-const augmentAugmentedSolids: CutPasteOpArgs<
-  Options,
-  Composite,
-  CompositeForme
-> = {
+const augmentAugmentedSolids: CutPasteOpArgs<Options, CompositeForme> = {
   apply({ specs, geom }, { face }) {
     let baseAxis, augAxis
     const { source } = specs.data
@@ -259,11 +257,7 @@ const augmentAugmentedSolids: CutPasteOpArgs<
 }
 
 // FIXME deal with augmented octahedron and rhombicuboctahedron
-const augmentIcosahedron: CutPasteOpArgs<
-  Options,
-  Composite,
-  PolyhedronForme<Composite>
-> = {
+const augmentIcosahedron: CutPasteOpArgs<Options, DiminishedSolidForme> = {
   apply({ specs, geom }, { face }) {
     return doAugment(specs, geom, face)
   },
@@ -289,8 +283,7 @@ const augmentIcosahedron: CutPasteOpArgs<
 
 const augmentRhombicosidodecahedron: CutPasteOpArgs<
   Options,
-  Composite,
-  PolyhedronForme<Composite>
+  GyrateSolidForme
 > = {
   apply({ specs, geom }, { face, gyrate }) {
     return doAugment(
@@ -327,7 +320,6 @@ const augmentRhombicosidodecahedron: CutPasteOpArgs<
 
 const augmentElementary: CutPasteOpArgs<
   Options,
-  Elementary,
   PolyhedronForme<Elementary>
 > = {
   apply({ specs, geom }, { face }) {
@@ -343,8 +335,8 @@ const augmentElementary: CutPasteOpArgs<
   },
 }
 
-export const augment = makeOperation<Options, CutPasteSpecs>("augment", {
-  ...combineOps<Options, CutPasteSpecs, PolyhedronForme<CutPasteSpecs>>([
+export const augment = makeOperation("augment", {
+  ...combineOps<Options, PolyhedronForme<CutPasteSpecs>>([
     augmentCapstone,
     augmentIcosahedron,
     augmentRhombicosidodecahedron,

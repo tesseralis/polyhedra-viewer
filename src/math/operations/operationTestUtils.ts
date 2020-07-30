@@ -89,7 +89,7 @@ function expectValidPolyhedron(result: Polyhedron) {
  */
 export function validateOperationApplication(
   op: Operation<any>,
-  original: PolyhedronForme<any>,
+  original: PolyhedronForme,
   args: any,
 ) {
   const opResult = op.apply(original, args)

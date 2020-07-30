@@ -207,7 +207,7 @@ const ambos = makeTruncateTrio(getAmboPose, {
   },
 })
 
-const augTruncate = makeOpPair<Composite, AugmentedClassicalForme>({
+const augTruncate = makeOpPair<AugmentedClassicalForme>({
   graph: Composite.query
     .where(
       (s) =>
@@ -279,7 +279,7 @@ const augTruncate = makeOpPair<Composite, AugmentedClassicalForme>({
 
 export const truncate = new Operation(
   "truncate",
-  combineOps<Classical | Composite, ClassicalForme | CompositeForme, any>([
+  combineOps<ClassicalForme | CompositeForme, any>([
     regs.truncate.left,
     ambos.truncate.left,
     augTruncate.left,
@@ -296,7 +296,7 @@ export const rectify = new Operation(
   combineOps([regs.rectify.left, ambos.rectify.left]),
 )
 
-const hitOptArgs: Partial<OpArgs<FacetOpts, Classical, ClassicalForme>> = {
+const hitOptArgs: Partial<OpArgs<FacetOpts, ClassicalForme>> = {
   hitOption: "facet",
   getHitOption(forme, hitPoint) {
     const face = forme.geom.hitFace(hitPoint)
@@ -313,11 +313,7 @@ const hitOptArgs: Partial<OpArgs<FacetOpts, Classical, ClassicalForme>> = {
 }
 
 export const sharpen = new Operation("sharpen", {
-  ...combineOps<
-    Classical | Composite,
-    ClassicalForme | CompositeForme,
-    Partial<FacetOpts>
-  >([
+  ...combineOps<ClassicalForme | CompositeForme, Partial<FacetOpts>>([
     regs.truncate.right,
     ambos.truncate.right,
     augTruncate.right,
@@ -332,7 +328,7 @@ export const sharpen = new Operation("sharpen", {
 // and need to be integrated into the app
 
 export const cosharpen = new Operation("cosharpen", {
-  ...combineOps<Classical, ClassicalForme, FacetOpts>([
+  ...combineOps<ClassicalForme, FacetOpts>([
     regs.cotruncate.right,
     ambos.cotruncate.right,
   ]),
@@ -340,7 +336,7 @@ export const cosharpen = new Operation("cosharpen", {
 })
 
 export const unrectify = new Operation("unrectify", {
-  ...combineOps<Classical, ClassicalForme, FacetOpts>([
+  ...combineOps<ClassicalForme, FacetOpts>([
     regs.rectify.right,
     ambos.rectify.right,
   ]),
