@@ -53,6 +53,8 @@ function getAugmentee(type: AugmentType, base: number) {
 
 type CrossAxis = (edge: Edge) => boolean
 
+// TODO make this work on a cap boundary instead of an underside for consistency
+// TODO make this a function on the cap forme
 function capOrientation(type: AugmentType): CrossAxis {
   switch (type) {
     case "pyramid":
@@ -166,7 +168,6 @@ const augmentCapstone: CutPasteOpArgs<Options, CapstoneForme> = {
     const augmentType = using ?? defaultAugmentType(face.numSides)
     let baseAxis
     // only matter if it's a bicupola that isn't gyroelongated
-    // FIXME simplify this
     if (
       !specs.isPrismatic() &&
       specs.isSecondary() &&
@@ -212,6 +213,7 @@ const augmentAugmentedSolids: CutPasteOpArgs<Options, CompositeForme> = {
 
   canApplyTo(specs) {
     if (!specs.isComposite()) return false
+    if (!specs.isAugmentedSolid()) return false
     const { source, augmented } = specs.data
     if (source.isCapstone()) {
       return augmented < (source.data.base % 3 === 0 ? 3 : 2) && !specs.isPara()
@@ -228,16 +230,14 @@ const augmentAugmentedSolids: CutPasteOpArgs<Options, CompositeForme> = {
 }
 
 // FIXME deal with augmented octahedron and rhombicuboctahedron
-const augmentIcosahedron: CutPasteOpArgs<Options, DiminishedSolidForme> = {
+const augmentDiminishedSolids: CutPasteOpArgs<Options, DiminishedSolidForme> = {
   apply({ specs, geom }, { face }) {
     return doAugment(specs, geom, face)
   },
 
   canApplyTo(specs) {
-    if (!specs.isComposite()) return false
-    const { source, diminished, augmented } = specs.data
-    if (source.canonicalName() !== "icosahedron") return false
-    return diminished > 0 && augmented === 0
+    if (!specs.isComposite() || !specs.isDiminishedSolid()) return false
+    return specs.isDiminished() && !specs.isAugmented()
   },
 
   getResult({ specs }, { face }) {
@@ -252,24 +252,15 @@ const augmentIcosahedron: CutPasteOpArgs<Options, DiminishedSolidForme> = {
   },
 }
 
-const augmentRhombicosidodecahedron: CutPasteOpArgs<
-  Options,
-  GyrateSolidForme
-> = {
+const augmentGyrateSolids: CutPasteOpArgs<Options, GyrateSolidForme> = {
   apply({ specs, geom }, { face, gyrate }) {
-    return doAugment(
-      specs,
-      geom,
-      face,
-      (edge) => edge.twinFace().numSides === (gyrate === "ortho" ? 4 : 5),
-    )
+    const crossAxis: CrossAxis = (edge) =>
+      edge.twinFace().numSides === (gyrate === "ortho" ? 4 : 5)
+    return doAugment(specs, geom, face, crossAxis)
   },
 
   canApplyTo(specs) {
-    if (!specs.isComposite()) return false
-    const { source, diminished } = specs.data
-    if (source.canonicalName() !== "rhombicosidodecahedron") return false
-    return diminished > 0
+    return specs.isComposite() && specs.isGyrateSolid() && specs.isDiminished()
   },
 
   getResult({ specs }, { gyrate }) {
@@ -305,8 +296,8 @@ const augmentElementary: CutPasteOpArgs<
 export const augment = makeOperation("augment", {
   ...combineOps<Options, PolyhedronForme<CutPasteSpecs>>([
     augmentCapstone,
-    augmentIcosahedron,
-    augmentRhombicosidodecahedron,
+    augmentDiminishedSolids,
+    augmentGyrateSolids,
     augmentAugmentedSolids,
     augmentElementary,
   ]),
