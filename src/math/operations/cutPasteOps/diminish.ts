@@ -2,7 +2,6 @@ import { range } from "lodash-es"
 
 import Capstone from "data/specs/Capstone"
 import Composite from "data/specs/Composite"
-import Prismatic from "data/specs/Prismatic"
 import Elementary from "data/specs/Elementary"
 import { mapObject } from "utils"
 import {
@@ -80,27 +79,17 @@ const diminishCapstone: CutPasteOpArgs<
   },
   canApplyTo(info) {
     if (!info.isCapstone()) return false
+    if (info.isPrismatic()) return false
     return !(info.isMono() && info.isShortened())
   },
   getResult({ specs }, { cap }) {
-    const { count, elongation, base, type } = specs.data
-    if (count === 1) {
-      return Prismatic.query.withData({
-        type: elongation as any,
-        base: specs.isPyramid() ? base : ((base * 2) as any),
-      })
-    } else {
-      const capType = cap.type
-      return specs.withData({
-        count: 1,
-        type:
-          type === "cupolarotunda"
-            ? capType === "rotunda"
-              ? "cupola"
-              : "rotunda"
-            : type,
-      })
-    }
+    const { count, rotundaCount = 0 } = specs.data
+    return specs.withData({
+      count: dec(count) as any,
+      rotundaCount: (cap.type === "rotunda"
+        ? dec(rotundaCount)
+        : rotundaCount) as any,
+    })
   },
 }
 

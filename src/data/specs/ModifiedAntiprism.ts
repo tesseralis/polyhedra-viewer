@@ -1,16 +1,14 @@
 import { Items } from "types"
 import Specs from "./PolyhedronSpecs"
 import Queries from "./Queries"
-import Prismatic from "./Prismatic"
+import Capstone from "./Capstone"
 
-const sources = Prismatic.query.where(
-  (s) => s.isAntiprism() && !s.isSecondary(),
-)
+const sources = Capstone.query.where((s) => s.isAntiprism() && !s.isSecondary())
 const operations = [null, "snub"] as const
 type Operation = Items<typeof operations>
 
 interface ModifiedAntiprismData {
-  source: Prismatic
+  source: Capstone
   // operation: null | "rectified" | "snub"
   operation: Operation
 }

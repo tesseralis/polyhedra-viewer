@@ -4,7 +4,7 @@ import { Items } from "types"
 import Specs from "./PolyhedronSpecs"
 import Queries from "./Queries"
 import Classical from "./Classical"
-import Prismatic from "./Prismatic"
+import Capstone from "./Capstone"
 
 export const counts = [0, 1, 2, 3] as const
 export type Count = Items<typeof counts>
@@ -13,15 +13,15 @@ const alignments = ["meta", "para"] as const
 type Align = Items<typeof alignments>
 
 interface CompositeData {
-  source: Classical | Prismatic
+  source: Classical | Capstone
   augmented: Count
   diminished: Count
   gyrate: Count
   align?: Align
 }
 
-const prismaticBases = Prismatic.query.where(
-  (s) => s.isPrism() && s.data.base <= 6,
+const prismaticBases = Capstone.query.where(
+  (s) => s.isPrism() && (s.isPrimary() || s.isTriangular()),
 )
 const augmentedClassicalBases = Classical.query.where(
   (s) => s.hasFacet() && !s.isVertex(),
@@ -46,7 +46,7 @@ export default class Composite extends Specs<CompositeData> {
     gyrate = 0,
     source,
     align,
-  }: Partial<CompositeData> & { source: Prismatic | Classical }) {
+  }: Partial<CompositeData> & { source: Capstone | Classical }) {
     super("composite", { source, align, augmented, diminished, gyrate })
     if (!this.isBi()) {
       delete this.data.align
@@ -86,7 +86,7 @@ export default class Composite extends Specs<CompositeData> {
     // Augmented prisms
     for (const source of prismaticBases) {
       for (const augmented of limitCount(source.data.base % 3 === 0 ? 3 : 2)) {
-        if (source.data.base === 6 && augmented === 2) {
+        if (source.isSecondary() && augmented === 2) {
           for (const align of alignments) {
             yield new Composite({ source, augmented, align })
           }

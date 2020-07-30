@@ -1,6 +1,5 @@
 import { isEqual, capitalize } from "lodash-es"
 import type Classical from "./Classical"
-import type Prismatic from "./Prismatic"
 import type Capstone from "./Capstone"
 import type Composite from "./Composite"
 import type ModifiedAntiprism from "./ModifiedAntiprism"
@@ -13,7 +12,6 @@ import { getAlternateNames, getCanonicalName } from "../alternates"
 
 type PolyhedronType =
   | "classical"
-  | "prismatic"
   | "capstone"
   | "composite"
   | "modified antiprism"
@@ -52,14 +50,14 @@ export default abstract class PolyhedronSpecs<Data extends {} = {}> {
     if (this.isClassical()) {
       return this.isRegular() ? "Platonic solid" : "Archimedean solid"
     }
-    if (this.isPrismatic()) {
-      return capitalize(this.data.type)
+    if (this.isCapstone() && this.isPrismatic()) {
+      return capitalize(this.data.elongation!)
     }
     return "Johnson solid"
   }
 
   isUniform() {
-    return this.isClassical() || this.isPrismatic()
+    return this.isClassical() || (this.isCapstone() && this.isPrismatic())
   }
 
   isChiral() {
@@ -83,10 +81,6 @@ export default abstract class PolyhedronSpecs<Data extends {} = {}> {
 
   isClassical(): this is Classical {
     return this.type === "classical"
-  }
-
-  isPrismatic(): this is Prismatic {
-    return this.type === "prismatic"
   }
 
   isCapstone(): this is Capstone {

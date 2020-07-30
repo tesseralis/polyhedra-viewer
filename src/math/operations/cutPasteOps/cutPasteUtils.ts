@@ -1,7 +1,6 @@
 import { getSingle } from "utils"
 import { Cap, Polyhedron } from "math/polyhedra"
 import { isInverse } from "math/geom"
-import Prismatic from "data/specs/Prismatic"
 import Capstone from "data/specs/Capstone"
 import Composite from "data/specs/Composite"
 import Elementary from "data/specs/Elementary"
@@ -9,7 +8,7 @@ import { OpArgs } from "../Operation"
 import PolyhedronSpecs from "data/specs/PolyhedronSpecs"
 import PolyhedronForme from "math/formes/PolyhedronForme"
 
-export type CutPasteSpecs = Prismatic | Capstone | Composite | Elementary
+export type CutPasteSpecs = Capstone | Composite | Elementary
 
 type Count = Composite["data"]["augmented"]
 

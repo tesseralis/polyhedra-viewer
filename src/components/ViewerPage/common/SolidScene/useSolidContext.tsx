@@ -4,7 +4,6 @@ import Config from "components/ConfigCtx"
 import { PolyhedronCtx, OperationCtx, TransitionCtx } from "../../context"
 import { Polyhedron } from "math/polyhedra"
 import ClassicalForme from "math/formes/ClassicalForme"
-import PrismaticForme from "math/formes/PrismaticForme"
 
 function toRgb(hex: string) {
   const { r, g, b } = tinycolor(hex).toRgb()
@@ -41,18 +40,6 @@ function getClassicalColors(forme: ClassicalForme) {
   })
 }
 
-function getPrismaticColors(forme: PrismaticForme) {
-  const bases = forme.bases()
-  const n = bases[0].numSides
-  const faceSides = n > 5 ? "secondary" : "primary"
-  const family = n > 5 ? n / 2 : n
-  return forme.geom.faces.map((face) => {
-    if (face.inSet(bases))
-      return (classicalColorScheme as any)[family][faceSides].face
-    return forme.specs.isPrism() ? orthoFace : gyroFace
-  })
-}
-
 const enableFormeColors = false
 
 // Hook that takes data from Polyhedron and Animation states and decides which to use.
@@ -71,8 +58,6 @@ export default function useSolidContext() {
     if (!enableFormeColors) return
     if (polyhedron instanceof ClassicalForme) {
       return getClassicalColors(polyhedron)
-    } else if (polyhedron instanceof PrismaticForme) {
-      return getPrismaticColors(polyhedron)
     }
   }, [polyhedron])
 

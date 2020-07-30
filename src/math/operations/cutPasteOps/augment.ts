@@ -1,6 +1,5 @@
 import { pickBy } from "lodash-es"
 
-import Prismatic from "data/specs/Prismatic"
 import Capstone from "data/specs/Capstone"
 import Composite from "data/specs/Composite"
 import Elementary from "data/specs/Elementary"
@@ -24,8 +23,7 @@ import {
 } from "./cutPasteUtils"
 import PolyhedronForme from "math/formes/PolyhedronForme"
 
-type AugmentSpecs = Prismatic | CutPasteSpecs
-
+type AugmentSpecs = CutPasteSpecs
 type AugmentType = "pyramid" | "cupola" | "rotunda"
 
 function hasAugmentAlignment(info: AugmentSpecs) {
@@ -33,7 +31,7 @@ function hasAugmentAlignment(info: AugmentSpecs) {
   const { source, augmented } = info.data
   if (augmented !== 1) return false
   // Only hexagonal prism has augment alignment
-  if (source.isPrismatic()) return source.data.base === 6
+  if (source.isCapstone()) return source.isSecondary()
   // If Classical, has alignment if it has icosahedral symmetry
   return source.isIcosahedral()
 }
@@ -96,14 +94,37 @@ function canAugment(base: Face) {
 }
 
 function getAugmentee(type: AugmentType, base: number) {
-  // FIXME withData doesn't work because of the null value
+  // FIXME make this simpler with more utility functions
+  if (type === "pyramid") {
+    return getGeometry(
+      Capstone.query.where(
+        (s) =>
+          s.isMono() &&
+          s.isShortened() &&
+          s.data.base === base &&
+          s.isPrimary(),
+      )[0],
+    )
+  } else if (type === "cupola") {
+    return getGeometry(
+      Capstone.query.where(
+        (s) =>
+          s.isMono() &&
+          s.isShortened() &&
+          s.data.base === base &&
+          s.isSecondary() &&
+          s.data.rotundaCount === 0,
+      )[0],
+    )
+  }
   return getGeometry(
     Capstone.query.where(
       (s) =>
         s.isMono() &&
         s.isShortened() &&
         s.data.base === base &&
-        s.data.type === type,
+        s.isSecondary() &&
+        s.data.rotundaCount === 1,
     )[0],
   )
 }
@@ -180,11 +201,8 @@ function getUsingOpt(numSides: number, using?: AugmentType) {
 }
 
 function hasRotunda(info: AugmentSpecs) {
-  if (info.isPrismatic()) {
-    return info.data.base === 10
-  }
   if (info.isCapstone()) {
-    return info.isMono() && !info.isPyramid() && info.isPentagonal()
+    return info.isMono() && info.isSecondary() && info.isPentagonal()
   }
   return false
 }
@@ -201,7 +219,7 @@ function hasGyrateOpts(info: AugmentSpecs) {
     // Gyroelongated capstones are always gyro
     if (info.isGyroelongated()) return false
     // Cupolae and rotundae (that are not the gyrobifastigium) always have gyrate opts
-    if (!info.isDigonal() && !info.isPyramid()) return true
+    if (!info.isDigonal() && info.isSecondary()) return true
     return false
   }
   if (info.isComposite()) {
@@ -219,35 +237,6 @@ interface Options {
   using?: AugmentType
 }
 
-const augmentPrismatic: CutPasteOpArgs<
-  Options,
-  Prismatic,
-  PolyhedronForme<Prismatic>
-> = {
-  apply({ specs, geom }, { face, using }) {
-    const augmentType = using ?? defaultAugmentType(face.numSides)
-    return doAugment(specs, geom, face, augmentType)
-  },
-
-  canApplyTo(specs) {
-    if (!specs.isPrismatic()) return false
-    const { base } = specs.data
-    if (specs.isAntiprism() && base === 3) return false
-    return base > 2
-  },
-
-  getResult({ specs }, { face, using }) {
-    const n = face.numSides
-    const { type, base } = getUsingOpt(n, using)
-    return Capstone.query.withData({
-      count: 1,
-      elongation: specs.data.type,
-      type,
-      base: base as any,
-    })
-  },
-}
-
 const augmentCapstone: CutPasteOpArgs<
   Options,
   Capstone,
@@ -258,7 +247,11 @@ const augmentCapstone: CutPasteOpArgs<
     let baseAxis, augAxis
     // only matter if it's a bicupola that isn't gyroelongated
     // FIXME simplify this
-    if (!specs.isPyramid() && !specs.isGyroelongated()) {
+    if (
+      !specs.isPrismatic() &&
+      specs.isSecondary() &&
+      !specs.isGyroelongated()
+    ) {
       baseAxis = (edge: Edge) => {
         if (specs.isShortened()) {
           return edge.twinFace().numSides === 3
@@ -266,7 +259,9 @@ const augmentCapstone: CutPasteOpArgs<
           return oppositeFace(edge).numSides === 3
         }
       }
-      const isCupolaRotunda = new Set([specs.data.type, augmentType]).size === 2
+      const hasRotunda = specs.data.rotundaCount! > 0
+      const augmentRotunda = augmentType === "rotunda"
+      const isCupolaRotunda = hasRotunda !== augmentRotunda
       if (gyrate === "ortho") {
         augAxis = (edge: Edge) =>
           isCupolaRotunda
@@ -284,16 +279,17 @@ const augmentCapstone: CutPasteOpArgs<
 
   canApplyTo(specs) {
     if (!specs.isCapstone()) return false
-    return specs.isMono()
+    return !specs.isBi()
   },
 
   getResult({ specs }, { face, using, gyrate }) {
     const n = face.numSides
-    const { type, base } = getUsingOpt(n, using)
+    const { base } = getUsingOpt(n, using)
     return specs.withData({
-      count: 2,
+      count: inc(specs.data.count) as any,
+      rotundaCount: (specs.data.rotundaCount! +
+        (using === "rotunda" ? 1 : 0)) as any,
       gyrate: base === 2 ? "gyro" : gyrate,
-      type: type === specs.data.type ? type : "cupolarotunda",
     })
   },
 }
@@ -317,7 +313,7 @@ const augmentAugmentedSolids: CutPasteOpArgs<
   canApplyTo(specs) {
     if (!specs.isComposite()) return false
     const { source, augmented } = specs.data
-    if (source.isPrismatic()) {
+    if (source.isCapstone()) {
       return augmented < (source.data.base % 3 === 0 ? 3 : 2) && !specs.isPara()
     }
     return augmented < source.data.family - 2 && !specs.isPara()
@@ -424,7 +420,6 @@ const augmentElementary: CutPasteOpArgs<
 
 export const augment = makeOperation<Options, CutPasteSpecs>("augment", {
   ...combineOps<Options, CutPasteSpecs, PolyhedronForme<CutPasteSpecs>>([
-    augmentPrismatic,
     augmentCapstone,
     augmentIcosahedron,
     augmentRhombicosidodecahedron,

@@ -8,9 +8,14 @@ type Base = Face | Cap
 // TODO add more useful functions here
 export default abstract class CapstoneForme extends PolyhedronForme<Capstone> {
   static create(specs: Capstone, geom: Polyhedron) {
-    return specs.isBi()
-      ? new BiCapstoneForme(specs, geom)
-      : new MonoCapstoneForme(specs, geom)
+    switch (specs.data.count) {
+      case 0:
+        return new PrismaticForme(specs, geom)
+      case 1:
+        return new MonoCapstoneForme(specs, geom)
+      case 2:
+        return new BiCapstoneForme(specs, geom)
+    }
   }
 
   abstract bases(): readonly [Base, Base]
@@ -27,9 +32,19 @@ export default abstract class CapstoneForme extends PolyhedronForme<Capstone> {
   }
 }
 
+class PrismaticForme extends CapstoneForme {
+  bases() {
+    const face1 = this.geom.faceWithNumSides(this.specs.baseSides())
+    const face2 = this.geom.faces.find((f) =>
+      isInverse(face1.normal(), f.normal()),
+    )!
+    return [face1, face2] as const
+  }
+}
+
 class MonoCapstoneForme extends CapstoneForme {
   bases() {
-    const base = this.specs.isPyramid()
+    const base = this.specs.isPrimary()
       ? this.specs.data.base
       : this.specs.data.base * 2
     const face = this.geom.faceWithNumSides(base)

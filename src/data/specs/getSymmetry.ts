@@ -14,14 +14,20 @@ const elementaryMapping = {
 }
 
 function getCapstoneSymmetry(capstone: Capstone) {
+  const { gyrate, base, elongation } = capstone.data
+
+  // Prismatic symmetry is simple
+  if (capstone.isPrismatic()) {
+    return Dihedral.get(capstone.baseSides(), elongation!)
+  }
+
   // mono-capstones always have cyclic symmetry
-  const { gyrate, base } = capstone.data
   if (capstone.isMono()) {
     return Cyclic.get(base)
   }
   const isGyroelongated = capstone.isGyroelongated()
 
-  if (capstone.isPyramid()) {
+  if (capstone.isPrimary()) {
     return Dihedral.get(base, isGyroelongated ? "antiprism" : "prism")
   }
   // Cupolarotundae are always cyclic, and have reflective symmetry if it is not chiral
@@ -48,12 +54,12 @@ function getCompositeSymmetry(composite: Composite) {
     case 1:
       // Mono-augmented prisms all have biradial symmetry,
       // everything else has the symmetry of their base polygon
-      return source.isPrismatic()
+      return source.isCapstone()
         ? Cyclic.biradial
         : Cyclic.get(source.data.family)
 
     case 2: {
-      if (source.isPrismatic()) {
+      if (source.isCapstone()) {
         // para-augmented prisms have digonal prismatic symmetry
         // meta-augmented prisms have biradial symmetry
         return align === "para" ? Dihedral.get(2, "prism") : Cyclic.biradial
@@ -76,7 +82,7 @@ function getCompositeSymmetry(composite: Composite) {
 
     case 3:
       // The only tri-augmented prisms are triangular and hexagonal
-      if (source.isPrismatic()) {
+      if (source.isCapstone()) {
         return Dihedral.get(3, "prism")
       }
 
@@ -95,10 +101,6 @@ function getCompositeSymmetry(composite: Composite) {
 export default function getSymmetry(solid: Specs): Symmetry {
   if (solid.isClassical()) {
     return Polyhedral.get(solid.data.family, solid.isSnub())
-  }
-  if (solid.isPrismatic()) {
-    const { base, type } = solid.data
-    return Dihedral.get(base, type)
   }
   if (solid.isCapstone()) {
     return getCapstoneSymmetry(solid)

@@ -1,14 +1,11 @@
 import { Twist, twists, oppositeTwist } from "types"
 import PolyhedronSpecs from "data/specs/PolyhedronSpecs"
 import Capstone from "data/specs/Capstone"
-import Prismatic from "data/specs/Prismatic"
 import { combineOps, makeOpPair } from "./operationPairs"
 import { makeOperation } from "./Operation"
 import { Pose, TwistOpts, getTransformedVertices } from "./operationUtils"
 import { withOrigin, getCentroid } from "math/geom"
-import PolyhedronForme from "math/formes/PolyhedronForme"
 import CapstoneForme from "math/formes/CapstoneForme"
-import PrismaticForme from "math/formes/PrismaticForme"
 import { createFormeFromSpecs } from "math/formes/createForme"
 
 const { PI } = Math
@@ -24,10 +21,11 @@ function getTwistMult(twist?: Twist) {
   }
 }
 
-// FIXME deduplicate these...
 function getCapstonePose(forme: CapstoneForme, twist?: Twist): Pose {
   const [top, bottom] = forme.baseFaces()
-  const edge = top.edges.find((e) => e.face.numSides === 3)!
+  const edge = forme.specs.isPrismatic()
+    ? top.edges[0]
+    : top.edges.find((e) => e.face.numSides === 3)!
   const n = top.numSides
   const angle =
     (forme.specs.isGyroelongated() ? 1 : 0) * getTwistMult(twist) * (PI / n / 2)
@@ -41,35 +39,16 @@ function getCapstonePose(forme: CapstoneForme, twist?: Twist): Pose {
   }
 }
 
-function getPrismaticPose(forme: PrismaticForme): Pose {
-  const [top, bottom] = forme.bases()
-  const n = top.numSides
-  const angle =
-    (forme.specs.isAntiprism() ? 1 : 0) * getTwistMult("left") * (PI / n / 2)
-  return {
-    origin: getCentroid([top.centroid(), bottom.centroid()]),
-    scale: forme.geom.edgeLength(),
-    orientation: [
-      top.normal(),
-      top.edges[0].v1.vec
-        .sub(top.centroid())
-        .getRotatedAroundAxis(top.normal(), angle),
-    ],
-  }
-}
-
 function getNumSides(specs: PolyhedronSpecs) {
-  if (specs.isPrismatic()) {
-    return specs.data.base
-  } else if (specs.isCapstone()) {
-    if (specs.isPyramid()) return specs.data.base
+  if (specs.isCapstone()) {
+    if (specs.isPrimary()) return specs.data.base
     return 2 * specs.data.base
   }
   throw new Error(`Invalid specs: ${specs.name()}`)
 }
 
 function getScaledPrismVertices(
-  forme: PrismaticForme | CapstoneForme,
+  forme: CapstoneForme,
   scale: number,
   twist?: Twist,
 ) {
@@ -85,11 +64,7 @@ function getScaledPrismVertices(
   )
 }
 
-function doPrismTransform(
-  forme: CapstoneForme | PrismaticForme,
-  result: any,
-  twist?: Twist,
-) {
+function doPrismTransform(forme: CapstoneForme, result: any, twist?: Twist) {
   const resultForme = createFormeFromSpecs(result) as any
   const resultHeight =
     (resultForme.prismaticHeight() / resultForme.geom.edgeLength()) *
@@ -109,7 +84,12 @@ function makePrismOp({ query, rightElongation = "antiprism" }: PrismOpArgs) {
   return (leftElongation: "prism" | null) => {
     return makeOpPair<Capstone, CapstoneForme>({
       graph: Capstone.query
-        .where((s) => query(s) && s.data.elongation === rightElongation)
+        .where(
+          (s) =>
+            query(s) &&
+            !s.isPrismatic() &&
+            s.data.elongation === rightElongation,
+        )
         .map((item) => ({
           left: item.withData({ elongation: leftElongation }),
           right: item,
@@ -125,17 +105,17 @@ function makePrismOp({ query, rightElongation = "antiprism" }: PrismOpArgs) {
   }
 }
 
-const turnPrismatic = makeOpPair<Prismatic, PrismaticForme>({
+const turnPrismatic = makeOpPair<Capstone, CapstoneForme>({
   // Every unelongated capstone (except fastigium) can be elongated
-  graph: Prismatic.query
+  graph: Capstone.query
     .where((s) => s.isPrism() && !s.isDigonal())
     .map((entry) => ({
       left: entry,
-      right: entry.withData({ type: "antiprism" }),
+      right: entry.withData({ elongation: "antiprism" }),
     })),
   middle: "right",
   getPose(side, forme) {
-    return getPrismaticPose(forme)
+    return getCapstonePose(forme, "left")
   },
   toLeft: (forme, $, result) => doPrismTransform(forme, result, "left"),
 })
@@ -145,17 +125,17 @@ const _elongate = makePrismOp({
   rightElongation: "prism",
 })(null)
 
-const canGyroelongPyramid = (s: Capstone) => s.isPyramid() && s.data.base > 3
-const canGyroelongCupola = (s: Capstone) => !s.isPyramid() && !s.isDigonal()
+const canGyroelongPrimary = (s: Capstone) => s.isPrimary() && !s.isTriangular()
+const canGyroelongSecondary = (s: Capstone) => s.isSecondary() && !s.isDigonal()
 
 const pyramidOps = makePrismOp({
-  query: (s) => canGyroelongPyramid(s),
+  query: (s) => canGyroelongPrimary(s),
 })
 const gyroelongPyramid = pyramidOps(null)
 const turnPyramid = pyramidOps("prism")
 
 const cupolaOps = makePrismOp({
-  query: (s) => canGyroelongCupola(s) && s.isMono(),
+  query: (s) => canGyroelongSecondary(s) && s.isMono(),
 })
 
 const gyroelongCupola = cupolaOps(null)
@@ -166,7 +146,7 @@ function makeBicupolaPrismOp(leftElongation: null | "prism") {
     graph: Capstone.query
       .where(
         (s) =>
-          canGyroelongCupola(s) &&
+          canGyroelongSecondary(s) &&
           s.isBi() &&
           s.data.elongation === leftElongation,
       )
@@ -223,11 +203,7 @@ export const shorten = makeOperation(
 
 export const turn = makeOperation(
   "turn",
-  combineOps<
-    Capstone | Prismatic,
-    PolyhedronForme<Capstone | Prismatic>,
-    Partial<TwistOpts>
-  >(
+  combineOps<Capstone, CapstoneForme, Partial<TwistOpts>>(
     [turnPrismatic, turnPyramid, turnCupola, turnBicupola].flatMap((op) => [
       op.left,
       op.right,

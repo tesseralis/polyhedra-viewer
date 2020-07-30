@@ -1,5 +1,4 @@
 import Classical from "./Classical"
-import Prismatic from "./Prismatic"
 import Capstone from "./Capstone"
 import Composite from "./Composite"
 import ModifiedAntiprism from "./ModifiedAntiprism"
@@ -7,7 +6,6 @@ import Elementary from "./Elementary"
 
 const subclasses = [
   Classical,
-  Prismatic,
   Capstone,
   Composite,
   ModifiedAntiprism,

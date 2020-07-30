@@ -23,9 +23,8 @@ export default function getConwaySymbol(structure: Specs) {
     return operationMapping[operation] + familyMapping[family](facet)
   }
 
-  if (structure.isPrismatic()) {
-    const { type, base } = structure.data
-    return `${type[0].toUpperCase()}${base}`
+  if (structure.isCapstone() && structure.isPrismatic()) {
+    return `${structure.data.elongation![0].toUpperCase()}${structure.baseSides()}`
   }
 
   const index = johnsonSolids.indexOf(structure.canonicalName())

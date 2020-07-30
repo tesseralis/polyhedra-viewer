@@ -50,19 +50,30 @@ export default function getName(solid: Specs): string {
     )
   }
 
-  if (solid.isPrismatic()) {
-    const { base, type } = solid.data
-    return `${polygonPrefixes.get(base)} ${type}`
-  }
-
   if (solid.isCapstone()) {
-    const { base, type, elongation, count, gyrate } = solid.data
+    const { base, elongation, count, gyrate } = solid.data
+    // If no caps attached, it's a prism or antiprism
+    if (solid.isPrismatic()) {
+      return wordJoin(polygonPrefixes.get(solid.baseSides()), elongation!)
+    }
+
     const elongStr = {
       prism: "elongated",
       antiprism: "gyroelongated",
       "": "",
     }
-    const baseStr = type === "cupolarotunda" ? type : countString(count, type)
+
+    // const typeName = solid.isPrimary() ? 'pyramid' : solid.isCupolaRotunda() ?
+    // FIXME type name
+    let baseStr
+    if (solid.isCupolaRotunda()) {
+      baseStr = "cupolarotunda"
+    } else if (solid.data.rotundaCount! > 0) {
+      baseStr = countString(count, "rotunda")
+    } else {
+      baseStr = countString(count, solid.isPrimary() ? "pyramid" : "cupola")
+    }
+
     return wordJoin(
       elongStr[elongation ?? ""],
       polygonPrefixes.get(base),

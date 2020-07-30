@@ -74,7 +74,7 @@ const gyrateCapstone: CutPasteOpArgs<CapOptions, Capstone, CapstoneForme> = {
   },
   canApplyTo(info) {
     if (!info.isCapstone()) return false
-    return info.isBi() && !info.isPyramid() && info.data.base > 2
+    return info.isBi() && info.isSecondary() && !info.isDigonal()
   },
   getResult({ specs }) {
     return specs.withData({

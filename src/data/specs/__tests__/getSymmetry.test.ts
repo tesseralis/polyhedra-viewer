@@ -22,14 +22,13 @@ describe("getSymmetry", () => {
     })
   })
 
-  describe("prisms and antiprisms", () => {
-    it("works", () => {
+  describe("capstones", () => {
+    it("returns dihedral symmetry on prisms", () => {
+      expectSymmetry("pentagonal antiprism", "D_5d")
       expectSymmetry("hexagonal prism", "D_6h")
       expectSymmetry("octagonal antiprism", "D_8d")
     })
-  })
 
-  describe("capstones", () => {
     it("returns pyramidal symmetry for mono-capstones", () => {
       expectSymmetry("square pyramid", "C_4v")
       expectSymmetry("elongated triangular cupola", "C_3v")
