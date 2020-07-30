@@ -76,6 +76,7 @@ class PrismaticForme extends CapstoneForme {
   }
 }
 
+// FIXME deal with fastigium
 class MonoCapstoneForme extends CapstoneForme {
   bases() {
     const base = this.specs.isPrimary()

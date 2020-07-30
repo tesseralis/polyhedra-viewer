@@ -10,8 +10,8 @@ const elongations = [null, ...prismaticTypes]
 const counts = [0, 1, 2] as const
 type Count = Items<typeof counts>
 
-const gyrations = ["ortho", "gyro"] as const
-type Gyration = Items<typeof gyrations>
+export const gyrations = ["ortho", "gyro"] as const
+export type Gyration = Items<typeof gyrations>
 
 const capTypes = ["primary", "secondary"]
 type CapstoneType = Items<typeof capTypes>

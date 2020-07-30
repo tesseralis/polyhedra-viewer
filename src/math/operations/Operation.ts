@@ -54,7 +54,7 @@ export interface OpArgs<
   allOptions?(
     solid: Forme,
     optionName: keyof Options,
-  ): Options[typeof optionName][]
+  ): readonly Options[typeof optionName][]
 
   allOptionCombos?(solid: Forme): Generator<Options>
 

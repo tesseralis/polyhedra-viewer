@@ -1,11 +1,11 @@
 import { pickBy } from "lodash-es"
 
-import Capstone from "data/specs/Capstone"
+import Capstone, { gyrations, Gyration } from "data/specs/Capstone"
 import Composite from "data/specs/Composite"
 import Elementary from "data/specs/Elementary"
 import { Polyhedron, Face, Edge } from "math/polyhedra"
-import { PRECISION, Vec3D } from "math/geom"
-import { repeat, getCyclic } from "utils"
+import { Vec3D } from "math/geom"
+import { repeat } from "utils"
 import { makeOperation } from "../Operation"
 import {
   oppositeFace,
@@ -23,59 +23,22 @@ import {
 } from "./cutPasteUtils"
 import PolyhedronForme from "math/formes/PolyhedronForme"
 import CompositeForme from "math/formes/CompositeForme"
+import CapstoneForme from "math/formes/CapstoneForme"
 
 type AugmentType = "pyramid" | "cupola" | "rotunda"
 
-function getPossibleAugmentees(n: number) {
-  if (n <= 5) {
-    return [getAugmentee("pyramid", n)]
-  } else if (n < 10) {
-    return [getAugmentee("cupola", n / 2)]
+function canAugment(forme: PolyhedronForme<any>, face: Face) {
+  if (forme instanceof CapstoneForme) {
+    // TODO make this easier to access from CapstoneForme?
+    return forme
+      .bases()
+      .some((base) => base instanceof Face && base.equals(face))
+  } else if (forme instanceof CompositeForme) {
+    return forme.canAugment(face)
   } else {
-    return [getAugmentee("cupola", n / 2), getAugmentee("rotunda", n / 2)]
+    // Elementary solid
+    return face.numSides === 4
   }
-}
-
-// Checks to see if the polyhedron can be augmented at the base while remaining convex
-function canAugmentWith(base: Face, augmentee: Polyhedron, offset: number) {
-  const n = base.numSides
-  if (!augmentee) return false
-  const underside = augmentee.faceWithNumSides(n)
-
-  return base.edges.every((edge, i: number) => {
-    const baseAngle = edge.dihedralAngle()
-
-    const edge2 = getCyclic(underside.edges, i - 1 + offset)
-    const augmenteeAngle = edge2.dihedralAngle()
-
-    return baseAngle + augmenteeAngle < Math.PI - PRECISION
-  })
-}
-
-function canAugmentWithType(base: Face, augmentType: AugmentType) {
-  const n = augmentType === "pyramid" ? base.numSides : base.numSides / 2
-  // FIXME maybe this should rely on Forme functions instead of dihedral angles
-  if (![2, 3, 4, 5].includes(n)) return false
-  if (augmentType === "rotunda" && n !== 5) return false
-  for (const offset of [0, 1]) {
-    if (canAugmentWith(base, getAugmentee(augmentType, n), offset)) {
-      return true
-    }
-  }
-  return false
-}
-
-function canAugment(base: Face) {
-  const n = base.numSides
-  const augmentees = getPossibleAugmentees(n)
-  for (const augmentee of augmentees) {
-    for (const offset of [0, 1]) {
-      if (canAugmentWith(base, augmentee, offset)) {
-        return true
-      }
-    }
-  }
-  return false
 }
 
 function getAugmentee(type: AugmentType, base: number) {
@@ -136,9 +99,9 @@ function doAugment(
   info: CutPasteSpecs,
   polyhedron: Polyhedron,
   base: Face,
-  augmentType: AugmentType,
   baseCrossAxis: (edge: Edge) => boolean = defaultCrossAxis,
   augmenteeCrossAxis: (edge: Edge) => boolean = defaultCrossAxis,
+  augmentType: AugmentType = defaultAugmentType(base.numSides),
 ) {
   const numSides = base.numSides
   const index = ["cupola", "rotunda"].includes(augmentType)
@@ -208,25 +171,18 @@ function hasGyrateOpts(info: CutPasteSpecs) {
     return false
   }
   if (info.isComposite()) {
-    return info.data.source.canonicalName() === "rhombicosidodecahedron"
+    return info.isGyrateSolid()
   }
   return false
 }
 
-type GyrateOpts = "ortho" | "gyro"
-const allGyrateOpts: GyrateOpts[] = ["ortho", "gyro"]
-
 interface Options {
   face: Face
-  gyrate?: GyrateOpts
+  gyrate?: Gyration
   using?: AugmentType
 }
 
-const augmentCapstone: CutPasteOpArgs<
-  Options,
-  Capstone,
-  PolyhedronForme<Capstone>
-> = {
+const augmentCapstone: CutPasteOpArgs<Options, Capstone, CapstoneForme> = {
   apply({ specs, geom }, { face, gyrate, using }) {
     const augmentType = using ?? defaultAugmentType(face.numSides)
     let baseAxis, augAxis
@@ -259,7 +215,7 @@ const augmentCapstone: CutPasteOpArgs<
             : edge.twinFace().numSides !== 3
       }
     }
-    return doAugment(specs, geom, face, augmentType, baseAxis, augAxis)
+    return doAugment(specs, geom, face, baseAxis, augAxis, using)
   },
 
   canApplyTo(specs) {
@@ -291,8 +247,7 @@ const augmentAugmentedSolids: CutPasteOpArgs<
       baseAxis = (edge: Edge) => edge.twinFace().numSides !== 3
       augAxis = (edge: Edge) => edge.twinFace().numSides === 3
     }
-    const augmentType = defaultAugmentType(face.numSides)
-    return doAugment(specs, geom, face, augmentType, baseAxis, augAxis)
+    return doAugment(specs, geom, face, baseAxis, augAxis)
   },
 
   canApplyTo(specs) {
@@ -319,8 +274,7 @@ const augmentIcosahedron: CutPasteOpArgs<
   PolyhedronForme<Composite>
 > = {
   apply({ specs, geom }, { face }) {
-    const augmentType = defaultAugmentType(face.numSides)
-    return doAugment(specs, geom, face, augmentType)
+    return doAugment(specs, geom, face)
   },
 
   canApplyTo(specs) {
@@ -348,12 +302,10 @@ const augmentRhombicosidodecahedron: CutPasteOpArgs<
   PolyhedronForme<Composite>
 > = {
   apply({ specs, geom }, { face, gyrate }) {
-    const augmentType = defaultAugmentType(face.numSides)
     return doAugment(
       specs,
       geom,
       face,
-      augmentType,
       (edge) => edge.twinFace().numSides === 4,
       (edge) =>
         gyrate === "ortho"
@@ -388,8 +340,7 @@ const augmentElementary: CutPasteOpArgs<
   PolyhedronForme<Elementary>
 > = {
   apply({ specs, geom }, { face }) {
-    const augmentType = defaultAugmentType(face.numSides)
-    return doAugment(specs, geom, face, augmentType)
+    return doAugment(specs, geom, face)
   },
 
   canApplyTo(specs) {
@@ -414,55 +365,45 @@ export const augment = makeOperation<Options, CutPasteSpecs>("augment", {
     return true
   },
 
-  *allOptionCombos({ specs, geom }) {
-    const gyrateOpts = hasGyrateOpts(specs) ? allGyrateOpts : [undefined]
-
+  *allOptionCombos(forme) {
+    const { specs, geom } = forme
+    const gyrateOpts = hasGyrateOpts(specs) ? gyrations : [undefined]
     const usingOpts = getUsingOpts(specs) ?? [undefined]
-    const faceOpts = geom.faces.filter((face) => canAugment(face))
+    const faceOpts = geom.faces.filter((face) => canAugment(forme, face))
 
     for (const face of faceOpts) {
       for (const gyrate of gyrateOpts) {
         for (const using of usingOpts) {
-          if (!using || canAugmentWithType(face, using)) {
-            yield { gyrate, using, face }
-          }
+          yield { gyrate, using, face }
         }
       }
     }
   },
 
   hitOption: "face",
-  getHitOption({ geom }, hitPnt, options) {
+  getHitOption(forme, hitPnt, options) {
     if (!options) return {}
-    const face = geom.hitFace(hitPnt)
-    if (!options.using) {
-      return canAugment(face) ? { face } : {}
-    }
-    if (!canAugmentWithType(face, options.using)) {
-      return {}
-    }
-    return { face }
+    const face = forme.geom.hitFace(hitPnt)
+    return canAugment(forme, face) ? { face } : {}
   },
 
-  faceSelectionStates({ geom }, { face, using }) {
-    return geom.faces.map((f) => {
+  faceSelectionStates(forme, { face }) {
+    return forme.geom.faces.map((f) => {
       if (face && f.equals(face)) return "selected"
-
-      if (!using && canAugment(f)) return "selectable"
-
-      if (using && canAugmentWithType(f, using)) return "selectable"
+      if (canAugment(forme, f)) return "selectable"
       return undefined
     })
   },
 
-  allOptions({ specs, geom }, optionName) {
+  allOptions(forme, optionName) {
+    const { specs, geom } = forme
     switch (optionName) {
       case "gyrate":
-        return hasGyrateOpts(specs) ? allGyrateOpts : []
+        return hasGyrateOpts(specs) ? gyrations : []
       case "using":
         return getUsingOpts(specs) ?? []
       case "face":
-        return geom.faces.filter((face) => canAugment(face))
+        return geom.faces.filter((face) => canAugment(forme, face))
     }
   },
 

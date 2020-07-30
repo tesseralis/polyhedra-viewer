@@ -41,6 +41,7 @@ export default abstract class CompositeForme extends PolyhedronForme<
     return Cap.getAll(this.geom)
   }
 
+  // FIXME implement this for diminished/gyrate
   sourceCentroid() {
     return getCentroid(this.sourceVertices().map((v) => v.vec))
   }
@@ -63,6 +64,8 @@ export default abstract class CompositeForme extends PolyhedronForme<
       ? "para"
       : "meta"
   }
+
+  abstract canAugment(face: Face): boolean
 }
 
 export class AugmentedPrismForme extends CompositeForme {
@@ -72,6 +75,21 @@ export class AugmentedPrismForme extends CompositeForme {
 
   modifications() {
     return this.caps()
+  }
+
+  isSideFace(face: Face) {
+    // FIXME deal with square prism
+    return face.numSides === 4
+  }
+
+  canAugment(face: Face) {
+    if (!this.isSideFace(face)) return false
+    return this.caps().every((cap) =>
+      cap
+        .boundary()
+        .adjacentFaces()
+        .every((f) => !f.equals(face)),
+    )
   }
 }
 
@@ -148,6 +166,16 @@ export class AugmentedClassicalForme extends CompositeForme {
   innerCapFaces() {
     return this.geom.faces.filter((f) => this.isInnerCapFace(f))
   }
+
+  canAugment(face: Face) {
+    if (!this.isMainFace(face)) return false
+    return this.caps().every((cap) =>
+      cap
+        .boundary()
+        .adjacentFaces()
+        .every((f) => !f.equals(face)),
+    )
+  }
 }
 
 export class DiminishedSolidForme extends CompositeForme {
@@ -167,6 +195,14 @@ export class DiminishedSolidForme extends CompositeForme {
   modifications() {
     return this.diminishedFaces()
   }
+
+  canAugment(face: Face) {
+    if (this.specs.isAugmented()) return false
+    return (
+      this.isDiminshedFace(face) ||
+      face.adjacentFaces().every((f) => f.numSides === 5)
+    )
+  }
 }
 
 export class GyrateSolidForme extends CompositeForme {
@@ -182,7 +218,7 @@ export class GyrateSolidForme extends CompositeForme {
     return Cap.getAll(this.geom).filter((cap) => this.isGyrate(cap))
   }
 
-  isDiminshedFace(face: Face) {
+  isDiminishedFace(face: Face) {
     return (
       this.specs.isDiminished() &&
       face.numSides === this.geom.largestFace().numSides
@@ -190,7 +226,7 @@ export class GyrateSolidForme extends CompositeForme {
   }
 
   diminishedFaces() {
-    return this.geom.faces.filter((f) => this.isDiminshedFace(f))
+    return this.geom.faces.filter((f) => this.isDiminishedFace(f))
   }
 
   /**
@@ -198,5 +234,9 @@ export class GyrateSolidForme extends CompositeForme {
    */
   modifications() {
     return [...this.gyrateCaps(), ...this.diminishedFaces()]
+  }
+
+  canAugment(face: Face) {
+    return this.isDiminishedFace(face)
   }
 }
