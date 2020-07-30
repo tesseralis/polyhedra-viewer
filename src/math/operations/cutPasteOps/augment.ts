@@ -4,7 +4,7 @@ import Capstone from "data/specs/Capstone"
 import Composite from "data/specs/Composite"
 import Elementary from "data/specs/Elementary"
 import { Polyhedron, Face, Edge } from "math/polyhedra"
-import { PRECISION } from "math/geom"
+import { PRECISION, Vec3D } from "math/geom"
 import { repeat, getCyclic } from "utils"
 import { makeOperation } from "../Operation"
 import {
@@ -114,8 +114,21 @@ function getAugmentee(type: AugmentType, base: number) {
   )
 }
 
+type CrossAxis = (edge: Edge) => boolean
+
 function defaultCrossAxis(edge: Edge) {
   return true
+}
+
+function getPose(base: Face, normal: Vec3D, crossAxis: CrossAxis): Pose {
+  return {
+    origin: base.centroid(),
+    scale: base.sideLength(),
+    orientation: [
+      normal,
+      base.edges.find(crossAxis)!.midpoint().sub(base.centroid()),
+    ],
+  }
 }
 
 // Augment the following
@@ -134,26 +147,13 @@ function doAugment(
   const augmentee = getAugmentee(augmentType, index)
   const underside = augmentee.faceWithNumSides(base.numSides)
 
-  const augmenteePose: Pose = {
-    origin: underside.centroid(),
-    scale: augmentee.edgeLength(),
-    orientation: [
-      underside.normal().getInverted(),
-      underside.edges
-        .find(augmenteeCrossAxis)!
-        .midpoint()
-        .sub(underside.centroid()),
-    ],
-  }
+  const augmenteePose = getPose(
+    underside,
+    underside.normal().getInverted(),
+    augmenteeCrossAxis,
+  )
 
-  const basePose: Pose = {
-    origin: base.centroid(),
-    scale: base.sideLength(),
-    orientation: [
-      base.normal(),
-      base.edges.find(baseCrossAxis)!.midpoint().sub(base.centroid()),
-    ],
-  }
+  const basePose = getPose(base, base.normal(), baseCrossAxis)
 
   const alignedAugmentee = alignPolyhedron(
     augmentee,
