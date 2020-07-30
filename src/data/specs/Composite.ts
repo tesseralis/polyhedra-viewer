@@ -98,6 +98,22 @@ export default class Composite extends Specs<CompositeData> {
   isPara = () => this.data.align === "para"
   isMeta = () => this.data.align === "meta"
 
+  sourcePrism() {
+    const { source } = this.data
+    if (!source.isCapstone()) {
+      throw new Error(`Source is not a prism: ${source.name()}`)
+    }
+    return source
+  }
+
+  sourceClassical() {
+    const { source } = this.data
+    if (!source.isClassical()) {
+      throw new Error(`Source is not a classical solid: ${source.name()}`)
+    }
+    return source
+  }
+
   equals(s2: Specs) {
     if (!s2.isComposite()) return false
     // Recursively compare the source data and other data

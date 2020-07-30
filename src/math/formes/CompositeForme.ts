@@ -1,16 +1,27 @@
 import { once } from "lodash-es"
+import { getSingle } from "utils"
 import PolyhedronForme from "./PolyhedronForme"
 import Composite from "data/specs/Composite"
 import { Polyhedron, Face, Cap } from "math/polyhedra"
-import { getCentroid } from "math/geom"
+import { getCentroid, isInverse } from "math/geom"
 
-export default class CompositeForme extends PolyhedronForme<Composite> {
+type Base = Cap | Face
+
+export default abstract class CompositeForme extends PolyhedronForme<
+  Composite
+> {
   static create(specs: Composite, geom: Polyhedron) {
-    if (specs.isAugmentedClassical()) {
+    // TODO lol maybe it's time for a visitor
+    if (specs.isAugmentedPrism()) {
+      return new AugmentedPrismForme(specs, geom)
+    } else if (specs.isAugmentedClassical()) {
       return new AugmentedClassicalForme(specs, geom)
+    } else if (specs.isDiminishedSolid()) {
+      return new DiminishedSolidForme(specs, geom)
+    } else if (specs.isGyrateSolid()) {
+      return new GyrateSolidForme(specs, geom)
     }
-    // TODO more subclasses
-    return new CompositeForme(specs, geom)
+    throw new Error(`Invalid composite specs: ${specs.name()}`)
   }
 
   protected capInnerVertIndices = once(() => {
@@ -38,9 +49,41 @@ export default class CompositeForme extends PolyhedronForme<Composite> {
   isSourceFace(face: Face) {
     return face.vertices.every((v) => !this.capInnerVertIndices().has(v.index))
   }
+
+  /** Return whether this solid can be modified in a way that creates separate alignments */
+  hasAlignment() {
+    return this.specs.isMono()
+  }
+
+  abstract modifications(): Base[]
+
+  alignment(cap: Base) {
+    if (!this.hasAlignment()) return undefined
+    return isInverse(cap.normal(), getSingle(this.modifications()).normal())
+      ? "para"
+      : "meta"
+  }
+}
+
+export class AugmentedPrismForme extends CompositeForme {
+  hasAlignment() {
+    return super.hasAlignment() && this.specs.sourcePrism().isSecondary()
+  }
+
+  modifications() {
+    return this.caps()
+  }
 }
 
 export class AugmentedClassicalForme extends CompositeForme {
+  hasAlignment() {
+    return super.hasAlignment() && this.specs.sourceClassical().isIcosahedral()
+  }
+
+  modifications() {
+    return this.caps()
+  }
+
   sourceSpecs() {
     if (!this.specs.data.source.isClassical()) {
       throw new Error(
@@ -104,5 +147,56 @@ export class AugmentedClassicalForme extends CompositeForme {
 
   innerCapFaces() {
     return this.geom.faces.filter((f) => this.isInnerCapFace(f))
+  }
+}
+
+export class DiminishedSolidForme extends CompositeForme {
+  // FIXME dedupe with gyrate
+  isDiminshedFace(face: Face) {
+    return (
+      this.specs.isDiminished() &&
+      face.numSides === this.geom.largestFace().numSides
+    )
+  }
+
+  diminishedFaces() {
+    return this.geom.faces.filter((f) => this.isDiminshedFace(f))
+  }
+
+  // FIXME deal with augmented tridiminished
+  modifications() {
+    return this.diminishedFaces()
+  }
+}
+
+export class GyrateSolidForme extends CompositeForme {
+  /** Return whether the given cap is gyrated */
+  isGyrate(cap: Cap) {
+    return cap.boundary().edges.every((edge) => {
+      const [n1, n2] = edge.adjacentFaces().map((f) => f.numSides)
+      return (n1 === 4) === (n2 === 4)
+    })
+  }
+
+  gyrateCaps() {
+    return Cap.getAll(this.geom).filter((cap) => this.isGyrate(cap))
+  }
+
+  isDiminshedFace(face: Face) {
+    return (
+      this.specs.isDiminished() &&
+      face.numSides === this.geom.largestFace().numSides
+    )
+  }
+
+  diminishedFaces() {
+    return this.geom.faces.filter((f) => this.isDiminshedFace(f))
+  }
+
+  /**
+   * Returns the single diminished or gyrate face of this polyhedron.
+   */
+  modifications() {
+    return [...this.gyrateCaps(), ...this.diminishedFaces()]
   }
 }

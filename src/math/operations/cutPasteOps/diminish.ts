@@ -14,14 +14,16 @@ import {
   inc,
   dec,
   CutPasteSpecs,
-  getCapAlignment,
-  getCupolaGyrate,
   CapOptions,
   capOptionArgs,
   CutPasteOpArgs,
   combineOps,
 } from "./cutPasteUtils"
 import PolyhedronForme from "math/formes/PolyhedronForme"
+import {
+  DiminishedSolidForme,
+  GyrateSolidForme,
+} from "math/formes/CompositeForme"
 
 function removeCap(polyhedron: Polyhedron, cap: Cap) {
   const boundary = cap.boundary()
@@ -117,10 +119,10 @@ const diminishAugmentedSolids: CutPasteOpArgs<
 }
 
 // FIXME do octahedron and rhombicuboctahedron as well
-const diminishIcosahedron: CutPasteOpArgs<
+const diminishDiminishedSolid: CutPasteOpArgs<
   CapOptions,
   Composite,
-  PolyhedronForme<Composite>
+  DiminishedSolidForme
 > = {
   apply({ geom }, { cap }) {
     return removeCap(geom, cap)
@@ -133,34 +135,35 @@ const diminishIcosahedron: CutPasteOpArgs<
     return (diminished < 3 || augmented === 1) && !specs.isPara()
   },
 
-  getResult({ specs, geom }, { cap }) {
-    const { augmented, diminished } = specs.data
-    if (augmented === 1) return specs.withData({ augmented: 0 })
+  getResult(forme, { cap }) {
+    const { specs } = forme
+    if (specs.isAugmented()) return specs.withData({ augmented: 0 })
     return specs.withData({
-      diminished: inc(diminished),
-      align: diminished === 1 ? getCapAlignment(geom, cap) : undefined,
+      diminished: inc(specs.data.diminished),
+      align: forme.alignment(cap),
     })
   },
 }
 
-const diminishIcosidodecahedron: CutPasteOpArgs<
+const diminishGyrateSolid: CutPasteOpArgs<
   CapOptions,
   Composite,
-  PolyhedronForme<Composite>
+  GyrateSolidForme
 > = {
   apply({ geom }, { cap }) {
     return removeCap(geom, cap)
   },
   canApplyTo(specs) {
     if (!specs.isComposite()) return false
-    const { source, diminished, gyrate } = specs.data
-    if (source.canonicalName() !== "rhombicosidodecahedron") return false
+    const { diminished, gyrate } = specs.data
+    if (!specs.isGyrateSolid()) return false
     if (diminished === 2 && gyrate === 0) return !specs.isPara()
     return diminished < 3
   },
-  getResult({ specs, geom }, { cap }) {
+  getResult(forme, { cap }) {
+    const { specs } = forme
     const { diminished, gyrate } = specs.data
-    if (getCupolaGyrate(cap) === "ortho") {
+    if (forme.isGyrate(cap)) {
       // we're just removing a gyrated cap in this case
       return specs.withData({
         gyrate: dec(gyrate),
@@ -169,7 +172,7 @@ const diminishIcosidodecahedron: CutPasteOpArgs<
     } else {
       return specs.withData({
         diminished: inc(diminished),
-        align: specs.isMono() ? getCapAlignment(geom, cap) : undefined,
+        align: forme.alignment(cap),
       })
     }
   },
@@ -196,8 +199,8 @@ export const diminish = makeOperation("diminish", {
   ...combineOps<CapOptions, CutPasteSpecs, PolyhedronForme<CutPasteSpecs>>([
     diminishCapstone,
     diminishAugmentedSolids,
-    diminishIcosahedron,
-    diminishIcosidodecahedron,
+    diminishDiminishedSolid,
+    diminishGyrateSolid,
     diminishElementary,
   ]),
   ...capOptionArgs,

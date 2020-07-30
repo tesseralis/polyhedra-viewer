@@ -3,9 +3,9 @@ import { pickBy } from "lodash-es"
 import Capstone from "data/specs/Capstone"
 import Composite from "data/specs/Composite"
 import Elementary from "data/specs/Elementary"
-import { Polyhedron, Face, Cap, Edge } from "math/polyhedra"
-import { isInverse, PRECISION } from "math/geom"
-import { repeat, getCyclic, getSingle } from "utils"
+import { Polyhedron, Face, Edge } from "math/polyhedra"
+import { PRECISION } from "math/geom"
+import { repeat, getCyclic } from "utils"
 import { makeOperation } from "../Operation"
 import {
   oppositeFace,
@@ -22,24 +22,9 @@ import {
   combineOps,
 } from "./cutPasteUtils"
 import PolyhedronForme from "math/formes/PolyhedronForme"
+import CompositeForme from "math/formes/CompositeForme"
 
-type AugmentSpecs = CutPasteSpecs
 type AugmentType = "pyramid" | "cupola" | "rotunda"
-
-function hasAugmentAlignment(info: AugmentSpecs) {
-  if (!info.isComposite()) return false
-  const { source, augmented } = info.data
-  if (augmented !== 1) return false
-  // Only hexagonal prism has augment alignment
-  if (source.isCapstone()) return source.isSecondary()
-  // If Classical, has alignment if it has icosahedral symmetry
-  return source.isIcosahedral()
-}
-
-function getAugmentAlignment(polyhedron: Polyhedron, face: Face) {
-  const boundary = getSingle(Cap.getAll(polyhedron)).boundary()
-  return isInverse(boundary.normal(), face.normal()) ? "para" : "meta"
-}
 
 function getPossibleAugmentees(n: number) {
   if (n <= 5) {
@@ -135,7 +120,7 @@ function defaultCrossAxis(edge: Edge) {
 
 // Augment the following
 function doAugment(
-  info: AugmentSpecs,
+  info: CutPasteSpecs,
   polyhedron: Polyhedron,
   base: Face,
   augmentType: AugmentType,
@@ -200,21 +185,21 @@ function getUsingOpt(numSides: number, using?: AugmentType) {
   return { type: using, base: numSides > 5 ? numSides / 2 : numSides }
 }
 
-function hasRotunda(info: AugmentSpecs) {
+function hasRotunda(info: CutPasteSpecs) {
   if (info.isCapstone()) {
     return info.isMono() && info.isSecondary() && info.isPentagonal()
   }
   return false
 }
 
-function getUsingOpts(info: AugmentSpecs): AugmentType[] | null {
+function getUsingOpts(info: CutPasteSpecs): AugmentType[] | null {
   if (hasRotunda(info)) {
     return ["cupola", "rotunda"]
   }
   return null
 }
 
-function hasGyrateOpts(info: AugmentSpecs) {
+function hasGyrateOpts(info: CutPasteSpecs) {
   if (info.isCapstone()) {
     // Gyroelongated capstones are always gyro
     if (info.isGyroelongated()) return false
@@ -297,7 +282,7 @@ const augmentCapstone: CutPasteOpArgs<
 const augmentAugmentedSolids: CutPasteOpArgs<
   Options,
   Composite,
-  PolyhedronForme<Composite>
+  CompositeForme
 > = {
   apply({ specs, geom }, { face }) {
     let baseAxis, augAxis
@@ -319,12 +304,10 @@ const augmentAugmentedSolids: CutPasteOpArgs<
     return augmented < source.data.family - 2 && !specs.isPara()
   },
 
-  getResult({ specs, geom }, { face }) {
-    return specs.withData({
-      augmented: inc(specs.data.augmented),
-      align: hasAugmentAlignment(specs)
-        ? getAugmentAlignment(geom, face)
-        : undefined,
+  getResult(forme, { face }) {
+    return forme.specs.withData({
+      augmented: inc(forme.specs.data.augmented),
+      align: forme.alignment(face),
     })
   },
 }

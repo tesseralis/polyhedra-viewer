@@ -1,13 +1,11 @@
 import { withOrigin } from "math/geom"
-import { Polyhedron, Cap } from "math/polyhedra"
+import { Polyhedron } from "math/polyhedra"
 import { mapObject } from "utils"
 import Capstone from "data/specs/Capstone"
 import Composite from "data/specs/Composite"
 import {
   inc,
   dec,
-  getCapAlignment,
-  getCupolaGyrate,
   CapOptions,
   capOptionArgs,
   CutPasteOpArgs,
@@ -16,13 +14,9 @@ import {
 import { getTransformedVertices } from "../operationUtils"
 import { makeOperation } from "../Operation"
 import CapstoneForme from "math/formes/CapstoneForme"
-import CompositeForme from "math/formes/CompositeForme"
+import CompositeForme, { GyrateSolidForme } from "math/formes/CompositeForme"
 
 const TAU = 2 * Math.PI
-
-export function isGyrated(cap: Cap) {
-  return getCupolaGyrate(cap) === "ortho"
-}
 
 function applyGyrate(polyhedron: Polyhedron, { cap }: CapOptions) {
   // get adjacent faces
@@ -83,26 +77,31 @@ const gyrateCapstone: CutPasteOpArgs<CapOptions, Capstone, CapstoneForme> = {
   },
 }
 
-const gyrateComposite: CutPasteOpArgs<CapOptions, Composite, CompositeForme> = {
+const gyrateComposite: CutPasteOpArgs<
+  CapOptions,
+  Composite,
+  GyrateSolidForme
+> = {
   apply({ geom }, options) {
     return applyGyrate(geom, options)
   },
   canApplyTo(info) {
     if (!info.isComposite()) return false
-    const { source, diminished } = info.data
+    if (!info.isGyrateSolid()) return false
     // FIXME deal with gyrate rhombicuboctahedron
-    if (source.canonicalName() !== "rhombicosidodecahedron") return false
+    const { diminished } = info.data
     if (diminished === 2) return !info.isPara()
     return diminished < 3
   },
-  getResult({ specs, geom }, { cap }) {
+  getResult(forme, { cap }) {
+    const { specs } = forme
     const { gyrate } = specs.data
-    if (isGyrated(cap)) {
+    if (forme.isGyrate(cap)) {
       return specs.withData({ gyrate: dec(gyrate), align: "meta" })
     } else {
       return specs.withData({
         gyrate: inc(gyrate),
-        align: specs.isMono() ? getCapAlignment(geom, cap) : undefined,
+        align: specs.isMono() ? forme.alignment(cap) : undefined,
       })
     }
   },
