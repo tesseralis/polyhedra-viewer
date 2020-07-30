@@ -4,6 +4,7 @@ import Config from "components/ConfigCtx"
 import { PolyhedronCtx, OperationCtx, TransitionCtx } from "../../context"
 import { Polyhedron } from "math/polyhedra"
 import ClassicalForme from "math/formes/ClassicalForme"
+import CapstoneForme from "math/formes/CapstoneForme"
 
 function toRgb(hex: string) {
   const { r, g, b } = tinycolor(hex).toRgb()
@@ -40,6 +41,29 @@ function getClassicalColors(forme: ClassicalForme) {
   })
 }
 
+function getCapstoneColors(forme: CapstoneForme) {
+  return forme.geom.faces.map((face) => {
+    if (forme.isBaseTop(face)) {
+      const faceSides = face.numSides > 5 ? "secondary" : "primary"
+      return (classicalColorScheme as any)[forme.specs.data.base][faceSides]
+        .face
+    } else if (forme.isBaseFace(face)) {
+      if (face.numSides === 3) {
+        return (classicalColorScheme as any)[forme.specs.data.base].primary
+          .vertex
+      } else if (face.numSides === 4) {
+        // FIXME need to distinguish this from the edge faces
+        return orthoFace
+      } else {
+        // TODO want this to be a separate color from the top face
+        return classicalColorScheme[5].primary.face
+      }
+    } else {
+      return forme.specs.isElongated() ? orthoFace : gyroFace
+    }
+  })
+}
+
 const enableFormeColors = false
 
 // Hook that takes data from Polyhedron and Animation states and decides which to use.
@@ -58,6 +82,8 @@ export default function useSolidContext() {
     if (!enableFormeColors) return
     if (polyhedron instanceof ClassicalForme) {
       return getClassicalColors(polyhedron)
+    } else if (polyhedron instanceof CapstoneForme) {
+      return getCapstoneColors(polyhedron)
     }
   }, [polyhedron])
 

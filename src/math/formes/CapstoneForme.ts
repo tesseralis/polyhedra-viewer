@@ -1,7 +1,8 @@
 import PolyhedronForme from "./PolyhedronForme"
 import Capstone from "data/specs/Capstone"
 import { Polyhedron, Face, Cap, FaceLike } from "math/polyhedra"
-import { isInverse } from "math/geom"
+import { PRECISION, isInverse } from "math/geom"
+import { getGeometry } from "math/operations/operationUtils"
 
 type Base = Face | Cap
 
@@ -18,8 +19,16 @@ export default abstract class CapstoneForme extends PolyhedronForme<Capstone> {
     }
   }
 
+  static fromSpecs(specs: Capstone) {
+    return this.create(specs, getGeometry(specs))
+  }
+
   abstract bases(): readonly [Base, Base]
 
+  /**
+   * Return the `FaceLike` representation of this capstone's bases:
+   * either the face itself or the boundary of the cap.
+   */
   baseFaces(): [FaceLike, FaceLike] {
     return this.bases().map((base) =>
       base instanceof Cap ? base.boundary() : base,
@@ -29,6 +38,31 @@ export default abstract class CapstoneForme extends PolyhedronForme<Capstone> {
   prismaticHeight() {
     const [top, bot] = this.baseFaces()
     return top.centroid().distanceTo(bot.centroid())
+  }
+
+  /**
+   * Returns the base of the capstone that this face belongs to,
+   * or undefined if the face does not belong to a base.
+   */
+  baseOf(face: Face) {
+    return this.bases().find((base) =>
+      base instanceof Cap ? face.inSet(base.faces()) : face.equals(base),
+    )
+  }
+
+  /**
+   * Return whether the given face is in one of the bases of the cap.
+   */
+  isBaseFace(face: Face) {
+    return !!this.baseOf(face)
+  }
+
+  /**
+   * Returns true if the face belongs to the top face of a capstone base.
+   */
+  isBaseTop(face: Face) {
+    const base = this.baseOf(face)
+    return base && face.normal().equalsWithTolerance(base.normal(), PRECISION)
   }
 }
 

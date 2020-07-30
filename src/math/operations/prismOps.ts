@@ -6,7 +6,6 @@ import { makeOperation } from "./Operation"
 import { Pose, TwistOpts, getTransformedVertices } from "./operationUtils"
 import { withOrigin, getCentroid } from "math/geom"
 import CapstoneForme from "math/formes/CapstoneForme"
-import { createFormeFromSpecs } from "math/formes/createForme"
 
 const { PI } = Math
 
@@ -64,8 +63,12 @@ function getScaledPrismVertices(
   )
 }
 
-function doPrismTransform(forme: CapstoneForme, result: any, twist?: Twist) {
-  const resultForme = createFormeFromSpecs(result) as any
+function doPrismTransform(
+  forme: CapstoneForme,
+  result: Capstone,
+  twist?: Twist,
+) {
+  const resultForme = CapstoneForme.fromSpecs(result)
   const resultHeight =
     (resultForme.prismaticHeight() / resultForme.geom.edgeLength()) *
     forme.geom.edgeLength()
