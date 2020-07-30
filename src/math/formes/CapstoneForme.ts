@@ -83,17 +83,17 @@ class MonoCapstoneForme extends CapstoneForme {
       ? this.specs.data.base
       : this.specs.data.base * 2
     const face = this.geom.faceWithNumSides(base)
-    const cap = Cap.getAll(this.geom).find((cap) =>
-      isInverse(cap.normal(), face.normal()),
-    )!
+    const cap = this.geom
+      .caps()
+      .find((cap) => isInverse(cap.normal(), face.normal()))!
     return [cap, face] as const
   }
 }
 
 class BiCapstoneForme extends CapstoneForme {
   bases() {
-    const caps = Cap.getAll(this.geom)
-    for (const cap of caps) {
+    const caps = this.geom.caps()
+    for (const cap of this.geom.caps()) {
       const cap2 = caps.find((cap2) => isInverse(cap.normal(), cap2.normal()))
       if (!cap2) continue
       // Favor the cupola over the rotunda as the "top" face

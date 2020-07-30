@@ -71,7 +71,7 @@ export const capOptionArgs: CapOptionArgs<PolyhedronSpecs> = {
 
   *allOptionCombos({ geom }) {
     // FIXME this should be restricted (e.g. for diminished icosahedron)
-    for (const cap of Cap.getAll(geom)) yield { cap }
+    for (const cap of geom.caps()) yield { cap }
   },
 
   hitOption: "cap",
@@ -81,7 +81,7 @@ export const capOptionArgs: CapOptionArgs<PolyhedronSpecs> = {
   },
 
   faceSelectionStates({ geom }, { cap }) {
-    const allCapFaces = Cap.getAll(geom).flatMap((cap) => cap.faces())
+    const allCapFaces = geom.caps().flatMap((cap) => cap.faces())
     return geom.faces.map((face) => {
       if (cap instanceof Cap && face.inSet(cap.faces())) return "selected"
       if (face.inSet(allCapFaces)) return "selectable"

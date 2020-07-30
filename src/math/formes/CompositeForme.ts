@@ -37,8 +37,9 @@ export default abstract class CompositeForme extends PolyhedronForme<
   }
 
   /** Get the caps associated with this forme */
+  // FIXME this is confusing because it can be subclassed
   caps() {
-    return Cap.getAll(this.geom)
+    return this.geom.caps()
   }
 
   // FIXME implement this for diminished/gyrate
@@ -215,7 +216,7 @@ export class GyrateSolidForme extends CompositeForme {
   }
 
   gyrateCaps() {
-    return Cap.getAll(this.geom).filter((cap) => this.isGyrate(cap))
+    return this.geom.caps().filter((cap) => this.isGyrate(cap))
   }
 
   isDiminishedFace(face: Face) {

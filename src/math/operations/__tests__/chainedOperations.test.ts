@@ -28,7 +28,7 @@ function getArgs(args: Args, polyhedron: Polyhedron) {
     return { ...args, face: polyhedron.faceWithNumSides(args.face) }
   }
   if (args.cap) {
-    return { ...args, cap: Cap.getAll(polyhedron)[0] }
+    return { ...args, cap: polyhedron.caps()[0] }
   }
   return args
 }

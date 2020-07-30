@@ -63,9 +63,7 @@ export default abstract class Cap implements VertexList {
 
   static find(polyhedron: Polyhedron, hitPoint: Vec3D) {
     const hitFace = polyhedron.hitFace(hitPoint)
-    const caps = Cap.getAll(polyhedron).filter((cap) =>
-      hitFace.inSet(cap.faces()),
-    )
+    const caps = polyhedron.caps().filter((cap) => hitFace.inSet(cap.faces()))
     if (caps.length === 0) {
       return null
     }

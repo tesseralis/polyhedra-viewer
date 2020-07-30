@@ -17,6 +17,7 @@ import { SolidData } from "./solidTypes"
 import Face from "./Face"
 import Vertex from "./Vertex"
 import Edge from "./Edge"
+import Cap from "./Cap"
 import Builder from "./SolidBuilder"
 import { VertexArg, FaceArg } from "./SolidBuilder"
 
@@ -97,6 +98,8 @@ export default class Polyhedron {
   numFacesBySides() {
     return countBy(this.faces, "numSides")
   }
+
+  caps = once(() => Cap.getAll(this))
 
   // Search functions
   // ================
