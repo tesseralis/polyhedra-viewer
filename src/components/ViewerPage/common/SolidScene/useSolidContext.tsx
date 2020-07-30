@@ -15,16 +15,23 @@ function createFamilyColor(face: string, vertex: string) {
   return {
     primary: { face, vertex },
     secondary: {
-      face: tinycolor(face).darken().spin(15),
-      vertex: tinycolor(vertex).darken().spin(15),
+      face: tinycolor(face).darken(20),
+      vertex: tinycolor(vertex).darken(20),
+    },
+    edge: {
+      ortho: tinycolor.mix(face, vertex, 50).desaturate(10),
+      gyro: tinycolor.mix(face, vertex, 50).lighten(20),
     },
   }
 }
 
 const classicalColorScheme = {
-  3: createFamilyColor("yellow", "magenta"),
-  4: createFamilyColor("red", "lime"),
-  5: createFamilyColor("blue", "orange"),
+  // yellow + purple
+  3: createFamilyColor("ffea00", "db39ce"),
+  // red + green
+  4: createFamilyColor("#e00909", "#22e34c"),
+  // blue + orange
+  5: createFamilyColor("2c65de", "ff9100"),
 }
 
 const orthoFace = "dimgray"
@@ -33,8 +40,11 @@ const gyroFace = "lightgray"
 function getClassicalColors(forme: ClassicalForme) {
   return forme.geom.faces.map((face) => {
     const facet = forme.getFacet(face)
+    // thing for the edge face
     if (!facet) {
-      return forme.specs.isSnub() ? gyroFace : orthoFace
+      return classicalColorScheme[forme.specs.data.family].edge[
+        forme.specs.isSnub() ? "gyro" : "ortho"
+      ]
     }
     const faceSides = face.numSides > 5 ? "secondary" : "primary"
     return classicalColorScheme[forme.specs.data.family][faceSides][facet]
@@ -64,7 +74,7 @@ function getCapstoneColors(forme: CapstoneForme) {
   })
 }
 
-const enableFormeColors = false
+const enableFormeColors = true
 
 // Hook that takes data from Polyhedron and Animation states and decides which to use.
 export default function useSolidContext() {
