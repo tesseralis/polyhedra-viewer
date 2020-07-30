@@ -1,6 +1,6 @@
 import { pickBy } from "lodash-es"
 
-import Capstone, { gyrations, Gyration } from "data/specs/Capstone"
+import Capstone, { gyrations, Gyration, CapType } from "data/specs/Capstone"
 import Elementary from "data/specs/Elementary"
 import { Polyhedron, Face, Edge } from "math/polyhedra"
 import { Vec3D } from "math/geom"
@@ -27,7 +27,7 @@ import CompositeForme, {
 } from "math/formes/CompositeForme"
 import CapstoneForme from "math/formes/CapstoneForme"
 
-type AugmentType = "pyramid" | "cupola" | "rotunda"
+type AugmentType = Exclude<CapType, "cupolarotunda">
 
 function canAugment(forme: PolyhedronForme, face: Face) {
   if (forme instanceof CapstoneForme) {
@@ -40,18 +40,6 @@ function canAugment(forme: PolyhedronForme, face: Face) {
   }
 }
 
-type Query = (s: Capstone) => boolean
-function getQuery(type: AugmentType): Query {
-  switch (type) {
-    case "pyramid":
-      return (s) => s.isPrimary()
-    case "cupola":
-      return (s) => s.isCupola()
-    case "rotunda":
-      return (s) => s.isRotunda()
-  }
-}
-
 function getAugmentee(type: AugmentType, base: number) {
   return getGeometry(
     Capstone.query.where(
@@ -59,7 +47,7 @@ function getAugmentee(type: AugmentType, base: number) {
         s.isMono() &&
         s.isShortened() &&
         s.data.base === base &&
-        getQuery(type)(s),
+        type === s.capType(),
     )[0],
   )
 }

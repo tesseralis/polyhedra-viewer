@@ -13,12 +13,20 @@ type Count = Items<typeof counts>
 export const gyrations = ["ortho", "gyro"] as const
 export type Gyration = Items<typeof gyrations>
 
-const capTypes = ["primary", "secondary"]
-type CapstoneType = Items<typeof capTypes>
+const polygonTypes = ["primary", "secondary"]
+type PolygonType = Items<typeof polygonTypes>
+
+export const capTypes = [
+  "pyramid",
+  "cupola",
+  "rotunda",
+  "cupolarotunda",
+] as const
+export type CapType = Items<typeof capTypes>
 
 interface CapstoneData {
   base: 2 | PrimaryPolygon
-  type: CapstoneType
+  type: PolygonType
   elongation: null | PrismaticType
   count: Count
   rotundaCount?: Count
@@ -28,7 +36,7 @@ interface CapstoneData {
 
 // Only pentagonal secondary has rotundae
 function rotundaCounts(
-  type: CapstoneType,
+  type: PolygonType,
   base: PrimaryPolygon,
   count: Count,
 ): Count[] {
@@ -86,9 +94,18 @@ export default class Capstone extends Specs<CapstoneData> {
   isPrism = () => this.isPrismatic() && this.isElongated()
   isAntiprism = () => this.isPrismatic() && this.isGyroelongated()
 
+  isPyramid = () => this.isPrimary()
   isCupola = () => this.isSecondary() && this.data.rotundaCount === 0
   isRotunda = () => this.data.count === this.data.rotundaCount
   isCupolaRotunda = () => this.isBi() && this.data.rotundaCount === 1
+
+  capType(): CapType {
+    if (this.isPyramid()) return "pyramid"
+    if (this.isCupola()) return "cupola"
+    if (this.isRotunda()) return "rotunda"
+    if (this.isCupolaRotunda()) return "cupolarotunda"
+    throw new Error(`Prismatic solid does not have a cap`)
+  }
 
   baseSides = () => (this.data.base * (this.isPrimary() ? 1 : 2)) as Polygon
   prismaticType() {
@@ -102,7 +119,7 @@ export default class Capstone extends Specs<CapstoneData> {
 
   static *getAll() {
     for (const base of primaryPolygons) {
-      for (const type of capTypes) {
+      for (const type of polygonTypes) {
         for (const elongation of elongations) {
           for (const count of counts) {
             // Gyroelongated pyramids are concave
@@ -167,7 +184,7 @@ export default class Capstone extends Specs<CapstoneData> {
     // Gyrobifastigium
     yield new Capstone({
       base: 2,
-      type: "cupola",
+      type: "secondary",
       elongation: null,
       count: 2,
       rotundaCount: 0,
