@@ -27,8 +27,7 @@ const regularNames: Record<
   PrimaryPolygon,
   (facet?: "face" | "vertex") => string
 > = {
-  // FIXME distinguish tetrahedron dual
-  3: () => "tetrahedron",
+  3: (facet) => (facet === "face" ? "tetrahedron" : "tetrahedron dual"),
   4: (facet) => (facet === "face" ? "cube" : "octahedron"),
   5: (facet) => (facet === "face" ? "dodecahedron" : "icosahedron"),
 }

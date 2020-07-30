@@ -1,7 +1,13 @@
 import { assertValidSolid } from "./common"
 
 export const alternateNamesMapping: Record<string, string[]> = {
-  tetrahedron: ["triangular pyramid", "digonal antiprism", "disphenoid"],
+  tetrahedron: [
+    "tetrahedron dual",
+    "triangular pyramid",
+    "digonal antiprism",
+    "disphenoid",
+  ],
+  "truncated tetrahedron": ["truncated tetrahedron dual"],
   cube: ["square prism"],
   octahedron: ["tetratetrahedron", "triangular antiprism", "square bipyramid"],
   icosahedron: [

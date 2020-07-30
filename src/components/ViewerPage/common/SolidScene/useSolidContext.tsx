@@ -61,7 +61,7 @@ function getCapstoneColors(forme: CapstoneForme) {
         return (classicalColorScheme as any)[forme.specs.data.base].primary
           .vertex
       } else if (face.numSides === 4) {
-        // FIXME need to distinguish this from the edge faces
+        // TODO need to distinguish this from the edge faces
         return orthoFace
       } else {
         // TODO want this to be a separate color from the top face
