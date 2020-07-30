@@ -54,7 +54,10 @@ export default function getName(solid: Specs): string {
     const { base, elongation, count, gyrate } = solid.data
     // If no caps attached, it's a prism or antiprism
     if (solid.isPrismatic()) {
-      return wordJoin(polygonPrefixes.get(solid.baseSides()), elongation!)
+      return wordJoin(
+        polygonPrefixes.get(solid.baseSides()),
+        solid.prismaticType(),
+      )
     }
 
     const elongStr = {
@@ -63,8 +66,6 @@ export default function getName(solid: Specs): string {
       "": "",
     }
 
-    // const typeName = solid.isPrimary() ? 'pyramid' : solid.isCupolaRotunda() ?
-    // FIXME type name
     let baseStr
     if (solid.isCupolaRotunda()) {
       baseStr = "cupolarotunda"

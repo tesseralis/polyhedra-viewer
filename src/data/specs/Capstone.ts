@@ -89,6 +89,14 @@ export default class Capstone extends Specs<CapstoneData> {
   isCupolaRotunda = () => this.isBi() && this.data.rotundaCount === 1
 
   baseSides = () => (this.data.base * (this.isPrimary() ? 1 : 2)) as Polygon
+  prismaticType() {
+    if (!this.isPrismatic() || !this.data.elongation) {
+      throw new Error(
+        `Tried to get prism type of non-prismatic: ${this.name()}`,
+      )
+    }
+    return this.data.elongation
+  }
 
   static *getAll() {
     for (const base of primaryPolygons) {

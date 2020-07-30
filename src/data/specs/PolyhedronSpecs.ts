@@ -51,7 +51,7 @@ export default abstract class PolyhedronSpecs<Data extends {} = {}> {
       return this.isRegular() ? "Platonic solid" : "Archimedean solid"
     }
     if (this.isCapstone() && this.isPrismatic()) {
-      return capitalize(this.data.elongation!)
+      return capitalize(this.prismaticType())
     }
     return "Johnson solid"
   }

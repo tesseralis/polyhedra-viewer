@@ -14,11 +14,11 @@ const elementaryMapping = {
 }
 
 function getCapstoneSymmetry(capstone: Capstone) {
-  const { gyrate, base, elongation } = capstone.data
+  const { gyrate, base } = capstone.data
 
   // Prismatic symmetry is simple
   if (capstone.isPrismatic()) {
-    return Dihedral.get(capstone.baseSides(), elongation!)
+    return Dihedral.get(capstone.baseSides(), capstone.prismaticType())
   }
 
   // mono-capstones always have cyclic symmetry
