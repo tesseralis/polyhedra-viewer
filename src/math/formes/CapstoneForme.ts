@@ -1,7 +1,7 @@
 import PolyhedronForme from "./PolyhedronForme"
 import Capstone from "data/specs/Capstone"
 import { Polyhedron, Face, Cap, FaceLike } from "math/polyhedra"
-import { PRECISION, isInverse } from "math/geom"
+import { vecEquals, isInverse } from "math/geom"
 import { getGeometry } from "math/operations/operationUtils"
 
 type Base = Face | Cap
@@ -70,7 +70,7 @@ export default abstract class CapstoneForme extends PolyhedronForme<Capstone> {
    */
   isBaseTop(face: Face) {
     const base = this.baseOf(face)
-    return base && face.normal().equalsWithTolerance(base.normal(), PRECISION)
+    return base && vecEquals(face.normal(), base.normal())
   }
 }
 

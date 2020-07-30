@@ -1,4 +1,4 @@
-import { angleBetween, getMidpoint } from "math/geom"
+import { angleBetween, getMidpoint, vecEquals } from "math/geom"
 import type Polyhedron from "./Polyhedron"
 import type Vertex from "./Vertex"
 import type { VertexList } from "./Vertex"
@@ -36,6 +36,10 @@ export default class Edge implements VertexList {
 
   length() {
     return this.v1.vec.distanceTo(this.v2.vec)
+  }
+
+  isValid() {
+    return !vecEquals(this.v1.vec, this.v2.vec)
   }
 
   midpoint() {

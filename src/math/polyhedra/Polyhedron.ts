@@ -20,6 +20,7 @@ import Edge from "./Edge"
 import Cap from "./Cap"
 import Builder from "./SolidBuilder"
 import { VertexArg, FaceArg } from "./SolidBuilder"
+const { PI, cbrt } = Math
 
 function calculateEdges(faces: Face[]) {
   return faces
@@ -175,7 +176,7 @@ export default class Polyhedron {
   sphericity() {
     const v = this.volume()
     const a = this.surfaceArea()
-    return (Math.PI ** (1 / 3) * (6 * v) ** (2 / 3)) / a
+    return (PI ** (1 / 3) * (6 * v) ** (2 / 3)) / a
   }
 
   /** Get the face that is closest to the given point. */
@@ -230,7 +231,7 @@ export default class Polyhedron {
   }
 
   normalizeToVolume(volume: number) {
-    const scale = Math.cbrt(volume / this.volume())
+    const scale = cbrt(volume / this.volume())
     return this.withVertices(this.vertices.map((v) => v.vec.scale(scale)))
   }
 

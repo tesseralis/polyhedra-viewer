@@ -10,10 +10,14 @@ export const PRECISION = 10 ** -PRECISION_DIGITS
 // convert an array of vertices into a vector
 export const vec = (p: Point) => new Vec3D(...p)
 
+export function vecEquals(v1: Vec3D, v2: Vec3D) {
+  return v1.equalsWithTolerance(v2, PRECISION)
+}
+
 export const getMidpoint = (v1: Vec3D, v2: Vec3D) => v1.add(v2).scale(0.5)
 
 export function isInverse(v1: Vec3D, v2: Vec3D) {
-  return v1.getInverted().equalsWithTolerance(v2, PRECISION)
+  return vecEquals(v1.getInverted(), v2)
 }
 
 export function angleBetween(o: Vec3D, a: Vec3D, b: Vec3D) {

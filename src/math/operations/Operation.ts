@@ -1,7 +1,7 @@
 import { mapValues } from "lodash-es"
 
 import { Polygon } from "data/polygons"
-import { Vec3D, vec, PRECISION } from "math/geom"
+import { Vec3D, vec, vecEquals } from "math/geom"
 import { Polyhedron, Face, VertexArg, normalizeVertex } from "math/polyhedra"
 import { deduplicateVertices } from "./operationUtils"
 import { Point } from "types"
@@ -100,7 +100,7 @@ function getCoplanarFaces(polyhedron: Polyhedron) {
 
     f1.adjacentFaces().forEach((f2) => {
       if (!f2 || !f2.isValid()) return
-      if (f1.normal().equalsWithTolerance(f2.normal(), PRECISION)) {
+      if (vecEquals(f1.normal(), f2.normal())) {
         pairs.push([f1, f2])
         found.push(f1)
         found.push(f2)

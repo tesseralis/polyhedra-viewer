@@ -1,5 +1,5 @@
 import { Facet } from "data/specs/Classical"
-import { Polyhedron, Cap } from "math/polyhedra"
+import { Polyhedron } from "math/polyhedra"
 import { OpName, operations } from "math/operations"
 import { validateOperationApplication } from "../operationTestUtils"
 import { getGeometry } from "math/operations/operationUtils"

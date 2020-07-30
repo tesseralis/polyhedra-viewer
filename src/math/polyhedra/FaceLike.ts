@@ -1,7 +1,6 @@
 import { Vec3D } from "math/geom"
 
 import {
-  PRECISION,
   Plane,
   isPlanar,
   getCentroid,
@@ -12,6 +11,8 @@ import type Polyhedron from "./Polyhedron"
 import type Edge from "./Edge"
 import type Vertex from "./Vertex"
 import type { VertexList } from "./Vertex"
+
+const { PI, sin, tan } = Math
 
 /**
  * An abstract polyhedral Face. An entity of a polyhedron that can be treated as a Face:
@@ -40,7 +41,7 @@ export default class FaceLike implements VertexList {
   }
 
   numUniqueSides() {
-    return this.edges.filter((edge) => edge.length() > PRECISION).length
+    return this.edges.filter((e) => e.isValid()).length
   }
 
   sideLength() {
@@ -56,11 +57,11 @@ export default class FaceLike implements VertexList {
   }
 
   apothem() {
-    return this.sideLength() / (2 * Math.tan(Math.PI / this.numSides))
+    return this.sideLength() / (2 * tan(PI / this.numSides))
   }
 
   radius() {
-    return this.sideLength() / (2 * Math.sin(Math.PI / this.numSides))
+    return this.sideLength() / (2 * sin(PI / this.numSides))
   }
 
   /** Get the area of a *regular* polygon */
@@ -88,6 +89,6 @@ export default class FaceLike implements VertexList {
   }
 
   isValid() {
-    return this.edges.every((edge) => edge.length() > PRECISION)
+    return this.edges.every((e) => e.isValid())
   }
 }

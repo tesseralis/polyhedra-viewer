@@ -4,7 +4,7 @@ import {
   Plane,
   Vec3D,
   Transform,
-  PRECISION,
+  vecEquals,
   getOrthonormalTransform,
   withOrigin,
 } from "math/geom"
@@ -139,9 +139,7 @@ export function deduplicateVertices(polyhedron: Polyhedron) {
   const oldToNew: Record<number, number> = {}
 
   polyhedron.vertices.forEach((v, vIndex) => {
-    const match = unique.find((point) =>
-      v.vec.equalsWithTolerance(point.vec, PRECISION),
-    )
+    const match = unique.find((point) => vecEquals(v.vec, point.vec))
     if (match === undefined) {
       unique.push(v)
       oldToNew[vIndex] = vIndex

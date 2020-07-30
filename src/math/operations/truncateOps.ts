@@ -15,6 +15,7 @@ import ClassicalForme from "math/formes/ClassicalForme"
 import CompositeForme, {
   AugmentedClassicalForme,
 } from "math/formes/CompositeForme"
+const { PI, tan } = Math
 
 /**
  * Returns the point to sharpen given parameters in the following setup:
@@ -29,8 +30,7 @@ import CompositeForme, {
 function getSharpenPoint(face: Face, p1: Vec3D, p2: Vec3D) {
   const ray = face.normalRay()
   const theta1 = angleBetween(p1, p2, ray)
-  const theta2 = Math.PI - theta1
-  const dist = ray.distanceTo(p1) * Math.tan(theta2)
+  const dist = ray.distanceTo(p1) * tan(PI - theta1)
   return ray.getPointAtDistance(dist)
 }
 

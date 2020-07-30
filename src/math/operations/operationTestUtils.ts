@@ -1,10 +1,11 @@
-import { PRECISION, PRECISION_DIGITS, Vec3D } from "math/geom"
+import { vecEquals, PRECISION_DIGITS, Vec3D } from "math/geom"
 import { Polyhedron } from "math/polyhedra"
 import Operation, { OpResult } from "./Operation"
 import PolyhedronForme from "math/formes/PolyhedronForme"
 import { getGeometry } from "math/operations/operationUtils"
 import { getSpecs2 } from "data/specs/getSpecs"
 import createForme from "math/formes/createForme"
+const { PI } = Math
 
 // FIXME rename and consolidate these functions
 export function makeApplyTo(operation: Operation<any>) {
@@ -34,7 +35,7 @@ function expectCRFPolyhedron(polyhedron: Polyhedron) {
     // Check that side lengths are all equal
     expect(sideLength).toBeCloseTo(expectedSideLength, PRECISION_DIGITS)
     // Make sure the whole thing is convex
-    expect(edge.dihedralAngle()).toBeLessThan(Math.PI)
+    expect(edge.dihedralAngle()).toBeLessThan(PI)
   }
 
   // Make sure all faces are facing the right way
@@ -43,14 +44,12 @@ function expectCRFPolyhedron(polyhedron: Polyhedron) {
     const faceCentroid = face.centroid()
     const normal = face.normal()
     const expectedNormal = faceCentroid.sub(centroid)
-    expect(normal.angleBetween(expectedNormal, true) || 0).toBeLessThan(
-      Math.PI / 2,
-    )
+    expect(normal.angleBetween(expectedNormal, true) || 0).toBeLessThan(PI / 2)
   }
 }
 
 function includesToPrecision(array: Vec3D[], value: Vec3D) {
-  return array.some((v) => v.equalsWithTolerance(value, PRECISION))
+  return array.some((v) => vecEquals(v, value))
 }
 
 // TODO figure out some not n-squared test for this
@@ -66,7 +65,7 @@ function expectValidAnimationData(opResult: OpResult, original: Polyhedron) {
   expect(animationData).toBeDefined()
   const { start, endVertices } = animationData!
   const startVertices = start.vertices
-    .filter((v) => !v.adjacentEdges().every((e) => e.length() < PRECISION))
+    .filter((v) => !v.adjacentEdges().every((e) => !e.isValid()))
     .map((v) => v.vec)
   expectVerticesMatch(
     startVertices,
