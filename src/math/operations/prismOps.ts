@@ -86,17 +86,19 @@ function makePrismOp({ query, rightElongation = "antiprism" }: PrismOpArgs) {
   const twist = rightElongation === "prism" ? undefined : "left"
   return (leftElongation: "prism" | null) => {
     return makeOpPair<CapstoneForme>({
-      graph: Capstone.query
-        .where(
+      graph: function* () {
+        for (const item of Capstone.query.where(
           (s) =>
             query(s) &&
             !s.isPrismatic() &&
             s.data.elongation === rightElongation,
-        )
-        .map((item) => ({
-          left: item.withElongation(leftElongation),
-          right: item,
-        })),
+        )) {
+          yield {
+            left: item.withElongation(leftElongation),
+            right: item,
+          }
+        }
+      },
       middle: "right",
       getPose(side, forme) {
         return getCapstonePose(forme, twist)
@@ -110,12 +112,16 @@ function makePrismOp({ query, rightElongation = "antiprism" }: PrismOpArgs) {
 
 const turnPrismatic = makeOpPair<CapstoneForme>({
   // Every unelongated capstone (except fastigium) can be elongated
-  graph: Capstone.query
-    .where((s) => s.isPrism() && !s.isDigonal())
-    .map((entry) => ({
-      left: entry,
-      right: entry.withElongation("antiprism"),
-    })),
+  graph: function* () {
+    for (const entry of Capstone.query.where(
+      (s) => s.isPrism() && !s.isDigonal(),
+    )) {
+      yield {
+        left: entry,
+        right: entry.withElongation("antiprism"),
+      }
+    }
+  },
   middle: "right",
   getPose(side, forme) {
     return getCapstonePose(forme, "left")
@@ -146,16 +152,15 @@ const turnCupola = cupolaOps("prism")
 
 function makeBicupolaPrismOp(leftElongation: null | "prism") {
   return makeOpPair<CapstoneForme, TwistOpts>({
-    graph: Capstone.query
-      .where(
+    graph: function* () {
+      for (const entry of Capstone.query.where(
         (s) =>
           canGyroelongSecondary(s) &&
           s.isBi() &&
           s.data.elongation === leftElongation,
-      )
-      .flatMap((entry) => {
-        return twists.map((twist) => {
-          return {
+      )) {
+        for (const twist of twists) {
+          yield {
             left: entry,
             // left twisting a gyro bicupola makes it be *left* twisted
             // but the opposite for ortho bicupolae
@@ -169,8 +174,9 @@ function makeBicupolaPrismOp(leftElongation: null | "prism") {
               right: { twist: oppositeTwist(twist) },
             },
           }
-        })
-      }),
+        }
+      }
+    },
     middle: "right",
     getPose(side, forme, { right: { twist } }) {
       return getCapstonePose(forme, twist)

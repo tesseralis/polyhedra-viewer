@@ -71,10 +71,11 @@ function makeTruncateTrio<L extends OpName, M extends OpName, R extends OpName>(
       leftOp === "middle" ? "left" : rightOp === "middle" ? "right" : null
 
     return makeOpPair({
-      graph: Classical.query
-        .where((s) => s.data.operation === middle.operation)
-        .map((entry) => {
-          return {
+      graph: function* () {
+        for (const entry of Classical.query.where(
+          (s) => s.data.operation === middle.operation,
+        )) {
+          yield {
             left: entry.withOperation(args[leftOp].operation),
             right: entry.withOperation(args[rightOp].operation),
             options: {
@@ -82,7 +83,8 @@ function makeTruncateTrio<L extends OpName, M extends OpName, R extends OpName>(
               right: args[rightOp].options?.(entry),
             },
           }
-        }),
+        }
+      },
       // If this is the left-right operation, then the intermediate
       // is going to be the middle operation
       middle:
@@ -207,19 +209,21 @@ const ambos = makeTruncateTrio(getAmboPose, {
 })
 
 const augTruncate = makeOpPair<AugmentedClassicalForme>({
-  graph: Composite.query
-    .where(
+  graph: function* () {
+    for (const entry of Composite.query.where(
       (s) =>
         s.isAugmentedClassical() &&
         s.data.source.isClassical() &&
         s.data.source.isRegular(),
-    )
-    .map((entry) => ({
-      left: entry,
-      right: entry.withData({
-        source: entry.sourceClassical().withOperation("truncate"),
-      }),
-    })),
+    )) {
+      yield {
+        left: entry,
+        right: entry.withData({
+          source: entry.sourceClassical().withOperation("truncate"),
+        }),
+      }
+    }
+  },
   middle: "right",
   getPose($, forme) {
     const { specs } = forme
@@ -326,8 +330,9 @@ export const sharpen = new Operation("sharpen", {
 // TODO the following operators are unused right now
 // and need to be integrated into the app
 
+// TODO why doesn't the typing work here?
 export const cosharpen = new Operation("cosharpen", {
-  ...combineOps<ClassicalForme, FacetOpts>([
+  ...combineOps<ClassicalForme, any>([
     regs.cotruncate.right,
     ambos.cotruncate.right,
   ]),
@@ -335,9 +340,6 @@ export const cosharpen = new Operation("cosharpen", {
 })
 
 export const unrectify = new Operation("unrectify", {
-  ...combineOps<ClassicalForme, FacetOpts>([
-    regs.rectify.right,
-    ambos.rectify.right,
-  ]),
+  ...combineOps<ClassicalForme, any>([regs.rectify.right, ambos.rectify.right]),
   ...hitOptArgs,
 })

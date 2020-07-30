@@ -74,57 +74,63 @@ const resizeArgs = getResizeArgs<{}, FacetOpts>((opts) => opts.right.facet)
 // Expansion of truncated to bevelled solids
 const semiExpand = makeOpPair<ClassicalForme, {}, FacetOpts>({
   ...resizeArgs,
-  graph: Classical.query
-    .where((s) => s.isTruncated())
-    .map((entry) => ({
-      left: entry,
-      right: entry.withOperation("bevel"),
-      options: { left: {}, right: { facet: entry.facet() } },
-    })),
+  graph: function* () {
+    for (const entry of Classical.query.where((s) => s.isTruncated())) {
+      yield {
+        left: entry,
+        right: entry.withOperation("bevel"),
+        options: { left: {}, right: { facet: entry.facet() } },
+      }
+    }
+  },
 })
 
 const _expand = makeOpPair<ClassicalForme, {}, FacetOpts>({
   ...resizeArgs,
-  graph: Classical.query
-    .where((s) => s.isRegular())
-    .map((entry) => {
-      return {
+  graph: function* () {
+    for (const entry of Classical.query.where((s) => s.isRegular())) {
+      yield {
         left: entry,
         right: entry.withOperation("cantellate"),
         options: { left: {}, right: { facet: entry.facet() } },
       }
-    }),
+    }
+  },
 })
 
 const _snub = makeOpPair<ClassicalForme, TwistOpts, FacetOpts>({
   ...resizeArgs,
-  graph: Classical.query
-    .where((s) => s.isRegular())
-    .flatMap((entry) => {
-      return twists.map((twist) => ({
-        left: entry,
-        right: entry.withOperation(
-          "snub",
+  graph: function* () {
+    for (const entry of Classical.query.where((s) => s.isRegular())) {
+      for (const twist of twists) {
+        yield {
+          left: entry,
           // If a vertex-solid, the chirality of the result
           // is *opposite* of the twist option
-          entry.isVertex() ? oppositeTwist(twist) : twist,
-        ),
-        options: { left: { twist }, right: { facet: entry.facet() } },
-      }))
-    }),
+          right: entry.withOperation(
+            "snub",
+            entry.isVertex() ? oppositeTwist(twist) : twist,
+          ),
+          options: { left: { twist }, right: { facet: entry.facet() } },
+        }
+      }
+    }
+  },
 })
 
 const _twist = makeOpPair<ClassicalForme, TwistOpts, {}>({
   ...getResizeArgs(() => "face"),
-  graph: Classical.query
-    .where((s) => s.isCantellated())
-    .flatMap((entry) => {
-      return twists.map((twist) => ({
-        left: entry,
-        right: entry.withOperation("snub", twist),
-        options: { left: { twist }, right: {} },
-      }))
-    }),
+  graph: function* () {
+    for (const entry of Classical.query.where((s) => s.isCantellated())) {
+      for (const twist of twists) {
+        yield {
+          left: entry,
+          right: entry.withOperation("snub", twist),
+          options: { left: { twist }, right: {} },
+        }
+      }
+    }
+  },
 })
 
 function getCantellatedMidradius(forme: ClassicalForme) {
@@ -146,12 +152,13 @@ function doDualTransform(forme: ClassicalForme, result: Classical) {
 }
 
 const _dual = makeOpPair<ClassicalForme>({
-  graph: Classical.query
-    .where((s) => s.isRegular() && !s.isVertex())
-    .map((specs) => ({
-      left: specs,
-      right: specs.withData({ facet: "vertex" }),
-    })),
+  graph: function* () {
+    for (const specs of Classical.query.where(
+      (s) => s.isRegular() && !s.isVertex(),
+    )) {
+      yield { left: specs, right: specs.withData({ facet: "vertex" }) }
+    }
+  },
   middle: (entry) => entry.left.withOperation("cantellate"),
   getPose(pos, forme) {
     const { geom } = forme

@@ -33,7 +33,7 @@ type MiddleGetter<Forme extends PolyhedronForme, L, R> = (
 
 export interface OpPairInput<Forme extends PolyhedronForme, L = {}, R = L> {
   // The graph of what polyhedron spec inputs are allowed and what maps to each other
-  graph: OpPairGraph<Forme["specs"], L, R>
+  graph(): Generator<GraphEntry<Forme["specs"], L, R>>
   // Get the intermediate polyhedron for the given graph entry
   middle: Side | MiddleGetter<Forme, L, R>
   // Get the post of a left, right, or middle state
@@ -66,12 +66,15 @@ class OpPair<
   R extends {} = L
 > {
   inputs: OpPairInput<Forme, L, R>
+  graph: GraphEntry<Forme["specs"], L, R>[]
+
   constructor(inputs: OpPairInput<Forme, L, R>) {
     this.inputs = inputs
+    this.graph = [...this.inputs.graph()]
   }
 
   private getEntries(side: Side, specs: Forme["specs"]) {
-    return this.inputs.graph.filter((entry) => entry[side].equals(specs))
+    return this.graph.filter((entry) => entry[side].equals(specs))
   }
 
   findEntry<S extends Side>(
@@ -79,7 +82,7 @@ class OpPair<
     specs: Forme["specs"],
     opts?: Opts<S, L, R>,
   ) {
-    return this.inputs.graph.find(
+    return this.graph.find(
       (entry) =>
         entry[side].equals(specs) &&
         isMatch(entry.options?.[side] ?? {}, opts ?? {}),
