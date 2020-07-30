@@ -102,8 +102,7 @@ const diminishAugmentedSolids: CutPasteOpArgs<
     return removeCap(geom, cap)
   },
   canApplyTo(specs) {
-    if (!specs.isComposite()) return false
-    return specs.isAugmented() && !specs.isDiminished()
+    return specs.isComposite() && specs.isAugmentedSolid()
   },
   getResult({ specs }) {
     const { source, augmented } = specs.data

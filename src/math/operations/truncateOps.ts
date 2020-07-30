@@ -209,15 +209,12 @@ const ambos = makeTruncateTrio(getAmboPose, {
 
 const augTruncate = makeOpPair<Composite, AugmentedClassicalForme>({
   graph: Composite.query
-    .where((s) => {
-      const source = s.data.source
-      return (
-        s.isAugmented() &&
-        !s.isDiminished() &&
-        source.isClassical() &&
-        source.isRegular()
-      )
-    })
+    .where(
+      (s) =>
+        s.isAugmentedClassical() &&
+        s.data.source.isClassical() &&
+        s.data.source.isRegular(),
+    )
     .map((entry) => ({
       left: entry,
       right: entry.withData({

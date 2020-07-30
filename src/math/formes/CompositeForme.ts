@@ -6,11 +6,7 @@ import { getCentroid } from "math/geom"
 
 export default class CompositeForme extends PolyhedronForme<Composite> {
   static create(specs: Composite, geom: Polyhedron) {
-    if (
-      specs.data.source.isClassical() &&
-      specs.isAugmented() &&
-      !specs.isDiminished()
-    ) {
+    if (specs.isAugmentedClassical()) {
       return new AugmentedClassicalForme(specs, geom)
     }
     // TODO more subclasses
@@ -63,6 +59,8 @@ export class AugmentedClassicalForme extends CompositeForme {
     }
     return caps
   }
+
+  // Functions that exclusive to augmented solids
 
   isMainFace(face: Face) {
     // Only source faces re main faces

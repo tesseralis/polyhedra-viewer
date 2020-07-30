@@ -70,6 +70,31 @@ export default class Composite extends Specs<CompositeData> {
   isDiminished = () => this.data.diminished > 0
   isGyrate = () => this.data.gyrate > 0
 
+  isAugmentedPrism() {
+    return this.data.source.isCapstone()
+  }
+
+  isAugmentedClassical() {
+    const { source } = this.data
+    if (!source.isClassical()) return false
+    if (source.isTruncated()) return true
+    return source.isRegular() && source.isFace()
+  }
+
+  isAugmentedSolid() {
+    return this.isAugmentedPrism() || this.isAugmentedClassical()
+  }
+
+  isDiminishedSolid() {
+    const { source } = this.data
+    return source.isClassical() && source.isRegular() && source.isVertex()
+  }
+
+  isGyrateSolid() {
+    const { source } = this.data
+    return source.isClassical() && source.isCantellated()
+  }
+
   isPara = () => this.data.align === "para"
   isMeta = () => this.data.align === "meta"
 
