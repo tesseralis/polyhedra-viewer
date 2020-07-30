@@ -170,17 +170,6 @@ describe("Viewer operations panel", () => {
       expectSolid("pentagonal gyrocupolarotunda")
     })
 
-    // FIXME this doesn't apply any more
-    xit("correctly displays using options for the fastigium", () => {
-      renderViewer("triangular prism")
-      clickOperation("augment")
-      expect(screen.queryByText("pyramid")).toBeInTheDocument()
-      expect(screen.queryByText("fastigium")).toBeInTheDocument()
-      fireEvent.click(screen.getByText("fastigium"))
-      clickFaceWithNumSides(4)
-      expectSolid("gyrobifastigium")
-    })
-
     it("does not display using options when unavailable", () => {
       renderViewer("triangular cupola")
       clickOperation("augment")

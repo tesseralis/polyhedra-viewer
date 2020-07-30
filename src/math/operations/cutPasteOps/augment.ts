@@ -94,13 +94,12 @@ function getPose(base: Face, normal: Vec3D, crossAxis: CrossAxis): Pose {
   }
 }
 
-// Augment the following
 function doAugment(
   info: CutPasteSpecs,
   polyhedron: Polyhedron,
   base: Face,
-  baseCrossAxis: (edge: Edge) => boolean = defaultCrossAxis,
-  augmenteeCrossAxis: (edge: Edge) => boolean = defaultCrossAxis,
+  baseCrossAxis: CrossAxis = defaultCrossAxis,
+  augmenteeCrossAxis: CrossAxis = defaultCrossAxis,
   augmentType: AugmentType = defaultAugmentType(base.numSides),
 ) {
   const numSides = base.numSides

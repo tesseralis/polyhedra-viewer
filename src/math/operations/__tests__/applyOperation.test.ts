@@ -7,8 +7,6 @@ import createForme from "math/formes/createForme"
 import { getGeometry } from "math/operations/operationUtils"
 
 const badOptions: any = {
-  // These appear in two "sequences": capstone and augmented
-  augment: ["triangular prism", "pentagonal prism", "hexagonal prism"],
   // This tries to apply to *all* caps, not just the bases
   diminish: ["gyroelongated pentagonal pyramid"],
 }
