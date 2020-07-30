@@ -20,6 +20,7 @@ import Edge from "./Edge"
 import Cap from "./Cap"
 import Builder from "./SolidBuilder"
 import { VertexArg, FaceArg } from "./SolidBuilder"
+import { find } from "utils"
 const { PI, cbrt } = Math
 
 function calculateEdges(faces: Face[]) {
@@ -126,9 +127,7 @@ export default class Polyhedron {
   }
 
   faceWithNumSides(n: number) {
-    const face = this.faces.find((f) => f.numSides === n)
-    if (!face) throw new Error(`No face of ${n} sides exists`)
-    return face
+    return find(this.faces, (f) => f.numSides === n)
   }
 
   // The list of the type of faces this polyhedron has, ordered

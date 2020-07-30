@@ -1,11 +1,11 @@
 import { Twist, twists, oppositeTwist } from "types"
-import PolyhedronSpecs from "data/specs/PolyhedronSpecs"
 import Capstone from "data/specs/Capstone"
 import { combineOps, makeOpPair } from "./operationPairs"
 import { makeOperation } from "./Operation"
 import { Pose, TwistOpts, getTransformedVertices } from "./operationUtils"
 import { withOrigin, getCentroid } from "math/geom"
 import CapstoneForme from "math/formes/CapstoneForme"
+import { find } from "utils"
 
 const { PI } = Math
 
@@ -24,7 +24,7 @@ function getCapstonePose(forme: CapstoneForme, twist?: Twist): Pose {
   const [top, bottom] = forme.baseBoundaries()
   const edge = forme.specs.isPrismatic()
     ? top.edges[0]
-    : top.edges.find((e) => e.face.numSides === 3)!
+    : find(top.edges, (e) => e.face.numSides === 3)
   const n = top.numSides
   const angle =
     (forme.specs.isGyroelongated() ? 1 : 0) * getTwistMult(twist) * (PI / n / 2)
@@ -38,21 +38,13 @@ function getCapstonePose(forme: CapstoneForme, twist?: Twist): Pose {
   }
 }
 
-function getNumSides(specs: PolyhedronSpecs) {
-  if (specs.isCapstone()) {
-    if (specs.isPrimary()) return specs.data.base
-    return 2 * specs.data.base
-  }
-  throw new Error(`Invalid specs: ${specs.name()}`)
-}
-
 function getScaledPrismVertices(
   forme: CapstoneForme,
   scale: number,
   twist?: Twist,
 ) {
   const vertexSets = forme.bases()
-  const angle = (getTwistMult(twist) * PI) / getNumSides(forme.specs)
+  const angle = (getTwistMult(twist) * PI) / forme.specs.baseSides()
 
   return getTransformedVertices(vertexSets, (set) =>
     withOrigin(set.normalRay(), (v) =>

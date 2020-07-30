@@ -38,6 +38,16 @@ export function flatMapUniq<T, U>(
 }
 
 /**
+ * Wrapper over `find` that throws an error if no elements match the predicate.
+ */
+export function find<T>(iter: Iterable<T>, predicate: (item: T) => boolean) {
+  for (const item of iter) {
+    if (predicate(item)) return item
+  }
+  throw new Error(`Could not find item in ${iter} matching ${predicate}`)
+}
+
+/**
  * Get the single element from the given array.
  */
 export function getSingle<T>(array: T[]): T {

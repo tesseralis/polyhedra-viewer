@@ -1,5 +1,5 @@
 import { pickBy, isMatch } from "lodash-es"
-import { getSingle } from "utils"
+import { getSingle, find } from "utils"
 import type Specs from "./PolyhedronSpecs"
 
 type Predicate<T> = (arg: T) => boolean
@@ -31,7 +31,7 @@ export default class Queries<S extends Specs> {
   }
 
   withName2(name: string) {
-    return this.entries.find((entry) => entry.name() === name)!
+    return find(this.entries, (entry) => entry.name() === name)
   }
 
   withData(data: S["data"]) {

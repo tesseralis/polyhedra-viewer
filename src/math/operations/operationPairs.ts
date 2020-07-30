@@ -1,4 +1,5 @@
 import { isMatch } from "lodash-es"
+import { find } from "utils"
 import PolyhedronSpecs from "data/specs/PolyhedronSpecs"
 import { VertexArg } from "math/polyhedra"
 import { OpArgs, SolidArgs } from "./Operation"
@@ -240,11 +241,7 @@ export function combineOps<F extends PolyhedronForme, O>(
   }
 
   function getOp(specs: F["specs"]) {
-    const entry = opArgs.find((op) => op.canApplyTo(specs))
-    if (!entry) {
-      throw new Error(`Could not apply any operations to ${specs.name}`)
-    }
-    return entry
+    return find(opArgs, (op) => op.canApplyTo(specs))
   }
 
   return {

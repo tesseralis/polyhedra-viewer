@@ -1,6 +1,6 @@
 import { minBy, once, countBy, isEqual } from "lodash-es"
 
-import { flatMapUniq } from "utils"
+import { flatMapUniq, find } from "utils"
 import { Vec3D } from "math/geom"
 import type Polyhedron from "./Polyhedron"
 import type Face from "./Face"
@@ -14,9 +14,10 @@ type FaceConfiguration = { [key: string]: number }
 
 // Find the boundary of a connected set of faces
 function getBoundary(faces: Face[]) {
-  const e0 = faces
-    .flatMap((f) => f.edges)
-    .find((e) => !e.twin().face.inSet(faces))!
+  const e0 = find(
+    faces.flatMap((f) => f.edges),
+    (e) => !e.twin().face.inSet(faces),
+  )!
 
   const result: Edge[] = []
   let e = e0

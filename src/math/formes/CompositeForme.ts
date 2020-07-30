@@ -1,5 +1,5 @@
 import { once } from "lodash-es"
-import { getSingle } from "utils"
+import { find, getSingle } from "utils"
 import PolyhedronForme from "./PolyhedronForme"
 import Composite from "data/specs/Composite"
 import { Polyhedron, Face, Cap } from "math/polyhedra"
@@ -134,10 +134,7 @@ export class AugmentedClassicalForme extends CompositeForme {
   }
 
   mainFace() {
-    const face = this.geom.faces.find((f) => this.isMainFace(f))
-    if (!face)
-      throw new Error(`Could not find a main face of AugmentedClassicalForme`)
-    return face
+    return find(this.geom.faces, (f) => this.isMainFace(f))
   }
 
   mainFaces() {
@@ -149,10 +146,7 @@ export class AugmentedClassicalForme extends CompositeForme {
   }
 
   minorFace() {
-    const face = this.geom.faces.find((f) => this.isMinorFace(f))
-    if (!face)
-      throw new Error(`Could not find a minor face of AugmentedClassicalForme`)
-    return face
+    return find(this.geom.faces, (f) => this.isMinorFace(f))
   }
 
   minorFaces() {

@@ -5,6 +5,7 @@ import Elementary from "data/specs/Elementary"
 import { OpArgs } from "../Operation"
 import PolyhedronForme from "math/formes/PolyhedronForme"
 import CapstoneForme from "math/formes/CapstoneForme"
+import { find } from "utils"
 
 export type CutPasteSpecs = Capstone | Composite | Elementary
 
@@ -12,12 +13,12 @@ type Count = Composite["data"]["augmented"]
 
 export function inc(count: Count): Count {
   if (count === 3) throw new Error(`Count ${count} is too high to increment`)
-  return (count + 1) as any
+  return (count + 1) as Count
 }
 
 export function dec(count: Count): Count {
   if (count === 0) throw new Error(`Count ${count} is too low to decrement`)
-  return (count - 1) as any
+  return (count - 1) as Count
 }
 
 export interface CapOptions {
@@ -36,11 +37,7 @@ export function combineOps<Opts, Forme extends PolyhedronForme>(
     return ops.some((op) => op.canApplyTo(specs))
   }
   function getOp(specs: Forme["specs"]) {
-    const entry = ops.find((op) => op.canApplyTo(specs))
-    if (!entry) {
-      throw new Error(`Could not apply any operations to ${specs.name}`)
-    }
-    return entry
+    return find(ops, (op) => op.canApplyTo(specs))
   }
 
   // TODO deduplicate this with the other combineOps

@@ -11,17 +11,13 @@ export type VertexArg = Point | Vec3D | Vertex
 
 export type FaceArg = (VIndex | Vertex)[] | Face
 
-export function normalizeVertex(v: VertexArg) {
-  // If it's a raw point
-  if (Array.isArray(v)) return v
-  // if it's a vector
+export function normalizeVertex(v: VertexArg): Point {
   if (v instanceof Vec3D) return v.toArray()
-  // If it's a vertex object
   if (v instanceof Vertex) return v.value
-  throw new Error("Invalid vertex")
+  return v // Otherwise it's just a raw point
 }
 
-function normalizeFace(face: FaceArg) {
+function normalizeFace(face: FaceArg): VIndex[] {
   if (Array.isArray(face)) {
     return face.map((v) => {
       if (typeof v === "number") return v

@@ -3,6 +3,7 @@ import Capstone from "data/specs/Capstone"
 import { Polyhedron, Face, Cap, FaceLike } from "math/polyhedra"
 import { vecEquals, isInverse } from "math/geom"
 import { getGeometry } from "math/operations/operationUtils"
+import { find } from "utils"
 
 type Base = Face | Cap
 
@@ -77,9 +78,9 @@ export default abstract class CapstoneForme extends PolyhedronForme<Capstone> {
 class PrismaticForme extends CapstoneForme {
   bases() {
     const face1 = this.geom.faceWithNumSides(this.specs.baseSides())
-    const face2 = this.geom.faces.find((f) =>
+    const face2 = find(this.geom.faces, (f) =>
       isInverse(face1.normal(), f.normal()),
-    )!
+    )
     return [face1, face2] as const
   }
 }
@@ -91,9 +92,9 @@ class MonoCapstoneForme extends CapstoneForme {
       ? this.specs.data.base
       : this.specs.data.base * 2
     const face = this.geom.faceWithNumSides(base)
-    const cap = this.geom
-      .caps()
-      .find((cap) => isInverse(cap.normal(), face.normal()))!
+    const cap = find(this.geom.caps(), (cap) =>
+      isInverse(cap.normal(), face.normal()),
+    )
     return [cap, face] as const
   }
 }

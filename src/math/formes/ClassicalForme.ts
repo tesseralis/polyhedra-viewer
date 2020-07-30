@@ -4,6 +4,7 @@ import Classical, { Facet, facets, oppositeFacet } from "data/specs/Classical"
 import { Polyhedron, Face } from "math/polyhedra"
 import { angleBetween } from "math/geom"
 import { getGeometry, oppositeFace } from "math/operations/operationUtils"
+import { find } from "utils"
 
 export default abstract class ClassicalForme extends PolyhedronForme<
   Classical
@@ -62,11 +63,7 @@ export default abstract class ClassicalForme extends PolyhedronForme<
   }
 
   facetFace(facet: Facet) {
-    const face = this.geom.faces.find((face) => this.isFacetFace(face, facet))
-    if (!face) {
-      throw new Error(`Could not find facet face for ${facet}`)
-    }
-    return face
+    return find(this.geom.faces, (face) => this.isFacetFace(face, facet))
   }
 
   /**
@@ -125,11 +122,7 @@ export default abstract class ClassicalForme extends PolyhedronForme<
   }
 
   edgeFace() {
-    const face = this.geom.faces.find((face) => this.isEdgeFace(face))
-    if (!face) {
-      throw new Error(`Could not find edge face`)
-    }
-    return face
+    return find(this.geom.faces, (face) => this.isEdgeFace(face))
   }
 
   edgeFaces() {
@@ -190,8 +183,7 @@ class TruncatedForme extends ClassicalForme {
   }
 
   adjacentFacetFace(face: Face, facet: Facet) {
-    // FIXME assert valid
-    return face.adjacentFaces().find((f) => this.isFacetFace(f, facet))!
+    return find(face.adjacentFaces(), (f) => this.isFacetFace(f, facet))
   }
 }
 
@@ -205,9 +197,10 @@ class RectifiedForme extends ClassicalForme {
   }
 
   adjacentFacetFace(face: Face, facet: Facet) {
-    return face.vertices[0]
-      .adjacentFaces()
-      .find((f) => this.isFacetFace(f, facet) && !f.equals(face))!
+    return find(
+      face.vertices[0].adjacentFaces(),
+      (f) => this.isFacetFace(f, facet) && !f.equals(face),
+    )
   }
 }
 
@@ -219,7 +212,7 @@ class BevelledForme extends ClassicalForme {
   tetrahedralFacetFaces(facet: Facet) {
     let f0 = this.geom.faceWithNumSides(6)
     if (facet === "vertex") {
-      f0 = f0.adjacentFaces().find((f) => f.numSides === 6)!
+      f0 = find(f0.adjacentFaces(), (f) => f.numSides === 6)
     }
     const rest = f0.edges
       .filter((e) => e.twinFace().numSides === 4)

@@ -4,7 +4,7 @@ import Capstone, { gyrations, Gyration, CapType } from "data/specs/Capstone"
 import Elementary from "data/specs/Elementary"
 import { Polyhedron, Face, Edge } from "math/polyhedra"
 import { Vec3D } from "math/geom"
-import { repeat } from "utils"
+import { repeat, find } from "utils"
 import { makeOperation } from "../Operation"
 import {
   deduplicateVertices,
@@ -76,7 +76,7 @@ function getPose(base: Face, normal: Vec3D, crossAxis: CrossAxis): Pose {
     scale: base.sideLength(),
     orientation: [
       normal,
-      base.edges.find(crossAxis)!.midpoint().sub(base.centroid()),
+      find(base.edges, crossAxis).midpoint().sub(base.centroid()),
     ],
   }
 }

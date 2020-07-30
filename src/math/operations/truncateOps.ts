@@ -15,6 +15,7 @@ import ClassicalForme from "math/formes/ClassicalForme"
 import CompositeForme, {
   AugmentedClassicalForme,
 } from "math/formes/CompositeForme"
+import { find } from "utils"
 const { PI, tan } = Math
 
 /**
@@ -239,8 +240,7 @@ const augTruncate = makeOpPair<AugmentedClassicalForme>({
       // If metabiaugmented, use the normal of the other cap
       crossAxis = caps[1].normal()
     } else {
-      crossAxis = boundary.edges
-        .find((e) => forme.isMainFace(e.twinFace()))!
+      crossAxis = find(boundary.edges, (e) => forme.isMainFace(e.twinFace()))
         .midpoint()
         .sub(boundary.centroid())
     }
@@ -262,13 +262,14 @@ const augTruncate = makeOpPair<AugmentedClassicalForme>({
           // Sharpen the cupola faces
           const v = face.vertices[0]
           // Find a triangular cupola face
-          const otherFace = v
-            .adjacentFaces()
-            .find((f) => f.numSides === 3 && !f.equals(face))!
+          const otherFace = find(
+            v.adjacentFaces(),
+            (f) => f.numSides === 3 && !f.equals(face),
+          )!
 
           return getSharpenPoint(face, v.vec, otherFace.centroid())
         } else {
-          const edge = face.edges.find((e) => forme.isMainFace(e.twinFace()))!
+          const edge = find(face.edges, (e) => forme.isMainFace(e.twinFace()))
           return getSharpenPointEdge(face, edge)
         }
       },
