@@ -48,7 +48,12 @@ export default class Classical extends Specs<ClassicalData> {
   }
 
   withData(data: Partial<ClassicalData>) {
+    // TODO don't create a new item
     return new Classical({ ...this.data, ...data })
+  }
+
+  withOperation(operation: Operation, twist?: Twist) {
+    return this.withData({ operation, twist })
   }
 
   isTetrahedral = () => this.data.family === 3

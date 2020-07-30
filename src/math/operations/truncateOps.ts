@@ -75,8 +75,8 @@ function makeTruncateTrio<L extends OpName, M extends OpName, R extends OpName>(
         .where((s) => s.data.operation === middle.operation)
         .map((entry) => {
           return {
-            left: entry.withData({ operation: args[leftOp].operation }),
-            right: entry.withData({ operation: args[rightOp].operation }),
+            left: entry.withOperation(args[leftOp].operation),
+            right: entry.withOperation(args[rightOp].operation),
             options: {
               left: args[leftOp].options?.(entry),
               right: args[rightOp].options?.(entry),
@@ -86,8 +86,7 @@ function makeTruncateTrio<L extends OpName, M extends OpName, R extends OpName>(
       // If this is the left-right operation, then the intermediate
       // is going to be the middle operation
       middle:
-        middleArg ??
-        ((entry) => entry.left.withData({ operation: middle.operation })),
+        middleArg ?? ((entry) => entry.left.withOperation(middle.operation)),
       getPose: ($, solid, options) => getPose(solid, options),
       toLeft: leftOp === "left" ? left.transformer : undefined,
       toRight: rightOp === "right" ? right.transformer : undefined,
@@ -218,7 +217,7 @@ const augTruncate = makeOpPair<AugmentedClassicalForme>({
     .map((entry) => ({
       left: entry,
       right: entry.withData({
-        source: entry.data.source.withData({ operation: "truncate" }),
+        source: entry.sourceClassical().withOperation("truncate"),
       }),
     })),
   middle: "right",

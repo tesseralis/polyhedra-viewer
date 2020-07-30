@@ -69,6 +69,10 @@ export default class Capstone extends Specs<CapstoneData> {
     return new Capstone({ ...this.data, ...data })
   }
 
+  withElongation(elongation: PrismaticType | null, twist?: Twist) {
+    return this.withData({ elongation, twist })
+  }
+
   isDigonal = () => this.data.base === 2
   isTriangular = () => this.data.base === 3
   isSquare = () => this.data.base === 4

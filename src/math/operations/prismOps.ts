@@ -94,7 +94,7 @@ function makePrismOp({ query, rightElongation = "antiprism" }: PrismOpArgs) {
             s.data.elongation === rightElongation,
         )
         .map((item) => ({
-          left: item.withData({ elongation: leftElongation }),
+          left: item.withElongation(leftElongation),
           right: item,
         })),
       middle: "right",
@@ -114,7 +114,7 @@ const turnPrismatic = makeOpPair<CapstoneForme>({
     .where((s) => s.isPrism() && !s.isDigonal())
     .map((entry) => ({
       left: entry,
-      right: entry.withData({ elongation: "antiprism" }),
+      right: entry.withElongation("antiprism"),
     })),
   middle: "right",
   getPose(side, forme) {
@@ -157,12 +157,12 @@ function makeBicupolaPrismOp(leftElongation: null | "prism") {
         return twists.map((twist) => {
           return {
             left: entry,
-            right: entry.withData({
-              elongation: "antiprism",
-              // left twisting a gyro bicupola makes it be *left* twisted
-              // but the opposite for ortho bicupolae
-              twist: entry.isGyro() ? twist : oppositeTwist(twist),
-            }),
+            // left twisting a gyro bicupola makes it be *left* twisted
+            // but the opposite for ortho bicupolae
+            right: entry.withElongation(
+              "antiprism",
+              entry.isGyro() ? twist : oppositeTwist(twist),
+            ),
             // Left and right options are opposites of each other
             options: {
               left: { twist },

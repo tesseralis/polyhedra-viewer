@@ -78,7 +78,7 @@ const semiExpand = makeOpPair<ClassicalForme, {}, FacetOpts>({
     .where((s) => s.isTruncated())
     .map((entry) => ({
       left: entry,
-      right: entry.withData({ operation: "bevel" }),
+      right: entry.withOperation("bevel"),
       options: { left: {}, right: { facet: entry.facet() } },
     })),
 })
@@ -90,7 +90,7 @@ const _expand = makeOpPair<ClassicalForme, {}, FacetOpts>({
     .map((entry) => {
       return {
         left: entry,
-        right: entry.withData({ operation: "cantellate" }),
+        right: entry.withOperation("cantellate"),
         options: { left: {}, right: { facet: entry.facet() } },
       }
     }),
@@ -103,12 +103,12 @@ const _snub = makeOpPair<ClassicalForme, TwistOpts, FacetOpts>({
     .flatMap((entry) => {
       return twists.map((twist) => ({
         left: entry,
-        right: entry.withData({
-          operation: "snub",
+        right: entry.withOperation(
+          "snub",
           // If a vertex-solid, the chirality of the result
           // is *opposite* of the twist option
-          twist: entry.isVertex() ? oppositeTwist(twist) : twist,
-        }),
+          entry.isVertex() ? oppositeTwist(twist) : twist,
+        ),
         options: { left: { twist }, right: { facet: entry.facet() } },
       }))
     }),
@@ -121,7 +121,7 @@ const _twist = makeOpPair<ClassicalForme, TwistOpts, {}>({
     .flatMap((entry) => {
       return twists.map((twist) => ({
         left: entry,
-        right: entry.withData({ operation: "snub", twist }),
+        right: entry.withOperation("snub", twist),
         options: { left: { twist }, right: {} },
       }))
     }),
@@ -152,7 +152,7 @@ const _dual = makeOpPair<ClassicalForme>({
       left: specs,
       right: specs.withData({ facet: "vertex" }),
     })),
-  middle: (entry) => entry.left.withData({ operation: "cantellate" }),
+  middle: (entry) => entry.left.withOperation("cantellate"),
   getPose(pos, forme) {
     const { geom } = forme
     switch (pos) {
