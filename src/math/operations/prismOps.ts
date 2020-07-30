@@ -21,7 +21,7 @@ function getTwistMult(twist?: Twist) {
 }
 
 function getCapstonePose(forme: CapstoneForme, twist?: Twist): Pose {
-  const [top, bottom] = forme.baseFaces()
+  const [top, bottom] = forme.baseBoundaries()
   const edge = forme.specs.isPrismatic()
     ? top.edges[0]
     : top.edges.find((e) => e.face.numSides === 3)!

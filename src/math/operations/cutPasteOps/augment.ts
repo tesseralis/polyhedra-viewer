@@ -29,10 +29,7 @@ type AugmentType = "pyramid" | "cupola" | "rotunda"
 
 function canAugment(forme: PolyhedronForme<any>, face: Face) {
   if (forme instanceof CapstoneForme) {
-    // TODO make this easier to access from CapstoneForme?
-    return forme
-      .bases()
-      .some((base) => base instanceof Face && base.equals(face))
+    return forme.baseFaces().some((base) => base.equals(face))
   } else if (forme instanceof CompositeForme) {
     return forme.canAugment(face)
   } else {

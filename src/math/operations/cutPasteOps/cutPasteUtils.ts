@@ -5,6 +5,7 @@ import Elementary from "data/specs/Elementary"
 import { OpArgs } from "../Operation"
 import PolyhedronSpecs from "data/specs/PolyhedronSpecs"
 import PolyhedronForme from "math/formes/PolyhedronForme"
+import CapstoneForme from "math/formes/CapstoneForme"
 
 export type CutPasteSpecs = Capstone | Composite | Elementary
 
@@ -60,6 +61,14 @@ export function combineOps<
   }
 }
 
+function getCaps(forme: PolyhedronForme<any>) {
+  if (forme instanceof CapstoneForme) {
+    return forme.baseCaps()
+  } else {
+    return forme.geom.caps()
+  }
+}
+
 type CapOptionArgs<Specs extends PolyhedronSpecs> = Partial<
   OpArgs<CapOptions, Specs, PolyhedronForme<Specs>>
 >
@@ -69,20 +78,20 @@ export const capOptionArgs: CapOptionArgs<PolyhedronSpecs> = {
     return true
   },
 
-  *allOptionCombos({ geom }) {
-    // FIXME this should be restricted (e.g. for diminished icosahedron)
-    for (const cap of geom.caps()) yield { cap }
+  *allOptionCombos(forme) {
+    for (const cap of getCaps(forme)) yield { cap }
   },
 
   hitOption: "cap",
   getHitOption({ geom }, hitPnt) {
+    // FIXME only allow the right caps
     const cap = Cap.find(geom, hitPnt)
     return cap ? { cap } : {}
   },
 
-  faceSelectionStates({ geom }, { cap }) {
-    const allCapFaces = geom.caps().flatMap((cap) => cap.faces())
-    return geom.faces.map((face) => {
+  faceSelectionStates(forme, { cap }) {
+    const allCapFaces = getCaps(forme).flatMap((cap) => cap.faces())
+    return forme.geom.faces.map((face) => {
       if (cap instanceof Cap && face.inSet(cap.faces())) return "selected"
       if (face.inSet(allCapFaces)) return "selectable"
       return undefined

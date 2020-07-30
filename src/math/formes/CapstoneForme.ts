@@ -25,18 +25,26 @@ export default abstract class CapstoneForme extends PolyhedronForme<Capstone> {
 
   abstract bases(): readonly [Base, Base]
 
+  baseCaps() {
+    return this.bases().filter((base) => base instanceof Cap) as Cap[]
+  }
+
+  baseFaces() {
+    return this.bases().filter((base) => base instanceof Face) as Face[]
+  }
+
   /**
    * Return the `FaceLike` representation of this capstone's bases:
    * either the face itself or the boundary of the cap.
    */
-  baseFaces(): [FaceLike, FaceLike] {
+  baseBoundaries(): [FaceLike, FaceLike] {
     return this.bases().map((base) =>
       base instanceof Cap ? base.boundary() : base,
     ) as [FaceLike, FaceLike]
   }
 
   prismaticHeight() {
-    const [top, bot] = this.baseFaces()
+    const [top, bot] = this.baseBoundaries()
     return top.centroid().distanceTo(bot.centroid())
   }
 
@@ -53,7 +61,7 @@ export default abstract class CapstoneForme extends PolyhedronForme<Capstone> {
   /**
    * Return whether the given face is in one of the bases of the cap.
    */
-  isBaseFace(face: Face) {
+  inBase(face: Face) {
     return !!this.baseOf(face)
   }
 

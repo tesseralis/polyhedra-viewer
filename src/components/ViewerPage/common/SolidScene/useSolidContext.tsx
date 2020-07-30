@@ -56,7 +56,7 @@ function getCapstoneColors(forme: CapstoneForme) {
       const faceSides = face.numSides > 5 ? "secondary" : "primary"
       return (classicalColorScheme as any)[forme.specs.data.base][faceSides]
         .face
-    } else if (forme.isBaseFace(face)) {
+    } else if (forme.inBase(face)) {
       if (face.numSides === 3) {
         return (classicalColorScheme as any)[forme.specs.data.base].primary
           .vertex
