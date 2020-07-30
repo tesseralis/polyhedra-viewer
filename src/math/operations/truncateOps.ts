@@ -72,9 +72,7 @@ function makeTruncateTrio<L extends OpName, M extends OpName, R extends OpName>(
 
     return makeOpPair({
       graph: function* () {
-        for (const entry of Classical.query.where(
-          (s) => s.data.operation === middle.operation,
-        )) {
+        for (const entry of Classical.allWithOperation(middle.operation)) {
           yield {
             left: entry.withOperation(args[leftOp].operation),
             right: entry.withOperation(args[rightOp].operation),

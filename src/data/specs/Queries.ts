@@ -4,6 +4,8 @@ import type Specs from "./PolyhedronSpecs"
 
 type Predicate<T> = (arg: T) => boolean
 
+// TODO use a similar naming convention to react-testing-library:
+// https://testing-library.com/docs/dom-testing-library/api-queries
 export default class Queries<S extends Specs> {
   entries: S[]
   nameMapping: Map<string, S[]>
@@ -57,13 +59,5 @@ export default class Queries<S extends Specs> {
 
   where(filter: Predicate<S>) {
     return this.entries.filter((entry) => filter(entry))
-  }
-
-  hasNameWhere(name: string, filter: Predicate<S["data"]>) {
-    const entries = this.nameMapping.get(name)
-    if (!entries) return false
-    return entries.some(
-      (entry) => entry.canonicalName() === name && filter(entry.data),
-    )
   }
 }

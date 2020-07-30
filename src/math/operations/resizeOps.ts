@@ -75,7 +75,7 @@ const resizeArgs = getResizeArgs<{}, FacetOpts>((opts) => opts.right.facet)
 const semiExpand = makeOpPair<ClassicalForme, {}, FacetOpts>({
   ...resizeArgs,
   graph: function* () {
-    for (const entry of Classical.query.where((s) => s.isTruncated())) {
+    for (const entry of Classical.allWithOperation("truncate")) {
       yield {
         left: entry,
         right: entry.withOperation("bevel"),
@@ -88,7 +88,7 @@ const semiExpand = makeOpPair<ClassicalForme, {}, FacetOpts>({
 const _expand = makeOpPair<ClassicalForme, {}, FacetOpts>({
   ...resizeArgs,
   graph: function* () {
-    for (const entry of Classical.query.where((s) => s.isRegular())) {
+    for (const entry of Classical.allWithOperation("regular")) {
       yield {
         left: entry,
         right: entry.withOperation("cantellate"),
@@ -101,7 +101,7 @@ const _expand = makeOpPair<ClassicalForme, {}, FacetOpts>({
 const _snub = makeOpPair<ClassicalForme, TwistOpts, FacetOpts>({
   ...resizeArgs,
   graph: function* () {
-    for (const entry of Classical.query.where((s) => s.isRegular())) {
+    for (const entry of Classical.allWithOperation("regular")) {
       for (const twist of twists) {
         yield {
           left: entry,
@@ -121,7 +121,7 @@ const _snub = makeOpPair<ClassicalForme, TwistOpts, FacetOpts>({
 const _twist = makeOpPair<ClassicalForme, TwistOpts, {}>({
   ...getResizeArgs(() => "face"),
   graph: function* () {
-    for (const entry of Classical.query.where((s) => s.isCantellated())) {
+    for (const entry of Classical.allWithOperation("cantellate")) {
       for (const twist of twists) {
         yield {
           left: entry,

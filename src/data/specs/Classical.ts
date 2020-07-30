@@ -93,4 +93,8 @@ export default class Classical extends Specs<ClassicalData> {
   }
 
   static query = new Queries(Classical.getAll())
+
+  static allWithOperation(operation: Operation) {
+    return this.query.where((s) => s.data.operation === operation)
+  }
 }
