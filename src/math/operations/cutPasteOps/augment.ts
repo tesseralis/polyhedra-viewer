@@ -143,11 +143,6 @@ function defaultAugmentType(numSides: number) {
   return numSides <= 5 ? "pyramid" : "cupola"
 }
 
-function getUsingOpt(numSides: number, using?: AugmentType) {
-  using = using ?? (numSides > 5 ? "cupola" : "pyramid")
-  return { type: using, base: numSides > 5 ? numSides / 2 : numSides }
-}
-
 function hasRotunda(info: CutPasteSpecs) {
   if (info.isCapstone()) {
     return info.isMono() && info.isSecondary() && info.isPentagonal()
@@ -223,9 +218,9 @@ const augmentCapstone: CutPasteOpArgs<Options, Capstone, CapstoneForme> = {
     return !specs.isBi()
   },
 
-  getResult({ specs }, { face, using, gyrate }) {
-    const n = face.numSides
-    const { base } = getUsingOpt(n, using)
+  getResult(forme, { using, gyrate }) {
+    const { specs } = forme
+    const base = specs.data.base
     return specs.withData({
       count: inc(specs.data.count) as any,
       rotundaCount: (specs.data.rotundaCount! +
