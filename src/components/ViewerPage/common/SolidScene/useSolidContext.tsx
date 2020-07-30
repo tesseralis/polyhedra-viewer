@@ -27,27 +27,26 @@ function createFamilyColor(face: string, vertex: string) {
 
 const classicalColorScheme = {
   // yellow + purple
-  3: createFamilyColor("ffea00", "db39ce"),
+  3: createFamilyColor("#ffea00", "#db39ce"),
   // red + green
   4: createFamilyColor("#e00909", "#22e34c"),
   // blue + orange
-  5: createFamilyColor("2c65de", "ff9100"),
+  5: createFamilyColor("#2c65de", "#ff9100"),
 }
 
 const orthoFace = "dimgray"
 const gyroFace = "lightgray"
 
 function getClassicalColors(forme: ClassicalForme) {
+  const scheme = classicalColorScheme[forme.specs.data.family]
   return forme.geom.faces.map((face) => {
     const facet = forme.getFacet(face)
     // thing for the edge face
     if (!facet) {
-      return classicalColorScheme[forme.specs.data.family].edge[
-        forme.specs.isSnub() ? "gyro" : "ortho"
-      ]
+      return scheme.edge[forme.specs.isSnub() ? "gyro" : "ortho"]
     }
     const faceSides = face.numSides > 5 ? "secondary" : "primary"
-    return classicalColorScheme[forme.specs.data.family][faceSides][facet]
+    return scheme[faceSides][facet]
   })
 }
 
