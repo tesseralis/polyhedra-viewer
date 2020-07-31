@@ -58,23 +58,30 @@ function expectVerticesMatch(test: Vec3D[], ref: Vec3D[]) {
 }
 
 // These operations behave badly and are banned :(
-const naughtyOps = ["augment", "diminish", "gyrate"]
+// FIXME we should be able to delete naughtyOps
+const naughtyOps = ["gyrate"]
 
-function expectValidAnimationData(opResult: OpResult, original: Polyhedron) {
+function expectValidAnimationData(
+  opName: string,
+  opResult: OpResult,
+  original: Polyhedron,
+) {
   const { result, animationData } = opResult
   expect(animationData).toBeDefined()
   const { start, endVertices } = animationData!
-  const startVertices = start.vertices
-    .filter((v) => !v.adjacentEdges().every((e) => !e.isValid()))
-    .map((v) => v.vec)
-  expectVerticesMatch(
-    startVertices,
-    original.vertices.map((v) => v.vec),
-  )
-  expectVerticesMatch(
-    endVertices.map((v) => new Vec3D(...v)),
-    result.geom.vertices.map((v) => v.vec),
-  )
+  if (opName !== "augment") {
+    const startVertices = start.vertices.map((v) => v.vec)
+    expectVerticesMatch(
+      startVertices,
+      original.vertices.map((v) => v.vec),
+    )
+  }
+  if (opName !== "diminish") {
+    expectVerticesMatch(
+      endVertices.map((v) => new Vec3D(...v)),
+      result.geom.vertices.map((v) => v.vec),
+    )
+  }
 }
 
 function expectValidPolyhedron(result: Polyhedron) {
@@ -98,7 +105,7 @@ export function validateOperationApplication(
   } else {
     // All other operations are implemented as OpPairs that use a reference,
     // so the results are guaranteed to be valid
-    expectValidAnimationData(opResult, original.geom)
+    expectValidAnimationData(op.name, opResult, original.geom)
   }
   return opResult
 }
