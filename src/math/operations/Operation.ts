@@ -36,11 +36,6 @@ export interface SolidArgs<Specs extends PolyhedronSpecs> {
   geom: Polyhedron
 }
 
-// export type PolyhedronForme = SolidArgs<PolyhedronSpecs>
-// type FormeSpecs<F extends PolyhedronForme> = F extends PolyhedronForme<infer S>
-//   ? S
-//   : never
-
 export interface OpArgs<Options extends {}, Forme extends PolyhedronForme> {
   canApplyTo(info: PolyhedronSpecs): boolean
 
