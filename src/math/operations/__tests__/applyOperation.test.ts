@@ -16,6 +16,7 @@ describe("applyOperation", () => {
 
   forEach(operations, (operation, opName) => {
     describe(opName, () => {
+      // TODO determine solid names from the graph instead
       for (const polyhedron of polyhedra) {
         if (operation.canApplyTo(polyhedron)) {
           it(polyhedron.geom.name, () => {
