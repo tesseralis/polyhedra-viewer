@@ -111,14 +111,14 @@ export function* gyrateCapstoneGraph(): GraphGenerator<Capstone, any, any> {
 
 export function* gyrateCompositeGraph(): GraphGenerator<Composite, any, any> {
   for (const solid of Composite.query.where(
-    (s) => s.isGyrateSolid() && !s.isTri(),
+    (s) => s.isGyrateSolid() && s.isGyrate(),
   )) {
     yield {
       left: solid.ungyrate(),
       right: solid,
       options: {
-        left: { align: solid.data.align },
-        right: {},
+        left: { direction: "forward", align: solid.data.align },
+        right: { direction: "back" },
       },
     }
   }

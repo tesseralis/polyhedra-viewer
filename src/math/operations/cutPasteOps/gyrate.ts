@@ -62,9 +62,12 @@ function applyGyrate(polyhedron: Polyhedron, { cap }: CapOptions) {
 }
 
 const gyrateCapstone: CutPasteOpArgs<CapOptions, CapstoneForme> = {
-  graph: toDirected("left", gyrateCapstoneGraph),
-  toGraphOpts(forme, opts) {
-    return opts as any
+  graph: function* () {
+    yield* toDirected("left", gyrateCapstoneGraph)()
+    yield* toDirected("right", gyrateCapstoneGraph)()
+  },
+  toGraphOpts() {
+    return {} as any
   },
   apply({ geom }, options) {
     return applyGyrate(geom, options)
@@ -72,10 +75,16 @@ const gyrateCapstone: CutPasteOpArgs<CapOptions, CapstoneForme> = {
 }
 
 const gyrateComposite: CutPasteOpArgs<CapOptions, GyrateSolidForme> = {
-  graph: toDirected("left", gyrateCompositeGraph),
-  toGraphOpts(forme, opts) {
-    // FIXME handle alignment and direction
-    return opts as any
+  graph: function* () {
+    yield* toDirected("left", gyrateCompositeGraph)()
+    yield* toDirected("right", gyrateCompositeGraph)()
+  },
+  toGraphOpts(forme, { cap }) {
+    if (forme.isGyrate(cap!)) {
+      return { direction: "back" } as any
+    } else {
+      return { direction: "forward", align: forme.alignment(cap!) }
+    }
   },
   apply({ geom }, options) {
     return applyGyrate(geom, options)

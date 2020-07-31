@@ -191,14 +191,6 @@ export default class Operation<Options extends {} = {}> {
   }
 
   getEntry(solid: PolyhedronForme, options: Options) {
-    // console.log(options)
-    // console.log(this.opArgs.toGraphOpts(solid, pickBy(options) as any))
-    // for (const entry of this.graph.filter((entry) =>
-    //   entry.start.equals(solid.specs),
-    // )) {
-    //   console.log(entry.end.name())
-    //   console.log(entry.options)
-    // }
     return find(
       this.graph,
       (entry) =>
