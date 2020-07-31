@@ -1,5 +1,5 @@
 import { range } from "lodash-es"
-import { Items, Twist } from "types"
+import { Items, Twist, oppositeTwist } from "types"
 import { Polygon, PrimaryPolygon, primaryPolygons } from "../polygons"
 import Specs from "./PolyhedronSpecs"
 import Queries from "./Queries"
@@ -132,6 +132,17 @@ export default class Capstone extends Specs<CapstoneData> {
       )
     }
     return this.data.elongation
+  }
+
+  gyrate() {
+    if (this.isGyroelongated()) {
+      return this.withData({
+        twist: oppositeTwist(this.data.twist!),
+      })
+    }
+    return this.withData({
+      gyrate: this.data.gyrate === "ortho" ? "gyro" : "ortho",
+    })
   }
 
   static *getAll() {

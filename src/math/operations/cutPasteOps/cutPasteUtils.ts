@@ -95,6 +95,21 @@ export function* augDimGyrateSolidGraph() {
   }
 }
 
+export function* augDimElementaryGraph() {
+  yield {
+    left: Elementary.query.withName("sphenocorona"),
+    right: Elementary.query.withName("augmented sphenocorona"),
+  }
+}
+
+export function* gyrateCapstoneGraph() {
+  for (const cap of Capstone.query.where(
+    (s) => s.isBi() && s.isSecondary() && !s.isGyro() && !s.isDigonal(),
+  )) {
+    yield { left: cap, right: cap.gyrate() }
+  }
+}
+
 export function combineOps<Opts, Forme extends PolyhedronForme>(
   ops: CutPasteOpArgs<Opts, Forme>[],
 ): CutPasteOpArgs<Opts, Forme> {

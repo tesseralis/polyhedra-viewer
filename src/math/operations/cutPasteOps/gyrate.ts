@@ -69,9 +69,7 @@ const gyrateCapstone: CutPasteOpArgs<CapOptions, CapstoneForme> = {
     return info.isBi() && info.isSecondary() && !info.isDigonal()
   },
   getResult({ specs }) {
-    return specs.withData({
-      gyrate: specs.data.gyrate === "ortho" ? "gyro" : "ortho",
-    })
+    return specs.gyrate()
   },
 }
 
