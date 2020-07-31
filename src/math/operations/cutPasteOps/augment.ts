@@ -47,7 +47,6 @@ function getAugmentee(type: AugmentType, base: number) {
 
 type CrossAxis = (edge: Edge) => boolean
 
-// TODO make this work on a cap boundary instead of an underside for consistency
 // TODO make this a function on the cap forme
 function capOrientation(type: AugmentType): CrossAxis {
   switch (type) {
