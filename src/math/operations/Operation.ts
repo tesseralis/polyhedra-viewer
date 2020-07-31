@@ -44,9 +44,9 @@ export interface GraphEntry<Specs, Opts> {
 }
 
 export interface OpArgs<Options extends {}, Forme extends PolyhedronForme> {
-  // canApplyTo(info: PolyhedronSpecs): boolean
-  graph: () => Generator<GraphEntry<Forme["specs"], Options>>
+  graph(): Generator<GraphEntry<Forme["specs"], Options>>
 
+  // FIXME!! this needs better typing, e.g. use two different generics for each type of option
   toGraphOpts(solid: Forme, opts: Partial<Options>): Options
 
   hasOptions?(info: Forme["specs"]): boolean
@@ -59,8 +59,6 @@ export interface OpArgs<Options extends {}, Forme extends PolyhedronForme> {
   ): readonly Options[typeof optionName][]
 
   allOptionCombos?(solid: Forme): Generator<Options>
-
-  // getResult(solid: Forme, options: Options): PolyhedronSpecs
 
   hitOption?: keyof Options
 
@@ -191,6 +189,8 @@ export default class Operation<Options extends {} = {}> {
   }
 
   getEntry(solid: PolyhedronForme, options: Options) {
+    // FIXME!! optimize this and make error checking better
+    // e.g. make it easier to type.
     return find(
       this.graph,
       (entry) =>
