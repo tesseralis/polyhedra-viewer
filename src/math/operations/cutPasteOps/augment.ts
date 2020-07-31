@@ -6,7 +6,17 @@ import { Polyhedron, Face, Edge, FaceLike } from "math/polyhedra"
 import { repeat, find } from "utils"
 import { makeOperation } from "../Operation"
 import { deduplicateVertices, alignPolyhedron, Pose } from "../operationUtils"
-import { inc, CutPasteSpecs, CutPasteOpArgs, combineOps } from "./cutPasteUtils"
+import {
+  CutPasteSpecs,
+  CutPasteOpArgs,
+  combineOps,
+  augDimCapstoneGraph,
+  augDimAugmentedSolidGraph,
+  augDimDiminishedSolidGraph,
+  augDimGyrateSolidGraph,
+  augDimElementaryGraph,
+} from "./cutPasteUtils"
+import { toDirected } from "../operationPairs"
 import PolyhedronForme from "math/formes/PolyhedronForme"
 import CompositeForme, {
   GyrateSolidForme,
@@ -127,6 +137,7 @@ function getUsingOpts(info: CutPasteSpecs): AugmentType[] | null {
 
 function hasGyrateOpts(info: CutPasteSpecs) {
   if (info.isCapstone()) {
+    if (!info.isMono()) return false
     // Gyroelongated capstones are always gyro
     if (info.isGyroelongated()) return false
     // Cupolae and rotundae (that are not the gyrobifastigium) always have gyrate opts
@@ -146,6 +157,10 @@ interface Options {
 }
 
 const augmentCapstone: CutPasteOpArgs<Options, CapstoneForme> = {
+  graph: toDirected("left", augDimCapstoneGraph),
+  toGraphOpts(forme, { face, ...opts }) {
+    return opts as any
+  },
   apply(forme, { face, gyrate, using }) {
     const { specs, geom } = forme
     const augmentType = using ?? defaultAugmentType(face.numSides)
@@ -167,25 +182,13 @@ const augmentCapstone: CutPasteOpArgs<Options, CapstoneForme> = {
     }
     return doAugment(specs, geom, face, baseAxis, augmentType)
   },
-
-  canApplyTo(specs) {
-    if (!specs.isCapstone()) return false
-    return !specs.isBi()
-  },
-
-  getResult(forme, { using, gyrate }) {
-    const { specs } = forme
-    const base = specs.data.base
-    return specs.withData({
-      count: inc(specs.data.count) as any,
-      rotundaCount: (specs.data.rotundaCount! +
-        (using === "rotunda" ? 1 : 0)) as any,
-      gyrate: base === 2 ? "gyro" : gyrate,
-    })
-  },
 }
 
 const augmentAugmentedSolids: CutPasteOpArgs<Options, CompositeForme> = {
+  graph: toDirected("left", augDimAugmentedSolidGraph),
+  toGraphOpts(forme, { face }) {
+    return { align: forme.alignment(face!) } as any
+  },
   apply({ specs, geom }, { face }) {
     let baseAxis
     const { source } = specs.data
@@ -194,54 +197,28 @@ const augmentAugmentedSolids: CutPasteOpArgs<Options, CompositeForme> = {
     }
     return doAugment(specs, geom, face, baseAxis)
   },
-
-  canApplyTo(specs) {
-    if (!specs.isComposite()) return false
-    if (!specs.isAugmentedSolid()) return false
-    const { source, augmented } = specs.data
-    if (source.isCapstone()) {
-      return augmented < (source.data.base % 3 === 0 ? 3 : 2) && !specs.isPara()
-    }
-    return augmented < source.data.family - 2 && !specs.isPara()
-  },
-
-  getResult(forme, { face }) {
-    return forme.specs.withData({
-      augmented: inc(forme.specs.data.augmented),
-      align: forme.alignment(face),
-    })
-  },
 }
 
 // FIXME deal with augmented octahedron and rhombicuboctahedron
 const augmentDiminishedSolids: CutPasteOpArgs<Options, DiminishedSolidForme> = {
+  graph: toDirected("left", augDimDiminishedSolidGraph),
+  toGraphOpts(forme, { face }) {
+    return { triangular: face!.numSides === 3 } as any
+  },
   apply({ specs, geom }, { face }) {
     return doAugment(specs, geom, face)
-  },
-
-  canApplyTo(specs) {
-    if (!specs.isComposite() || !specs.isDiminishedSolid()) return false
-    return specs.isDiminished() && !specs.isAugmented()
-  },
-
-  getResult({ specs }, { face }) {
-    return specs.augmentDiminished(face.numSides === 3)
   },
 }
 
 const augmentGyrateSolids: CutPasteOpArgs<Options, GyrateSolidForme> = {
+  graph: toDirected("left", augDimGyrateSolidGraph),
+  toGraphOpts(forme, { face, ...opts }) {
+    return { gyrate: opts.gyrate } as any
+  },
   apply({ specs, geom }, { face, gyrate }) {
     const crossAxis: CrossAxis = (edge) =>
       edge.twinFace().numSides === (gyrate === "ortho" ? 4 : 5)
     return doAugment(specs, geom, face, crossAxis)
-  },
-
-  canApplyTo(specs) {
-    return specs.isComposite() && specs.isGyrateSolid() && specs.isDiminished()
-  },
-
-  getResult({ specs }, { gyrate }) {
-    return specs.augmentGyrate(gyrate!)
   },
 }
 
@@ -249,16 +226,12 @@ const augmentElementary: CutPasteOpArgs<
   Options,
   PolyhedronForme<Elementary>
 > = {
+  graph: toDirected("left", augDimElementaryGraph),
+  toGraphOpts(forme, options) {
+    return {} as any
+  },
   apply({ specs, geom }, { face }) {
     return doAugment(specs, geom, face)
-  },
-
-  canApplyTo(specs) {
-    return specs.canonicalName() === "sphenocorona"
-  },
-
-  getResult() {
-    return Elementary.query.withName("augmented sphenocorona")
   },
 }
 

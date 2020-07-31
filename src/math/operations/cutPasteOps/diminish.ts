@@ -9,13 +9,16 @@ import {
 import { makeOperation } from "../Operation"
 import { Polyhedron, Cap } from "math/polyhedra"
 import {
-  inc,
-  dec,
   CutPasteSpecs,
   CapOptions,
   capOptionArgs,
   CutPasteOpArgs,
   combineOps,
+  augDimCapstoneGraph,
+  augDimAugmentedSolidGraph,
+  augDimDiminishedSolidGraph,
+  augDimGyrateSolidGraph,
+  augDimElementaryGraph,
 } from "./cutPasteUtils"
 import PolyhedronForme from "math/formes/PolyhedronForme"
 import CompositeForme, {
@@ -23,6 +26,7 @@ import CompositeForme, {
   GyrateSolidForme,
 } from "math/formes/CompositeForme"
 import CapstoneForme from "math/formes/CapstoneForme"
+import { toDirected } from "../operationPairs"
 
 function removeCap(polyhedron: Polyhedron, cap: Cap) {
   const boundary = cap.boundary()
@@ -71,28 +75,23 @@ function removeCap(polyhedron: Polyhedron, cap: Cap) {
 }
 
 const diminishCapstone: CutPasteOpArgs<CapOptions, CapstoneForme> = {
+  graph: toDirected("right", augDimCapstoneGraph),
+  toGraphOpts(forme, { cap }) {
+    if (!forme.specs.isCupolaRotunda()) return {} as any
+    return { using: cap!.type as any } as any
+  },
   apply({ geom }, { cap }) {
     return removeCap(geom, cap)
-  },
-  canApplyTo(info) {
-    if (!info.isCapstone()) return false
-    if (info.isPrismatic()) return false
-    return !(info.isMono() && info.isShortened())
-  },
-  getResult({ specs }, { cap }) {
-    return specs.remove(cap.type as any)
   },
 }
 
 const diminishAugmentedSolids: CutPasteOpArgs<CapOptions, CompositeForme> = {
+  graph: toDirected("right", augDimAugmentedSolidGraph),
+  toGraphOpts() {
+    return {} as any
+  },
   apply({ geom }, { cap }) {
     return removeCap(geom, cap)
-  },
-  canApplyTo(specs) {
-    return specs.isComposite() && specs.isAugmentedSolid()
-  },
-  getResult({ specs }) {
-    return specs.diminish()
   },
 }
 
@@ -101,53 +100,25 @@ const diminishDiminishedSolid: CutPasteOpArgs<
   CapOptions,
   DiminishedSolidForme
 > = {
+  graph: toDirected("right", augDimDiminishedSolidGraph),
+  toGraphOpts(forme, { cap }) {
+    return { align: forme.alignment(cap!) } as any
+  },
   apply({ geom }, { cap }) {
     return removeCap(geom, cap)
-  },
-
-  canApplyTo(specs) {
-    if (!specs.isComposite()) return false
-    const { source, diminished, augmented } = specs.data
-    if (source.canonicalName() !== "icosahedron") return false
-    return (diminished < 3 || augmented === 1) && !specs.isPara()
-  },
-
-  getResult(forme, { cap }) {
-    const { specs } = forme
-    if (specs.isAugmented()) return specs.withData({ augmented: 0 })
-    return specs.withData({
-      diminished: inc(specs.data.diminished),
-      align: forme.alignment(cap),
-    })
   },
 }
 
 const diminishGyrateSolid: CutPasteOpArgs<CapOptions, GyrateSolidForme> = {
+  graph: toDirected("right", augDimGyrateSolidGraph),
+  toGraphOpts(forme, { cap }) {
+    return {
+      align: forme.alignment(cap!),
+      gyrate: forme.isGyrate(cap!) ? "ortho" : "gyro",
+    } as any
+  },
   apply({ geom }, { cap }) {
     return removeCap(geom, cap)
-  },
-  canApplyTo(specs) {
-    if (!specs.isComposite()) return false
-    const { diminished, gyrate } = specs.data
-    if (!specs.isGyrateSolid()) return false
-    if (diminished === 2 && gyrate === 0) return !specs.isPara()
-    return diminished < 3
-  },
-  getResult(forme, { cap }) {
-    const { specs } = forme
-    const { diminished, gyrate } = specs.data
-    if (forme.isGyrate(cap)) {
-      // we're just removing a gyrated cap in this case
-      return specs.withData({
-        gyrate: dec(gyrate),
-        diminished: inc(diminished),
-      })
-    } else {
-      return specs.withData({
-        diminished: inc(diminished),
-        align: forme.alignment(cap),
-      })
-    }
   },
 }
 
@@ -155,15 +126,12 @@ const diminishElementary: CutPasteOpArgs<
   CapOptions,
   PolyhedronForme<Elementary>
 > = {
+  graph: toDirected("right", augDimElementaryGraph),
+  toGraphOpts(forme, opts) {
+    return {} as any
+  },
   apply({ geom }, { cap }) {
     return removeCap(geom, cap)
-  },
-
-  canApplyTo(specs) {
-    return specs.canonicalName() === "augmented sphenocorona"
-  },
-  getResult() {
-    return Elementary.query.withName("sphenocorona")
   },
 }
 

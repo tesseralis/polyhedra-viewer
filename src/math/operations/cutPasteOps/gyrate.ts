@@ -2,17 +2,18 @@ import { withOrigin } from "math/geom"
 import { Polyhedron } from "math/polyhedra"
 import { mapObject } from "utils"
 import {
-  inc,
-  dec,
   CapOptions,
   capOptionArgs,
   CutPasteOpArgs,
   combineOps,
+  gyrateCapstoneGraph,
+  gyrateCompositeGraph,
 } from "./cutPasteUtils"
 import { getTransformedVertices } from "../operationUtils"
 import { makeOperation } from "../Operation"
 import CapstoneForme from "math/formes/CapstoneForme"
 import CompositeForme, { GyrateSolidForme } from "math/formes/CompositeForme"
+import { toDirected } from "../operationPairs"
 
 const TAU = 2 * Math.PI
 
@@ -61,41 +62,23 @@ function applyGyrate(polyhedron: Polyhedron, { cap }: CapOptions) {
 }
 
 const gyrateCapstone: CutPasteOpArgs<CapOptions, CapstoneForme> = {
+  graph: toDirected("left", gyrateCapstoneGraph),
+  toGraphOpts(forme, opts) {
+    return opts as any
+  },
   apply({ geom }, options) {
     return applyGyrate(geom, options)
-  },
-  canApplyTo(info) {
-    if (!info.isCapstone()) return false
-    return info.isBi() && info.isSecondary() && !info.isDigonal()
-  },
-  getResult({ specs }) {
-    return specs.gyrate()
   },
 }
 
 const gyrateComposite: CutPasteOpArgs<CapOptions, GyrateSolidForme> = {
+  graph: toDirected("left", gyrateCompositeGraph),
+  toGraphOpts(forme, opts) {
+    // FIXME handle alignment and direction
+    return opts as any
+  },
   apply({ geom }, options) {
     return applyGyrate(geom, options)
-  },
-  canApplyTo(info) {
-    if (!info.isComposite()) return false
-    if (!info.isGyrateSolid()) return false
-    // FIXME deal with gyrate rhombicuboctahedron
-    const { diminished } = info.data
-    if (diminished === 2) return !info.isPara()
-    return diminished < 3
-  },
-  getResult(forme, { cap }) {
-    const { specs } = forme
-    const { gyrate } = specs.data
-    if (forme.isGyrate(cap)) {
-      return specs.withData({ gyrate: dec(gyrate), align: "meta" })
-    } else {
-      return specs.withData({
-        gyrate: inc(gyrate),
-        align: specs.isMono() ? forme.alignment(cap) : undefined,
-      })
-    }
   },
 }
 

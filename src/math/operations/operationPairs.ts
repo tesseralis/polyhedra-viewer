@@ -2,7 +2,11 @@ import { isMatch } from "lodash-es"
 import { find } from "utils"
 import PolyhedronSpecs from "data/specs/PolyhedronSpecs"
 import { VertexArg } from "math/polyhedra"
-import { OpArgs, SolidArgs } from "./Operation"
+import {
+  OpArgs,
+  SolidArgs,
+  GraphEntry as DirectedGraphEntry,
+} from "./Operation"
 import { Pose, alignPolyhedron, getGeometry } from "./operationUtils"
 import PolyhedronForme from "math/formes/PolyhedronForme"
 import createForme from "math/formes/createForme"
@@ -25,9 +29,22 @@ export interface GraphEntry<Specs, L, R> {
   options?: GraphOpts<L, R>
 }
 
-export type GraphGenerator<Specs, L, R> = () => Generator<
-  GraphEntry<Specs, L, R>
->
+export function toDirected<S extends Side, Specs, L, R>(
+  side: S,
+  graph: () => Generator<GraphEntry<Specs, L, R>>,
+): () => Generator<DirectedGraphEntry<Specs, Opts<S, L, R>>> {
+  return function* () {
+    for (const entry of graph()) {
+      yield {
+        start: entry[side],
+        end: entry[oppositeSide(side)],
+        options: entry.options?.[side] as any,
+      }
+    }
+  }
+}
+
+export type GraphGenerator<Specs, L, R> = Generator<GraphEntry<Specs, L, R>>
 
 type MiddleGetter<Forme extends PolyhedronForme, L, R> = (
   entry: GraphEntry<Forme["specs"], L, R>,
@@ -35,7 +52,7 @@ type MiddleGetter<Forme extends PolyhedronForme, L, R> = (
 
 export interface OpPairInput<Forme extends PolyhedronForme, L = {}, R = L> {
   // The graph of what polyhedron spec inputs are allowed and what maps to each other
-  graph: GraphGenerator<Forme["specs"], L, R>
+  graph(): GraphGenerator<Forme["specs"], L, R>
   // Get the intermediate polyhedron for the given graph entry
   middle: Side | MiddleGetter<Forme, L, R>
   // Get the post of a left, right, or middle state
@@ -192,10 +209,7 @@ class OpPair<
 }
 
 type OpInput<O, F extends PolyhedronForme> = Required<
-  Pick<
-    OpArgs<O, F>,
-    "apply" | "canApplyTo" | "allOptionCombos" | "getResult" | "hasOptions"
-  >
+  Pick<OpArgs<O, F>, "apply" | "graph" | "toGraphOpts">
 >
 
 /**
@@ -209,17 +223,9 @@ function makeOperation<S extends Side, Forme extends PolyhedronForme, L, R>(
     apply(solid, opts) {
       return op.apply(side, solid, opts)
     },
-    canApplyTo(specs) {
-      return op.canApplyTo(side, specs)
-    },
-    getResult(solid, opts) {
-      return op.getOpposite(side, solid.specs, opts)
-    },
-    hasOptions(specs) {
-      return op.hasOptions(side, specs)
-    },
-    *allOptionCombos({ specs }) {
-      yield* op.allOptions(side, specs)
+    graph: toDirected(side, op.inputs.graph),
+    toGraphOpts(forme, opts) {
+      return opts as any
     },
   }
 }
@@ -237,27 +243,22 @@ export function makeOpPair<Forme extends PolyhedronForme, L = {}, R = L>(
 export function combineOps<F extends PolyhedronForme, O>(
   opArgs: OpInput<O, F>[],
 ): OpInput<O, F> {
-  function canApplyTo(specs: F["specs"]) {
-    return opArgs.some((op) => op.canApplyTo(specs))
+  function getOp(solid: F["specs"]) {
+    return find(opArgs, (op) =>
+      [...op.graph()].some((entry) => entry.start.equals(solid)),
+    )
   }
-
-  function getOp(specs: F["specs"]) {
-    return find(opArgs, (op) => op.canApplyTo(specs))
-  }
-
   return {
-    canApplyTo,
+    graph: function* () {
+      for (const op of opArgs) {
+        yield* op.graph()
+      }
+    },
     apply(solid, opts) {
       return getOp(solid.specs).apply(solid, opts)
     },
-    getResult(solid, opts) {
-      return getOp(solid.specs).getResult(solid, opts)
-    },
-    hasOptions(specs) {
-      return getOp(specs).hasOptions(specs) ?? false
-    },
-    *allOptionCombos(solid) {
-      yield* getOp(solid.specs).allOptionCombos(solid)
+    toGraphOpts(solid, ops) {
+      return getOp(solid.specs).toGraphOpts(solid, ops)
     },
   }
 }

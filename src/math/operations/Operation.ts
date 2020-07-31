@@ -1,4 +1,4 @@
-import { mapValues } from "lodash-es"
+import { pickBy, mapValues, isMatch } from "lodash-es"
 
 import { Polygon } from "data/polygons"
 import { Vec3D, vec, vecEquals } from "math/geom"
@@ -8,6 +8,7 @@ import { Point } from "types"
 import PolyhedronSpecs from "data/specs/PolyhedronSpecs"
 import PolyhedronForme from "math/formes/PolyhedronForme"
 import createForme from "math/formes/createForme"
+import { find } from "utils"
 
 type SelectState = "selected" | "selectable" | undefined
 
@@ -36,8 +37,17 @@ export interface SolidArgs<Specs extends PolyhedronSpecs> {
   geom: Polyhedron
 }
 
+export interface GraphEntry<Specs, Opts> {
+  start: Specs
+  end: Specs
+  options?: Opts
+}
+
 export interface OpArgs<Options extends {}, Forme extends PolyhedronForme> {
-  canApplyTo(info: PolyhedronSpecs): boolean
+  // canApplyTo(info: PolyhedronSpecs): boolean
+  graph: () => Generator<GraphEntry<Forme["specs"], Options>>
+
+  toGraphOpts(solid: Forme, opts: Partial<Options>): Options
 
   hasOptions?(info: Forme["specs"]): boolean
 
@@ -50,7 +60,7 @@ export interface OpArgs<Options extends {}, Forme extends PolyhedronForme> {
 
   allOptionCombos?(solid: Forme): Generator<Options>
 
-  getResult(solid: Forme, options: Options): PolyhedronSpecs
+  // getResult(solid: Forme, options: Options): PolyhedronSpecs
 
   hitOption?: keyof Options
 
@@ -68,8 +78,6 @@ export interface OpArgs<Options extends {}, Forme extends PolyhedronForme> {
 type OperationArg = keyof OpArgs<any, any>
 const methodDefaults = {
   getHitOption: {},
-  hasOptions: false,
-  allOptionCombos: [null],
   faceSelectionStates: [],
   defaultOptions: {},
 }
@@ -154,18 +162,20 @@ function normalizeOpResult(
 
 export default class Operation<Options extends {} = {}> {
   name: string
+  graph: GraphEntry<PolyhedronSpecs, Options>[]
   hitOption: keyof Options
   private opArgs: Required<OpArgs<Options, PolyhedronForme>>
 
   constructor(name: string, opArgs: OpArgs<Options, PolyhedronForme>) {
     this.name = name
     this.opArgs = fillDefaults(opArgs)
+    this.graph = [...this.opArgs.graph()]
     this.hitOption = this.opArgs.hitOption
   }
 
   apply(solid: PolyhedronForme, options: Options) {
     // get the next polyhedron name
-    const next = this.opArgs.getResult(solid, options ?? {})
+    const next = this.getResult(solid, options)
 
     // Get the actual operation result
     const opResult = this.opArgs.apply(solid, options ?? {})
@@ -177,11 +187,43 @@ export default class Operation<Options extends {} = {}> {
   }
 
   canApplyTo(solid: PolyhedronForme) {
-    return this.opArgs.canApplyTo(solid.specs)
+    return this.graph.some((entry) => entry.start.equals(solid.specs))
+  }
+
+  getEntry(solid: PolyhedronForme, options: Options) {
+    // console.log(options)
+    // console.log(this.opArgs.toGraphOpts(solid, pickBy(options) as any))
+    // for (const entry of this.graph.filter((entry) =>
+    //   entry.start.equals(solid.specs),
+    // )) {
+    //   console.log(entry.end.name())
+    //   console.log(entry.options)
+    // }
+    return find(
+      this.graph,
+      (entry) =>
+        entry.start.equals(solid.specs) &&
+        isMatch(
+          entry.options ?? {},
+          // FIXME lololol this is trash
+          pickBy(this.opArgs.toGraphOpts(solid, pickBy(options) as any)),
+        ),
+    )
+  }
+
+  getEntries(solid: PolyhedronForme) {
+    return this.graph.filter((entry) => entry.start.equals(solid.specs))
+  }
+
+  getResult(solid: PolyhedronForme, options: Options) {
+    return this.getEntry(solid, options).end
   }
 
   hasOptions(solid: PolyhedronForme) {
-    return this.opArgs.hasOptions(solid.specs)
+    if (this.opArgs.hasOptions) {
+      return this.opArgs.hasOptions(solid.specs)
+    }
+    return this.getEntries(solid).length > 1
   }
 
   allOptions(solid: PolyhedronForme, optionName: keyof Options) {
@@ -189,7 +231,13 @@ export default class Operation<Options extends {} = {}> {
   }
 
   *allOptionCombos(solid: PolyhedronForme) {
-    yield* this.opArgs.allOptionCombos(solid)
+    if (this.opArgs.allOptionCombos) {
+      yield* this.opArgs.allOptionCombos(solid)
+    } else {
+      for (const entry of this.getEntries(solid)) {
+        yield entry.options
+      }
+    }
   }
 
   defaultOptions(solid: PolyhedronForme) {

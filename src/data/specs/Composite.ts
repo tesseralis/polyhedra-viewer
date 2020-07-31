@@ -160,6 +160,13 @@ export default class Composite extends Specs<CompositeData> {
     })
   }
 
+  ungyrate() {
+    return this.withData({
+      gyrate: (this.data.gyrate - 1) as Count,
+      align: "meta",
+    })
+  }
+
   equals(s2: Specs) {
     if (!s2.isComposite()) return false
     // Recursively compare the source data and other data
