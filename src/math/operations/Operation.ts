@@ -1,4 +1,4 @@
-import { pickBy, mapValues, isMatch } from "lodash-es"
+import { pickBy, mapValues, isMatch, isNil } from "lodash-es"
 
 import { Polygon } from "data/polygons"
 import { Vec3D, vec, vecEquals } from "math/geom"
@@ -205,8 +205,7 @@ export default class Operation<Options extends {} = {}> {
         entry.start.equals(solid.specs) &&
         isMatch(
           entry.options ?? {},
-          // FIXME lololol this is trash
-          pickBy(this.opArgs.toGraphOpts(solid, pickBy(options) as any)),
+          pickBy(this.opArgs.toGraphOpts(solid, options), (opt) => !isNil(opt)),
         ),
     )
   }

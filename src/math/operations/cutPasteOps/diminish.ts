@@ -113,7 +113,7 @@ const diminishGyrateSolid: CutPasteOpArgs<CapOptions, GyrateSolidForme> = {
   graph: toDirected("right", augDimGyrateSolidGraph),
   toGraphOpts(forme, { cap }) {
     return {
-      align: forme.alignment(cap!),
+      align: forme.isGyrate(cap!) ? undefined : forme.alignment(cap!),
       gyrate: forme.isGyrate(cap!) ? "ortho" : "gyro",
     } as any
   },
