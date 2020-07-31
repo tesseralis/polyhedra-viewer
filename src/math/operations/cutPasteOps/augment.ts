@@ -2,16 +2,10 @@ import { pickBy } from "lodash-es"
 
 import Capstone, { gyrations, Gyration, CapType } from "data/specs/Capstone"
 import Elementary from "data/specs/Elementary"
-import { Polyhedron, Face, Edge } from "math/polyhedra"
-import { Vec3D } from "math/geom"
+import { Polyhedron, Face, Edge, FaceLike } from "math/polyhedra"
 import { repeat, find } from "utils"
 import { makeOperation } from "../Operation"
-import {
-  deduplicateVertices,
-  alignPolyhedron,
-  Pose,
-  getGeometry,
-} from "../operationUtils"
+import { deduplicateVertices, alignPolyhedron, Pose } from "../operationUtils"
 import {
   inc,
   dec,
@@ -40,7 +34,7 @@ function canAugment(forme: PolyhedronForme, face: Face) {
 }
 
 function getAugmentee(type: AugmentType, base: number) {
-  return getGeometry(
+  return CapstoneForme.fromSpecs(
     Capstone.query.where(
       (s) =>
         s.isMono() &&
@@ -60,9 +54,9 @@ function capOrientation(type: AugmentType): CrossAxis {
     case "pyramid":
       return () => true
     case "cupola":
-      return (e) => e.twinFace().numSides === 4
+      return (e) => e.face.numSides === 4
     case "rotunda":
-      return (e) => e.twinFace().numSides === 3
+      return (e) => e.face.numSides === 3
   }
 }
 
@@ -70,12 +64,12 @@ function defaultCrossAxis(edge: Edge) {
   return true
 }
 
-function getPose(base: Face, normal: Vec3D, crossAxis: CrossAxis): Pose {
+function getPose(base: FaceLike, crossAxis: CrossAxis): Pose {
   return {
     origin: base.centroid(),
     scale: base.sideLength(),
     orientation: [
-      normal,
+      base.normal(),
       find(base.edges, crossAxis).midpoint().sub(base.centroid()),
     ],
   }
@@ -92,25 +86,21 @@ function doAugment(
   const index = ["cupola", "rotunda"].includes(augmentType)
     ? numSides / 2
     : numSides
+
   const augmentee = getAugmentee(augmentType, index)
-  const underside = augmentee.faceWithNumSides(base.numSides)
+  const [top, bottom] = augmentee.baseBoundaries()
 
-  const augmenteePose = getPose(
-    underside,
-    underside.normal().getInverted(),
-    capOrientation(augmentType),
-  )
-
-  const basePose = getPose(base, base.normal(), baseCrossAxis)
+  const augmenteePose = getPose(top, capOrientation(augmentType))
+  const basePose = getPose(base, baseCrossAxis)
 
   const alignedAugmentee = alignPolyhedron(
-    augmentee,
+    augmentee.geom,
     augmenteePose,
     basePose,
-  ).withoutFaces([underside])
+  ).withoutFaces([bottom as Face])
 
-  const augmenteeInitial = augmentee.withVertices(
-    repeat(base.centroid(), augmentee.numVertices()),
+  const augmenteeInitial = augmentee.geom.withVertices(
+    repeat(base.centroid(), augmentee.geom.numVertices()),
   )
 
   const endResult = polyhedron.addPolyhedron(alignedAugmentee)
@@ -177,7 +167,8 @@ const augmentCapstone: CutPasteOpArgs<Options, CapstoneForme> = {
         const orientationFn = capOrientation(
           forme.baseCaps()[0].type as AugmentType,
         )
-        if (!specs.isShortened()) edge = edge.twin().next().next()
+        edge = edge.twin()
+        if (!specs.isShortened()) edge = edge.next().next().twin()
         return gyrate === "ortho" ? orientationFn(edge) : !orientationFn(edge)
       }
     }
