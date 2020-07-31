@@ -30,6 +30,71 @@ export type CutPasteOpArgs<Opts, Forme extends PolyhedronForme> = Pick<
   "apply" | "canApplyTo" | "getResult"
 >
 
+export function* augDimCapstoneGraph() {
+  for (const cap of Capstone.query.where(
+    (s) => !s.isPrismatic() && (s.isBi() || !s.isShortened()),
+  )) {
+    for (const capType of cap.capTypes()) {
+      yield {
+        left: cap.remove(capType),
+        right: cap,
+        options: {
+          left: { gyrate: cap.data.gyrate, using: capType },
+        },
+      }
+    }
+  }
+}
+
+export function* augDimAugmentedSolidGraph() {
+  for (const solid of Composite.query.where(
+    (s) => s.isAugmentedSolid() && s.isAugmented(),
+  )) {
+    yield {
+      left: solid.diminish(),
+      right: solid,
+      options: {
+        left: { align: solid.data.align },
+      },
+    }
+  }
+}
+
+export function* augDimDiminishedSolidGraph() {
+  for (const solid of Composite.query.where(
+    (s) => s.isDiminishedSolid() && s.isDiminished() && !s.isAugmented(),
+  )) {
+    const options = solid.isTri() ? [true, false] : [false]
+    for (const option of options) {
+      yield {
+        left: solid,
+        right: solid.augmentDiminished(option),
+        options: {
+          left: { triangular: option },
+          right: { align: solid.data.align },
+        },
+      }
+    }
+  }
+}
+
+export function* augDimGyrateSolidGraph() {
+  for (const solid of Composite.query.where(
+    (s) => s.isGyrateSolid() && s.isDiminished(),
+  )) {
+    for (const gyrate of ["ortho", "gyro"] as const) {
+      yield {
+        left: solid,
+        right: solid.augmentGyrate(gyrate),
+        options: {
+          left: { gyrate },
+          right: { align: solid.data.align },
+        },
+      }
+    }
+  }
+}
+
 export function combineOps<Opts, Forme extends PolyhedronForme>(
   ops: CutPasteOpArgs<Opts, Forme>[],
 ): CutPasteOpArgs<Opts, Forme> {

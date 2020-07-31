@@ -48,7 +48,7 @@ export default class Composite extends Specs<CompositeData> {
     align,
   }: Partial<CompositeData> & { source: Capstone | Classical }) {
     super("composite", { source, align, augmented, diminished, gyrate })
-    if (!this.isBi()) {
+    if (!this.hasAlignemnt()) {
       delete this.data.align
     }
   }
@@ -98,6 +98,14 @@ export default class Composite extends Specs<CompositeData> {
   isPara = () => this.data.align === "para"
   isMeta = () => this.data.align === "meta"
 
+  hasAlignemnt() {
+    if (!this.isBi()) return false
+    if (this.isAugmentedPrism()) return this.sourcePrism().isSecondary()
+    if (this.isAugmentedClassical())
+      return this.sourceClassical().isIcosahedral()
+    return true
+  }
+
   sourcePrism() {
     const { source } = this.data
     if (!source.isCapstone()) {
@@ -112,6 +120,44 @@ export default class Composite extends Specs<CompositeData> {
       throw new Error(`Source is not a classical solid: ${source.name()}`)
     }
     return source
+  }
+
+  diminish() {
+    if (!this.isAugmentedSolid())
+      throw new Error(`diminish() only implemented for augmented solids`)
+    return this.withData({
+      augmented: (this.data.augmented - 1) as Count,
+      align: "meta",
+    })
+  }
+
+  augmentDiminished(triangular?: boolean) {
+    if (!this.isDiminishedSolid())
+      throw new Error(
+        `augmentDiminished() only implemented for diminished solids`,
+      )
+    if (triangular) {
+      return this.withData({ augmented: 1 })
+    }
+    return this.withData({
+      diminished: (this.data.diminished - 1) as Count,
+      align: "meta",
+    })
+  }
+
+  augmentGyrate(gyrate: "ortho" | "gyro") {
+    if (!this.isGyrateSolid())
+      throw new Error(`augmentGyrate() only implemented for gyrate solids`)
+    if (gyrate === "ortho") {
+      return this.withData({
+        gyrate: (this.data.gyrate + 1) as Count,
+        diminished: (this.data.diminished - 1) as Count,
+      })
+    }
+    return this.withData({
+      diminished: (this.data.diminished - 1) as Count,
+      align: "meta",
+    })
   }
 
   equals(s2: Specs) {

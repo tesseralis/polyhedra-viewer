@@ -111,6 +111,19 @@ export default class Capstone extends Specs<CapstoneData> {
     throw new Error(`Prismatic solid does not have a cap`)
   }
 
+  capTypes(): CapType[] {
+    if (this.isCupolaRotunda()) return ["cupola", "rotunda"]
+    return [this.capType()]
+  }
+
+  remove(capType: CapType) {
+    return this.withData({
+      count: (this.data.count - 1) as Count,
+      rotundaCount: (this.data.rotundaCount! -
+        (capType === "rotunda" ? 1 : 0)) as Count,
+    })
+  }
+
   baseSides = () => (this.data.base * (this.isPrimary() ? 1 : 2)) as Polygon
   prismaticType() {
     if (!this.isPrismatic() || !this.data.elongation) {

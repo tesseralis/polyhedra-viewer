@@ -19,14 +19,15 @@ export interface GraphOpts<L, R> {
 }
 
 // TODO ugh this is still ugly
-interface GraphEntry<Specs, L, R> {
+export interface GraphEntry<Specs, L, R> {
   left: Specs
   right: Specs
   options?: GraphOpts<L, R>
 }
 
-// list of polyhedron pairs and their arguments
-type OpPairGraph<Specs, L, R> = GraphEntry<Specs, L, R>[]
+export type GraphGenerator<Specs, L, R> = () => Generator<
+  GraphEntry<Specs, L, R>
+>
 
 type MiddleGetter<Forme extends PolyhedronForme, L, R> = (
   entry: GraphEntry<Forme["specs"], L, R>,
@@ -34,7 +35,7 @@ type MiddleGetter<Forme extends PolyhedronForme, L, R> = (
 
 export interface OpPairInput<Forme extends PolyhedronForme, L = {}, R = L> {
   // The graph of what polyhedron spec inputs are allowed and what maps to each other
-  graph(): Generator<GraphEntry<Forme["specs"], L, R>>
+  graph: GraphGenerator<Forme["specs"], L, R>
   // Get the intermediate polyhedron for the given graph entry
   middle: Side | MiddleGetter<Forme, L, R>
   // Get the post of a left, right, or middle state

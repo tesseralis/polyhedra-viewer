@@ -6,13 +6,7 @@ import { Polyhedron, Face, Edge, FaceLike } from "math/polyhedra"
 import { repeat, find } from "utils"
 import { makeOperation } from "../Operation"
 import { deduplicateVertices, alignPolyhedron, Pose } from "../operationUtils"
-import {
-  inc,
-  dec,
-  CutPasteSpecs,
-  CutPasteOpArgs,
-  combineOps,
-} from "./cutPasteUtils"
+import { inc, CutPasteSpecs, CutPasteOpArgs, combineOps } from "./cutPasteUtils"
 import PolyhedronForme from "math/formes/PolyhedronForme"
 import CompositeForme, {
   GyrateSolidForme,
@@ -231,14 +225,7 @@ const augmentDiminishedSolids: CutPasteOpArgs<Options, DiminishedSolidForme> = {
   },
 
   getResult({ specs }, { face }) {
-    const n = face.numSides
-    if (n === 3) {
-      return specs.withData({ augmented: 1 })
-    }
-    return specs.withData({
-      diminished: dec(specs.data.diminished),
-      align: "meta",
-    })
+    return specs.augmentDiminished(face.numSides === 3)
   },
 }
 
@@ -254,15 +241,7 @@ const augmentGyrateSolids: CutPasteOpArgs<Options, GyrateSolidForme> = {
   },
 
   getResult({ specs }, { gyrate }) {
-    const { diminished, gyrate: gyrated } = specs.data
-    if (gyrate === "ortho") {
-      return specs.withData({
-        gyrate: inc(gyrated),
-        diminished: dec(diminished),
-      })
-    } else {
-      return specs.withData({ diminished: dec(diminished), align: "meta" })
-    }
+    return specs.augmentGyrate(gyrate!)
   },
 }
 

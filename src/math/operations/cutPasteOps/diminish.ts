@@ -80,13 +80,7 @@ const diminishCapstone: CutPasteOpArgs<CapOptions, CapstoneForme> = {
     return !(info.isMono() && info.isShortened())
   },
   getResult({ specs }, { cap }) {
-    const { count, rotundaCount = 0 } = specs.data
-    return specs.withData({
-      count: dec(count) as any,
-      rotundaCount: (cap.type === "rotunda"
-        ? dec(rotundaCount)
-        : rotundaCount) as any,
-    })
+    return specs.remove(cap.type as any)
   },
 }
 
@@ -98,14 +92,7 @@ const diminishAugmentedSolids: CutPasteOpArgs<CapOptions, CompositeForme> = {
     return specs.isComposite() && specs.isAugmentedSolid()
   },
   getResult({ specs }) {
-    const { source, augmented } = specs.data
-    return specs.withData({
-      augmented: dec(augmented),
-      align:
-        augmented === 3 && source.canonicalName() !== "triangular prism"
-          ? "meta"
-          : undefined,
-    })
+    return specs.diminish()
   },
 }
 
