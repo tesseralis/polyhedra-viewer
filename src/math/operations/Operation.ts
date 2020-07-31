@@ -170,7 +170,7 @@ export default class Operation<Options extends {} = {}> {
 
   apply(solid: PolyhedronForme, options: Options) {
     // get the next polyhedron name
-    const next = this.opArgs.getResult!(solid, options ?? {})
+    const next = this.opArgs.getResult(solid, options ?? {})
 
     // Get the actual operation result
     const opResult = this.opArgs.apply(solid, options ?? {})
