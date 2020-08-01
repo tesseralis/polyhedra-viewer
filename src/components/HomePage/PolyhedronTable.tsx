@@ -2,8 +2,10 @@ import React, { ThHTMLAttributes } from "react"
 
 import { fromConwayNotation } from "data/conway"
 import { Table } from "data/oldTables"
+import PolyhedronSpecs from "data/specs/PolyhedronSpecs"
 import PolyhedronLink from "./PolyhedronLink"
 import { media, fonts, useStyle, scales } from "styles"
+import getSpecs from "data/specs/getSpecs"
 
 function useCellStyle() {
   return useStyle({
@@ -16,19 +18,31 @@ function useCellStyle() {
   })
 }
 
-const Cell = ({ cell, colSpan = 1 }: { cell: string; colSpan?: number }) => {
-  const isFake = cell[0] === "!"
-  const polyhedron = fromConwayNotation(isFake ? cell.substring(1) : cell)
-
-  const symbol = isFake ? `(${cell.substring(1)})` : cell
-
-  // Render a link for each cell, or a grayed-out link when indicated by an "!"
+const Cell = ({
+  cell,
+  colSpan = 1,
+}: {
+  cell: PolyhedronSpecs | string
+  colSpan?: number
+}) => {
   const css = useCellStyle()
   const label = useStyle({ marginTop: scales.spacing[1] })
+  if (typeof cell === "string") {
+    return (
+      <td {...css()} colSpan={colSpan}>
+        {cell}
+      </td>
+    )
+  }
+  const isFake = cell.name() !== cell.canonicalName()
+  let symbol = getSpecs(cell.canonicalName()).conwaySymbol()
+  if (isFake) symbol = `(${symbol})`
+
+  // Render a link for each cell, or a grayed-out link when indicated by an "!"
   return (
     <td {...css()} colSpan={colSpan}>
-      {polyhedron ? <PolyhedronLink isFake={isFake} name={polyhedron} /> : cell}
-      <div {...label()}>{polyhedron && symbol}</div>
+      {<PolyhedronLink isFake={isFake} specs={cell} />}
+      <div {...label()}>{symbol}</div>
     </td>
   )
 }

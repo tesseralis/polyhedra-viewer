@@ -63,7 +63,7 @@ export default function getName(solid: Specs): string {
     const elongStr = {
       prism: "elongated",
       antiprism: "gyroelongated",
-      "": "",
+      null: "",
     }
 
     const baseStr = solid.isCupolaRotunda()
@@ -71,7 +71,7 @@ export default function getName(solid: Specs): string {
       : countString(count, solid.capType())
 
     return wordJoin(
-      elongStr[elongation ?? ""],
+      elongStr[elongation],
       polygonPrefixes.get(base),
       prefix(gyrate, baseStr),
     )

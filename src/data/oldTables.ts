@@ -1,7 +1,18 @@
-import { unzip } from "lodash-es"
+import { chunk } from "lodash-es"
+import {
+  classicalTable,
+  prismaticTable,
+  capstoneTable,
+  augmentedTable,
+  diminishedTable,
+  gyrateTable,
+  snubAntiprismTable,
+  elementaryTable,
+} from "./tables"
+import PolyhedronSpecs from "data/specs/PolyhedronSpecs"
 
 export type Column = { name: string; sub: string[] } | string
-export type Data = string | string[]
+export type Data = PolyhedronSpecs | PolyhedronSpecs[]
 export type DataRow = Data[]
 
 export interface Table {
@@ -9,6 +20,10 @@ export interface Table {
   rows: string[]
   columns: Column[]
   data: DataRow[]
+}
+
+function convertTable(table: any) {
+  return table
 }
 
 export const archimedean: Table = {
@@ -27,14 +42,7 @@ export const archimedean: Table = {
     { name: "", sub: ["cube", "octahedron"] },
     { name: "", sub: ["dodecahedron", "icosahedron"] },
   ],
-  data: [
-    ["T", ["C", "O"], ["D", "I"]],
-    ["tT", ["tC", "tO"], ["tD", "tI"]],
-    ["!O", "aC", "aD"],
-    ["!tO", "bC", "bD"],
-    ["!aC", "eC", "eD"],
-    ["!I", "sC", "sD"],
-  ],
+  data: convertTable(classicalTable),
 }
 
 export const prisms: Table = {
@@ -48,10 +56,7 @@ export const prisms: Table = {
     "decagonal",
   ],
   columns: ["prism", "antiprism"],
-  data: unzip([
-    ["P3", "!C", "P5", "P6", "P8", "P10"],
-    ["!O", "A4", "A5", "A6", "A8", "A10"],
-  ]),
+  data: convertTable(prismaticTable),
 }
 
 export const capstones: Table = {
@@ -75,35 +80,12 @@ export const capstones: Table = {
     { name: "elongated bi-", sub: ["ortho-", "gyro-"] },
     "gyroelongated bi-",
   ],
-  data: unzip([
-    ["!T", "J1", "J2", "!P3", "J3", "J4", "J5", "", "J6"],
-    ["J7", "J8", "J9", "coplanar", "J18", "J19", "J20", "", "J21"],
-    ["coplanar", "J10", "J11", "concave", "J22", "J23", "J24", "", "J25"],
-    [
-      "J12",
-      "!O",
-      "J13",
-      ["coplanar", "J26"],
-      ["J27", "!aC"],
-      ["J28", "J29"],
-      ["J30", "J31"],
-      ["J32", "J33"],
-      ["J34", "!aD"],
-    ],
-    [
-      "J14",
-      "J15",
-      "J16",
-      ["coplanar", "coplanar"],
-      ["J35", "J36"],
-      ["!eC", "J37"],
-      ["J38", "J39"],
-      ["J40", "J41"],
-      ["J42", "J43"],
-    ],
-    ["coplanar", "J17", "!I", "concave", "J44", "J45", "J46", "J47", "J48"],
-  ]),
+  data: convertTable(capstoneTable),
 }
+
+const capstoneMonoTable = capstoneTable
+  .map((row) => row.slice(0, 3))
+  .filter((row, i) => i !== 3 && i !== 7)
 
 export const capstonesMono: Table = {
   caption: "Pyramids, Cupolæ, and Rotundæ",
@@ -117,12 +99,10 @@ export const capstonesMono: Table = {
     "pentagonal rotunda",
   ],
   columns: ["--", "elongated", "gyroelongated"],
-  data: unzip([
-    ["!T", "J1", "J2", "J3", "J4", "J5", "J6"],
-    ["J7", "J8", "J9", "J18", "J19", "J20", "J21"],
-    ["coplanar", "J10", "J11", "J22", "J23", "J24", "J25"],
-  ]),
+  data: convertTable(capstoneMonoTable),
 }
+
+const capstoneBiTable = capstoneTable.map((row) => row.slice(3))
 
 export const capstonesBi: Table = {
   caption: "Bipyramids, Cupolæ, and Rotundæ",
@@ -142,31 +122,7 @@ export const capstonesBi: Table = {
     { name: "elongated bi-", sub: ["ortho-", "gyro-"] },
     "gyroelongated bi-",
   ],
-  data: unzip([
-    [
-      "J12",
-      "!O",
-      "J13",
-      ["coplanar", "J26"],
-      ["J27", "!aC"],
-      ["J28", "J29"],
-      ["J30", "J31"],
-      ["J32", "J33"],
-      ["J34", "!aD"],
-    ],
-    [
-      "J14",
-      "J15",
-      "J16",
-      ["coplanar", "coplanar"],
-      ["J35", "J36"],
-      ["!eC", "J37"],
-      ["J38", "J39"],
-      ["J40", "J41"],
-      ["J42", "J43"],
-    ],
-    ["coplanar", "J17", "!I", "concave", "J44", "J45", "J46", "J47", "J48"],
-  ]),
+  data: convertTable(capstoneBiTable),
 }
 
 export const augmented: Table = {
@@ -185,15 +141,7 @@ export const augmented: Table = {
     { name: "biaugmented", sub: ["para-", "meta-"] },
     "triaugmented",
   ],
-  data: [
-    ["J49", "J50", "J51"],
-    ["J52", "J53"],
-    ["J54", ["J55", "J56"], "J57"],
-    ["J58", ["J59", "J60"], "J61"],
-    ["J65"],
-    ["J66", "J67"],
-    ["J68", ["J69", "J70"], "J71"],
-  ],
+  data: convertTable(augmentedTable),
 }
 
 export const icosahedra: Table = {
@@ -204,7 +152,7 @@ export const icosahedra: Table = {
     { name: "bidiminished", sub: ["para-", "meta-"] },
     { name: "tridiminished", sub: ["--", "augmented"] },
   ],
-  data: [["!J11", ["!A5", "J62"], ["J63", "J64"]]],
+  data: convertTable(diminishedTable),
 }
 
 export const rhombicosidodecahedra: Table = {
@@ -216,20 +164,18 @@ export const rhombicosidodecahedra: Table = {
     { name: "bidiminished", sub: ["para-", "meta-"] },
     "tridiminished",
   ],
-  data: [
-    ["!eD", "J76", ["J80", "J81"], "J83"],
-    ["J72", ["J77", "J78"], "J82"],
-    [["J73", "J74"], "J79"],
-    ["J75"],
-  ],
+  data: convertTable(gyrateTable),
 }
 
+const gyrateRhombicos = gyrateTable.slice(1).map((row) => [row[0]])
 export const gyrateRhombicosidodecahedra: Table = {
   caption: "Gyrate Rhombicosidodecahedra",
   rows: ["gyrate", "bigyrate", "trigyrate"],
   columns: [{ name: "--", sub: ["para-", "meta-"] }],
-  data: [["J72"], [["J73", "J74"]], ["J75"]],
+  data: convertTable(gyrateRhombicos),
 }
+
+const diminishedRhombicos = gyrateTable.slice(0, 3).map((row) => row.slice(1))
 export const diminishedRhombicosidodecahedra: Table = {
   caption: "Diminished Rhombicosidodecahedra",
   rows: ["--", "gyrate", "bigyrate"],
@@ -238,30 +184,28 @@ export const diminishedRhombicosidodecahedra: Table = {
     { name: "bidiminished", sub: ["para-", "meta-"] },
     "tridiminished",
   ],
-  data: [["J76", ["J80", "J81"], "J83"], [["J77", "J78"], "J82"], ["J79"]],
+  data: convertTable(diminishedRhombicos),
 }
 export const snubAntiprisms: Table = {
   caption: "Snub Antiprisms",
   rows: ["snub"],
   columns: ["digonal", "triangular", "square"],
-  data: [["J84", "!I", "J85"]],
+  data: convertTable(snubAntiprismTable),
 }
 
 export const others: Table = {
   caption: "Other Johnson Solids",
   rows: [""],
   columns: ["", "", "", "", "", "", ""],
-  data: [["J86", "J87", "J88", "J89", "J90", "J91", "J92"]],
+  data: convertTable(elementaryTable),
 }
 
+export const elementaryTwoRows = chunk(elementaryTable[0], 4)
 export const othersTwoRows: Table = {
   caption: "Other Johnson Solids",
   rows: [""],
   columns: ["", "", "", ""],
-  data: [
-    ["J86", "J87", "J88", "J89"],
-    ["J90", "J91", "J92"],
-  ],
+  data: convertTable(elementaryTwoRows),
 }
 
 export const sections: Record<string, Table> = {

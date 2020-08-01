@@ -201,17 +201,15 @@ export default class Composite extends Specs<CompositeData> {
     }
   }
 
-  static *getAll() {
-    // Augmented prisms
-    for (const source of prismaticBases) {
-      for (const augmented of limitCount(source.data.base % 3 === 0 ? 3 : 2)) {
-        yield* this.getWithAlignments({ source, augmented })
-      }
-    }
+  static modifyLimit(source: Capstone | Classical) {
+    if (source.isCapstone()) return source.data.base % 3 === 0 ? 3 : 2
+    return source.data.family - 2
+  }
 
-    // Augmented classical polyhedra
-    for (const source of augmentedClassicalBases) {
-      for (const augmented of limitCount(source.data.family - 2)) {
+  static *getAll() {
+    // Augmented solids
+    for (const source of [...prismaticBases, ...augmentedClassicalBases]) {
+      for (const augmented of limitCount(this.modifyLimit(source))) {
         yield* this.getWithAlignments({ source, augmented })
       }
     }

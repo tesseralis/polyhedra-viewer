@@ -76,7 +76,7 @@ interface PrismOpArgs {
 
 function makePrismOp({ query, rightElongation = "antiprism" }: PrismOpArgs) {
   const twist = rightElongation === "prism" ? undefined : "left"
-  return (leftElongation: "prism" | null) => {
+  return (leftElongation: "prism" | "null") => {
     return makeOpPair<CapstoneForme>({
       graph: function* () {
         for (const item of Capstone.query.where(
@@ -124,7 +124,7 @@ const turnPrismatic = makeOpPair<CapstoneForme>({
 const _elongate = makePrismOp({
   query: (s) => !s.isDigonal(),
   rightElongation: "prism",
-})(null)
+})("null")
 
 const canGyroelongPrimary = (s: Capstone) => s.isPrimary() && !s.isTriangular()
 const canGyroelongSecondary = (s: Capstone) => s.isSecondary() && !s.isDigonal()
@@ -132,14 +132,14 @@ const canGyroelongSecondary = (s: Capstone) => s.isSecondary() && !s.isDigonal()
 const pyramidOps = makePrismOp({
   query: (s) => canGyroelongPrimary(s),
 })
-const gyroelongPyramid = pyramidOps(null)
+const gyroelongPyramid = pyramidOps("null")
 const turnPyramid = pyramidOps("prism")
 
 const cupolaOps = makePrismOp({
   query: (s) => canGyroelongSecondary(s) && s.isMono(),
 })
 
-const gyroelongCupola = cupolaOps(null)
+const gyroelongCupola = cupolaOps("null")
 const turnCupola = cupolaOps("prism")
 
 function makeBicupolaPrismOp(leftElongation: null | "prism") {

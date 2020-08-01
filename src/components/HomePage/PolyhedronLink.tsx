@@ -4,9 +4,10 @@ import { Link } from "react-router-dom"
 import { escape } from "utils"
 import { square, hover, flexRow } from "styles/common"
 import { useStyle, media } from "styles"
+import PolyhedronSpecs from "data/specs/PolyhedronSpecs"
 
 interface Props {
-  name: string
+  specs: PolyhedronSpecs
   isFake: boolean
 }
 
@@ -14,7 +15,7 @@ interface Props {
 const thumbnailSize = 64
 const mobThumbnailSize = 48
 
-function Image({ name }: Pick<Props, "name">) {
+function Image({ name }: { name: string }) {
   const css = useStyle({
     ...flexRow("center", "center"),
     [media.notMobile]: {
@@ -34,8 +35,8 @@ function Image({ name }: Pick<Props, "name">) {
   )
 }
 
-export default function PolyhedronLink({ name, isFake }: Props) {
-  const escapedName = escape(name)
+export default function PolyhedronLink({ specs, isFake }: Props) {
+  const escapedName = escape(specs.name())
 
   const css = useStyle(
     {
@@ -57,9 +58,9 @@ export default function PolyhedronLink({ name, isFake }: Props) {
       {...css()}
       id={!isFake ? escapedName : undefined}
       to={"/" + escapedName}
-      title={name}
+      title={specs.name()}
     >
-      <Image name={name} />
+      <Image name={escape(specs.canonicalName())} />
     </Link>
   )
 }

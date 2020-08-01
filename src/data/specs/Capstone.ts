@@ -5,7 +5,7 @@ import Specs from "./PolyhedronSpecs"
 import Queries from "./Queries"
 import { PrismaticType, prismaticTypes } from "./common"
 
-const elongations = [null, ...prismaticTypes]
+const elongations = ["null", ...prismaticTypes] as const
 
 const counts = [0, 1, 2] as const
 type Count = Items<typeof counts>
@@ -13,8 +13,8 @@ type Count = Items<typeof counts>
 export const gyrations = ["ortho", "gyro"] as const
 export type Gyration = Items<typeof gyrations>
 
-const polygonTypes = ["primary", "secondary"]
-type PolygonType = Items<typeof polygonTypes>
+export const polygonTypes = ["primary", "secondary"]
+export type PolygonType = Items<typeof polygonTypes>
 
 export const capTypes = ["pyramid", "cupola", "rotunda"] as const
 export type CapType = Items<typeof capTypes>
@@ -22,7 +22,7 @@ export type CapType = Items<typeof capTypes>
 interface CapstoneData {
   base: 2 | PrimaryPolygon
   type: PolygonType
-  elongation: null | PrismaticType
+  elongation: "null" | PrismaticType
   count: Count
   rotundaCount?: Count
   gyrate?: Gyration
@@ -64,7 +64,7 @@ export default class Capstone extends Specs<CapstoneData> {
     return new Capstone({ ...this.data, ...data })
   }
 
-  withElongation(elongation: PrismaticType | null, twist?: Twist) {
+  withElongation(elongation: PrismaticType | "null", twist?: Twist) {
     return this.withData({ elongation, twist })
   }
 
@@ -80,7 +80,7 @@ export default class Capstone extends Specs<CapstoneData> {
   isMono = () => this.data.count === 1
   isBi = () => this.data.count === 2
 
-  isShortened = () => !this.data.elongation
+  isShortened = () => this.data.elongation === "null"
   isElongated = () => this.data.elongation === "prism"
   isGyroelongated = () => this.data.elongation === "antiprism"
 
@@ -121,13 +121,11 @@ export default class Capstone extends Specs<CapstoneData> {
   }
 
   baseSides = () => (this.data.base * (this.isPrimary() ? 1 : 2)) as Polygon
-  prismaticType() {
-    if (!this.isPrismatic() || !this.data.elongation) {
-      throw new Error(
-        `Tried to get prism type of non-prismatic: ${this.name()}`,
-      )
+  prismaticType(): PrismaticType {
+    if (!this.isPrismatic()) {
+      throw new Error(`Tried to get prism type of non-prismatic`)
     }
-    return this.data.elongation
+    return this.data.elongation as PrismaticType
   }
 
   gyrate() {
@@ -163,7 +161,7 @@ export default class Capstone extends Specs<CapstoneData> {
               continue
             }
             // Prismatic stuff without elongation doesn't exist
-            if (count === 0 && !elongation) {
+            if (count === 0 && elongation === "null") {
               continue
             }
             for (const rotundaCount of rotundaCounts(type, base, count)) {
@@ -204,7 +202,7 @@ export default class Capstone extends Specs<CapstoneData> {
     yield new Capstone({
       base: 2,
       type: "secondary",
-      elongation: null,
+      elongation: "null",
       count: 1,
       rotundaCount: 0,
     })
@@ -212,7 +210,7 @@ export default class Capstone extends Specs<CapstoneData> {
     yield new Capstone({
       base: 2,
       type: "secondary",
-      elongation: null,
+      elongation: "null",
       count: 2,
       rotundaCount: 0,
       gyrate: "gyro",
