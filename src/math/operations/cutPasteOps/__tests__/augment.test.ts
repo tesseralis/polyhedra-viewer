@@ -43,7 +43,7 @@ describe("augment", () => {
       expectApplyTo("parabiaugmented dodecahedron", false)
     })
 
-    xit("works on diminished icosahedra", () => {
+    it("works on diminished icosahedra", () => {
       expectApplyTo("metabidiminished icosahedron")
       expectApplyTo("tridiminished icosahedron")
       // fully maxed out
@@ -51,7 +51,7 @@ describe("augment", () => {
       expectApplyTo("augmented tridiminished icosahedron", false)
     })
 
-    xit("works on rhombicosidodecahedra", () => {
+    it("works on rhombicosidodecahedra", () => {
       // expectApplyTo("rhombicosidodecahedron", false)
       expectApplyTo("diminished rhombicosidodecahedron")
       expectApplyTo("tridiminished rhombicosidodecahedron")
