@@ -248,21 +248,6 @@ export const augment = makeOperation("augment", {
     return true
   },
 
-  *allOptionCombos(forme) {
-    const { specs, geom } = forme
-    const gyrateOpts = hasGyrateOpts(specs) ? gyrations : [undefined]
-    const usingOpts = getUsingOpts(specs) ?? [undefined]
-    const faceOpts = geom.faces.filter((face) => canAugment(forme, face))
-
-    for (const face of faceOpts) {
-      for (const gyrate of gyrateOpts) {
-        for (const using of usingOpts) {
-          yield { gyrate, using, face }
-        }
-      }
-    }
-  },
-
   hitOption: "face",
   getHitOption(forme, hitPnt, options) {
     if (!options) return {}
@@ -278,15 +263,12 @@ export const augment = makeOperation("augment", {
     })
   },
 
-  allOptions(forme, optionName) {
+  allOptions(forme) {
     const { specs, geom } = forme
-    switch (optionName) {
-      case "gyrate":
-        return hasGyrateOpts(specs) ? gyrations : []
-      case "using":
-        return getUsingOpts(specs) ?? []
-      case "face":
-        return geom.faces.filter((face) => canAugment(forme, face))
+    return {
+      gyrate: hasGyrateOpts(specs) ? gyrations : [undefined],
+      using: getUsingOpts(specs) ?? [undefined],
+      face: geom.faces.filter((face) => canAugment(forme, face)),
     }
   },
 

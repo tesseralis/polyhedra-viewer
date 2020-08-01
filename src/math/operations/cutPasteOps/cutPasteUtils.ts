@@ -164,8 +164,10 @@ export const capOptionArgs: CapOptionArgs = {
     return true
   },
 
-  *allOptionCombos(forme) {
-    for (const cap of getCaps(forme)) yield { cap }
+  allOptions(forme) {
+    return {
+      cap: getCaps(forme),
+    }
   },
 
   hitOption: "cap",

@@ -1,4 +1,4 @@
-import { pickBy, mapValues, isMatch, isNil } from "lodash-es"
+import { pickBy, mapValues, isMatch, isNil, compact } from "lodash-es"
 
 import { Polygon } from "data/polygons"
 import { Vec3D, vec, vecEquals } from "math/geom"
@@ -8,7 +8,7 @@ import { Point } from "types"
 import PolyhedronSpecs from "data/specs/PolyhedronSpecs"
 import PolyhedronForme from "math/formes/PolyhedronForme"
 import createForme from "math/formes/createForme"
-import { find } from "utils"
+import { find, EntryIters, cartesian } from "utils"
 
 type SelectState = "selected" | "selectable" | undefined
 
@@ -53,12 +53,8 @@ export interface OpArgs<Options extends {}, Forme extends PolyhedronForme> {
 
   apply(solid: Forme, options: Options): PartialOpResult
 
-  allOptions?(
-    solid: Forme,
-    optionName: keyof Options,
-  ): readonly Options[typeof optionName][]
-
-  allOptionCombos?(solid: Forme): Generator<Options>
+  /** Return an iterator of all possible options of each polyhedron */
+  allOptions?(solid: Forme): EntryIters<Options>
 
   hitOption?: keyof Options
 
@@ -202,6 +198,11 @@ export default class Operation<Options extends {} = {}> {
     )
   }
 
+  /** Return the list of all valid specs that this operationc an be applied to */
+  // allInputs() {
+  //   return this.graph.map()
+  // }
+
   getEntries(solid: PolyhedronForme) {
     return this.graph.filter((entry) => entry.start.equals(solid.specs))
   }
@@ -218,16 +219,25 @@ export default class Operation<Options extends {} = {}> {
   }
 
   allOptions(solid: PolyhedronForme, optionName: keyof Options) {
-    return this.opArgs.allOptions(solid, optionName)
+    if (!this.opArgs.allOptions)
+      throw new Error(
+        `Operation ${this.name} does not support getting individual options`,
+      )
+    return compact([...this.opArgs.allOptions(solid)[optionName]])
   }
 
+  /**
+   * (Testing utility)
+   * Return all possible options that can be used to apply this operation on the given solid.
+   */
   *allOptionCombos(solid: PolyhedronForme) {
-    if (this.opArgs.allOptionCombos) {
-      yield* this.opArgs.allOptionCombos(solid)
-    } else {
+    if (!this.opArgs.allOptions) {
+      // If allOptions is not defined, default to listing the options of the solid graph
       for (const entry of this.getEntries(solid)) {
         yield entry.options
       }
+    } else {
+      return cartesian(this.opArgs.allOptions(solid))
     }
   }
 
