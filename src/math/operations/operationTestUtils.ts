@@ -1,4 +1,4 @@
-import { vecEquals, PRECISION_DIGITS, Vec3D } from "math/geom"
+import { vecEquals, Vec3D } from "math/geom"
 import { Polyhedron } from "math/polyhedra"
 import Operation, { OpResult } from "./Operation"
 import PolyhedronForme from "math/formes/PolyhedronForme"
@@ -6,22 +6,44 @@ import { getGeometry } from "math/operations/operationUtils"
 import { getSpecs2 } from "data/specs/getSpecs"
 import createForme from "math/formes/createForme"
 
-// FIXME rename and consolidate these functions
-export function makeApplyTo(operation: Operation<any>) {
-  return function (name: string, value: boolean = true) {
+interface OpTestCases {
+  pass: string[]
+  fail: string[]
+}
+
+export function validateOpInputs(
+  operation: Operation<any>,
+  { pass, fail }: OpTestCases,
+) {
+  function canApplyTo(name: string) {
     const specs = getSpecs2(name)
     const geom = getGeometry(specs)
     const forme = createForme(specs, geom)
-    expect(operation.canApplyTo(forme)).toEqual(value)
+    return operation.canApplyTo(forme)
+  }
+  for (const name of pass) {
+    expect(name).toSatisfy(canApplyTo)
+  }
+  for (const name of fail) {
+    expect(name).not.toSatisfy(canApplyTo)
   }
 }
 
-export function makeHasOptions(operation: Operation<any>) {
-  return function (name: string, value: boolean = true) {
+export function validateHasOptions(
+  operation: Operation<any>,
+  { pass, fail }: OpTestCases,
+) {
+  function hasOptions(name: string) {
     const specs = getSpecs2(name)
     const geom = getGeometry(specs)
     const forme = createForme(specs, geom)
-    expect(operation.hasOptions(forme)).toEqual(value)
+    return operation.hasOptions(forme)
+  }
+  for (const name of pass) {
+    expect(name).toSatisfy(hasOptions)
+  }
+  for (const name of fail) {
+    expect(name).not.toSatisfy(hasOptions)
   }
 }
 

@@ -1,31 +1,39 @@
 import { gyrate } from "../gyrate"
-import { makeApplyTo } from "../../operationTestUtils"
-
-const expectApplyTo = makeApplyTo(gyrate)
+import { validateOpInputs } from "../../operationTestUtils"
 
 describe("gyrate", () => {
   describe("canApplyTo", () => {
     it("works on capstones", () => {
-      // only birotundate, bicupolae, and cupolarotundae work
-      expectApplyTo("square orthobicupola")
-      expectApplyTo("elongated triangular gyrobicupola")
-      expectApplyTo("pentagonal orthobicupola")
-      expectApplyTo("gyroelongated pentagonal cupolarotunda")
-
-      expectApplyTo("square cupola", false)
-      expectApplyTo("elongated pentagonal cupola", false)
-      expectApplyTo("triangular bipyramid", false)
+      validateOpInputs(gyrate, {
+        pass: [
+          // only birotundate, bicupolae, and cupolarotundae work
+          "square orthobicupola",
+          "elongated triangular gyrobicupola",
+          "pentagonal orthobicupola",
+          "gyroelongated pentagonal cupolarotunda",
+        ],
+        fail: [
+          "square cupola",
+          "elongated pentagonal cupola",
+          "triangular bipyramid",
+        ],
+      })
     })
 
-    it("works on rhombicosidodecahedra", () => {
-      // FIXME
-      // expectApplyTo("rhombicosidodecahedron")
-      expectApplyTo("trigyrate rhombicosidodecahedron")
-      expectApplyTo("metabidiminished rhombicosidodecahedron")
-      expectApplyTo("paragyrate diminished rhombicosidodecahedron")
-      // false cases
-      expectApplyTo("parabidiminished rhombicosidodecahedron", false)
-      expectApplyTo("tridiminished rhombicosidodecahedron", false)
+    it("works on gyrate solids", () => {
+      validateOpInputs(gyrate, {
+        pass: [
+          // FIXME
+          // "rhombicosidodecahedron",
+          "trigyrate rhombicosidodecahedron",
+          "metabidiminished rhombicosidodecahedron",
+          "paragyrate diminished rhombicosidodecahedron",
+        ],
+        fail: [
+          "parabidiminished rhombicosidodecahedron",
+          "tridiminished rhombicosidodecahedron",
+        ],
+      })
     })
   })
 })
