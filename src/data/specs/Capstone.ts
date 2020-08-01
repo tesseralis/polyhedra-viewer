@@ -16,12 +16,7 @@ export type Gyration = Items<typeof gyrations>
 const polygonTypes = ["primary", "secondary"]
 type PolygonType = Items<typeof polygonTypes>
 
-export const capTypes = [
-  "pyramid",
-  "cupola",
-  "rotunda",
-  "cupolarotunda",
-] as const
+export const capTypes = ["pyramid", "cupola", "rotunda"] as const
 export type CapType = Items<typeof capTypes>
 
 interface CapstoneData {
@@ -107,7 +102,8 @@ export default class Capstone extends Specs<CapstoneData> {
     if (this.isPyramid()) return "pyramid"
     if (this.isCupola()) return "cupola"
     if (this.isRotunda()) return "rotunda"
-    if (this.isCupolaRotunda()) return "cupolarotunda"
+    if (this.isCupolaRotunda())
+      throw new Error(`Cupolarotunda does not have a single cap type`)
     throw new Error(`Prismatic solid does not have a cap`)
   }
 
