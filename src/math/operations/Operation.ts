@@ -201,11 +201,6 @@ export default class Operation<Options extends {} = {}> {
     )
   }
 
-  /** Return the list of all valid specs that this operationc an be applied to */
-  // allInputs() {
-  //   return this.graph.map()
-  // }
-
   getEntries(solid: PolyhedronForme) {
     return this.graph.filter((entry) => entry.start.equals(solid.specs))
   }
