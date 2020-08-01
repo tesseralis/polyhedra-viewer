@@ -98,17 +98,18 @@ export default class Capstone extends Specs<CapstoneData> {
   isRotunda = () => this.data.count === this.data.rotundaCount
   isCupolaRotunda = () => this.isBi() && this.data.rotundaCount === 1
 
-  capType(): CapType | "cupolarotunda" {
+  capType(): CapType {
     if (this.isPyramid()) return "pyramid"
     if (this.isCupola()) return "cupola"
     if (this.isRotunda()) return "rotunda"
-    if (this.isCupolaRotunda()) return "cupolarotunda"
+    if (this.isCupolaRotunda())
+      throw new Error(`Cupolarotunda does not have a single cap type`)
     throw new Error(`Prismatic solid does not have a cap`)
   }
 
   capTypes(): CapType[] {
     if (this.isCupolaRotunda()) return ["cupola", "rotunda"]
-    return [this.capType() as any]
+    return [this.capType()]
   }
 
   remove(capType: CapType) {
