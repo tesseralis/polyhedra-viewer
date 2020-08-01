@@ -8,12 +8,14 @@ import {
   combineOps,
   gyrateCapstoneGraph,
   gyrateCompositeGraph,
+  GyrateGraphOpts,
 } from "./cutPasteUtils"
 import { getTransformedVertices } from "../operationUtils"
 import { makeOperation } from "../Operation"
 import CapstoneForme from "math/formes/CapstoneForme"
 import CompositeForme, { GyrateSolidForme } from "math/formes/CompositeForme"
 import { toDirected } from "../operationPairs"
+import PolyhedronForme from "math/formes/PolyhedronForme"
 
 const TAU = 2 * Math.PI
 
@@ -61,29 +63,35 @@ function applyGyrate(polyhedron: Polyhedron, { cap }: CapOptions) {
   }
 }
 
-const gyrateCapstone: CutPasteOpArgs<CapOptions, CapstoneForme> = {
+type GyrateOpArgs<F extends PolyhedronForme> = CutPasteOpArgs<
+  CapOptions,
+  F,
+  GyrateGraphOpts
+>
+
+const gyrateCapstone: GyrateOpArgs<CapstoneForme> = {
   graph: function* () {
     yield* toDirected("left", gyrateCapstoneGraph)()
     yield* toDirected("right", gyrateCapstoneGraph)()
   },
   toGraphOpts() {
-    return {} as any
+    return {}
   },
   apply({ geom }, options) {
     return applyGyrate(geom, options)
   },
 }
 
-const gyrateComposite: CutPasteOpArgs<CapOptions, GyrateSolidForme> = {
+const gyrateComposite: GyrateOpArgs<GyrateSolidForme> = {
   graph: function* () {
     yield* toDirected("left", gyrateCompositeGraph)()
     yield* toDirected("right", gyrateCompositeGraph)()
   },
   toGraphOpts(forme, { cap }) {
-    if (forme.isGyrate(cap!)) {
-      return { direction: "back" } as any
+    if (forme.isGyrate(cap)) {
+      return { direction: "back" }
     } else {
-      return { direction: "forward", align: forme.alignment(cap!) }
+      return { direction: "forward", align: forme.alignment(cap) }
     }
   },
   apply({ geom }, options) {
@@ -92,7 +100,7 @@ const gyrateComposite: CutPasteOpArgs<CapOptions, GyrateSolidForme> = {
 }
 
 export const gyrate = makeOperation("gyrate", {
-  ...combineOps<CapOptions, CapstoneForme | CompositeForme>([
+  ...combineOps<CapOptions, CapstoneForme | CompositeForme, GyrateGraphOpts>([
     gyrateCapstone,
     gyrateComposite,
   ]),

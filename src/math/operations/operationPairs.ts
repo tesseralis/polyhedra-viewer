@@ -225,7 +225,7 @@ function makeOperation<S extends Side, Forme extends PolyhedronForme, L, R>(
     },
     graph: toDirected(side, op.inputs.graph),
     toGraphOpts(forme, opts) {
-      return opts as any
+      return opts
     },
   }
 }
@@ -243,7 +243,9 @@ export function makeOpPair<Forme extends PolyhedronForme, L = {}, R = L>(
 export function combineOps<F extends PolyhedronForme, O>(
   opArgs: OpInput<O, F>[],
 ): OpInput<O, F> {
+  // FIXME!! this needs to account for the options as well
   function getOp(solid: F["specs"]) {
+    // FIXME!! I'm pretty sure I've implemented this already somewhere
     return find(opArgs, (op) =>
       [...op.graph()].some((entry) => entry.start.equals(solid)),
     )

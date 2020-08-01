@@ -14,12 +14,28 @@ export interface CapOptions {
   cap: Cap
 }
 
-export type CutPasteOpArgs<Opts, Forme extends PolyhedronForme> = Pick<
-  OpArgs<Opts, Forme>,
-  "graph" | "apply" | "toGraphOpts"
->
+export type CutPasteOpArgs<
+  Opts,
+  Forme extends PolyhedronForme,
+  GraphOpts
+> = Pick<OpArgs<Opts, Forme, GraphOpts>, "graph" | "apply" | "toGraphOpts">
 
-export function* augDimCapstoneGraph(): GraphGenerator<Capstone, any, any> {
+export interface AugGraphOpts {
+  gyrate?: "gyro" | "ortho"
+  using?: "pyramid" | "cupola" | "rotunda"
+  align?: "meta" | "para"
+  faceType?: number
+}
+
+export interface DimGraphOpts {
+  using?: "pyramid" | "cupola" | "rotunda"
+  align?: "meta" | "para"
+  gyrate?: "gyro" | "ortho"
+}
+
+type AugDimGraphGenerator<S> = GraphGenerator<S, AugGraphOpts, DimGraphOpts>
+
+export function* augDimCapstoneGraph(): AugDimGraphGenerator<Capstone> {
   for (const cap of Capstone.query.where(
     (s) => !s.isPrismatic() && (s.isBi() || !s.isShortened()),
   )) {
@@ -36,11 +52,7 @@ export function* augDimCapstoneGraph(): GraphGenerator<Capstone, any, any> {
   }
 }
 
-export function* augDimAugmentedSolidGraph(): GraphGenerator<
-  Composite,
-  any,
-  any
-> {
+export function* augDimAugmentedSolidGraph(): AugDimGraphGenerator<Composite> {
   for (const solid of Composite.query.where(
     (s) => s.isAugmentedSolid() && s.isAugmented(),
   )) {
@@ -55,21 +67,17 @@ export function* augDimAugmentedSolidGraph(): GraphGenerator<
   }
 }
 
-export function* augDimDiminishedSolidGraph(): GraphGenerator<
-  Composite,
-  any,
-  any
-> {
+export function* augDimDiminishedSolidGraph(): AugDimGraphGenerator<Composite> {
   for (const solid of Composite.query.where(
     (s) => s.isDiminishedSolid() && s.isDiminished() && !s.isAugmented(),
   )) {
-    const options = solid.isTri() ? [true, false] : [false]
-    for (const option of options) {
+    const options = solid.isTri() ? [3, 5] : [5]
+    for (const faceType of options) {
       yield {
         left: solid,
-        right: solid.augmentDiminished(option),
+        right: solid.augmentDiminished(faceType === 5),
         options: {
-          left: { triangular: option },
+          left: { faceType },
           right: { align: solid.data.align },
         },
       }
@@ -77,7 +85,7 @@ export function* augDimDiminishedSolidGraph(): GraphGenerator<
   }
 }
 
-export function* augDimGyrateSolidGraph(): GraphGenerator<Composite, any, any> {
+export function* augDimGyrateSolidGraph(): AugDimGraphGenerator<Composite> {
   for (const solid of Composite.query.where(
     (s) => s.isGyrateSolid() && s.isDiminished(),
   )) {
@@ -94,14 +102,25 @@ export function* augDimGyrateSolidGraph(): GraphGenerator<Composite, any, any> {
   }
 }
 
-export function* augDimElementaryGraph(): GraphGenerator<Elementary, any, any> {
+export function* augDimElementaryGraph(): AugDimGraphGenerator<Elementary> {
   yield {
     left: Elementary.query.withName("sphenocorona"),
     right: Elementary.query.withName("augmented sphenocorona"),
   }
 }
 
-export function* gyrateCapstoneGraph(): GraphGenerator<Capstone, any, any> {
+export interface GyrateGraphOpts {
+  align?: "meta" | "para"
+  direction?: "forward" | "back"
+}
+
+type GyrateGraphGenerator<S> = GraphGenerator<
+  S,
+  GyrateGraphOpts,
+  GyrateGraphOpts
+>
+
+export function* gyrateCapstoneGraph(): GyrateGraphGenerator<Capstone> {
   for (const cap of Capstone.query.where(
     (s) => s.isBi() && s.isSecondary() && !s.isGyro() && !s.isDigonal(),
   )) {
@@ -109,7 +128,7 @@ export function* gyrateCapstoneGraph(): GraphGenerator<Capstone, any, any> {
   }
 }
 
-export function* gyrateCompositeGraph(): GraphGenerator<Composite, any, any> {
+export function* gyrateCompositeGraph(): GyrateGraphGenerator<Composite> {
   for (const solid of Composite.query.where(
     (s) => s.isGyrateSolid() && s.isGyrate(),
   )) {
@@ -124,9 +143,9 @@ export function* gyrateCompositeGraph(): GraphGenerator<Composite, any, any> {
   }
 }
 
-export function combineOps<Opts, Forme extends PolyhedronForme>(
-  ops: CutPasteOpArgs<Opts, Forme>[],
-): CutPasteOpArgs<Opts, Forme> {
+export function combineOps<Opts, Forme extends PolyhedronForme, GraphOpts>(
+  ops: CutPasteOpArgs<Opts, Forme, GraphOpts>[],
+): CutPasteOpArgs<Opts, Forme, GraphOpts> {
   function getOp(solid: Forme["specs"]) {
     return find(ops, (op) =>
       [...op.graph()].some((entry) => entry.start.equals(solid)),
@@ -157,7 +176,7 @@ function getCaps(forme: PolyhedronForme) {
   }
 }
 
-type CapOptionArgs = Partial<OpArgs<CapOptions, PolyhedronForme>>
+type CapOptionArgs = Partial<OpArgs<CapOptions, PolyhedronForme, DimGraphOpts>>
 
 export const capOptionArgs: CapOptionArgs = {
   hasOptions() {

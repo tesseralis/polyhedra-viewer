@@ -15,6 +15,7 @@ import {
   augDimDiminishedSolidGraph,
   augDimGyrateSolidGraph,
   augDimElementaryGraph,
+  AugGraphOpts,
 } from "./cutPasteUtils"
 import { toDirected } from "../operationPairs"
 import PolyhedronForme from "math/formes/PolyhedronForme"
@@ -156,10 +157,16 @@ interface Options {
   using?: AugmentType
 }
 
-const augmentCapstone: CutPasteOpArgs<Options, CapstoneForme> = {
+type AugOpArgs<F extends PolyhedronForme> = CutPasteOpArgs<
+  Options,
+  F,
+  AugGraphOpts
+>
+
+const augmentCapstone: AugOpArgs<CapstoneForme> = {
   graph: toDirected("left", augDimCapstoneGraph),
   toGraphOpts(forme, { face, ...opts }) {
-    return opts as any
+    return opts
   },
   apply(forme, { face, gyrate, using }) {
     const { specs, geom } = forme
@@ -184,10 +191,10 @@ const augmentCapstone: CutPasteOpArgs<Options, CapstoneForme> = {
   },
 }
 
-const augmentAugmentedSolids: CutPasteOpArgs<Options, CompositeForme> = {
+const augmentAugmentedSolids: AugOpArgs<CompositeForme> = {
   graph: toDirected("left", augDimAugmentedSolidGraph),
   toGraphOpts(forme, { face }) {
-    return { align: forme.alignment(face!) } as any
+    return { align: forme.alignment(face) }
   },
   apply({ specs, geom }, { face }) {
     let baseAxis
@@ -200,20 +207,20 @@ const augmentAugmentedSolids: CutPasteOpArgs<Options, CompositeForme> = {
 }
 
 // FIXME deal with augmented octahedron and rhombicuboctahedron
-const augmentDiminishedSolids: CutPasteOpArgs<Options, DiminishedSolidForme> = {
+const augmentDiminishedSolids: AugOpArgs<DiminishedSolidForme> = {
   graph: toDirected("left", augDimDiminishedSolidGraph),
   toGraphOpts(forme, { face }) {
-    return { triangular: face!.numSides === 3 } as any
+    return { faceType: face.numSides }
   },
   apply({ specs, geom }, { face }) {
     return doAugment(specs, geom, face)
   },
 }
 
-const augmentGyrateSolids: CutPasteOpArgs<Options, GyrateSolidForme> = {
+const augmentGyrateSolids: AugOpArgs<GyrateSolidForme> = {
   graph: toDirected("left", augDimGyrateSolidGraph),
   toGraphOpts(forme, { face, ...opts }) {
-    return { gyrate: opts.gyrate } as any
+    return { gyrate: opts.gyrate }
   },
   apply({ specs, geom }, { face, gyrate }) {
     const crossAxis: CrossAxis = (edge) =>
@@ -222,13 +229,10 @@ const augmentGyrateSolids: CutPasteOpArgs<Options, GyrateSolidForme> = {
   },
 }
 
-const augmentElementary: CutPasteOpArgs<
-  Options,
-  PolyhedronForme<Elementary>
-> = {
+const augmentElementary: AugOpArgs<PolyhedronForme<Elementary>> = {
   graph: toDirected("left", augDimElementaryGraph),
-  toGraphOpts(forme, options) {
-    return {} as any
+  toGraphOpts() {
+    return {}
   },
   apply({ specs, geom }, { face }) {
     return doAugment(specs, geom, face)
@@ -236,7 +240,7 @@ const augmentElementary: CutPasteOpArgs<
 }
 
 export const augment = makeOperation("augment", {
-  ...combineOps<Options, PolyhedronForme<CutPasteSpecs>>([
+  ...combineOps<Options, PolyhedronForme<CutPasteSpecs>, AugGraphOpts>([
     augmentCapstone,
     augmentDiminishedSolids,
     augmentGyrateSolids,

@@ -1,4 +1,4 @@
-import { ValueIteratee, omit } from "lodash"
+import { ValueIteratee } from "lodash"
 import { uniqBy } from "lodash-es"
 
 function mod(a: number, b: number) {
@@ -87,11 +87,10 @@ export function* cartesian<T>(itemLists: EntryIters<T>): Generator<T> {
   const keys = Object.keys(itemLists)
   if (keys.length === 0) return
   const key = keys[0]
-  const items = (itemLists as any)[key]
-  const remainingLists = omit(itemLists, key)
+  const { [key]: items, ...remainingLists } = itemLists as Record<string, any>
   for (const item of items) {
-    for (const rest of cartesian(remainingLists as any)) {
-      yield { [key]: item, ...(rest as any) }
+    for (const rest of cartesian(remainingLists)) {
+      yield { [key]: item, ...rest } as T
     }
   }
 }

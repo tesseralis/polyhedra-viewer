@@ -111,9 +111,9 @@ export default class Capstone extends Specs<CapstoneData> {
     throw new Error(`Prismatic solid does not have a cap`)
   }
 
-  capTypes(): CapType[] {
+  capTypes(): Exclude<CapType, "cupolarotunda">[] {
     if (this.isCupolaRotunda()) return ["cupola", "rotunda"]
-    return [this.capType()]
+    return [this.capType() as any]
   }
 
   remove(capType: CapType) {

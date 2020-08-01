@@ -43,11 +43,14 @@ export interface GraphEntry<Specs, Opts> {
   options?: Opts
 }
 
-export interface OpArgs<Options extends {}, Forme extends PolyhedronForme> {
-  graph(): Generator<GraphEntry<Forme["specs"], Options>>
+export interface OpArgs<
+  Options extends {},
+  Forme extends PolyhedronForme,
+  GraphOpts = Options
+> {
+  graph(): Generator<GraphEntry<Forme["specs"], GraphOpts>>
 
-  // FIXME!! this needs better typing, e.g. use two different generics for each type of option
-  toGraphOpts(solid: Forme, opts: Partial<Options>): Options
+  toGraphOpts(solid: Forme, opts: Options): GraphOpts
 
   hasOptions?(info: Forme["specs"]): boolean
 
@@ -78,7 +81,7 @@ const methodDefaults = {
 
 // TODO get this to return the correct type
 function fillDefaults<Options extends {}, Forme extends PolyhedronForme>(
-  op: OpArgs<Options, Forme>,
+  op: OpArgs<Options, Forme, any>,
 ): Required<OpArgs<Options, Forme>> {
   return {
     ...mapValues(
@@ -160,7 +163,7 @@ export default class Operation<Options extends {} = {}> {
   hitOption: keyof Options
   private opArgs: Required<OpArgs<Options, PolyhedronForme>>
 
-  constructor(name: string, opArgs: OpArgs<Options, PolyhedronForme>) {
+  constructor(name: string, opArgs: OpArgs<Options, PolyhedronForme, any>) {
     this.name = name
     this.opArgs = fillDefaults(opArgs)
     this.graph = [...this.opArgs.graph()]
@@ -252,7 +255,8 @@ export default class Operation<Options extends {} = {}> {
 
 export function makeOperation<
   Options extends {} = {},
-  Forme extends PolyhedronForme = PolyhedronForme
->(name: string, opArgs: OpArgs<Options, Forme>) {
+  Forme extends PolyhedronForme = PolyhedronForme,
+  GraphOpts = Options
+>(name: string, opArgs: OpArgs<Options, Forme, GraphOpts>) {
   return new Operation(name, opArgs)
 }
