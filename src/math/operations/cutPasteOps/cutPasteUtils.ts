@@ -151,13 +151,11 @@ export const capOptionArgs: CapOptionArgs = {
     return cap ? { cap } : {}
   },
 
-  faceSelectionStates(forme, { cap }) {
+  selectionState(face, forme, { cap }) {
     const allCapFaces = getCaps(forme).flatMap((cap) => cap.faces())
-    return forme.geom.faces.map((face) => {
-      if (cap instanceof Cap && face.inSet(cap.faces())) return "selected"
-      if (face.inSet(allCapFaces)) return "selectable"
-      return undefined
-    })
+    if (cap instanceof Cap && face.inSet(cap.faces())) return "selected"
+    if (face.inSet(allCapFaces)) return "selectable"
+    return undefined
   },
 }
 
@@ -174,12 +172,10 @@ export const augOptionArgs: AugOptionArgs = {
     return canAugment(forme, face) ? { face } : {}
   },
 
-  faceSelectionStates(forme, { face }) {
-    return forme.geom.faces.map((f) => {
-      if (face && f.equals(face)) return "selected"
-      if (canAugment(forme, f)) return "selectable"
-      return undefined
-    })
+  selectionState(f, forme, { face }) {
+    if (face && f.equals(face)) return "selected"
+    if (canAugment(forme, f)) return "selectable"
+    return undefined
   },
 
   allOptions(forme) {

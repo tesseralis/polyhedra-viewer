@@ -1,10 +1,11 @@
-import { useMemo } from "react"
+import { useMemo, useCallback } from "react"
 import tinycolor from "tinycolor2"
 import Config from "components/ConfigCtx"
 import { PolyhedronCtx, OperationCtx, TransitionCtx } from "../../context"
-import { Polyhedron } from "math/polyhedra"
+import { Polyhedron, Face } from "math/polyhedra"
 import ClassicalForme from "math/formes/ClassicalForme"
 import CapstoneForme from "math/formes/CapstoneForme"
+import PolyhedronForme from "math/formes/PolyhedronForme"
 
 function toRgb(hex: string) {
   const { r, g, b } = tinycolor(hex).toRgb()
@@ -37,40 +38,42 @@ const classicalColorScheme = {
 const orthoFace = "dimgray"
 const gyroFace = "lightgray"
 
-function getClassicalColors(forme: ClassicalForme) {
+function getClassicalColor(forme: ClassicalForme, face: Face) {
   const scheme = classicalColorScheme[forme.specs.data.family]
-  return forme.geom.faces.map((face) => {
-    const facet = forme.getFacet(face)
-    // thing for the edge face
-    if (!facet) {
-      return scheme.edge[forme.specs.isSnub() ? "gyro" : "ortho"]
-    }
-    const faceSides = face.numSides > 5 ? "secondary" : "primary"
-    return scheme[faceSides][facet]
-  })
+  const facet = forme.getFacet(face)
+  // thing for the edge face
+  if (!facet) {
+    return scheme.edge[forme.specs.isSnub() ? "gyro" : "ortho"]
+  }
+  const faceSides = face.numSides > 5 ? "secondary" : "primary"
+  return scheme[faceSides][facet]
 }
 
-function getCapstoneColors(forme: CapstoneForme) {
-  return forme.geom.faces.map((face) => {
-    if (forme.isBaseTop(face)) {
-      const faceSides = face.numSides > 5 ? "secondary" : "primary"
-      return (classicalColorScheme as any)[forme.specs.data.base][faceSides]
-        .face
-    } else if (forme.inBase(face)) {
-      if (face.numSides === 3) {
-        return (classicalColorScheme as any)[forme.specs.data.base].primary
-          .vertex
-      } else if (face.numSides === 4) {
-        // TODO need to distinguish this from the edge faces
-        return orthoFace
-      } else {
-        // TODO want this to be a separate color from the top face
-        return classicalColorScheme[5].primary.face
-      }
+function getCapstoneColor(forme: CapstoneForme, face: Face) {
+  if (forme.isBaseTop(face)) {
+    const faceSides = face.numSides > 5 ? "secondary" : "primary"
+    return (classicalColorScheme as any)[forme.specs.data.base][faceSides].face
+  } else if (forme.inBase(face)) {
+    if (face.numSides === 3) {
+      return (classicalColorScheme as any)[forme.specs.data.base].primary.vertex
+    } else if (face.numSides === 4) {
+      // TODO need to distinguish this from the edge faces
+      return orthoFace
     } else {
-      return forme.specs.isElongated() ? orthoFace : gyroFace
+      // TODO want this to be a separate color from the top face
+      return classicalColorScheme[5].primary.face
     }
-  })
+  } else {
+    return forme.specs.isElongated() ? orthoFace : gyroFace
+  }
+}
+
+function getFormeColor(polyhedron: PolyhedronForme, face: Face) {
+  if (polyhedron instanceof ClassicalForme) {
+    return getClassicalColor(polyhedron, face)
+  } else if (polyhedron instanceof CapstoneForme) {
+    return getCapstoneColor(polyhedron, face)
+  }
 }
 
 const enableFormeColors = true
@@ -87,14 +90,27 @@ export default function useSolidContext() {
   } = TransitionCtx.useState()
   const { operation, options = {} } = OperationCtx.useState()
 
+  const getSelectionColor = useCallback(
+    (face, color) => {
+      if (!operation) return color
+      switch (operation.selectionState(face, polyhedron, options)) {
+        case "selected":
+          return tinycolor.mix(color, "lime")
+        case "selectable":
+          return tinycolor.mix(color, "yellow", 25)
+        default:
+          return color
+      }
+    },
+    [operation, options, polyhedron],
+  )
+
   const formeColors = useMemo(() => {
     if (!enableFormeColors) return
-    if (polyhedron instanceof ClassicalForme) {
-      return getClassicalColors(polyhedron)
-    } else if (polyhedron instanceof CapstoneForme) {
-      return getCapstoneColors(polyhedron)
-    }
-  }, [polyhedron])
+    return polyhedron.geom.faces.map((f) =>
+      getSelectionColor(f, getFormeColor(polyhedron, f)),
+    )
+  }, [polyhedron, getSelectionColor])
 
   // Colors when animation is being applied
   const transitionColors = useMemo(
@@ -107,25 +123,16 @@ export default function useSolidContext() {
 
   // Colors when in operation mode and hit options are being selected
   const operationColors = useMemo(() => {
-    if (!operation) return
-    const selectState = operation.faceSelectionStates(polyhedron, options)
-    return geom.faces.map((face, i) => {
-      switch (selectState[i]) {
-        case "selected":
-          return tinycolor.mix(colors[face.numSides], "lime")
-        case "selectable":
-          return tinycolor.mix(colors[face.numSides], "yellow", 25)
-        default:
-          return colors[face.numSides]
-      }
-    })
-  }, [polyhedron, geom, operation, options, colors])
+    return geom.faces.map((face) =>
+      getSelectionColor(face, colors[face.numSides]),
+    )
+  }, [colors, geom.faces, getSelectionColor])
 
   const normalizedColors = useMemo(() => {
     const rawColors =
       transitionColors ||
-      operationColors ||
       formeColors ||
+      operationColors ||
       geom.faces.map((f) => colors[f.numSides])
     return rawColors.map(toRgb)
   }, [formeColors, transitionColors, operationColors, geom, colors])

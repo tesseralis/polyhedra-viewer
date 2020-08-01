@@ -69,13 +69,12 @@ export interface OpArgs<
 
   defaultOptions?(info: Forme["specs"]): Partial<Options>
 
-  faceSelectionStates?(solid: Forme, options: Options): SelectState[]
+  selectionState?(face: Face, solid: Forme, options: Options): SelectState
 }
 
 type OperationArg = keyof OpArgs<any, any>
 const methodDefaults = {
   getHitOption: {},
-  faceSelectionStates: [],
   defaultOptions: {},
 }
 
@@ -243,8 +242,8 @@ export default class Operation<Options extends {} = {}> {
     return this.opArgs.defaultOptions(solid.specs)
   }
 
-  faceSelectionStates(solid: PolyhedronForme, options: Options) {
-    return this.opArgs.faceSelectionStates(solid, options)
+  selectionState(face: Face, solid: PolyhedronForme, options: Options) {
+    return this.opArgs.selectionState?.(face, solid, options)
   }
 }
 

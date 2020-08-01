@@ -220,11 +220,9 @@ export const contract = makeOperation<FacetOpts, ClassicalForme>("contract", {
     return facet ? { facet } : {}
   },
 
-  faceSelectionStates(forme, { facet }) {
-    return forme.geom.faces.map((face) => {
-      if (forme.isFacetFace(face, facet)) return "selected"
-      if (forme.isAnyFacetFace(face)) return "selectable"
-      return undefined
-    })
+  selectionState(face, forme, { facet }) {
+    if (forme.isFacetFace(face, facet)) return "selected"
+    if (forme.isAnyFacetFace(face)) return "selectable"
+    return undefined
   },
 })

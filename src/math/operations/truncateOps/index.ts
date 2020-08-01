@@ -35,11 +35,9 @@ const hitOptArgs: Partial<OpArgs<FacetOpts, ClassicalForme>> = {
     return facet ? { facet: oppositeFacet(facet) } : {}
   },
 
-  faceSelectionStates(forme, { facet }) {
-    return forme.geom.faces.map((face) => {
-      if (forme.isFacetFace(face, oppositeFacet(facet))) return "selected"
-      return "selectable"
-    })
+  selectionState(face, forme, { facet }) {
+    if (forme.isFacetFace(face, oppositeFacet(facet))) return "selected"
+    return "selectable"
   },
 }
 
