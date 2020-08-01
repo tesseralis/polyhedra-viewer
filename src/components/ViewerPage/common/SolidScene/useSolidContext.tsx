@@ -76,7 +76,7 @@ function getFormeColor(polyhedron: PolyhedronForme, face: Face) {
   }
 }
 
-const enableFormeColors = false
+const enableFormeColors = true
 
 // Hook that takes data from Polyhedron and Animation states and decides which to use.
 export default function useSolidContext() {
