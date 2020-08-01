@@ -60,7 +60,7 @@ xdescribe("chained tests", () => {
       description: "pyramid operations",
       start: "square pyramid",
       operations: [
-        { op: "augment", args: { face: 4 }, expected: "octahedron" },
+        { op: "augment", args: { face: 4 }, expected: "square bipyramid" },
         { op: "diminish", args: { cap: true }, expected: "square pyramid" },
         ["elongate", "elongated square pyramid"],
       ],
