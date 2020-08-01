@@ -208,8 +208,8 @@ class OpPair<
   }
 }
 
-type OpInput<O, F extends PolyhedronForme> = Required<
-  Pick<OpArgs<O, F>, "apply" | "graph" | "toGraphOpts">
+export type OpInput<O, F extends PolyhedronForme, GO = O> = Required<
+  Pick<OpArgs<O, F, GO>, "apply" | "graph" | "toGraphOpts">
 >
 
 /**
@@ -240,9 +240,9 @@ export function makeOpPair<Forme extends PolyhedronForme, L = {}, R = L>(
   return { left: makeOperation("left", op), right: makeOperation("right", op) }
 }
 
-export function combineOps<F extends PolyhedronForme, O>(
-  opArgs: OpInput<O, F>[],
-): OpInput<O, F> {
+export function combineOps<F extends PolyhedronForme, O, GO = O>(
+  opArgs: OpInput<O, F, GO>[],
+): OpInput<O, F, GO> {
   // FIXME!! this needs to account for the options as well
   function getOp(solid: F["specs"]) {
     // FIXME!! I'm pretty sure I've implemented this already somewhere

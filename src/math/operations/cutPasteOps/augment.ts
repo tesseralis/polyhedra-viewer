@@ -8,8 +8,6 @@ import { makeOperation } from "../Operation"
 import { deduplicateVertices, alignPolyhedron, Pose } from "../operationUtils"
 import {
   CutPasteSpecs,
-  CutPasteOpArgs,
-  combineOps,
   augDimCapstoneGraph,
   augDimAugmentedSolidGraph,
   augDimDiminishedSolidGraph,
@@ -17,7 +15,7 @@ import {
   augDimElementaryGraph,
   AugGraphOpts,
 } from "./cutPasteUtils"
-import { toDirected } from "../operationPairs"
+import { OpInput, combineOps, toDirected } from "../operationPairs"
 import PolyhedronForme from "math/formes/PolyhedronForme"
 import CompositeForme, {
   GyrateSolidForme,
@@ -157,11 +155,7 @@ interface Options {
   using?: AugmentType
 }
 
-type AugOpArgs<F extends PolyhedronForme> = CutPasteOpArgs<
-  Options,
-  F,
-  AugGraphOpts
->
+type AugOpArgs<F extends PolyhedronForme> = OpInput<Options, F, AugGraphOpts>
 
 const augmentCapstone: AugOpArgs<CapstoneForme> = {
   graph: toDirected("left", augDimCapstoneGraph),
@@ -240,7 +234,7 @@ const augmentElementary: AugOpArgs<PolyhedronForme<Elementary>> = {
 }
 
 export const augment = makeOperation("augment", {
-  ...combineOps<Options, PolyhedronForme<CutPasteSpecs>, AugGraphOpts>([
+  ...combineOps<PolyhedronForme<CutPasteSpecs>, Options, AugGraphOpts>([
     augmentCapstone,
     augmentDiminishedSolids,
     augmentGyrateSolids,

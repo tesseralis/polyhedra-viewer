@@ -4,8 +4,6 @@ import { mapObject } from "utils"
 import {
   CapOptions,
   capOptionArgs,
-  CutPasteOpArgs,
-  combineOps,
   gyrateCapstoneGraph,
   gyrateCompositeGraph,
   GyrateGraphOpts,
@@ -14,7 +12,7 @@ import { getTransformedVertices } from "../operationUtils"
 import { makeOperation } from "../Operation"
 import CapstoneForme from "math/formes/CapstoneForme"
 import CompositeForme, { GyrateSolidForme } from "math/formes/CompositeForme"
-import { toDirected } from "../operationPairs"
+import { toDirected, combineOps, OpInput } from "../operationPairs"
 import PolyhedronForme from "math/formes/PolyhedronForme"
 
 const TAU = 2 * Math.PI
@@ -63,7 +61,7 @@ function applyGyrate(polyhedron: Polyhedron, { cap }: CapOptions) {
   }
 }
 
-type GyrateOpArgs<F extends PolyhedronForme> = CutPasteOpArgs<
+type GyrateOpArgs<F extends PolyhedronForme> = OpInput<
   CapOptions,
   F,
   GyrateGraphOpts
@@ -100,7 +98,7 @@ const gyrateComposite: GyrateOpArgs<GyrateSolidForme> = {
 }
 
 export const gyrate = makeOperation("gyrate", {
-  ...combineOps<CapOptions, CapstoneForme | CompositeForme, GyrateGraphOpts>([
+  ...combineOps<CapstoneForme | CompositeForme, CapOptions, GyrateGraphOpts>([
     gyrateCapstone,
     gyrateComposite,
   ]),

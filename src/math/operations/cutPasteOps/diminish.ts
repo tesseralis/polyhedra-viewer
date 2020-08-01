@@ -12,8 +12,6 @@ import {
   CutPasteSpecs,
   CapOptions,
   capOptionArgs,
-  CutPasteOpArgs,
-  combineOps,
   augDimCapstoneGraph,
   augDimAugmentedSolidGraph,
   augDimDiminishedSolidGraph,
@@ -27,7 +25,7 @@ import CompositeForme, {
   GyrateSolidForme,
 } from "math/formes/CompositeForme"
 import CapstoneForme from "math/formes/CapstoneForme"
-import { toDirected } from "../operationPairs"
+import { toDirected, combineOps, OpInput } from "../operationPairs"
 
 function removeCap(polyhedron: Polyhedron, cap: Cap) {
   const boundary = cap.boundary()
@@ -75,11 +73,7 @@ function removeCap(polyhedron: Polyhedron, cap: Cap) {
   }
 }
 
-type DimOpArgs<F extends PolyhedronForme> = CutPasteOpArgs<
-  CapOptions,
-  F,
-  DimGraphOpts
->
+type DimOpArgs<F extends PolyhedronForme> = OpInput<CapOptions, F, DimGraphOpts>
 
 const diminishCapstone: DimOpArgs<CapstoneForme> = {
   graph: toDirected("right", augDimCapstoneGraph),
@@ -130,7 +124,7 @@ const diminishElementary: DimOpArgs<PolyhedronForme<Elementary>> = {
 }
 
 export const diminish = makeOperation("diminish", {
-  ...combineOps<CapOptions, PolyhedronForme<CutPasteSpecs>, DimGraphOpts>([
+  ...combineOps<PolyhedronForme<CutPasteSpecs>, CapOptions, DimGraphOpts>([
     diminishCapstone,
     diminishAugmentedSolids,
     diminishDiminishedSolid,

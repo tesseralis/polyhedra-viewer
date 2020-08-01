@@ -6,19 +6,12 @@ import { OpArgs } from "../Operation"
 import PolyhedronForme from "math/formes/PolyhedronForme"
 import CapstoneForme from "math/formes/CapstoneForme"
 import { GraphGenerator } from "../operationPairs"
-import { find } from "utils"
 
 export type CutPasteSpecs = Capstone | Composite | Elementary
 
 export interface CapOptions {
   cap: Cap
 }
-
-export type CutPasteOpArgs<
-  Opts,
-  Forme extends PolyhedronForme,
-  GraphOpts
-> = Pick<OpArgs<Opts, Forme, GraphOpts>, "graph" | "apply" | "toGraphOpts">
 
 export interface AugGraphOpts {
   gyrate?: "gyro" | "ortho"
@@ -140,31 +133,6 @@ export function* gyrateCompositeGraph(): GyrateGraphGenerator<Composite> {
         right: { direction: "back" },
       },
     }
-  }
-}
-
-export function combineOps<Opts, Forme extends PolyhedronForme, GraphOpts>(
-  ops: CutPasteOpArgs<Opts, Forme, GraphOpts>[],
-): CutPasteOpArgs<Opts, Forme, GraphOpts> {
-  function getOp(solid: Forme["specs"]) {
-    return find(ops, (op) =>
-      [...op.graph()].some((entry) => entry.start.equals(solid)),
-    )
-  }
-
-  // TODO deduplicate this with the other combineOps
-  return {
-    graph: function* () {
-      for (const op of ops) {
-        yield* op.graph()
-      }
-    },
-    apply(forme, options) {
-      return getOp(forme.specs).apply(forme, options)
-    },
-    toGraphOpts(solid, ops) {
-      return getOp(solid.specs).toGraphOpts(solid, ops)
-    },
   }
 }
 
