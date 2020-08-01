@@ -102,40 +102,6 @@ export function* augDimElementaryGraph(): AugDimGraphGenerator<Elementary> {
   }
 }
 
-export interface GyrateGraphOpts {
-  align?: "meta" | "para"
-  direction?: "forward" | "back"
-}
-
-type GyrateGraphGenerator<S> = GraphGenerator<
-  S,
-  GyrateGraphOpts,
-  GyrateGraphOpts
->
-
-export function* gyrateCapstoneGraph(): GyrateGraphGenerator<Capstone> {
-  for (const cap of Capstone.query.where(
-    (s) => s.isBi() && s.isSecondary() && !s.isGyro() && !s.isDigonal(),
-  )) {
-    yield { left: cap, right: cap.gyrate() }
-  }
-}
-
-export function* gyrateCompositeGraph(): GyrateGraphGenerator<Composite> {
-  for (const solid of Composite.query.where(
-    (s) => s.isGyrateSolid() && s.isGyrate(),
-  )) {
-    yield {
-      left: solid.ungyrate(),
-      right: solid,
-      options: {
-        left: { direction: "forward", align: solid.data.align },
-        right: { direction: "back" },
-      },
-    }
-  }
-}
-
 function getCaps(forme: PolyhedronForme) {
   if (forme instanceof CapstoneForme) {
     return forme.baseCaps()
