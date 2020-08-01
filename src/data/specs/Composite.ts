@@ -9,8 +9,8 @@ import Capstone from "./Capstone"
 export const counts = [0, 1, 2, 3] as const
 export type Count = Items<typeof counts>
 
-const alignments = ["meta", "para"] as const
-type Align = Items<typeof alignments>
+export const alignments = ["meta", "para"] as const
+export type Align = Items<typeof alignments>
 
 interface CompositeData {
   source: Classical | Capstone
@@ -156,6 +156,13 @@ export default class Composite extends Specs<CompositeData> {
     }
     return this.withData({
       diminished: (this.data.diminished - 1) as Count,
+      align: "meta",
+    })
+  }
+
+  ungyrate() {
+    return this.withData({
+      gyrate: (this.data.gyrate - 1) as Count,
       align: "meta",
     })
   }

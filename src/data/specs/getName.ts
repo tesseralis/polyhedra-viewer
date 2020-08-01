@@ -66,10 +66,9 @@ export default function getName(solid: Specs): string {
       "": "",
     }
 
-    const baseStr = countString(
-      solid.isCupolaRotunda() ? 1 : count,
-      solid.capType(),
-    )
+    const baseStr = solid.isCupolaRotunda()
+      ? "cupolarotunda"
+      : countString(count, solid.capType())
 
     return wordJoin(
       elongStr[elongation ?? ""],

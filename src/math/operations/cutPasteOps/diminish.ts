@@ -9,13 +9,15 @@ import {
 import { makeOperation } from "../Operation"
 import { Polyhedron, Cap } from "math/polyhedra"
 import {
-  inc,
-  dec,
   CutPasteSpecs,
   CapOptions,
   capOptionArgs,
-  CutPasteOpArgs,
-  combineOps,
+  augDimCapstoneGraph,
+  augDimAugmentedSolidGraph,
+  augDimDiminishedSolidGraph,
+  augDimGyrateSolidGraph,
+  augDimElementaryGraph,
+  DimGraphOpts,
 } from "./cutPasteUtils"
 import PolyhedronForme from "math/formes/PolyhedronForme"
 import CompositeForme, {
@@ -23,6 +25,7 @@ import CompositeForme, {
   GyrateSolidForme,
 } from "math/formes/CompositeForme"
 import CapstoneForme from "math/formes/CapstoneForme"
+import { toDirected, combineOps, OpInput } from "../operationPairs"
 
 function removeCap(polyhedron: Polyhedron, cap: Cap) {
   const boundary = cap.boundary()
@@ -70,105 +73,58 @@ function removeCap(polyhedron: Polyhedron, cap: Cap) {
   }
 }
 
-const diminishCapstone: CutPasteOpArgs<CapOptions, CapstoneForme> = {
+type DimOpArgs<F extends PolyhedronForme> = OpInput<CapOptions, F, DimGraphOpts>
+
+const diminishCapstone: DimOpArgs<CapstoneForme> = {
+  graph: toDirected("right", augDimCapstoneGraph),
+  toGraphOpts(forme, { cap }) {
+    if (!forme.specs.isCupolaRotunda()) return {}
+    return { using: cap.type as any }
+  },
   apply({ geom }, { cap }) {
     return removeCap(geom, cap)
-  },
-  canApplyTo(info) {
-    if (!info.isCapstone()) return false
-    if (info.isPrismatic()) return false
-    return !(info.isMono() && info.isShortened())
-  },
-  getResult({ specs }, { cap }) {
-    return specs.remove(cap.type as any)
   },
 }
 
-const diminishAugmentedSolids: CutPasteOpArgs<CapOptions, CompositeForme> = {
-  apply({ geom }, { cap }) {
-    return removeCap(geom, cap)
-  },
-  canApplyTo(specs) {
-    return specs.isComposite() && specs.isAugmentedSolid()
-  },
-  getResult({ specs }) {
-    return specs.diminish()
-  },
+const diminishAugmentedSolids: DimOpArgs<CompositeForme> = {
+  graph: toDirected("right", augDimAugmentedSolidGraph),
+  toGraphOpts: () => ({}),
+  apply: ({ geom }, { cap }) => removeCap(geom, cap),
 }
 
 // FIXME do octahedron and rhombicuboctahedron as well
-const diminishDiminishedSolid: CutPasteOpArgs<
-  CapOptions,
-  DiminishedSolidForme
-> = {
+const diminishDiminishedSolid: DimOpArgs<DiminishedSolidForme> = {
+  graph: toDirected("right", augDimDiminishedSolidGraph),
+  toGraphOpts: (forme, { cap }) => ({ align: forme.alignment(cap) }),
   apply({ geom }, { cap }) {
     return removeCap(geom, cap)
-  },
-
-  canApplyTo(specs) {
-    if (!specs.isComposite()) return false
-    const { source, diminished, augmented } = specs.data
-    if (source.canonicalName() !== "icosahedron") return false
-    return (diminished < 3 || augmented === 1) && !specs.isPara()
-  },
-
-  getResult(forme, { cap }) {
-    const { specs } = forme
-    if (specs.isAugmented()) return specs.withData({ augmented: 0 })
-    return specs.withData({
-      diminished: inc(specs.data.diminished),
-      align: forme.alignment(cap),
-    })
   },
 }
 
-const diminishGyrateSolid: CutPasteOpArgs<CapOptions, GyrateSolidForme> = {
-  apply({ geom }, { cap }) {
-    return removeCap(geom, cap)
-  },
-  canApplyTo(specs) {
-    if (!specs.isComposite()) return false
-    const { diminished, gyrate } = specs.data
-    if (!specs.isGyrateSolid()) return false
-    if (diminished === 2 && gyrate === 0) return !specs.isPara()
-    return diminished < 3
-  },
-  getResult(forme, { cap }) {
-    const { specs } = forme
-    const { diminished, gyrate } = specs.data
+const diminishGyrateSolid: DimOpArgs<GyrateSolidForme> = {
+  graph: toDirected("right", augDimGyrateSolidGraph),
+  toGraphOpts(forme, { cap }) {
     if (forme.isGyrate(cap)) {
-      // we're just removing a gyrated cap in this case
-      return specs.withData({
-        gyrate: dec(gyrate),
-        diminished: inc(diminished),
-      })
+      return { gyrate: "ortho" }
     } else {
-      return specs.withData({
-        diminished: inc(diminished),
-        align: forme.alignment(cap),
-      })
+      return { gyrate: "gyro", align: forme.alignment(cap) }
     }
   },
-}
-
-const diminishElementary: CutPasteOpArgs<
-  CapOptions,
-  PolyhedronForme<Elementary>
-> = {
   apply({ geom }, { cap }) {
     return removeCap(geom, cap)
   },
+}
 
-  canApplyTo(specs) {
-    return specs.canonicalName() === "augmented sphenocorona"
-  },
-  getResult() {
-    return Elementary.query.withName("sphenocorona")
+const diminishElementary: DimOpArgs<PolyhedronForme<Elementary>> = {
+  graph: toDirected("right", augDimElementaryGraph),
+  toGraphOpts: () => ({}),
+  apply({ geom }, { cap }) {
+    return removeCap(geom, cap)
   },
 }
 
 export const diminish = makeOperation("diminish", {
-  ...combineOps<CapOptions, PolyhedronForme<CutPasteSpecs>>([
+  ...combineOps<PolyhedronForme<CutPasteSpecs>, CapOptions, DimGraphOpts>([
     diminishCapstone,
     diminishAugmentedSolids,
     diminishDiminishedSolid,
