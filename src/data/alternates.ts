@@ -24,18 +24,19 @@ export const alternateNamesMapping: Record<string, string[]> = {
   "triangular prism": ["fastigium", "digonal cupola"],
   gyrobifastigium: ["digonal gyrobicupola"],
 
-  // related to augmented/diminished/gyrate solids
-  "pentagonal antiprism": ["parabidiminished icosahedron"],
-  "gyroelongated pentagonal pyramid": ["diminished icosahedron"],
-  "square pyramid": ["diminished octahedron"],
-
+  // Augmented solids
   "triangular bipyramid": ["augmented tetrahedron"],
   "elongated square pyramid": ["augmented cube", "augmented square prism"],
   "elongated square bipyramid": [
     "biaugmented cube",
     "biaugmented square prism",
   ],
+  // Diminished solids
+  "square pyramid": ["diminished octahedron"],
+  "pentagonal antiprism": ["parabidiminished icosahedron"],
+  "gyroelongated pentagonal pyramid": ["diminished icosahedron"],
 
+  // Gyrate solids
   "elongated square gyrobicupola": ["gyrate rhombicuboctahedron"],
   "elongated square cupola": ["diminished rhombicuboctahedron"],
   "octagonal prism": ["bidiminished rhombicuboctahedron"],
