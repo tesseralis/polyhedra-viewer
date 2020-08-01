@@ -8,6 +8,7 @@ export default makeCutPastePair<GyrateSolidForme>({
     for (const solid of Composite.query.where(
       (s) => s.isGyrateSolid() && s.isDiminished(),
     )) {
+      // Each solid can be gyro-augmented or ortho-augmented
       for (const gyrate of gyrations) {
         yield {
           left: solid,
@@ -31,6 +32,7 @@ export default makeCutPastePair<GyrateSolidForme>({
     }
   },
   baseAxis($, { gyrate }) {
+    // If ortho, line the square face of the cupola with a square face here
     return (edge) => edge.twinFace().numSides === (gyrate === "ortho" ? 4 : 5)
   },
 })

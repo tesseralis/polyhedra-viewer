@@ -4,6 +4,8 @@ import { makeCutPastePair } from "./cutPasteUtils"
 
 export default makeCutPastePair<CompositeForme>({
   graph: function* () {
+    // Take all augmented solids with at least one augmentation
+    // and pair it with its diminishing
     for (const solid of Composite.query.where(
       (s) => s.isAugmentedSolid() && s.isAugmented(),
     )) {
@@ -22,6 +24,8 @@ export default makeCutPastePair<CompositeForme>({
   },
   baseAxis({ specs }) {
     const { source } = specs.data
+    // Make sure that augmented truncated polyhedra align
+    // the square cupola face to a triangular face
     if (source.isClassical() && source.isTruncated()) {
       return (edge) => edge.twinFace().numSides === 3
     }

@@ -4,6 +4,7 @@ import { makeCutPastePair } from "./cutPasteUtils"
 
 export default makeCutPastePair<DiminishedSolidForme>({
   graph: function* () {
+    // Pick every diminished icosahedron except the tridiminished augmented
     for (const solid of Composite.query.where(
       (s) => s.isDiminishedSolid() && s.isDiminished() && !s.isAugmented(),
     )) {
