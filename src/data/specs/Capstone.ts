@@ -141,6 +141,13 @@ export default class Capstone extends Specs<CapstoneData> {
     })
   }
 
+  hasGyrate = () => Capstone.hasGyrate(this.data)
+
+  /** Return true if this solid has a gyrate option */
+  static hasGyrate({ count, type, elongation }: CapstoneData) {
+    return count === 2 && type === "secondary" && elongation !== "antiprism"
+  }
+
   static *getAll() {
     for (const base of primaryPolygons) {
       for (const type of polygonTypes) {
@@ -161,11 +168,7 @@ export default class Capstone extends Specs<CapstoneData> {
             }
             for (const rotundaCount of rotundaCounts(type, base, count)) {
               // Only cupolae, rotundae can be ortho or gyro
-              if (
-                count === 2 &&
-                type === "secondary" &&
-                elongation !== "antiprism"
-              ) {
+              if (this.hasGyrate({ count, type, elongation, base })) {
                 for (const gyrate of gyrations) {
                   yield new Capstone({
                     base,

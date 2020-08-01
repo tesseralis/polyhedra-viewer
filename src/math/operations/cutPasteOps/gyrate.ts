@@ -93,7 +93,7 @@ type GyrateOpArgs<F extends PolyhedronForme> = OpInput<CapOptions, F, GraphOpts>
 const gyrateCapstone = makeGyrateOp<CapstoneForme>({
   graph: function* () {
     for (const cap of Capstone.query.where(
-      (s) => s.isBi() && s.isSecondary() && !s.isGyro() && !s.isDigonal(),
+      (s) => (s.hasGyrate() && s.isOrtho() && !s.isDigonal()) || s.isChiral(),
     )) {
       yield { left: cap, right: cap.gyrate() }
     }
