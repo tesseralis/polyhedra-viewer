@@ -221,7 +221,7 @@ export const contract = makeOperation<FacetOpts, ClassicalForme>("contract", {
   },
 
   selectionState(face, forme, { facet }) {
-    if (forme.isFacetFace(face, facet)) return "selected"
+    if (facet && forme.isFacetFace(face, facet)) return "selected"
     if (forme.isAnyFacetFace(face)) return "selectable"
     return undefined
   },
