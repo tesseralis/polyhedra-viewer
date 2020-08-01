@@ -1,5 +1,5 @@
-import { gyrate } from "../gyrate"
-import { validateOpInputs } from "../../operationTestUtils"
+import { gyrate } from "../cutPasteOps"
+import { validateOpInputs } from "../operationTestUtils"
 
 describe("gyrate", () => {
   describe("canApplyTo", () => {

@@ -1,5 +1,5 @@
-import { diminish } from "../diminish"
-import { validateOpInputs } from "../../operationTestUtils"
+import { diminish } from "../cutPasteOps"
+import { validateOpInputs } from "../operationTestUtils"
 
 describe("diminish", () => {
   describe("canApplyTo", () => {

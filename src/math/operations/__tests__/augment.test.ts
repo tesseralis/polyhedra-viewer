@@ -1,5 +1,5 @@
-import { augment } from "../augment"
-import { validateOpInputs } from "../../operationTestUtils"
+import { augment } from "../cutPasteOps"
+import { validateOpInputs } from "../operationTestUtils"
 
 // TODO test other methods:
 // * defaultOptions
