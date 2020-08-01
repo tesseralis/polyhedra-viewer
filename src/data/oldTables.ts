@@ -10,6 +10,11 @@ import {
   elementaryTable,
 } from "./tables"
 import PolyhedronSpecs from "data/specs/PolyhedronSpecs"
+import { gyrations } from "data/specs/Capstone"
+import { alignments } from "data/specs/Composite"
+
+const gyrateLabels = gyrations.map((gyrate) => `${gyrate}-`)
+const alignLabels = alignments.map((align) => `${align}-`)
 
 export type Column = { name: string; sub: string[] } | string
 type Data = PolyhedronSpecs | string
@@ -73,8 +78,8 @@ export const capstones: Table = {
     "--",
     "elongated",
     "gyroelongated",
-    { name: "bi-", sub: ["ortho-", "gyro-"] },
-    { name: "elongated bi-", sub: ["ortho-", "gyro-"] },
+    { name: "bi-", sub: gyrateLabels },
+    { name: "elongated bi-", sub: gyrateLabels },
     "gyroelongated bi-",
   ],
   data: capstoneTable,
@@ -115,8 +120,8 @@ export const capstonesBi: Table = {
     "pentagonal rotunda",
   ],
   columns: [
-    { name: "bi-", sub: ["ortho-", "gyro-"] },
-    { name: "elongated bi-", sub: ["ortho-", "gyro-"] },
+    { name: "bi-", sub: gyrateLabels },
+    { name: "elongated bi-", sub: gyrateLabels },
     "gyroelongated bi-",
   ],
   data: capstoneBiTable,
@@ -135,7 +140,7 @@ export const augmented: Table = {
   ],
   columns: [
     "augmented",
-    { name: "biaugmented", sub: ["para-", "meta-"] },
+    { name: "biaugmented", sub: alignLabels },
     "triaugmented",
   ],
   data: augmentedTable,
@@ -146,7 +151,7 @@ export const icosahedra: Table = {
   rows: ["icosahedron"],
   columns: [
     "diminished",
-    { name: "bidiminished", sub: ["para-", "meta-"] },
+    { name: "bidiminished", sub: alignLabels },
     { name: "tridiminished", sub: ["--", "augmented"] },
   ],
   data: diminishedTable,
@@ -156,9 +161,9 @@ export const rhombicosidodecahedra: Table = {
   caption: "Gyrate and Diminished Rhombicosidodecahedra",
   rows: ["--", "gyrate", "bigyrate", "trigyrate"],
   columns: [
-    { name: "--", sub: ["para-", "meta-"] },
-    { name: "diminished", sub: ["para-", "meta-"] },
-    { name: "bidiminished", sub: ["para-", "meta-"] },
+    { name: "--", sub: alignLabels },
+    { name: "diminished", sub: alignLabels },
+    { name: "bidiminished", sub: alignLabels },
     "tridiminished",
   ],
   data: gyrateTable,
@@ -168,7 +173,7 @@ const gyrateRhombicos = gyrateTable.slice(1).map((row) => [row[0]])
 export const gyrateRhombicosidodecahedra: Table = {
   caption: "Gyrate Rhombicosidodecahedra",
   rows: ["gyrate", "bigyrate", "trigyrate"],
-  columns: [{ name: "--", sub: ["para-", "meta-"] }],
+  columns: [{ name: "--", sub: alignLabels }],
   data: gyrateRhombicos,
 }
 
@@ -177,8 +182,8 @@ export const diminishedRhombicosidodecahedra: Table = {
   caption: "Diminished Rhombicosidodecahedra",
   rows: ["--", "gyrate", "bigyrate"],
   columns: [
-    { name: "diminished", sub: ["para-", "meta-"] },
-    { name: "bidiminished", sub: ["para-", "meta-"] },
+    { name: "diminished", sub: alignLabels },
+    { name: "bidiminished", sub: alignLabels },
     "tridiminished",
   ],
   data: diminishedRhombicos,
