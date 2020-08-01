@@ -78,7 +78,6 @@ function getPose(base: FaceLike, crossAxis: CrossAxis): Pose {
 }
 
 function doAugment(
-  info: CutPasteSpecs,
   polyhedron: Polyhedron,
   base: Face,
   baseCrossAxis: CrossAxis = defaultCrossAxis,
@@ -181,7 +180,7 @@ const augmentCapstone: AugOpArgs<CapstoneForme> = {
         return gyrate === "ortho" ? orientationFn(edge) : !orientationFn(edge)
       }
     }
-    return doAugment(specs, geom, face, baseAxis, augmentType)
+    return doAugment(geom, face, baseAxis, augmentType)
   },
 }
 
@@ -196,7 +195,7 @@ const augmentAugmentedSolids: AugOpArgs<CompositeForme> = {
     if (source.isClassical() && source.isTruncated()) {
       baseAxis = (edge: Edge) => edge.twinFace().numSides === 3
     }
-    return doAugment(specs, geom, face, baseAxis)
+    return doAugment(geom, face, baseAxis)
   },
 }
 
@@ -206,8 +205,8 @@ const augmentDiminishedSolids: AugOpArgs<DiminishedSolidForme> = {
   toGraphOpts(forme, { face }) {
     return { faceType: face.numSides }
   },
-  apply({ specs, geom }, { face }) {
-    return doAugment(specs, geom, face)
+  apply({ geom }, { face }) {
+    return doAugment(geom, face)
   },
 }
 
@@ -216,10 +215,10 @@ const augmentGyrateSolids: AugOpArgs<GyrateSolidForme> = {
   toGraphOpts(forme, { face, ...opts }) {
     return { gyrate: opts.gyrate }
   },
-  apply({ specs, geom }, { face, gyrate }) {
+  apply({ geom }, { face, gyrate }) {
     const crossAxis: CrossAxis = (edge) =>
       edge.twinFace().numSides === (gyrate === "ortho" ? 4 : 5)
-    return doAugment(specs, geom, face, crossAxis)
+    return doAugment(geom, face, crossAxis)
   },
 }
 
@@ -228,8 +227,8 @@ const augmentElementary: AugOpArgs<PolyhedronForme<Elementary>> = {
   toGraphOpts() {
     return {}
   },
-  apply({ specs, geom }, { face }) {
-    return doAugment(specs, geom, face)
+  apply({ geom }, { face }) {
+    return doAugment(geom, face)
   },
 }
 
