@@ -12,8 +12,9 @@ import {
 import PolyhedronSpecs from "data/specs/PolyhedronSpecs"
 
 export type Column = { name: string; sub: string[] } | string
-export type Data = PolyhedronSpecs | PolyhedronSpecs[]
-export type DataRow = Data[]
+type Data = PolyhedronSpecs | string
+export type DataEntry = Data | Data[]
+export type DataRow = DataEntry[]
 
 export interface Table {
   caption: string
@@ -22,11 +23,7 @@ export interface Table {
   data: DataRow[]
 }
 
-function convertTable(table: any) {
-  return table
-}
-
-export const archimedean: Table = {
+export const classical: Table = {
   caption: "Platonic and Archimedean Solids",
   rows: [
     "regular",
@@ -42,7 +39,7 @@ export const archimedean: Table = {
     { name: "", sub: ["cube", "octahedron"] },
     { name: "", sub: ["dodecahedron", "icosahedron"] },
   ],
-  data: convertTable(classicalTable),
+  data: classicalTable,
 }
 
 export const prisms: Table = {
@@ -56,7 +53,7 @@ export const prisms: Table = {
     "decagonal",
   ],
   columns: ["prism", "antiprism"],
-  data: convertTable(prismaticTable),
+  data: prismaticTable,
 }
 
 export const capstones: Table = {
@@ -80,7 +77,7 @@ export const capstones: Table = {
     { name: "elongated bi-", sub: ["ortho-", "gyro-"] },
     "gyroelongated bi-",
   ],
-  data: convertTable(capstoneTable),
+  data: capstoneTable,
 }
 
 const capstoneMonoTable = capstoneTable
@@ -99,7 +96,7 @@ export const capstonesMono: Table = {
     "pentagonal rotunda",
   ],
   columns: ["--", "elongated", "gyroelongated"],
-  data: convertTable(capstoneMonoTable),
+  data: capstoneMonoTable,
 }
 
 const capstoneBiTable = capstoneTable.map((row) => row.slice(3))
@@ -122,7 +119,7 @@ export const capstonesBi: Table = {
     { name: "elongated bi-", sub: ["ortho-", "gyro-"] },
     "gyroelongated bi-",
   ],
-  data: convertTable(capstoneBiTable),
+  data: capstoneBiTable,
 }
 
 export const augmented: Table = {
@@ -141,7 +138,7 @@ export const augmented: Table = {
     { name: "biaugmented", sub: ["para-", "meta-"] },
     "triaugmented",
   ],
-  data: convertTable(augmentedTable),
+  data: augmentedTable,
 }
 
 export const icosahedra: Table = {
@@ -152,7 +149,7 @@ export const icosahedra: Table = {
     { name: "bidiminished", sub: ["para-", "meta-"] },
     { name: "tridiminished", sub: ["--", "augmented"] },
   ],
-  data: convertTable(diminishedTable),
+  data: diminishedTable,
 }
 
 export const rhombicosidodecahedra: Table = {
@@ -164,7 +161,7 @@ export const rhombicosidodecahedra: Table = {
     { name: "bidiminished", sub: ["para-", "meta-"] },
     "tridiminished",
   ],
-  data: convertTable(gyrateTable),
+  data: gyrateTable,
 }
 
 const gyrateRhombicos = gyrateTable.slice(1).map((row) => [row[0]])
@@ -172,7 +169,7 @@ export const gyrateRhombicosidodecahedra: Table = {
   caption: "Gyrate Rhombicosidodecahedra",
   rows: ["gyrate", "bigyrate", "trigyrate"],
   columns: [{ name: "--", sub: ["para-", "meta-"] }],
-  data: convertTable(gyrateRhombicos),
+  data: gyrateRhombicos,
 }
 
 const diminishedRhombicos = gyrateTable.slice(0, 3).map((row) => row.slice(1))
@@ -184,20 +181,20 @@ export const diminishedRhombicosidodecahedra: Table = {
     { name: "bidiminished", sub: ["para-", "meta-"] },
     "tridiminished",
   ],
-  data: convertTable(diminishedRhombicos),
+  data: diminishedRhombicos,
 }
 export const snubAntiprisms: Table = {
   caption: "Snub Antiprisms",
   rows: ["snub"],
   columns: ["digonal", "triangular", "square"],
-  data: convertTable(snubAntiprismTable),
+  data: snubAntiprismTable,
 }
 
 export const others: Table = {
   caption: "Other Johnson Solids",
   rows: [""],
   columns: ["", "", "", "", "", "", ""],
-  data: convertTable(elementaryTable),
+  data: elementaryTable,
 }
 
 export const elementaryTwoRows = chunk(elementaryTable[0], 4)
@@ -205,11 +202,11 @@ export const othersTwoRows: Table = {
   caption: "Other Johnson Solids",
   rows: [""],
   columns: ["", "", "", ""],
-  data: convertTable(elementaryTwoRows),
+  data: elementaryTwoRows,
 }
 
 export const sections: Record<string, Table> = {
-  archimedean,
+  archimedean: classical,
   prisms,
   capstones,
   capstonesMono,

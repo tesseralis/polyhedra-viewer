@@ -1,7 +1,7 @@
 import * as text from "./text"
 
 import {
-  archimedean,
+  classical,
   prisms,
   capstones,
   capstonesMono,
@@ -30,7 +30,7 @@ const polyhedronTables: TableSection[] = [
   {
     header: "Uniform Polyhedra",
     description: text.uniform,
-    tables: [archimedean, prisms],
+    tables: [classical, prisms],
   },
   {
     header: "Johnson Solids",

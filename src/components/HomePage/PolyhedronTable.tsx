@@ -1,6 +1,5 @@
 import React, { ThHTMLAttributes } from "react"
 
-import { fromConwayNotation } from "data/conway"
 import { Table } from "data/oldTables"
 import PolyhedronSpecs from "data/specs/PolyhedronSpecs"
 import PolyhedronLink from "./PolyhedronLink"

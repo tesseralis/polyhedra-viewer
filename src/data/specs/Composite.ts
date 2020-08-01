@@ -9,7 +9,7 @@ import Capstone from "./Capstone"
 export const counts = [0, 1, 2, 3] as const
 export type Count = Items<typeof counts>
 
-export const alignments = ["meta", "para"] as const
+export const alignments = ["para", "meta"] as const
 export type Align = Items<typeof alignments>
 
 interface CompositeData {

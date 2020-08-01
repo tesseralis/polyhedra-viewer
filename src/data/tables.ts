@@ -10,11 +10,11 @@ import Capstone, {
   gyrations,
 } from "./specs/Capstone"
 import { Polygon, PrimaryPolygon, primaryPolygons } from "./polygons"
-import { PrismaticType, prismaticTypes } from "./specs/common"
+import { prismaticTypes } from "./specs/common"
 import Composite, { Count, counts, alignments } from "./specs/Composite"
 import ModifiedAntiprism from "./specs/ModifiedAntiprism"
 import Elementary from "./specs/Elementary"
-import { chunk, range } from "lodash-es"
+import { range } from "lodash-es"
 import PolyhedronSpecs from "./specs/PolyhedronSpecs"
 import { getSpecs2 } from "./specs/getSpecs"
 
@@ -73,7 +73,6 @@ function capstoneEntry(data: Capstone["data"], rotunda?: any) {
       Capstone.query.withData({ ...data, gyrate, rotundaCount }),
     )
   } else {
-    console.log("finding entry", data)
     return Capstone.query.withData({ ...data, rotundaCount })
   }
 }
@@ -117,7 +116,6 @@ function* capstoneRows() {
 }
 
 export const capstoneTable = [...capstoneRows()]
-console.log(capstoneTable)
 
 const augSources = [
   "triangular prism",
