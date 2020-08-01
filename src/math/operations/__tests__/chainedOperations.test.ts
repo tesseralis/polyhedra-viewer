@@ -160,7 +160,7 @@ xdescribe("chained tests", () => {
         const result = validateOperationApplication(op, polyhedron, args)
 
         polyhedron = result.result
-        expect(polyhedron.geom.name).toEqual(expected)
+        expect(polyhedron.specs.name()).toEqual(expected)
       })
     })
   }
