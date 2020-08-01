@@ -1,4 +1,4 @@
-import { isMatch, isNil, pickBy } from "lodash-es"
+import { isMatch, pickBy } from "lodash-es"
 import { find } from "utils"
 import PolyhedronSpecs from "data/specs/PolyhedronSpecs"
 import { VertexArg } from "math/polyhedra"
@@ -244,15 +244,12 @@ export function combineOps<F extends PolyhedronForme, O, GO extends {} = O>(
   opArgs: OpInput<O, F, GO>[],
 ): OpInput<O, F, GO> {
   function getOp(solid: F, options: O) {
-    // FIXME!! This is the same logic in Operation for finding the entry
+    // FIXME This is the same logic in Operation for finding the entry
     return find(opArgs, (op) =>
       [...op.graph()].some(
         (entry) =>
           entry.start.equals(solid.specs) &&
-          isMatch(
-            entry.options ?? {},
-            pickBy(op.toGraphOpts(solid, options), (opt) => !isNil(opt)),
-          ),
+          isMatch(entry.options ?? {}, pickBy(op.toGraphOpts(solid, options))),
       ),
     )
   }

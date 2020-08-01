@@ -1,4 +1,4 @@
-import { pickBy, mapValues, isMatch, isNil, compact } from "lodash-es"
+import { pickBy, mapValues, isMatch, compact } from "lodash-es"
 
 import { Polygon } from "data/polygons"
 import { Vec3D, vec, vecEquals } from "math/geom"
@@ -188,7 +188,7 @@ export default class Operation<Options extends {} = {}> {
   }
 
   getEntry(solid: PolyhedronForme, options: Options) {
-    // FIXME!! optimize this and make error checking better
+    // FIXME optimize this and make error checking better
     // e.g. make it easier to type.
     return find(
       this.graph,
@@ -196,7 +196,7 @@ export default class Operation<Options extends {} = {}> {
         entry.start.equals(solid.specs) &&
         isMatch(
           entry.options ?? {},
-          pickBy(this.opArgs.toGraphOpts(solid, options), (opt) => !isNil(opt)),
+          pickBy(this.opArgs.toGraphOpts(solid, options)),
         ),
     )
   }

@@ -1,6 +1,6 @@
 import { Cap } from "math/polyhedra"
-import Capstone from "data/specs/Capstone"
-import Composite from "data/specs/Composite"
+import Capstone, { CapType, Gyration, gyrations } from "data/specs/Capstone"
+import Composite, { Align } from "data/specs/Composite"
 import Elementary from "data/specs/Elementary"
 import { OpArgs } from "../Operation"
 import PolyhedronForme from "math/formes/PolyhedronForme"
@@ -13,17 +13,14 @@ export interface CapOptions {
   cap: Cap
 }
 
-export interface AugGraphOpts {
-  gyrate?: "gyro" | "ortho"
-  using?: "pyramid" | "cupola" | "rotunda"
-  align?: "meta" | "para"
-  faceType?: number
+export interface DimGraphOpts {
+  using?: CapType
+  align?: Align
+  gyrate?: Gyration
 }
 
-export interface DimGraphOpts {
-  using?: "pyramid" | "cupola" | "rotunda"
-  align?: "meta" | "para"
-  gyrate?: "gyro" | "ortho"
+export interface AugGraphOpts extends DimGraphOpts {
+  faceType?: number
 }
 
 type AugDimGraphGenerator<S> = GraphGenerator<S, AugGraphOpts, DimGraphOpts>
@@ -82,7 +79,7 @@ export function* augDimGyrateSolidGraph(): AugDimGraphGenerator<Composite> {
   for (const solid of Composite.query.where(
     (s) => s.isGyrateSolid() && s.isDiminished(),
   )) {
-    for (const gyrate of ["ortho", "gyro"] as const) {
+    for (const gyrate of gyrations) {
       yield {
         left: solid,
         right: solid.augmentGyrate(gyrate),
@@ -106,6 +103,7 @@ function getCaps(forme: PolyhedronForme) {
   if (forme instanceof CapstoneForme) {
     return forme.baseCaps()
   } else {
+    // FIXME this doesn't return the right thing for composite
     return forme.geom.caps()
   }
 }
