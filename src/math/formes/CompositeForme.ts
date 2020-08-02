@@ -231,8 +231,9 @@ export class DiminishedSolidForme extends CompositeForme {
     )
   }
 
-  augmentedCap() {
-    return find(this.caps(), (cap) => cap.boundary().numSides === 3)
+  augmentedCaps() {
+    if (!this.specs.isAugmented()) return []
+    return this.caps().filter((cap) => cap.boundary().numSides === 3)
   }
 
   diminishedFaces() {
@@ -241,12 +242,11 @@ export class DiminishedSolidForme extends CompositeForme {
 
   isAugmentedFace(face: Face) {
     if (!this.specs.isAugmented()) return false
-    return face.inSet(this.augmentedCap().faces())
+    return face.inSet(this.augmentedCaps()[0].faces())
   }
 
-  // FIXME deal with augmented tridiminished
   modifications() {
-    return this.diminishedFaces()
+    return [...this.diminishedFaces(), ...this.augmentedCaps()]
   }
 
   canAugment(face: Face) {
