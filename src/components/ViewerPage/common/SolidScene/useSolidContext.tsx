@@ -26,7 +26,8 @@ function createFamilyColor(face: string, vertex: string) {
   }
 }
 
-const classicalColorScheme = {
+const colorScheme = {
+  2: createFamilyColor("#000000", "#ffffff"),
   // green + cyan
   3: createFamilyColor("#1bcc3b", "#15ace8"),
   // red + yellow
@@ -36,7 +37,7 @@ const classicalColorScheme = {
 }
 
 function getClassicalColor(forme: ClassicalForme, face: Face) {
-  const scheme = classicalColorScheme[forme.specs.data.family]
+  const scheme = colorScheme[forme.specs.data.family]
   const facet = forme.getFacet(face)
   // thing for the edge face
   if (!facet) {
@@ -47,8 +48,7 @@ function getClassicalColor(forme: ClassicalForme, face: Face) {
 }
 
 function getCapstoneColor(forme: CapstoneForme, face: Face) {
-  // TODO digonal
-  const scheme = (classicalColorScheme as any)[forme.specs.data.base]
+  const scheme = colorScheme[forme.specs.data.base]
   if (forme.isBaseTop(face)) {
     const faceSides = face.numSides > 5 ? "secondary" : "primary"
     return scheme[faceSides].face
@@ -60,7 +60,7 @@ function getCapstoneColor(forme: CapstoneForme, face: Face) {
       return scheme.edge.ortho
     } else {
       // TODO want this to be a separate color from the top face
-      return classicalColorScheme[5].primary.face
+      return colorScheme[5].primary.face
     }
   } else {
     const side = forme.specs.isElongated() ? "ortho" : ("gyro" as const)
