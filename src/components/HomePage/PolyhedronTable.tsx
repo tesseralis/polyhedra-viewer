@@ -1,6 +1,6 @@
 import React, { ThHTMLAttributes } from "react"
 
-import { Table } from "data/oldTables"
+import { Table } from "data/tables"
 import { PolyhedronSpecs } from "data/specs"
 import PolyhedronLink from "./PolyhedronLink"
 import { media, fonts, useStyle, scales } from "styles"
