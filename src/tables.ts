@@ -88,7 +88,13 @@ const classical: Table = {
 
 function* prismaticRow(base: PrimaryPolygon, type: PolygonType) {
   for (const elongation of prismaticTypes) {
-    yield Capstone.query.withData({ base, type, elongation, count: 0 })
+    yield Capstone.query.withData({
+      base,
+      type,
+      elongation,
+      count: 0,
+      rotundaCount: 0,
+    })
   }
 }
 
@@ -114,7 +120,10 @@ const prisms: Table = {
   data: [...prismaticRows()],
 }
 
-function capstoneEntry(data: Capstone["data"], rotunda?: any) {
+function capstoneEntry(
+  data: Omit<Capstone["data"], "rotundaCount">,
+  rotunda?: any,
+) {
   if (
     data.base === 3 &&
     data.type === "primary" &&
@@ -124,11 +133,12 @@ function capstoneEntry(data: Capstone["data"], rotunda?: any) {
   }
   if (rotunda === "half" && data.count === 1) return ""
   const rotundaCount = rotunda === "half" ? 1 : rotunda ? data.count : 0
-  if (Capstone.hasGyrate(data)) {
+  const _data = { ...data, rotundaCount }
+  if (Capstone.hasGyrate(_data)) {
     return gyrations.map((gyrate) =>
       Capstone.query.withData({ ...data, gyrate, rotundaCount }),
     )
-  } else if (Capstone.isChiral(data)) {
+  } else if (Capstone.isChiral(_data)) {
     return Capstone.query.withData({ ...data, rotundaCount, twist: "left" })
   } else {
     return Capstone.query.withData({ ...data, rotundaCount })

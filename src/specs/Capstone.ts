@@ -33,7 +33,7 @@ interface CapstoneData {
   type: PolygonType
   elongation: Elongation
   count: Count
-  rotundaCount?: Count
+  rotundaCount: Count
   gyrate?: Gyration
   twist?: Twist
 }
@@ -196,11 +196,11 @@ export default class Capstone extends Specs<CapstoneData> {
                 base,
                 rotundaCount,
               }
-              if (this.hasGyrate({ count, type, elongation, base })) {
+              if (this.hasGyrate(data)) {
                 for (const gyrate of gyrations) {
                   yield new Capstone({ ...data, gyrate })
                 }
-              } else if (this.isChiral({ count, type, elongation, base })) {
+              } else if (this.isChiral(data)) {
                 for (const twist of twists) {
                   yield new Capstone({ ...data, twist })
                 }
@@ -218,6 +218,7 @@ export default class Capstone extends Specs<CapstoneData> {
       type: "primary",
       elongation: "antiprism",
       count: 0,
+      rotundaCount: 0,
     })
     // Fastigium
     yield new Capstone({
@@ -244,6 +245,7 @@ export default class Capstone extends Specs<CapstoneData> {
         type: "primary",
         elongation: "snub",
         count: 0,
+        rotundaCount: 0,
       })
     }
   }
