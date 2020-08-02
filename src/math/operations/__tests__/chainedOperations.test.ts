@@ -161,8 +161,9 @@ const chainedTests: OpTest[] = [
 function doOperationStep(opInfo: OpInfo, polyhedron: PolyhedronForme) {
   const { op, args, expected } = getOpInfo(opInfo, polyhedron.geom)
   if (op === "forme") {
-    // FIXME check if they are alternates
-    return createForme(getSpecs(expected), polyhedron.geom)
+    const nextSpecs = getSpecs(expected)
+    expect(polyhedron.specs.canonicalName()).toEqual(nextSpecs.canonicalName())
+    return createForme(nextSpecs, polyhedron.geom)
   }
   const operation = operations[op]
   expect(polyhedron).toSatisfy((p) => operation.canApplyTo(p))
