@@ -12,7 +12,7 @@ export default makeCutPastePair<DiminishedSolidForme>({
       for (const faceType of options) {
         yield {
           left: solid,
-          right: solid.augmentDiminished(faceType === 5),
+          right: solid.augmentDiminished(faceType === 3),
           options: {
             left: { faceType },
             right: { align: solid.data.align },

@@ -1,4 +1,3 @@
-import { omit, isEqual } from "lodash-es"
 import { Items } from "types"
 
 import Specs from "./PolyhedronSpecs"
@@ -44,21 +43,14 @@ function limitCount(limit: number) {
  * with pyramids or cupolae added, removed, or gyrated from it.
  */
 export default class Composite extends Specs<CompositeData> {
-  private constructor({
-    augmented = 0,
-    diminished = 0,
-    gyrate = 0,
-    source,
-    align,
-  }: CompositeDataArgs) {
-    super("composite", { source, align, augmented, diminished, gyrate })
-    if (!this.hasAlignment()) {
-      delete this.data.align
-    }
+  private constructor(data: CompositeDataArgs) {
+    super("composite", Composite.cleanData(data))
   }
 
   withData(data: Partial<CompositeData>) {
-    return new Composite({ ...this.data, ...data })
+    return Composite.query.withData(
+      Composite.cleanData({ ...this.data, ...data }),
+    )
   }
 
   totalCount() {
@@ -167,15 +159,6 @@ export default class Composite extends Specs<CompositeData> {
     })
   }
 
-  equals(s2: Specs) {
-    if (!s2.isComposite()) return false
-    // Recursively compare the source data and other data
-    const { source, ...data } = this.data
-    const source2: Specs = s2.data.source
-    const data2: Omit<CompositeData, "source"> = omit(s2.data, "source")
-    return source.equals(source2) && isEqual(data, data2)
-  }
-
   static hasAlignment({
     source,
     augmented = 0,
@@ -189,6 +172,13 @@ export default class Composite extends Specs<CompositeData> {
     // Only dodecahedra and icosahedra have alignments
     if (source.isClassical()) return source.isIcosahedral()
     return false
+  }
+
+  static cleanData(data: CompositeDataArgs): CompositeData {
+    if (!this.hasAlignment(data)) {
+      delete data.align
+    }
+    return { augmented: 0, diminished: 0, gyrate: 0, ...data }
   }
 
   static *getWithAlignments(data: CompositeDataArgs) {
