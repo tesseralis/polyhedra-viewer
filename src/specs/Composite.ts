@@ -174,7 +174,7 @@ export default class Composite extends Specs<CompositeData> {
     return false
   }
 
-  static cleanData(data: CompositeDataArgs): CompositeData {
+  private static cleanData(data: CompositeDataArgs): CompositeData {
     if (!this.hasAlignment(data)) {
       delete data.align
     }

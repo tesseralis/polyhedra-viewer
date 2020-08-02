@@ -150,7 +150,7 @@ export default class Capstone extends Specs<CapstoneData> {
     return elongation === "antiprism" && count === 2 && type === "secondary"
   }
 
-  static cleanData(data: CapstoneData) {
+  private static cleanData(data: CapstoneData) {
     if (!this.hasGyrate(data)) {
       delete data.gyrate
     }

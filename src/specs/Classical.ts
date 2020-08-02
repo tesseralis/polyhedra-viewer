@@ -73,7 +73,7 @@ export default class Classical extends Specs<ClassicalData> {
     return ["regular", "truncate"].includes(operation)
   }
 
-  static cleanData(data: ClassicalData) {
+  private static cleanData(data: ClassicalData) {
     if (!this.hasFacet(data.operation)) {
       delete data.facet
     }
