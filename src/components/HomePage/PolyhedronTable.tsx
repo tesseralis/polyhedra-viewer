@@ -33,14 +33,15 @@ const Cell = ({
       </td>
     )
   }
-  const isFake = cell.name() !== cell.canonicalName()
-  let symbol = getSpecs(cell.canonicalName()).conwaySymbol()
-  if (isFake) symbol = `(${symbol})`
+  const canonical = getSpecs(cell.canonicalName())
+  const isDuplicate = !cell.equals(canonical)
+  let symbol = canonical.conwaySymbol()
+  if (isDuplicate) symbol = `(${symbol})`
 
   // Render a link for each cell, or a grayed-out link when indicated by an "!"
   return (
     <td {...css()} colSpan={colSpan}>
-      {<PolyhedronLink isFake={isFake} specs={cell} />}
+      {<PolyhedronLink isDuplicate={isDuplicate} specs={cell} />}
       <div {...label()}>{symbol}</div>
     </td>
   )

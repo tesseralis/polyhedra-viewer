@@ -8,7 +8,7 @@ import { PolyhedronSpecs } from "data/specs"
 
 interface Props {
   specs: PolyhedronSpecs
-  isFake: boolean
+  isDuplicate: boolean
 }
 
 // using raw pixel values since we need to do math
@@ -35,13 +35,13 @@ function Image({ name }: { name: string }) {
   )
 }
 
-export default function PolyhedronLink({ specs, isFake }: Props) {
+export default function PolyhedronLink({ specs, isDuplicate }: Props) {
   const escapedName = escape(specs.name())
 
   const css = useStyle(
     {
       ...hover,
-      ...(isFake ? { opacity: 0.5, filter: "grayscale(50%)" } : {}),
+      ...(isDuplicate ? { opacity: 0.5, filter: "grayscale(50%)" } : {}),
       ...flexRow("center", "center"),
       border: "1px LightGray solid",
       color: "black",
@@ -51,12 +51,12 @@ export default function PolyhedronLink({ specs, isFake }: Props) {
       [media.notMobile]: square(thumbnailSize),
       [media.mobile]: square(mobThumbnailSize),
     },
-    [isFake],
+    [isDuplicate],
   )
   return (
     <Link
       {...css()}
-      id={!isFake ? escapedName : undefined}
+      id={!isDuplicate ? escapedName : undefined}
       to={"/" + escapedName}
       title={specs.name()}
     >
