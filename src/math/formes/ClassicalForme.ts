@@ -1,10 +1,16 @@
-import { oppositeTwist } from "types"
-import PolyhedronForme from "./PolyhedronForme"
-import Classical, { Facet, facets, oppositeFacet } from "data/specs/Classical"
+import { find } from "utils"
+import {
+  Classical,
+  Facet,
+  facets,
+  oppositeFacet,
+  oppositeTwist,
+  getSpecs,
+} from "specs"
 import { Polyhedron, Face } from "math/polyhedra"
 import { angleBetween } from "math/geom"
 import { getGeometry, oppositeFace } from "math/operations/operationUtils"
-import { find } from "utils"
+import PolyhedronForme from "./PolyhedronForme"
 
 export default abstract class ClassicalForme extends PolyhedronForme<
   Classical
@@ -28,6 +34,12 @@ export default abstract class ClassicalForme extends PolyhedronForme<
 
   static fromSpecs(specs: Classical) {
     return this.create(specs, getGeometry(specs))
+  }
+
+  static fromName(name: string) {
+    const specs = getSpecs(name)
+    if (!specs.isClassical()) throw new Error(`Invalid specs for name`)
+    return this.fromSpecs(specs)
   }
 
   faceType(facet: Facet): number {
@@ -256,16 +268,15 @@ class SnubForme extends ClassicalForme {
     )
   }
 
-  tetrahedralFacetFaces(facet: Facet) {
-    let f0 = this.geom.faceWithNumSides(3)
+  tetrahedralFacetFaces = (facet: Facet) => {
+    let f0 = this.geom.faces[0]
     const edge = f0.edges[0].twin()
+    let { twist } = this.specs.data
     if (facet === "vertex") {
-      f0 =
-        this.specs.data.twist === "left"
-          ? edge.next().twinFace()
-          : edge.prev().twinFace()
+      f0 = twist === "left" ? edge.prev().twinFace() : edge.next().twinFace()
+      twist = oppositeTwist(twist!)
     }
-    return [f0, ...f0.edges.map((e) => oppositeFace(e, this.specs.data.twist))]
+    return [f0, ...f0.edges.map((e) => oppositeFace(e, twist))]
   }
 
   adjacentFacetFace(face: Face, facet: Facet) {

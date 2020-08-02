@@ -9,8 +9,8 @@ import Capstone from "./Capstone"
 export const counts = [0, 1, 2, 3] as const
 export type Count = Items<typeof counts>
 
-const alignments = ["meta", "para"] as const
-type Align = Items<typeof alignments>
+export const alignments = ["para", "meta"] as const
+export type Align = Items<typeof alignments>
 
 interface CompositeData {
   source: Classical | Capstone
@@ -18,6 +18,10 @@ interface CompositeData {
   diminished: Count
   gyrate: Count
   align?: Align
+}
+
+interface CompositeDataArgs extends Partial<CompositeData> {
+  source: Classical | Capstone
 }
 
 const prismaticBases = Capstone.query.where(
@@ -46,9 +50,9 @@ export default class Composite extends Specs<CompositeData> {
     gyrate = 0,
     source,
     align,
-  }: Partial<CompositeData> & { source: Capstone | Classical }) {
+  }: CompositeDataArgs) {
     super("composite", { source, align, augmented, diminished, gyrate })
-    if (!this.hasAlignemnt()) {
+    if (!this.hasAlignment()) {
       delete this.data.align
     }
   }
@@ -98,12 +102,8 @@ export default class Composite extends Specs<CompositeData> {
   isPara = () => this.data.align === "para"
   isMeta = () => this.data.align === "meta"
 
-  hasAlignemnt() {
-    if (!this.isBi()) return false
-    if (this.isAugmentedPrism()) return this.sourcePrism().isSecondary()
-    if (this.isAugmentedClassical())
-      return this.sourceClassical().isIcosahedral()
-    return true
+  hasAlignment() {
+    return Composite.hasAlignment(this.data)
   }
 
   sourcePrism() {
@@ -160,6 +160,13 @@ export default class Composite extends Specs<CompositeData> {
     })
   }
 
+  ungyrate() {
+    return this.withData({
+      gyrate: (this.data.gyrate - 1) as Count,
+      align: "meta",
+    })
+  }
+
   equals(s2: Specs) {
     if (!s2.isComposite()) return false
     // Recursively compare the source data and other data
@@ -169,30 +176,41 @@ export default class Composite extends Specs<CompositeData> {
     return source.equals(source2) && isEqual(data, data2)
   }
 
-  static *getAll() {
-    // Augmented prisms
-    for (const source of prismaticBases) {
-      for (const augmented of limitCount(source.data.base % 3 === 0 ? 3 : 2)) {
-        if (source.isSecondary() && augmented === 2) {
-          for (const align of alignments) {
-            yield new Composite({ source, augmented, align })
-          }
-        } else {
-          yield new Composite({ source, augmented })
-        }
-      }
-    }
+  static hasAlignment({
+    source,
+    augmented = 0,
+    diminished = 0,
+    gyrate = 0,
+  }: CompositeDataArgs) {
+    const count = augmented + diminished + gyrate
+    if (count !== 2) return false
+    // Only hexagonal prism has alignment
+    if (source.isCapstone()) return source.isSecondary()
+    // Only dodecahedra and icosahedra have alignments
+    if (source.isClassical()) return source.isIcosahedral()
+    return false
+  }
 
-    // Augmented classical polyhedra
-    for (const source of augmentedClassicalBases) {
-      for (const augmented of limitCount(source.data.family - 2)) {
-        if (source.isIcosahedral() && augmented === 2) {
-          for (const align of alignments) {
-            yield new Composite({ source, augmented, align })
-          }
-        } else {
-          yield new Composite({ source, augmented })
-        }
+  static *getWithAlignments(data: CompositeDataArgs) {
+    if (this.hasAlignment(data)) {
+      for (const align of alignments) {
+        yield new Composite({ ...data, align })
+      }
+    } else {
+      yield new Composite(data)
+    }
+  }
+
+  static modifyLimit(source: Capstone | Classical) {
+    if (source.isCapstone()) return source.data.base % 3 === 0 ? 3 : 2
+    return source.data.family - 2
+  }
+
+  static *getAll() {
+    // Augmented solids
+    for (const source of [...prismaticBases, ...augmentedClassicalBases]) {
+      for (const augmented of limitCount(this.modifyLimit(source))) {
+        yield* this.getWithAlignments({ source, augmented })
       }
     }
 
@@ -200,35 +218,18 @@ export default class Composite extends Specs<CompositeData> {
 
     // diminished icosahedra
     for (const diminished of counts) {
-      if (diminished === 2) {
-        for (const align of alignments) {
-          yield new Composite({ source: icosahedron, diminished, align })
-        }
-      } else {
-        yield new Composite({ source: icosahedron, diminished })
-      }
+      yield* this.getWithAlignments({ source: icosahedron, diminished })
     }
     yield new Composite({ source: icosahedron, diminished: 3, augmented: 1 })
 
     // rhombicosidodecahedra
     for (const gyrate of counts) {
       for (const diminished of limitCount(3 - gyrate)) {
-        if (gyrate + diminished === 2) {
-          for (const align of alignments) {
-            yield new Composite({
-              source: rhombicosidodecahedron,
-              gyrate,
-              diminished,
-              align,
-            })
-          }
-        } else {
-          yield new Composite({
-            source: rhombicosidodecahedron,
-            gyrate,
-            diminished,
-          })
-        }
+        yield* this.getWithAlignments({
+          source: rhombicosidodecahedron,
+          gyrate,
+          diminished,
+        })
       }
     }
   }

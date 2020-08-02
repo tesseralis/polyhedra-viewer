@@ -1,7 +1,8 @@
 import { once } from "lodash-es"
 import { find, getSingle } from "utils"
 import PolyhedronForme from "./PolyhedronForme"
-import Composite from "data/specs/Composite"
+import { getGeometry } from "math/operations/operationUtils"
+import { Composite, getSpecs } from "specs"
 import { Polyhedron, Face, Cap } from "math/polyhedra"
 import { getCentroid, isInverse } from "math/geom"
 
@@ -24,13 +25,39 @@ export default abstract class CompositeForme extends PolyhedronForme<
     throw new Error(`Invalid composite specs: ${specs.name()}`)
   }
 
+  static fromSpecs(specs: Composite) {
+    return this.create(specs, getGeometry(specs))
+  }
+
+  static fromName(name: string) {
+    const specs = getSpecs(name)
+    if (!specs.isComposite()) throw new Error(`Invalid specs for name`)
+    return this.fromSpecs(specs)
+  }
+
+  isAugmentedClassical(): this is AugmentedClassicalForme {
+    return this.specs.isAugmentedClassical()
+  }
+
+  isAugmentedPrism(): this is AugmentedPrismForme {
+    return this.specs.isAugmentedPrism()
+  }
+
+  isDiminishedSolid(): this is DiminishedSolidForme {
+    return this.specs.isDiminishedSolid()
+  }
+
+  isGyrateSolid(): this is GyrateSolidForme {
+    return this.specs.isGyrateSolid()
+  }
+
   protected capInnerVertIndices = once(() => {
     return new Set(
       this.caps().flatMap((cap) => cap.innerVertices().map((v) => v.index)),
     )
   })
 
-  private sourceVertices() {
+  protected sourceVertices() {
     return this.geom.vertices.filter(
       (v) => !this.capInnerVertIndices().has(v.index),
     )
@@ -75,7 +102,13 @@ export class AugmentedPrismForme extends CompositeForme {
   }
 
   modifications() {
+    // FIXME make sure triangular prism doesn't count the fastigium
     return this.caps()
+  }
+
+  isBaseFace(face: Face) {
+    // FIXME deal with triangular prism
+    return face.numSides === this.specs.sourcePrism().baseSides()
   }
 
   isSideFace(face: Face) {
@@ -103,18 +136,9 @@ export class AugmentedClassicalForme extends CompositeForme {
     return this.caps()
   }
 
-  sourceSpecs() {
-    if (!this.specs.data.source.isClassical()) {
-      throw new Error(
-        `Attempting to create an AugmentedClassicalForme for non-classical specs: ${this.specs.name()}`,
-      )
-    }
-    return this.specs.data.source
-  }
-
   caps() {
     const caps = super.caps()
-    const specs = this.sourceSpecs()
+    const specs = this.specs.sourceClassical()
     // If it's an augmented tetrahedron, only consider the first cap
     if (specs.isTetrahedral() && specs.isRegular()) {
       return [caps[0]]
@@ -128,7 +152,7 @@ export class AugmentedClassicalForme extends CompositeForme {
     // Only source faces re main faces
     if (!this.isSourceFace(face)) return false
     // All regular faces are main faces
-    if (this.sourceSpecs().isRegular()) return true
+    if (this.specs.sourceClassical().isRegular()) return true
     // It's a main face if it's not a truncated face
     return face.numSides !== 3
   }
@@ -153,13 +177,13 @@ export class AugmentedClassicalForme extends CompositeForme {
     return this.geom.faces.filter((f) => this.isMinorFace(f))
   }
 
-  isInnerCapFace(face: Face) {
-    if (this.sourceSpecs().isRegular()) return false
+  isCapTop(face: Face) {
+    if (this.specs.sourceClassical().isRegular()) return false
     return face.vertices.every((v) => this.capInnerVertIndices().has(v.index))
   }
 
-  innerCapFaces() {
-    return this.geom.faces.filter((f) => this.isInnerCapFace(f))
+  capTops() {
+    return this.geom.faces.filter((f) => this.isCapTop(f))
   }
 
   canAugment(face: Face) {
@@ -175,15 +199,24 @@ export class AugmentedClassicalForme extends CompositeForme {
 
 export class DiminishedSolidForme extends CompositeForme {
   // FIXME dedupe with gyrate
-  isDiminshedFace(face: Face) {
+  isDiminishedFace(face: Face) {
     return (
       this.specs.isDiminished() &&
       face.numSides === this.geom.largestFace().numSides
     )
   }
 
+  augmentedCap() {
+    return find(this.caps(), (cap) => cap.boundary().numSides === 3)
+  }
+
   diminishedFaces() {
-    return this.geom.faces.filter((f) => this.isDiminshedFace(f))
+    return this.geom.faces.filter((f) => this.isDiminishedFace(f))
+  }
+
+  isAugmentedFace(face: Face) {
+    if (!this.specs.isAugmented()) return false
+    return face.inSet(this.augmentedCap().faces())
   }
 
   // FIXME deal with augmented tridiminished
@@ -194,7 +227,7 @@ export class DiminishedSolidForme extends CompositeForme {
   canAugment(face: Face) {
     if (this.specs.isAugmented()) return false
     return (
-      this.isDiminshedFace(face) ||
+      this.isDiminishedFace(face) ||
       face.adjacentFaces().every((f) => f.numSides === 5)
     )
   }

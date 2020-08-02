@@ -1,133 +1,126 @@
-import { Cap } from "math/polyhedra"
-import Capstone from "data/specs/Capstone"
-import Composite from "data/specs/Composite"
-import Elementary from "data/specs/Elementary"
+import { pickBy } from "lodash-es"
+import { Face, Cap } from "math/polyhedra"
+import {
+  Capstone,
+  Composite,
+  Elementary,
+  CapType,
+  Align,
+  Gyration,
+  gyrations,
+} from "specs"
+import CompositeForme from "math/formes/CompositeForme"
 import { OpArgs } from "../Operation"
 import PolyhedronForme from "math/formes/PolyhedronForme"
 import CapstoneForme from "math/formes/CapstoneForme"
-import { find } from "utils"
+import { GraphGenerator, OpInput, toDirected } from "../operationPairs"
+import removeCap from "./removeCap"
+import addCap, { CrossAxis } from "./addCap"
+
+function canAugment(forme: PolyhedronForme, face: Face) {
+  if (forme instanceof CapstoneForme) {
+    return forme.baseFaces().some((base) => base.equals(face))
+  } else if (forme instanceof CompositeForme) {
+    return forme.canAugment(face)
+  } else {
+    // Elementary solid
+    return face.numSides === 4
+  }
+}
+
+function hasRotunda(info: CutPasteSpecs) {
+  if (info.isCapstone()) {
+    return info.isMono() && info.isSecondary() && info.isPentagonal()
+  }
+  return false
+}
+
+function getUsingOpts(info: CutPasteSpecs): CapType[] | null {
+  if (hasRotunda(info)) {
+    return ["cupola", "rotunda"]
+  }
+  return null
+}
+
+function hasGyrateOpts(info: CutPasteSpecs) {
+  if (info.isCapstone()) {
+    if (!info.isMono()) return false
+    // Gyroelongated capstones are always gyro
+    if (info.isGyroelongated()) return false
+    // Cupolae and rotundae (that are not the gyrobifastigium) always have gyrate opts
+    if (!info.isDigonal() && info.isSecondary()) return true
+    return false
+  }
+  if (info.isComposite()) {
+    return info.isGyrateSolid()
+  }
+  return false
+}
 
 export type CutPasteSpecs = Capstone | Composite | Elementary
-
-type Count = Composite["data"]["augmented"]
-
-export function inc(count: Count): Count {
-  if (count === 3) throw new Error(`Count ${count} is too high to increment`)
-  return (count + 1) as Count
-}
-
-export function dec(count: Count): Count {
-  if (count === 0) throw new Error(`Count ${count} is too low to decrement`)
-  return (count - 1) as Count
-}
 
 export interface CapOptions {
   cap: Cap
 }
 
-export type CutPasteOpArgs<Opts, Forme extends PolyhedronForme> = Pick<
-  OpArgs<Opts, Forme>,
-  "apply" | "canApplyTo" | "getResult"
->
-
-export function* augDimCapstoneGraph() {
-  for (const cap of Capstone.query.where(
-    (s) => !s.isPrismatic() && (s.isBi() || !s.isShortened()),
-  )) {
-    for (const capType of cap.capTypes()) {
-      yield {
-        left: cap.remove(capType),
-        right: cap,
-        options: {
-          left: { gyrate: cap.data.gyrate, using: capType },
-        },
-      }
-    }
-  }
+interface DimGraphOpts {
+  using?: CapType
+  align?: Align
+  gyrate?: Gyration
 }
 
-export function* augDimAugmentedSolidGraph() {
-  for (const solid of Composite.query.where(
-    (s) => s.isAugmentedSolid() && s.isAugmented(),
-  )) {
-    yield {
-      left: solid.diminish(),
-      right: solid,
-      options: {
-        left: { align: solid.data.align },
-      },
-    }
-  }
+interface AugGraphOpts extends DimGraphOpts {
+  faceType?: number
 }
 
-export function* augDimDiminishedSolidGraph() {
-  for (const solid of Composite.query.where(
-    (s) => s.isDiminishedSolid() && s.isDiminished() && !s.isAugmented(),
-  )) {
-    const options = solid.isTri() ? [true, false] : [false]
-    for (const option of options) {
-      yield {
-        left: solid,
-        right: solid.augmentDiminished(option),
-        options: {
-          left: { triangular: option },
-          right: { align: solid.data.align },
-        },
-      }
-    }
-  }
+interface AugOptions {
+  face: Face
+  gyrate?: Gyration
+  using?: CapType
 }
 
-export function* augDimGyrateSolidGraph() {
-  for (const solid of Composite.query.where(
-    (s) => s.isGyrateSolid() && s.isDiminished(),
-  )) {
-    for (const gyrate of ["ortho", "gyro"] as const) {
-      yield {
-        left: solid,
-        right: solid.augmentGyrate(gyrate),
-        options: {
-          left: { gyrate },
-          right: { align: solid.data.align },
-        },
-      }
-    }
-  }
+type AugDimGraphGenerator<S> = GraphGenerator<S, AugGraphOpts, DimGraphOpts>
+
+interface CutPastePairInput<F extends PolyhedronForme> {
+  /** The bidirectional graph representing solids that can be augmented or diminished. */
+  graph(): AugDimGraphGenerator<F["specs"]>
+  /** How to transform the arguments to graph options for diminish */
+  toDimGraphOpts?(forme: F, options: CapOptions): DimGraphOpts
+  /** How to transform the arguments to graph options for augment */
+  toAugGraphOpts?(forme: F, options: AugOptions): AugGraphOpts
+  /** Get the axis of the polyhedron base when augmenting */
+  baseAxis?(forme: F, options: AugOptions): CrossAxis | undefined
 }
 
-export function* augDimElementaryGraph() {
-  yield {
-    left: Elementary.query.withName("sphenocorona"),
-    right: Elementary.query.withName("augmented sphenocorona"),
-  }
+interface CutPastePair<F extends PolyhedronForme> {
+  augment: OpInput<AugOptions, F, AugGraphOpts>
+  diminish: OpInput<CapOptions, F, DimGraphOpts>
 }
 
-export function* gyrateCapstoneGraph() {
-  for (const cap of Capstone.query.where(
-    (s) => s.isBi() && s.isSecondary() && !s.isGyro() && !s.isDigonal(),
-  )) {
-    yield { left: cap, right: cap.gyrate() }
-  }
+function defaultGraphOpts() {
+  return {}
 }
 
-export function combineOps<Opts, Forme extends PolyhedronForme>(
-  ops: CutPasteOpArgs<Opts, Forme>[],
-): CutPasteOpArgs<Opts, Forme> {
-  function canApplyTo(specs: Forme["specs"]) {
-    return ops.some((op) => op.canApplyTo(specs))
-  }
-  function getOp(specs: Forme["specs"]) {
-    return find(ops, (op) => op.canApplyTo(specs))
-  }
-
-  // TODO deduplicate this with the other combineOps
+/**
+ * Create a pair of augment/diminish operations.
+ */
+export function makeCutPastePair<F extends PolyhedronForme>(
+  input: CutPastePairInput<F>,
+): CutPastePair<F> {
   return {
-    canApplyTo,
-    apply(forme, options) {
-      return getOp(forme.specs).apply(forme, options)
+    augment: {
+      graph: toDirected("left", input.graph),
+      toGraphOpts: input.toAugGraphOpts ?? defaultGraphOpts,
+      apply(forme, options) {
+        const { using, face } = options
+        const baseAxis = input.baseAxis?.(forme, options)
+        return addCap(forme.geom, face, baseAxis, using)
+      },
     },
-    getResult(forme, options) {
-      return getOp(forme.specs).getResult(forme, options)
+    diminish: {
+      graph: toDirected("right", input.graph),
+      toGraphOpts: input.toDimGraphOpts ?? defaultGraphOpts,
+      apply: ({ geom }, { cap }) => removeCap(geom, cap),
     },
   }
 }
@@ -136,19 +129,25 @@ function getCaps(forme: PolyhedronForme) {
   if (forme instanceof CapstoneForme) {
     return forme.baseCaps()
   } else {
+    // FIXME this doesn't return the right thing for composite
     return forme.geom.caps()
   }
 }
 
-type CapOptionArgs = Partial<OpArgs<CapOptions, PolyhedronForme>>
+type CapOptionArgs = Partial<OpArgs<CapOptions, PolyhedronForme, DimGraphOpts>>
+type AugOptionArgs = Partial<
+  OpArgs<AugOptions, PolyhedronForme<CutPasteSpecs>, AugGraphOpts>
+>
 
 export const capOptionArgs: CapOptionArgs = {
   hasOptions() {
     return true
   },
 
-  *allOptionCombos(forme) {
-    for (const cap of getCaps(forme)) yield { cap }
+  allOptions(forme) {
+    return {
+      cap: getCaps(forme),
+    }
   },
 
   hitOption: "cap",
@@ -158,12 +157,47 @@ export const capOptionArgs: CapOptionArgs = {
     return cap ? { cap } : {}
   },
 
-  faceSelectionStates(forme, { cap }) {
+  selectionState(face, forme, { cap }) {
     const allCapFaces = getCaps(forme).flatMap((cap) => cap.faces())
-    return forme.geom.faces.map((face) => {
-      if (cap instanceof Cap && face.inSet(cap.faces())) return "selected"
-      if (face.inSet(allCapFaces)) return "selectable"
-      return undefined
+    if (cap instanceof Cap && face.inSet(cap.faces())) return "selected"
+    if (face.inSet(allCapFaces)) return "selectable"
+    return undefined
+  },
+}
+
+// TODO putting this here is a little awkward
+export const augOptionArgs: AugOptionArgs = {
+  hasOptions() {
+    return true
+  },
+
+  hitOption: "face",
+  getHitOption(forme, hitPnt, options) {
+    if (!options) return {}
+    const face = forme.geom.hitFace(hitPnt)
+    return canAugment(forme, face) ? { face } : {}
+  },
+
+  selectionState(f, forme, { face }) {
+    if (face && f.equals(face)) return "selected"
+    if (canAugment(forme, f)) return "selectable"
+    return undefined
+  },
+
+  allOptions(forme) {
+    const { specs, geom } = forme
+    return {
+      gyrate: hasGyrateOpts(specs) ? gyrations : [undefined],
+      using: getUsingOpts(specs) ?? [undefined],
+      face: geom.faces.filter((face) => canAugment(forme, face)),
+    }
+  },
+
+  defaultOptions(info) {
+    const usingOpts = getUsingOpts(info) ?? []
+    return pickBy({
+      gyrate: hasGyrateOpts(info) && "gyro",
+      using: usingOpts.length > 1 && usingOpts[0],
     })
   },
 }

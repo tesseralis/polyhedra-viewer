@@ -1,72 +1,69 @@
 import { truncate, rectify, sharpen } from "../truncateOps"
-import { makeApplyTo, makeHasOptions } from "../operationTestUtils"
+import { validateOpInputs, validateHasOptions } from "../operationTestUtils"
 
 describe("truncate", () => {
-  describe("canApplyTo", () => {
-    const expectApplyTo = makeApplyTo(truncate)
-    it("works on regular and rectified polyhedra", () => {
-      expectApplyTo("tetrahedron")
-      expectApplyTo("cube")
-      expectApplyTo("icosahedron")
-
-      expectApplyTo("cuboctahedron")
-      expectApplyTo("icosidodecahedron")
+  it("canApplyTo", () => {
+    validateOpInputs(truncate, {
+      pass: [
+        "tetrahedron",
+        "cube",
+        "icosahedron",
+        // rectified polyhedra
+        "cuboctahedron",
+        "icosidodecahedron",
+      ],
+      fail: [],
     })
   })
 })
 
 describe("rectify", () => {
-  describe("canApplyTo", () => {
-    const expectApplyTo = makeApplyTo(rectify)
-    it("works on regular polyhedra", () => {
-      expectApplyTo("tetrahedron")
-      expectApplyTo("cube")
-      expectApplyTo("icosahedron")
-    })
-
-    it("works on quasiregular polyhedra", () => {
-      expectApplyTo("cuboctahedron")
-      expectApplyTo("icosidodecahedron")
+  it("canApplyTo", () => {
+    validateOpInputs(rectify, {
+      pass: [
+        "tetrahedron",
+        "cube",
+        "icosahedron",
+        // rectified polyhedra
+        "cuboctahedron",
+        "icosidodecahedron",
+      ],
+      fail: [],
     })
   })
 })
 
 describe("sharpen", () => {
-  const expectApplyTo = makeApplyTo(sharpen)
-  const expectHasOptions = makeHasOptions(sharpen)
-
-  describe("canApplyTo", () => {
-    it("works on truncated polyhedra", () => {
-      expectApplyTo("truncated tetrahedron")
-      expectApplyTo("truncated cube")
-      expectApplyTo("truncated icosahedron")
-    })
-
-    it("works on bevelled polyhedra", () => {
-      expectApplyTo("truncated cuboctahedron")
-      expectApplyTo("truncated icosidodecahedron")
-    })
-
-    it("works on rectified polyhedra", () => {
-      expectApplyTo("tetratetrahedron")
-      expectApplyTo("cuboctahedron")
-      expectApplyTo("icosidodecahedron")
-    })
-
-    it("works on cantellated polyhera", () => {
-      expectApplyTo("rhombicuboctahedron")
-      expectApplyTo("rhombicosidodecahedron")
+  it("canApplyTo", () => {
+    validateOpInputs(sharpen, {
+      pass: [
+        // truncated solids
+        "truncated tetrahedron",
+        "truncated cube",
+        "truncated icosahedron",
+        // bevelled solids
+        "truncated cuboctahedron",
+        "truncated icosidodecahedron",
+        // rectified solids
+        "tetratetrahedron",
+        "cuboctahedron",
+        "icosidodecahedron",
+        // cantellated solids
+        "rhombicuboctahedron",
+        "rhombicosidodecahedron",
+      ],
+      fail: [],
     })
   })
 
-  describe("hasOptions", () => {
-    it("is true only on rectified", () => {
-      expectHasOptions("cuboctahedron")
-      expectHasOptions("icosidodecahedron")
-
-      expectHasOptions("truncated tetratetrahedron", false)
-      expectHasOptions("truncated cuboctahedron", false)
-      expectHasOptions("truncated icosahedron", false)
+  it("hasOptions", () => {
+    validateHasOptions(sharpen, {
+      pass: ["cuboctahedron", "icosidodecahedron"],
+      fail: [
+        "truncated tetratetrahedron",
+        "truncated cuboctahedron",
+        "truncated icosahedron",
+      ],
     })
   })
 })

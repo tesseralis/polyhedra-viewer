@@ -1,8 +1,6 @@
 import { Items } from "types"
 import { BiMap } from "bimap"
 
-export type PolygonMap<T> = { [n: number]: T }
-
 export const polygonNames = new BiMap([
   [3, "triangle"],
   [4, "square"],
@@ -31,3 +29,13 @@ export type SecondaryPolygon = Items<typeof secondaryPolygons>
 
 export const polygons = [...primaryPolygons, ...secondaryPolygons]
 export type Polygon = PrimaryPolygon | SecondaryPolygon
+
+export const polygonTypes = ["primary", "secondary"] as const
+export type PolygonType = Items<typeof polygonTypes>
+
+/** Type representing chiral orientation or rotation direction. */
+export type Twist = "left" | "right"
+export const twists: Twist[] = ["left", "right"]
+export function oppositeTwist(twist: Twist) {
+  return twist === "left" ? "right" : "left"
+}

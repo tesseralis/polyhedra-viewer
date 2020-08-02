@@ -1,10 +1,12 @@
-import { useMemo } from "react"
+import { useMemo, useCallback } from "react"
 import tinycolor from "tinycolor2"
 import Config from "components/ConfigCtx"
 import { PolyhedronCtx, OperationCtx, TransitionCtx } from "../../context"
-import { Polyhedron } from "math/polyhedra"
+import { Polyhedron, Face } from "math/polyhedra"
 import ClassicalForme from "math/formes/ClassicalForme"
 import CapstoneForme from "math/formes/CapstoneForme"
+import CompositeForme from "math/formes/CompositeForme"
+import PolyhedronForme from "math/formes/PolyhedronForme"
 
 function toRgb(hex: string) {
   const { r, g, b } = tinycolor(hex).toRgb()
@@ -15,62 +17,106 @@ function createFamilyColor(face: string, vertex: string) {
   return {
     primary: { face, vertex },
     secondary: {
-      face: tinycolor(face).darken(20),
-      vertex: tinycolor(vertex).darken(20),
+      face: tinycolor(face).darken(25),
+      vertex: tinycolor(vertex).darken(25),
     },
     edge: {
-      ortho: tinycolor.mix(face, vertex, 50).desaturate(10),
-      gyro: tinycolor.mix(face, vertex, 50).lighten(20),
+      ortho: tinycolor.mix(face, vertex, 33).desaturate(25).lighten(),
+      gyro: tinycolor.mix(face, vertex, 67).desaturate(25).lighten(),
     },
   }
 }
 
-const classicalColorScheme = {
-  // yellow + purple
-  3: createFamilyColor("#ffea00", "#db39ce"),
-  // red + green
-  4: createFamilyColor("#e00909", "#22e34c"),
-  // blue + orange
-  5: createFamilyColor("#2c65de", "#ff9100"),
+const colorScheme = {
+  2: createFamilyColor("#000000", "#ffffff"),
+  // green + cyan
+  3: createFamilyColor("#1bcc3b", "#15ace8"),
+  // red + yellow
+  4: createFamilyColor("#ff3d3d", "#ffe100"),
+  // blue + magenta
+  5: createFamilyColor("#424eed", "#f24bd4"),
 }
 
-const orthoFace = "dimgray"
-const gyroFace = "lightgray"
+function getClassicalColor(forme: ClassicalForme, face: Face) {
+  const scheme = colorScheme[forme.specs.data.family]
+  const facet = forme.getFacet(face)
+  // thing for the edge face
+  if (!facet) {
+    return scheme.edge[forme.specs.isSnub() ? "gyro" : "ortho"]
+  }
+  const faceSides = face.numSides > 5 ? "secondary" : "primary"
+  return scheme[faceSides][facet]
+}
 
-function getClassicalColors(forme: ClassicalForme) {
-  const scheme = classicalColorScheme[forme.specs.data.family]
-  return forme.geom.faces.map((face) => {
-    const facet = forme.getFacet(face)
-    // thing for the edge face
-    if (!facet) {
-      return scheme.edge[forme.specs.isSnub() ? "gyro" : "ortho"]
-    }
+function getCapstoneColor(forme: CapstoneForme, face: Face) {
+  const scheme = colorScheme[forme.specs.data.base]
+  if (forme.isBaseTop(face)) {
     const faceSides = face.numSides > 5 ? "secondary" : "primary"
-    return scheme[faceSides][facet]
-  })
+    return scheme[faceSides].face
+  } else if (forme.inBase(face)) {
+    if (face.numSides === 3) {
+      return scheme.primary.vertex
+    } else if (face.numSides === 4) {
+      // TODO need to distinguish this from the edge faces
+      return scheme.edge.ortho
+    } else {
+      // TODO want this to be a separate color from the top face
+      return colorScheme[5].primary.face
+    }
+  } else {
+    const side = forme.specs.isElongated() ? "ortho" : ("gyro" as const)
+    return tinycolor(scheme.edge[side]).desaturate(2).lighten(1)
+  }
 }
 
-function getCapstoneColors(forme: CapstoneForme) {
-  return forme.geom.faces.map((face) => {
-    if (forme.isBaseTop(face)) {
-      const faceSides = face.numSides > 5 ? "secondary" : "primary"
-      return (classicalColorScheme as any)[forme.specs.data.base][faceSides]
-        .face
-    } else if (forme.inBase(face)) {
-      if (face.numSides === 3) {
-        return (classicalColorScheme as any)[forme.specs.data.base].primary
-          .vertex
-      } else if (face.numSides === 4) {
-        // TODO need to distinguish this from the edge faces
-        return orthoFace
-      } else {
-        // TODO want this to be a separate color from the top face
-        return classicalColorScheme[5].primary.face
-      }
+function getCompositeColor(forme: CompositeForme, face: Face) {
+  if (forme.isAugmentedPrism()) {
+    const sourceSpecs = forme.specs.sourcePrism()
+    const scheme = colorScheme[sourceSpecs.data.base]
+    if (forme.isBaseFace(face)) {
+      return scheme[sourceSpecs.data.type].face
+    } else if (forme.isSideFace(face)) {
+      return scheme.edge.ortho
     } else {
-      return forme.specs.isElongated() ? orthoFace : gyroFace
+      // augmented face
+      return tinycolor(scheme.primary.vertex).lighten(25)
     }
-  })
+  } else if (forme.isAugmentedClassical()) {
+    const scheme = colorScheme[forme.specs.sourceClassical().data.family]
+    const type = forme.specs.sourceClassical().isTruncated()
+      ? "secondary"
+      : ("primary" as const)
+    if (forme.isMainFace(face)) {
+      return scheme[type].face
+    } else if (forme.isMinorFace(face)) {
+      return scheme.primary.vertex
+    } else if (forme.isCapTop(face)) {
+      return tinycolor(scheme.primary.face).lighten(25)
+    } else {
+      return tinycolor(
+        face.numSides === 3 ? scheme.primary.vertex : scheme.edge.ortho,
+      ).lighten(25)
+    }
+  } else if (forme.isDiminishedSolid()) {
+    const scheme = colorScheme[5]
+    if (forme.isAugmentedFace(face)) {
+      return tinycolor(scheme.primary.vertex).lighten(25)
+    } else if (forme.isDiminishedFace(face)) {
+      return tinycolor(scheme.primary.face).darken(25)
+    } else {
+      return scheme.primary.vertex
+    }
+  }
+}
+
+function getFormeColor(polyhedron: PolyhedronForme, face: Face) {
+  if (polyhedron instanceof ClassicalForme) {
+    return getClassicalColor(polyhedron, face)
+  } else if (polyhedron instanceof CapstoneForme) {
+    return getCapstoneColor(polyhedron, face)
+  } else if (polyhedron instanceof CompositeForme) {
+    return getCompositeColor(polyhedron, face)
+  }
 }
 
 const enableFormeColors = true
@@ -87,14 +133,27 @@ export default function useSolidContext() {
   } = TransitionCtx.useState()
   const { operation, options = {} } = OperationCtx.useState()
 
+  const getSelectionColor = useCallback(
+    (face, color) => {
+      if (!operation) return color
+      switch (operation.selectionState(face, polyhedron, options)) {
+        case "selected":
+          return tinycolor(color).lighten(25)
+        case "selectable":
+          return tinycolor(color).lighten()
+        default:
+          return color
+      }
+    },
+    [operation, options, polyhedron],
+  )
+
   const formeColors = useMemo(() => {
     if (!enableFormeColors) return
-    if (polyhedron instanceof ClassicalForme) {
-      return getClassicalColors(polyhedron)
-    } else if (polyhedron instanceof CapstoneForme) {
-      return getCapstoneColors(polyhedron)
-    }
-  }, [polyhedron])
+    return polyhedron.geom.faces.map((f) =>
+      getSelectionColor(f, getFormeColor(polyhedron, f)),
+    )
+  }, [polyhedron, getSelectionColor])
 
   // Colors when animation is being applied
   const transitionColors = useMemo(
@@ -107,25 +166,16 @@ export default function useSolidContext() {
 
   // Colors when in operation mode and hit options are being selected
   const operationColors = useMemo(() => {
-    if (!operation) return
-    const selectState = operation.faceSelectionStates(polyhedron, options)
-    return geom.faces.map((face, i) => {
-      switch (selectState[i]) {
-        case "selected":
-          return tinycolor.mix(colors[face.numSides], "lime")
-        case "selectable":
-          return tinycolor.mix(colors[face.numSides], "yellow", 25)
-        default:
-          return colors[face.numSides]
-      }
-    })
-  }, [polyhedron, geom, operation, options, colors])
+    return geom.faces.map((face) =>
+      getSelectionColor(face, colors[face.numSides]),
+    )
+  }, [colors, geom.faces, getSelectionColor])
 
   const normalizedColors = useMemo(() => {
     const rawColors =
       transitionColors ||
-      operationColors ||
       formeColors ||
+      operationColors ||
       geom.faces.map((f) => colors[f.numSides])
     return rawColors.map(toRgb)
   }, [formeColors, transitionColors, operationColors, geom, colors])

@@ -1,5 +1,5 @@
 import { startCase, set } from "lodash-es"
-import { polygons, polygonNames } from "data/polygons"
+import { polygons, polygonNames } from "specs"
 
 // Colors from d3-scale-chromatic:
 // https://github.com/d3/d3-scale-chromatic#schemeCategory10
@@ -52,7 +52,7 @@ export const configInputs: ConfigInput[] = [
   {
     key: "opacity",
     type: "range",
-    default: 0.9,
+    default: 1.0,
     min: 0,
     max: 1,
     step: 0.01,

@@ -2,7 +2,7 @@ import { Items } from "types"
 import Specs from "./PolyhedronSpecs"
 import Queries from "./Queries"
 
-const bases = [
+export const bases = [
   "sphenocorona",
   "augmented sphenocorona",
   "sphenomegacorona",

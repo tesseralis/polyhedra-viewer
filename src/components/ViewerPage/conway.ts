@@ -1,9 +1,9 @@
 import { BiMap } from "bimap"
-import { allSolidNames } from "./common"
-import getSpecs from "./specs/getSpecs"
+import { allSolidNames } from "data/common"
+import { getCanonicalSpecs } from "specs"
 
 function getConwayNotation(name: string) {
-  return getSpecs(name).conwaySymbol()
+  return getCanonicalSpecs(name).conwaySymbol()
 }
 
 const conwayMapping = new BiMap(

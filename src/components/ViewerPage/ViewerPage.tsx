@@ -10,7 +10,7 @@ import {
 import { escape, choose } from "utils"
 import { isValidSolid, allSolidNames } from "data/common"
 import { isAlternateName } from "data/alternates"
-import { isConwayNotation, fromConwayNotation } from "data/conway"
+import { isConwayNotation, fromConwayNotation } from "./conway"
 
 import ErrorPage from "components/ErrorPage"
 import Viewer from "./Viewer"

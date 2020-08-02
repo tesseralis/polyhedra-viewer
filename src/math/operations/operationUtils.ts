@@ -9,9 +9,7 @@ import {
   withOrigin,
 } from "math/geom"
 import { mapObject } from "utils"
-import PolyhedronSpecs from "data/specs/PolyhedronSpecs"
-import { Facet } from "data/specs/Classical"
-import { Twist } from "types"
+import { PolyhedronSpecs, Facet, Twist } from "specs"
 
 export interface FacetOpts {
   facet: Facet

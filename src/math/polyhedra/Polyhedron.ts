@@ -10,7 +10,7 @@ import {
 } from "lodash-es"
 
 import { getSolidData } from "data/common"
-import { polygons } from "data/polygons"
+import { polygons } from "specs"
 import { Vec3D, getCentroid } from "math/geom"
 
 import { SolidData } from "./solidTypes"
@@ -31,7 +31,6 @@ function calculateEdges(faces: Face[]) {
 
 export default class Polyhedron {
   _solidData: SolidData
-  name: string
   faces: Face[]
   vertices: Vertex[]
   private _edges?: Edge[]
@@ -46,7 +45,6 @@ export default class Polyhedron {
       (vertex, vIndex) => new Vertex(this, vIndex),
     )
     this.faces = solidData.faces.map((face, fIndex) => new Face(this, fIndex))
-    this.name = solidData.name ?? ""
   }
 
   get edges() {
@@ -188,10 +186,6 @@ export default class Polyhedron {
 
   withChanges(changes: (b: Builder) => Builder) {
     return changes(new Builder(this)).build()
-  }
-
-  withName(name: string) {
-    return new Polyhedron({ ...this.solidData, name })
   }
 
   // TODO support all the solid builder functions
