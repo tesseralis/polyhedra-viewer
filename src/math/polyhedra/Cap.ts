@@ -1,6 +1,7 @@
 import { minBy, once, countBy, isEqual } from "lodash-es"
 
 import { flatMapUniq, find } from "utils"
+import { CapType } from "specs"
 import { Vec3D } from "math/geom"
 import type Polyhedron from "./Polyhedron"
 import type Face from "./Face"
@@ -9,7 +10,6 @@ import type { VertexList } from "./Vertex"
 import type Edge from "./Edge"
 import FaceLike from "./FaceLike"
 
-type CapType = "pyramid" | "cupola" | "rotunda" | "fastigium"
 type FaceConfiguration = { [key: string]: number }
 
 // Find the boundary of a connected set of faces
@@ -152,7 +152,7 @@ class Pyramid extends Cap {
 class Fastigium extends Cap {
   constructor(polyhedron: Polyhedron, edge: Edge) {
     const config = { "3": 1, "4": 2 }
-    super(polyhedron, edge.vertices, "fastigium", edge.midpoint(), config)
+    super(polyhedron, edge.vertices, "cupola", edge.midpoint(), config)
   }
   static getAll = createMapper((p) => p.edges, Fastigium)
 }

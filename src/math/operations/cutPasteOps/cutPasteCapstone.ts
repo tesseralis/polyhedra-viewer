@@ -29,7 +29,7 @@ export default makeCutPastePair<CapstoneForme>({
   toDimGraphOpts(forme, { cap }) {
     if (!forme.specs.isCupolaRotunda()) return {}
     // Determine the cap type for cupolarotundae
-    return { using: cap.type as any }
+    return { using: cap.type }
   },
   baseAxis(forme, { gyrate }) {
     const { specs } = forme
@@ -38,7 +38,7 @@ export default makeCutPastePair<CapstoneForme>({
       return
     }
     // FIXME this might fail with the digonal cupola?
-    const orientationFn = capOrientation(forme.baseCaps()[0].type as any)
+    const orientationFn = capOrientation(forme.baseCaps()[0].type)
     return (edge) => {
       // Determine the cupola face to check
       edge = edge.twin()
