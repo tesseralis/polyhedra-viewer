@@ -2,12 +2,11 @@ import React from "react"
 import { CSSProperties } from "aphrodite"
 import { useStyle, scales } from "styles"
 
-import { Table } from "data/tables"
+import { Table, TableSection as TableSectionType } from "data/tables"
 import { media, fonts } from "styles"
 import * as text from "./text"
 import Description from "./Description"
 import PolyhedronTable from "./PolyhedronTable"
-import { TableSection as TableSectionType } from "./tableSections"
 import { flexColumn, paddingHoriz } from "styles/common"
 
 const gridAreaMapping: Record<string, string> = {

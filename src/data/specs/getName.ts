@@ -67,7 +67,7 @@ export default function getName(solid: Specs): string {
     const elongStr = {
       prism: "elongated",
       antiprism: "gyroelongated",
-      null: "",
+      none: "",
       snub: "",
     }
 

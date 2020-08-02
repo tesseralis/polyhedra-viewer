@@ -15,7 +15,7 @@ import {
 export const prismaticTypes = ["prism", "antiprism"] as const
 export type PrismaticType = Items<typeof prismaticTypes>
 
-const elongations = ["null", ...prismaticTypes, "snub"] as const
+const elongations = ["none", ...prismaticTypes, "snub"] as const
 type Elongation = Items<typeof elongations>
 
 const counts = [0, 1, 2] as const
@@ -72,7 +72,7 @@ export default class Capstone extends Specs<CapstoneData> {
     return new Capstone({ ...this.data, ...data })
   }
 
-  withElongation(elongation: PrismaticType | "null", twist?: Twist) {
+  withElongation(elongation: PrismaticType | "none", twist?: Twist) {
     return this.withData({ elongation, twist })
   }
 
@@ -88,7 +88,7 @@ export default class Capstone extends Specs<CapstoneData> {
   isMono = () => this.data.count === 1
   isBi = () => this.data.count === 2
 
-  isShortened = () => this.data.elongation === "null"
+  isShortened = () => this.data.elongation === "none"
   isElongated = () => this.data.elongation === "prism"
   isGyroelongated = () => this.data.elongation === "antiprism"
   isSnub = () => this.data.elongation === "snub"
@@ -172,7 +172,7 @@ export default class Capstone extends Specs<CapstoneData> {
               continue
             }
             // Prismatic stuff without elongation doesn't exist
-            if (count === 0 && elongation === "null") {
+            if (count === 0 && elongation === "none") {
               continue
             }
             for (const rotundaCount of rotundaCounts(type, base, count)) {
@@ -213,7 +213,7 @@ export default class Capstone extends Specs<CapstoneData> {
     yield new Capstone({
       base: 2,
       type: "secondary",
-      elongation: "null",
+      elongation: "none",
       count: 1,
       rotundaCount: 0,
     })
@@ -221,7 +221,7 @@ export default class Capstone extends Specs<CapstoneData> {
     yield new Capstone({
       base: 2,
       type: "secondary",
-      elongation: "null",
+      elongation: "none",
       count: 2,
       rotundaCount: 0,
       gyrate: "gyro",

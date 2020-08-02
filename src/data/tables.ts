@@ -34,6 +34,15 @@ export interface Table {
   data: DataRow[]
 }
 
+export interface TableSection {
+  id: string
+  header: string
+  sticky?: boolean
+  tables?: Table[]
+  narrowTables?: Table[]
+  subsections?: TableSection[]
+}
+
 function* classicalRow(operation: Operation) {
   for (const family of families) {
     if (Classical.hasFacet(operation)) {
@@ -56,7 +65,7 @@ function* classicalRows() {
   }
 }
 
-export const classical: Table = {
+const classical: Table = {
   caption: "Platonic and Archimedean Solids",
   rows: [
     "regular",
@@ -89,7 +98,7 @@ function* prismaticRows() {
   }
 }
 
-export const prisms: Table = {
+const prisms: Table = {
   caption: "Prisms and Antiprisms",
   rows: [
     "triangular",
@@ -124,7 +133,7 @@ function capstoneEntry(data: Capstone["data"], rotunda?: any) {
 
 function* capstoneRow(base: Polygon, type: PolygonType, rotunda?: any) {
   for (const count of [1, 2]) {
-    for (const elongation of ["null", ...prismaticTypes]) {
+    for (const elongation of ["none", ...prismaticTypes]) {
       yield capstoneEntry(
         {
           base: base as any,
@@ -162,7 +171,7 @@ function* capstoneRows() {
 
 const capstoneTable = [...capstoneRows()]
 
-export const capstones: Table = {
+const capstones: Table = {
   caption: "Pyramids, Cupolæ, and Rotundæ",
   rows: [
     "triangular pyramid",
@@ -190,7 +199,7 @@ const capstoneMonoTable = capstoneTable
   .map((row) => row.slice(0, 3))
   .filter((row, i) => i !== 3 && i !== 7)
 
-export const capstonesMono: Table = {
+const capstonesMono: Table = {
   caption: "Pyramids, Cupolæ, and Rotundæ",
   rows: [
     "triangular pyramid",
@@ -207,7 +216,7 @@ export const capstonesMono: Table = {
 
 const capstoneBiTable = capstoneTable.map((row) => row.slice(3))
 
-export const capstonesBi: Table = {
+const capstonesBi: Table = {
   caption: "Bipyramids, Cupolæ, and Rotundæ",
   rows: [
     "triangular pyramid",
@@ -268,7 +277,7 @@ function* augmentedRows() {
   }
 }
 
-export const augmented: Table = {
+const augmented: Table = {
   caption: "Augmented Polyhedra",
   rows: augSources,
   columns: [
@@ -313,7 +322,7 @@ function* diminishedRow() {
   }
 }
 
-export const icosahedra: Table = {
+const icosahedra: Table = {
   caption: "Diminished Icosahedra",
   rows: ["icosahedron"],
   columns: [
@@ -359,8 +368,8 @@ function* gyrateRows() {
   }
 }
 
-export const gyrateTable = [...gyrateRows()]
-export const rhombicosidodecahedra: Table = {
+const gyrateTable = [...gyrateRows()]
+const rhombicosidodecahedra: Table = {
   caption: "Gyrate and Diminished Rhombicosidodecahedra",
   rows: ["--", "gyrate", "bigyrate", "trigyrate"],
   columns: [
@@ -373,7 +382,7 @@ export const rhombicosidodecahedra: Table = {
 }
 
 const gyrateRhombicos = gyrateTable.slice(1).map((row) => [row[0]])
-export const gyrateRhombicosidodecahedra: Table = {
+const gyrateRhombicosidodecahedra: Table = {
   caption: "Gyrate Rhombicosidodecahedra",
   rows: ["gyrate", "bigyrate", "trigyrate"],
   columns: [{ name: "--", sub: alignLabels }],
@@ -381,7 +390,7 @@ export const gyrateRhombicosidodecahedra: Table = {
 }
 
 const diminishedRhombicos = gyrateTable.slice(0, 3).map((row) => row.slice(1))
-export const diminishedRhombicosidodecahedra: Table = {
+const diminishedRhombicosidodecahedra: Table = {
   caption: "Diminished Rhombicosidodecahedra",
   rows: ["--", "gyrate", "bigyrate"],
   columns: [
@@ -396,41 +405,66 @@ function snubAntiprismRow() {
   return Capstone.query.where((cap) => cap.isSnub())
 }
 
-export const snubAntiprismTable = [snubAntiprismRow()]
-export const snubAntiprisms: Table = {
+const snubAntiprisms: Table = {
   caption: "Snub Antiprisms",
   rows: ["snub"],
   columns: ["digonal", "triangular", "square"],
   data: [snubAntiprismRow()],
 }
-export const elementaryTable = [[...Elementary.getAll()]]
-export const others: Table = {
+const elementaryTable = [[...Elementary.getAll()]]
+const others: Table = {
   caption: "Other Johnson Solids",
   rows: [""],
   columns: ["", "", "", "", "", "", ""],
   data: elementaryTable,
 }
 
-export const elementaryTwoRows = chunk(elementaryTable[0], 4)
-export const othersTwoRows: Table = {
+const elementaryTwoRows = chunk(elementaryTable[0], 4)
+const othersTwoRows: Table = {
   caption: "Other Johnson Solids",
   rows: [""],
   columns: ["", "", "", ""],
   data: elementaryTwoRows,
 }
 
-export const sections: Record<string, Table> = {
-  classical,
-  prisms,
-  capstones,
-  capstonesMono,
-  capstonesBi,
-  augmented,
-  icosahedra,
-  rhombicosidodecahedra,
-  gyrateRhombicosidodecahedra,
-  diminishedRhombicosidodecahedra,
-  snubAntiprisms,
-  others,
-  othersTwoRows,
-}
+export const tableSections: TableSection[] = [
+  {
+    id: "uniform",
+    header: "Uniform Polyhedra",
+    tables: [classical, prisms],
+  },
+  {
+    id: "johnson",
+    header: "Johnson Solids",
+    subsections: [
+      {
+        id: "capstones",
+        header: "Pyramids, Cupolæ, and Rotundæ",
+        tables: [capstones],
+        narrowTables: [capstonesMono, capstonesBi],
+      },
+      {
+        id: "composite",
+        header: "Augmented, Diminished, and Gyrate Polyhedra",
+        tables: [augmented, icosahedra, rhombicosidodecahedra],
+        narrowTables: [
+          augmented,
+          icosahedra,
+          gyrateRhombicosidodecahedra,
+          diminishedRhombicosidodecahedra,
+        ],
+      },
+      {
+        id: "elementary",
+        header: "Elementary Johnson Solids",
+        tables: [snubAntiprisms, others],
+        narrowTables: [snubAntiprisms, othersTwoRows],
+      },
+    ],
+  },
+  {
+    id: "more",
+    header: "And Many More...",
+    sticky: true,
+  },
+]
