@@ -141,7 +141,7 @@ const cupolaOps = makePrismOp({
 const gyroelongCupola = cupolaOps("null")
 const turnCupola = cupolaOps("prism")
 
-function makeBicupolaPrismOp(leftElongation: null | "prism") {
+function makeBicupolaPrismOp(leftElongation: "null" | "prism") {
   return makeOpPair<CapstoneForme, TwistOpts>({
     graph: function* () {
       for (const entry of Capstone.query.where(
@@ -178,7 +178,7 @@ function makeBicupolaPrismOp(leftElongation: null | "prism") {
   })
 }
 
-const gyroelongBicupola = makeBicupolaPrismOp(null)
+const gyroelongBicupola = makeBicupolaPrismOp("null")
 const turnBicupola = makeBicupolaPrismOp("prism")
 
 // Exported operations
