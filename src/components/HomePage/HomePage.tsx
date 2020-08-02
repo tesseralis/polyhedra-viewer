@@ -2,7 +2,7 @@ import React, { useEffect } from "react"
 import { useLocation } from "react-router-dom"
 
 import { useStyle, scales } from "styles"
-import { tableSections } from "data/tables"
+import { tableSections } from "tables"
 
 import useMediaInfo from "components/useMediaInfo"
 import { usePageTitle } from "components/common"

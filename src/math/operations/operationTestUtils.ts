@@ -3,7 +3,7 @@ import { Polyhedron } from "math/polyhedra"
 import Operation, { OpResult } from "./Operation"
 import PolyhedronForme from "math/formes/PolyhedronForme"
 import { getGeometry } from "math/operations/operationUtils"
-import { getSpecs2 } from "data/specs/getSpecs"
+import { getSpecs2 } from "specs/getSpecs"
 import createForme from "math/formes/createForme"
 
 interface OpTestCases {

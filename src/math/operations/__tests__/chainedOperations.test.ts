@@ -1,9 +1,9 @@
-import { Facet } from "data/specs"
+import { Facet } from "specs"
 import { Polyhedron } from "math/polyhedra"
 import { OpName, operations } from "math/operations"
 import { validateOperationApplication } from "../operationTestUtils"
 import { getGeometry } from "math/operations/operationUtils"
-import { getSpecs2 } from "data/specs/getSpecs"
+import { getSpecs2 } from "specs/getSpecs"
 import createForme from "math/formes/createForme"
 
 interface Args {

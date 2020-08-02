@@ -1,4 +1,4 @@
-import { Composite, gyrations } from "data/specs"
+import { Composite, gyrations } from "specs"
 import { GyrateSolidForme } from "math/formes/CompositeForme"
 import { makeCutPastePair } from "./cutPasteUtils"
 

@@ -3,7 +3,7 @@ import ClassicalForme from "./ClassicalForme"
 import CapstoneForme from "./CapstoneForme"
 import CompositeForme from "./CompositeForme"
 
-import { PolyhedronSpecs } from "data/specs"
+import { PolyhedronSpecs } from "specs"
 import { Polyhedron } from "math/polyhedra"
 
 export default function createForme<Specs extends PolyhedronSpecs>(

@@ -2,7 +2,7 @@ import React, { useCallback } from "react"
 import Icon from "@mdi/react"
 import { mdiRotateLeft, mdiRotateRight } from "@mdi/js"
 
-import { Twist } from "data/specs"
+import { Twist } from "specs"
 import { useStyle, scales } from "styles"
 import { flexRow, square, flexColumn, hover } from "styles/common"
 import { SrOnly } from "components/common"

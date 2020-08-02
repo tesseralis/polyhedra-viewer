@@ -1,5 +1,5 @@
 import { find } from "utils"
-import { Capstone, Twist, twists, oppositeTwist } from "data/specs"
+import { Capstone, Twist, twists, oppositeTwist } from "specs"
 import { withOrigin, getCentroid } from "math/geom"
 import CapstoneForme from "math/formes/CapstoneForme"
 import { combineOps, makeOpPair } from "./operationPairs"

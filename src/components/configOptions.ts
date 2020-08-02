@@ -1,5 +1,5 @@
 import { startCase, set } from "lodash-es"
-import { polygons, polygonNames } from "data/specs"
+import { polygons, polygonNames } from "specs"
 
 // Colors from d3-scale-chromatic:
 // https://github.com/d3/d3-scale-chromatic#schemeCategory10

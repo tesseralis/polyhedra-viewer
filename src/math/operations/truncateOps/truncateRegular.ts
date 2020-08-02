@@ -1,4 +1,4 @@
-import { Facet } from "data/specs"
+import { Facet } from "specs"
 import ClassicalForme from "math/formes/ClassicalForme"
 import { getTransformedVertices, Pose } from "../operationUtils"
 import { getSharpenPointEdge, makeTruncateTrio } from "./truncateHelpers"

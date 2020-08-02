@@ -1,4 +1,4 @@
-import { Composite } from "data/specs"
+import { Composite } from "specs"
 import CompositeForme from "math/formes/CompositeForme"
 import { makeCutPastePair } from "./cutPasteUtils"
 

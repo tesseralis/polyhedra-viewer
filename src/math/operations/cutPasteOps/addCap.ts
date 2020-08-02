@@ -1,6 +1,6 @@
 import { repeat, find } from "utils"
 import { Polyhedron, Face, FaceLike, Edge } from "math/polyhedra"
-import { Capstone, CapType } from "data/specs"
+import { Capstone, CapType } from "specs"
 import CapstoneForme from "math/formes/CapstoneForme"
 import { deduplicateVertices, alignPolyhedron, Pose } from "../operationUtils"
 

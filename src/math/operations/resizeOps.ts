@@ -1,10 +1,4 @@
-import {
-  Classical,
-  Facet,
-  oppositeFacet,
-  twists,
-  oppositeTwist,
-} from "data/specs"
+import { Classical, Facet, oppositeFacet, twists, oppositeTwist } from "specs"
 import {
   makeOpPair,
   combineOps,

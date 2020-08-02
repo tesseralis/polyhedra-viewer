@@ -1,7 +1,7 @@
 import { withOrigin } from "math/geom"
 import { Polyhedron } from "math/polyhedra"
 import { mapObject } from "utils"
-import { Capstone, Composite } from "data/specs"
+import { Capstone, Composite } from "specs"
 import { CapOptions, capOptionArgs } from "./cutPasteUtils"
 import { getTransformedVertices } from "../operationUtils"
 import { makeOperation } from "../Operation"

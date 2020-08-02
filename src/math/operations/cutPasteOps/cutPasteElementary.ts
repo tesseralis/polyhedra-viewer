@@ -1,5 +1,5 @@
 import { makeCutPastePair } from "./cutPasteUtils"
-import { Elementary } from "data/specs"
+import { Elementary } from "specs"
 
 export default makeCutPastePair({
   graph: function* () {

@@ -1,4 +1,4 @@
-import { Composite } from "data/specs"
+import { Composite } from "specs"
 import { makeOpPair } from "../operationPairs"
 import { getCentroid } from "math/geom"
 import { getTransformedVertices } from "../operationUtils"

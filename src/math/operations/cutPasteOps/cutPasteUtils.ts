@@ -8,7 +8,7 @@ import {
   Align,
   Gyration,
   gyrations,
-} from "data/specs"
+} from "specs"
 import CompositeForme from "math/formes/CompositeForme"
 import { OpArgs } from "../Operation"
 import PolyhedronForme from "math/formes/PolyhedronForme"

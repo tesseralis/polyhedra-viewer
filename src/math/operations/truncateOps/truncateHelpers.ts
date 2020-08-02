@@ -1,5 +1,5 @@
 import { Face, Edge, VertexArg } from "math/polyhedra"
-import Classical, { Operation as OpName } from "data/specs/Classical"
+import Classical, { Operation as OpName } from "specs/Classical"
 import { makeOpPair } from "../operationPairs"
 import { Vec3D, angleBetween } from "math/geom"
 import { Pose } from "../operationUtils"

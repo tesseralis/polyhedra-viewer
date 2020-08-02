@@ -1,7 +1,7 @@
 import { forEach } from "lodash-es"
 import { allSolidNames } from "data/common"
 import { operations } from ".."
-import getSpecs from "data/specs/getSpecs"
+import getSpecs from "specs/getSpecs"
 import { validateOperationApplication } from "../operationTestUtils"
 import createForme from "math/formes/createForme"
 import { getGeometry } from "math/operations/operationUtils"

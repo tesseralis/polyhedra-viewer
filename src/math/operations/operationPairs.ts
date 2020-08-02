@@ -1,6 +1,6 @@
 import { isMatch, pickBy } from "lodash-es"
 import { find } from "utils"
-import { PolyhedronSpecs } from "data/specs"
+import { PolyhedronSpecs } from "specs"
 import { VertexArg } from "math/polyhedra"
 import {
   OpArgs,
