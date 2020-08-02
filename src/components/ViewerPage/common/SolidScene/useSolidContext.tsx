@@ -20,19 +20,19 @@ function createFamilyColor(face: string, vertex: string) {
       vertex: tinycolor(vertex).darken(20),
     },
     edge: {
-      ortho: tinycolor.mix(face, vertex, 50).desaturate(10),
-      gyro: tinycolor.mix(face, vertex, 50).lighten(20),
+      ortho: tinycolor.mix(face, vertex, 33).desaturate(25).lighten(),
+      gyro: tinycolor.mix(face, vertex, 67).desaturate(25).lighten(),
     },
   }
 }
 
 const classicalColorScheme = {
-  // yellow + purple
-  3: createFamilyColor("#ffea00", "#db39ce"),
-  // red + green
-  4: createFamilyColor("#e00909", "#22e34c"),
-  // blue + orange
-  5: createFamilyColor("#2c65de", "#ff9100"),
+  // green + cyan
+  3: createFamilyColor("#1bcc3b", "#15ace8"),
+  // red + yellow
+  4: createFamilyColor("#ff3d3d", "#ffe100"),
+  // blue + magenta
+  5: createFamilyColor("#424eed", "#f24bd4"),
 }
 
 const orthoFace = "dimgray"

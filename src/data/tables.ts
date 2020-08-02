@@ -91,8 +91,8 @@ function* prismaticRow(base: PrimaryPolygon, type: PolygonType) {
 }
 
 function* prismaticRows() {
-  for (const base of families) {
-    for (const type of polygonTypes) {
+  for (const type of polygonTypes) {
+    for (const base of families) {
       yield [...prismaticRow(base, type)]
     }
   }

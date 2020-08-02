@@ -52,7 +52,7 @@ export const configInputs: ConfigInput[] = [
   {
     key: "opacity",
     type: "range",
-    default: 0.9,
+    default: 1.0,
     min: 0,
     max: 1,
     step: 0.01,
