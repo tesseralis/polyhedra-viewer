@@ -107,24 +107,32 @@ export class AugmentedPrismForme extends CompositeForme {
   }
 
   baseFaces = once(() => {
-    if (!this.specs.sourcePrism().isTriangular()) {
-      // FIXME deal with square prism
-      return this.geom.faces.filter(
-        (f) => f.numSides === this.specs.sourcePrism().baseSides(),
-      ) as [Face, Face]
-    }
-    for (const face1 of this.geom.faces) {
-      for (const face2 of this.geom.faces) {
-        if (isInverse(face1.normal(), face2.normal())) {
-          return [face1, face2] as const
+    if (this.specs.sourcePrism().isTriangular()) {
+      for (const face1 of this.geom.faces) {
+        for (const face2 of this.geom.faces) {
+          if (isInverse(face1.normal(), face2.normal())) {
+            return [face1, face2] as const
+          }
         }
       }
+      throw new Error(`Could not find base faces for ${this.specs.name()}`)
     }
-    throw new Error(`Could not find base faces for ${this.specs.name()}`)
+
+    if (this.specs.sourcePrism().isSquare()) {
+      // FIXME why doesn't this work??
+      const face1 = this.geom.faceWithNumSides(4)
+      const face2 = find(this.geom.faces, (f) =>
+        isInverse(face1.normal(), f.normal()),
+      )
+      return [face1, face2] as const
+    }
+
+    return this.geom.faces.filter(
+      (f) => f.numSides === this.specs.sourcePrism().baseSides(),
+    ) as [Face, Face]
   })
 
   isBaseFace(face: Face) {
-    // FIXME deal with triangular prism
     return face.inSet(this.baseFaces())
   }
 
