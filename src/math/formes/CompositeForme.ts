@@ -1,7 +1,7 @@
 import { once } from "lodash-es"
 import { find, getSingle } from "utils"
 import PolyhedronForme from "./PolyhedronForme"
-import Composite from "data/specs/Composite"
+import { Composite } from "data/specs"
 import { Polyhedron, Face, Cap } from "math/polyhedra"
 import { getCentroid, isInverse } from "math/geom"
 

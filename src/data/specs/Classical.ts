@@ -1,5 +1,5 @@
-import { Items, Twist } from "types"
-import { PrimaryPolygon, primaryPolygons } from "../polygons"
+import { Items } from "types"
+import { PrimaryPolygon, primaryPolygons, Twist } from "./common"
 import Specs from "./PolyhedronSpecs"
 import Queries from "./Queries"
 

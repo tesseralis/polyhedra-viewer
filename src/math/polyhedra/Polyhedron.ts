@@ -10,7 +10,7 @@ import {
 } from "lodash-es"
 
 import { getSolidData } from "data/common"
-import { polygons } from "data/polygons"
+import { polygons } from "data/specs"
 import { Vec3D, getCentroid } from "math/geom"
 
 import { SolidData } from "./solidTypes"

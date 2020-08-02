@@ -1,21 +1,23 @@
-import Classical, {
-  Operation,
-  operations,
-  families,
-  facets,
-} from "./specs/Classical"
-import Capstone, {
+import { Operation, operations, families } from "./specs/Classical"
+import {
+  PolyhedronSpecs,
+  Classical,
+  Composite,
+  Capstone,
+  ModifiedAntiprism,
+  Elementary,
+  Polygon,
+  PrimaryPolygon,
+  primaryPolygons,
   polygonTypes,
   PolygonType,
+  prismaticTypes,
+  facets,
   gyrations,
-} from "./specs/Capstone"
-import { Polygon, PrimaryPolygon, primaryPolygons } from "./polygons"
-import { prismaticTypes } from "./specs/common"
-import Composite, { Count, counts, alignments } from "./specs/Composite"
-import ModifiedAntiprism from "./specs/ModifiedAntiprism"
-import Elementary from "./specs/Elementary"
+  alignments,
+} from "./specs"
+import { Count, counts } from "./specs/Composite"
 import { range } from "lodash-es"
-import PolyhedronSpecs from "./specs/PolyhedronSpecs"
 import { getSpecs2 } from "./specs/getSpecs"
 
 function* classicalRow(operation: Operation) {

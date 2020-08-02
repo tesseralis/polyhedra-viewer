@@ -9,9 +9,7 @@ import {
   snubAntiprismTable,
   elementaryTable,
 } from "./tables"
-import PolyhedronSpecs from "data/specs/PolyhedronSpecs"
-import { gyrations } from "data/specs/Capstone"
-import { alignments } from "data/specs/Composite"
+import { PolyhedronSpecs, gyrations, alignments } from "data/specs"
 
 const gyrateLabels = gyrations.map((gyrate) => `${gyrate}-`)
 const alignLabels = alignments.map((align) => `${align}-`)

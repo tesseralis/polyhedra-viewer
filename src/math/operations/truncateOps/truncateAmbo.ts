@@ -1,5 +1,5 @@
 import { sum } from "lodash-es"
-import { facets } from "data/specs/Classical"
+import { facets } from "data/specs"
 import { getTransformedVertices, Pose } from "../operationUtils"
 import ClassicalForme from "math/formes/ClassicalForme"
 import { makeTruncateTrio } from "./truncateHelpers"

@@ -1,11 +1,10 @@
-import { Twist, twists, oppositeTwist } from "types"
-import Capstone from "data/specs/Capstone"
+import { find } from "utils"
+import { Capstone, Twist, twists, oppositeTwist } from "data/specs"
+import { withOrigin, getCentroid } from "math/geom"
+import CapstoneForme from "math/formes/CapstoneForme"
 import { combineOps, makeOpPair } from "./operationPairs"
 import { makeOperation } from "./Operation"
 import { Pose, TwistOpts, getTransformedVertices } from "./operationUtils"
-import { withOrigin, getCentroid } from "math/geom"
-import CapstoneForme from "math/formes/CapstoneForme"
-import { find } from "utils"
 
 const { PI } = Math
 

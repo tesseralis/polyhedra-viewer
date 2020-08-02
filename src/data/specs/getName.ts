@@ -1,6 +1,6 @@
 import { compact } from "lodash-es"
 import type Specs from "./PolyhedronSpecs"
-import { PrimaryPolygon, polygonPrefixes } from "../polygons"
+import { PrimaryPolygon, polygonPrefixes } from "./common"
 
 const countPrefixes: Record<number, string> = { 1: "", 2: "bi", 3: "tri" }
 

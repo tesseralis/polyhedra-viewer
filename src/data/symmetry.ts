@@ -1,4 +1,4 @@
-import { Polygon, polygonPrefixes } from "./polygons"
+import { Polygon, polygonPrefixes } from "data/specs"
 
 type SymPolygon = 1 | 2 | Polygon
 

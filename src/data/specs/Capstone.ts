@@ -1,9 +1,19 @@
 import { range } from "lodash-es"
-import { Items, Twist, oppositeTwist } from "types"
-import { Polygon, PrimaryPolygon, primaryPolygons } from "../polygons"
+import { Items } from "types"
 import Specs from "./PolyhedronSpecs"
 import Queries from "./Queries"
-import { PrismaticType, prismaticTypes } from "./common"
+import {
+  Polygon,
+  PrimaryPolygon,
+  primaryPolygons,
+  PolygonType,
+  polygonTypes,
+  Twist,
+  oppositeTwist,
+} from "./common"
+
+export const prismaticTypes = ["prism", "antiprism"] as const
+export type PrismaticType = Items<typeof prismaticTypes>
 
 const elongations = ["null", ...prismaticTypes] as const
 
@@ -12,9 +22,6 @@ type Count = Items<typeof counts>
 
 export const gyrations = ["ortho", "gyro"] as const
 export type Gyration = Items<typeof gyrations>
-
-export const polygonTypes = ["primary", "secondary"]
-export type PolygonType = Items<typeof polygonTypes>
 
 export const capTypes = ["pyramid", "cupola", "rotunda"] as const
 export type CapType = Items<typeof capTypes>

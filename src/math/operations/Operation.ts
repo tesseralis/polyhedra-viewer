@@ -1,11 +1,10 @@
 import { pickBy, mapValues, isMatch, compact } from "lodash-es"
 
-import { Polygon } from "data/polygons"
 import { Vec3D, vec, vecEquals } from "math/geom"
 import { Polyhedron, Face, VertexArg, normalizeVertex } from "math/polyhedra"
 import { deduplicateVertices } from "./operationUtils"
 import { Point } from "types"
-import PolyhedronSpecs from "data/specs/PolyhedronSpecs"
+import { Polygon, PolyhedronSpecs } from "data/specs"
 import PolyhedronForme from "math/formes/PolyhedronForme"
 import createForme from "math/formes/createForme"
 import { find, EntryIters, cartesian } from "utils"

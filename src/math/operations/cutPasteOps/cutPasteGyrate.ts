@@ -1,7 +1,6 @@
-import Composite from "data/specs/Composite"
+import { Composite, gyrations } from "data/specs"
 import { GyrateSolidForme } from "math/formes/CompositeForme"
 import { makeCutPastePair } from "./cutPasteUtils"
-import { gyrations } from "data/specs/Capstone"
 
 export default makeCutPastePair<GyrateSolidForme>({
   graph: function* () {

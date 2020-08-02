@@ -4,7 +4,7 @@ import { Link } from "react-router-dom"
 import { escape } from "utils"
 import { square, hover, flexRow } from "styles/common"
 import { useStyle, media } from "styles"
-import PolyhedronSpecs from "data/specs/PolyhedronSpecs"
+import { PolyhedronSpecs } from "data/specs"
 
 interface Props {
   specs: PolyhedronSpecs
