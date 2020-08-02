@@ -1,7 +1,9 @@
 import { once } from "lodash-es"
 import { find, getSingle } from "utils"
 import PolyhedronForme from "./PolyhedronForme"
+import { getGeometry } from "math/operations/operationUtils"
 import { Composite } from "data/specs"
+import { getSpecs2 } from "data/specs/getSpecs"
 import { Polyhedron, Face, Cap } from "math/polyhedra"
 import { getCentroid, isInverse } from "math/geom"
 
@@ -22,6 +24,16 @@ export default abstract class CompositeForme extends PolyhedronForme<
       return new GyrateSolidForme(specs, geom)
     }
     throw new Error(`Invalid composite specs: ${specs.name()}`)
+  }
+
+  static fromSpecs(specs: Composite) {
+    return this.create(specs, getGeometry(specs))
+  }
+
+  static fromName(name: string) {
+    const specs = getSpecs2(name)
+    if (!specs.isComposite()) throw new Error(`Invalid specs for name`)
+    return this.fromSpecs(specs)
   }
 
   protected capInnerVertIndices = once(() => {

@@ -1,5 +1,6 @@
 import PolyhedronForme from "./PolyhedronForme"
 import { Capstone } from "data/specs"
+import { getSpecs2 } from "data/specs/getSpecs"
 import { Polyhedron, Face, Edge, Cap, FaceLike } from "math/polyhedra"
 import { vecEquals, isInverse } from "math/geom"
 import { getGeometry } from "math/operations/operationUtils"
@@ -12,7 +13,9 @@ export default abstract class CapstoneForme extends PolyhedronForme<Capstone> {
   static create(specs: Capstone, geom: Polyhedron) {
     switch (specs.data.count) {
       case 0:
-        return new PrismaticForme(specs, geom)
+        return specs.isSnub()
+          ? new SnubCapstoneForme(specs, geom)
+          : new PrismaticForme(specs, geom)
       case 1:
         return new MonoCapstoneForme(specs, geom)
       case 2:
@@ -22,6 +25,12 @@ export default abstract class CapstoneForme extends PolyhedronForme<Capstone> {
 
   static fromSpecs(specs: Capstone) {
     return this.create(specs, getGeometry(specs))
+  }
+
+  static fromName(name: string) {
+    const specs = getSpecs2(name)
+    if (!specs.isCapstone()) throw new Error(`Invalid specs for name`)
+    return this.fromSpecs(specs)
   }
 
   abstract bases(): readonly [Base, Base]
@@ -94,6 +103,24 @@ class PrismaticForme extends CapstoneForme {
       )
       return [edge1, edge2] as const
     }
+    const face1 = this.geom.faceWithNumSides(this.specs.baseSides())
+    const face2 = find(this.geom.faces, (f) =>
+      isInverse(face1.normal(), f.normal()),
+    )
+    return [face1, face2] as const
+  }
+}
+
+class SnubCapstoneForme extends CapstoneForme {
+  bases() {
+    if (this.specs.isDigonal()) {
+      const bases = this.geom.edges.filter((e) =>
+        e.vertices.every((v) => v.adjacentFaces().length === 4),
+      )
+      if (bases.length !== 2) throw new Error(`Invalid number of bases`)
+      return [bases[0], bases[1]] as const
+    }
+    // TODO dedupe with prismatic?
     const face1 = this.geom.faceWithNumSides(this.specs.baseSides())
     const face2 = find(this.geom.faces, (f) =>
       isInverse(face1.normal(), f.normal()),

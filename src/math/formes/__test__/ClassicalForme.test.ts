@@ -1,12 +1,9 @@
 import ClassicalForme from "../ClassicalForme"
-import { getSpecs2 } from "data/specs/getSpecs"
 
 describe("ClassicalForme", () => {
   describe("facet faces", () => {
     it("works correctly for snub tetratetrahedron", () => {
-      const forme = ClassicalForme.fromSpecs(
-        getSpecs2("snub tetratetrahedron") as any,
-      )
+      const forme = ClassicalForme.fromName("snub tetratetrahedron")
       const faceFaces = forme.facetFaces("face")
       const vertexFaces = forme.facetFaces("vertex")
       for (const vertexFace of vertexFaces) {
