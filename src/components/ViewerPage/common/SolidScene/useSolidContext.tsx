@@ -119,11 +119,9 @@ function getFormeColor(polyhedron: PolyhedronForme, face: Face) {
   }
 }
 
-const enableFormeColors = true
-
 // Hook that takes data from Polyhedron and Animation states and decides which to use.
 export default function useSolidContext() {
-  const { colors } = Config.useState()
+  const { enableFormeColors, colors } = Config.useState()
   const polyhedron = PolyhedronCtx.useState()
 
   const {
@@ -153,7 +151,7 @@ export default function useSolidContext() {
     return polyhedron.geom.faces.map((f) =>
       getSelectionColor(f, getFormeColor(polyhedron, f)),
     )
-  }, [polyhedron, getSelectionColor])
+  }, [polyhedron, enableFormeColors, getSelectionColor])
 
   // Colors when animation is being applied
   const transitionColors = useMemo(
