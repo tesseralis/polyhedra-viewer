@@ -1,11 +1,11 @@
 import PolyhedronForme from "./PolyhedronForme"
 import { Capstone } from "data/specs"
-import { Polyhedron, Face, Cap, FaceLike } from "math/polyhedra"
+import { Polyhedron, Face, Edge, Cap, FaceLike } from "math/polyhedra"
 import { vecEquals, isInverse } from "math/geom"
 import { getGeometry } from "math/operations/operationUtils"
 import { find } from "utils"
 
-type Base = Face | Cap
+type Base = Face | Cap | Edge
 
 // TODO add more useful functions here
 export default abstract class CapstoneForme extends PolyhedronForme<Capstone> {
@@ -54,9 +54,15 @@ export default abstract class CapstoneForme extends PolyhedronForme<Capstone> {
    * or undefined if the face does not belong to a base.
    */
   baseOf(face: Face) {
-    return this.bases().find((base) =>
-      base instanceof Cap ? face.inSet(base.faces()) : face.equals(base),
-    )
+    return this.bases().find((base) => {
+      if (base instanceof Cap) {
+        return face.inSet(base.faces())
+      } else if (base instanceof Edge) {
+        return false
+      } else {
+        return face.equals(base)
+      }
+    })
   }
 
   /**
@@ -71,12 +77,23 @@ export default abstract class CapstoneForme extends PolyhedronForme<Capstone> {
    */
   isBaseTop(face: Face) {
     const base = this.baseOf(face)
+    if (base instanceof Edge) return false
     return base && vecEquals(face.normal(), base.normal())
   }
 }
 
 class PrismaticForme extends CapstoneForme {
   bases() {
+    if (this.specs.isDigonal()) {
+      const edge1 = this.geom.getEdge()
+      const edge2 = find(this.geom.edges, (e) =>
+        isInverse(
+          e.midpoint().sub(this.geom.centroid()),
+          edge1.midpoint().sub(this.geom.centroid()),
+        ),
+      )
+      return [edge1, edge2] as const
+    }
     const face1 = this.geom.faceWithNumSides(this.specs.baseSides())
     const face2 = find(this.geom.faces, (f) =>
       isInverse(face1.normal(), f.normal()),
