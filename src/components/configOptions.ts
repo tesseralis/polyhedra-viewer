@@ -50,7 +50,7 @@ export const configInputs: ConfigInput[] = [
     default: true,
   },
   {
-    key: "enalbeFormeColors",
+    key: "enableFormeColors",
     type: "checkbox",
     default: false,
   },
