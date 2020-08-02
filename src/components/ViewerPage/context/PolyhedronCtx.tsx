@@ -1,7 +1,7 @@
 import { createHookedContext } from "components/common"
 import PolyhedronForme from "math/formes/PolyhedronForme"
 import createForme from "math/formes/createForme"
-import { getSpecs2 } from "specs/getSpecs"
+import { getSpecs } from "specs/getSpecs"
 import { getGeometry } from "math/operations/operationUtils"
 
 const defaultProps = { name: "tetrahedron" }
@@ -12,7 +12,7 @@ export default createHookedContext<
   {
     setPolyhedron: (forme) => () => forme,
     setPolyhedronToName: (name) => (current) => {
-      const specs = getSpecs2(name)
+      const specs = getSpecs(name)
       if (current.specs.canonicalName() === specs.canonicalName()) {
         return createForme(specs, current.geom)
       }
@@ -20,7 +20,7 @@ export default createHookedContext<
     },
   },
   ({ name } = defaultProps) => {
-    const specs = getSpecs2(name)
+    const specs = getSpecs(name)
     return createForme(specs, getGeometry(specs))
   },
 )

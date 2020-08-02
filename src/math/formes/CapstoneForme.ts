@@ -1,6 +1,6 @@
 import PolyhedronForme from "./PolyhedronForme"
 import { Capstone } from "specs"
-import { getSpecs2 } from "specs/getSpecs"
+import { getSpecs } from "specs/getSpecs"
 import { Polyhedron, Face, Edge, Cap, FaceLike } from "math/polyhedra"
 import { vecEquals, isInverse } from "math/geom"
 import { getGeometry } from "math/operations/operationUtils"
@@ -28,7 +28,7 @@ export default abstract class CapstoneForme extends PolyhedronForme<Capstone> {
   }
 
   static fromName(name: string) {
-    const specs = getSpecs2(name)
+    const specs = getSpecs(name)
     if (!specs.isCapstone()) throw new Error(`Invalid specs for name`)
     return this.fromSpecs(specs)
   }

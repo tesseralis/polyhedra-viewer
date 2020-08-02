@@ -4,7 +4,7 @@ import { Table } from "tables"
 import { PolyhedronSpecs } from "specs"
 import PolyhedronLink from "./PolyhedronLink"
 import { media, fonts, useStyle, scales } from "styles"
-import getSpecs from "specs/getSpecs"
+import { getCanonicalSpecs } from "specs/getSpecs"
 
 function useCellStyle() {
   return useStyle({
@@ -33,7 +33,7 @@ const Cell = ({
       </td>
     )
   }
-  const canonical = getSpecs(cell.canonicalName())
+  const canonical = getCanonicalSpecs(cell.canonicalName())
   const isDuplicate = !cell.equals(canonical)
   let symbol = canonical.conwaySymbol()
   if (isDuplicate) symbol = `(${symbol})`

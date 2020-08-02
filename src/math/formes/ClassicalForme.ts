@@ -4,7 +4,7 @@ import { Polyhedron, Face } from "math/polyhedra"
 import { angleBetween } from "math/geom"
 import { getGeometry, oppositeFace } from "math/operations/operationUtils"
 import PolyhedronForme from "./PolyhedronForme"
-import { getSpecs2 } from "specs/getSpecs"
+import { getSpecs } from "specs/getSpecs"
 
 export default abstract class ClassicalForme extends PolyhedronForme<
   Classical
@@ -31,7 +31,7 @@ export default abstract class ClassicalForme extends PolyhedronForme<
   }
 
   static fromName(name: string) {
-    const specs = getSpecs2(name)
+    const specs = getSpecs(name)
     if (!specs.isClassical()) throw new Error(`Invalid specs for name`)
     return this.fromSpecs(specs)
   }

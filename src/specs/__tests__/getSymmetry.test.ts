@@ -1,4 +1,4 @@
-import getSpecs from "../getSpecs"
+import { getSpecs } from "../getSpecs"
 
 describe("getSymmetry", () => {
   function expectSymmetry(solid: string, expected: string) {
@@ -36,7 +36,7 @@ describe("getSymmetry", () => {
     })
 
     it("returns D_2d for gyrobifastigium", () => {
-      expectSymmetry("gyrobifastigium", "D_2d")
+      expectSymmetry("digonal gyrobicupola", "D_2d")
     })
 
     it("returns dihedral symmetry on bipyramids", () => {
@@ -125,7 +125,7 @@ describe("getSymmetry", () => {
 
   describe("elementary solids", () => {
     it("works", () => {
-      expectSymmetry("snub disphenoid", "D_2d")
+      expectSymmetry("snub digonal antiprism", "D_2d")
       expectSymmetry("sphenocorona", "C_2v")
       expectSymmetry("augmented sphenocorona", "C_1v")
     })

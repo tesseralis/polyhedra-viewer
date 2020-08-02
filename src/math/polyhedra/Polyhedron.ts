@@ -188,10 +188,6 @@ export default class Polyhedron {
     return changes(new Builder(this)).build()
   }
 
-  withName(name: string) {
-    return new Polyhedron({ ...this.solidData, name })
-  }
-
   // TODO support all the solid builder functions
   // return a new polyhedron with the given vertices
   withVertices(vertices: VertexArg[]) {

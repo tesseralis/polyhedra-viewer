@@ -3,7 +3,7 @@ import { find, getSingle } from "utils"
 import PolyhedronForme from "./PolyhedronForme"
 import { getGeometry } from "math/operations/operationUtils"
 import { Composite } from "specs"
-import { getSpecs2 } from "specs/getSpecs"
+import { getSpecs } from "specs/getSpecs"
 import { Polyhedron, Face, Cap } from "math/polyhedra"
 import { getCentroid, isInverse } from "math/geom"
 
@@ -31,7 +31,7 @@ export default abstract class CompositeForme extends PolyhedronForme<
   }
 
   static fromName(name: string) {
-    const specs = getSpecs2(name)
+    const specs = getSpecs(name)
     if (!specs.isComposite()) throw new Error(`Invalid specs for name`)
     return this.fromSpecs(specs)
   }

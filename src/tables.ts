@@ -17,7 +17,7 @@ import {
   alignments,
 } from "./specs"
 import { Count, counts } from "./specs/Composite"
-import { getSpecs2 } from "./specs/getSpecs"
+import { getSpecs } from "./specs/getSpecs"
 
 const gyrateLabels = gyrations.map((gyrate) => `${gyrate}-`)
 const alignLabels = alignments.map((align) => `${align}-`)
@@ -148,10 +148,10 @@ function* capstoneRow(base: Polygon, type: PolygonType, rotunda?: any) {
 }
 
 function* fastigiumRow() {
-  yield getSpecs2("digonal cupola")
+  yield getSpecs("digonal cupola")
   yield "coplanar"
   yield "concave"
-  yield ["coplanar", getSpecs2("digonal gyrobicupola")]
+  yield ["coplanar", getSpecs("digonal gyrobicupola")]
   yield ["coplanar", "coplanar"]
   yield "concave"
 }
@@ -273,7 +273,7 @@ function* augmentedRow(source: PolyhedronSpecs) {
 
 function* augmentedRows() {
   for (const sourceName of augSources) {
-    yield [...augmentedRow(getSpecs2(sourceName))]
+    yield [...augmentedRow(getSpecs(sourceName))]
   }
 }
 

@@ -3,7 +3,7 @@ import { Polyhedron } from "math/polyhedra"
 import { OpName, operations } from "math/operations"
 import { validateOperationApplication } from "../operationTestUtils"
 import { getGeometry } from "math/operations/operationUtils"
-import { getSpecs2 } from "specs/getSpecs"
+import { getSpecs } from "specs/getSpecs"
 import createForme from "math/formes/createForme"
 
 interface Args {
@@ -150,7 +150,7 @@ xdescribe("chained tests", () => {
 
   for (const test of tests) {
     const { start, description, operations } = test
-    const specs = getSpecs2(start)
+    const specs = getSpecs(start)
     let polyhedron = createForme(specs, getGeometry(specs))
     it(description, () => {
       operations.forEach((opInfo) => {

@@ -3,7 +3,7 @@ import { Polyhedron } from "math/polyhedra"
 import Operation, { OpResult } from "./Operation"
 import PolyhedronForme from "math/formes/PolyhedronForme"
 import { getGeometry } from "math/operations/operationUtils"
-import { getSpecs2 } from "specs/getSpecs"
+import { getSpecs } from "specs/getSpecs"
 import createForme from "math/formes/createForme"
 
 interface OpTestCases {
@@ -16,7 +16,7 @@ export function validateOpInputs(
   { pass, fail }: OpTestCases,
 ) {
   function canApplyTo(name: string) {
-    const specs = getSpecs2(name)
+    const specs = getSpecs(name)
     const geom = getGeometry(specs)
     const forme = createForme(specs, geom)
     return operation.canApplyTo(forme)
@@ -34,7 +34,7 @@ export function validateHasOptions(
   { pass, fail }: OpTestCases,
 ) {
   function hasOptions(name: string) {
-    const specs = getSpecs2(name)
+    const specs = getSpecs(name)
     const geom = getGeometry(specs)
     const forme = createForme(specs, geom)
     return operation.hasOptions(forme)
