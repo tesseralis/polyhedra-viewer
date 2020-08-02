@@ -1,6 +1,11 @@
-import { oppositeTwist } from "types"
 import PolyhedronForme from "./PolyhedronForme"
-import Classical, { Facet, facets, oppositeFacet } from "data/specs/Classical"
+import {
+  Classical,
+  Facet,
+  facets,
+  oppositeFacet,
+  oppositeTwist,
+} from "data/specs"
 import { Polyhedron, Face } from "math/polyhedra"
 import { angleBetween } from "math/geom"
 import { getGeometry, oppositeFace } from "math/operations/operationUtils"

@@ -1,4 +1,4 @@
-import { Facet } from "data/specs/Classical"
+import { Facet } from "data/specs"
 import { Polyhedron } from "math/polyhedra"
 import { OpName, operations } from "math/operations"
 import { validateOperationApplication } from "../operationTestUtils"

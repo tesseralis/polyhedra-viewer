@@ -1,9 +1,15 @@
 import { pickBy } from "lodash-es"
 import { Face, Cap } from "math/polyhedra"
-import Capstone, { CapType, Gyration, gyrations } from "data/specs/Capstone"
-import Composite, { Align } from "data/specs/Composite"
+import {
+  Capstone,
+  Composite,
+  Elementary,
+  CapType,
+  Align,
+  Gyration,
+  gyrations,
+} from "data/specs"
 import CompositeForme from "math/formes/CompositeForme"
-import Elementary from "data/specs/Elementary"
 import { OpArgs } from "../Operation"
 import PolyhedronForme from "math/formes/PolyhedronForme"
 import CapstoneForme from "math/formes/CapstoneForme"

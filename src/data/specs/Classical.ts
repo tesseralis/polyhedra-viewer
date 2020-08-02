@@ -1,9 +1,9 @@
-import { Items, Twist } from "types"
-import { PrimaryPolygon, primaryPolygons } from "../polygons"
+import { Items } from "types"
+import { PrimaryPolygon, primaryPolygons, Twist } from "./common"
 import Specs from "./PolyhedronSpecs"
 import Queries from "./Queries"
 
-const families = primaryPolygons
+export const families = primaryPolygons
 export type Family = PrimaryPolygon
 
 export const facets = ["face", "vertex"] as const
@@ -12,7 +12,7 @@ export function oppositeFacet(facet: Facet) {
   return facet === "face" ? "vertex" : "face"
 }
 
-const operations = [
+export const operations = [
   "regular",
   "truncate",
   "rectify",

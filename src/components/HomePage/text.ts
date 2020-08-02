@@ -51,7 +51,7 @@ The following operations are defined:
 Cupolae and rotundae can be oriented two different ways: _ortho-_ means that opposite faces are aligned with each other, while _gyro-_ means that they are unaligned.
 `
 
-export const cutPaste = `
+export const composite = `
 The next group of Johnson solids are defined by _augmenting_, _diminishing_, and _gyrating_ uniform polyhedra.
 
 These operations are defined:

@@ -1,4 +1,4 @@
-import { Symmetry, Polyhedral, Cyclic, Dihedral } from "../symmetry"
+import { Symmetry, Polyhedral, Cyclic, Dihedral } from "./symmetry"
 import type Specs from "./PolyhedronSpecs"
 import type Composite from "./Composite"
 import type Capstone from "./Capstone"
@@ -19,6 +19,10 @@ function getCapstoneSymmetry(capstone: Capstone) {
   // Prismatic symmetry is simple
   if (capstone.isPrismatic()) {
     return Dihedral.get(capstone.baseSides(), capstone.prismaticType())
+  }
+
+  if (capstone.isSnub()) {
+    return Dihedral.get(base, "antiprism")
   }
 
   // mono-capstones always have cyclic symmetry
@@ -107,15 +111,6 @@ export default function getSymmetry(solid: Specs): Symmetry {
   }
   if (solid.isComposite()) {
     return getCompositeSymmetry(solid)
-  }
-  if (solid.isModifiedAntiprism()) {
-    const { source, operation } = solid.data
-    switch (operation) {
-      case "snub":
-        return Dihedral.get(source.data.base, "antiprism")
-      default:
-        return source.symmetry()
-    }
   }
   if (solid.isElementary()) {
     return elementaryMapping[solid.data.base]

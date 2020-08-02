@@ -1,5 +1,10 @@
-import { twists, oppositeTwist } from "types"
-import Classical, { Facet, oppositeFacet } from "data/specs/Classical"
+import {
+  Classical,
+  Facet,
+  oppositeFacet,
+  twists,
+  oppositeTwist,
+} from "data/specs"
 import {
   makeOpPair,
   combineOps,

@@ -1,4 +1,4 @@
-import PolyhedronSpecs from "data/specs/PolyhedronSpecs"
+import { PolyhedronSpecs } from "data/specs"
 import { Polyhedron } from "math/polyhedra"
 
 export default class PolyhedronForme<

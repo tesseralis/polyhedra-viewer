@@ -1,16 +1,9 @@
 import Classical from "./Classical"
 import Capstone from "./Capstone"
 import Composite from "./Composite"
-import ModifiedAntiprism from "./ModifiedAntiprism"
 import Elementary from "./Elementary"
 
-const subclasses = [
-  Classical,
-  Capstone,
-  Composite,
-  ModifiedAntiprism,
-  Elementary,
-]
+const subclasses = [Classical, Capstone, Composite, Elementary]
 
 export default function getSpecs(name: string) {
   for (const Subclass of subclasses) {

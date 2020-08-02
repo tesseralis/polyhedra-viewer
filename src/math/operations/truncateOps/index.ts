@@ -1,4 +1,4 @@
-import { oppositeFacet } from "data/specs/Classical"
+import { oppositeFacet } from "data/specs"
 import { combineOps } from "../operationPairs"
 import Operation, { OpArgs } from "../Operation"
 import { FacetOpts } from "../operationUtils"
