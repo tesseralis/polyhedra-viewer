@@ -30,18 +30,18 @@ function InnerViewer({ solid, panel }: InnerProps) {
   }, [solid])
 
   useEffect(() => {
-    setSolidSync(polyhedron.geom.name)
-  }, [polyhedron.geom.name])
+    setSolidSync(polyhedron.specs.name())
+  }, [polyhedron.specs])
 
   useEffect(() => {
-    if (polyhedron.geom.name !== solidSync) {
+    if (polyhedron.specs.name() !== solidSync) {
       // If the route has changed (and it wasn't from an operation)
       // cancel the current operation and set the polyhedorn model
       unsetOperation()
       setPolyhedronToName(solidSync)
     } else if (solid !== solidSync) {
       // If an operation was executed, update the URL
-      navigate(`/${escape(polyhedron.geom.name)}/operations`)
+      navigate(`/${escape(polyhedron.specs.name())}/operations`)
     }
     // Don't depend on `solid` or `polyhedron.name` over here:
     // this is how the two states get synced with each other

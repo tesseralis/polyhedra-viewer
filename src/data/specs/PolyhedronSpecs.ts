@@ -2,12 +2,11 @@ import { isEqual, capitalize } from "lodash-es"
 import type Classical from "./Classical"
 import type Capstone from "./Capstone"
 import type Composite from "./Composite"
-import type ModifiedAntiprism from "./ModifiedAntiprism"
 import type Elementary from "./Elementary"
 import getSymmetry from "./getSymmetry"
 import getName from "./getName"
 import getConwaySymbol from "./getConwaySymbol"
-import type { Symmetry } from "../symmetry"
+import type { Symmetry } from "./symmetry"
 import { getAlternateNames, getCanonicalName } from "../alternates"
 
 type PolyhedronType =
@@ -89,10 +88,6 @@ export default abstract class PolyhedronSpecs<Data extends {} = {}> {
 
   isComposite(): this is Composite {
     return this.type === "composite"
-  }
-
-  isModifiedAntiprism(): this is ModifiedAntiprism {
-    return this.type === "modified antiprism"
   }
 
   isElementary(): this is Elementary {

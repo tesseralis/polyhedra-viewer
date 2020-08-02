@@ -1,5 +1,10 @@
-import { twists, oppositeTwist } from "types"
-import Classical, { Facet, oppositeFacet } from "data/specs/Classical"
+import {
+  Classical,
+  Facet,
+  oppositeFacet,
+  twists,
+  oppositeTwist,
+} from "data/specs"
 import {
   makeOpPair,
   combineOps,
@@ -221,7 +226,7 @@ export const contract = makeOperation<FacetOpts, ClassicalForme>("contract", {
   },
 
   selectionState(face, forme, { facet }) {
-    if (forme.isFacetFace(face, facet)) return "selected"
+    if (facet && forme.isFacetFace(face, facet)) return "selected"
     if (forme.isAnyFacetFace(face)) return "selectable"
     return undefined
   },

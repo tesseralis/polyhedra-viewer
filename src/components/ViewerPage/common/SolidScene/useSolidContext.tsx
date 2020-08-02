@@ -95,9 +95,9 @@ export default function useSolidContext() {
       if (!operation) return color
       switch (operation.selectionState(face, polyhedron, options)) {
         case "selected":
-          return tinycolor.mix(color, "lime")
+          return tinycolor(color).lighten(25)
         case "selectable":
-          return tinycolor.mix(color, "yellow", 25)
+          return tinycolor(color).lighten()
         default:
           return color
       }

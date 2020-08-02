@@ -1,6 +1,6 @@
-import { Facet } from "data/specs/Classical"
-import { getTransformedVertices, Pose } from "../operationUtils"
+import { Facet } from "data/specs"
 import ClassicalForme from "math/formes/ClassicalForme"
+import { getTransformedVertices, Pose } from "../operationUtils"
 import { getSharpenPointEdge, makeTruncateTrio } from "./truncateHelpers"
 
 function getRegularPose(

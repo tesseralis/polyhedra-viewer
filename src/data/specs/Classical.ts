@@ -1,9 +1,9 @@
-import { Items, Twist } from "types"
-import { PrimaryPolygon, primaryPolygons } from "../polygons"
+import { Items } from "types"
+import { PrimaryPolygon, primaryPolygons, Twist } from "./common"
 import Specs from "./PolyhedronSpecs"
 import Queries from "./Queries"
 
-const families = primaryPolygons
+export const families = primaryPolygons
 export type Family = PrimaryPolygon
 
 export const facets = ["face", "vertex"] as const
@@ -12,7 +12,7 @@ export function oppositeFacet(facet: Facet) {
   return facet === "face" ? "vertex" : "face"
 }
 
-const operations = [
+export const operations = [
   "regular",
   "truncate",
   "rectify",
@@ -67,7 +67,7 @@ export default class Classical extends Specs<ClassicalData> {
   isCantellated = () => this.data.operation === "cantellate"
   isSnub = () => this.data.operation === "snub"
 
-  hasFacet = () => this.isRegular() || this.isTruncated()
+  hasFacet = () => Classical.hasFacet(this.data.operation)
   facet() {
     if (!this.data.facet) throw new Error(`Spec ${this.name()} has no facet`)
     return this.data.facet
@@ -78,10 +78,14 @@ export default class Classical extends Specs<ClassicalData> {
 
   isChiral = () => this.isSnub()
 
+  static hasFacet(operation: Operation) {
+    return ["regular", "truncate"].includes(operation)
+  }
+
   static *getAll() {
     for (const operation of operations) {
       for (const family of families) {
-        if (["regular", "truncate"].includes(operation)) {
+        if (this.hasFacet(operation)) {
           for (const facet of facets) {
             yield new Classical({ family, operation, facet })
           }

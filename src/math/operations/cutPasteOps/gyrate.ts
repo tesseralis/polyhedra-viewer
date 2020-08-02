@@ -1,8 +1,7 @@
 import { withOrigin } from "math/geom"
 import { Polyhedron } from "math/polyhedra"
 import { mapObject } from "utils"
-import Capstone from "data/specs/Capstone"
-import Composite from "data/specs/Composite"
+import { Capstone, Composite } from "data/specs"
 import { CapOptions, capOptionArgs } from "./cutPasteUtils"
 import { getTransformedVertices } from "../operationUtils"
 import { makeOperation } from "../Operation"
@@ -93,7 +92,7 @@ type GyrateOpArgs<F extends PolyhedronForme> = OpInput<CapOptions, F, GraphOpts>
 const gyrateCapstone = makeGyrateOp<CapstoneForme>({
   graph: function* () {
     for (const cap of Capstone.query.where(
-      (s) => s.isBi() && s.isSecondary() && !s.isGyro() && !s.isDigonal(),
+      (s) => (s.hasGyrate() && s.isOrtho() && !s.isDigonal()) || s.isChiral(),
     )) {
       yield { left: cap, right: cap.gyrate() }
     }

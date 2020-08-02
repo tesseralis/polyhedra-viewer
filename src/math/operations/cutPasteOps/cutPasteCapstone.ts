@@ -1,4 +1,4 @@
-import Capstone from "data/specs/Capstone"
+import { Capstone } from "data/specs"
 import CapstoneForme from "math/formes/CapstoneForme"
 import { makeCutPastePair } from "./cutPasteUtils"
 import { capOrientation } from "./addCap"
@@ -8,7 +8,7 @@ export default makeCutPastePair<CapstoneForme>({
     // Take every capstone solid that has at least one cap,
     // and ignore pure capstones
     for (const cap of Capstone.query.where(
-      (s) => !s.isPrismatic() && (s.isBi() || !s.isShortened()),
+      (s) => !s.isSnub() && !s.isPrismatic() && (s.isBi() || !s.isShortened()),
     )) {
       // Some capstones can be modified with rotunda
       for (const capType of cap.capTypes()) {

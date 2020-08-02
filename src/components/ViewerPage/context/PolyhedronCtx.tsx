@@ -11,8 +11,11 @@ export default createHookedContext<
 >(
   {
     setPolyhedron: (forme) => () => forme,
-    setPolyhedronToName: (name) => () => {
+    setPolyhedronToName: (name) => (current) => {
       const specs = getSpecs2(name)
+      if (current.specs.canonicalName() === specs.canonicalName()) {
+        return createForme(specs, current.geom)
+      }
       return createForme(specs, getGeometry(specs))
     },
   },

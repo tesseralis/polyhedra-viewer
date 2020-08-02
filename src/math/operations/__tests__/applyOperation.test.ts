@@ -19,7 +19,7 @@ describe("applyOperation", () => {
       // TODO determine solid names from the graph instead
       for (const polyhedron of polyhedra) {
         if (operation.canApplyTo(polyhedron)) {
-          it(polyhedron.geom.name, () => {
+          it(polyhedron.specs.name(), () => {
             for (const options of operation.allOptionCombos(polyhedron)) {
               validateOperationApplication(operation, polyhedron, options)
             }

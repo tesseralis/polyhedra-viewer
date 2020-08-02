@@ -1,6 +1,6 @@
 import { compact } from "lodash-es"
 import type Specs from "./PolyhedronSpecs"
-import { PrimaryPolygon, polygonPrefixes } from "../polygons"
+import { PrimaryPolygon, polygonPrefixes } from "./common"
 
 const countPrefixes: Record<number, string> = { 1: "", 2: "bi", 3: "tri" }
 
@@ -60,10 +60,15 @@ export default function getName(solid: Specs): string {
       )
     }
 
+    if (solid.isSnub()) {
+      return wordJoin("snub", polygonPrefixes.get(base), "antiprism")
+    }
+
     const elongStr = {
       prism: "elongated",
       antiprism: "gyroelongated",
-      "": "",
+      none: "",
+      snub: "",
     }
 
     const baseStr = solid.isCupolaRotunda()
@@ -71,7 +76,7 @@ export default function getName(solid: Specs): string {
       : countString(count, solid.capType())
 
     return wordJoin(
-      elongStr[elongation ?? ""],
+      elongStr[elongation],
       polygonPrefixes.get(base),
       prefix(gyrate, baseStr),
     )
@@ -88,11 +93,6 @@ export default function getName(solid: Specs): string {
         source.name(),
       ),
     )
-  }
-
-  if (solid.isModifiedAntiprism()) {
-    const { operation, source } = solid.data
-    return wordJoin(operation ?? "", source.name())
   }
 
   if (solid.isElementary()) {
