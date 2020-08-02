@@ -1,4 +1,4 @@
-import { Symmetry, Polyhedral, Cyclic, Dihedral } from "../symmetry"
+import { Symmetry, Polyhedral, Cyclic, Dihedral } from "./symmetry"
 import type Specs from "./PolyhedronSpecs"
 import type Composite from "./Composite"
 import type Capstone from "./Capstone"

@@ -6,7 +6,7 @@ import type Elementary from "./Elementary"
 import getSymmetry from "./getSymmetry"
 import getName from "./getName"
 import getConwaySymbol from "./getConwaySymbol"
-import type { Symmetry } from "../symmetry"
+import type { Symmetry } from "./symmetry"
 import { getAlternateNames, getCanonicalName } from "../alternates"
 
 type PolyhedronType =
