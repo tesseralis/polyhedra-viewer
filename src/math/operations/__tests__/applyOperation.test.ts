@@ -1,10 +1,10 @@
 import { forEach } from "lodash-es"
 import { allSolidNames } from "data/common"
-import { operations } from ".."
-import { getCanonicalSpecs } from "specs/getSpecs"
-import { validateOperationApplication } from "../operationTestUtils"
+import { getCanonicalSpecs } from "specs"
 import createForme from "math/formes/createForme"
 import { getGeometry } from "math/operations/operationUtils"
+import { operations } from ".."
+import { validateOperationApplication } from "../operationTestUtils"
 
 describe("applyOperation", () => {
   // FIXME this needs to look at all alternates too

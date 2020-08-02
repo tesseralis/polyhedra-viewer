@@ -1,6 +1,5 @@
 import PolyhedronForme from "./PolyhedronForme"
-import { Capstone } from "specs"
-import { getSpecs } from "specs/getSpecs"
+import { Capstone, getSpecs } from "specs"
 import { Polyhedron, Face, Edge, Cap, FaceLike } from "math/polyhedra"
 import { vecEquals, isInverse } from "math/geom"
 import { getGeometry } from "math/operations/operationUtils"

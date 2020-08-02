@@ -1,10 +1,16 @@
 import { find } from "utils"
-import { Classical, Facet, facets, oppositeFacet, oppositeTwist } from "specs"
+import {
+  Classical,
+  Facet,
+  facets,
+  oppositeFacet,
+  oppositeTwist,
+  getSpecs,
+} from "specs"
 import { Polyhedron, Face } from "math/polyhedra"
 import { angleBetween } from "math/geom"
 import { getGeometry, oppositeFace } from "math/operations/operationUtils"
 import PolyhedronForme from "./PolyhedronForme"
-import { getSpecs } from "specs/getSpecs"
 
 export default abstract class ClassicalForme extends PolyhedronForme<
   Classical

@@ -1,5 +1,5 @@
 import { chunk, range } from "lodash-es"
-import { Operation, operations, families } from "./specs/Classical"
+import { Operation, operations, families } from "specs/Classical"
 import {
   PolyhedronSpecs,
   Classical,
@@ -15,9 +15,9 @@ import {
   facets,
   gyrations,
   alignments,
-} from "./specs"
-import { Count, counts } from "./specs/Composite"
-import { getSpecs } from "./specs/getSpecs"
+  getSpecs,
+} from "specs"
+import { Count, counts } from "specs/Composite"
 
 const gyrateLabels = gyrations.map((gyrate) => `${gyrate}-`)
 const alignLabels = alignments.map((align) => `${align}-`)
