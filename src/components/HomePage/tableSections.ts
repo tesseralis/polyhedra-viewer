@@ -1,5 +1,3 @@
-import * as text from "./text"
-
 import {
   classical,
   prisms,
@@ -18,8 +16,8 @@ import {
 } from "data/tables"
 
 export interface TableSection {
+  id: string
   header: string
-  description: string
   sticky?: boolean
   tables?: Table[]
   narrowTables?: Table[]
@@ -28,23 +26,23 @@ export interface TableSection {
 
 const polyhedronTables: TableSection[] = [
   {
+    id: "uniform",
     header: "Uniform Polyhedra",
-    description: text.uniform,
     tables: [classical, prisms],
   },
   {
+    id: "johnson",
     header: "Johnson Solids",
-    description: text.johnson,
     subsections: [
       {
+        id: "capstones",
         header: "Pyramids, Cupolæ, and Rotundæ",
-        description: text.capstones,
         tables: [capstones],
         narrowTables: [capstonesMono, capstonesBi],
       },
       {
+        id: "composite",
         header: "Augmented, Diminished, and Gyrate Polyhedra",
-        description: text.cutPaste,
         tables: [augmented, icosahedra, rhombicosidodecahedra],
         narrowTables: [
           augmented,
@@ -54,17 +52,17 @@ const polyhedronTables: TableSection[] = [
         ],
       },
       {
+        id: "elementary",
         header: "Elementary Johnson Solids",
-        description: text.elementary,
         tables: [snubAntiprisms, others],
         narrowTables: [snubAntiprisms, othersTwoRows],
       },
     ],
   },
   {
+    id: "more",
     header: "And Many More...",
     sticky: true,
-    description: text.more,
   },
 ]
 export default polyhedronTables
