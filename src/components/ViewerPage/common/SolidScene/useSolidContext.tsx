@@ -16,8 +16,8 @@ function createFamilyColor(face: string, vertex: string) {
   return {
     primary: { face, vertex },
     secondary: {
-      face: tinycolor(face).darken(20),
-      vertex: tinycolor(vertex).darken(20),
+      face: tinycolor(face).darken(25),
+      vertex: tinycolor(vertex).darken(25),
     },
     edge: {
       ortho: tinycolor.mix(face, vertex, 33).desaturate(25).lighten(),
@@ -35,9 +35,6 @@ const classicalColorScheme = {
   5: createFamilyColor("#424eed", "#f24bd4"),
 }
 
-const orthoFace = "dimgray"
-const gyroFace = "lightgray"
-
 function getClassicalColor(forme: ClassicalForme, face: Face) {
   const scheme = classicalColorScheme[forme.specs.data.family]
   const facet = forme.getFacet(face)
@@ -50,21 +47,24 @@ function getClassicalColor(forme: ClassicalForme, face: Face) {
 }
 
 function getCapstoneColor(forme: CapstoneForme, face: Face) {
+  // TODO digonal
+  const scheme = (classicalColorScheme as any)[forme.specs.data.base]
   if (forme.isBaseTop(face)) {
     const faceSides = face.numSides > 5 ? "secondary" : "primary"
-    return (classicalColorScheme as any)[forme.specs.data.base][faceSides].face
+    return scheme[faceSides].face
   } else if (forme.inBase(face)) {
     if (face.numSides === 3) {
-      return (classicalColorScheme as any)[forme.specs.data.base].primary.vertex
+      return scheme.primary.vertex
     } else if (face.numSides === 4) {
       // TODO need to distinguish this from the edge faces
-      return orthoFace
+      return scheme.edge.ortho
     } else {
       // TODO want this to be a separate color from the top face
       return classicalColorScheme[5].primary.face
     }
   } else {
-    return forme.specs.isElongated() ? orthoFace : gyroFace
+    const side = forme.specs.isElongated() ? "ortho" : ("gyro" as const)
+    return tinycolor(scheme.edge[side]).desaturate(2).lighten(1)
   }
 }
 
