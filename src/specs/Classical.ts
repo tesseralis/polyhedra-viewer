@@ -1,5 +1,5 @@
 import { Items } from "types"
-import { PrimaryPolygon, primaryPolygons, Twist } from "./common"
+import { PrimaryPolygon, primaryPolygons, Twist, twists } from "./common"
 import Specs from "./PolyhedronSpecs"
 import Queries from "./Queries"
 
@@ -34,22 +34,13 @@ interface ClassicalData {
  */
 export default class Classical extends Specs<ClassicalData> {
   private constructor(data: ClassicalData) {
-    super("classical", data)
-    if (!this.hasFacet()) {
-      delete this.data.facet
-    }
-    if (!this.isChiral()) {
-      delete this.data.twist
-    }
-    // Set a default twist for snub solids
-    if (this.isChiral() && !this.data.twist) {
-      this.data.twist = "left"
-    }
+    super("classical", Classical.cleanData(data))
   }
 
   withData(data: Partial<ClassicalData>) {
-    // TODO don't create a new item
-    return new Classical({ ...this.data, ...data })
+    return Classical.query.withData(
+      Classical.cleanData({ ...this.data, ...data }),
+    )
   }
 
   withOperation(operation: Operation, twist?: Twist) {
@@ -82,12 +73,30 @@ export default class Classical extends Specs<ClassicalData> {
     return ["regular", "truncate"].includes(operation)
   }
 
+  static cleanData(data: ClassicalData) {
+    if (!this.hasFacet(data.operation)) {
+      delete data.facet
+    }
+    if (data.operation !== "snub") {
+      delete data.twist
+    }
+    // Set a default twist for snub solids
+    if (data.operation === "snub" && !data.twist) {
+      data.twist = "left"
+    }
+    return data
+  }
+
   static *getAll() {
     for (const operation of operations) {
       for (const family of families) {
         if (this.hasFacet(operation)) {
           for (const facet of facets) {
             yield new Classical({ family, operation, facet })
+          }
+        } else if (operation === "snub") {
+          for (const twist of twists) {
+            yield new Classical({ family, operation, twist })
           }
         } else {
           yield new Classical({ family, operation })

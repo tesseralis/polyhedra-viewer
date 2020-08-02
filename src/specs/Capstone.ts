@@ -9,6 +9,7 @@ import {
   PolygonType,
   polygonTypes,
   Twist,
+  twists,
   oppositeTwist,
 } from "./common"
 
@@ -53,23 +54,13 @@ function rotundaCounts(
  */
 export default class Capstone extends Specs<CapstoneData> {
   private constructor(data: CapstoneData) {
-    super("capstone", data)
-    if (this.isGyroelongated() || this.isMono()) {
-      delete this.data.gyrate
-    }
-    if (!this.isChiral()) {
-      delete this.data.twist
-    }
-    if (this.isChiral() && !this.data.twist) {
-      this.data.twist = "left"
-    }
-    if (!this.isPentagonal() && !this.isSecondary()) {
-      this.data.rotundaCount = 0
-    }
+    super("capstone", Capstone.cleanData(data))
   }
 
   withData(data: Partial<CapstoneData>) {
-    return new Capstone({ ...this.data, ...data })
+    return Capstone.query.withData(
+      Capstone.cleanData({ ...this.data, ...data }),
+    )
   }
 
   withElongation(elongation: PrismaticType | "none", twist?: Twist) {
@@ -97,7 +88,7 @@ export default class Capstone extends Specs<CapstoneData> {
   isOrtho = () => this.data.gyrate === "ortho"
 
   // Overwrite from PolyhedronSpec
-  isChiral = () => this.isGyroelongated() && this.isBi() && this.isSecondary()
+  isChiral = () => Capstone.isChiral(this.data)
 
   isPrism = () => this.isPrismatic() && this.isElongated()
   isAntiprism = () => this.isPrismatic() && this.isGyroelongated()
@@ -155,6 +146,27 @@ export default class Capstone extends Specs<CapstoneData> {
     return count === 2 && type === "secondary" && elongation !== "antiprism"
   }
 
+  static isChiral({ elongation, count, type }: CapstoneData) {
+    return elongation === "antiprism" && count === 2 && type === "secondary"
+  }
+
+  static cleanData(data: CapstoneData) {
+    if (!this.hasGyrate(data)) {
+      delete data.gyrate
+    }
+    if (!this.isChiral(data)) {
+      delete data.twist
+    }
+    if (this.isChiral(data) && !data.twist) {
+      data.twist = "left"
+    }
+    if (data.base !== 5 || data.type === "primary") {
+      data.rotundaCount = 0
+    }
+    if (!data.rotundaCount) data.rotundaCount = 0
+    return data
+  }
+
   static *getAll() {
     for (const base of primaryPolygons) {
       for (const type of polygonTypes) {
@@ -177,25 +189,23 @@ export default class Capstone extends Specs<CapstoneData> {
             }
             for (const rotundaCount of rotundaCounts(type, base, count)) {
               // Only cupolae, rotundae can be ortho or gyro
+              const data: CapstoneData = {
+                count,
+                type,
+                elongation,
+                base,
+                rotundaCount,
+              }
               if (this.hasGyrate({ count, type, elongation, base })) {
                 for (const gyrate of gyrations) {
-                  yield new Capstone({
-                    base,
-                    type,
-                    elongation,
-                    count,
-                    rotundaCount,
-                    gyrate,
-                  })
+                  yield new Capstone({ ...data, gyrate })
+                }
+              } else if (this.isChiral({ count, type, elongation, base })) {
+                for (const twist of twists) {
+                  yield new Capstone({ ...data, twist })
                 }
               } else {
-                yield new Capstone({
-                  base,
-                  type,
-                  elongation,
-                  count,
-                  rotundaCount,
-                })
+                yield new Capstone({ ...data, rotundaCount })
               }
             }
           }

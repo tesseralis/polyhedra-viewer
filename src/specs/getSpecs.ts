@@ -17,6 +17,7 @@ export function getCanonicalSpecs(name: string) {
 export function getSpecs(name: string) {
   for (const Subclass of subclasses) {
     if (Subclass.query.hasName(name)) {
+      // TODO this might cause unanticipated errors for chiral polyhedra
       return Subclass.query.withName(name)
     }
   }

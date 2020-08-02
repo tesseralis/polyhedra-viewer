@@ -138,7 +138,7 @@ describe("Viewer operations panel", () => {
     expect(screen.queryByText("right")).toBeInTheDocument()
     // Make sure it turns in the right direction
     fireEvent.click(screen.getByText("right"))
-    expectSolid("elongated triangular gyrobicupola")
+    expectSolid("elongated triangular orthobicupola")
   })
 
   describe("augment options", () => {

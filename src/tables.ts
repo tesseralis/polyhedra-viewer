@@ -53,6 +53,8 @@ function* classicalRow(operation: Operation) {
           Classical.query.withData({ operation, family, facet }),
         )
       }
+    } else if (operation === "snub") {
+      yield Classical.query.withData({ operation, family, twist: "left" })
     } else {
       yield Classical.query.withData({ operation, family })
     }
@@ -126,6 +128,8 @@ function capstoneEntry(data: Capstone["data"], rotunda?: any) {
     return gyrations.map((gyrate) =>
       Capstone.query.withData({ ...data, gyrate, rotundaCount }),
     )
+  } else if (Capstone.isChiral(data)) {
+    return Capstone.query.withData({ ...data, rotundaCount, twist: "left" })
   } else {
     return Capstone.query.withData({ ...data, rotundaCount })
   }
