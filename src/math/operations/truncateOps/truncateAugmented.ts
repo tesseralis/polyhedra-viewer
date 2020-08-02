@@ -53,7 +53,7 @@ export default makeOpPair<AugmentedClassicalForme>({
   toLeft(forme) {
     const truncatedFaces = forme.minorFaces()
     // the inner faces of the caps
-    const cupolaFaces = forme.innerCapFaces()
+    const cupolaFaces = forme.capTops()
     return getTransformedVertices(
       [...truncatedFaces, ...cupolaFaces],
       (face) => {

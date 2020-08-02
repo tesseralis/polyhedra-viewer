@@ -30,7 +30,7 @@ export type SecondaryPolygon = Items<typeof secondaryPolygons>
 export const polygons = [...primaryPolygons, ...secondaryPolygons]
 export type Polygon = PrimaryPolygon | SecondaryPolygon
 
-export const polygonTypes = ["primary", "secondary"]
+export const polygonTypes = ["primary", "secondary"] as const
 export type PolygonType = Items<typeof polygonTypes>
 
 /** Type representing chiral orientation or rotation direction. */

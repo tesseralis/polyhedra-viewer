@@ -5,6 +5,7 @@ import { PolyhedronCtx, OperationCtx, TransitionCtx } from "../../context"
 import { Polyhedron, Face } from "math/polyhedra"
 import ClassicalForme from "math/formes/ClassicalForme"
 import CapstoneForme from "math/formes/CapstoneForme"
+import CompositeForme from "math/formes/CompositeForme"
 import PolyhedronForme from "math/formes/PolyhedronForme"
 
 function toRgb(hex: string) {
@@ -68,11 +69,53 @@ function getCapstoneColor(forme: CapstoneForme, face: Face) {
   }
 }
 
+function getCompositeColor(forme: CompositeForme, face: Face) {
+  if (forme.isAugmentedPrism()) {
+    const sourceSpecs = forme.specs.sourcePrism()
+    const scheme = colorScheme[sourceSpecs.data.base]
+    if (forme.isBaseFace(face)) {
+      return scheme[sourceSpecs.data.type].face
+    } else if (forme.isSideFace(face)) {
+      return scheme.edge.ortho
+    } else {
+      // augmented face
+      return tinycolor(scheme.primary.vertex).lighten(25)
+    }
+  } else if (forme.isAugmentedClassical()) {
+    const scheme = colorScheme[forme.specs.sourceClassical().data.family]
+    const type = forme.specs.sourceClassical().isTruncated()
+      ? "secondary"
+      : ("primary" as const)
+    if (forme.isMainFace(face)) {
+      return scheme[type].face
+    } else if (forme.isMinorFace(face)) {
+      return scheme.primary.vertex
+    } else if (forme.isCapTop(face)) {
+      return tinycolor(scheme.primary.face).lighten(25)
+    } else {
+      return tinycolor(
+        face.numSides === 3 ? scheme.primary.vertex : scheme.edge.ortho,
+      ).lighten(25)
+    }
+  } else if (forme.isDiminishedSolid()) {
+    const scheme = colorScheme[5]
+    if (forme.isAugmentedFace(face)) {
+      return tinycolor(scheme.primary.vertex).lighten(25)
+    } else if (forme.isDiminishedFace(face)) {
+      return tinycolor(scheme.primary.face).darken(25)
+    } else {
+      return scheme.primary.vertex
+    }
+  }
+}
+
 function getFormeColor(polyhedron: PolyhedronForme, face: Face) {
   if (polyhedron instanceof ClassicalForme) {
     return getClassicalColor(polyhedron, face)
   } else if (polyhedron instanceof CapstoneForme) {
     return getCapstoneColor(polyhedron, face)
+  } else if (polyhedron instanceof CompositeForme) {
+    return getCompositeColor(polyhedron, face)
   }
 }
 
