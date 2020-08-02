@@ -420,7 +420,7 @@ export const othersTwoRows: Table = {
 }
 
 export const sections: Record<string, Table> = {
-  archimedean: classical,
+  classical,
   prisms,
   capstones,
   capstonesMono,
