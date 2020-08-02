@@ -15,7 +15,8 @@ import {
 export const prismaticTypes = ["prism", "antiprism"] as const
 export type PrismaticType = Items<typeof prismaticTypes>
 
-const elongations = ["null", ...prismaticTypes] as const
+const elongations = ["null", ...prismaticTypes, "snub"] as const
+type Elongation = Items<typeof elongations>
 
 const counts = [0, 1, 2] as const
 type Count = Items<typeof counts>
@@ -29,7 +30,7 @@ export type CapType = Items<typeof capTypes>
 interface CapstoneData {
   base: 2 | PrimaryPolygon
   type: PolygonType
-  elongation: "null" | PrismaticType
+  elongation: Elongation
   count: Count
   rotundaCount?: Count
   gyrate?: Gyration
@@ -83,13 +84,14 @@ export default class Capstone extends Specs<CapstoneData> {
   isPrimary = () => this.data.type === "primary"
   isSecondary = () => this.data.type === "secondary"
 
-  isPrismatic = () => this.data.count === 0
+  isPrismatic = () => this.data.count === 0 && !this.isSnub()
   isMono = () => this.data.count === 1
   isBi = () => this.data.count === 2
 
   isShortened = () => this.data.elongation === "null"
   isElongated = () => this.data.elongation === "prism"
   isGyroelongated = () => this.data.elongation === "antiprism"
+  isSnub = () => this.data.elongation === "snub"
 
   isGyro = () => this.data.gyrate === "gyro"
   isOrtho = () => this.data.gyrate === "ortho"
@@ -157,6 +159,8 @@ export default class Capstone extends Specs<CapstoneData> {
     for (const base of primaryPolygons) {
       for (const type of polygonTypes) {
         for (const elongation of elongations) {
+          // Skip `snub` in the main ordering
+          if (elongation === "snub") continue
           for (const count of counts) {
             // Gyroelongated pyramids are concave
             if (
@@ -222,6 +226,16 @@ export default class Capstone extends Specs<CapstoneData> {
       rotundaCount: 0,
       gyrate: "gyro",
     })
+
+    // Snub antiprisms
+    for (const base of [2, 3, 4] as const) {
+      yield new Capstone({
+        base,
+        type: "primary",
+        elongation: "snub",
+        count: 0,
+      })
+    }
   }
 
   static query = new Queries(Capstone.getAll())

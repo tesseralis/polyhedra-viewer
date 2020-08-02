@@ -4,7 +4,6 @@ import {
   Classical,
   Composite,
   Capstone,
-  ModifiedAntiprism,
   Elementary,
   Polygon,
   PrimaryPolygon,
@@ -234,5 +233,9 @@ function* gyrateRows() {
 
 export const gyrateTable = [...gyrateRows()]
 
-export const snubAntiprismTable = [[...ModifiedAntiprism.getAll()]]
+function snubAntiprismRow() {
+  return Capstone.query.where((cap) => cap.isSnub())
+}
+
+export const snubAntiprismTable = [snubAntiprismRow()]
 export const elementaryTable = [[...Elementary.getAll()]]

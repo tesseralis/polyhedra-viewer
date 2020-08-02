@@ -21,6 +21,10 @@ function getCapstoneSymmetry(capstone: Capstone) {
     return Dihedral.get(capstone.baseSides(), capstone.prismaticType())
   }
 
+  if (capstone.isSnub()) {
+    return Dihedral.get(base, "antiprism")
+  }
+
   // mono-capstones always have cyclic symmetry
   if (capstone.isMono()) {
     return Cyclic.get(base)
@@ -107,15 +111,6 @@ export default function getSymmetry(solid: Specs): Symmetry {
   }
   if (solid.isComposite()) {
     return getCompositeSymmetry(solid)
-  }
-  if (solid.isModifiedAntiprism()) {
-    const { source, operation } = solid.data
-    switch (operation) {
-      case "snub":
-        return Dihedral.get(source.data.base, "antiprism")
-      default:
-        return source.symmetry()
-    }
   }
   if (solid.isElementary()) {
     return elementaryMapping[solid.data.base]

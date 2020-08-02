@@ -28,5 +28,4 @@ export {
 export type { PrismaticType, Gyration, CapType } from "./Capstone"
 export { default as Composite, alignments } from "./Composite"
 export type { Align } from "./Composite"
-export { default as ModifiedAntiprism } from "./ModifiedAntiprism"
 export { default as Elementary } from "./Elementary"

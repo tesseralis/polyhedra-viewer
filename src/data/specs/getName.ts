@@ -60,10 +60,15 @@ export default function getName(solid: Specs): string {
       )
     }
 
+    if (solid.isSnub()) {
+      return wordJoin("snub", polygonPrefixes.get(base), "antiprism")
+    }
+
     const elongStr = {
       prism: "elongated",
       antiprism: "gyroelongated",
       null: "",
+      snub: "",
     }
 
     const baseStr = solid.isCupolaRotunda()
@@ -88,11 +93,6 @@ export default function getName(solid: Specs): string {
         source.name(),
       ),
     )
-  }
-
-  if (solid.isModifiedAntiprism()) {
-    const { operation, source } = solid.data
-    return wordJoin(operation ?? "", source.name())
   }
 
   if (solid.isElementary()) {
