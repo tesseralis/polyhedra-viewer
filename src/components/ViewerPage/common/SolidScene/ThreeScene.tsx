@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from "react"
+import { PerspectiveCamera } from "three"
 import { Canvas, extend, useThree, useFrame } from "react-three-fiber"
 import { TrackballControls } from "three/examples/jsm/controls/TrackballControls"
 import ThreePolyhedron from "./ThreePolyhedron"
@@ -13,10 +14,10 @@ function CameraControls() {
     gl: { domElement },
   } = useThree()
   // Ref to the controls, so that we can update them on every frame using useFrame
-  const camera = useRef<any>()
-  const controls = useRef<any>()
+  const camera = useRef<PerspectiveCamera | undefined>()
+  const controls = useRef<TrackballControls | undefined>()
   useEffect(() => {
-    setDefaultCamera(camera.current)
+    if (camera.current) setDefaultCamera(camera.current)
   }, [setDefaultCamera])
   useFrame(() => {
     camera.current?.updateMatrixWorld()
