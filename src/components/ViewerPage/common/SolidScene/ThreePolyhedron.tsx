@@ -63,7 +63,7 @@ export default function ThreePolyhedron({
   config,
 }: Props) {
   const { vertices, faces, edges = [] } = value
-  const hit = useRef<Vector3 | undefined>()
+  const hasMoved = useRef(false)
   const { showFaces, showEdges, showInnerFaces, opacity } = config
 
   const ref = useUpdate(
@@ -103,16 +103,14 @@ export default function ThreePolyhedron({
       {showFaces && (
         <mesh
           onPointerDown={(e) => {
-            // FIXME it's still pretty finnicky..
-            hit.current = e.point.clone()
+            hasMoved.current = false
           }}
           onPointerUp={(e) => {
-            if (!hit.current?.equals(e.point)) return
-            hit.current = undefined
+            if (hasMoved.current) return
             onClick?.(e.point.toArray() as Point)
           }}
           onPointerMove={(e) => {
-            hit.current = e.point.clone()
+            hasMoved.current = true
             onPointerMove?.(e.point.toArray() as Point)
           }}
           onPointerOut={(e) => {
