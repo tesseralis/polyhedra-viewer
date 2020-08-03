@@ -1,8 +1,9 @@
 import React, { useEffect, useRef } from "react"
 import { Canvas, extend, useThree, useFrame } from "react-three-fiber"
+import { TrackballControls } from "three/examples/jsm/controls/TrackballControls"
 import ThreePolyhedron from "./ThreePolyhedron"
 import useSolidContext from "./useSolidContext"
-import { TrackballControls } from "three/examples/jsm/controls/TrackballControls"
+import useHitOptions from "./useHitOptions"
 
 extend({ TrackballControls })
 
@@ -23,7 +24,7 @@ function CameraControls() {
   })
   return (
     <>
-      <perspectiveCamera ref={camera} position={[0, 0, 10]}>
+      <perspectiveCamera ref={camera} position={[0, 0, 5]}>
         <pointLight />
       </perspectiveCamera>
       {camera.current && (
@@ -42,11 +43,17 @@ function CameraControls() {
 
 export default function ThreeScene() {
   const { colors, solidData } = useSolidContext()
+  const { setHitOption, unsetHitOption, applyWithHitOption } = useHitOptions()
   return (
     <Canvas>
       <CameraControls />
       <ambientLight />
-      <ThreePolyhedron value={solidData} colors={colors} />
+      <ThreePolyhedron
+        value={solidData}
+        colors={colors}
+        onPointerOver={setHitOption}
+        onClick={applyWithHitOption}
+      />
     </Canvas>
   )
 }

@@ -26,7 +26,12 @@ function convertFaces(faces: number[][], colors: any[]) {
   )
 }
 
-export default function ThreePolyhedron({ value, colors }: any) {
+export default function ThreePolyhedron({
+  onClick,
+  onPointerOver,
+  value,
+  colors,
+}: any) {
   // This reference will give us direct access to the mesh
   const mesh = useRef<any>()
   const { vertices, faces } = value
@@ -44,7 +49,16 @@ export default function ThreePolyhedron({ value, colors }: any) {
   )
 
   return (
-    <mesh ref={mesh} scale={[2, 2, 2]}>
+    <mesh
+      ref={mesh}
+      scale={[1, 1, 1]}
+      onClick={(e) => {
+        onClick?.(e.unprojectedPoint.toArray())
+      }}
+      onPointerOver={(e) => {
+        onPointerOver?.(e.unprojectedPoint.toArray())
+      }}
+    >
       <geometry ref={ref} attach="geometry" />
       <meshStandardMaterial
         side={DoubleSide}

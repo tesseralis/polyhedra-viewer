@@ -1,3 +1,4 @@
+import { useCallback } from "react"
 import { isEmpty, isEqual } from "lodash-es"
 
 import { Point } from "types"
@@ -33,24 +34,40 @@ export default function useHitOptions() {
     if (!operation) return
     setOption(hitOption, undefined)
   }
+  console.log("operation set to", operation)
 
-  const applyWithHitOption = (hitPnt: Point) => {
-    if (!operation || isTransitioning) return
-    const newHitOptions = operation.getHitOption(polyhedron, hitPnt, options)
-    const newValue = newHitOptions[hitOption]
-    // only apply operation if we have a hit
-    if (options && newValue) {
-      applyOperation(
-        operation,
-        { ...options, [hitOption]: newValue },
-        (result) => {
-          // If we're still on a cap, select it
-          if (hitOption === "cap" && options[hitOption]) {
-            setOption("cap", Cap.find(result, options[hitOption].topPoint))
-          }
-        },
-      )
-    }
-  }
+  const applyWithHitOption = useCallback(
+    (hitPnt: Point) => {
+      console.log("calling applyWithHitOptions")
+      console.log({ operation, isTransitioning })
+      if (!operation || isTransitioning) return
+      console.log("we have an opration")
+      const newHitOptions = operation.getHitOption(polyhedron, hitPnt, options)
+      console.log({ newHitOptions })
+      const newValue = newHitOptions[hitOption]
+      // only apply operation if we have a hit
+      if (options && newValue) {
+        applyOperation(
+          operation,
+          { ...options, [hitOption]: newValue },
+          (result) => {
+            // If we're still on a cap, select it
+            if (hitOption === "cap" && options[hitOption]) {
+              setOption("cap", Cap.find(result, options[hitOption].topPoint))
+            }
+          },
+        )
+      }
+    },
+    [
+      operation,
+      applyOperation,
+      hitOption,
+      isTransitioning,
+      options,
+      polyhedron,
+      setOption,
+    ],
+  )
   return { setHitOption, unsetHitOption, applyWithHitOption }
 }
