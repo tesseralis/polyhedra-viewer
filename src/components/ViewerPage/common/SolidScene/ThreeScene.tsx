@@ -1,4 +1,4 @@
-import React, { useRef } from "react"
+import React, { useEffect, useRef } from "react"
 import { Canvas, extend, useThree, useFrame } from "react-three-fiber"
 import ThreePolyhedron from "./ThreePolyhedron"
 import useSolidContext from "./useSolidContext"
@@ -8,24 +8,34 @@ extend({ TrackballControls })
 
 function CameraControls() {
   const {
-    camera,
+    setDefaultCamera,
     gl: { domElement },
   } = useThree()
   // Ref to the controls, so that we can update them on every frame using useFrame
+  const camera = useRef<any>()
   const controls = useRef<any>()
-  useFrame((state) => controls?.current?.update())
-  // FIXME
+  useEffect(() => {
+    setDefaultCamera(camera.current)
+  }, [setDefaultCamera])
+  useFrame(() => {
+    camera.current?.updateMatrixWorld()
+    controls.current?.update()
+  })
   return (
     <>
-      {/* @ts-ignore */}
-      <trackballControls
-        ref={controls}
-        args={[camera, domElement]}
-        enabled
-        noPan
-        rotateSpeed={8.0}
-        staticMoving
-      />
+      <perspectiveCamera ref={camera} position={[0, 0, 10]}>
+        <pointLight />
+      </perspectiveCamera>
+      {camera.current && (
+        <trackballControls
+          ref={controls}
+          args={[camera.current, domElement]}
+          enabled
+          noPan
+          rotateSpeed={8.0}
+          staticMoving
+        />
+      )}
     </>
   )
 }
@@ -36,12 +46,6 @@ export default function ThreeScene() {
     <Canvas>
       <CameraControls />
       <ambientLight />
-      <perspectiveCamera
-        args={[45, window.innerWidth / window.innerHeight, 1, 500]}
-        position={[0, 0, 100]}
-      >
-        <pointLight />
-      </perspectiveCamera>
       <ThreePolyhedron value={solidData} colors={colors} />
     </Canvas>
   )

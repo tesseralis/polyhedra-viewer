@@ -46,6 +46,7 @@ export default function ThreePolyhedron({ value, colors }: any) {
 
   return (
     <mesh ref={mesh} scale={[2, 2, 2]}>
+      {/* FIXME FUCK YOU POLYHEDRONGEOMETRY YOU ARE A FALSE MESSIAH */}
       <polyhedronGeometry
         ref={geom}
         attach="geometry"
