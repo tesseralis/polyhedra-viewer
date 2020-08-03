@@ -7,26 +7,23 @@ import { TrackballControls } from "three/examples/jsm/controls/TrackballControls
 extend({ TrackballControls })
 
 function CameraControls() {
-  const camera = useRef<any>()
   const {
+    camera,
     gl: { domElement },
   } = useThree()
   // Ref to the controls, so that we can update them on every frame using useFrame
   const controls = useRef<any>()
-  useFrame((state) => controls.current.update())
+  useFrame((state) => controls?.current?.update())
   // FIXME
   return (
     <>
-      <perspectiveCamera ref={camera}>
-        <pointLight position={[10, 10, 10]} />
-      </perspectiveCamera>
       {/* @ts-ignore */}
       <trackballControls
         ref={controls}
-        args={[camera.current, domElement]}
+        args={[camera, domElement]}
         enabled
         noPan
-        rotateSpeed={15.0}
+        rotateSpeed={8.0}
         staticMoving
       />
     </>
@@ -39,6 +36,12 @@ export default function ThreeScene() {
     <Canvas>
       <CameraControls />
       <ambientLight />
+      <perspectiveCamera
+        args={[45, window.innerWidth / window.innerHeight, 1, 500]}
+        position={[0, 0, 100]}
+      >
+        <pointLight />
+      </perspectiveCamera>
       <ThreePolyhedron value={solidData} colors={colors} />
     </Canvas>
   )

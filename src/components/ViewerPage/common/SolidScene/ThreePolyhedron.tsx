@@ -1,6 +1,7 @@
 import { zip } from "lodash"
 import React, { useRef } from "react"
 import { useFrame } from "react-three-fiber"
+import { DoubleSide } from "three"
 import { repeat } from "utils"
 
 function triangulateFace(face: number[]): [number, number, number][] {
@@ -44,13 +45,14 @@ export default function ThreePolyhedron({ value, colors }: any) {
   })
 
   return (
-    <mesh ref={mesh} scale={[1, 1, 1]}>
+    <mesh ref={mesh} scale={[2, 2, 2]}>
       <polyhedronGeometry
         ref={geom}
         attach="geometry"
         args={[vertices.flat(), triangulateFaces(faces).flat()]}
       />
       <meshStandardMaterial
+        side={DoubleSide}
         attach="material"
         color="grey"
         args={[{ vertexColors: true }]}
