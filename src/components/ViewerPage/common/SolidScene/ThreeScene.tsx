@@ -45,7 +45,7 @@ export default function ThreeScene() {
   const { colors, solidData } = useSolidContext()
   const { setHitOption, unsetHitOption, applyWithHitOption } = useHitOptions()
   return (
-    <Canvas>
+    <Canvas gl={{ antialias: true }}>
       <CameraControls />
       <ambientLight />
       <ThreePolyhedron
