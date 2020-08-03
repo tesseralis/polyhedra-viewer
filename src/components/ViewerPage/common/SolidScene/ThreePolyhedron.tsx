@@ -112,8 +112,7 @@ export default function ThreePolyhedron({
         />
       </mesh>
       <lineSegments geometry={edgeGeom}>
-        {/* <bufferGeometry ref={edgeRef} attach="geometry" /> */}
-        <lineBasicMaterial color={0x222222} linewidth={10} />
+        <lineBasicMaterial attach="material" color={0x222222} linewidth={5} />
       </lineSegments>
     </>
   )
