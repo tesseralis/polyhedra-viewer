@@ -45,13 +45,13 @@ export default function ThreeScene() {
   const { colors, solidData } = useSolidContext()
   const { setHitOption, unsetHitOption, applyWithHitOption } = useHitOptions()
   return (
-    <Canvas>
+    <Canvas onPointerMissed={unsetHitOption}>
       <CameraControls />
       <ambientLight />
       <ThreePolyhedron
         value={solidData}
         colors={colors}
-        onPointerOver={setHitOption}
+        onPointerMove={setHitOption}
         onClick={applyWithHitOption}
       />
     </Canvas>

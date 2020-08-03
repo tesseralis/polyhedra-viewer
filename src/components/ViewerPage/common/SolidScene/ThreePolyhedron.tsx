@@ -28,7 +28,7 @@ function convertFaces(faces: number[][], colors: any[]) {
 
 export default function ThreePolyhedron({
   onClick,
-  onPointerOver,
+  onPointerMove,
   value,
   colors,
 }: any) {
@@ -56,7 +56,7 @@ export default function ThreePolyhedron({
         onClick?.(e.unprojectedPoint.toArray())
       }}
       onPointerOver={(e) => {
-        onPointerOver?.(e.unprojectedPoint.toArray())
+        onPointerMove?.(e.unprojectedPoint.toArray())
       }}
     >
       <geometry ref={ref} attach="geometry" />

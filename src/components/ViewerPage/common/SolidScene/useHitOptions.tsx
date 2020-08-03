@@ -34,16 +34,10 @@ export default function useHitOptions() {
     if (!operation) return
     setOption(hitOption, undefined)
   }
-  console.log("operation set to", operation)
-
   const applyWithHitOption = useCallback(
     (hitPnt: Point) => {
-      console.log("calling applyWithHitOptions")
-      console.log({ operation, isTransitioning })
       if (!operation || isTransitioning) return
-      console.log("we have an opration")
       const newHitOptions = operation.getHitOption(polyhedron, hitPnt, options)
-      console.log({ newHitOptions })
       const newValue = newHitOptions[hitOption]
       // only apply operation if we have a hit
       if (options && newValue) {
