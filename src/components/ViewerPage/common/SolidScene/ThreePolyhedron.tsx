@@ -9,6 +9,7 @@ import {
   Color,
   BufferGeometry,
   FrontSide,
+  Geometry,
 } from "three"
 import { useFrame, useUpdate } from "react-three-fiber"
 
@@ -64,7 +65,7 @@ export default function ThreePolyhedron({
   const { showFaces, showEdges, showInnerFaces, opacity } = config
 
   const ref = useUpdate(
-    (geom: any) => {
+    (geom: Geometry) => {
       geom.vertices = convertVertices(vertices)
       geom.verticesNeedUpdate = true
       geom.faces = convertFaces(faces, colors)
