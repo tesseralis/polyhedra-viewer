@@ -34,5 +34,6 @@ module.exports = {
       "error",
       { ignoreParameters: true },
     ],
+    "@typescript-eslint/ban-ts-ignore": "on",
   },
 }
