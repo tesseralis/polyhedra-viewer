@@ -25,6 +25,7 @@ function CameraControls() {
     camera.current?.updateMatrixWorld()
     controls.current?.update()
   })
+  // FIXME v4 This needs to adjusted when resizing
   return (
     <>
       <perspectiveCamera ref={camera} position={[0, 0, 5]}>
