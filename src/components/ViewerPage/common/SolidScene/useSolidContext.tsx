@@ -178,6 +178,8 @@ export default function useSolidContext() {
     return rawColors.map(toRgb)
   }, [formeColors, transitionColors, operationColors, geom, colors])
 
+  console.log(polyhedron.specs.name(), polyhedron.geom.solidData)
+
   return {
     colors: normalizedColors,
     solidData: isTransitioning ? solidData! : polyhedron.geom.solidData,

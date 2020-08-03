@@ -10,13 +10,14 @@ function joinListOfLists<T>(list: T[][], outerSep: string, innerSep: string) {
 }
 
 const Coordinates = ({ points }: { points: Point[] }) => {
-  return (
-    <coordinate
-      is="x3d"
-      data-testid="x3d-vertices"
-      point={joinListOfLists(points, ", ", " ")}
-    />
-  )
+  return null
+  // return (
+  // <coordinate
+  //   is="x3d"
+  //   data-testid="x3d-vertices"
+  //   point={joinListOfLists(points, ", ", " ")}
+  // />
+  // )
 }
 
 /* Edges */
@@ -25,13 +26,14 @@ const Edges = ({
   edges = [],
   vertices = [],
 }: Pick<SolidData, "edges" | "vertices">) => {
-  return (
-    <shape is="x3d">
-      <indexedlineset is="x3d" coordindex={joinListOfLists(edges, " -1 ", " ")}>
-        <Coordinates points={vertices} />
-      </indexedlineset>
-    </shape>
-  )
+  return null
+  // return (
+  // <shape is="x3d">
+  //   <indexedlineset is="x3d" coordindex={joinListOfLists(edges, " -1 ", " ")}>
+  //     <Coordinates points={vertices} />
+  //   </indexedlineset>
+  // </shape>
+  // )
 }
 
 interface X3dEvent extends MouseEvent {
@@ -115,7 +117,7 @@ export default function X3dPolyhedron({
   const colorStr = joinListOfLists(colors, ",", " ")
   return (
     <>
-      {showFaces && (
+      {/* {showFaces && (
         <shape is="x3d" data-testid="x3d-shape" ref={shape}>
           <appearance is="x3d">
             <material is="x3d" transparency={1 - opacity} />
@@ -132,7 +134,7 @@ export default function X3dPolyhedron({
           </indexedfaceset>
         </shape>
       )}
-      {showEdges && <Edges edges={edges} vertices={vertices} />}
+      {showEdges && <Edges edges={edges} vertices={vertices} />} */}
     </>
   )
 }

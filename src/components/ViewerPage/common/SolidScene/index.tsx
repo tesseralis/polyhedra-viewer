@@ -1,2 +1,3 @@
-import SolidScene from "./SolidScene"
-export default SolidScene
+// import SolidScene from "./SolidScene"
+import ThreeScene from "./ThreeScene"
+export default ThreeScene

@@ -37,6 +37,7 @@ function InnerViewer({ solid, panel }: InnerProps) {
     if (polyhedron.specs.name() !== solidSync) {
       // If the route has changed (and it wasn't from an operation)
       // cancel the current operation and set the polyhedorn model
+      console.log("setting to ", solidSync)
       unsetOperation()
       setPolyhedronToName(solidSync)
     } else if (solid !== solidSync) {

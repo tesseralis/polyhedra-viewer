@@ -37,12 +37,13 @@ export default function X3dScene({ label, children }: Props) {
     width: "100%",
   })
 
-  return (
-    <x3d is="x3d" {...css("class")} ref={x3d}>
-      <scene is="x3d">
-        <viewpoint is="x3d" position="0,0,5" />
-        {children}
-      </scene>
-    </x3d>
-  )
+  return null
+  // return (
+  // <x3d is="x3d" {...css("class")} ref={x3d}>
+  //   <scene is="x3d">
+  //     <viewpoint is="x3d" position="0,0,5" />
+  //     {children}
+  //   </scene>
+  // </x3d>
+  // )
 }
