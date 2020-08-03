@@ -1,3 +1,4 @@
+import { useCallback } from "react"
 import { isEmpty, isEqual } from "lodash-es"
 
 import { Point } from "types"
@@ -33,24 +34,34 @@ export default function useHitOptions() {
     if (!operation) return
     setOption(hitOption, undefined)
   }
-
-  const applyWithHitOption = (hitPnt: Point) => {
-    if (!operation || isTransitioning) return
-    const newHitOptions = operation.getHitOption(polyhedron, hitPnt, options)
-    const newValue = newHitOptions[hitOption]
-    // only apply operation if we have a hit
-    if (options && newValue) {
-      applyOperation(
-        operation,
-        { ...options, [hitOption]: newValue },
-        (result) => {
-          // If we're still on a cap, select it
-          if (hitOption === "cap" && options[hitOption]) {
-            setOption("cap", Cap.find(result, options[hitOption].topPoint))
-          }
-        },
-      )
-    }
-  }
+  const applyWithHitOption = useCallback(
+    (hitPnt: Point) => {
+      if (!operation || isTransitioning) return
+      const newHitOptions = operation.getHitOption(polyhedron, hitPnt, options)
+      const newValue = newHitOptions[hitOption]
+      // only apply operation if we have a hit
+      if (options && newValue) {
+        applyOperation(
+          operation,
+          { ...options, [hitOption]: newValue },
+          (result) => {
+            // If we're still on a cap, select it
+            if (hitOption === "cap" && options[hitOption]) {
+              setOption("cap", Cap.find(result, options[hitOption].topPoint))
+            }
+          },
+        )
+      }
+    },
+    [
+      operation,
+      applyOperation,
+      hitOption,
+      isTransitioning,
+      options,
+      polyhedron,
+      setOption,
+    ],
+  )
   return { setHitOption, unsetHitOption, applyWithHitOption }
 }

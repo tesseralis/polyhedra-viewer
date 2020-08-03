@@ -1,3 +1,4 @@
+import { Point } from "types"
 import { useMemo, useCallback } from "react"
 import tinycolor from "tinycolor2"
 import Config from "components/ConfigCtx"
@@ -8,7 +9,7 @@ import CapstoneForme from "math/formes/CapstoneForme"
 import CompositeForme from "math/formes/CompositeForme"
 import PolyhedronForme from "math/formes/PolyhedronForme"
 
-function toRgb(hex: string) {
+function toRgb(hex: string): Point {
   const { r, g, b } = tinycolor(hex).toRgb()
   return [r / 255, g / 255, b / 255]
 }
@@ -169,7 +170,7 @@ export default function useSolidContext() {
     )
   }, [colors, geom.faces, getSelectionColor])
 
-  const normalizedColors = useMemo(() => {
+  const normalizedColors: Point[] = useMemo(() => {
     const rawColors =
       transitionColors ||
       formeColors ||

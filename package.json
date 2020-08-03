@@ -12,6 +12,7 @@
     "husky": "^4.2.5",
     "jest-extended": "^0.11.5",
     "lint-staged": "^10.2.10",
+    "mutationobserver-shim": "^0.3.7",
     "prettier": "^2.0.5",
     "react-scripts": "^3.4.1"
   },
@@ -39,11 +40,12 @@
     "react-ga": "^3.0.0",
     "react-markdown": "^4.3.1",
     "react-router-dom": "^6.0.0-beta.0",
+    "react-three-fiber": "^4.2.18",
+    "three": "^0.119.1",
     "tinycolor2": "^1.4.1",
     "toxiclibsjs": "^0.3.3",
     "typescript": "^3.9.5",
-    "what-input": "^5.2.10",
-    "x3dom": "1.7.2"
+    "what-input": "^5.2.10"
   },
   "scripts": {
     "start": "react-scripts start",

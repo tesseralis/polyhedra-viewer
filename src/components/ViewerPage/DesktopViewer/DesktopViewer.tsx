@@ -25,7 +25,7 @@ function Scene({ solid, full }: Pick<Props, "solid"> & { full: boolean }) {
   )
   return (
     <div {...css()}>
-      <SolidScene label={solid} />
+      <SolidScene />
       <Overlay solid={solid} />
     </div>
   )

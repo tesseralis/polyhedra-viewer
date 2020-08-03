@@ -1,4 +1,4 @@
-import { ValueIteratee } from "lodash"
+import type { ValueIteratee } from "lodash"
 import { uniqBy } from "lodash-es"
 
 function mod(a: number, b: number) {
