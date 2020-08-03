@@ -29,12 +29,14 @@ function convertFaces(faces: number[][], colors: any[]) {
 export default function ThreePolyhedron({
   onClick,
   onPointerMove,
+  onPointerOut,
   value,
   colors,
 }: any) {
   // This reference will give us direct access to the mesh
   const mesh = useRef<any>()
   const { vertices, faces } = value
+  const hit = useRef(new Vector3())
 
   const ref = useUpdate(
     (geom: any) => {
@@ -52,11 +54,20 @@ export default function ThreePolyhedron({
     <mesh
       ref={mesh}
       scale={[1, 1, 1]}
-      onClick={(e) => {
+      onPointerDown={(e) => {
+        // FIXME it's still pretty finnicky..
+        hit.current.copy(e.point)
+      }}
+      onPointerUp={(e) => {
+        if (!hit.current.equals(e.point)) return
         onClick?.(e.point.toArray())
       }}
       onPointerMove={(e) => {
+        hit.current.copy(e.point)
         onPointerMove?.(e.point.toArray())
+      }}
+      onPointerOut={(e) => {
+        onPointerOut?.(e.point.toArray())
       }}
     >
       <geometry ref={ref} attach="geometry" />
