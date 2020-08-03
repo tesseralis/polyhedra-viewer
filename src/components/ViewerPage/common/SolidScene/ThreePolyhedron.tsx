@@ -1,25 +1,28 @@
 import { zip } from "lodash"
-import React, { useRef } from "react"
-import { useFrame } from "react-three-fiber"
-import { DoubleSide } from "three"
-import { repeat } from "utils"
+import React, { useEffect, useRef } from "react"
+import { DoubleSide, Vector3, Face3, Color } from "three"
 
-function triangulateFace(face: number[]): [number, number, number][] {
+function convertVertex([x, y, z]: [number, number, number]) {
+  return new Vector3(x, y, z)
+}
+
+function convertVertices(vertices: [number, number, number][]) {
+  return vertices.map(convertVertex)
+}
+
+function convertFace(face: number[], [r, g, b]: any) {
   const [v0, ...vs] = face
   const pairs = zip(vs.slice(0, vs.length - 1), vs.slice(1))
-  return pairs.map((pair) => [v0, ...pair]) as any
-}
-
-function triangulateFaces(faces: number[][]) {
-  return faces.flatMap(triangulateFace)
-}
-
-function triangulateColors(faces: number[][], colors: any[]) {
-  return colors.flatMap((color, i) => {
-    const face = faces[i]
-    const reps = face.length - 2
-    return repeat(color, reps)
+  const color = new Color(r, g, b)
+  return pairs.map(([v1, v2]) => {
+    return new Face3(v0, v1!, v2!, undefined, color)
   })
+}
+
+function convertFaces(faces: number[][], colors: any[]) {
+  return zip(faces, colors).flatMap(([face, color]) =>
+    convertFace(face!, color),
+  )
 }
 
 export default function ThreePolyhedron({ value, colors }: any) {
@@ -31,26 +34,18 @@ export default function ThreePolyhedron({ value, colors }: any) {
 
   // Set up state for the hovered and active state
 
-  // Rotate mesh every frame, this is outside of React without overhead
-  // useFrame(() => (mesh.current.rotation.x = mesh.current.rotation.y += 0.01))
-
-  const triangColors = triangulateColors(faces, colors)
-
-  // FIXME initialize colors when we generate the polyhedron
-  useFrame(() => {
-    geom.current.faces.forEach((face: any, i: number) => {
-      const color = triangColors[i]
-      face.color.setRGB(...color)
-    })
+  // FIXME this doesn't update
+  useEffect(() => {
+    geom.current.computeFaceNormals()
   })
 
   return (
     <mesh ref={mesh} scale={[2, 2, 2]}>
-      {/* FIXME FUCK YOU POLYHEDRONGEOMETRY YOU ARE A FALSE MESSIAH */}
-      <polyhedronGeometry
+      <geometry
         ref={geom}
         attach="geometry"
-        args={[vertices.flat(), triangulateFaces(faces).flat()]}
+        vertices={convertVertices(vertices)}
+        faces={convertFaces(faces, colors)}
       />
       <meshStandardMaterial
         side={DoubleSide}
