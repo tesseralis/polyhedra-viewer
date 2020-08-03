@@ -48,7 +48,7 @@ interface Props {
   value: SolidData
   colors: Point[]
   config: SolidConfig
-  onClick?(point: any): void
+  onClick?(point: Point): void
   onPointerMove?(point: Point): void
   onPointerOut?(point: Point): void
 }
@@ -86,7 +86,7 @@ export default function ThreePolyhedron({
 
   useFrame(() => {
     const positions = edgeGeom.attributes.position.array as number[]
-    edges.forEach((edge: any, i: number) => {
+    edges.forEach((edge: [number, number], i: number) => {
       const [i1, i2] = edge
       const v1 = vertices[i1]
       const v2 = vertices[i2]
@@ -112,7 +112,7 @@ export default function ThreePolyhedron({
           }}
           onPointerUp={(e) => {
             if (!hit.current.equals(e.point)) return
-            onClick?.(e.point.toArray())
+            onClick?.(e.point.toArray() as Point)
           }}
           onPointerMove={(e) => {
             hit.current.copy(e.point)
