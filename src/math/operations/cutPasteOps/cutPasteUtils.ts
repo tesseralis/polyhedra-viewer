@@ -30,7 +30,7 @@ function canAugment(forme: PolyhedronForme, face: Face) {
 
 function hasRotunda(info: CutPasteSpecs) {
   if (info.isCapstone()) {
-    return info.isMono() && info.isSecondary() && info.isPentagonal()
+    return info.isSecondary() && info.isPentagonal()
   }
   return false
 }
