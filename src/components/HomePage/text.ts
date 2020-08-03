@@ -112,13 +112,13 @@ Inspiration and geometric data taken from [Virtual Polyhedra] by George W. Hart.
 
 Thank you to the countless friends and unsuspecting strangers who helped test this site and provided their feedback.
 
-Made with [React] and [X3DOM].
+Made with [react-three-fiber].
 
 Source on [GitHub].
 
 [Ko-fi]: https://ko-fi.com/tesseralis/
 [Virtual Polyhedra]: http://www.georgehart.com/virtual-polyhedra/vp.html
 [React]: https://reactjs.org/
-[X3DOM]: https://www.x3dom.org/
+[react-three-fiber]: https://github.com/react-spring/react-three-fiber/
 [GitHub]: https://www.github.com/tesseralis/polyhedra-viewer
 `
