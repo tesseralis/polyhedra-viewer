@@ -12,6 +12,7 @@
     "husky": "^4.2.5",
     "jest-extended": "^0.11.5",
     "lint-staged": "^10.2.10",
+    "mutationobserver-shim": "^0.3.7",
     "prettier": "^2.0.5",
     "react-scripts": "^3.4.1"
   },
