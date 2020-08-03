@@ -1,6 +1,7 @@
 import { zip } from "lodash"
-import React, { useEffect, useRef } from "react"
+import React, { useRef } from "react"
 import { DoubleSide, Vector3, Face3, Color } from "three"
+import { useUpdate } from "react-three-fiber"
 
 function convertVertex([x, y, z]: [number, number, number]) {
   return new Vector3(x, y, z)
@@ -28,25 +29,23 @@ function convertFaces(faces: number[][], colors: any[]) {
 export default function ThreePolyhedron({ value, colors }: any) {
   // This reference will give us direct access to the mesh
   const mesh = useRef<any>()
-  const geom = useRef<any>()
-
   const { vertices, faces } = value
 
-  // Set up state for the hovered and active state
-
-  // FIXME this doesn't update
-  useEffect(() => {
-    geom.current.computeFaceNormals()
-  })
+  const ref = useUpdate(
+    (geom: any) => {
+      geom.vertices = convertVertices(vertices)
+      geom.verticesNeedUpdate = true
+      geom.faces = convertFaces(faces, colors)
+      geom.elementsNeedUpdate = true
+      geom.colorsNeedUpdate = true
+      geom.computeFaceNormals()
+    },
+    [vertices, faces, colors],
+  )
 
   return (
     <mesh ref={mesh} scale={[2, 2, 2]}>
-      <geometry
-        ref={geom}
-        attach="geometry"
-        vertices={convertVertices(vertices)}
-        faces={convertFaces(faces, colors)}
-      />
+      <geometry ref={ref} attach="geometry" />
       <meshStandardMaterial
         side={DoubleSide}
         attach="material"
