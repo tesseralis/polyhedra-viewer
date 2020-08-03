@@ -10734,22 +10734,10 @@ text-table@0.2.0, text-table@^0.2.0:
   resolved "https://registry.yarnpkg.com/text-table/-/text-table-0.2.0.tgz#7f5ee823ae805207c00af2df4a84ec3fcfa570b4"
   integrity sha1-f17oI66AUgfACvLfSoTsP8+lcLQ=
 
-three.js@^0.77.1:
-  version "0.77.1"
-  resolved "https://registry.yarnpkg.com/three.js/-/three.js-0.77.1.tgz#07858a8749e4b627a31083252a2d987776cca32a"
-  integrity sha1-B4WKh0nktiejEIMlKi2Yd3bMoyo=
-  dependencies:
-    three "0.77.0"
-
-three@*:
+three@*, three@^0.119.1:
   version "0.119.1"
   resolved "https://registry.yarnpkg.com/three/-/three-0.119.1.tgz#9d979a082c4cd9622af8e3498a8dfa026a619332"
   integrity sha512-GHyh/RiUfQ5VTiWIVRRTANYoXc1PFB1y+jDVRTb649nif1uX1F06PT1TKU3k2+F/MN4UJ3PWvQB53fY2OqKqKw==
-
-three@0.77.0:
-  version "0.77.0"
-  resolved "https://registry.yarnpkg.com/three/-/three-0.77.0.tgz#8b0b1b00047689ceaa020d480a562ca60d87ff37"
-  integrity sha1-iwsbAAR2ic6qAg1IClYspg2H/zc=
 
 throat@^4.0.0:
   version "4.1.0"
@@ -11719,11 +11707,6 @@ x-is-string@^0.1.0:
   version "0.1.0"
   resolved "https://registry.yarnpkg.com/x-is-string/-/x-is-string-0.1.0.tgz#474b50865af3a49a9c4657f05acd145458f77d82"
   integrity sha1-R0tQhlrzpJqcRlfwWs0UVFj3fYI=
-
-x3dom@1.7.2:
-  version "1.7.2"
-  resolved "https://registry.yarnpkg.com/x3dom/-/x3dom-1.7.2.tgz#fb2552bbcf1e20748eb74824f9b80d82eb738521"
-  integrity sha1-+yVSu88eIHSOt0gk+bgNgutzhSE=
 
 xml-name-validator@^3.0.0:
   version "3.0.0"
