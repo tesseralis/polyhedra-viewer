@@ -1,4 +1,5 @@
 import { zip } from "lodash"
+import { SolidData } from "math/polyhedra"
 import React, { useRef, useMemo } from "react"
 import {
   BufferAttribute,
@@ -7,6 +8,7 @@ import {
   Face3,
   Color,
   BufferGeometry,
+  FrontSide,
 } from "three"
 import { useFrame, useUpdate } from "react-three-fiber"
 
@@ -33,17 +35,33 @@ function convertFaces(faces: number[][], colors: any[]) {
   )
 }
 
+interface SolidConfig {
+  showFaces: boolean
+  showEdges: boolean
+  showInnerFaces: boolean
+  opacity: number
+}
+
+interface Props {
+  value: SolidData
+  colors: number[][]
+  config: SolidConfig
+  onClick?(point: any): void
+  onPointerMove?(point: any): void
+  onPointerOut?(point: any): void
+}
+
 export default function ThreePolyhedron({
   onClick,
   onPointerMove,
   onPointerOut,
   value,
   colors,
-}: any) {
-  // This reference will give us direct access to the mesh
-  const mesh = useRef<any>()
-  const { vertices, faces, edges } = value
+  config,
+}: Props) {
+  const { vertices, faces, edges = [] } = value
   const hit = useRef(new Vector3())
+  const { showFaces, showEdges, showInnerFaces, opacity } = config
 
   const ref = useUpdate(
     (geom: any) => {
@@ -84,41 +102,44 @@ export default function ThreePolyhedron({
 
   return (
     <>
-      <mesh
-        ref={mesh}
-        scale={[1, 1, 1]}
-        onPointerDown={(e) => {
-          // FIXME it's still pretty finnicky..
-          hit.current.copy(e.point)
-        }}
-        onPointerUp={(e) => {
-          if (!hit.current.equals(e.point)) return
-          onClick?.(e.point.toArray())
-        }}
-        onPointerMove={(e) => {
-          hit.current.copy(e.point)
-          onPointerMove?.(e.point.toArray())
-        }}
-        onPointerOut={(e) => {
-          onPointerOut?.(e.point.toArray())
-        }}
-      >
-        <geometry ref={ref} attach="geometry" />
-        <meshStandardMaterial
-          side={DoubleSide}
-          attach="material"
-          color="grey"
-          args={[{ vertexColors: true }]}
-        />
-      </mesh>
-      <lineSegments geometry={edgeGeom}>
-        <lineBasicMaterial
-          attach="material"
-          color={0x222222}
-          linewidth={1}
-          opacity={0.9}
-        />
-      </lineSegments>
+      {showFaces && (
+        <mesh
+          onPointerDown={(e) => {
+            // FIXME it's still pretty finnicky..
+            hit.current.copy(e.point)
+          }}
+          onPointerUp={(e) => {
+            if (!hit.current.equals(e.point)) return
+            onClick?.(e.point.toArray())
+          }}
+          onPointerMove={(e) => {
+            hit.current.copy(e.point)
+            onPointerMove?.(e.point.toArray())
+          }}
+          onPointerOut={(e) => {
+            onPointerOut?.(e.point.toArray())
+          }}
+        >
+          <geometry ref={ref} attach="geometry" />
+          <meshStandardMaterial
+            side={showInnerFaces ? DoubleSide : FrontSide}
+            attach="material"
+            color="grey"
+            args={[{ vertexColors: true }]}
+            opacity={opacity}
+          />
+        </mesh>
+      )}
+      {showEdges && (
+        <lineSegments geometry={edgeGeom}>
+          <lineBasicMaterial
+            attach="material"
+            color={0x222222}
+            linewidth={1}
+            opacity={0.9}
+          />
+        </lineSegments>
+      )}
     </>
   )
 }

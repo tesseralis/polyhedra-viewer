@@ -5,6 +5,7 @@ import { TrackballControls } from "three/examples/jsm/controls/TrackballControls
 import ThreePolyhedron from "./ThreePolyhedron"
 import useSolidContext from "./useSolidContext"
 import useHitOptions from "./useHitOptions"
+import ConfigCtx from "components/ConfigCtx"
 
 extend({ TrackballControls })
 
@@ -45,6 +46,7 @@ function CameraControls() {
 export default function ThreeScene() {
   const { colors, solidData } = useSolidContext()
   const { setHitOption, unsetHitOption, applyWithHitOption } = useHitOptions()
+  const config = ConfigCtx.useState()
   return (
     <Canvas gl={{ antialias: true }}>
       <CameraControls />
@@ -52,6 +54,7 @@ export default function ThreeScene() {
       <ThreePolyhedron
         value={solidData}
         colors={colors}
+        config={config as any}
         onPointerMove={setHitOption}
         onClick={applyWithHitOption}
         onPointerOut={unsetHitOption}
