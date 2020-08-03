@@ -1,4 +1,5 @@
 import { zip } from "lodash-es"
+// TODO just use Vector3 throughout instead of converting to and from points
 import { Point } from "types"
 import { SolidData } from "math/polyhedra"
 import React, { useRef, useMemo } from "react"
@@ -79,7 +80,7 @@ export default function ThreePolyhedron({
 
   const edgeGeom = useMemo(() => {
     const geom = new BufferGeometry()
-    const positions = new Float32Array(200 * 3) // 3 vertices per point
+    const positions = new Float32Array(300 * 3) // 3 vertices per point
     geom.setAttribute("position", new BufferAttribute(positions, 3))
     return geom
   }, [])
@@ -88,15 +89,10 @@ export default function ThreePolyhedron({
     const positions = edgeGeom.attributes.position.array as number[]
     edges.forEach((edge: [number, number], i: number) => {
       const [i1, i2] = edge
-      const v1 = vertices[i1]
-      const v2 = vertices[i2]
-
-      positions[i * 6 + 0] = v1[0]
-      positions[i * 6 + 1] = v1[1]
-      positions[i * 6 + 2] = v1[2]
-      positions[i * 6 + 3] = v2[0]
-      positions[i * 6 + 4] = v2[1]
-      positions[i * 6 + 5] = v2[2]
+      const vs = [...vertices[i1], ...vertices[i2]]
+      for (let j = 0; j < 6; j++) {
+        positions[i * 6 + j] = vs[j]
+      }
     })
     edgeGeom.setDrawRange(0, edges.length * 2)
     edgeGeom.attributes.position.needsUpdate = true
