@@ -124,6 +124,7 @@ export default function ThreePolyhedron({
             attach="material"
             color="grey"
             args={[{ vertexColors: true }]}
+            transparent={opacity < 1}
             opacity={opacity}
           />
         </mesh>
@@ -132,9 +133,10 @@ export default function ThreePolyhedron({
         <lineSegments geometry={edgeGeom}>
           <lineBasicMaterial
             attach="material"
-            color={0x222222}
+            color={0x444444}
             linewidth={1}
-            opacity={0.9}
+            transparent
+            opacity={0.8}
           />
         </lineSegments>
       )}
