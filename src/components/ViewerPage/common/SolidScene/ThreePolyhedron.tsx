@@ -53,10 +53,10 @@ export default function ThreePolyhedron({
       ref={mesh}
       scale={[1, 1, 1]}
       onClick={(e) => {
-        onClick?.(e.unprojectedPoint.toArray())
+        onClick?.(e.point.toArray())
       }}
-      onPointerOver={(e) => {
-        onPointerMove?.(e.unprojectedPoint.toArray())
+      onPointerMove={(e) => {
+        onPointerMove?.(e.point.toArray())
       }}
     >
       <geometry ref={ref} attach="geometry" />
