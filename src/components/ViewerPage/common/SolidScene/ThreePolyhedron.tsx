@@ -1,4 +1,5 @@
 import { zip } from "lodash-es"
+import { Point } from "types"
 import { SolidData } from "math/polyhedra"
 import React, { useRef, useMemo } from "react"
 import {
@@ -13,15 +14,15 @@ import {
 } from "three"
 import { useFrame, useUpdate } from "react-three-fiber"
 
-function convertVertex([x, y, z]: [number, number, number]) {
+function convertVertex([x, y, z]: Point) {
   return new Vector3(x, y, z)
 }
 
-function convertVertices(vertices: [number, number, number][]) {
+function convertVertices(vertices: Point[]) {
   return vertices.map(convertVertex)
 }
 
-function convertFace(face: number[], [r, g, b]: any) {
+function convertFace(face: number[], [r, g, b]: Point) {
   const [v0, ...vs] = face
   const pairs = zip(vs.slice(0, vs.length - 1), vs.slice(1))
   const color = new Color(r, g, b)
@@ -30,9 +31,9 @@ function convertFace(face: number[], [r, g, b]: any) {
   })
 }
 
-function convertFaces(faces: number[][], colors: any[]) {
+function convertFaces(faces: number[][], colors: Point[]) {
   return zip(faces, colors).flatMap(([face, color]) =>
-    convertFace(face!, color),
+    convertFace(face!, color!),
   )
 }
 
@@ -45,11 +46,11 @@ interface SolidConfig {
 
 interface Props {
   value: SolidData
-  colors: number[][]
+  colors: Point[]
   config: SolidConfig
   onClick?(point: any): void
-  onPointerMove?(point: any): void
-  onPointerOut?(point: any): void
+  onPointerMove?(point: Point): void
+  onPointerOut?(point: Point): void
 }
 
 export default function ThreePolyhedron({
@@ -115,10 +116,10 @@ export default function ThreePolyhedron({
           }}
           onPointerMove={(e) => {
             hit.current.copy(e.point)
-            onPointerMove?.(e.point.toArray())
+            onPointerMove?.(e.point.toArray() as Point)
           }}
           onPointerOut={(e) => {
-            onPointerOut?.(e.point.toArray())
+            onPointerOut?.(e.point.toArray() as Point)
           }}
         >
           <geometry ref={ref} attach="geometry" />

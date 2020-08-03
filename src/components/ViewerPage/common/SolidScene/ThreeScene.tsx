@@ -1,3 +1,4 @@
+import { pick } from "lodash-es"
 import React, { useEffect, useRef } from "react"
 import { PerspectiveCamera } from "three"
 import { Canvas, extend, useThree, useFrame } from "react-three-fiber"
@@ -54,7 +55,12 @@ export default function ThreeScene() {
       <ThreePolyhedron
         value={solidData}
         colors={colors}
-        config={config as any}
+        config={pick(config, [
+          "showFaces",
+          "showEdges",
+          "showInnerFaces",
+          "opacity",
+        ])}
         onPointerMove={setHitOption}
         onClick={applyWithHitOption}
         onPointerOut={unsetHitOption}
