@@ -1,12 +1,7 @@
 import { takeRight, dropRight, invert, isEmpty, uniq } from "lodash-es"
+import { Matrix4 } from "three"
 import { Polyhedron, Edge, Vertex, VertexList, VertexArg } from "math/polyhedra"
-import {
-  Plane,
-  Vector3,
-  Transform,
-  vecEquals,
-  getOrthonormalTransform,
-} from "math/geom"
+import { Vector3, Transform, vecEquals } from "math/geom"
 import { mapObject } from "utils"
 import { PolyhedronSpecs, Facet, Twist } from "specs"
 
@@ -50,22 +45,30 @@ export interface Pose {
 
 function normalizeOrientation([u1, u2]: Orientation): Orientation {
   const _u1 = u1.clone().normalize()
-  const _u2 = new Plane(_u1).projectPoint(u2, new Vector3()).normalize()
+  const _u2 = u2.clone().projectOnPlane(_u1).normalize()
   return [_u1, _u2]
 }
 
+function getTransform({ origin, scale, orientation }: Pose) {
+  const [u1, u2] = normalizeOrientation(orientation)
+  const translateM = new Matrix4().makeTranslation(origin.x, origin.y, origin.z)
+  const scaleM = new Matrix4().makeScale(scale, scale, scale)
+  const rotationM = new Matrix4().makeBasis(u1, u2, u1.clone().cross(u2))
+  return rotationM.premultiply(scaleM).premultiply(translateM)
+}
+
 // Translate, rotate, and scale the polyhedron with the transformation given by the two poses
-export function alignPolyhedron(solid: Polyhedron, pose1: Pose, pose2: Pose) {
-  const [u1, u2] = normalizeOrientation(pose1.orientation)
-  const [v1, v2] = normalizeOrientation(pose2.orientation)
-  const matrix = getOrthonormalTransform(u1, u2, v1, v2)
+export function alignPolyhedron(
+  solid: Polyhedron,
+  oldPose: Pose,
+  newPose: Pose,
+) {
+  const oldMat = getTransform(oldPose)
+  const newMat = getTransform(newPose)
+  const oldMatInv = oldMat.getInverse(oldMat)
+  // Un-apply the original pose, then apply the new pose
   const newVertices = solid.vertices.map((v) =>
-    v.vec
-      .clone()
-      .sub(pose1.origin)
-      .multiplyScalar(pose2.scale / pose1.scale)
-      .applyMatrix4(matrix)
-      .add(pose2.origin),
+    v.vec.clone().applyMatrix4(oldMatInv).applyMatrix4(newMat),
   )
   return solid.withVertices(newVertices)
 }

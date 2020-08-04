@@ -1,4 +1,4 @@
-import { Vector3, Plane, Ray, Matrix4 } from "three"
+import { Vector3, Plane, Ray } from "three"
 
 // Re-export useful things so its easier to switch
 export { Vector3, Ray, Plane }
@@ -57,26 +57,4 @@ export type Transform = (v: Vector3) => Vector3
 
 export function withOrigin(o: Vector3, t: Transform): Transform {
   return (v) => t(v.clone().sub(o)).add(o)
-}
-
-/**
- * Return the rotation matrix based on the orthonormal bases v1, v2, and (v1 x v2)
- */
-export function getOrientation(v1: Vector3, v2: Vector3) {
-  return new Matrix4().makeBasis(v1, v2, new Vector3().crossVectors(v1, v2))
-}
-
-/**
- * Return the rotation matrix that transforms the basis (u1, u2, u1 x u2) to (v1, v2, v1 x v2)
- */
-export function getOrthonormalTransform(
-  u1: Vector3,
-  u2: Vector3,
-  v1: Vector3,
-  v2: Vector3,
-) {
-  // https://math.stackexchange.com/questions/624348/finding-rotation-axis-and-angle-to-align-two-oriented-vectors
-  const uOrientation = getOrientation(u1, u2)
-  const vOrientation = getOrientation(v1, v2)
-  return vOrientation.multiply(uOrientation.transpose())
 }
