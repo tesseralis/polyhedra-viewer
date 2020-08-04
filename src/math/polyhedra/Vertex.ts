@@ -1,5 +1,6 @@
 import { findKey, countBy } from "lodash-es"
-import { Vector3, getCentroid } from "math/geom"
+import { Vector3 } from "three"
+import { getCentroid } from "math/geom"
 import { VIndex } from "./solidTypes"
 import Facet from "./Facet"
 import type Polyhedron from "./Polyhedron"

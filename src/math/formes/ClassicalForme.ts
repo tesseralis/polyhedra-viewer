@@ -1,4 +1,5 @@
 import { find } from "utils"
+import { Vector3 } from "three"
 import {
   Classical,
   Facet,
@@ -8,7 +9,7 @@ import {
   getSpecs,
 } from "specs"
 import { Polyhedron, Face } from "math/polyhedra"
-import { Vector3, angleBetween } from "math/geom"
+import { angleBetween } from "math/geom"
 import { getGeometry, oppositeFace } from "math/operations/operationUtils"
 import PolyhedronForme from "./PolyhedronForme"
 

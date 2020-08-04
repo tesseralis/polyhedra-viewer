@@ -1,6 +1,7 @@
+import { Vector3 } from "three"
 import { pickBy, mapValues, isMatch, compact } from "lodash-es"
 
-import { Vector3, vecEquals } from "math/geom"
+import { vecEquals } from "math/geom"
 import { Polyhedron, Face, VertexArg, normalizeVertex } from "math/polyhedra"
 import { deduplicateVertices } from "./operationUtils"
 import { Polygon, PolyhedronSpecs } from "specs"

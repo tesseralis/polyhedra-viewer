@@ -1,7 +1,8 @@
+import { Vector3 } from "three"
 import { Face, Edge, VertexArg } from "math/polyhedra"
 import Classical, { Operation as OpName } from "specs/Classical"
 import { makeOpPair } from "../operationPairs"
-import { Vector3, angleBetween } from "math/geom"
+import { angleBetween } from "math/geom"
 import { Pose } from "../operationUtils"
 import ClassicalForme from "math/formes/ClassicalForme"
 const { PI, tan } = Math

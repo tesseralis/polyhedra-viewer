@@ -1,8 +1,5 @@
 import { Matrix4, Vector3, Plane, Ray } from "three"
 
-// Re-export useful things so its easier to switch
-export { Vector3, Ray, Plane }
-
 export const PRECISION_DIGITS = 3
 export const PRECISION = 10 ** -PRECISION_DIGITS
 

@@ -1,13 +1,7 @@
 import { takeRight, dropRight, invert, isEmpty, uniq } from "lodash-es"
-import { Matrix4 } from "three"
+import { Vector3, Matrix4 } from "three"
 import { Polyhedron, Edge, Vertex, VertexList, VertexArg } from "math/polyhedra"
-import {
-  Vector3,
-  Transform,
-  vecEquals,
-  translateMat,
-  scaleMat,
-} from "math/geom"
+import { Transform, vecEquals, translateMat, scaleMat } from "math/geom"
 import { mapObject } from "utils"
 import { PolyhedronSpecs, Facet, Twist } from "specs"
 

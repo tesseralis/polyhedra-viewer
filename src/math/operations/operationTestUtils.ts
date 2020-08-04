@@ -1,4 +1,5 @@
-import { vecEquals, Vector3 } from "math/geom"
+import { Vector3 } from "three"
+import { vecEquals } from "math/geom"
 import { Polyhedron } from "math/polyhedra"
 import Operation, { OpResult } from "./Operation"
 import PolyhedronForme from "math/formes/PolyhedronForme"

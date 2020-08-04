@@ -8,11 +8,12 @@ import {
   sum,
   isEqual,
 } from "lodash-es"
+import { Vector3 } from "three"
 
 import { Point } from "types"
 import { getSolidData } from "data/common"
 import { polygons } from "specs"
-import { Vector3, getCentroid } from "math/geom"
+import { getCentroid } from "math/geom"
 
 import { SolidData, RawSolidData } from "./solidTypes"
 import Face from "./Face"

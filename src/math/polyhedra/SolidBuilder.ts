@@ -1,6 +1,6 @@
 import { pullAt } from "lodash-es"
 
-import { Vector3 } from "math/geom"
+import { Vector3 } from "three"
 import { VIndex, SolidData } from "./solidTypes"
 import Vertex from "./Vertex"
 import Face from "./Face"
