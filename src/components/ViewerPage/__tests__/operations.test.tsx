@@ -1,3 +1,4 @@
+import { Vector3 } from "three"
 import { capitalize } from "lodash-es"
 import "mutationobserver-shim"
 import React from "react"
@@ -50,14 +51,13 @@ function getPolyhedron() {
   )!
   const vertices = splitListOfLists(vertexStr, ", ", " ") as Point[]
   const faces = splitListOfLists(faceStr, " -1 ", " ")
-  const name = screen.getByTestId("viewer-title").textContent!.toLowerCase()
-  return new Polyhedron({ name, vertices, faces })
+  return Polyhedron.fromRawData({ vertices, faces })
 }
 
 function fireX3dEvent(
   node: HTMLElement,
   eventName: keyof typeof createEvent,
-  hitPnt: Point,
+  hitPnt: Vector3,
 ) {
   const event: any = createEvent[eventName](node)
   event.hitPnt = hitPnt
@@ -65,7 +65,7 @@ function fireX3dEvent(
 }
 
 function clickFace(face: Face) {
-  const hitPnt = face.centroid().toArray()
+  const hitPnt = face.centroid()
   const shapeNode = screen.getByTestId("x3d-shape")
   fireX3dEvent(shapeNode, "mouseDown", hitPnt)
   fireX3dEvent(shapeNode, "mouseUp", hitPnt)

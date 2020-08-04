@@ -1,14 +1,10 @@
 import { Vector3, Plane, Ray, Matrix4 } from "three"
-import { Point } from "types"
 
 // Re-export useful things so its easier to switch
 export { Vector3, Ray, Plane }
 
 export const PRECISION_DIGITS = 3
 export const PRECISION = 10 ** -PRECISION_DIGITS
-
-// convert an array of vertices into a vector
-export const vec = (p: Point) => new Vector3(...p)
 
 export function vecEquals(v1: Vector3, v2: Vector3) {
   return v1.distanceTo(v2) < PRECISION

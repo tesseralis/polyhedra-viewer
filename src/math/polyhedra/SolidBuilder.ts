@@ -1,20 +1,17 @@
 import { pullAt } from "lodash-es"
 
-import { Point } from "types"
 import { Vector3 } from "math/geom"
 import { VIndex, SolidData } from "./solidTypes"
 import Vertex from "./Vertex"
 import Face from "./Face"
 import Polyhedron from "./Polyhedron"
 
-export type VertexArg = Point | Vector3 | Vertex
+export type VertexArg = Vector3 | Vertex
 
 export type FaceArg = (VIndex | Vertex)[] | Face
 
 export function normalizeVertex(v: VertexArg): Vector3 {
-  if (v instanceof Vector3) return v
-  if (v instanceof Vertex) return v.vec
-  return new Vector3(...v) // Otherwise it's just a raw point
+  return v instanceof Vertex ? v.vec : v
 }
 
 function normalizeFace(face: FaceArg): VIndex[] {

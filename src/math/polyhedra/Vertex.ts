@@ -1,5 +1,4 @@
 import { findKey, countBy } from "lodash-es"
-import { Point } from "types"
 import { Vector3 } from "math/geom"
 import { VIndex } from "./solidTypes"
 import type Polyhedron from "./Polyhedron"
@@ -26,14 +25,12 @@ function arrayMin<T>(a1: T[], a2: T[]): T[] {
 export default class Vertex {
   polyhedron: Polyhedron
   index: VIndex
-  value: Point
   vec: Vector3
 
   constructor(polyhedron: Polyhedron, index: VIndex) {
     this.polyhedron = polyhedron
     this.index = index
     this.vec = polyhedron._solidData.vertices[index]
-    this.value = this.vec.toArray() as Point
   }
 
   equals(other: Vertex) {

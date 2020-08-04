@@ -6,7 +6,6 @@ import {
   Transform,
   vecEquals,
   getOrthonormalTransform,
-  withOrigin,
 } from "math/geom"
 import { mapObject } from "utils"
 import { PolyhedronSpecs, Facet, Twist } from "specs"
@@ -60,15 +59,13 @@ export function alignPolyhedron(solid: Polyhedron, pose1: Pose, pose2: Pose) {
   const [u1, u2] = normalizeOrientation(pose1.orientation)
   const [v1, v2] = normalizeOrientation(pose2.orientation)
   const matrix = getOrthonormalTransform(u1, u2, v1, v2)
-  const rotate = withOrigin(pose2.origin, (u) => u.clone().applyMatrix4(matrix))
   const newVertices = solid.vertices.map((v) =>
-    rotate(
-      v.vec
-        .clone()
-        .sub(pose1.origin)
-        .multiplyScalar(pose2.scale / pose1.scale)
-        .add(pose2.origin),
-    ),
+    v.vec
+      .clone()
+      .sub(pose1.origin)
+      .multiplyScalar(pose2.scale / pose1.scale)
+      .applyMatrix4(matrix)
+      .add(pose2.origin),
   )
   return solid.withVertices(newVertices)
 }
