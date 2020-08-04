@@ -1,6 +1,8 @@
+import { once } from "lodash-es"
 import { Vector3, Ray, Matrix4 } from "three"
-import { translateMat } from "math/geom"
+import { translateMat, getCentroid, withOrigin } from "math/geom"
 import type Polyhedron from "./Polyhedron"
+import type Vertex from "./Vertex"
 
 export default abstract class Facet {
   polyhedron: Polyhedron
@@ -9,12 +11,19 @@ export default abstract class Facet {
     this.polyhedron = polyhedron
   }
 
-  abstract centroid(): Vector3
-
   abstract normal(): Vector3
+
+  abstract get vertices(): Vertex[]
+
+  centroid = once(() => getCentroid(this.vertices.map((v) => v.vec)))
 
   normalRay() {
     return new Ray(this.centroid(), this.normal())
+  }
+
+  distanceToCenter() {
+    const origin = this.polyhedron.centroid()
+    return origin.distanceTo(this.centroid())
   }
 
   /** Get the rotation matrix for rotation around this face's normal */
@@ -28,8 +37,8 @@ export default abstract class Facet {
     return translateMat(scaled)
   }
 
-  distanceToCenter() {
-    const origin = this.polyhedron.centroid()
-    return origin.distanceTo(this.centroid())
+  /** Return the given transform using this facet's centroid as origin */
+  withCentroidOrigin(mat: Matrix4) {
+    return withOrigin(this.centroid(), mat)
   }
 }

@@ -1,4 +1,3 @@
-import { withOrigin } from "math/geom"
 import { Polyhedron } from "math/polyhedra"
 import { mapObject } from "utils"
 import { Capstone, Composite } from "specs"
@@ -42,7 +41,7 @@ function applyGyrate(polyhedron: Polyhedron, { cap }: CapOptions) {
 
   const endVertices = getTransformedVertices(
     [cap],
-    (cap) => withOrigin(cap.boundary().centroid(), cap.rotateNormal(theta)),
+    (cap) => cap.withCentroidOrigin(cap.rotateNormal(theta)),
     mockPolyhedron.vertices,
   )
 

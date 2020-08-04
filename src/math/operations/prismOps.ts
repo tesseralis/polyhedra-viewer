@@ -1,6 +1,6 @@
 import { find } from "utils"
 import { Capstone, Twist, twists, oppositeTwist } from "specs"
-import { withOrigin, getCentroid } from "math/geom"
+import { getCentroid } from "math/geom"
 import CapstoneForme from "math/formes/CapstoneForme"
 import { combineOps, makeOpPair } from "./operationPairs"
 import { makeOperation } from "./Operation"
@@ -51,7 +51,7 @@ function getScaledPrismVertices(
   return getTransformedVertices(vertexSets, (set) => {
     const rotateM = set.rotateNormal(angle / 2)
     const translateM = set.translateNormal(scale / 2)
-    return withOrigin(set.normalRay().origin, rotateM.premultiply(translateM))
+    return set.withCentroidOrigin(rotateM.premultiply(translateM))
   })
 }
 

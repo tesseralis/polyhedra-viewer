@@ -1,10 +1,9 @@
 import { Plane, Vector3 } from "three"
 
-import { isPlanar, getCentroid, getNormal } from "math/geom"
+import { isPlanar, getNormal } from "math/geom"
 import Facet from "./Facet"
 import type Edge from "./Edge"
 import type Vertex from "./Vertex"
-import type { VertexList } from "./Vertex"
 
 const { PI, sin, tan } = Math
 
@@ -13,7 +12,7 @@ const { PI, sin, tan } = Math
  * something containing vertices, edges and lying on a plane.
  * Examples include the boundary of a cupola and a concrete Face.
  */
-export default class FaceLike extends Facet implements VertexList {
+export default class FaceLike extends Facet {
   // polyhedron: Polyhedron
   vertices: Vertex[]
   edges: Edge[]
@@ -64,11 +63,6 @@ export default class FaceLike extends Facet implements VertexList {
   /** Get the area of a *regular* polygon */
   area() {
     return (this.numSides * this.sideLength() * this.apothem()) / 2
-  }
-
-  /** Return the centroid of the face given by the face index */
-  centroid() {
-    return getCentroid(this.vectors)
   }
 
   /** Return the normal of the face given by the face index */

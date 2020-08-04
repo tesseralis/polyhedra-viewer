@@ -33,6 +33,8 @@ export default class Vertex extends Facet {
     this.vec = polyhedron._solidData.vertices[index]
   }
 
+  vertices = [this]
+
   equals(other: Vertex) {
     return this.index === other.index
   }
@@ -79,8 +81,6 @@ export default class Vertex extends Facet {
   adjacentFaceCounts() {
     return countBy(this.adjacentFaces(), "numSides")
   }
-
-  centroid = () => this.vec
 
   normal() {
     return getCentroid(this.adjacentFaces().map((f) => f.normal())).normalize()

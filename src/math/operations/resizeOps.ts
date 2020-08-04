@@ -5,7 +5,6 @@ import {
   OpPairInput,
   GraphOpts,
 } from "./operationPairs"
-import { withOrigin } from "math/geom"
 import {
   getTransformedVertices,
   FacetOpts,
@@ -35,7 +34,7 @@ function getResizedVertices(
   return getTransformedVertices(forme.facetFaces(facet), (f) => {
     const rotateM = f.rotateNormal(angle)
     const translateM = f.translateNormal(scale)
-    return withOrigin(f.centroid(), rotateM.premultiply(translateM))
+    return f.withCentroidOrigin(rotateM.premultiply(translateM))
   })
 }
 

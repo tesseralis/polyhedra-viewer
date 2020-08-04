@@ -1,10 +1,9 @@
 import { angleBetween, getMidpoint, vecEquals } from "math/geom"
 import Facet from "./Facet"
 import type Vertex from "./Vertex"
-import type { VertexList } from "./Vertex"
 import { find } from "utils"
 
-export default class Edge extends Facet implements VertexList {
+export default class Edge extends Facet {
   v1: Vertex
   v2: Vertex
 
@@ -43,7 +42,7 @@ export default class Edge extends Facet implements VertexList {
   }
 
   midpoint() {
-    return getMidpoint(this.v1.vec, this.v2.vec)
+    return this.centroid()
   }
 
   twin() {
@@ -75,10 +74,6 @@ export default class Edge extends Facet implements VertexList {
 
   normal() {
     return getMidpoint(this.face.normal(), this.twinFace().normal())
-  }
-
-  centroid() {
-    return this.midpoint()
   }
 
   equals(edge: Edge) {

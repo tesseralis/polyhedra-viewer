@@ -7,7 +7,6 @@ import Facet from "./Facet"
 import type Polyhedron from "./Polyhedron"
 import type Face from "./Face"
 import type Vertex from "./Vertex"
-import type { VertexList } from "./Vertex"
 import type Edge from "./Edge"
 import FaceLike from "./FaceLike"
 
@@ -56,7 +55,7 @@ function createMapper<T>(mapper: (p: Polyhedron) => T[], Base: Constructor<T>) {
   }
 }
 
-export default abstract class Cap extends Facet implements VertexList {
+export default abstract class Cap extends Facet {
   type: CapType
   private _innerVertices: Vertex[]
   private topPoint: Vector3
@@ -119,10 +118,8 @@ export default abstract class Cap extends Facet implements VertexList {
     return getBoundary(this.faces())
   })
 
-  // NOTE for ease-of-use, this calculates the centroid of the *boundary* not of all the vertices
-  centroid() {
-    return this.boundary().centroid()
-  }
+  // NOTE for convenience, this calculates the centroid of the *boundary* not of all the vertices
+  centroid = () => this.boundary().centroid()
 
   normal() {
     return this.boundary().normal()
