@@ -67,16 +67,7 @@ export function withOrigin(o: Vec3D, t: Transform): Transform {
  * Return the rotation matrix based on the orthonormal bases v1, v2, and (v1 x v2)
  */
 export function getOrientation(v1: Vec3D, v2: Vec3D) {
-  // https://math.stackexchange.com/questions/624348/finding-rotation-axis-and-angle-to-align-two-oriented-vectors
-  const v3 = v1.clone().cross(v2)
-  const mat = new Matrix4()
-  // prettier-ignore
-  return mat.set(
-    v1.x, v2.x, v3.x, 0,
-    v1.y, v2.y, v3.y, 0,
-    v1.z, v2.z, v3.z, 0,
-    0,    0,    0,    1,
-  )
+  return new Matrix4().makeBasis(v1, v2, v1.clone().cross(v2))
 }
 
 /**
