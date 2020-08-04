@@ -1,9 +1,8 @@
 import type { ValueIteratee } from "lodash"
 import { uniqBy } from "lodash-es"
+import { MathUtils } from "three"
 
-function mod(a: number, b: number) {
-  return a >= 0 ? a % b : (a % b) + b
-}
+const mod = MathUtils.euclideanModulo
 
 /**
  * Get the element of the array at the given index, modulo its length
