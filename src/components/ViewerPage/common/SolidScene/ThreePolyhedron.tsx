@@ -4,9 +4,9 @@ import { Point } from "types"
 import { SolidData } from "math/polyhedra"
 import React, { useRef, useMemo } from "react"
 import {
+  Vector3,
   BufferAttribute,
   DoubleSide,
-  Vector3,
   Face3,
   Color,
   BufferGeometry,
@@ -14,14 +14,6 @@ import {
   Geometry,
 } from "three"
 import { useFrame, useUpdate } from "react-three-fiber"
-
-function convertVertex([x, y, z]: Point) {
-  return new Vector3(x, y, z)
-}
-
-function convertVertices(vertices: Point[]) {
-  return vertices.map(convertVertex)
-}
 
 function convertFace(face: number[], [r, g, b]: Point) {
   const [v0, ...vs] = face
@@ -49,9 +41,9 @@ interface Props {
   value: SolidData
   colors: Point[]
   config: SolidConfig
-  onClick?(point: Point): void
-  onPointerMove?(point: Point): void
-  onPointerOut?(point: Point): void
+  onClick?(point: Vector3): void
+  onPointerMove?(point: Vector3): void
+  onPointerOut?(point: Vector3): void
 }
 
 export default function ThreePolyhedron({
@@ -68,7 +60,7 @@ export default function ThreePolyhedron({
 
   const ref = useUpdate(
     (geom: Geometry) => {
-      geom.vertices = convertVertices(vertices)
+      geom.vertices = vertices
       geom.verticesNeedUpdate = true
       geom.faces = convertFaces(faces, colors)
       geom.elementsNeedUpdate = true
@@ -89,7 +81,7 @@ export default function ThreePolyhedron({
     const positions = edgeGeom.attributes.position.array as number[]
     edges.forEach((edge: [number, number], i: number) => {
       const [i1, i2] = edge
-      const vs = [...vertices[i1], ...vertices[i2]]
+      const vs = [...vertices[i1].toArray(), ...vertices[i2].toArray()]
       for (let j = 0; j < 6; j++) {
         positions[i * 6 + j] = vs[j]
       }
@@ -107,14 +99,14 @@ export default function ThreePolyhedron({
           }}
           onPointerUp={(e) => {
             if (hasMoved.current) return
-            onClick?.(e.point.toArray() as Point)
+            onClick?.(e.point)
           }}
           onPointerMove={(e) => {
             hasMoved.current = true
-            onPointerMove?.(e.point.toArray() as Point)
+            onPointerMove?.(e.point)
           }}
           onPointerOut={(e) => {
-            onPointerOut?.(e.point.toArray() as Point)
+            onPointerOut?.(e.point)
           }}
         >
           <geometry ref={ref} attach="geometry" />

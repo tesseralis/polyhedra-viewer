@@ -59,7 +59,7 @@ export default function InfoPanel() {
       <div {...downloaderCss()}>
         <DataDownloader
           name={polyhedron.specs.name()}
-          solid={polyhedron.geom.solidData}
+          solid={polyhedron.geom.rawSolidData()}
         />
       </div>
     </div>

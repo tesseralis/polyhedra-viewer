@@ -5,7 +5,7 @@ import { useStyle, scales } from "styles"
 import { SrOnly } from "components/common"
 import { fonts } from "styles"
 
-import { SolidData } from "math/polyhedra"
+import { RawSolidData } from "math/polyhedra"
 import { hover } from "styles/common"
 import { mdiDownload } from "@mdi/js"
 
@@ -21,7 +21,7 @@ function fToObj(face: number[]) {
   return "f " + face.map((i) => i + 1).join(" ")
 }
 
-function toObj({ vertices, faces }: SolidData) {
+function toObj({ vertices, faces }: RawSolidData) {
   const vObj = vertices.map(vToObj)
   const fObj = faces.map(fToObj)
   return vObj.concat(fObj).join("\n")
@@ -40,7 +40,7 @@ const fileFormats = [
 
 interface Props {
   name: string
-  solid: SolidData
+  solid: RawSolidData
 }
 
 function DownloadLink({

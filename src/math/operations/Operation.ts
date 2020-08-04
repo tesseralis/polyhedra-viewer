@@ -1,9 +1,8 @@
 import { pickBy, mapValues, isMatch, compact } from "lodash-es"
 
-import { Vector3, vec, vecEquals } from "math/geom"
+import { Vector3, vecEquals } from "math/geom"
 import { Polyhedron, Face, VertexArg, normalizeVertex } from "math/polyhedra"
 import { deduplicateVertices } from "./operationUtils"
-import { Point } from "types"
 import { Polygon, PolyhedronSpecs } from "specs"
 import PolyhedronForme from "math/formes/PolyhedronForme"
 import createForme from "math/formes/createForme"
@@ -13,7 +12,7 @@ type SelectState = "selected" | "selectable" | undefined
 
 export interface AnimationData {
   start: Polyhedron
-  endVertices: Point[]
+  endVertices: Vector3[]
   startColors: Polygon[]
   endColors: Polygon[]
 }
@@ -174,8 +173,8 @@ export default class Operation<Options extends {} = {}> {
     return normalizeOpResult(opResult, next)
   }
 
-  getHitOption(solid: PolyhedronForme, hitPnt: Point, options: Options) {
-    return this.opArgs.getHitOption(solid, vec(hitPnt), options)
+  getHitOption(solid: PolyhedronForme, hitPnt: Vector3, options: Options) {
+    return this.opArgs.getHitOption(solid, hitPnt, options)
   }
 
   canApplyTo(solid: PolyhedronForme) {

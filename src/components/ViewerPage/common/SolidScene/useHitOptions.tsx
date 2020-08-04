@@ -1,7 +1,7 @@
 import { useCallback } from "react"
 import { isEmpty, isEqual } from "lodash-es"
+import { Vector3 } from "three"
 
-import { Point } from "types"
 import { Cap } from "math/polyhedra"
 import {
   PolyhedronCtx,
@@ -18,7 +18,7 @@ export default function useHitOptions() {
   const applyOperation = useApplyOperation()
   const { hitOption = "" } = operation ?? {}
 
-  const setHitOption = (hitPnt: Point) => {
+  const setHitOption = (hitPnt: Vector3) => {
     if (!operation || isTransitioning) return
     const newHitOptions = operation.getHitOption(polyhedron, hitPnt, options)
     if (isEmpty(newHitOptions)) {
@@ -35,7 +35,7 @@ export default function useHitOptions() {
     setOption(hitOption, undefined)
   }
   const applyWithHitOption = useCallback(
-    (hitPnt: Point) => {
+    (hitPnt: Vector3) => {
       if (!operation || isTransitioning) return
       const newHitOptions = operation.getHitOption(polyhedron, hitPnt, options)
       const newValue = newHitOptions[hitOption]

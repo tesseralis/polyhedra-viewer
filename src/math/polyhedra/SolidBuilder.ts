@@ -11,10 +11,10 @@ export type VertexArg = Point | Vector3 | Vertex
 
 export type FaceArg = (VIndex | Vertex)[] | Face
 
-export function normalizeVertex(v: VertexArg): Point {
-  if (v instanceof Vector3) return v.toArray() as Point
-  if (v instanceof Vertex) return v.value
-  return v // Otherwise it's just a raw point
+export function normalizeVertex(v: VertexArg): Vector3 {
+  if (v instanceof Vector3) return v
+  if (v instanceof Vertex) return v.vec
+  return new Vector3(...v) // Otherwise it's just a raw point
 }
 
 function normalizeFace(face: FaceArg): VIndex[] {

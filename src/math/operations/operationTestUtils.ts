@@ -78,7 +78,7 @@ function expectValidAnimationData(
   // "Diminish" has a weird end position so skip this check for it
   if (opName !== "diminish") {
     expectVerticesMatch(
-      endVertices.map((v) => new Vector3(...v)),
+      endVertices,
       result.geom.vertices.map((v) => v.vec),
     )
   }

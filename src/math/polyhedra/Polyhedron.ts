@@ -9,11 +9,12 @@ import {
   isEqual,
 } from "lodash-es"
 
+import { Point } from "types"
 import { getSolidData } from "data/common"
 import { polygons } from "specs"
 import { Vector3, getCentroid } from "math/geom"
 
-import { SolidData } from "./solidTypes"
+import { SolidData, RawSolidData } from "./solidTypes"
 import Face from "./Face"
 import Vertex from "./Vertex"
 import Edge from "./Edge"
@@ -35,16 +36,23 @@ export default class Polyhedron {
   vertices: Vertex[]
   private _edges?: Edge[]
 
-  static get(name: string) {
-    return new Polyhedron(getSolidData(name))
-  }
-
   constructor(solidData: SolidData) {
     this._solidData = solidData
     this.vertices = solidData.vertices.map(
       (vertex, vIndex) => new Vertex(this, vIndex),
     )
     this.faces = solidData.faces.map((face, fIndex) => new Face(this, fIndex))
+  }
+
+  static fromRawData(data: RawSolidData) {
+    return new Polyhedron({
+      ...data,
+      vertices: data.vertices.map((v) => new Vector3(...v)),
+    })
+  }
+
+  static get(name: string) {
+    return this.fromRawData(getSolidData(name))
   }
 
   get edges() {
@@ -59,6 +67,13 @@ export default class Polyhedron {
       this._solidData.edges = this.edges.map((e) => e.value)
     }
     return this._solidData
+  }
+
+  rawSolidData(): RawSolidData {
+    return {
+      ...this.solidData,
+      vertices: this.vertices.map((v) => v.vec.toArray() as Point),
+    }
   }
 
   toString() {
