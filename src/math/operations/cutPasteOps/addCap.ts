@@ -12,7 +12,7 @@ function getPose(base: FaceLike, crossAxis: CrossAxis): Pose {
     scale: base.sideLength(),
     orientation: [
       base.normal(),
-      find(base.edges, crossAxis).midpoint().sub(base.centroid()),
+      find(base.edges, crossAxis).midpoint().clone().sub(base.centroid()),
     ],
   }
 }

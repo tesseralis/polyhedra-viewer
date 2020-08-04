@@ -43,7 +43,6 @@
     "react-three-fiber": "^4.2.18",
     "three": "^0.119.1",
     "tinycolor2": "^1.4.1",
-    "toxiclibsjs": "^0.3.3",
     "typescript": "^3.9.5",
     "what-input": "^5.2.10"
   },

@@ -1,7 +1,7 @@
 import { Face, Edge, VertexArg } from "math/polyhedra"
 import Classical, { Operation as OpName } from "specs/Classical"
 import { makeOpPair } from "../operationPairs"
-import { Vec3D, angleBetween } from "math/geom"
+import { Vector3, angleBetween } from "math/geom"
 import { Pose } from "../operationUtils"
 import ClassicalForme from "math/formes/ClassicalForme"
 const { PI, tan } = Math
@@ -16,11 +16,11 @@ const { PI, tan } = Math
  * p1
  *
  */
-export function getSharpenPoint(face: Face, p1: Vec3D, p2: Vec3D) {
+export function getSharpenPoint(face: Face, p1: Vector3, p2: Vector3) {
   const ray = face.normalRay()
-  const theta1 = angleBetween(p1, p2, ray)
-  const dist = ray.distanceTo(p1) * tan(PI - theta1)
-  return ray.getPointAtDistance(dist)
+  const theta1 = angleBetween(p1, p2, ray.origin)
+  const dist = ray.distanceToPoint(p1) * tan(PI - theta1)
+  return ray.at(dist, new Vector3())
 }
 
 export function getSharpenPointEdge(face: Face, edge: Edge) {

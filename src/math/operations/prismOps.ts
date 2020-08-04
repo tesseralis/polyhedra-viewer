@@ -32,7 +32,10 @@ function getCapstonePose(forme: CapstoneForme, twist?: Twist): Pose {
     scale: forme.geom.edgeLength(),
     orientation: [
       top.normal(),
-      edge.v1.vec.sub(top.centroid()).getRotatedAroundAxis(top.normal(), angle),
+      edge.v1.vec
+        .clone()
+        .sub(top.centroid())
+        .applyAxisAngle(top.normal(), angle),
     ],
   }
 }
@@ -46,10 +49,11 @@ function getScaledPrismVertices(
   const angle = (getTwistMult(twist) * PI) / forme.specs.baseSides()
 
   return getTransformedVertices(vertexSets, (set) =>
-    withOrigin(set.normalRay(), (v) =>
+    withOrigin(set.normalRay().origin, (v) =>
       v
-        .add(set.normal().scale(scale / 2))
-        .getRotatedAroundAxis(set.normal(), angle / 2),
+        .clone()
+        .addScaledVector(set.normal(), scale / 2)
+        .applyAxisAngle(set.normal(), angle / 2),
     ),
   )
 }

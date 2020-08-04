@@ -1,4 +1,4 @@
-import { Vec3D } from "math/geom"
+import { Vector3 } from "math/geom"
 
 import {
   Plane,
@@ -23,7 +23,7 @@ export default class FaceLike implements VertexList {
   polyhedron: Polyhedron
   vertices: Vertex[]
   edges: Edge[]
-  vectors: Vec3D[]
+  vectors: Vector3[]
 
   constructor(vertices: Vertex[], edges: Edge[]) {
     this.polyhedron = vertices[0].polyhedron
@@ -52,8 +52,11 @@ export default class FaceLike implements VertexList {
     return isPlanar(this.vectors)
   }
 
-  plane() {
-    return new Plane(this.centroid(), this.normal())
+  plane(): Plane {
+    return new Plane().setFromNormalAndCoplanarPoint(
+      this.normal(),
+      this.centroid(),
+    )
   }
 
   apothem() {

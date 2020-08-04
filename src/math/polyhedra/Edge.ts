@@ -1,4 +1,4 @@
-import { angleBetween, getMidpoint, vecEquals, Ray3D } from "math/geom"
+import { angleBetween, getMidpoint, vecEquals, Ray } from "math/geom"
 import type Polyhedron from "./Polyhedron"
 import type Vertex from "./Vertex"
 import type { VertexList } from "./Vertex"
@@ -84,7 +84,7 @@ export default class Edge implements VertexList {
   }
 
   normalRay() {
-    return new Ray3D(this.midpoint(), this.normal())
+    return new Ray(this.midpoint(), this.normal())
   }
 
   equals(edge: Edge) {

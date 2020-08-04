@@ -2,7 +2,7 @@ import { takeRight, dropRight, invert, isEmpty, uniq } from "lodash-es"
 import { Polyhedron, Edge, Vertex, VertexList, VertexArg } from "math/polyhedra"
 import {
   Plane,
-  Vec3D,
+  Vector3,
   Transform,
   vecEquals,
   getOrthonormalTransform,
@@ -38,20 +38,21 @@ export function oppositeFace(edge: Edge, twist?: Twist) {
  * Defines an orthonormal orientation.
  * An orientation [u, v] defineds the basis [u, v, u x v]
  */
-type Orientation = readonly [Vec3D, Vec3D]
+type Orientation = readonly [Vector3, Vector3]
 
 /**
  * Defines a scale, origin, and orientation used to transform one polyhedron to another.
  */
 export interface Pose {
   scale: number
-  origin: Vec3D
+  origin: Vector3
   orientation: Orientation
 }
 
-function normalizeOrientation([u1, u2]: Orientation) {
-  const _u2 = new Plane(Vec3D.ZERO, u1).getProjectedPoint(u2)
-  return [u1.getNormalized(), _u2.getNormalized()]
+function normalizeOrientation([u1, u2]: Orientation): Orientation {
+  const _u1 = u1.clone().normalize()
+  const _u2 = new Plane(_u1).projectPoint(u2, new Vector3()).normalize()
+  return [_u1, _u2]
 }
 
 // Translate, rotate, and scale the polyhedron with the transformation given by the two poses
@@ -59,12 +60,13 @@ export function alignPolyhedron(solid: Polyhedron, pose1: Pose, pose2: Pose) {
   const [u1, u2] = normalizeOrientation(pose1.orientation)
   const [v1, v2] = normalizeOrientation(pose2.orientation)
   const matrix = getOrthonormalTransform(u1, u2, v1, v2)
-  const rotate = withOrigin(pose2.origin, (u) => matrix.applyTo(u))
+  const rotate = withOrigin(pose2.origin, (u) => u.clone().applyMatrix4(matrix))
   const newVertices = solid.vertices.map((v) =>
     rotate(
       v.vec
+        .clone()
         .sub(pose1.origin)
-        .scale(pose2.scale / pose1.scale)
+        .multiplyScalar(pose2.scale / pose1.scale)
         .add(pose2.origin),
     ),
   )
@@ -169,7 +171,7 @@ export function deduplicateVertices(polyhedron: Polyhedron) {
  */
 export function getTransformedVertices<T extends VertexList>(
   vLists: readonly T[],
-  iteratee: (key: T) => Transform | Vec3D,
+  iteratee: (key: T) => Transform | Vector3,
   vertices: Vertex[] = vLists[0].polyhedron.vertices,
 ) {
   const result: VertexArg[] = [...vertices]

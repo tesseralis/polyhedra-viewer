@@ -8,7 +8,7 @@ import {
   getSpecs,
 } from "specs"
 import { Polyhedron, Face } from "math/polyhedra"
-import { angleBetween } from "math/geom"
+import { Vector3, angleBetween } from "math/geom"
 import { getGeometry, oppositeFace } from "math/operations/operationUtils"
 import PolyhedronForme from "./PolyhedronForme"
 
@@ -293,7 +293,7 @@ class SnubForme extends ClassicalForme {
     const angle = angleBetween(
       face0.centroid(),
       face0.edges[0].midpoint(),
-      face0.plane().getProjectedPoint(face1.centroid()),
+      face0.plane().projectPoint(face1.centroid(), new Vector3()),
     )
 
     const twistSign = this.specs.data.twist === "left" ? -1 : 1

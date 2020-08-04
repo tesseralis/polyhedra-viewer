@@ -40,7 +40,7 @@ export default makeTruncateTrio(getAmboPose, {
       // Sharpen each of the faces to a point aligning with the vertices
       // of the rectified solid
       return getTransformedVertices(forme.edgeFaces(), (f) =>
-        forme.geom.centroid().add(f.normal().scale(scale)),
+        forme.geom.centroid().clone().addScaledVector(f.normal(), scale),
       )
     },
   },
@@ -55,14 +55,16 @@ export default makeTruncateTrio(getAmboPose, {
       return getTransformedVertices(forme.edgeFaces(), (f) => {
         const faceCentroid = forme.geom
           .centroid()
-          .add(f.normal().scale(refMidradius * scale))
+          .clone()
+          .addScaledVector(f.normal(), refMidradius * scale)
 
         return (v) =>
-          faceCentroid.add(
+          faceCentroid.clone().add(
             v
+              .clone()
               .sub(f.centroid())
-              .getNormalized()
-              .scale(edgeFace.radius() * scale),
+              .normalize()
+              .multiplyScalar(edgeFace.radius() * scale),
           )
       })
     },
