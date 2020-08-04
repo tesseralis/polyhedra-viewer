@@ -1,16 +1,15 @@
-import { angleBetween, getMidpoint, vecEquals, Ray } from "math/geom"
-import type Polyhedron from "./Polyhedron"
+import { angleBetween, getMidpoint, vecEquals } from "math/geom"
+import Facet from "./Facet"
 import type Vertex from "./Vertex"
 import type { VertexList } from "./Vertex"
 import { find } from "utils"
 
-export default class Edge implements VertexList {
-  polyhedron: Polyhedron
+export default class Edge extends Facet implements VertexList {
   v1: Vertex
   v2: Vertex
 
   constructor(v1: Vertex, v2: Vertex) {
-    this.polyhedron = v1.polyhedron
+    super(v1.polyhedron)
     this.v1 = v1
     this.v2 = v2
   }
@@ -66,11 +65,6 @@ export default class Edge implements VertexList {
     return [this.face, this.twin().face]
   }
 
-  // Distance of this midpoint to polyhedron center
-  distanceToCenter() {
-    return this.midpoint().distanceTo(this.polyhedron.centroid())
-  }
-
   dihedralAngle() {
     return angleBetween(
       this.midpoint(),
@@ -83,8 +77,8 @@ export default class Edge implements VertexList {
     return getMidpoint(this.face.normal(), this.twinFace().normal())
   }
 
-  normalRay() {
-    return new Ray(this.midpoint(), this.normal())
+  centroid() {
+    return this.midpoint()
   }
 
   equals(edge: Edge) {

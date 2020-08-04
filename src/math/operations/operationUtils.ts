@@ -1,7 +1,13 @@
 import { takeRight, dropRight, invert, isEmpty, uniq } from "lodash-es"
 import { Matrix4 } from "three"
 import { Polyhedron, Edge, Vertex, VertexList, VertexArg } from "math/polyhedra"
-import { Vector3, Transform, vecEquals } from "math/geom"
+import {
+  Vector3,
+  Transform,
+  vecEquals,
+  translateMat,
+  scaleMat,
+} from "math/geom"
 import { mapObject } from "utils"
 import { PolyhedronSpecs, Facet, Twist } from "specs"
 
@@ -51,8 +57,8 @@ function normalizeOrientation([u1, u2]: Orientation): Orientation {
 
 function getTransform({ origin, scale, orientation }: Pose) {
   const [u1, u2] = normalizeOrientation(orientation)
-  const translateM = new Matrix4().makeTranslation(origin.x, origin.y, origin.z)
-  const scaleM = new Matrix4().makeScale(scale, scale, scale)
+  const translateM = translateMat(origin)
+  const scaleM = scaleMat(scale)
   const rotationM = new Matrix4().makeBasis(u1, u2, u1.clone().cross(u2))
   return rotationM.premultiply(scaleM).premultiply(translateM)
 }
@@ -159,6 +165,16 @@ export function deduplicateVertices(polyhedron: Polyhedron) {
   return removeExtraneousVertices(polyhedron.withFaces(newFaces))
 }
 
+function normalizeTransform(t: Transform | Vector3 | Matrix4): Transform {
+  if (t instanceof Matrix4) {
+    return (v) => v.clone().applyMatrix4(t)
+  }
+  if (t instanceof Vector3) {
+    return () => t
+  }
+  return t
+}
+
 /**
  * Apply a transformation per vertex list. This function allows transformations like
  * "blow up these faces away from a center point" or "expand these faces out radially".
@@ -171,14 +187,14 @@ export function deduplicateVertices(polyhedron: Polyhedron) {
  */
 export function getTransformedVertices<T extends VertexList>(
   vLists: readonly T[],
-  iteratee: (key: T) => Transform | Vector3,
+  iteratee: (key: T) => Transform | Vector3 | Matrix4,
   vertices: Vertex[] = vLists[0].polyhedron.vertices,
 ) {
   const result: VertexArg[] = [...vertices]
   for (const vList of vLists) {
     for (const v of vList.vertices) {
-      const t = iteratee(vList)
-      result[v.index] = typeof t === "function" ? t(v.vec) : t
+      const t = normalizeTransform(iteratee(vList))
+      result[v.index] = t(v.vec)
     }
   }
   return result

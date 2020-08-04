@@ -1,4 +1,4 @@
-import { Vector3, Plane, Ray } from "three"
+import { Matrix4, Vector3, Plane, Ray } from "three"
 
 // Re-export useful things so its easier to switch
 export { Vector3, Ray, Plane }
@@ -55,6 +55,16 @@ export function getNormalRay(vertices: Vector3[]) {
 
 export type Transform = (v: Vector3) => Vector3
 
-export function withOrigin(o: Vector3, t: Transform): Transform {
-  return (v) => t(v.clone().sub(o)).add(o)
+export function translateMat(v: Vector3) {
+  return new Matrix4().makeTranslation(v.x, v.y, v.z)
+}
+
+export function scaleMat(s: number) {
+  return new Matrix4().makeScale(s, s, s)
+}
+
+export function withOrigin(o: Vector3, m: Matrix4): Matrix4 {
+  const mat = translateMat(o)
+  const matInv = new Matrix4().getInverse(mat)
+  return matInv.premultiply(m).premultiply(mat)
 }

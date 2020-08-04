@@ -1,6 +1,7 @@
 import { findKey, countBy } from "lodash-es"
-import { Vector3 } from "math/geom"
+import { Vector3, getCentroid } from "math/geom"
 import { VIndex } from "./solidTypes"
+import Facet from "./Facet"
 import type Polyhedron from "./Polyhedron"
 import Edge from "./Edge"
 import { splitAt } from "utils"
@@ -22,13 +23,12 @@ function arrayMin<T>(a1: T[], a2: T[]): T[] {
   return [h1, ...arrayMin(t1, t2)]
 }
 
-export default class Vertex {
-  polyhedron: Polyhedron
+export default class Vertex extends Facet {
   index: VIndex
   vec: Vector3
 
   constructor(polyhedron: Polyhedron, index: VIndex) {
-    this.polyhedron = polyhedron
+    super(polyhedron)
     this.index = index
     this.vec = polyhedron._solidData.vertices[index]
   }
@@ -43,6 +43,7 @@ export default class Vertex {
 
   private *adjacentEdgesIter() {
     const v2 = parseInt(findKey(this.polyhedron.edgeToFaceGraph()[this.index])!)
+    // TODO don't create a new edge?
     const e0 = new Edge(this, this.polyhedron.vertices[v2])
     let e = e0
     let count = 0
@@ -79,8 +80,10 @@ export default class Vertex {
     return countBy(this.adjacentFaces(), "numSides")
   }
 
-  distanceToCenter() {
-    return this.vec.distanceTo(this.polyhedron.centroid())
+  centroid = () => this.vec
+
+  normal() {
+    return getCentroid(this.adjacentFaces().map((f) => f.normal())).normalize()
   }
 }
 

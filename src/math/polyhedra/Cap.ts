@@ -1,8 +1,9 @@
+import { Vector3 } from "three"
 import { minBy, once, countBy, isEqual } from "lodash-es"
 
 import { flatMapUniq, find } from "utils"
 import { CapType } from "specs"
-import { Vector3 } from "math/geom"
+import Facet from "./Facet"
 import type Polyhedron from "./Polyhedron"
 import type Face from "./Face"
 import type Vertex from "./Vertex"
@@ -55,8 +56,7 @@ function createMapper<T>(mapper: (p: Polyhedron) => T[], Base: Constructor<T>) {
   }
 }
 
-export default abstract class Cap implements VertexList {
-  polyhedron: Polyhedron
+export default abstract class Cap extends Facet implements VertexList {
   type: CapType
   private _innerVertices: Vertex[]
   private topPoint: Vector3
@@ -92,7 +92,7 @@ export default abstract class Cap implements VertexList {
     topPoint: Vector3,
     faceConfiguration: FaceConfiguration,
   ) {
-    this.polyhedron = polyhedron
+    super(polyhedron)
     this._innerVertices = innerVertices
     this.type = type
     this.topPoint = topPoint
@@ -119,12 +119,13 @@ export default abstract class Cap implements VertexList {
     return getBoundary(this.faces())
   })
 
-  normal() {
-    return this.boundary().normal()
+  // NOTE for ease-of-use, this calculates the centroid of the *boundary* not of all the vertices
+  centroid() {
+    return this.boundary().centroid()
   }
 
-  normalRay() {
-    return this.boundary().normalRay()
+  normal() {
+    return this.boundary().normal()
   }
 
   isValid() {

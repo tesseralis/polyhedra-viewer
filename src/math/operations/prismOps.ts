@@ -48,14 +48,11 @@ function getScaledPrismVertices(
   const vertexSets = forme.bases()
   const angle = (getTwistMult(twist) * PI) / forme.specs.baseSides()
 
-  return getTransformedVertices(vertexSets, (set) =>
-    withOrigin(set.normalRay().origin, (v) =>
-      v
-        .clone()
-        .addScaledVector(set.normal(), scale / 2)
-        .applyAxisAngle(set.normal(), angle / 2),
-    ),
-  )
+  return getTransformedVertices(vertexSets, (set) => {
+    const rotateM = set.rotateNormal(angle / 2)
+    const translateM = set.translateNormal(scale / 2)
+    return withOrigin(set.normalRay().origin, rotateM.premultiply(translateM))
+  })
 }
 
 function doPrismTransform(

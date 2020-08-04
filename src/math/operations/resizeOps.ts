@@ -32,14 +32,11 @@ function getResizedVertices(
   const angle = forme.snubAngle(facet)
   const distance = resultForme.inradius(facet) / resultForme.geom.edgeLength()
   const scale = forme.geom.edgeLength() * distance - forme.inradius(facet)
-  return getTransformedVertices(forme.facetFaces(facet), (f) =>
-    withOrigin(f.centroid(), (v) =>
-      v
-        .clone()
-        .applyAxisAngle(f.normal(), angle)
-        .addScaledVector(f.normal(), scale),
-    ),
-  )
+  return getTransformedVertices(forme.facetFaces(facet), (f) => {
+    const rotateM = f.rotateNormal(angle)
+    const translateM = f.translateNormal(scale)
+    return withOrigin(f.centroid(), rotateM.premultiply(translateM))
+  })
 }
 
 function getClassicalPose(forme: ClassicalForme, facet: Facet): Pose {
