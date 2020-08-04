@@ -193,7 +193,9 @@ export default class Polyhedron {
 
   /** Get the face that is closest to the given point. */
   hitFace(point: Vector3) {
-    return minBy(this.faces, (face) => face.plane().distanceToPoint(point))!
+    return minBy(this.faces, (face) =>
+      Math.abs(face.plane().distanceToPoint(point)),
+    )!
   }
 
   // Mutations
