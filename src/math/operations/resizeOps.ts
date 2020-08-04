@@ -34,7 +34,10 @@ function getResizedVertices(
   const scale = forme.geom.edgeLength() * distance - forme.inradius(facet)
   return getTransformedVertices(forme.facetFaces(facet), (f) =>
     withOrigin(f.centroid(), (v) =>
-      v.getRotatedAroundAxis(f.normal(), angle).add(f.normal().scale(scale)),
+      v
+        .clone()
+        .applyAxisAngle(f.normal(), angle)
+        .add(f.normal().clone().multiplyScalar(scale)),
     ),
   )
 }
@@ -146,7 +149,10 @@ function doDualTransform(forme: ClassicalForme, result: Classical) {
   const scale = resultSideLength * resultForme.circumradius()
   const faces = forme.facetFaces(oppositeFacet(result.facet()))
   return getTransformedVertices(faces, (f) => {
-    return forme.geom.centroid().add(f.normal().scale(scale))
+    return forme.geom
+      .centroid()
+      .clone()
+      .add(f.normal().clone().multiplyScalar(scale))
   })
 }
 
@@ -172,12 +178,12 @@ const _dual = makeOpPair<ClassicalForme>({
       case "right": {
         // for the vertex figure, pick a vertex and align it with that edge
         const vertex = geom.getVertex()
-        const normal = vertex.vec.sub(geom.centroid())
+        const normal = vertex.vec.clone().sub(geom.centroid())
         const v2 = vertex.adjacentVertices()[0]
         return {
           origin: geom.centroid(),
           scale: forme.midradius(),
-          orientation: [normal, v2.vec.sub(vertex.vec)],
+          orientation: [normal, v2.vec.clone().sub(vertex.vec)],
         }
       }
       case "middle": {

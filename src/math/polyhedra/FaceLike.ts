@@ -52,8 +52,11 @@ export default class FaceLike implements VertexList {
     return isPlanar(this.vectors)
   }
 
-  plane() {
-    return new Plane(this.centroid(), this.normal())
+  plane(): Plane {
+    return new Plane().setFromNormalAndCoplanarPoint(
+      this.normal(),
+      this.centroid(),
+    )
   }
 
   apothem() {

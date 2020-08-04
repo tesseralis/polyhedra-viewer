@@ -49,9 +49,10 @@ export interface Pose {
   orientation: Orientation
 }
 
-function normalizeOrientation([u1, u2]: Orientation) {
-  const _u2 = new Plane(Vec3D.ZERO, u1).getProjectedPoint(u2)
-  return [u1.getNormalized(), _u2.getNormalized()]
+function normalizeOrientation([u1, u2]: Orientation): Orientation {
+  const _u1 = u1.clone().normalize()
+  const _u2 = new Plane(_u1).projectPoint(u2, new Vec3D()).normalize()
+  return [_u1, _u2]
 }
 
 // Translate, rotate, and scale the polyhedron with the transformation given by the two poses
@@ -59,12 +60,13 @@ export function alignPolyhedron(solid: Polyhedron, pose1: Pose, pose2: Pose) {
   const [u1, u2] = normalizeOrientation(pose1.orientation)
   const [v1, v2] = normalizeOrientation(pose2.orientation)
   const matrix = getOrthonormalTransform(u1, u2, v1, v2)
-  const rotate = withOrigin(pose2.origin, (u) => matrix.applyTo(u))
+  const rotate = withOrigin(pose2.origin, (u) => u.clone().applyMatrix4(matrix))
   const newVertices = solid.vertices.map((v) =>
     rotate(
       v.vec
+        .clone()
         .sub(pose1.origin)
-        .scale(pose2.scale / pose1.scale)
+        .multiplyScalar(pose2.scale / pose1.scale)
         .add(pose2.origin),
     ),
   )

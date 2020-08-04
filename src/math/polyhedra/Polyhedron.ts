@@ -178,7 +178,7 @@ export default class Polyhedron {
 
   /** Get the face that is closest to the given point. */
   hitFace(point: Vec3D) {
-    return minBy(this.faces, (face) => face.plane().getDistanceToPoint(point))!
+    return minBy(this.faces, (face) => face.plane().distanceToPoint(point))!
   }
 
   // Mutations
@@ -220,12 +220,16 @@ export default class Polyhedron {
   /** Center the polyhedron on its centroid. */
   center() {
     const centroid = this.centroid()
-    return this.withVertices(this.vertices.map((v) => v.vec.sub(centroid)))
+    return this.withVertices(
+      this.vertices.map((v) => v.vec.clone().sub(centroid)),
+    )
   }
 
   normalizeToVolume(volume: number) {
     const scale = cbrt(volume / this.volume())
-    return this.withVertices(this.vertices.map((v) => v.vec.scale(scale)))
+    return this.withVertices(
+      this.vertices.map((v) => v.vec.clone().multiplyScalar(scale)),
+    )
   }
 
   isDeltahedron() {

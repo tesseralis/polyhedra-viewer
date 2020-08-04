@@ -12,7 +12,7 @@ export type VertexArg = Point | Vec3D | Vertex
 export type FaceArg = (VIndex | Vertex)[] | Face
 
 export function normalizeVertex(v: VertexArg): Point {
-  if (v instanceof Vec3D) return v.toArray()
+  if (v instanceof Vec3D) return v.toArray() as Point
   if (v instanceof Vertex) return v.value
   return v // Otherwise it's just a raw point
 }

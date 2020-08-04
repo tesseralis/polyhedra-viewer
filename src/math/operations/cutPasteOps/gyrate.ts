@@ -43,8 +43,8 @@ function applyGyrate(polyhedron: Polyhedron, { cap }: CapOptions) {
   const endVertices = getTransformedVertices(
     [cap],
     (p) =>
-      withOrigin(p.normalRay(), (v) =>
-        v.getRotatedAroundAxis(p.normal(), theta),
+      withOrigin(p.boundary().centroid(), (v) =>
+        v.clone().applyAxisAngle(p.normal(), theta),
       ),
     mockPolyhedron.vertices,
   )

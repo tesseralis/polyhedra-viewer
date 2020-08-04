@@ -18,9 +18,9 @@ const { PI, tan } = Math
  */
 export function getSharpenPoint(face: Face, p1: Vec3D, p2: Vec3D) {
   const ray = face.normalRay()
-  const theta1 = angleBetween(p1, p2, ray)
-  const dist = ray.distanceTo(p1) * tan(PI - theta1)
-  return ray.getPointAtDistance(dist)
+  const theta1 = angleBetween(p1, p2, ray.origin)
+  const dist = ray.distanceToPoint(p1) * tan(PI - theta1)
+  return ray.at(dist, new Vec3D())
 }
 
 export function getSharpenPointEdge(face: Face, edge: Edge) {

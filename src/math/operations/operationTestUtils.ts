@@ -53,7 +53,10 @@ function includesToPrecision(array: Vec3D[], value: Vec3D) {
 
 // TODO figure out some not n-squared test for this
 function expectVerticesMatch(test: Vec3D[], ref: Vec3D[]) {
-  expect(test).toSatisfyAll((vec) => includesToPrecision(ref, vec))
+  for (const vec of test) {
+    expect(vec).toSatisfy((vec) => includesToPrecision(ref, vec))
+  }
+  // expect(test).toSatisfyAll((vec) => includesToPrecision(ref, vec))
 }
 
 function expectValidAnimationData(

@@ -41,6 +41,7 @@ export default makeOpPair<AugmentedClassicalForme>({
     } else {
       crossAxis = find(boundary.edges, (e) => forme.isMainFace(e.twinFace()))
         .midpoint()
+        .clone()
         .sub(boundary.centroid())
     }
 
