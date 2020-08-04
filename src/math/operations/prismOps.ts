@@ -52,12 +52,7 @@ function getScaledPrismVertices(
     withOrigin(set.normalRay().origin, (v) =>
       v
         .clone()
-        .add(
-          set
-            .normal()
-            .clone()
-            .multiplyScalar(scale / 2),
-        )
+        .addScaledVector(set.normal(), scale / 2)
         .applyAxisAngle(set.normal(), angle / 2),
     ),
   )

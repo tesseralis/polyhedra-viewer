@@ -37,7 +37,7 @@ function getResizedVertices(
       v
         .clone()
         .applyAxisAngle(f.normal(), angle)
-        .add(f.normal().clone().multiplyScalar(scale)),
+        .addScaledVector(f.normal(), scale),
     ),
   )
 }
@@ -149,10 +149,7 @@ function doDualTransform(forme: ClassicalForme, result: Classical) {
   const scale = resultSideLength * resultForme.circumradius()
   const faces = forme.facetFaces(oppositeFacet(result.facet()))
   return getTransformedVertices(faces, (f) => {
-    return forme.geom
-      .centroid()
-      .clone()
-      .add(f.normal().clone().multiplyScalar(scale))
+    return forme.geom.centroid().clone().addScaledVector(f.normal(), scale)
   })
 }
 

@@ -220,15 +220,13 @@ export default class Polyhedron {
   /** Center the polyhedron on its centroid. */
   center() {
     const centroid = this.centroid()
-    return this.withVertices(
-      this.vertices.map((v) => v.vec.clone().sub(centroid)),
-    )
+    return this.withVertices(this.vertices.map((v) => v.vec.sub(centroid)))
   }
 
   normalizeToVolume(volume: number) {
     const scale = cbrt(volume / this.volume())
     return this.withVertices(
-      this.vertices.map((v) => v.vec.clone().multiplyScalar(scale)),
+      this.vertices.map((v) => v.vec.multiplyScalar(scale)),
     )
   }
 

@@ -95,10 +95,7 @@ class PrismaticForme extends CapstoneForme {
     if (this.specs.isDigonal()) {
       const edge1 = this.geom.getEdge()
       const edge2 = find(this.geom.edges, (e) =>
-        isInverse(
-          e.midpoint().clone().sub(this.geom.centroid()),
-          edge1.midpoint().clone().sub(this.geom.centroid()),
-        ),
+        isInverse(e.normal(), edge1.normal()),
       )
       return [edge1, edge2] as const
     }

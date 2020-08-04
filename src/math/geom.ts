@@ -15,7 +15,7 @@ export function vecEquals(v1: Vector3, v2: Vector3) {
 }
 
 export const getMidpoint = (v1: Vector3, v2: Vector3) =>
-  v1.clone().add(v2).multiplyScalar(0.5)
+  new Vector3().addVectors(v1, v2).divideScalar(2)
 
 export function isInverse(v1: Vector3, v2: Vector3) {
   return vecEquals(v1.clone().negate(), v2)
@@ -44,7 +44,7 @@ export function isPlanar(points: Vector3[]) {
 export function getCentroid(vectors: Vector3[]) {
   return vectors
     .reduce((v1, v2) => v1.add(v2), new Vector3())
-    .multiplyScalar(1 / vectors.length)
+    .divideScalar(vectors.length)
 }
 
 // Get the normal of a polygon given its ordered vertices
@@ -60,14 +60,14 @@ export function getNormalRay(vertices: Vector3[]) {
 export type Transform = (v: Vector3) => Vector3
 
 export function withOrigin(o: Vector3, t: Transform): Transform {
-  return (v) => t(v.clone().sub(o)).clone().add(o)
+  return (v) => t(v.clone().sub(o)).add(o)
 }
 
 /**
  * Return the rotation matrix based on the orthonormal bases v1, v2, and (v1 x v2)
  */
 export function getOrientation(v1: Vector3, v2: Vector3) {
-  return new Matrix4().makeBasis(v1, v2, v1.clone().cross(v2))
+  return new Matrix4().makeBasis(v1, v2, new Vector3().crossVectors(v1, v2))
 }
 
 /**
