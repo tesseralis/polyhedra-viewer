@@ -1,5 +1,6 @@
 import { noop } from "lodash-es"
 
+import { Vector3 } from "three"
 import React, { useRef, useEffect, useContext, useCallback } from "react"
 import { ChildrenProp } from "types"
 
@@ -70,11 +71,12 @@ function InnerProvider({ children }: ChildrenProp) {
           duration: 1000 / animationSpeed,
           ease: "easeQuadInOut",
           startValue: {
-            vertices: start.solidData.vertices,
+            // FIXME don't use d3 interpolation any more!
+            vertices: start.rawSolidData().vertices,
             faceColors: getFaceColors(startColors, colors),
           },
           endValue: {
-            vertices: endVertices,
+            vertices: endVertices.map((v) => v.toArray()),
             faceColors: getFaceColors(endColors, colors),
           },
           onFinish: () => {
@@ -83,7 +85,13 @@ function InnerProvider({ children }: ChildrenProp) {
           },
         },
         ({ vertices, faceColors }) => {
-          anim.set({ ...start.solidData, vertices }, faceColors)
+          anim.set(
+            {
+              ...start.solidData,
+              vertices: vertices.map((v) => new Vector3(...v)),
+            },
+            faceColors,
+          )
         },
       )
     },
