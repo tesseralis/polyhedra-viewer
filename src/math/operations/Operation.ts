@@ -1,6 +1,6 @@
 import { pickBy, mapValues, isMatch, compact } from "lodash-es"
 
-import { Vec3D, vec, vecEquals } from "math/geom"
+import { Vector3, vec, vecEquals } from "math/geom"
 import { Polyhedron, Face, VertexArg, normalizeVertex } from "math/polyhedra"
 import { deduplicateVertices } from "./operationUtils"
 import { Point } from "types"
@@ -62,7 +62,7 @@ export interface OpArgs<
 
   getHitOption?(
     solid: Forme,
-    hitPnt: Vec3D,
+    hitPnt: Vector3,
     options: Partial<Options>,
   ): Partial<Options>
 

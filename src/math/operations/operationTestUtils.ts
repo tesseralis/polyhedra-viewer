@@ -1,4 +1,4 @@
-import { vecEquals, Vec3D } from "math/geom"
+import { vecEquals, Vector3 } from "math/geom"
 import { Polyhedron } from "math/polyhedra"
 import Operation, { OpResult } from "./Operation"
 import PolyhedronForme from "math/formes/PolyhedronForme"
@@ -47,12 +47,12 @@ export function validateHasOptions(
   }
 }
 
-function includesToPrecision(array: Vec3D[], value: Vec3D) {
+function includesToPrecision(array: Vector3[], value: Vector3) {
   return array.some((v) => vecEquals(v, value))
 }
 
 // TODO figure out some not n-squared test for this
-function expectVerticesMatch(test: Vec3D[], ref: Vec3D[]) {
+function expectVerticesMatch(test: Vector3[], ref: Vector3[]) {
   for (const vec of test) {
     expect(vec).toSatisfy((vec) => includesToPrecision(ref, vec))
   }
@@ -78,7 +78,7 @@ function expectValidAnimationData(
   // "Diminish" has a weird end position so skip this check for it
   if (opName !== "diminish") {
     expectVerticesMatch(
-      endVertices.map((v) => new Vec3D(...v)),
+      endVertices.map((v) => new Vector3(...v)),
       result.geom.vertices.map((v) => v.vec),
     )
   }

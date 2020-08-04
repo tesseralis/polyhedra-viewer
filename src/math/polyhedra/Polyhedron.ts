@@ -11,7 +11,7 @@ import {
 
 import { getSolidData } from "data/common"
 import { polygons } from "specs"
-import { Vec3D, getCentroid } from "math/geom"
+import { Vector3, getCentroid } from "math/geom"
 
 import { SolidData } from "./solidTypes"
 import Face from "./Face"
@@ -177,7 +177,7 @@ export default class Polyhedron {
   }
 
   /** Get the face that is closest to the given point. */
-  hitFace(point: Vec3D) {
+  hitFace(point: Vector3) {
     return minBy(this.faces, (face) => face.plane().distanceToPoint(point))!
   }
 
@@ -212,7 +212,7 @@ export default class Polyhedron {
   reflect() {
     return this.withChanges((s) =>
       s
-        .mapVertices((v) => new Vec3D(-v.vec.x, v.vec.y, v.vec.z))
+        .mapVertices((v) => new Vector3(-v.vec.x, v.vec.y, v.vec.z))
         .mapFaces((f) => [...f.vertices.map((v) => v.index)].reverse()),
     )
   }

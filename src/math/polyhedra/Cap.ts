@@ -2,7 +2,7 @@ import { minBy, once, countBy, isEqual } from "lodash-es"
 
 import { flatMapUniq, find } from "utils"
 import { CapType } from "specs"
-import { Vec3D } from "math/geom"
+import { Vector3 } from "math/geom"
 import type Polyhedron from "./Polyhedron"
 import type Face from "./Face"
 import type Vertex from "./Vertex"
@@ -59,10 +59,10 @@ export default abstract class Cap implements VertexList {
   polyhedron: Polyhedron
   type: CapType
   private _innerVertices: Vertex[]
-  private topPoint: Vec3D
+  private topPoint: Vector3
   private faceConfiguration: FaceConfiguration
 
-  static find(polyhedron: Polyhedron, hitPoint: Vec3D) {
+  static find(polyhedron: Polyhedron, hitPoint: Vector3) {
     const hitFace = polyhedron.hitFace(hitPoint)
     const caps = polyhedron.caps().filter((cap) => hitFace.inSet(cap.faces()))
     if (caps.length === 0) {
@@ -89,7 +89,7 @@ export default abstract class Cap implements VertexList {
     polyhedron: Polyhedron,
     innerVertices: Vertex[],
     type: CapType,
-    topPoint: Vec3D,
+    topPoint: Vector3,
     faceConfiguration: FaceConfiguration,
   ) {
     this.polyhedron = polyhedron

@@ -2,7 +2,7 @@ import { takeRight, dropRight, invert, isEmpty, uniq } from "lodash-es"
 import { Polyhedron, Edge, Vertex, VertexList, VertexArg } from "math/polyhedra"
 import {
   Plane,
-  Vec3D,
+  Vector3,
   Transform,
   vecEquals,
   getOrthonormalTransform,
@@ -38,20 +38,20 @@ export function oppositeFace(edge: Edge, twist?: Twist) {
  * Defines an orthonormal orientation.
  * An orientation [u, v] defineds the basis [u, v, u x v]
  */
-type Orientation = readonly [Vec3D, Vec3D]
+type Orientation = readonly [Vector3, Vector3]
 
 /**
  * Defines a scale, origin, and orientation used to transform one polyhedron to another.
  */
 export interface Pose {
   scale: number
-  origin: Vec3D
+  origin: Vector3
   orientation: Orientation
 }
 
 function normalizeOrientation([u1, u2]: Orientation): Orientation {
   const _u1 = u1.clone().normalize()
-  const _u2 = new Plane(_u1).projectPoint(u2, new Vec3D()).normalize()
+  const _u2 = new Plane(_u1).projectPoint(u2, new Vector3()).normalize()
   return [_u1, _u2]
 }
 
@@ -171,7 +171,7 @@ export function deduplicateVertices(polyhedron: Polyhedron) {
  */
 export function getTransformedVertices<T extends VertexList>(
   vLists: readonly T[],
-  iteratee: (key: T) => Transform | Vec3D,
+  iteratee: (key: T) => Transform | Vector3,
   vertices: Vertex[] = vLists[0].polyhedron.vertices,
 ) {
   const result: VertexArg[] = [...vertices]

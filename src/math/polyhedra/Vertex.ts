@@ -1,6 +1,6 @@
 import { findKey, countBy } from "lodash-es"
 import { Point } from "types"
-import { vec, Vec3D } from "math/geom"
+import { vec, Vector3 } from "math/geom"
 import { VIndex } from "./solidTypes"
 import type Polyhedron from "./Polyhedron"
 import Edge from "./Edge"
@@ -27,7 +27,7 @@ export default class Vertex {
   polyhedron: Polyhedron
   index: VIndex
   value: Point
-  vec: Vec3D
+  vec: Vector3
 
   constructor(polyhedron: Polyhedron, index: VIndex) {
     this.polyhedron = polyhedron
