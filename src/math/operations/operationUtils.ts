@@ -187,7 +187,7 @@ function normalizeTransform(t: Transform | Vector3 | Matrix4): Transform {
  */
 export function getTransformedVertices<T extends VertexList>(
   vLists: readonly T[],
-  iteratee: (key: T) => Transform | Vector3 | Matrix4,
+  iteratee: (key: T) => Vector3 | Matrix4,
   vertices: Vertex[] = vLists[0].polyhedron.vertices,
 ) {
   const result: VertexArg[] = [...vertices]

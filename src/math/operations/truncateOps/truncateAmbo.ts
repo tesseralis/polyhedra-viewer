@@ -3,6 +3,7 @@ import { facets } from "specs"
 import { getTransformedVertices, Pose } from "../operationUtils"
 import ClassicalForme from "math/formes/ClassicalForme"
 import { makeTruncateTrio } from "./truncateHelpers"
+import { scaleMat } from "math/geom"
 
 function avgInradius(forme: ClassicalForme) {
   return sum(facets.map((f) => forme.inradius(f))) / facets.length
@@ -53,19 +54,13 @@ export default makeTruncateTrio(getAmboPose, {
       const refMidradius = edgeFace.distanceToCenter()
       const scale = avgInradius(forme) / avgInradius(refForme)
       return getTransformedVertices(forme.edgeFaces(), (f) => {
-        const faceCentroid = forme.geom
-          .centroid()
-          .clone()
-          .addScaledVector(f.normal(), refMidradius * scale)
-
-        return (v) =>
-          faceCentroid.clone().add(
-            v
-              .clone()
-              .sub(f.centroid())
-              .normalize()
-              .multiplyScalar(edgeFace.radius() * scale),
-          )
+        const translateM = f.translateNormal(
+          refMidradius * scale - f.distanceToCenter(),
+        )
+        const scaleM = f.withCentroidOrigin(
+          scaleMat((edgeFace.radius() * scale) / f.radius()),
+        )
+        return translateM.multiply(scaleM)
       })
     },
   },
