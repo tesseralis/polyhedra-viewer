@@ -57,7 +57,10 @@ export default function InfoPanel() {
       <p {...typeCss()}>{info.group()}</p>
       <DataList polyhedron={polyhedron.geom} info={info} />
       <div {...downloaderCss()}>
-        <DataDownloader solid={polyhedron.geom.solidData} />
+        <DataDownloader
+          name={polyhedron.specs.name()}
+          solid={polyhedron.geom.solidData}
+        />
       </div>
     </div>
   )

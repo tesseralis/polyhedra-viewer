@@ -39,6 +39,7 @@ const fileFormats = [
 ]
 
 interface Props {
+  name: string
   solid: SolidData
 }
 
@@ -46,8 +47,9 @@ function DownloadLink({
   ext,
   serializer,
   solid,
+  name,
 }: typeof fileFormats[0] & Props) {
-  const filename = `${solid.name}.${ext}`
+  const filename = `${name}.${ext}`
   const blob = new Blob([serializer(solid)], {
     type: "text/plain;charset=utf-8",
   })
@@ -80,7 +82,7 @@ function DownloadLink({
   )
 }
 
-export default function DataDownloader({ solid }: Props) {
+export default function DataDownloader({ solid, name }: Props) {
   const heading = useStyle({
     fontFamily: fonts.times,
     fontSize: scales.font[4],
@@ -91,7 +93,12 @@ export default function DataDownloader({ solid }: Props) {
       <h2 {...heading()}>Download model</h2>
       <div>
         {fileFormats.map((format) => (
-          <DownloadLink key={format.ext} {...format} solid={solid} />
+          <DownloadLink
+            key={format.ext}
+            {...format}
+            name={name}
+            solid={solid}
+          />
         ))}
       </div>
     </div>
