@@ -23,7 +23,7 @@ export default makeOpPair<AugmentedClassicalForme>({
     }
   },
   middle: "right",
-  getPose($, forme) {
+  getPose(forme) {
     const { specs } = forme
     const caps = forme.caps()
     // Calculate the centroid *only* for the source polyhedra

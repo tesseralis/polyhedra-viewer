@@ -77,7 +77,7 @@ export function makeTruncateTrio<
       // is going to be the middle operation
       middle:
         middleArg ?? ((entry) => entry.left.withOperation(middle.operation)),
-      getPose: ($, solid, options) => getPose(solid, options),
+      getPose,
       toLeft: leftOp === "left" ? left.transformer : undefined,
       toRight: rightOp === "right" ? right.transformer : undefined,
     })

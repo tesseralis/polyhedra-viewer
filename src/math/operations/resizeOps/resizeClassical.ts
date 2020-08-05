@@ -52,7 +52,7 @@ function getResizeArgs<L, R>(
 ): ResizeArgs<L, R> {
   return {
     middle: "right",
-    getPose(pos, forme, options) {
+    getPose(forme, options) {
       return getClassicalPose(forme, getFacet(options))
     },
     toLeft(forme, options, result) {

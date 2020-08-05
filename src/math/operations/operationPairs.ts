@@ -54,8 +54,8 @@ export interface OpPairInput<Forme extends PolyhedronForme, L = {}, R = L> {
   graph(): GraphGenerator<Forme["specs"], L, R>
   // Get the intermediate polyhedron for the given graph entry
   middle: Side | MiddleGetter<Forme, L, R>
-  // Get the post of a left, right, or middle state
-  getPose(pos: Side | "middle", solid: Forme, opts: GraphOpts<L, R>): Pose
+  // Get the pose of a left, right, or intermediate forme
+  getPose(solid: Forme, opts: GraphOpts<L, R>): Pose
   // Move the intermediate figure to the left position
   toLeft?(
     solid: Forme,
@@ -158,14 +158,14 @@ class OpPair<
     const options =
       entry.options ?? ({ left: {}, right: {} } as GraphOpts<L, R>)
     const solidForme = createForme(solid.specs, solid.geom) as Forme
-    const startPose = getPose(side, solidForme, options)
+    const startPose = getPose(solidForme, options)
 
     const endSide = oppositeSide(side)
     const endSpecs = entry[endSide]
     const endGeom = getGeometry(endSpecs)
     const alignedEnd = alignPolyhedron(
       endGeom,
-      getPose(endSide, createForme(endSpecs, endGeom) as Forme, options),
+      getPose(createForme(endSpecs, endGeom) as Forme, options),
       startPose,
     )
 
@@ -188,7 +188,7 @@ class OpPair<
 
       const alignedInter = alignPolyhedron(
         middleSolid.geom,
-        getPose("middle", middleSolid, options),
+        getPose(middleSolid, options),
         startPose,
       )
       middle = createForme(middleSolid.specs, alignedInter) as Forme

@@ -43,25 +43,21 @@ export default makeOpPair<ClassicalForme>({
     }
   },
   middle: (entry) => entry.left.withOperation("cantellate"),
-  getPose(pos, forme) {
+  getPose(forme) {
     const { geom } = forme
-    switch (pos) {
-      case "left": {
-        return getPose(forme, "face", forme.midradius())
-      }
-      case "right": {
-        // for the vertex figure, pick a vertex and align it with that edge
-        const vertex = geom.getVertex()
-        const v2 = vertex.adjacentVertices()[0]
-        return {
-          origin: geom.centroid(),
-          scale: forme.midradius(),
-          orientation: [vertex.normal(), v2.normal()],
-        }
-      }
-      case "middle": {
-        return getPose(forme, "face", getCantellatedMidradius(forme))
-      }
+    if (forme.specs.isCantellated()) {
+      return getPose(forme, "face", getCantellatedMidradius(forme))
+    }
+    if (forme.specs.isFace()) {
+      return getPose(forme, "face", forme.midradius())
+    }
+    // for the vertex figure, pick a vertex and align it with that edge
+    const vertex = geom.getVertex()
+    const v2 = vertex.adjacentVertices()[0]
+    return {
+      origin: geom.centroid(),
+      scale: forme.midradius(),
+      orientation: [vertex.normal(), v2.normal()],
     }
   },
   toLeft: (forme, _, result) => doDualTransform(forme, result),

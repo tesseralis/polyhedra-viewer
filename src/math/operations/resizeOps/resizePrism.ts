@@ -93,7 +93,7 @@ export const expand = makeOpPair<CapstoneForme, {}, FacetOpts>({
     }
   },
   middle: "right",
-  getPose: (pos, forme) => getPose(forme),
+  getPose,
   toLeft(forme, { right: { facet } }) {
     return facet === "face"
       ? contractToPrism(forme)
@@ -116,7 +116,7 @@ export const dual = makeOpPair<CapstoneForme>({
       type: "secondary",
       gyrate: "ortho",
     }),
-  getPose: (pos, forme) => getPose(forme),
+  getPose,
   toLeft: contractToPrism,
   toRight: contractToBipyramid,
 })
