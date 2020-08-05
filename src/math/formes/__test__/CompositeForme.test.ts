@@ -11,5 +11,23 @@ describe("CompositeForme", () => {
       }
       expect(faces).toSatisfyAll(canAugment)
     })
+
+    it("returns true for side faces of triangular pyramid", () => {
+      const forme = CompositeForme.fromName("triangular prism")
+      const faces = forme.geom.facesWithNumSides(4)
+      function canAugment(face: Face) {
+        return forme.canAugment(face)
+      }
+      expect(faces).toSatisfyAll(canAugment)
+    })
+
+    it("return true for square faces of augmented triangular pyramid", () => {
+      const forme = CompositeForme.fromName("augmented triangular prism")
+      const faces = forme.geom.facesWithNumSides(4)
+      function canAugment(face: Face) {
+        return forme.canAugment(face)
+      }
+      expect(faces).toSatisfyAll(canAugment)
+    })
   })
 })

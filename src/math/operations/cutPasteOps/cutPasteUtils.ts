@@ -201,7 +201,6 @@ function canAugment(forme: PolyhedronForme, face: Face): boolean {
   if (forme.isCapstone()) {
     return forme.isEndFace(face) || canWrapAugmented(forme, face)
   } else if (forme.isComposite()) {
-    // FIXME not working for tetrahedron or triangular prism
     return forme.canAugment(face)
   } else {
     // Elementary solid

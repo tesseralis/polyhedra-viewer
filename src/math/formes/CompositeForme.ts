@@ -96,6 +96,10 @@ export default abstract class CompositeForme extends PolyhedronForme<
 }
 
 export class AugmentedPrismForme extends CompositeForme {
+  caps() {
+    return super.caps().filter((cap) => cap.type === "pyramid")
+  }
+
   hasAlignment() {
     return super.hasAlignment() && this.specs.sourcePrism().isSecondary()
   }
@@ -142,6 +146,7 @@ export class AugmentedPrismForme extends CompositeForme {
 
   canAugment(face: Face) {
     if (!this.isSideFace(face)) return false
+    if (this.specs.sourcePrism().baseSides() === 3) return true
     return this.caps().every((cap) =>
       cap
         .boundary()
