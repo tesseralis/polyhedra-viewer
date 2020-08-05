@@ -5,12 +5,15 @@ import CapstoneForme from "math/formes/CapstoneForme"
 
 function getCapstoneCrossAxis(forme: CapstoneForme) {
   const topBoundary = forme.endBoundaries()[0]
+  // for the bicupolae, find an edge connected to a square cupola face
   if (forme.specs.isSecondary()) {
     return topBoundary.edges.find((e) => e.face.numSides === 4)!
   }
+  // For prisms, it can be any edge
   if (forme.specs.isPrismatic()) {
     return topBoundary.edges[0]
   }
+  // For bipyramids, it's vertex-centered
   return topBoundary.vertices[0]
 }
 
@@ -19,13 +22,14 @@ function getApothem(s: number, n: number) {
 }
 
 function contractToPrism(forme: CapstoneForme) {
-  const faces = forme.geom.faces.filter((f) => forme.isFacetFace(f, "face"))
-  return getTransformedVertices(faces, (face) => {
+  return getTransformedVertices(forme.facetFaces("face"), (face) => {
     if (forme.isTop(face)) {
+      // Push the tops down so that they are aligned with the prismatic height
       return face.translateNormal(
         forme.prismaticHeight() / 2 - face.distanceToCenter(),
       )
     } else {
+      // Push the side faces in to the apothem length of the bipyramid
       const apothem = getApothem(face.sideLength(), forme.specs.data.base)
       return face.translateNormal(apothem - face.distanceToCenter())
     }
@@ -33,11 +37,10 @@ function contractToPrism(forme: CapstoneForme) {
 }
 
 function contractToBipyramid(forme: CapstoneForme) {
-  const faces = forme.geom.faces.filter((f) => forme.isFacetFace(f, "vertex"))
-  return getTransformedVertices(faces, (face) => {
-    const sideFace = face
-      .adjacentFaces()
-      .find((f) => !forme.isContainedInEnd(f))!
+  return getTransformedVertices(forme.facetFaces("vertex"), (face) => {
+    // The pyramid faces need to be pushed *down* and *in*
+    // so find relative side and top faces as reference
+    const sideFace = face.adjacentFaces().find((f) => forme.isSideFace(f))!
     const apothem = getApothem(face.sideLength(), forme.specs.data.base)
     const horiz = sideFace.translateNormal(
       apothem - sideFace.distanceToCenter(),
@@ -50,16 +53,22 @@ function contractToBipyramid(forme: CapstoneForme) {
   })
 }
 
+function* elongatedOrthobicupolae() {
+  for (const specs of Capstone.query.where(
+    (cap) =>
+      cap.isSecondary() &&
+      cap.isBi() &&
+      cap.isElongated() &&
+      cap.isOrtho() &&
+      cap.isCupola(),
+  )) {
+    yield specs
+  }
+}
+
 export const expand = makeOpPair<CapstoneForme, {}, FacetOpts>({
   graph: function* () {
-    for (const specs of Capstone.query.where(
-      (cap) =>
-        cap.isSecondary() &&
-        cap.isBi() &&
-        cap.isElongated() &&
-        cap.isOrtho() &&
-        cap.isCupola(),
-    )) {
+    for (const specs of elongatedOrthobicupolae()) {
       yield {
         left: specs.withData({ count: 0, type: "primary" }),
         right: specs,
@@ -97,14 +106,7 @@ export const expand = makeOpPair<CapstoneForme, {}, FacetOpts>({
 
 export const dual = makeOpPair<CapstoneForme>({
   graph: function* () {
-    for (const specs of Capstone.query.where(
-      (cap) =>
-        cap.isSecondary() &&
-        cap.isBi() &&
-        cap.isElongated() &&
-        cap.isOrtho() &&
-        cap.isCupola(),
-    )) {
+    for (const specs of elongatedOrthobicupolae()) {
       yield {
         left: specs.withData({ count: 0, type: "primary" }),
         right: specs.withData({ elongation: "none", type: "primary" }),

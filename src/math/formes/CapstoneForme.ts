@@ -1,5 +1,5 @@
 import PolyhedronForme from "./PolyhedronForme"
-import { Capstone } from "specs"
+import { Capstone, Facet as FacetType } from "specs"
 import { Polyhedron, Face, Edge, Cap, FaceLike, Facet } from "math/polyhedra"
 import { vecEquals, isInverse, getCentroid } from "math/geom"
 import { getGeometry } from "math/operations/operationUtils"
@@ -112,15 +112,23 @@ export default abstract class CapstoneForme extends PolyhedronForme<Capstone> {
     return end && vecEquals(face.normal(), end.normal())
   }
 
+  isSideFace(face: Face) {
+    return !this.isContainedInEnd(face)
+  }
+
   centroid() {
     return getCentroid(this.ends().map((end) => end.centroid()))
   }
 
-  isFacetFace(face: Face, facet: "face" | "vertex") {
+  // Utilities for determining "facet faces" analogous to thoes in classical formes
+  // TODO these should only work with elongated orthobicupolae
+  // TODO deduplicate these functions with ClassicalForme
+
+  isFacetFace(face: Face, facet: FacetType) {
     if (facet === "face") {
       return (
         this.isTop(face) ||
-        (!this.isContainedInEnd(face) &&
+        (this.isSideFace(face) &&
           face.adjacentFaces().every((f) => f.numSides === 4))
       )
     } else {
@@ -128,6 +136,10 @@ export default abstract class CapstoneForme extends PolyhedronForme<Capstone> {
         this.isContainedInEnd(face) && face.numSides === 3 && !this.isTop(face)
       )
     }
+  }
+
+  facetFaces(facet: FacetType) {
+    return this.geom.faces.filter((f) => this.isFacetFace(f, facet))
   }
 
   getFacet(face: Face) {
