@@ -66,7 +66,7 @@ export default function doAugment(
 
   const cap = getCap(capType, index)
 
-  const [top, bottom] = cap.baseBoundaries()
+  const [top, bottom] = cap.endBoundaries()
   const capPose = getPose(top, capOrientation(capType))
   const basePose = getPose(base, baseCrossAxis)
 

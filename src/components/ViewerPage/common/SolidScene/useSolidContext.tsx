@@ -70,10 +70,10 @@ function getClassicalColor(forme: ClassicalForme, face: Face) {
 
 function getCapstoneColor(forme: CapstoneForme, face: Face) {
   const scheme = colorScheme[forme.specs.data.base]
-  if (forme.isBaseTop(face)) {
+  if (forme.isTop(face)) {
     const faceSides = face.numSides > 5 ? "secondary" : "primary"
     return scheme[faceSides].face
-  } else if (forme.inBase(face)) {
+  } else if (forme.isEndFace(face)) {
     if (face.numSides === 3) {
       return scheme.primary.vertex
     } else if (face.numSides === 4) {

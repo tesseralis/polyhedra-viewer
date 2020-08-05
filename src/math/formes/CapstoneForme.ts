@@ -1,11 +1,11 @@
 import PolyhedronForme from "./PolyhedronForme"
 import { Capstone, getSpecs } from "specs"
-import { Polyhedron, Face, Edge, Cap, FaceLike } from "math/polyhedra"
-import { vecEquals, isInverse } from "math/geom"
+import { Polyhedron, Face, Edge, Cap, FaceLike, Facet } from "math/polyhedra"
+import { vecEquals, isInverse, getCentroid } from "math/geom"
 import { getGeometry } from "math/operations/operationUtils"
 import { find } from "utils"
 
-type Base = Face | Cap | Edge
+type CapstoneEnd = Facet
 
 // TODO add more useful functions here
 export default abstract class CapstoneForme extends PolyhedronForme<Capstone> {
@@ -32,66 +32,71 @@ export default abstract class CapstoneForme extends PolyhedronForme<Capstone> {
     return this.fromSpecs(specs)
   }
 
-  abstract bases(): readonly [Base, Base]
+  abstract ends(): readonly [CapstoneEnd, CapstoneEnd]
 
-  baseCaps() {
-    return this.bases().filter((base) => base instanceof Cap) as Cap[]
+  endCaps() {
+    return this.ends().filter((end) => end instanceof Cap) as Cap[]
   }
 
-  baseFaces() {
-    return this.bases().filter((base) => base instanceof Face) as Face[]
+  endFaces() {
+    return this.ends().filter((end) => end instanceof Face) as Face[]
   }
 
   /**
-   * Return the `FaceLike` representation of this capstone's bases:
+   * Return the `FaceLike` representation of this capstone's ends:
    * either the face itself or the boundary of the cap.
    */
-  baseBoundaries(): [FaceLike, FaceLike] {
-    return this.bases().map((base) =>
-      base instanceof Cap ? base.boundary() : base,
+  endBoundaries(): [FaceLike, FaceLike] {
+    return this.ends().map((end) =>
+      end instanceof Cap ? end.boundary() : end,
     ) as [FaceLike, FaceLike]
   }
 
   prismaticHeight() {
-    const [top, bot] = this.baseBoundaries()
+    const [top, bot] = this.ends()
     return top.centroid().distanceTo(bot.centroid())
   }
 
   /**
-   * Returns the base of the capstone that this face belongs to,
-   * or undefined if the face does not belong to a base.
+   * Returns the end of the capstone that this face belongs to,
+   * or undefined if the face does not belong to an end.
    */
-  baseOf(face: Face) {
-    return this.bases().find((base) => {
-      if (base instanceof Cap) {
-        return face.inSet(base.faces())
-      } else if (base instanceof Edge) {
+  containingEnd(face: Face) {
+    return this.ends().find((end) => {
+      if (end instanceof Cap) {
+        return face.inSet(end.faces())
+      } else if (end instanceof Edge) {
         return false
-      } else {
-        return face.equals(base)
+      } else if (end instanceof Face) {
+        return face.equals(end)
       }
+      throw new Error("Unknown extremity")
     })
   }
 
   /**
-   * Return whether the given face is in one of the bases of the cap.
+   * Return whether the given face is in one of the ends of the cap.
    */
-  inBase(face: Face) {
-    return !!this.baseOf(face)
+  isEndFace(face: Face) {
+    return !!this.containingEnd(face)
   }
 
   /**
-   * Returns true if the face belongs to the top face of a capstone base.
+   * Returns true if the face belongs to the top face of a capstone end.
    */
-  isBaseTop(face: Face) {
-    const base = this.baseOf(face)
-    if (base instanceof Edge) return false
-    return base && vecEquals(face.normal(), base.normal())
+  isTop(face: Face) {
+    const end = this.containingEnd(face)
+    if (end instanceof Edge) return false
+    return end && vecEquals(face.normal(), end.normal())
+  }
+
+  centroid() {
+    return getCentroid(this.ends().map((end) => end.centroid()))
   }
 }
 
 class PrismaticForme extends CapstoneForme {
-  bases() {
+  ends() {
     if (this.specs.isDigonal()) {
       const edge1 = this.geom.getEdge()
       const edge2 = find(this.geom.edges, (e) =>
@@ -108,13 +113,13 @@ class PrismaticForme extends CapstoneForme {
 }
 
 class SnubCapstoneForme extends CapstoneForme {
-  bases() {
+  ends() {
     if (this.specs.isDigonal()) {
-      const bases = this.geom.edges.filter((e) =>
+      const ends = this.geom.edges.filter((e) =>
         e.vertices.every((v) => v.adjacentFaces().length === 4),
       )
-      if (bases.length !== 2) throw new Error(`Invalid number of bases`)
-      return [bases[0], bases[1]] as const
+      if (ends.length !== 2) throw new Error(`Invalid number of capstone ends`)
+      return [ends[0], ends[1]] as const
     }
     // TODO dedupe with prismatic?
     const face1 = this.geom.faceWithNumSides(this.specs.baseSides())
@@ -127,11 +132,11 @@ class SnubCapstoneForme extends CapstoneForme {
 
 // FIXME deal with fastigium
 class MonoCapstoneForme extends CapstoneForme {
-  bases() {
-    const base = this.specs.isPrimary()
+  ends() {
+    const end = this.specs.isPrimary()
       ? this.specs.data.base
       : this.specs.data.base * 2
-    const face = this.geom.faceWithNumSides(base)
+    const face = this.geom.faceWithNumSides(end)
     const cap = find(this.geom.caps(), (cap) =>
       isInverse(cap.normal(), face.normal()),
     )
@@ -140,7 +145,7 @@ class MonoCapstoneForme extends CapstoneForme {
 }
 
 class BiCapstoneForme extends CapstoneForme {
-  bases() {
+  ends() {
     const caps = this.geom.caps()
     for (const cap of this.geom.caps()) {
       const cap2 = caps.find((cap2) => isInverse(cap.normal(), cap2.normal()))

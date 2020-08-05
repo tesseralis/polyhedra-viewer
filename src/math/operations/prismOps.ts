@@ -1,6 +1,5 @@
 import { find } from "utils"
 import { Capstone, Twist, twists, oppositeTwist } from "specs"
-import { getCentroid } from "math/geom"
 import CapstoneForme from "math/formes/CapstoneForme"
 import { combineOps, makeOpPair } from "./operationPairs"
 import { makeOperation } from "./Operation"
@@ -20,7 +19,7 @@ function getTwistMult(twist?: Twist) {
 }
 
 function getCapstonePose(forme: CapstoneForme, twist?: Twist): Pose {
-  const [top, bottom] = forme.baseBoundaries()
+  const [top] = forme.endBoundaries()
   const edge = forme.specs.isPrismatic()
     ? top.edges[0]
     : find(top.edges, (e) => e.face.numSides === 3)
@@ -28,7 +27,7 @@ function getCapstonePose(forme: CapstoneForme, twist?: Twist): Pose {
   const angle =
     (forme.specs.isGyroelongated() ? 1 : 0) * getTwistMult(twist) * (PI / n / 2)
   return {
-    origin: getCentroid([top.centroid(), bottom.centroid()]),
+    origin: forme.centroid(),
     scale: forme.geom.edgeLength(),
     orientation: [
       top.normal(),
@@ -46,7 +45,7 @@ function getScaledPrismVertices(
   scale: number,
   twist?: Twist,
 ) {
-  const vertexSets = forme.bases()
+  const vertexSets = forme.ends()
   const angle = (getTwistMult(twist) * PI) / forme.specs.baseSides()
 
   return getTransformedVertices(vertexSets, (set) => {

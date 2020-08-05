@@ -38,7 +38,7 @@ export default makeCutPastePair<CapstoneForme>({
       return
     }
     // FIXME this might fail with the digonal cupola?
-    const orientationFn = capOrientation(forme.baseCaps()[0].type)
+    const orientationFn = capOrientation(forme.endCaps()[0].type)
     return (edge) => {
       // Determine the cupola face to check
       edge = edge.twin()

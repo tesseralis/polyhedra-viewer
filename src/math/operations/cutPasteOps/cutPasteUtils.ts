@@ -19,7 +19,7 @@ import addCap, { CrossAxis } from "./addCap"
 
 function canAugment(forme: PolyhedronForme, face: Face) {
   if (forme instanceof CapstoneForme) {
-    return forme.baseFaces().some((base) => base.equals(face))
+    return forme.endFaces().some((base) => base.equals(face))
   } else if (forme instanceof CompositeForme) {
     return forme.canAugment(face)
   } else {
@@ -127,7 +127,7 @@ export function makeCutPastePair<F extends PolyhedronForme>(
 
 function getCaps(forme: PolyhedronForme) {
   if (forme instanceof CapstoneForme) {
-    return forme.baseCaps()
+    return forme.endCaps()
   } else {
     // FIXME this doesn't return the right thing for composite
     return forme.geom.caps()
