@@ -115,22 +115,25 @@ export function makeCutPastePair<F extends PolyhedronForme>(
   }
 }
 
-function getCaps(forme: PolyhedronForme) {
+function getModifiableCaps(forme: PolyhedronForme) {
   if (forme instanceof CapstoneForme) {
     return forme.endCaps()
+  } else if (forme instanceof CompositeForme) {
+    return forme.caps()
   } else {
-    // FIXME this doesn't return the right thing for composite
     return forme.geom.caps()
   }
 }
 
 function getCapFaces(forme: PolyhedronForme) {
-  return getCaps(forme).flatMap((cap) => cap.faces())
+  return getModifiableCaps(forme).flatMap((cap) => cap.faces())
 }
 
 function getHitCap(forme: PolyhedronForme, hitPoint: Vector3) {
   const hitFace = forme.geom.hitFace(hitPoint)
-  const caps = getCaps(forme).filter((cap) => hitFace.inSet(cap.faces()))
+  const caps = getModifiableCaps(forme).filter((cap) =>
+    hitFace.inSet(cap.faces()),
+  )
   if (caps.length === 0) {
     return null
   }
@@ -143,22 +146,15 @@ type AugOptionArgs = Partial<
 >
 
 export const capOptionArgs: CapOptionArgs = {
-  hasOptions() {
-    return true
-  },
-
-  allOptions(forme) {
-    return {
-      cap: getCaps(forme),
-    }
-  },
-
   hitOption: "cap",
+  hasOptions: () => true,
+  allOptions(forme) {
+    return { cap: getModifiableCaps(forme) }
+  },
   getHitOption(forme, hitPnt) {
     const cap = getHitCap(forme, hitPnt)
     return cap ? { cap } : {}
   },
-
   selectionState(face, forme, { cap }) {
     const allCapFaces = getCapFaces(forme)
     if (!!cap && face.inSet(cap.faces())) return "selected"
@@ -180,23 +176,18 @@ function canAugment(forme: PolyhedronForme, face: Face) {
 
 // TODO putting this here is a little awkward
 export const augOptionArgs: AugOptionArgs = {
-  hasOptions() {
-    return true
-  },
-
   hitOption: "face",
+  hasOptions: () => true,
   getHitOption(forme, hitPnt, options) {
     if (!options) return {}
     const face = forme.geom.hitFace(hitPnt)
     return canAugment(forme, face) ? { face } : {}
   },
-
   selectionState(f, forme, { face }) {
     if (face && f.equals(face)) return "selected"
     if (canAugment(forme, f)) return "selectable"
     return undefined
   },
-
   allOptions(forme) {
     const { specs, geom } = forme
     return {
@@ -205,7 +196,6 @@ export const augOptionArgs: AugOptionArgs = {
       face: geom.faces.filter((face) => canAugment(forme, face)),
     }
   },
-
   defaultOptions(info) {
     const usingOpts = getUsingOpts(info) ?? []
     return pickBy({
