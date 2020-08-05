@@ -252,7 +252,7 @@ export function combineOps<F extends PolyhedronForme, O, GO extends {} = O>(
       for (const op of opArgs) {
         const entry = [...op.graph()].find(
           ({ start, options }) =>
-            start.unwrap().equals(solid.specs.unwrap()) &&
+            start.equivalent(solid.specs) &&
             isMatch(
               options ?? {},
               pickBy(op.toGraphOpts(createForme(start, solid.geom) as F, opts)),
@@ -272,7 +272,7 @@ export function combineOps<F extends PolyhedronForme, O, GO extends {} = O>(
     toGraphOpts(solid, opts) {
       for (const op of opArgs) {
         const entry = [...op.graph()].find(({ start, options }) => {
-          if (!start.unwrap().equals(solid.specs.unwrap())) {
+          if (!start.equivalent(solid.specs)) {
             return false
           }
           const graphOpts = op.toGraphOpts(

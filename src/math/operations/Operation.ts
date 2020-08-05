@@ -141,7 +141,7 @@ function normalizeOpResult(
   const endColors = getFaceColors(end)
 
   return {
-    result: createForme(newSpecs.unwrap(), normedResult),
+    result: createForme(newSpecs, normedResult),
     animationData: {
       start,
       endVertices: endVertices.map(normalizeVertex),
@@ -192,7 +192,7 @@ export default class Operation<Options extends {} = {}> {
     // e.g. make it easier to type.
     return find(this.graph, ({ start, options }) => {
       return (
-        start.unwrap().equals(solid.specs) &&
+        start.equivalent(solid.specs) &&
         isMatch(
           options ?? {},
           pickBy(this.opArgs.toGraphOpts(this.wrap(solid), opts)),
@@ -202,9 +202,7 @@ export default class Operation<Options extends {} = {}> {
   }
 
   getEntries(solid: PolyhedronForme) {
-    return this.graph.filter((entry) =>
-      entry.start.unwrap().equals(solid.specs),
-    )
+    return this.graph.filter((entry) => entry.start.equivalent(solid.specs))
   }
 
   /** Return all polyhedron formes that can be an input to this operation */
@@ -213,7 +211,7 @@ export default class Operation<Options extends {} = {}> {
   }
 
   getResult(solid: PolyhedronForme, options: Options) {
-    return this.getEntry(solid, options).end
+    return this.getEntry(solid, options).end.unwrap()
   }
 
   hasOptions(solid: PolyhedronForme) {

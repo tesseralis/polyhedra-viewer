@@ -64,8 +64,16 @@ export default abstract class PolyhedronSpecs<Data extends {} = {}> {
     return false
   }
 
-  equals(s2: PolyhedronSpecs) {
-    return this.type === s2.type && isEqual(this.data, s2.data)
+  equals(other: PolyhedronSpecs) {
+    return this.type === other.type && isEqual(this.data, other.data)
+  }
+
+  /**
+   * Returns whether the two specs represent the same underlying polyhedron.
+   * In general, this is true if this.canonicalName() === s2.canonicalName()
+   */
+  equivalent(other: PolyhedronSpecs) {
+    return this.unwrap().equals(other.unwrap())
   }
 
   isHoneycomb() {
