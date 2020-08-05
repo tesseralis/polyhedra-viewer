@@ -55,12 +55,7 @@ function contractToBipyramid(forme: CapstoneForme) {
 
 function* elongatedOrthobicupolae() {
   for (const specs of Capstone.query.where(
-    (cap) =>
-      cap.isSecondary() &&
-      cap.isBi() &&
-      cap.isElongated() &&
-      cap.isOrtho() &&
-      cap.isCupola(),
+    (cap) => cap.isCupola() && cap.isBi() && cap.isElongated() && cap.isOrtho(),
   )) {
     yield specs
   }
