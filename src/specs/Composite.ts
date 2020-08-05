@@ -34,6 +34,13 @@ const rhombicosidodecahedron = Classical.query.withName(
   "rhombicosidodecahedron",
 )
 
+const sources = [
+  ...prismaticBases,
+  ...augmentedClassicalBases,
+  icosahedron,
+  rhombicosidodecahedron,
+]
+
 function limitCount(limit: number) {
   return counts.filter((n) => n <= limit)
 }
@@ -160,6 +167,19 @@ export default class Composite extends Specs<CompositeData> {
     return this.withData({
       gyrate: (this.data.gyrate - 1) as Count,
       align: "meta",
+    })
+  }
+
+  static hasSource(source: Classical | Capstone) {
+    return sources.some((s) => s.equals(source))
+  }
+
+  static wrap(source: Classical | Capstone) {
+    return this.query.withData({
+      source,
+      augmented: 0,
+      diminished: 0,
+      gyrate: 0,
     })
   }
 

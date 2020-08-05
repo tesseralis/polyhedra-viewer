@@ -142,6 +142,12 @@ function getHitCap(forme: PolyhedronForme, hitPoint: Vector3) {
   return minBy(caps, (cap) => cap.centroid().distanceToSquared(hitPoint))
 }
 
+function wrapForme(forme: PolyhedronForme) {
+  if (!Composite.hasSource(forme.specs as any)) return
+  const specs = Composite.wrap(forme.specs as any)
+  return CompositeForme.create(specs, forme.geom)
+}
+
 type CapOptionArgs = Partial<OpArgs<CapOptions, PolyhedronForme, DimGraphOpts>>
 type AugOptionArgs = Partial<
   OpArgs<AugOptions, PolyhedronForme<CutPasteSpecs>, AugGraphOpts>
@@ -165,36 +171,13 @@ export const capOptionArgs: CapOptionArgs = {
   },
   wrap(forme) {
     if (forme.isClassical()) {
-      const specs = Composite.query.where(
-        (s) =>
-          s.data.source.equals(forme.specs) &&
-          s.data.augmented === 0 &&
-          s.data.diminished === 0 &&
-          s.data.gyrate === 0,
-      )[0]
-      if (!specs) return undefined
-      return CompositeForme.create(specs, forme.geom)
+      return wrapForme(forme)
     }
   },
 }
 
-function wrapPrism(prism: CapstoneForme) {
-  if (!prism.specs.isPrismatic()) {
-    return
-  }
-  const specs = Composite.query.where(
-    (s) =>
-      s.data.source.equals(prism.specs) &&
-      s.data.augmented === 0 &&
-      s.data.diminished === 0 &&
-      s.data.gyrate === 0,
-  )[0]
-  if (!specs) return
-  return CompositeForme.create(specs, prism.geom)
-}
-
 function canWrapAugmented(prism: CapstoneForme, face: Face): boolean {
-  const wrapped = wrapPrism(prism)
+  const wrapped = wrapForme(prism)
   if (!wrapped) return false
   return canAugment(wrapped, face)
 }
@@ -240,15 +223,7 @@ export const augOptionArgs: AugOptionArgs = {
   },
   wrap(forme) {
     if (forme.isClassical()) {
-      const specs = Composite.query.where(
-        (s) =>
-          s.data.source.equals(forme.specs) &&
-          s.data.augmented === 0 &&
-          s.data.diminished === 0 &&
-          s.data.gyrate === 0,
-      )[0]
-      if (!specs) return undefined
-      return CompositeForme.create(specs, forme.geom)
+      return wrapForme(forme)
     }
   },
 }
