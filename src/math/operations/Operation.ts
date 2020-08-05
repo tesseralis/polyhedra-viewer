@@ -1,5 +1,5 @@
 import { Vector3 } from "three"
-import { pickBy, mapValues, isMatch, compact } from "lodash-es"
+import { pickBy, mapValues, isMatch, compact, uniq } from "lodash-es"
 
 import { vecEquals } from "math/geom"
 import { Polyhedron, Face, VertexArg, normalizeVertex } from "math/polyhedra"
@@ -205,6 +205,11 @@ export default class Operation<Options extends {} = {}> {
     return this.graph.filter((entry) =>
       entry.start.unwrap().equals(solid.specs),
     )
+  }
+
+  /** Return all polyhedron formes that can be an input to this operation */
+  allInputs() {
+    return uniq(this.graph.map((entry) => entry.start.unwrap()))
   }
 
   getResult(solid: PolyhedronForme, options: Options) {
