@@ -2,7 +2,7 @@ import { once } from "lodash-es"
 import { find, getSingle } from "utils"
 import PolyhedronForme from "./PolyhedronForme"
 import { getGeometry } from "math/operations/operationUtils"
-import { Composite, getSpecs } from "specs"
+import { Composite } from "specs"
 import { Polyhedron, Face, Cap } from "math/polyhedra"
 import { getCentroid, isInverse } from "math/geom"
 
@@ -30,8 +30,7 @@ export default abstract class CompositeForme extends PolyhedronForme<
   }
 
   static fromName(name: string) {
-    const specs = getSpecs(name)
-    if (!specs.isComposite()) throw new Error(`Invalid specs for name`)
+    const specs = Composite.query.withName(name)
     return this.fromSpecs(specs)
   }
 
@@ -97,12 +96,15 @@ export default abstract class CompositeForme extends PolyhedronForme<
 }
 
 export class AugmentedPrismForme extends CompositeForme {
+  caps() {
+    return super.caps().filter((cap) => cap.type === "pyramid")
+  }
+
   hasAlignment() {
     return super.hasAlignment() && this.specs.sourcePrism().isSecondary()
   }
 
   modifications() {
-    // FIXME make sure triangular prism doesn't count the fastigium
     return this.caps()
   }
 
@@ -143,6 +145,7 @@ export class AugmentedPrismForme extends CompositeForme {
 
   canAugment(face: Face) {
     if (!this.isSideFace(face)) return false
+    if (this.specs.sourcePrism().baseSides() === 3) return true
     return this.caps().every((cap) =>
       cap
         .boundary()
@@ -166,7 +169,7 @@ export class AugmentedClassicalForme extends CompositeForme {
     const specs = this.specs.sourceClassical()
     // If it's an augmented tetrahedron, only consider the first cap
     if (specs.isTetrahedral() && specs.isRegular()) {
-      return [caps[0]]
+      return this.specs.isAugmented() ? [caps[0]] : []
     }
     return caps
   }

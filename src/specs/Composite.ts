@@ -34,6 +34,13 @@ const rhombicosidodecahedron = Classical.query.withName(
   "rhombicosidodecahedron",
 )
 
+const sources = [
+  ...prismaticBases,
+  ...augmentedClassicalBases,
+  icosahedron,
+  rhombicosidodecahedron,
+]
+
 function limitCount(limit: number) {
   return counts.filter((n) => n <= limit)
 }
@@ -94,6 +101,10 @@ export default class Composite extends Specs<CompositeData> {
   isPara = () => this.data.align === "para"
   isMeta = () => this.data.align === "meta"
 
+  unwrap() {
+    return this.totalCount() === 0 ? this.data.source : this
+  }
+
   hasAlignment() {
     return Composite.hasAlignment(this.data)
   }
@@ -112,6 +123,14 @@ export default class Composite extends Specs<CompositeData> {
       throw new Error(`Source is not a classical solid: ${source.name()}`)
     }
     return source
+  }
+
+  augmentFaceType() {
+    if (!this.isAugmentedSolid())
+      throw new Error(`augmentFaceType() only implemented for augmented solids`)
+    if (this.isAugmentedPrism()) return 4
+    const source = this.sourceClassical()
+    return source.data.family * (source.isTruncated() ? 2 : 1)
   }
 
   diminish() {
@@ -156,6 +175,19 @@ export default class Composite extends Specs<CompositeData> {
     return this.withData({
       gyrate: (this.data.gyrate - 1) as Count,
       align: "meta",
+    })
+  }
+
+  static hasSource(source: Classical | Capstone) {
+    return sources.some((s) => s.equals(source))
+  }
+
+  static wrap(source: Classical | Capstone) {
+    return this.query.withData({
+      source,
+      augmented: 0,
+      diminished: 0,
+      gyrate: 0,
     })
   }
 

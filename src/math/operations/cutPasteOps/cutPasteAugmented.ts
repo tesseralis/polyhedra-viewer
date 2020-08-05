@@ -13,14 +13,17 @@ export default makeCutPastePair<CompositeForme>({
         left: solid.diminish(),
         right: solid,
         options: {
-          left: { align: solid.data.align },
+          left: {
+            align: solid.data.align,
+            faceType: solid.augmentFaceType(),
+          },
           right: {},
         },
       }
     }
   },
   toAugGraphOpts(forme, { face }) {
-    return { align: forme.alignment(face) }
+    return { align: forme.alignment(face), faceType: face.numSides }
   },
   baseAxis({ specs }) {
     const { source } = specs.data

@@ -122,12 +122,11 @@ const chainedTests: OpTest[] = [
       ["sharpen", "cuboctahedron"],
       { op: "sharpen", args: { facet: "face" }, expected: "cube" },
       ["truncate", "truncated cube"],
-      // FIXME
-      // {
-      //   op: "augment",
-      //   args: { face: 8 },
-      //   expected: "augmented truncated cube",
-      // },
+      {
+        op: "augment",
+        args: { face: 8 },
+        expected: "augmented truncated cube",
+      },
     ],
   },
   {
@@ -135,12 +134,11 @@ const chainedTests: OpTest[] = [
     start: "dodecahedron",
     operations: [
       ["expand", "rhombicosidodecahedron"],
-      // FIXME
-      // {
-      //   op: "diminish",
-      //   args: { cap: true },
-      //   expected: "diminished rhombicosidodecahedron",
-      // },
+      {
+        op: "diminish",
+        args: { cap: true },
+        expected: "diminished rhombicosidodecahedron",
+      },
     ],
   },
   {
@@ -154,6 +152,23 @@ const chainedTests: OpTest[] = [
         expected: "metabiaugmented truncated dodecahedron",
       },
       ["sharpen", "metabiaugmented dodecahedron"],
+    ],
+  },
+  {
+    description: "Augmented prisms",
+    start: "elongated pentagonal bipyramid",
+    operations: [
+      {
+        op: "diminish",
+        args: { cap: true },
+        expected: "elongated pentagonal pyramid",
+      },
+      { op: "diminish", args: { cap: true }, expected: "pentagonal prism" },
+      {
+        op: "augment",
+        args: { face: 4 },
+        expected: "augmented pentagonal prism",
+      },
     ],
   },
 ]

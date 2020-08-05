@@ -1,5 +1,4 @@
 import { isMatch, pickBy } from "lodash-es"
-import { find } from "utils"
 import { PolyhedronSpecs } from "specs"
 import { VertexArg } from "math/polyhedra"
 import {
@@ -243,14 +242,33 @@ export function makeOpPair<Forme extends PolyhedronForme, L = {}, R = L>(
 export function combineOps<F extends PolyhedronForme, O, GO extends {} = O>(
   opArgs: OpInput<O, F, GO>[],
 ): OpInput<O, F, GO> {
-  function getOp(solid: F, options: O) {
-    // FIXME This is the same logic in Operation for finding the entry
-    return find(opArgs, (op) =>
-      [...op.graph()].some(
-        (entry) =>
-          entry.start.equals(solid.specs) &&
-          isMatch(entry.options ?? {}, pickBy(op.toGraphOpts(solid, options))),
-      ),
+  interface CallbackArg {
+    op: OpInput<O, F, GO>
+    forme: F
+    graphOpts: GO
+  }
+
+  function doWithRightForme<R>(
+    solid: F,
+    opts: O,
+    callback: (args: CallbackArg) => R,
+  ) {
+    for (const op of opArgs) {
+      // Finagle with the arguments to get the correctly (un)wrapped
+      // version of the forme
+      for (const { start, options = {} } of op.graph()) {
+        if (!start.equivalent(solid.specs)) continue
+        const forme = createForme(start, solid.geom) as F
+        const graphOpts = op.toGraphOpts(forme, opts)
+        if (isMatch(options, pickBy(graphOpts))) {
+          return callback({ op, forme, graphOpts })
+        }
+      }
+    }
+    throw new Error(
+      `Could not find matching graph entry for ${
+        solid.specs.type
+      } ${solid.specs.name()}`,
     )
   }
   return {
@@ -260,10 +278,12 @@ export function combineOps<F extends PolyhedronForme, O, GO extends {} = O>(
       }
     },
     apply(solid, opts) {
-      return getOp(solid, opts).apply(solid, opts)
+      return doWithRightForme(solid, opts, ({ op, forme }) =>
+        op.apply(forme, opts),
+      )
     },
     toGraphOpts(solid, opts) {
-      return getOp(solid, opts).toGraphOpts(solid, opts)
+      return doWithRightForme(solid, opts, ({ graphOpts }) => graphOpts)
     },
   }
 }

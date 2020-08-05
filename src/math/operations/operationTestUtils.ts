@@ -85,14 +85,6 @@ function expectValidAnimationData(
   }
 }
 
-function expectCorrectForme(forme: PolyhedronForme) {
-  const ref = getGeometry(forme.specs)
-  function matchesGeometry(geom: Polyhedron) {
-    return ref.isSame(geom)
-  }
-  expect(forme.geom).toSatisfy(matchesGeometry)
-}
-
 /**
  * Assert that the given operation applied to the given polyhedron returns
  * a valid polyhedron and valid intermediate forms.
@@ -108,6 +100,5 @@ export function validateOperationApplication(
   // All we need to do is verify that the intermediate data
   // matches the start and end polyhedra.
   expectValidAnimationData(op.name, opResult, original.geom)
-  expectCorrectForme(opResult.result)
   return opResult
 }

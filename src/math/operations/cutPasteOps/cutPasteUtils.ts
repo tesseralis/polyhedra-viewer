@@ -15,6 +15,8 @@ import PolyhedronForme from "math/formes/PolyhedronForme"
 import { GraphGenerator, OpInput, toDirected } from "../operationPairs"
 import removeCap from "./removeCap"
 import addCap, { CrossAxis } from "./addCap"
+import CompositeForme from "math/formes/CompositeForme"
+import CapstoneForme from "math/formes/CapstoneForme"
 
 function hasRotunda(info: CutPasteSpecs) {
   if (info.isCapstone()) {
@@ -26,6 +28,8 @@ function hasRotunda(info: CutPasteSpecs) {
 function getUsingOpts(info: CutPasteSpecs): CapType[] | null {
   if (hasRotunda(info)) {
     return ["cupola", "rotunda"]
+  } else if (info.isCapstone()) {
+    return [info.capType()]
   }
   return null
 }
@@ -138,6 +142,12 @@ function getHitCap(forme: PolyhedronForme, hitPoint: Vector3) {
   return minBy(caps, (cap) => cap.centroid().distanceToSquared(hitPoint))
 }
 
+function wrapForme(forme: PolyhedronForme) {
+  if (!Composite.hasSource(forme.specs as any)) return
+  const specs = Composite.wrap(forme.specs as any)
+  return CompositeForme.create(specs, forme.geom)
+}
+
 type CapOptionArgs = Partial<OpArgs<CapOptions, PolyhedronForme, DimGraphOpts>>
 type AugOptionArgs = Partial<
   OpArgs<AugOptions, PolyhedronForme<CutPasteSpecs>, AugGraphOpts>
@@ -159,11 +169,22 @@ export const capOptionArgs: CapOptionArgs = {
     if (face.inSet(allCapFaces)) return "selectable"
     return undefined
   },
+  wrap(forme) {
+    if (forme.isClassical()) {
+      return wrapForme(forme)
+    }
+  },
 }
 
-function canAugment(forme: PolyhedronForme, face: Face) {
+function canAugmentWrapped(prism: CapstoneForme, face: Face): boolean {
+  const wrapped = wrapForme(prism)
+  if (!wrapped) return false
+  return canAugment(wrapped, face)
+}
+
+function canAugment(forme: PolyhedronForme, face: Face): boolean {
   if (forme.isCapstone()) {
-    return forme.isEndFace(face)
+    return forme.isEndFace(face) || canAugmentWrapped(forme, face)
   } else if (forme.isComposite()) {
     return forme.canAugment(face)
   } else {
@@ -197,7 +218,12 @@ export const augOptionArgs: AugOptionArgs = {
     const usingOpts = getUsingOpts(info) ?? []
     return pickBy({
       gyrate: hasGyrateOpts(info) && "gyro",
-      using: usingOpts.length > 1 && usingOpts[0],
+      using: usingOpts[0],
     })
+  },
+  wrap(forme) {
+    if (forme.isClassical()) {
+      return wrapForme(forme)
+    }
   },
 }

@@ -1,13 +1,6 @@
 import { find } from "utils"
 import { Vector3 } from "three"
-import {
-  Classical,
-  Facet,
-  facets,
-  oppositeFacet,
-  oppositeTwist,
-  getSpecs,
-} from "specs"
+import { Classical, Facet, facets, oppositeFacet, oppositeTwist } from "specs"
 import { Polyhedron, Face } from "math/polyhedra"
 import { angleBetween } from "math/geom"
 import { getGeometry, oppositeFace } from "math/operations/operationUtils"
@@ -38,9 +31,7 @@ export default abstract class ClassicalForme extends PolyhedronForme<
   }
 
   static fromName(name: string) {
-    const specs = getSpecs(name)
-    if (!specs.isClassical()) throw new Error(`Invalid specs for name`)
-    return this.fromSpecs(specs)
+    return this.fromSpecs(Classical.query.withName(name))
   }
 
   faceType(facet: Facet): number {
