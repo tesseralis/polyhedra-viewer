@@ -60,11 +60,7 @@ export interface OpArgs<
 
   hitOption?: keyof Options
 
-  getHitOption?(
-    solid: Forme,
-    hitPnt: Vector3,
-    options: Partial<Options>,
-  ): Partial<Options>
+  getHitOption?(solid: Forme, hitPnt: Vector3): Partial<Options>
 
   defaultOptions?(info: Forme["specs"]): Partial<Options>
 
@@ -174,8 +170,8 @@ export default class Operation<Options extends {} = {}> {
     return normalizeOpResult(opResult, next)
   }
 
-  getHitOption(solid: PolyhedronForme, hitPnt: Vector3, options: Options) {
-    return this.opArgs.getHitOption(solid, hitPnt, options)
+  getHitOption(solid: PolyhedronForme, hitPnt: Vector3) {
+    return this.opArgs.getHitOption(solid, hitPnt)
   }
 
   canApplyTo(solid: PolyhedronForme) {

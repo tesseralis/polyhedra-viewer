@@ -1,5 +1,4 @@
-import { Vector3 } from "three"
-import { minBy, once, countBy, isEqual } from "lodash-es"
+import { once, countBy, isEqual } from "lodash-es"
 
 import { flatMapUniq, find } from "utils"
 import { CapType } from "specs"
@@ -58,17 +57,7 @@ function createMapper<T>(mapper: (p: Polyhedron) => T[], Base: Constructor<T>) {
 export default abstract class Cap extends Facet {
   type: CapType
   private _innerVertices: Vertex[]
-  private topPoint: Vector3
   private faceConfiguration: FaceConfiguration
-
-  static find(polyhedron: Polyhedron, hitPoint: Vector3) {
-    const hitFace = polyhedron.hitFace(hitPoint)
-    const caps = polyhedron.caps().filter((cap) => hitFace.inSet(cap.faces()))
-    if (caps.length === 0) {
-      return null
-    }
-    return minBy(caps, (cap) => cap.topPoint.distanceToSquared(hitPoint))
-  }
 
   static getAll(polyhedron: Polyhedron): Cap[] {
     const pyramids = Pyramid.getAll(polyhedron)
@@ -88,13 +77,11 @@ export default abstract class Cap extends Facet {
     polyhedron: Polyhedron,
     innerVertices: Vertex[],
     type: CapType,
-    topPoint: Vector3,
     faceConfiguration: FaceConfiguration,
   ) {
     super(polyhedron)
     this._innerVertices = innerVertices
     this.type = type
-    this.topPoint = topPoint
     this.faceConfiguration = faceConfiguration
   }
 
@@ -140,7 +127,7 @@ export default abstract class Cap extends Facet {
 
 class Pyramid extends Cap {
   constructor(polyhedron: Polyhedron, vertex: Vertex) {
-    super(polyhedron, [vertex], "pyramid", vertex.vec, {
+    super(polyhedron, [vertex], "pyramid", {
       "3": vertex.adjacentEdges().length,
     })
   }
@@ -150,7 +137,7 @@ class Pyramid extends Cap {
 class Fastigium extends Cap {
   constructor(polyhedron: Polyhedron, edge: Edge) {
     const config = { "3": 1, "4": 2 }
-    super(polyhedron, edge.vertices, "cupola", edge.midpoint(), config)
+    super(polyhedron, edge.vertices, "cupola", config)
   }
   static getAll = createMapper((p) => p.edges, Fastigium)
 }
@@ -161,7 +148,6 @@ class Cupola extends Cap {
       polyhedron,
       face.vertices,
       "cupola",
-      face.centroid(),
       countBy([3, 4, 4, face.numSides]),
     )
   }
@@ -174,7 +160,6 @@ class Rotunda extends Cap {
       polyhedron,
       flatMapUniq(face.vertices, (v) => v.adjacentVertices(), "index"),
       "rotunda",
-      face.centroid(),
       { "5": 2, "3": 2 },
     )
   }

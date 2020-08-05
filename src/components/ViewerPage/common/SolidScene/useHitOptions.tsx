@@ -2,7 +2,6 @@ import { useCallback } from "react"
 import { isEmpty, isEqual } from "lodash-es"
 import { Vector3 } from "three"
 
-import { Cap } from "math/polyhedra"
 import {
   PolyhedronCtx,
   OperationCtx,
@@ -20,7 +19,7 @@ export default function useHitOptions() {
 
   const setHitOption = (hitPnt: Vector3) => {
     if (!operation || isTransitioning) return
-    const newHitOptions = operation.getHitOption(polyhedron, hitPnt, options)
+    const newHitOptions = operation.getHitOption(polyhedron, hitPnt)
     if (isEmpty(newHitOptions)) {
       return setOption(hitOption, undefined)
     }
@@ -37,20 +36,13 @@ export default function useHitOptions() {
   const applyWithHitOption = useCallback(
     (hitPnt: Vector3) => {
       if (!operation || isTransitioning) return
-      const newHitOptions = operation.getHitOption(polyhedron, hitPnt, options)
-      const newValue = newHitOptions[hitOption]
+      const hitOptions = operation.getHitOption(polyhedron, hitPnt)
       // only apply operation if we have a hit
-      if (options && newValue) {
-        applyOperation(
-          operation,
-          { ...options, [hitOption]: newValue },
-          (result) => {
-            // If we're still on a cap, select it
-            if (hitOption === "cap" && options[hitOption]) {
-              setOption("cap", Cap.find(result, options[hitOption].topPoint))
-            }
-          },
-        )
+      if (options && hitOptions[hitOption]) {
+        applyOperation(operation, { ...options, ...hitOptions }, (result) => {
+          const newHitOptions = operation.getHitOption(result, hitPnt)
+          setOption(hitOption, newHitOptions[hitOption])
+        })
       }
     },
     [

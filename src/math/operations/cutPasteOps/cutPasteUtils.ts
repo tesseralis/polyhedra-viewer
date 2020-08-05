@@ -176,8 +176,7 @@ function canAugment(forme: PolyhedronForme, face: Face) {
 export const augOptionArgs: AugOptionArgs = {
   hitOption: "face",
   hasOptions: () => true,
-  getHitOption(forme, hitPnt, options) {
-    if (!options) return {}
+  getHitOption(forme, hitPnt) {
     const face = forme.geom.hitFace(hitPnt)
     return canAugment(forme, face) ? { face } : {}
   },
