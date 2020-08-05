@@ -105,7 +105,6 @@ export class AugmentedPrismForme extends CompositeForme {
   }
 
   modifications() {
-    // FIXME make sure triangular prism doesn't count the fastigium
     return this.caps()
   }
 

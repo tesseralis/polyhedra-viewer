@@ -28,6 +28,8 @@ function hasRotunda(info: CutPasteSpecs) {
 function getUsingOpts(info: CutPasteSpecs): CapType[] | null {
   if (hasRotunda(info)) {
     return ["cupola", "rotunda"]
+  } else if (info.isCapstone()) {
+    return [info.capType()]
   }
   return null
 }
@@ -233,7 +235,7 @@ export const augOptionArgs: AugOptionArgs = {
     const usingOpts = getUsingOpts(info) ?? []
     return pickBy({
       gyrate: hasGyrateOpts(info) && "gyro",
-      using: usingOpts.length > 1 && usingOpts[0],
+      using: usingOpts[0],
     })
   },
   wrap(forme) {
