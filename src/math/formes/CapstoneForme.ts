@@ -119,7 +119,9 @@ export default abstract class CapstoneForme extends PolyhedronForme<Capstone> {
   isFacetFace(face: Face, facet: "face" | "vertex") {
     if (facet === "face") {
       return (
-        this.isTop(face) || face.adjacentFaces().every((f) => f.numSides === 4)
+        this.isTop(face) ||
+        (!this.isContainedInEnd(face) &&
+          face.adjacentFaces().every((f) => f.numSides === 4))
       )
     } else {
       return (
@@ -131,6 +133,7 @@ export default abstract class CapstoneForme extends PolyhedronForme<Capstone> {
   getFacet(face: Face) {
     if (this.isFacetFace(face, "face")) return "face"
     if (this.isFacetFace(face, "vertex")) return "vertex"
+    return null
   }
 
   isAnyFacetFace(face: Face) {
