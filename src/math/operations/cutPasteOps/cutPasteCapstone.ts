@@ -16,7 +16,11 @@ export default makeCutPastePair<CapstoneForme>({
           left: cap.remove(capType),
           right: cap,
           options: {
-            left: { gyrate: cap.data.gyrate, using: capType },
+            left: {
+              gyrate: cap.data.gyrate,
+              using: capType,
+              faceType: cap.baseSides(),
+            },
             right: { using: capType },
           },
         }
@@ -24,7 +28,7 @@ export default makeCutPastePair<CapstoneForme>({
     }
   },
   toAugGraphOpts($, { face, ...opts }) {
-    return opts
+    return { ...opts, faceType: face.numSides }
   },
   toDimGraphOpts(forme, { cap }) {
     if (!forme.specs.isCupolaRotunda()) return {}

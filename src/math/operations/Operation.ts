@@ -51,6 +51,9 @@ export interface OpArgs<
 
   toGraphOpts(solid: Forme, opts: Options): GraphOpts
 
+  // Function to wrap a solid to create a forme of the correct type
+  wrap?(solid: PolyhedronForme): Forme | undefined
+
   hasOptions?(info: Forme["specs"]): boolean
 
   apply(solid: Forme, options: Options): PartialOpResult
@@ -138,7 +141,7 @@ function normalizeOpResult(
   const endColors = getFaceColors(end)
 
   return {
-    result: createForme(newSpecs, normedResult),
+    result: createForme(newSpecs.unwrap(), normedResult),
     animationData: {
       start,
       endVertices: endVertices.map(normalizeVertex),
@@ -166,34 +169,42 @@ export default class Operation<Options extends {} = {}> {
     const next = this.getResult(solid, options)
 
     // Get the actual operation result
-    const opResult = this.opArgs.apply(solid, options ?? {})
+    const opResult = this.opArgs.apply(this.wrap(solid), options ?? {})
     return normalizeOpResult(opResult, next)
   }
 
+  private wrap(solid: PolyhedronForme) {
+    return this.opArgs.wrap?.(solid) ?? solid
+  }
+
   getHitOption(solid: PolyhedronForme, hitPnt: Vector3) {
-    return this.opArgs.getHitOption(solid, hitPnt)
+    return this.opArgs.getHitOption(this.wrap(solid), hitPnt)
   }
 
   canApplyTo(solid: PolyhedronForme) {
-    return this.graph.some((entry) => entry.start.equals(solid.specs))
-  }
-
-  getEntry(solid: PolyhedronForme, options: Options) {
-    // FIXME optimize this and make error checking better
-    // e.g. make it easier to type.
-    return find(
-      this.graph,
-      (entry) =>
-        entry.start.equals(solid.specs) &&
-        isMatch(
-          entry.options ?? {},
-          pickBy(this.opArgs.toGraphOpts(solid, options)),
-        ),
+    return this.graph.some((entry) =>
+      entry.start.equals(this.wrap(solid).specs),
     )
   }
 
+  getEntry(solid: PolyhedronForme, opts: Options) {
+    // FIXME optimize this and make error checking better
+    // e.g. make it easier to type.
+    return find(this.graph, ({ start, options }) => {
+      return (
+        start.unwrap().equals(solid.specs) &&
+        isMatch(
+          options ?? {},
+          pickBy(this.opArgs.toGraphOpts(this.wrap(solid), opts)),
+        )
+      )
+    })
+  }
+
   getEntries(solid: PolyhedronForme) {
-    return this.graph.filter((entry) => entry.start.equals(solid.specs))
+    return this.graph.filter((entry) =>
+      entry.start.unwrap().equals(solid.specs),
+    )
   }
 
   getResult(solid: PolyhedronForme, options: Options) {
@@ -202,7 +213,7 @@ export default class Operation<Options extends {} = {}> {
 
   hasOptions(solid: PolyhedronForme) {
     if (this.opArgs.hasOptions) {
-      return this.opArgs.hasOptions(solid.specs)
+      return this.opArgs.hasOptions(this.wrap(solid).specs)
     }
     return this.getEntries(solid).length > 1
   }
@@ -212,7 +223,7 @@ export default class Operation<Options extends {} = {}> {
       throw new Error(
         `Operation ${this.name} does not support getting individual options`,
       )
-    return compact([...this.opArgs.allOptions(solid)[optionName]])
+    return compact([...this.opArgs.allOptions(this.wrap(solid))[optionName]])
   }
 
   /**
@@ -226,16 +237,16 @@ export default class Operation<Options extends {} = {}> {
         yield entry.options
       }
     } else {
-      return cartesian(this.opArgs.allOptions(solid))
+      return cartesian(this.opArgs.allOptions(this.wrap(solid)))
     }
   }
 
   defaultOptions(solid: PolyhedronForme) {
-    return this.opArgs.defaultOptions(solid.specs)
+    return this.opArgs.defaultOptions(this.wrap(solid).specs)
   }
 
   selectionState(face: Face, solid: PolyhedronForme, options: Options) {
-    return this.opArgs.selectionState?.(face, solid, options)
+    return this.opArgs.selectionState?.(face, this.wrap(solid), options)
   }
 }
 

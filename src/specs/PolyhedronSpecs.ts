@@ -93,4 +93,8 @@ export default abstract class PolyhedronSpecs<Data extends {} = {}> {
   isElementary(): this is Elementary {
     return this.type === "elementary"
   }
+
+  unwrap(): PolyhedronSpecs {
+    return this
+  }
 }

@@ -104,7 +104,7 @@ describe("Viewer operations panel", () => {
   })
 
   it("unsets the operation and options when choosing a different operation without options", () => {
-    renderViewer("tetrahedron")
+    renderViewer("triangular pyramid")
     clickOperation("augment")
     clickOperation("elongate")
     expect(screen.queryByText("Select a face")).not.toBeInTheDocument()

@@ -94,6 +94,10 @@ export default class Composite extends Specs<CompositeData> {
   isPara = () => this.data.align === "para"
   isMeta = () => this.data.align === "meta"
 
+  unwrap() {
+    return this.totalCount() === 0 ? this.data.source : this
+  }
+
   hasAlignment() {
     return Composite.hasAlignment(this.data)
   }

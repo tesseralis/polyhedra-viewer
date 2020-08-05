@@ -248,7 +248,7 @@ export function combineOps<F extends PolyhedronForme, O, GO extends {} = O>(
     return find(opArgs, (op) =>
       [...op.graph()].some(
         (entry) =>
-          entry.start.equals(solid.specs) &&
+          entry.start.unwrap().equals(solid.specs) &&
           isMatch(entry.options ?? {}, pickBy(op.toGraphOpts(solid, options))),
       ),
     )

@@ -15,6 +15,8 @@ import PolyhedronForme from "math/formes/PolyhedronForme"
 import { GraphGenerator, OpInput, toDirected } from "../operationPairs"
 import removeCap from "./removeCap"
 import addCap, { CrossAxis } from "./addCap"
+import CompositeForme from "math/formes/CompositeForme"
+import CapstoneForme from "math/formes/CapstoneForme"
 
 function hasRotunda(info: CutPasteSpecs) {
   if (info.isCapstone()) {
@@ -159,11 +161,45 @@ export const capOptionArgs: CapOptionArgs = {
     if (face.inSet(allCapFaces)) return "selectable"
     return undefined
   },
+  wrap(forme) {
+    if (forme.isClassical()) {
+      const specs = Composite.query.where(
+        (s) =>
+          s.data.source.equals(forme.specs) &&
+          s.data.augmented === 0 &&
+          s.data.diminished === 0 &&
+          s.data.gyrate === 0,
+      )[0]
+      if (!specs) return undefined
+      return CompositeForme.create(specs, forme.geom)
+    }
+  },
 }
 
-function canAugment(forme: PolyhedronForme, face: Face) {
+function wrapPrism(prism: CapstoneForme) {
+  if (!prism.specs.isPrismatic()) {
+    return
+  }
+  const specs = Composite.query.where(
+    (s) =>
+      s.data.source.equals(prism.specs) &&
+      s.data.augmented === 0 &&
+      s.data.diminished === 0 &&
+      s.data.gyrate === 0,
+  )[0]
+  if (!specs) return
+  return CompositeForme.create(specs, prism.geom)
+}
+
+function canWrapAugmented(prism: CapstoneForme, face: Face): boolean {
+  const wrapped = wrapPrism(prism)
+  if (!wrapped) return false
+  return canAugment(wrapped, face)
+}
+
+function canAugment(forme: PolyhedronForme, face: Face): boolean {
   if (forme.isCapstone()) {
-    return forme.isEndFace(face)
+    return forme.isEndFace(face) || canWrapAugmented(forme, face)
   } else if (forme.isComposite()) {
     return forme.canAugment(face)
   } else {
@@ -199,5 +235,18 @@ export const augOptionArgs: AugOptionArgs = {
       gyrate: hasGyrateOpts(info) && "gyro",
       using: usingOpts.length > 1 && usingOpts[0],
     })
+  },
+  wrap(forme) {
+    if (forme.isClassical()) {
+      const specs = Composite.query.where(
+        (s) =>
+          s.data.source.equals(forme.specs) &&
+          s.data.augmented === 0 &&
+          s.data.diminished === 0 &&
+          s.data.gyrate === 0,
+      )[0]
+      if (!specs) return undefined
+      return CompositeForme.create(specs, forme.geom)
+    }
   },
 }
