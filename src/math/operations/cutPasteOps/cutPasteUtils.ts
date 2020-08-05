@@ -10,10 +10,8 @@ import {
   Gyration,
   gyrations,
 } from "specs"
-import CompositeForme from "math/formes/CompositeForme"
 import { OpArgs } from "../Operation"
 import PolyhedronForme from "math/formes/PolyhedronForme"
-import CapstoneForme from "math/formes/CapstoneForme"
 import { GraphGenerator, OpInput, toDirected } from "../operationPairs"
 import removeCap from "./removeCap"
 import addCap, { CrossAxis } from "./addCap"
@@ -116,9 +114,9 @@ export function makeCutPastePair<F extends PolyhedronForme>(
 }
 
 function getModifiableCaps(forme: PolyhedronForme) {
-  if (forme instanceof CapstoneForme) {
+  if (forme.isCapstone()) {
     return forme.endCaps()
-  } else if (forme instanceof CompositeForme) {
+  } else if (forme.isComposite()) {
     return forme.caps()
   } else {
     return forme.geom.caps()
@@ -164,9 +162,9 @@ export const capOptionArgs: CapOptionArgs = {
 }
 
 function canAugment(forme: PolyhedronForme, face: Face) {
-  if (forme instanceof CapstoneForme) {
+  if (forme.isCapstone()) {
     return forme.isEndFace(face)
-  } else if (forme instanceof CompositeForme) {
+  } else if (forme.isComposite()) {
     return forme.canAugment(face)
   } else {
     // Elementary solid

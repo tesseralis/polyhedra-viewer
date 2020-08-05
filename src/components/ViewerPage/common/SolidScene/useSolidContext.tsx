@@ -131,11 +131,11 @@ function getCompositeColor(forme: CompositeForme, face: Face) {
 }
 
 function getFormeColor(polyhedron: PolyhedronForme, face: Face) {
-  if (polyhedron instanceof ClassicalForme) {
+  if (polyhedron.isClassical()) {
     return getClassicalColor(polyhedron, face)
-  } else if (polyhedron instanceof CapstoneForme) {
+  } else if (polyhedron.isCapstone()) {
     return getCapstoneColor(polyhedron, face)
-  } else if (polyhedron instanceof CompositeForme) {
+  } else if (polyhedron.isComposite()) {
     return getCompositeColor(polyhedron, face)
   }
 }
