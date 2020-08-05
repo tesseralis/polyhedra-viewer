@@ -42,15 +42,12 @@ function getBoundary(faces: Face[]) {
 }
 
 interface Constructor<T> {
-  new (polyhedron: Polyhedron, arg: T): Cap
+  new (arg: T): Cap
 }
 function createMapper<T>(mapper: (p: Polyhedron) => T[], Base: Constructor<T>) {
   return (polyhedron: Polyhedron) => {
-    // const mapper = polyhedron[property]
     const values: T[] = mapper(polyhedron)
-    return values
-      .map((arg) => new Base(polyhedron, arg))
-      .filter((cap) => cap.isValid())
+    return values.map((arg) => new Base(arg)).filter((cap) => cap.isValid())
   }
 }
 
@@ -74,12 +71,11 @@ export default abstract class Cap extends Facet {
   }
 
   constructor(
-    polyhedron: Polyhedron,
     innerVertices: Vertex[],
     type: CapType,
     faceConfiguration: FaceConfiguration,
   ) {
-    super(polyhedron)
+    super(innerVertices[0].polyhedron)
     this._innerVertices = innerVertices
     this.type = type
     this.faceConfiguration = faceConfiguration
@@ -126,8 +122,8 @@ export default abstract class Cap extends Facet {
 }
 
 class Pyramid extends Cap {
-  constructor(polyhedron: Polyhedron, vertex: Vertex) {
-    super(polyhedron, [vertex], "pyramid", {
+  constructor(vertex: Vertex) {
+    super([vertex], "pyramid", {
       "3": vertex.adjacentEdges().length,
     })
   }
@@ -135,29 +131,23 @@ class Pyramid extends Cap {
 }
 
 class Fastigium extends Cap {
-  constructor(polyhedron: Polyhedron, edge: Edge) {
+  constructor(edge: Edge) {
     const config = { "3": 1, "4": 2 }
-    super(polyhedron, edge.vertices, "cupola", config)
+    super(edge.vertices, "cupola", config)
   }
   static getAll = createMapper((p) => p.edges, Fastigium)
 }
 
 class Cupola extends Cap {
-  constructor(polyhedron: Polyhedron, face: Face) {
-    super(
-      polyhedron,
-      face.vertices,
-      "cupola",
-      countBy([3, 4, 4, face.numSides]),
-    )
+  constructor(face: Face) {
+    super(face.vertices, "cupola", countBy([3, 4, 4, face.numSides]))
   }
   static getAll = createMapper((p) => p.faces, Cupola)
 }
 
 class Rotunda extends Cap {
-  constructor(polyhedron: Polyhedron, face: Face) {
+  constructor(face: Face) {
     super(
-      polyhedron,
       flatMapUniq(face.vertices, (v) => v.adjacentVertices(), "index"),
       "rotunda",
       { "5": 2, "3": 2 },
