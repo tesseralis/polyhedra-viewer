@@ -138,17 +138,17 @@ class SnubCapstoneForme extends CapstoneForme {
   }
 }
 
-// FIXME deal with fastigium
 class MonoCapstoneForme extends CapstoneForme {
   ends() {
-    const end = this.specs.isPrimary()
-      ? this.specs.data.base
-      : this.specs.data.base * 2
-    const face = this.geom.faceWithNumSides(end)
-    const cap = find(this.geom.caps(), (cap) =>
-      isInverse(cap.normal(), face.normal()),
-    )
-    return [cap, face] as const
+    for (const cap of this.geom.caps()) {
+      const face = this.geom.faces.find((f) =>
+        isInverse(cap.normal(), f.normal()),
+      )
+      if (!face) continue
+      return [cap, face] as const
+    }
+
+    throw new Error(`Could not find opposite caps`)
   }
 }
 
