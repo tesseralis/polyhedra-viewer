@@ -214,6 +214,38 @@ function getApothem(s: number, n: number) {
   return s / 2 / Math.tan(Math.PI / n)
 }
 
+function contractToPrism(forme: CapstoneForme) {
+  const faces = forme.geom.faces.filter((f) => forme.isFacetFace(f, "face"))
+  return getTransformedVertices(faces, (face) => {
+    if (forme.isTop(face)) {
+      return face.translateNormal(
+        forme.prismaticHeight() / 2 - face.distanceToCenter(),
+      )
+    } else {
+      const apothem = getApothem(face.sideLength(), forme.specs.data.base)
+      return face.translateNormal(apothem - face.distanceToCenter())
+    }
+  })
+}
+
+function contractToBipyramid(forme: CapstoneForme) {
+  const faces = forme.geom.faces.filter((f) => forme.isFacetFace(f, "vertex"))
+  return getTransformedVertices(faces, (face) => {
+    const sideFace = face
+      .adjacentFaces()
+      .find((f) => !forme.isContainedInEnd(f))!
+    const apothem = getApothem(face.sideLength(), forme.specs.data.base)
+    const horiz = sideFace.translateNormal(
+      apothem - sideFace.distanceToCenter(),
+    )
+    const topFace = face.vertices
+      .flatMap((v) => v.adjacentFaces())
+      .find((f) => forme.isTop(f))!
+    const vert = topFace.translateNormal(-forme.prismaticHeight() / 2)
+    return horiz.multiply(vert)
+  })
+}
+
 const expandPrism = makeOpPair<CapstoneForme, {}, FacetOpts>({
   graph: function* () {
     for (const specs of Capstone.query.where(
@@ -253,34 +285,9 @@ const expandPrism = makeOpPair<CapstoneForme, {}, FacetOpts>({
     }
   },
   toLeft(forme, { right: { facet } }) {
-    const faces = forme.geom.faces.filter((f) => forme.isFacetFace(f, facet))
-    if (facet === "face") {
-      return getTransformedVertices(faces, (face) => {
-        if (forme.isTop(face)) {
-          return face.translateNormal(
-            forme.prismaticHeight() / 2 - face.distanceToCenter(),
-          )
-        } else {
-          const apothem = getApothem(face.sideLength(), forme.specs.data.base)
-          return face.translateNormal(apothem - face.distanceToCenter())
-        }
-      })
-    } else {
-      return getTransformedVertices(faces, (face) => {
-        const sideFace = face
-          .adjacentFaces()
-          .find((f) => !forme.isContainedInEnd(f))!
-        const apothem = getApothem(face.sideLength(), forme.specs.data.base)
-        const horiz = sideFace.translateNormal(
-          apothem - sideFace.distanceToCenter(),
-        )
-        const topFace = face.vertices
-          .flatMap((v) => v.adjacentFaces())
-          .find((f) => forme.isTop(f))!
-        const vert = topFace.translateNormal(-forme.prismaticHeight() / 2)
-        return horiz.multiply(vert)
-      })
-    }
+    return facet === "face"
+      ? contractToPrism(forme)
+      : contractToBipyramid(forme)
   },
 })
 
@@ -315,36 +322,8 @@ const dualPrism = makeOpPair<CapstoneForme>({
       orientation: [forme.ends()[0].normal(), cross],
     }
   },
-  toLeft(forme) {
-    const faces = forme.geom.faces.filter((f) => forme.isFacetFace(f, "face"))
-    return getTransformedVertices(faces, (face) => {
-      if (forme.isTop(face)) {
-        return face.translateNormal(
-          forme.prismaticHeight() / 2 - face.distanceToCenter(),
-        )
-      } else {
-        const apothem = getApothem(face.sideLength(), forme.specs.data.base)
-        return face.translateNormal(apothem - face.distanceToCenter())
-      }
-    })
-  },
-  toRight(forme) {
-    const faces = forme.geom.faces.filter((f) => forme.isFacetFace(f, "vertex"))
-    return getTransformedVertices(faces, (face) => {
-      const sideFace = face
-        .adjacentFaces()
-        .find((f) => !forme.isContainedInEnd(f))!
-      const apothem = getApothem(face.sideLength(), forme.specs.data.base)
-      const horiz = sideFace.translateNormal(
-        apothem - sideFace.distanceToCenter(),
-      )
-      const topFace = face.vertices
-        .flatMap((v) => v.adjacentFaces())
-        .find((f) => forme.isTop(f))!
-      const vert = topFace.translateNormal(-forme.prismaticHeight() / 2)
-      return horiz.multiply(vert)
-    })
-  },
+  toLeft: (forme) => contractToPrism(forme),
+  toRight: (forme) => contractToBipyramid(forme),
 })
 
 // Exported members
