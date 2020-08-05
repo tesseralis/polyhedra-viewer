@@ -73,7 +73,7 @@ function getCapstoneColor(forme: CapstoneForme, face: Face) {
   if (forme.isTop(face)) {
     const faceSides = face.numSides > 5 ? "secondary" : "primary"
     return scheme[faceSides].face
-  } else if (forme.isEndFace(face)) {
+  } else if (forme.isContainedInEnd(face)) {
     if (face.numSides === 3) {
       return scheme.primary.vertex
     } else if (face.numSides === 4) {

@@ -38,8 +38,16 @@ export default abstract class CapstoneForme extends PolyhedronForme<Capstone> {
     return this.ends().filter((end) => end instanceof Cap) as Cap[]
   }
 
+  isEndCap(cap: Cap) {
+    return this.endCaps().some((c) => vecEquals(c.normal(), cap.normal()))
+  }
+
   endFaces() {
     return this.ends().filter((end) => end instanceof Face) as Face[]
+  }
+
+  isEndFace(face: Face) {
+    return face.inSet(this.endFaces())
   }
 
   /**
@@ -77,7 +85,7 @@ export default abstract class CapstoneForme extends PolyhedronForme<Capstone> {
   /**
    * Return whether the given face is in one of the ends of the cap.
    */
-  isEndFace(face: Face) {
+  isContainedInEnd(face: Face) {
     return !!this.containingEnd(face)
   }
 

@@ -1,4 +1,5 @@
-import { pickBy } from "lodash-es"
+import { minBy, pickBy } from "lodash-es"
+import { Vector3 } from "three"
 import { Face, Cap } from "math/polyhedra"
 import {
   Capstone,
@@ -16,17 +17,6 @@ import CapstoneForme from "math/formes/CapstoneForme"
 import { GraphGenerator, OpInput, toDirected } from "../operationPairs"
 import removeCap from "./removeCap"
 import addCap, { CrossAxis } from "./addCap"
-
-function canAugment(forme: PolyhedronForme, face: Face) {
-  if (forme instanceof CapstoneForme) {
-    return forme.endFaces().some((base) => base.equals(face))
-  } else if (forme instanceof CompositeForme) {
-    return forme.canAugment(face)
-  } else {
-    // Elementary solid
-    return face.numSides === 4
-  }
-}
 
 function hasRotunda(info: CutPasteSpecs) {
   if (info.isCapstone()) {
@@ -134,6 +124,19 @@ function getCaps(forme: PolyhedronForme) {
   }
 }
 
+function getCapFaces(forme: PolyhedronForme) {
+  return getCaps(forme).flatMap((cap) => cap.faces())
+}
+
+function getHitCap(forme: PolyhedronForme, hitPoint: Vector3) {
+  const hitFace = forme.geom.hitFace(hitPoint)
+  const caps = getCaps(forme).filter((cap) => hitFace.inSet(cap.faces()))
+  if (caps.length === 0) {
+    return null
+  }
+  return minBy(caps, (cap) => cap.centroid().distanceToSquared(hitPoint))
+}
+
 type CapOptionArgs = Partial<OpArgs<CapOptions, PolyhedronForme, DimGraphOpts>>
 type AugOptionArgs = Partial<
   OpArgs<AugOptions, PolyhedronForme<CutPasteSpecs>, AugGraphOpts>
@@ -151,18 +154,28 @@ export const capOptionArgs: CapOptionArgs = {
   },
 
   hitOption: "cap",
-  getHitOption({ geom }, hitPnt) {
-    // FIXME only allow the right caps
-    const cap = Cap.find(geom, hitPnt)
+  getHitOption(forme, hitPnt) {
+    const cap = getHitCap(forme, hitPnt)
     return cap ? { cap } : {}
   },
 
   selectionState(face, forme, { cap }) {
-    const allCapFaces = getCaps(forme).flatMap((cap) => cap.faces())
-    if (cap instanceof Cap && face.inSet(cap.faces())) return "selected"
+    const allCapFaces = getCapFaces(forme)
+    if (!!cap && face.inSet(cap.faces())) return "selected"
     if (face.inSet(allCapFaces)) return "selectable"
     return undefined
   },
+}
+
+function canAugment(forme: PolyhedronForme, face: Face) {
+  if (forme instanceof CapstoneForme) {
+    return forme.isEndFace(face)
+  } else if (forme instanceof CompositeForme) {
+    return forme.canAugment(face)
+  } else {
+    // Elementary solid
+    return face.numSides === 4
+  }
 }
 
 // TODO putting this here is a little awkward
