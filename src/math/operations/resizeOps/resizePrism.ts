@@ -1,6 +1,6 @@
 import { Capstone } from "specs"
 import { makeOpPair } from "../operationPairs"
-import { getTransformedVertices, FacetOpts } from "../operationUtils"
+import { Pose, getTransformedVertices, FacetOpts } from "../operationUtils"
 import CapstoneForme from "math/formes/CapstoneForme"
 
 function getCapstoneCrossAxis(forme: CapstoneForme) {
@@ -15,6 +15,16 @@ function getCapstoneCrossAxis(forme: CapstoneForme) {
   }
   // For bipyramids, it's vertex-centered
   return topBoundary.vertices[0]
+}
+
+function getPose(forme: CapstoneForme): Pose {
+  const crossAxis = getCapstoneCrossAxis(forme)
+  const cross = crossAxis.centroid().clone().sub(forme.ends()[0].centroid())
+  return {
+    origin: forme.centroid(),
+    scale: forme.geom.edgeLength(),
+    orientation: [forme.ends()[0].normal(), cross],
+  }
 }
 
 function getApothem(s: number, n: number) {
@@ -83,15 +93,7 @@ export const expand = makeOpPair<CapstoneForme, {}, FacetOpts>({
     }
   },
   middle: "right",
-  getPose(pos, forme) {
-    const crossAxis = getCapstoneCrossAxis(forme)
-    const cross = crossAxis.centroid().clone().sub(forme.ends()[0].centroid())
-    return {
-      origin: forme.centroid(),
-      scale: forme.geom.edgeLength(),
-      orientation: [forme.ends()[0].normal(), cross],
-    }
-  },
+  getPose: (pos, forme) => getPose(forme),
   toLeft(forme, { right: { facet } }) {
     return facet === "face"
       ? contractToPrism(forme)
@@ -114,15 +116,7 @@ export const dual = makeOpPair<CapstoneForme>({
       type: "secondary",
       gyrate: "ortho",
     }),
-  getPose(pos, forme) {
-    const crossAxis = getCapstoneCrossAxis(forme)
-    const cross = crossAxis.centroid().clone().sub(forme.ends()[0].centroid())
-    return {
-      origin: forme.centroid(),
-      scale: forme.geom.edgeLength(),
-      orientation: [forme.ends()[0].normal(), cross],
-    }
-  },
-  toLeft: (forme) => contractToPrism(forme),
-  toRight: (forme) => contractToBipyramid(forme),
+  getPose: (pos, forme) => getPose(forme),
+  toLeft: contractToPrism,
+  toRight: contractToBipyramid,
 })
