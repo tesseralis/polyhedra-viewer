@@ -67,7 +67,11 @@ export interface OpArgs<
 
   defaultOptions?(info: Forme["specs"]): Partial<Options>
 
-  selectionState?(face: Face, solid: Forme, options: Options): SelectState
+  selectionState?(
+    face: Face,
+    solid: Forme,
+    options: Partial<Options>,
+  ): SelectState
 }
 
 type OperationArg = keyof OpArgs<any, any>

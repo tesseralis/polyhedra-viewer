@@ -36,7 +36,8 @@ const hitOptArgs: Partial<OpArgs<FacetOpts, ClassicalForme>> = {
   },
 
   selectionState(face, forme, { facet }) {
-    if (forme.isFacetFace(face, oppositeFacet(facet))) return "selected"
+    if (facet && forme.isFacetFace(face, oppositeFacet(facet)))
+      return "selected"
     return "selectable"
   },
 }
