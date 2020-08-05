@@ -1,6 +1,5 @@
 import { Color } from "three"
 import { useMemo, useCallback } from "react"
-import tinycolor from "tinycolor2"
 import Config from "components/ConfigCtx"
 import { PolyhedronCtx, OperationCtx, TransitionCtx } from "../../context"
 import { Polyhedron, Face } from "math/polyhedra"
@@ -20,16 +19,30 @@ function lighten(color: Color, amount: number) {
     .offsetHSL(0, 0, amount / 100)
 }
 
+function darken(color: Color, amount: number) {
+  return toColor(color)
+    .clone()
+    .offsetHSL(0, 0, -amount / 100)
+}
+
 function createFamilyColor(face: string, vertex: string) {
+  const faceColor = new Color(face)
+  const vertexColor = new Color(vertex)
   return {
-    primary: { face, vertex },
+    primary: { face: faceColor, vertex: vertexColor },
     secondary: {
-      face: tinycolor(face).darken(25),
-      vertex: tinycolor(vertex).darken(25),
+      face: faceColor.clone().offsetHSL(0, 0, -1 / 4),
+      vertex: vertexColor.clone().offsetHSL(0, 0, -1 / 4),
     },
     edge: {
-      ortho: tinycolor.mix(face, vertex, 33).desaturate(25).lighten(),
-      gyro: tinycolor.mix(face, vertex, 67).desaturate(25).lighten(),
+      ortho: faceColor
+        .clone()
+        .lerp(vertexColor, 1 / 3)
+        .offsetHSL(0, -1 / 4, 1 / 10),
+      gyro: faceColor
+        .clone()
+        .lerp(vertexColor, 2 / 3)
+        .offsetHSL(0, -1 / 4, 1 / 10),
     },
   }
 }
@@ -72,7 +85,7 @@ function getCapstoneColor(forme: CapstoneForme, face: Face) {
     }
   } else {
     const side = forme.specs.isElongated() ? "ortho" : ("gyro" as const)
-    return tinycolor(scheme.edge[side]).desaturate(2).lighten(1)
+    return scheme.edge[side].clone().offsetHSL(0, -1 / 50, 1 / 100)
   }
 }
 
@@ -86,7 +99,7 @@ function getCompositeColor(forme: CompositeForme, face: Face) {
       return scheme.edge.ortho
     } else {
       // augmented face
-      return tinycolor(scheme.primary.vertex).lighten(25)
+      return scheme.primary.vertex.clone().offsetHSL(0, 0, 1 / 4)
     }
   } else if (forme.isAugmentedClassical()) {
     const scheme = colorScheme[forme.specs.sourceClassical().data.family]
@@ -98,18 +111,19 @@ function getCompositeColor(forme: CompositeForme, face: Face) {
     } else if (forme.isMinorFace(face)) {
       return scheme.primary.vertex
     } else if (forme.isCapTop(face)) {
-      return tinycolor(scheme.primary.face).lighten(25)
+      return lighten(scheme.primary.face, 25)
     } else {
-      return tinycolor(
+      return lighten(
         face.numSides === 3 ? scheme.primary.vertex : scheme.edge.ortho,
-      ).lighten(25)
+        25,
+      )
     }
   } else if (forme.isDiminishedSolid()) {
     const scheme = colorScheme[5]
     if (forme.isAugmentedFace(face)) {
-      return tinycolor(scheme.primary.vertex).lighten(25)
+      return lighten(scheme.primary.vertex, 25)
     } else if (forme.isDiminishedFace(face)) {
-      return tinycolor(scheme.primary.face).darken(25)
+      return darken(scheme.primary.face, 25)
     } else {
       return scheme.primary.vertex
     }
