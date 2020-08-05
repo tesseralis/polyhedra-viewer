@@ -3,7 +3,6 @@ import { Capstone, getSpecs } from "specs"
 import { Polyhedron, Face, Edge, Cap, FaceLike, Facet } from "math/polyhedra"
 import { vecEquals, isInverse, getCentroid } from "math/geom"
 import { getGeometry } from "math/operations/operationUtils"
-import { find } from "utils"
 
 type CapstoneEnd = Facet
 
@@ -32,7 +31,24 @@ export default abstract class CapstoneForme extends PolyhedronForme<Capstone> {
     return this.fromSpecs(specs)
   }
 
-  abstract ends(): readonly [CapstoneEnd, CapstoneEnd]
+  abstract queryTops(): Generator<CapstoneEnd>
+  *queryBottoms(): Generator<CapstoneEnd> {
+    yield* this.queryTops()
+  }
+
+  // abstract ends(): readonly [CapstoneEnd, CapstoneEnd]
+  ends() {
+    for (const top of this.queryTops()) {
+      for (const bottom of this.queryBottoms()) {
+        if (isInverse(top.normal(), bottom.normal())) {
+          return [top, bottom]
+        }
+      }
+    }
+    throw new Error(
+      `Error finding two opposite ends for capstone ${this.specs.name()}`,
+    )
+  }
 
   endCaps() {
     return this.ends().filter((end) => end instanceof Cap) as Cap[]
@@ -104,66 +120,48 @@ export default abstract class CapstoneForme extends PolyhedronForme<Capstone> {
 }
 
 class PrismaticForme extends CapstoneForme {
-  ends() {
+  *queryTops() {
     if (this.specs.isDigonal()) {
-      const edge1 = this.geom.getEdge()
-      const edge2 = find(this.geom.edges, (e) =>
-        isInverse(e.normal(), edge1.normal()),
-      )
-      return [edge1, edge2] as const
+      yield* this.geom.edges
+    } else {
+      yield* this.geom.facesWithNumSides(this.specs.baseSides())
     }
-    const face1 = this.geom.faceWithNumSides(this.specs.baseSides())
-    const face2 = find(this.geom.faces, (f) =>
-      isInverse(face1.normal(), f.normal()),
-    )
-    return [face1, face2] as const
   }
 }
 
 class SnubCapstoneForme extends CapstoneForme {
-  ends() {
+  *queryTops() {
     if (this.specs.isDigonal()) {
-      const ends = this.geom.edges.filter((e) =>
+      yield* this.geom.edges.filter((e) =>
         e.vertices.every((v) => v.adjacentFaces().length === 4),
       )
-      if (ends.length !== 2) throw new Error(`Invalid number of capstone ends`)
-      return [ends[0], ends[1]] as const
+    } else {
+      yield* this.geom.facesWithNumSides(this.specs.baseSides())
     }
-    // TODO dedupe with prismatic?
-    const face1 = this.geom.faceWithNumSides(this.specs.baseSides())
-    const face2 = find(this.geom.faces, (f) =>
-      isInverse(face1.normal(), f.normal()),
-    )
-    return [face1, face2] as const
   }
 }
 
 class MonoCapstoneForme extends CapstoneForme {
-  ends() {
-    for (const cap of this.geom.caps()) {
-      const face = this.geom.faces.find((f) =>
-        isInverse(cap.normal(), f.normal()),
-      )
-      if (!face) continue
-      return [cap, face] as const
-    }
+  *queryTops() {
+    yield* this.geom.caps()
+  }
 
-    throw new Error(`Could not find opposite caps`)
+  *queryBottoms() {
+    yield* this.geom.facesWithNumSides(this.specs.baseSides())
   }
 }
 
 class BiCapstoneForme extends CapstoneForme {
-  ends() {
+  *queryTops() {
     const caps = this.geom.caps()
-    for (const cap of this.geom.caps()) {
-      const cap2 = caps.find((cap2) => isInverse(cap.normal(), cap2.normal()))
-      if (!cap2) continue
-      // Favor the cupola over the rotunda as the "top" face
-      if (this.specs.isCupolaRotunda() && cap2.type === "rotunda") {
-        return [cap2, cap] as const
-      }
-      return [cap, cap2] as const
+    if (this.specs.isCupolaRotunda()) {
+      yield* caps.filter((cap) => cap.type === "rotunda")
+    } else {
+      yield* caps
     }
-    throw new Error(`Could not find opposite caps`)
+  }
+
+  *queryBottoms() {
+    yield* this.geom.caps()
   }
 }

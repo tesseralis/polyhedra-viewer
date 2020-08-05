@@ -140,6 +140,10 @@ export default class Polyhedron {
     return minBy(this.faces, "numSides")!
   }
 
+  facesWithNumSides(n: number) {
+    return this.faces.filter((f) => f.numSides === n)
+  }
+
   faceWithNumSides(n: number) {
     return find(this.faces, (f) => f.numSides === n)
   }

@@ -127,8 +127,8 @@ export class AugmentedPrismForme extends CompositeForme {
       return [face1, face2] as const
     }
 
-    return this.geom.faces.filter(
-      (f) => f.numSides === this.specs.sourcePrism().baseSides(),
+    return this.geom.facesWithNumSides(
+      this.specs.sourcePrism().baseSides(),
     ) as [Face, Face]
   })
 

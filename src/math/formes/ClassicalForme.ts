@@ -190,9 +190,7 @@ class TruncatedForme extends ClassicalForme {
   }
 
   tetrahedralFacetFaces(facet: Facet) {
-    return this.geom.faces.filter(
-      (f) => f.numSides === (this.specs.facet() === facet ? 6 : 3),
-    )
+    return this.geom.facesWithNumSides(this.specs.facet() === facet ? 6 : 3)
   }
 
   adjacentFacetFace(face: Face, facet: Facet) {
