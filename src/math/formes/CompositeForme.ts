@@ -2,7 +2,7 @@ import { once } from "lodash-es"
 import { find, getSingle } from "utils"
 import PolyhedronForme from "./PolyhedronForme"
 import { getGeometry } from "math/operations/operationUtils"
-import { Composite, getSpecs } from "specs"
+import { Composite } from "specs"
 import { Polyhedron, Face, Cap } from "math/polyhedra"
 import { getCentroid, isInverse } from "math/geom"
 
@@ -30,8 +30,7 @@ export default abstract class CompositeForme extends PolyhedronForme<
   }
 
   static fromName(name: string) {
-    const specs = getSpecs(name)
-    if (!specs.isComposite()) throw new Error(`Invalid specs for name`)
+    const specs = Composite.query.withName(name)
     return this.fromSpecs(specs)
   }
 
@@ -166,7 +165,7 @@ export class AugmentedClassicalForme extends CompositeForme {
     const specs = this.specs.sourceClassical()
     // If it's an augmented tetrahedron, only consider the first cap
     if (specs.isTetrahedral() && specs.isRegular()) {
-      return [caps[0]]
+      return this.specs.isAugmented() ? [caps[0]] : []
     }
     return caps
   }

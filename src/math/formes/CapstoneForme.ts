@@ -1,5 +1,5 @@
 import PolyhedronForme from "./PolyhedronForme"
-import { Capstone, getSpecs } from "specs"
+import { Capstone } from "specs"
 import { Polyhedron, Face, Edge, Cap, FaceLike, Facet } from "math/polyhedra"
 import { vecEquals, isInverse, getCentroid } from "math/geom"
 import { getGeometry } from "math/operations/operationUtils"
@@ -26,9 +26,7 @@ export default abstract class CapstoneForme extends PolyhedronForme<Capstone> {
   }
 
   static fromName(name: string) {
-    const specs = getSpecs(name)
-    if (!specs.isCapstone()) throw new Error(`Invalid specs for name`)
-    return this.fromSpecs(specs)
+    return this.fromSpecs(Capstone.query.withName(name))
   }
 
   abstract queryTops(): Generator<CapstoneEnd>
