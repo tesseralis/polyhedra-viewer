@@ -18,12 +18,12 @@ function getCapstoneCrossAxis(forme: CapstoneForme) {
 }
 
 function getPose(forme: CapstoneForme): Pose {
+  const top = forme.ends()[0]
   const crossAxis = getCapstoneCrossAxis(forme)
-  const cross = crossAxis.centroid().clone().sub(forme.ends()[0].centroid())
   return {
     origin: forme.centroid(),
     scale: forme.geom.edgeLength(),
-    orientation: [forme.ends()[0].normal(), cross],
+    orientation: [top.normal(), top.to(crossAxis)],
   }
 }
 

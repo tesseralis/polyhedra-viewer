@@ -41,4 +41,10 @@ export default abstract class Facet {
   withCentroidOrigin(mat: Matrix4) {
     return withOrigin(this.centroid(), mat)
   }
+
+  /** Get the difference vector from this facet's centroid to the given input */
+  to(v: Facet | Vector3) {
+    const _v = v instanceof Facet ? v.centroid() : v
+    return _v.clone().sub(this.centroid())
+  }
 }

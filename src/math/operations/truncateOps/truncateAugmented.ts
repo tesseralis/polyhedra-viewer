@@ -39,10 +39,8 @@ export default makeOpPair<AugmentedClassicalForme>({
       // If metabiaugmented, use the normal of the other cap
       crossAxis = caps[1].normal()
     } else {
-      crossAxis = find(boundary.edges, (e) => forme.isMainFace(e.twinFace()))
-        .midpoint()
-        .clone()
-        .sub(boundary.centroid())
+      const edge = find(boundary.edges, (e) => forme.isMainFace(e.twinFace()))
+      crossAxis = boundary.to(edge)
     }
 
     return {
