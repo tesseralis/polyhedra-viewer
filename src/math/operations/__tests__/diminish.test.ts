@@ -45,8 +45,7 @@ describe("diminish", () => {
     it("works on diminished solids", () => {
       validateOpInputs(diminish, {
         pass: [
-          // FIXME
-          // "icosahedron"
+          "icosahedron",
           "metabidiminished icosahedron",
           "augmented tridiminished icosahedron",
         ],
@@ -57,8 +56,7 @@ describe("diminish", () => {
     it("works on gyrate solids", () => {
       validateOpInputs(diminish, {
         pass: [
-          // FIXME
-          // "rhombicosidodecahedron",
+          "rhombicosidodecahedron",
           "trigyrate rhombicosidodecahedron",
           "metabidiminished rhombicosidodecahedron",
           "paragyrate diminished rhombicosidodecahedron",

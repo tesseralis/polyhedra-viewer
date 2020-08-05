@@ -1,5 +1,4 @@
 import { isMatch, pickBy } from "lodash-es"
-import { find } from "utils"
 import { PolyhedronSpecs } from "specs"
 import { VertexArg } from "math/polyhedra"
 import {
@@ -243,16 +242,6 @@ export function makeOpPair<Forme extends PolyhedronForme, L = {}, R = L>(
 export function combineOps<F extends PolyhedronForme, O, GO extends {} = O>(
   opArgs: OpInput<O, F, GO>[],
 ): OpInput<O, F, GO> {
-  function getOp(solid: F, options: O) {
-    // FIXME This is the same logic in Operation for finding the entry
-    return find(opArgs, (op) =>
-      [...op.graph()].some(
-        (entry) =>
-          entry.start.unwrap().equals(solid.specs) &&
-          isMatch(entry.options ?? {}, pickBy(op.toGraphOpts(solid, options))),
-      ),
-    )
-  }
   return {
     graph: function* () {
       for (const op of opArgs) {
@@ -260,10 +249,46 @@ export function combineOps<F extends PolyhedronForme, O, GO extends {} = O>(
       }
     },
     apply(solid, opts) {
-      return getOp(solid, opts).apply(solid, opts)
+      for (const op of opArgs) {
+        const entry = [...op.graph()].find(
+          ({ start, options }) =>
+            start.unwrap().equals(solid.specs) &&
+            isMatch(
+              options ?? {},
+              pickBy(op.toGraphOpts(createForme(start, solid.geom) as F, opts)),
+            ),
+        )
+        if (entry) {
+          return op.apply(createForme(entry.start, solid.geom) as F, opts)
+        }
+      }
+      throw new Error(
+        `Could not find matching application for ${
+          solid.specs.type
+        } ${solid.specs.name()}`,
+      )
+      // return getOp(solid, opts).apply(solid, opts)
     },
     toGraphOpts(solid, opts) {
-      return getOp(solid, opts).toGraphOpts(solid, opts)
+      for (const op of opArgs) {
+        const entry = [...op.graph()].find(
+          ({ start, options }) =>
+            start.unwrap().equals(solid.specs.unwrap()) &&
+            isMatch(
+              options ?? {},
+              pickBy(op.toGraphOpts(createForme(start, solid.geom) as F, opts)),
+            ),
+        )
+        if (entry) {
+          return op.toGraphOpts(createForme(entry.start, solid.geom) as F, opts)
+        }
+      }
+      throw new Error(
+        `Could not find correct entry for ${
+          solid.specs.type
+        } ${solid.specs.name()}`,
+      )
+      // return getOp(solid, opts).toGraphOpts(solid, opts)
     },
   }
 }

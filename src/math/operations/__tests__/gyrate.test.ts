@@ -23,8 +23,7 @@ describe("gyrate", () => {
     it("works on gyrate solids", () => {
       validateOpInputs(gyrate, {
         pass: [
-          // FIXME
-          // "rhombicosidodecahedron",
+          "rhombicosidodecahedron",
           "trigyrate rhombicosidodecahedron",
           "metabidiminished rhombicosidodecahedron",
           "paragyrate diminished rhombicosidodecahedron",

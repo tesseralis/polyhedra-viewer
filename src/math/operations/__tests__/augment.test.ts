@@ -34,8 +34,7 @@ describe("augment", () => {
     it("works on augmented composites", () => {
       validateOpInputs(augment, {
         pass: [
-          // FIXME these fail because they pick up the wrong specs
-          // "dodecahedron",
+          "dodecahedron",
           "augmented truncated cube",
           "metabiaugmented hexagonal prism",
         ],
@@ -57,10 +56,7 @@ describe("augment", () => {
           "metabidiminished icosahedron",
           "tridiminished icosahedron",
         ],
-        fail: [
-          // "icosahedron",
-          "augmented tridiminished icosahedron",
-        ],
+        fail: ["icosahedron", "augmented tridiminished icosahedron"],
       })
       // fully maxed out
     })
@@ -73,7 +69,7 @@ describe("augment", () => {
           "metagyrate diminished rhombicosidodecahedron",
         ],
         fail: [
-          // "rhombicosidodecahedron",
+          "rhombicosidodecahedron",
           // false if only gyrated
           "gyrate rhombicosidodecahedron",
           "metabigyrate rhombicosidodecahedron",

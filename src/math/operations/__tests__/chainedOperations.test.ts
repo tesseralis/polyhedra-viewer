@@ -122,12 +122,11 @@ const chainedTests: OpTest[] = [
       ["sharpen", "cuboctahedron"],
       { op: "sharpen", args: { facet: "face" }, expected: "cube" },
       ["truncate", "truncated cube"],
-      // FIXME
-      // {
-      //   op: "augment",
-      //   args: { face: 8 },
-      //   expected: "augmented truncated cube",
-      // },
+      {
+        op: "augment",
+        args: { face: 8 },
+        expected: "augmented truncated cube",
+      },
     ],
   },
   {
@@ -135,12 +134,11 @@ const chainedTests: OpTest[] = [
     start: "dodecahedron",
     operations: [
       ["expand", "rhombicosidodecahedron"],
-      // FIXME
-      // {
-      //   op: "diminish",
-      //   args: { cap: true },
-      //   expected: "diminished rhombicosidodecahedron",
-      // },
+      {
+        op: "diminish",
+        args: { cap: true },
+        expected: "diminished rhombicosidodecahedron",
+      },
     ],
   },
   {
