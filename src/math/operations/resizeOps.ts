@@ -391,7 +391,6 @@ export const contract = makeOperation<
   },
 
   selectionState(face, forme, { facet }) {
-    console.log({ facet })
     if (facet && forme.isFacetFace(face, facet)) return "selected"
     if (forme.isAnyFacetFace(face)) return "selectable"
     return undefined
