@@ -125,6 +125,14 @@ export default class Composite extends Specs<CompositeData> {
     return source
   }
 
+  augmentFaceType() {
+    if (!this.isAugmentedSolid())
+      throw new Error(`augmentFaceType() only implemented for augmented solids`)
+    if (this.isAugmentedPrism()) return 4
+    const source = this.sourceClassical()
+    return source.data.family * (source.isTruncated() ? 2 : 1)
+  }
+
   diminish() {
     if (!this.isAugmentedSolid())
       throw new Error(`diminish() only implemented for augmented solids`)

@@ -2,12 +2,6 @@ import { Composite } from "specs"
 import CompositeForme from "math/formes/CompositeForme"
 import { makeCutPastePair } from "./cutPasteUtils"
 
-function getFaceType(solid: Composite) {
-  if (solid.isAugmentedPrism()) return 4
-  const source = solid.sourceClassical()
-  return source.data.family * (source.isTruncated() ? 2 : 1)
-}
-
 export default makeCutPastePair<CompositeForme>({
   graph: function* () {
     // Take all augmented solids with at least one augmentation
@@ -21,7 +15,7 @@ export default makeCutPastePair<CompositeForme>({
         options: {
           left: {
             align: solid.data.align,
-            faceType: getFaceType(solid),
+            faceType: solid.augmentFaceType(),
           },
           right: {},
         },
