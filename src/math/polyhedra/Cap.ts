@@ -67,7 +67,7 @@ export default abstract class Cap extends Facet {
     if (caps.length === 0) {
       return null
     }
-    return minBy(caps, (cap) => cap.topPoint.distanceTo(hitPoint))
+    return minBy(caps, (cap) => cap.topPoint.distanceToSquared(hitPoint))
   }
 
   static getAll(polyhedron: Polyhedron): Cap[] {

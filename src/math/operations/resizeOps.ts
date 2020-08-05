@@ -171,12 +171,11 @@ const _dual = makeOpPair<ClassicalForme>({
       case "right": {
         // for the vertex figure, pick a vertex and align it with that edge
         const vertex = geom.getVertex()
-        const normal = vertex.vec.clone().sub(geom.centroid())
         const v2 = vertex.adjacentVertices()[0]
         return {
           origin: geom.centroid(),
           scale: forme.midradius(),
-          orientation: [normal, v2.vec.clone().sub(vertex.vec)],
+          orientation: [vertex.normal(), v2.normal()],
         }
       }
       case "middle": {
