@@ -242,6 +242,35 @@ export function makeOpPair<Forme extends PolyhedronForme, L = {}, R = L>(
 export function combineOps<F extends PolyhedronForme, O, GO extends {} = O>(
   opArgs: OpInput<O, F, GO>[],
 ): OpInput<O, F, GO> {
+  interface CallbackArg {
+    op: OpInput<O, F, GO>
+    forme: F
+    graphOpts: GO
+  }
+
+  function doWithRightForme<R>(
+    solid: F,
+    opts: O,
+    callback: (args: CallbackArg) => R,
+  ) {
+    for (const op of opArgs) {
+      // Finagle with the arguments to get the correctly (un)wrapped
+      // version of the forme
+      for (const { start, options = {} } of op.graph()) {
+        if (!start.equivalent(solid.specs)) continue
+        const forme = createForme(start, solid.geom) as F
+        const graphOpts = op.toGraphOpts(forme, opts)
+        if (isMatch(options, pickBy(graphOpts))) {
+          return callback({ op, forme, graphOpts })
+        }
+      }
+    }
+    throw new Error(
+      `Could not find matching graph entry for ${
+        solid.specs.type
+      } ${solid.specs.name()}`,
+    )
+  }
   return {
     graph: function* () {
       for (const op of opArgs) {
@@ -249,47 +278,12 @@ export function combineOps<F extends PolyhedronForme, O, GO extends {} = O>(
       }
     },
     apply(solid, opts) {
-      for (const op of opArgs) {
-        const entry = [...op.graph()].find(
-          ({ start, options }) =>
-            start.equivalent(solid.specs) &&
-            isMatch(
-              options ?? {},
-              pickBy(op.toGraphOpts(createForme(start, solid.geom) as F, opts)),
-            ),
-        )
-        if (entry) {
-          return op.apply(createForme(entry.start, solid.geom) as F, opts)
-        }
-      }
-      throw new Error(
-        `Could not find matching application for ${
-          solid.specs.type
-        } ${solid.specs.name()}`,
+      return doWithRightForme(solid, opts, ({ op, forme }) =>
+        op.apply(forme, opts),
       )
-      // return getOp(solid, opts).apply(solid, opts)
     },
     toGraphOpts(solid, opts) {
-      for (const op of opArgs) {
-        const entry = [...op.graph()].find(({ start, options }) => {
-          if (!start.equivalent(solid.specs)) {
-            return false
-          }
-          const graphOpts = op.toGraphOpts(
-            createForme(start, solid.geom) as F,
-            opts,
-          )
-          return isMatch(options ?? {}, pickBy(graphOpts))
-        })
-        if (entry) {
-          return op.toGraphOpts(createForme(entry.start, solid.geom) as F, opts)
-        }
-      }
-      throw new Error(
-        `Could not find correct entry for ${
-          solid.specs.type
-        } ${solid.specs.name()}`,
-      )
+      return doWithRightForme(solid, opts, ({ graphOpts }) => graphOpts)
     },
   }
 }

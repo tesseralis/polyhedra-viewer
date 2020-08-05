@@ -176,7 +176,7 @@ export const capOptionArgs: CapOptionArgs = {
   },
 }
 
-function canWrapAugmented(prism: CapstoneForme, face: Face): boolean {
+function canAugmentWrapped(prism: CapstoneForme, face: Face): boolean {
   const wrapped = wrapForme(prism)
   if (!wrapped) return false
   return canAugment(wrapped, face)
@@ -184,7 +184,7 @@ function canWrapAugmented(prism: CapstoneForme, face: Face): boolean {
 
 function canAugment(forme: PolyhedronForme, face: Face): boolean {
   if (forme.isCapstone()) {
-    return forme.isEndFace(face) || canWrapAugmented(forme, face)
+    return forme.isEndFace(face) || canAugmentWrapped(forme, face)
   } else if (forme.isComposite()) {
     return forme.canAugment(face)
   } else {

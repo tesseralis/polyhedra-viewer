@@ -154,6 +154,23 @@ const chainedTests: OpTest[] = [
       ["sharpen", "metabiaugmented dodecahedron"],
     ],
   },
+  {
+    description: "Augmented prisms",
+    start: "elongated pentagonal bipyramid",
+    operations: [
+      {
+        op: "diminish",
+        args: { cap: true },
+        expected: "elongated pentagonal pyramid",
+      },
+      { op: "diminish", args: { cap: true }, expected: "pentagonal prism" },
+      {
+        op: "augment",
+        args: { face: 4 },
+        expected: "augmented pentagonal prism",
+      },
+    ],
+  },
 ]
 
 function doOperationStep(opInfo: OpInfo, polyhedron: PolyhedronForme) {
