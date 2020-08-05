@@ -1,6 +1,6 @@
 import { noop } from "lodash-es"
 
-import { Vector3 } from "three"
+import { Vector3, Color } from "three"
 import React, { useRef, useEffect, useContext, useCallback } from "react"
 import { ChildrenProp } from "types"
 
@@ -13,7 +13,7 @@ import { AnimationData } from "math/operations"
 
 // Get the colors for each face given our current configuration
 function getFaceColors(mapping: number[], colors: any) {
-  return mapping.map((f) => colors[f])
+  return mapping.map((f) => new Color(colors[f]))
 }
 
 const defaultState = {
@@ -64,33 +64,33 @@ function InnerProvider({ children }: ChildrenProp) {
       }
 
       const { start, endVertices, startColors, endColors } = animationData
-      anim.set(start.solidData, getFaceColors(startColors, colors))
-
+      const startFaceColors = getFaceColors(startColors, colors)
+      const endFaceColors = getFaceColors(endColors, colors)
+      anim.set(start.solidData, startFaceColors)
+      function lerpColors(t: number) {
+        return startFaceColors.map((color, i) =>
+          color.clone().lerp(endFaceColors[i], t),
+        )
+      }
       transitionId.current = transition(
         {
           duration: 1000 / animationSpeed,
           ease: "easeQuadInOut",
-          startValue: {
-            // FIXME don't use d3 interpolation any more!
-            vertices: start.rawSolidData().vertices,
-            faceColors: getFaceColors(startColors, colors),
-          },
-          endValue: {
-            vertices: endVertices.map((v) => v.toArray()),
-            faceColors: getFaceColors(endColors, colors),
-          },
           onFinish: () => {
             setPolyhedron(result)
             anim.reset()
           },
         },
-        ({ vertices, faceColors }) => {
+        (t) => {
+          // TODO update the vectors instead of creating new ones and updating state each time
           anim.set(
             {
               ...start.solidData,
-              vertices: vertices.map((v) => new Vector3(...v)),
+              vertices: start.vertices.map((v, i) =>
+                new Vector3().lerpVectors(v.vec, endVertices[i], t),
+              ),
             },
-            faceColors,
+            lerpColors(t),
           )
         },
       )

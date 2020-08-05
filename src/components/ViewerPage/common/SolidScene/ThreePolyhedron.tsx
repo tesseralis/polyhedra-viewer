@@ -1,30 +1,27 @@
 import { zip } from "lodash-es"
-// TODO just use Vector3 throughout instead of converting to and from points
-import { Point } from "types"
 import { SolidData } from "math/polyhedra"
 import React, { useRef, useMemo } from "react"
 import {
+  Color,
   Vector3,
   BufferAttribute,
   DoubleSide,
   Face3,
-  Color,
   BufferGeometry,
   FrontSide,
   Geometry,
 } from "three"
 import { useFrame, useUpdate } from "react-three-fiber"
 
-function convertFace(face: number[], [r, g, b]: Point) {
+function convertFace(face: number[], color: Color) {
   const [v0, ...vs] = face
   const pairs = zip(vs.slice(0, vs.length - 1), vs.slice(1))
-  const color = new Color(r, g, b)
   return pairs.map(([v1, v2]) => {
     return new Face3(v0, v1!, v2!, undefined, color)
   })
 }
 
-function convertFaces(faces: number[][], colors: Point[]) {
+function convertFaces(faces: number[][], colors: Color[]) {
   return zip(faces, colors).flatMap(([face, color]) =>
     convertFace(face!, color!),
   )
@@ -39,7 +36,7 @@ interface SolidConfig {
 
 interface Props {
   value: SolidData
-  colors: Point[]
+  colors: Color[]
   config: SolidConfig
   onClick?(point: Vector3): void
   onPointerMove?(point: Vector3): void

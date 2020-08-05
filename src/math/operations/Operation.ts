@@ -123,8 +123,8 @@ function getFaceColors(polyhedron: Polyhedron): Polygon[] {
   )
 }
 
-function arrayDefaults<T>(first: T[], second: T[]) {
-  return first.map((item, i) => item ?? second[i])
+function arrayDefaults(first: Polygon[], second: Polygon[]) {
+  return first.map((item, i) => (item >= 3 ? item : second[i]))
 }
 
 function normalizeOpResult(

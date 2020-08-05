@@ -1,4 +1,4 @@
-import { Point } from "types"
+import { Color } from "three"
 import { useMemo, useCallback } from "react"
 import tinycolor from "tinycolor2"
 import Config from "components/ConfigCtx"
@@ -9,9 +9,15 @@ import CapstoneForme from "math/formes/CapstoneForme"
 import CompositeForme from "math/formes/CompositeForme"
 import PolyhedronForme from "math/formes/PolyhedronForme"
 
-function toRgb(hex: string): Point {
-  const { r, g, b } = tinycolor(hex).toRgb()
-  return [r / 255, g / 255, b / 255]
+function toColor(color: any): Color {
+  if (color instanceof Color) return color
+  return new Color(color)
+}
+
+function lighten(color: Color, amount: number) {
+  return toColor(color)
+    .clone()
+    .offsetHSL(0, 0, amount / 100)
 }
 
 function createFamilyColor(face: string, vertex: string) {
@@ -137,9 +143,9 @@ export default function useSolidContext() {
       if (!operation) return color
       switch (operation.selectionState(face, polyhedron, options)) {
         case "selected":
-          return tinycolor(color).lighten(25)
+          return lighten(color, 25)
         case "selectable":
-          return tinycolor(color).lighten()
+          return lighten(color, 10)
         default:
           return color
       }
@@ -155,12 +161,9 @@ export default function useSolidContext() {
   }, [polyhedron, enableFormeColors, getSelectionColor])
 
   // Colors when animation is being applied
-  const transitionColors = useMemo(
-    () =>
-      isTransitioning &&
-      solidData!.faces.map((face, i) => faceColors[i] || colors[face.length]),
-    [solidData, faceColors, colors, isTransitioning],
-  )
+  const transitionColors = useMemo(() => {
+    return isTransitioning && faceColors
+  }, [faceColors, isTransitioning])
   const geom: Polyhedron = polyhedron.geom
 
   // Colors when in operation mode and hit options are being selected
@@ -170,13 +173,13 @@ export default function useSolidContext() {
     )
   }, [colors, geom.faces, getSelectionColor])
 
-  const normalizedColors: Point[] = useMemo(() => {
+  const normalizedColors: Color[] = useMemo(() => {
     const rawColors =
       transitionColors ||
       formeColors ||
       operationColors ||
       geom.faces.map((f) => colors[f.numSides])
-    return rawColors.map(toRgb)
+    return rawColors.map(toColor)
   }, [formeColors, transitionColors, operationColors, geom, colors])
 
   return {
