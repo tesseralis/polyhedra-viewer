@@ -1,4 +1,11 @@
-import { Classical, Facet, oppositeFacet, twists, oppositeTwist } from "specs"
+import {
+  Classical,
+  Capstone,
+  Facet,
+  oppositeFacet,
+  twists,
+  oppositeTwist,
+} from "specs"
 import {
   makeOpPair,
   combineOps,
@@ -12,7 +19,9 @@ import {
   Pose,
 } from "./operationUtils"
 import Operation, { makeOperation } from "./Operation"
+import PolyhedronForme from "math/formes/PolyhedronForme"
 import ClassicalForme from "math/formes/ClassicalForme"
+import CapstoneForme from "math/formes/CapstoneForme"
 
 /**
  * Return the expanded vertices of the polyhedron resized to the given distance-from-center
@@ -190,13 +199,173 @@ const _dual = makeOpPair<ClassicalForme>({
   toRight: (forme, _, result) => doDualTransform(forme, result),
 })
 
+function getCapstoneCrossAxis(forme: CapstoneForme) {
+  const topBoundary = forme.endBoundaries()[0]
+  if (forme.specs.isSecondary()) {
+    return topBoundary.edges.find((e) => e.face.numSides === 4)!
+  }
+  if (forme.specs.isPrismatic()) {
+    return topBoundary.edges[0]
+  }
+  return topBoundary.vertices[0]
+}
+
+function getApothem(s: number, n: number) {
+  return s / 2 / Math.tan(Math.PI / n)
+}
+
+const expandPrism = makeOpPair<CapstoneForme, {}, FacetOpts>({
+  graph: function* () {
+    for (const specs of Capstone.query.where(
+      (cap) =>
+        cap.isSecondary() &&
+        cap.isBi() &&
+        cap.isElongated() &&
+        cap.isOrtho() &&
+        cap.isCupola(),
+    )) {
+      yield {
+        left: specs.withData({ count: 0, type: "primary" }),
+        right: specs,
+        options: {
+          left: {},
+          right: { facet: "face" },
+        },
+      }
+      yield {
+        left: specs.withData({ elongation: "none", type: "primary" }),
+        right: specs,
+        options: {
+          left: {},
+          right: { facet: "vertex" },
+        },
+      }
+    }
+  },
+  middle: "right",
+  getPose(pos, forme) {
+    const crossAxis = getCapstoneCrossAxis(forme)
+    const cross = crossAxis.centroid().clone().sub(forme.ends()[0].centroid())
+    return {
+      origin: forme.centroid(),
+      scale: forme.geom.edgeLength(),
+      orientation: [forme.ends()[0].normal(), cross],
+    }
+  },
+  toLeft(forme, { right: { facet } }) {
+    const faces = forme.geom.faces.filter((f) => forme.isFacetFace(f, facet))
+    if (facet === "face") {
+      return getTransformedVertices(faces, (face) => {
+        if (forme.isTop(face)) {
+          return face.translateNormal(
+            forme.prismaticHeight() / 2 - face.distanceToCenter(),
+          )
+        } else {
+          const apothem = getApothem(face.sideLength(), forme.specs.data.base)
+          return face.translateNormal(apothem - face.distanceToCenter())
+        }
+      })
+    } else {
+      return getTransformedVertices(faces, (face) => {
+        const sideFace = face
+          .adjacentFaces()
+          .find((f) => !forme.isContainedInEnd(f))!
+        const apothem = getApothem(face.sideLength(), forme.specs.data.base)
+        const horiz = sideFace.translateNormal(
+          apothem - sideFace.distanceToCenter(),
+        )
+        const topFace = face.vertices
+          .flatMap((v) => v.adjacentFaces())
+          .find((f) => forme.isTop(f))!
+        const vert = topFace.translateNormal(-forme.prismaticHeight() / 2)
+        return horiz.multiply(vert)
+      })
+    }
+  },
+})
+
+const dualPrism = makeOpPair<CapstoneForme>({
+  graph: function* () {
+    for (const specs of Capstone.query.where(
+      (cap) =>
+        cap.isSecondary() &&
+        cap.isBi() &&
+        cap.isElongated() &&
+        cap.isOrtho() &&
+        cap.isCupola(),
+    )) {
+      yield {
+        left: specs.withData({ count: 0, type: "primary" }),
+        right: specs.withData({ elongation: "none", type: "primary" }),
+      }
+    }
+  },
+  middle: (entry) =>
+    entry.right.withData({
+      elongation: "prism",
+      type: "secondary",
+      gyrate: "ortho",
+    }),
+  getPose(pos, forme) {
+    const crossAxis = getCapstoneCrossAxis(forme)
+    const cross = crossAxis.centroid().clone().sub(forme.ends()[0].centroid())
+    return {
+      origin: forme.centroid(),
+      scale: forme.geom.edgeLength(),
+      orientation: [forme.ends()[0].normal(), cross],
+    }
+  },
+  toLeft(forme) {
+    const faces = forme.geom.faces.filter((f) => forme.isFacetFace(f, "face"))
+    return getTransformedVertices(faces, (face) => {
+      if (forme.isTop(face)) {
+        return face.translateNormal(
+          forme.prismaticHeight() / 2 - face.distanceToCenter(),
+        )
+      } else {
+        const apothem = getApothem(face.sideLength(), forme.specs.data.base)
+        return face.translateNormal(apothem - face.distanceToCenter())
+      }
+    })
+  },
+  toRight(forme) {
+    const faces = forme.geom.faces.filter((f) => forme.isFacetFace(f, "vertex"))
+    return getTransformedVertices(faces, (face) => {
+      const sideFace = face
+        .adjacentFaces()
+        .find((f) => !forme.isContainedInEnd(f))!
+      const apothem = getApothem(face.sideLength(), forme.specs.data.base)
+      const horiz = sideFace.translateNormal(
+        apothem - sideFace.distanceToCenter(),
+      )
+      const topFace = face.vertices
+        .flatMap((v) => v.adjacentFaces())
+        .find((f) => forme.isTop(f))!
+      const vert = topFace.translateNormal(-forme.prismaticHeight() / 2)
+      return horiz.multiply(vert)
+    })
+  },
+})
+
 // Exported members
 
-export const dual = new Operation("dual", combineOps([_dual.left, _dual.right]))
+export const dual = new Operation(
+  "dual",
+  combineOps<ClassicalForme | CapstoneForme, {}>([
+    _dual.left,
+    _dual.right,
+    dualPrism.left,
+    dualPrism.right,
+  ]),
+)
 
 export const expand = new Operation(
   "expand",
-  combineOps([semiExpand.left, _expand.left]),
+  combineOps<PolyhedronForme, {}>([
+    semiExpand.left,
+    _expand.left,
+    expandPrism.left,
+  ]),
 )
 
 export const snub = makeOperation("snub", _snub.left)
@@ -207,8 +376,13 @@ export const twist = makeOperation(
 )
 
 // NOTE: We are using the same operation for contracting both expanded and snub solids.
-export const contract = makeOperation<FacetOpts, ClassicalForme>("contract", {
-  ...combineOps([_expand, _snub, semiExpand].map((op) => op.right)),
+export const contract = makeOperation<
+  FacetOpts,
+  ClassicalForme | CapstoneForme
+>("contract", {
+  ...combineOps<ClassicalForme | CapstoneForme, FacetOpts>(
+    [_expand, _snub, semiExpand, expandPrism].map((op) => op.right),
+  ),
 
   hitOption: "facet",
   getHitOption(forme, hitPoint) {

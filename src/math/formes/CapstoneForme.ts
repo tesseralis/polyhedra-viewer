@@ -115,6 +115,27 @@ export default abstract class CapstoneForme extends PolyhedronForme<Capstone> {
   centroid() {
     return getCentroid(this.ends().map((end) => end.centroid()))
   }
+
+  isFacetFace(face: Face, facet: "face" | "vertex") {
+    if (facet === "face") {
+      return (
+        this.isTop(face) || face.adjacentFaces().every((f) => f.numSides === 4)
+      )
+    } else {
+      return (
+        this.isContainedInEnd(face) && face.numSides === 3 && !this.isTop(face)
+      )
+    }
+  }
+
+  getFacet(face: Face) {
+    if (this.isFacetFace(face, "face")) return "face"
+    if (this.isFacetFace(face, "vertex")) return "vertex"
+  }
+
+  isAnyFacetFace(face: Face) {
+    return this.isFacetFace(face, "face") || this.isFacetFace(face, "vertex")
+  }
 }
 
 class PrismaticForme extends CapstoneForme {
