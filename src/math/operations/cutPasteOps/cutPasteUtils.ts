@@ -165,7 +165,7 @@ export const capOptionArgs: CapOptionArgs = {
   },
   selectionState(face, forme, { cap }) {
     const allCapFaces = getCapFaces(forme)
-    if (!!cap && face.inSet(cap.faces())) return "selected"
+    if (cap && face.inSet(cap.faces())) return "selected"
     if (face.inSet(allCapFaces)) return "selectable"
     return undefined
   },
