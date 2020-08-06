@@ -16,7 +16,6 @@ export function isInverse(v1: Vector3, v2: Vector3) {
 
 export function angleBetween(o: Vector3, a: Vector3, b: Vector3) {
   // colinear points return NaN, so return 0 instead
-  // FIXME? make sure we don't need to normalize this?
   return a.clone().sub(o).angleTo(b.clone().sub(o))
 }
 

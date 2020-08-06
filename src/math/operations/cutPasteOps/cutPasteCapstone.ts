@@ -41,7 +41,6 @@ export default makeCutPastePair<CapstoneForme>({
     if (specs.isPrismatic() || specs.isPrimary() || specs.isGyroelongated()) {
       return
     }
-    // FIXME this might fail with the digonal cupola?
     const orientationFn = capOrientation(forme.endCaps()[0].type)
     return (edge) => {
       // Determine the cupola face to check

@@ -63,12 +63,11 @@ export default abstract class CompositeForme extends PolyhedronForme<
   }
 
   /** Get the caps associated with this forme */
-  // FIXME this is confusing because it can be subclassed
   caps() {
     return this.geom.caps()
   }
 
-  // FIXME implement this for diminished/gyrate
+  // TODO implement this for diminished/gyrate
   sourceCentroid() {
     return getCentroid(this.sourceVertices().map((v) => v.vec))
   }
@@ -226,7 +225,7 @@ export class AugmentedClassicalForme extends CompositeForme {
 }
 
 export class DiminishedSolidForme extends CompositeForme {
-  // FIXME dedupe with gyrate
+  // TODO dedupe with gyrate
   isDiminishedFace(face: Face) {
     return (
       this.specs.isDiminished() &&
