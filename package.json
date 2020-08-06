@@ -7,7 +7,6 @@
     "@testing-library/react": "^10.0.2",
     "eslint-config-prettier": "^6.11.0",
     "eslint-plugin-prettier": "^3.1.3",
-    "exports-loader": "^0.7.0",
     "file-loader": "^6.0.0",
     "husky": "^4.2.5",
     "jest-extended": "^0.11.5",
