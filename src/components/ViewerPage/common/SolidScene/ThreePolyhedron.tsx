@@ -78,7 +78,12 @@ export default function ThreePolyhedron({
     const positions = edgeGeom.attributes.position.array as number[]
     edges.forEach((edge: [number, number], i: number) => {
       const [i1, i2] = edge
-      const vs = [...vertices[i1].toArray(), ...vertices[i2].toArray()]
+      // Scale edges slightly so they don't overlap
+      // TODO do this in a way that doesn't rely on it being centered
+      const vs = [
+        ...vertices[i1].clone().multiplyScalar(1.001).toArray(),
+        ...vertices[i2].clone().multiplyScalar(1.001).toArray(),
+      ]
       for (let j = 0; j < 6; j++) {
         positions[i * 6 + j] = vs[j]
       }
@@ -89,45 +94,43 @@ export default function ThreePolyhedron({
 
   return (
     <>
-      {showFaces && (
-        <mesh
-          onPointerDown={(e) => {
-            hasMoved.current = false
-          }}
-          onPointerUp={(e) => {
-            if (hasMoved.current) return
-            onClick?.(e.point)
-          }}
-          onPointerMove={(e) => {
-            hasMoved.current = true
-            onPointerMove?.(e.point)
-          }}
-          onPointerOut={(e) => {
-            onPointerOut?.(e.point)
-          }}
-        >
-          <geometry ref={ref} attach="geometry" />
-          <meshStandardMaterial
-            side={showInnerFaces ? DoubleSide : FrontSide}
-            attach="material"
-            color="grey"
-            args={[{ vertexColors: true }]}
-            transparent={opacity < 1}
-            opacity={opacity}
-          />
-        </mesh>
-      )}
-      {showEdges && (
-        <lineSegments geometry={edgeGeom}>
-          <lineBasicMaterial
-            attach="material"
-            color={0x444444}
-            linewidth={1}
-            transparent
-            opacity={0.8}
-          />
-        </lineSegments>
-      )}
+      <mesh
+        visible={showFaces}
+        onPointerDown={(e) => {
+          hasMoved.current = false
+        }}
+        onPointerUp={(e) => {
+          if (hasMoved.current) return
+          onClick?.(e.point)
+        }}
+        onPointerMove={(e) => {
+          hasMoved.current = true
+          onPointerMove?.(e.point)
+        }}
+        onPointerOut={(e) => {
+          onPointerOut?.(e.point)
+        }}
+      >
+        <geometry ref={ref} attach="geometry" />
+        <meshStandardMaterial
+          side={showInnerFaces ? DoubleSide : FrontSide}
+          attach="material"
+          color="grey"
+          args={[{ vertexColors: true }]}
+          transparent={opacity < 1}
+          opacity={opacity}
+        />
+      </mesh>
+      <lineSegments geometry={edgeGeom}>
+        <lineBasicMaterial
+          attach="material"
+          color={0x444444}
+          linewidth={1}
+          transparent
+          visible={showEdges}
+          opacity={0.8}
+        />
+      </lineSegments>
     </>
   )
 }
