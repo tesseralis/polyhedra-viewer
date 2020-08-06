@@ -43,18 +43,15 @@ interface Props {
   onPointerOut?(point: Vector3): void
 }
 
-export default function ThreePolyhedron({
+function SolidFaces({
+  value,
+  colors,
   onClick,
   onPointerMove,
   onPointerOut,
-  value,
-  colors,
   config,
 }: Props) {
-  const { vertices, faces, edges = [] } = value
-  const hasMoved = useRef(false)
-  const { showFaces, showEdges, showInnerFaces, opacity } = config
-
+  const { vertices, faces } = value
   const ref = useUpdate(
     (geom: Geometry) => {
       geom.vertices = vertices
@@ -66,6 +63,43 @@ export default function ThreePolyhedron({
     },
     [vertices, faces, colors],
   )
+
+  const hasMoved = useRef(false)
+  const { showFaces, showInnerFaces, opacity } = config
+  return (
+    <mesh
+      visible={showFaces}
+      onPointerDown={(e) => {
+        hasMoved.current = false
+      }}
+      onPointerUp={(e) => {
+        if (hasMoved.current) return
+        onClick?.(e.point)
+      }}
+      onPointerMove={(e) => {
+        hasMoved.current = true
+        onPointerMove?.(e.point)
+      }}
+      onPointerOut={(e) => {
+        onPointerOut?.(e.point)
+      }}
+    >
+      <geometry ref={ref} attach="geometry" />
+      <meshStandardMaterial
+        side={showInnerFaces ? DoubleSide : FrontSide}
+        attach="material"
+        color="grey"
+        args={[{ vertexColors: true }]}
+        transparent={opacity < 1}
+        opacity={opacity}
+      />
+    </mesh>
+  )
+}
+
+function SolidEdges({ value, config }: Props) {
+  const { vertices, edges = [] } = value
+  const { showEdges } = config
 
   const edgeGeom = useMemo(() => {
     const geom = new BufferGeometry()
@@ -93,44 +127,24 @@ export default function ThreePolyhedron({
   })
 
   return (
-    <>
-      <mesh
-        visible={showFaces}
-        onPointerDown={(e) => {
-          hasMoved.current = false
-        }}
-        onPointerUp={(e) => {
-          if (hasMoved.current) return
-          onClick?.(e.point)
-        }}
-        onPointerMove={(e) => {
-          hasMoved.current = true
-          onPointerMove?.(e.point)
-        }}
-        onPointerOut={(e) => {
-          onPointerOut?.(e.point)
-        }}
-      >
-        <geometry ref={ref} attach="geometry" />
-        <meshStandardMaterial
-          side={showInnerFaces ? DoubleSide : FrontSide}
-          attach="material"
-          color="grey"
-          args={[{ vertexColors: true }]}
-          transparent={opacity < 1}
-          opacity={opacity}
-        />
-      </mesh>
-      <lineSegments geometry={edgeGeom}>
-        <lineBasicMaterial
-          attach="material"
-          color={0x444444}
-          linewidth={1}
-          transparent
-          visible={showEdges}
-          opacity={0.8}
-        />
-      </lineSegments>
-    </>
+    <lineSegments geometry={edgeGeom}>
+      <lineBasicMaterial
+        attach="material"
+        color={0x444444}
+        linewidth={1}
+        transparent
+        visible={showEdges}
+        opacity={0.8}
+      />
+    </lineSegments>
+  )
+}
+
+export default function PolyhedronModel(props: Props) {
+  return (
+    <group>
+      <SolidFaces {...props} />
+      <SolidEdges {...props} />
+    </group>
   )
 }

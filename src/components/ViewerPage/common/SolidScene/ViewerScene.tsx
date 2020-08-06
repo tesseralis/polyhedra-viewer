@@ -3,7 +3,7 @@ import React, { useEffect, useRef } from "react"
 import { PerspectiveCamera } from "three"
 import { Canvas, extend, useThree, useFrame } from "react-three-fiber"
 import { TrackballControls } from "three/examples/jsm/controls/TrackballControls"
-import ThreePolyhedron from "./ThreePolyhedron"
+import ThreePolyhedron from "./PolyhedronModel"
 import useSolidContext from "./useSolidContext"
 import useHitOptions from "./useHitOptions"
 import ConfigCtx from "components/ConfigCtx"
@@ -45,7 +45,7 @@ function CameraControls() {
   )
 }
 
-export default function ThreeScene() {
+export default function ViewerScene() {
   const { colors, solidData } = useSolidContext()
   const { setHitOption, unsetHitOption, applyWithHitOption } = useHitOptions()
   const config = ConfigCtx.useState()
