@@ -154,6 +154,12 @@ export default abstract class ClassicalForme extends PolyhedronForme<
   snubAngle(facet: Facet) {
     return 0
   }
+
+  orientation() {
+    return this.adjacentFacetFaces(this.specs.data.facet ?? "face").map((f) =>
+      f.normal(),
+    ) as any
+  }
 }
 
 class RegularForme extends ClassicalForme {

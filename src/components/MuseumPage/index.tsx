@@ -4,6 +4,7 @@ import { useStyle } from "styles"
 import { TrackballControls } from "three/examples/jsm/controls/TrackballControls"
 import { tableSections } from "tables"
 import PolyhedronGroup from "./PolyhedronGroup"
+import { useNavigate } from "react-router-dom"
 
 extend({ TrackballControls })
 
@@ -34,6 +35,7 @@ function Controls() {
 const sectionSpacing = 40
 const subsecSpacing = 25
 export default function MuseumScene() {
+  const navigate = useNavigate()
   const style = useStyle({
     position: "absolute",
     top: 0,
@@ -52,7 +54,7 @@ export default function MuseumScene() {
             if (section.tables) {
               return section.tables.map((table, j) => (
                 <group key={table.caption} position={[j * subsecSpacing, 0, 0]}>
-                  <PolyhedronGroup table={table} />
+                  <PolyhedronGroup navigate={navigate} table={table} />
                 </group>
               ))
             }
@@ -65,7 +67,7 @@ export default function MuseumScene() {
                         key={table.caption}
                         position={[k * subsecSpacing, 0, 0]}
                       >
-                        <PolyhedronGroup table={table} />
+                        <PolyhedronGroup navigate={navigate} table={table} />
                       </group>
                     ))}
                   </group>

@@ -13,8 +13,7 @@ export default function App() {
   return (
     <Suspense fallback={<Loading />}>
       <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/museum" element={<MuseumPage />} />
+        <Route path="/" element={<MuseumPage />} />
         <Route path=":solid/*" element={<ViewerPage />} />
       </Routes>
     </Suspense>

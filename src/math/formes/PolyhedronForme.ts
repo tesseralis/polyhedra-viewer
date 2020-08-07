@@ -4,6 +4,8 @@ import { Polyhedron } from "math/polyhedra"
 import type ClassicalForme from "./ClassicalForme"
 import type CapstoneForme from "./CapstoneForme"
 import type CompositeForme from "./CompositeForme"
+import { Vector3 } from "three"
+import { Pose, alignPolyhedron } from "math/operations/operationUtils"
 
 export default class PolyhedronForme<
   Specs extends PolyhedronSpecs = PolyhedronSpecs
@@ -26,5 +28,23 @@ export default class PolyhedronForme<
 
   isComposite(): this is CompositeForme {
     return this.specs.isComposite()
+  }
+
+  orientation(): readonly [Vector3, Vector3] {
+    return [this.geom.vertices[0].vec, this.geom.vertices[1].vec]
+  }
+
+  orient() {
+    const startPose: Pose = {
+      origin: this.geom.centroid(),
+      scale: this.geom.surfaceArea(),
+      orientation: this.orientation(),
+    }
+    const endPose: Pose = {
+      origin: new Vector3(),
+      scale: 10,
+      orientation: [new Vector3(0, 1, 0), new Vector3(1, 0, 0)],
+    }
+    return alignPolyhedron(this.geom, startPose, endPose)
   }
 }
