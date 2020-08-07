@@ -1,3 +1,4 @@
+import { mean } from "lodash-es"
 import { PolyhedronSpecs } from "specs"
 import { Polyhedron } from "math/polyhedra"
 
@@ -35,15 +36,16 @@ export default class PolyhedronForme<
   }
 
   orient() {
+    const scale = mean(this.geom.edges.map((e) => e.distanceToCenter()))
     const startPose: Pose = {
       origin: this.geom.centroid(),
       // TODO this is still determined by the original model!
-      scale: this.geom.surfaceArea(),
+      scale,
       orientation: this.orientation(),
     }
     const endPose: Pose = {
       origin: new Vector3(),
-      scale: 10,
+      scale: 1,
       orientation: [new Vector3(0, 1, 0), new Vector3(1, 0, 0)],
     }
     return alignPolyhedron(this.geom, startPose, endPose)
