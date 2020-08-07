@@ -148,7 +148,6 @@ export class AugmentedPrismForme extends CompositeForme {
   })
 
   isEndFace(face: Face) {
-    console.log(this.endFaces())
     return face.inSet(this.endFaces())
   }
 
@@ -170,6 +169,23 @@ export class AugmentedPrismForme extends CompositeForme {
 }
 
 export class AugmentedClassicalForme extends CompositeForme {
+  // @override
+  orientation() {
+    const caps = this.caps()
+    if (this.specs.isTri()) {
+      const axis = getCentroid(caps.map((c) => c.normal()))
+      return [axis, caps[0].normal()] as const
+    }
+    if (this.specs.hasAlignment() && this.specs.isMeta()) {
+      const axis = getCentroid(caps.map((c) => c.normal()))
+      const cross = axis.clone().cross(caps[0].normal())
+      return [axis, cross] as const
+    }
+    const cap = caps[0]
+    const edge = find(cap.boundary().edges, (e) => e.face.numSides === 3)
+    return [cap.normal(), edge.normal()] as const
+  }
+
   hasAlignment() {
     return super.hasAlignment() && this.specs.sourceClassical().isIcosahedral()
   }
@@ -240,6 +256,21 @@ export class AugmentedClassicalForme extends CompositeForme {
 }
 
 export class DiminishedSolidForme extends CompositeForme {
+  // @override
+  orientation() {
+    const faces = this.diminishedFaces()
+    if (this.specs.isAugmented() || this.specs.isTri()) {
+      const normal = getCentroid(faces.map((f) => f.normal()))
+      return [normal, faces[0].normal()] as const
+    }
+    if (this.specs.hasAlignment() && this.specs.isMeta()) {
+      const axis = getCentroid(faces.map((f) => f.normal()))
+      const cross = axis.clone().cross(faces[0].normal())
+      return [axis, cross] as const
+    }
+    return [faces[0].normal(), faces[0].edges[0].normal()] as const
+  }
+
   // TODO dedupe with gyrate
   isDiminishedFace(face: Face) {
     return (
