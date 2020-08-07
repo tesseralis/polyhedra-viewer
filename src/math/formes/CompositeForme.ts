@@ -132,11 +132,14 @@ export class AugmentedPrismForme extends CompositeForme {
 
     if (source.isSquare()) {
       // FIXME why doesn't this work??
-      const face1 = this.geom.faceWithNumSides(4)
-      const face2 = find(this.geom.faces, (f) =>
-        isInverse(face1.normal(), f.normal()),
-      )
-      return [face1, face2] as const
+      for (const f1 of this.geom.facesWithNumSides(4)) {
+        for (const f2 of this.geom.facesWithNumSides(4)) {
+          if (isInverse(f1.normal(), f2.normal())) {
+            return [f1, f2] as const
+          }
+        }
+      }
+      throw new Error(`Error finding inverse faces`)
     }
 
     return this.geom.facesWithNumSides(

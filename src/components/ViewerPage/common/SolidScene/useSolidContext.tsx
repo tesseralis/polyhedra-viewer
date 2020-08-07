@@ -48,10 +48,11 @@ export default function useSolidContext() {
 
   const formeColors = useMemo(() => {
     if (!enableFormeColors) return
-    return polyhedron.geom.faces.map((f) =>
-      getSelectionColor(f, getFormeColors(polyhedron, f)),
+    return polyhedron.geom.faces.map(
+      (f) => getFormeColors(polyhedron, f),
+      // getSelectionColor(f, getFormeColors(polyhedron, f)),
     )
-  }, [polyhedron, enableFormeColors, getSelectionColor])
+  }, [polyhedron, enableFormeColors])
 
   // Colors when animation is being applied
   const transitionColors = useMemo(() => {
