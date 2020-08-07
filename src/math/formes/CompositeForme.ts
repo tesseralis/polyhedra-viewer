@@ -307,6 +307,18 @@ export class DiminishedSolidForme extends CompositeForme {
 }
 
 export class GyrateSolidForme extends CompositeForme {
+  // @override
+  orientation() {
+    const mods = this.modifications()
+    if (mods.length === 0) {
+      // TODO return orientation of the base
+      return [this.geom.faces[0].normal(), this.geom.faces[1].normal()] as const
+    }
+    // FIXME make this more sophisticated
+    const boundary = mods[0] instanceof Cap ? mods[0].boundary() : mods[0]
+    return [mods[0].normal(), boundary.edges[0].normal()] as const
+  }
+
   /** Return whether the given cap is gyrated */
   isGyrate(cap: Cap) {
     return cap.boundary().edges.every((edge) => {
