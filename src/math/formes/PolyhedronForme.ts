@@ -37,6 +37,7 @@ export default class PolyhedronForme<
   orient() {
     const startPose: Pose = {
       origin: this.geom.centroid(),
+      // TODO this is still determined by the original model!
       scale: this.geom.surfaceArea(),
       orientation: this.orientation(),
     }
