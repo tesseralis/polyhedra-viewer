@@ -117,7 +117,12 @@ export default abstract class CapstoneForme extends PolyhedronForme<Capstone> {
   isTop(face: Face) {
     const end = this.containingEnd(face)
     if (end instanceof Edge) return false
-    return end && vecEquals(face.normal(), end.normal())
+    if (end instanceof Face) return end.equals(face)
+    if (end instanceof Cap) {
+      if (end.type === "pyramid") return false
+      return vecEquals(face.normal(), end.normal())
+    }
+    return false
   }
 
   isSideFace(face: Face) {

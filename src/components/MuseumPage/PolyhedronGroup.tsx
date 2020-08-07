@@ -1,13 +1,13 @@
 import { pick } from "lodash-es"
 import React, { useState, useRef } from "react"
 import { Table } from "tables"
-import { Color } from "three"
 import PolyhedronModel from "components/ViewerPage/common/SolidScene/PolyhedronModel"
 import { getGeometry } from "math/operations/operationUtils"
 import ConfigCtx from "components/ConfigCtx"
 import createForme from "math/formes/createForme"
 
 import { useFrame } from "react-three-fiber"
+import getFormeColors from "components/ViewerPage/common/SolidScene/getFormeColors"
 
 const rowSpacing = 2
 const colSpacing = 7
@@ -45,18 +45,19 @@ function PolyhedronEntry({ entry, position, navigate }: any) {
   }
   const isDupe = entry.name() !== entry.canonicalName()
   const forme = createForme(entry, getGeometry(entry))
+  // const colors = forme.geom.fagetFormeColors(forme)
   const geom = forme.orient()
 
   const config = ConfigCtx.useState()
-  const { colors } = config
+  // const { colors } = config
   const faceColors = geom.faces.map((face) => {
-    const color = new Color(colors[face.numSides])
-    if (hovered) {
-      color.offsetHSL(0, 0, 0.2)
-    }
-    if (isDupe) {
-      color.offsetHSL(0, -0.5, 0.2)
-    }
+    const color = getFormeColors(forme, face)
+    // if (hovered) {
+    //   color.offsetHSL(0, 0, 0.2)
+    // }
+    // if (isDupe) {
+    //   color.offsetHSL(0, -0.5, 0.2)
+    // }
     return color
   })
 
