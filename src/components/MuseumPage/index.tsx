@@ -38,6 +38,7 @@ export default function MuseumScene() {
   const navigate = useNavigate()
   const style = useStyle({
     position: "absolute",
+    backgroundColor: "#111",
     top: 0,
     left: 0,
     right: 0,
@@ -74,6 +75,7 @@ export default function MuseumScene() {
                 )
               })
             }
+            return null
           })}
         </group>
       </Canvas>

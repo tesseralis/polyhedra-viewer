@@ -156,9 +156,11 @@ export default abstract class ClassicalForme extends PolyhedronForme<
   }
 
   orientation() {
-    return this.adjacentFacetFaces(this.specs.data.facet ?? "face").map((f) =>
-      f.normal(),
-    ) as any
+    if (this.specs.isRegular() && this.specs.isVertex()) {
+      const v = this.geom.getVertex()
+      return [v.vec, v.adjacentVertices()[0].vec]
+    }
+    return this.adjacentFacetFaces("face").map((f) => f.normal()) as any
   }
 }
 
@@ -191,7 +193,14 @@ class TruncatedForme extends ClassicalForme {
   }
 
   adjacentFacetFace(face: Face, facet: Facet) {
-    return find(face.adjacentFaces(), (f) => this.isFacetFace(f, facet))
+    if (facet === this.specs.facet()) {
+      return find(face.adjacentFaces(), (f) => this.isFacetFace(f, facet))
+    } else {
+      return find(
+        face.adjacentFaces()[0].adjacentFaces(),
+        (f) => f.numSides === face.numSides && !f.equals(face),
+      )
+    }
   }
 }
 
