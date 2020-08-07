@@ -13,15 +13,23 @@ import {
 } from "three"
 import { useFrame, useUpdate } from "react-three-fiber"
 
-function convertFace(face: number[], color: Color) {
+function getColorAndMaterial(arg: ColorArg) {
+  if (arg instanceof Color) {
+    return { color: arg, material: 0 }
+  }
+  return arg
+}
+
+function convertFace(face: number[], arg: ColorArg) {
   const [v0, ...vs] = face
   const pairs = zip(vs.slice(0, vs.length - 1), vs.slice(1))
+  const { color, material } = getColorAndMaterial(arg)
   return pairs.map(([v1, v2]) => {
-    return new Face3(v0, v1!, v2!, undefined, color)
+    return new Face3(v0, v1!, v2!, undefined, color, material)
   })
 }
 
-function convertFaces(faces: number[][], colors: Color[]) {
+function convertFaces(faces: number[][], colors: ColorArg[]) {
   return zip(faces, colors).flatMap(([face, color]) =>
     convertFace(face!, color!),
   )
@@ -32,11 +40,20 @@ interface SolidConfig {
   showEdges: boolean
   showInnerFaces: boolean
   opacity: number
+  roughness: number
+  metalness: number
 }
+
+interface MaterialArg {
+  color: Color
+  material: number
+}
+
+type ColorArg = Color | MaterialArg
 
 interface Props {
   value: SolidData
-  colors: Color[]
+  colors: ColorArg[]
   config: SolidConfig
   onClick?(point: Vector3): void
   onPointerMove?(point: Vector3): void
@@ -65,7 +82,7 @@ function SolidFaces({
   )
 
   const hasMoved = useRef(false)
-  const { showFaces, showInnerFaces, opacity } = config
+  const { showFaces, showInnerFaces, roughness } = config
   return (
     <mesh
       visible={showFaces}
@@ -85,13 +102,20 @@ function SolidFaces({
       }}
     >
       <geometry ref={ref} attach="geometry" />
-      <meshStandardMaterial
+      <meshPhongMaterial
         side={showInnerFaces ? DoubleSide : FrontSide}
-        attach="material"
+        attachArray="material"
         color="grey"
         args={[{ vertexColors: true }]}
-        transparent={opacity < 1}
-        opacity={opacity}
+      />
+      <meshStandardMaterial
+        side={showInnerFaces ? DoubleSide : FrontSide}
+        attachArray="material"
+        color="grey"
+        args={[{ vertexColors: true }]}
+        transparent
+        opacity={7 / 8}
+        roughness={roughness}
       />
     </mesh>
   )

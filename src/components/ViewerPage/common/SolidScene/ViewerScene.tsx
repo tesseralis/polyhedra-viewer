@@ -61,6 +61,8 @@ export default function ViewerScene() {
           "showEdges",
           "showInnerFaces",
           "opacity",
+          "roughness",
+          "metalness",
         ])}
         onPointerMove={setHitOption}
         onClick={applyWithHitOption}

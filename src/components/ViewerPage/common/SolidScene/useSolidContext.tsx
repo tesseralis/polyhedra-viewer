@@ -10,6 +10,9 @@ import PolyhedronForme from "math/formes/PolyhedronForme"
 
 function toColor(color: any): Color {
   if (color instanceof Color) return color
+  if (color.color) {
+    return { ...color, color: new Color(color.color) }
+  }
   return new Color(color)
 }
 
@@ -62,10 +65,16 @@ function getClassicalColor(forme: ClassicalForme, face: Face) {
   const facet = forme.getFacet(face)
   // thing for the edge face
   if (!facet) {
-    return scheme.edge[forme.specs.isSnub() ? "gyro" : "ortho"]
+    return {
+      color: scheme.edge[forme.specs.isSnub() ? "gyro" : "ortho"],
+      material: 1,
+    }
   }
   const faceSides = face.numSides > 5 ? "secondary" : "primary"
-  return scheme[faceSides][facet]
+  return {
+    color: scheme[faceSides][facet],
+    material: 0,
+  }
 }
 
 function getCapstoneColor(forme: CapstoneForme, face: Face) {
