@@ -122,10 +122,13 @@ function getCompositeColor(forme: CompositeForme, face: Face) {
   if (forme.isAugmentedPrism()) {
     const sourceSpecs = forme.specs.sourcePrism()
     const scheme = colorScheme[sourceSpecs.data.base]
-    if (forme.isBaseFace(face)) {
+    if (forme.isEndFace(face)) {
       return scheme[sourceSpecs.data.type].face
     } else if (forme.isSideFace(face)) {
-      return scheme.edge.ortho
+      return {
+        color: scheme.edge.ortho,
+        material: 1,
+      }
     } else {
       // augmented face
       return scheme.primary.vertex.clone().offsetHSL(0, 0, 1 / 4)

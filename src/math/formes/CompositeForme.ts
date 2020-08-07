@@ -95,6 +95,16 @@ export default abstract class CompositeForme extends PolyhedronForme<
 }
 
 export class AugmentedPrismForme extends CompositeForme {
+  // @override
+  orientation() {
+    const caps = this.caps()
+    const normal =
+      this.specs.data.augmented === 2
+        ? getCentroid(caps.map((c) => c.normal()))
+        : caps[0].normal()
+    return [this.endFaces()[0].normal(), normal] as const
+  }
+
   caps() {
     return super.caps().filter((cap) => cap.type === "pyramid")
   }
@@ -107,8 +117,9 @@ export class AugmentedPrismForme extends CompositeForme {
     return this.caps()
   }
 
-  baseFaces = once(() => {
-    if (this.specs.sourcePrism().isTriangular()) {
+  endFaces = once(() => {
+    const source = this.specs.sourcePrism()
+    if (source.isPrimary() && source.isTriangular()) {
       for (const face1 of this.geom.faces) {
         for (const face2 of this.geom.faces) {
           if (isInverse(face1.normal(), face2.normal())) {
@@ -119,7 +130,7 @@ export class AugmentedPrismForme extends CompositeForme {
       throw new Error(`Could not find base faces for ${this.specs.name()}`)
     }
 
-    if (this.specs.sourcePrism().isSquare()) {
+    if (source.isSquare()) {
       // FIXME why doesn't this work??
       const face1 = this.geom.faceWithNumSides(4)
       const face2 = find(this.geom.faces, (f) =>
@@ -133,8 +144,9 @@ export class AugmentedPrismForme extends CompositeForme {
     ) as [Face, Face]
   })
 
-  isBaseFace(face: Face) {
-    return face.inSet(this.baseFaces())
+  isEndFace(face: Face) {
+    console.log(this.endFaces())
+    return face.inSet(this.endFaces())
   }
 
   isSideFace(face: Face) {
