@@ -94,7 +94,10 @@ function getCapstoneColor(forme: CapstoneForme, face: Face) {
     }
   } else {
     const side = forme.specs.isElongated() ? "ortho" : ("gyro" as const)
-    return scheme.edge[side].clone().offsetHSL(0, -1 / 50, 1 / 100)
+    return {
+      color: scheme.edge[side].clone().offsetHSL(0, -1 / 50, 1 / 100),
+      material: 1,
+    }
   }
 }
 

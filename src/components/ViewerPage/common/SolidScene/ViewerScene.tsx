@@ -56,14 +56,7 @@ export default function ViewerScene() {
       <ThreePolyhedron
         value={solidData}
         colors={colors}
-        config={pick(config, [
-          "showFaces",
-          "showEdges",
-          "showInnerFaces",
-          "opacity",
-          "roughness",
-          "metalness",
-        ])}
+        config={pick(config, ["showFaces", "showEdges", "showInnerFaces"])}
         onPointerMove={setHitOption}
         onClick={applyWithHitOption}
         onPointerOut={unsetHitOption}

@@ -39,9 +39,6 @@ interface SolidConfig {
   showFaces: boolean
   showEdges: boolean
   showInnerFaces: boolean
-  opacity: number
-  roughness: number
-  metalness: number
 }
 
 interface MaterialArg {
@@ -82,7 +79,7 @@ function SolidFaces({
   )
 
   const hasMoved = useRef(false)
-  const { showFaces, showInnerFaces, roughness } = config
+  const { showFaces, showInnerFaces } = config
   return (
     <mesh
       visible={showFaces}
@@ -115,7 +112,6 @@ function SolidFaces({
         args={[{ vertexColors: true }]}
         transparent
         opacity={7 / 8}
-        roughness={roughness}
       />
     </mesh>
   )
@@ -154,11 +150,11 @@ function SolidEdges({ value, config }: Props) {
     <lineSegments geometry={edgeGeom}>
       <lineBasicMaterial
         attach="material"
-        color={0x444444}
+        color={0x555555}
         linewidth={1}
         transparent
         visible={showEdges}
-        opacity={0.8}
+        opacity={0.5}
       />
     </lineSegments>
   )
