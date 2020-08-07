@@ -38,7 +38,7 @@ function CameraControls() {
           enabled
           noPan
           rotateSpeed={8.0}
-          staticMoving // TODO make this configurable
+          // staticMoving // TODO make this configurable
         />
       )}
     </>
