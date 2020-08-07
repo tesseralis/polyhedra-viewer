@@ -159,9 +159,28 @@ function getCompositeColor(forme: CompositeForme, face: Face) {
     } else {
       return scheme.primary.vertex
     }
-  } else {
-    return new Color()
+  } else if (forme.isGyrateSolid()) {
+    const scheme = colorScheme[5]
+    const mix = (color: Color) => {
+      if (forme.isGyrateFace(face)) {
+        return color.clone().offsetHSL(0, 0, 0.25)
+      }
+      return color
+    }
+    if (forme.isDiminishedFace(face)) {
+      return mix(scheme.secondary.face)
+    } else if (forme.isFacetFace(face, "face")) {
+      return mix(scheme.primary.face)
+    } else if (forme.isFacetFace(face, "vertex")) {
+      return mix(scheme.primary.vertex)
+    } else {
+      return {
+        color: mix(scheme.edge.ortho),
+        material: 1,
+      }
+    }
   }
+  return new Color()
 }
 
 export default function getFormeColors(

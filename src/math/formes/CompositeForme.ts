@@ -319,6 +319,14 @@ export class GyrateSolidForme extends CompositeForme {
     return this.geom.caps().filter((cap) => this.isGyrate(cap))
   }
 
+  gyrateFaces = once(() => {
+    return this.gyrateCaps().flatMap((cap) => cap.faces())
+  })
+
+  isGyrateFace(face: Face) {
+    return face.inSet(this.gyrateFaces())
+  }
+
   isDiminishedFace(face: Face) {
     return (
       this.specs.isDiminished() &&
@@ -328,6 +336,18 @@ export class GyrateSolidForme extends CompositeForme {
 
   diminishedFaces() {
     return this.geom.faces.filter((f) => this.isDiminishedFace(f))
+  }
+
+  isFacetFace(face: Face, facet: "face" | "vertex") {
+    if (facet === "face") {
+      return face.numSides === 5
+    } else {
+      return face.numSides === 3
+    }
+  }
+
+  isEdgeFace(face: Face) {
+    return face.numSides === 4
   }
 
   /**
