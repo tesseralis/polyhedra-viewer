@@ -6,6 +6,7 @@ import Loading from "./Loading"
 
 const HomePage = React.lazy(() => import("./HomePage"))
 const ViewerPage = React.lazy(() => import("./ViewerPage"))
+const MuseumPage = React.lazy(() => import("./MuseumPage"))
 
 export default function App() {
   usePageTracker()
@@ -13,6 +14,7 @@ export default function App() {
     <Suspense fallback={<Loading />}>
       <Routes>
         <Route path="/" element={<HomePage />} />
+        <Route path="/museum" element={<MuseumPage />} />
         <Route path=":solid/*" element={<ViewerPage />} />
       </Routes>
     </Suspense>
