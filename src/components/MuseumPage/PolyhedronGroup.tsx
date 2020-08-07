@@ -1,5 +1,5 @@
 import { pick } from "lodash-es"
-import React, { useState, useRef } from "react"
+import React, { useRef } from "react"
 import { Table } from "tables"
 import PolyhedronModel from "components/ViewerPage/common/SolidScene/PolyhedronModel"
 import { getGeometry } from "math/operations/operationUtils"
@@ -15,7 +15,7 @@ const innerSpacing = 3
 
 function PolyhedronEntry({ entry, position, navigate }: any) {
   const ref = useRef<any>()
-  const [hovered, setHovered] = useState(false)
+  // const [hovered, setHovered] = useState(false)
   useFrame(() => {
     const rotation = ref.current?.rotation
     if (rotation) {
@@ -43,7 +43,7 @@ function PolyhedronEntry({ entry, position, navigate }: any) {
       </group>
     )
   }
-  const isDupe = entry.name() !== entry.canonicalName()
+  // const isDupe = entry.name() !== entry.canonicalName()
   const forme = createForme(entry, getGeometry(entry))
   // const colors = forme.geom.fagetFormeColors(forme)
   const geom = forme.orient()
@@ -65,8 +65,8 @@ function PolyhedronEntry({ entry, position, navigate }: any) {
     <group ref={ref} position={position}>
       <PolyhedronModel
         onClick={() => navigate(`/${escape(entry.name())}`)}
-        onPointerMove={() => setHovered(true)}
-        onPointerOut={() => setHovered(false)}
+        // onPointerMove={() => setHovered(true)}
+        // onPointerOut={() => setHovered(false)}
         value={geom.solidData}
         colors={faceColors}
         config={pick(config, ["showFaces", "showEdges", "showInnerFaces"])}

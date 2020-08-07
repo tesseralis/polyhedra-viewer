@@ -155,12 +155,14 @@ export default abstract class ClassicalForme extends PolyhedronForme<
     return 0
   }
 
+  // @override
   orientation() {
     if (this.specs.isRegular() && this.specs.isVertex()) {
       const v = this.geom.getVertex()
-      return [v.vec, v.adjacentVertices()[0].vec]
+      return [v.vec.clone().negate(), v.adjacentVertices()[0].vec] as const
     }
-    return this.adjacentFacetFaces("face").map((f) => f.normal()) as any
+    const [f1, f2] = this.adjacentFacetFaces("face")
+    return [f1.normal().clone().negate(), f2.normal()] as const
   }
 }
 
