@@ -29,8 +29,6 @@ function convertFace(face: number[], arg: AnyMatArg) {
       return new Face3(v0, v1!, v2!, undefined, color, material)
     } else {
       const colorArray = [v0, v1!, v2!].map((v) => color[face.indexOf(v)])
-      // const colorArray = [color[v0], color[v1!], color[v2!]]
-      console.log(colorArray)
       return new Face3(v0, v1!, v2!, undefined, colorArray, material)
     }
   })
@@ -86,7 +84,6 @@ function SolidFaces({
     },
     [vertices, faces, colors],
   )
-  console.log(colors)
 
   const hasMoved = useRef(false)
   const { showFaces, showInnerFaces } = config

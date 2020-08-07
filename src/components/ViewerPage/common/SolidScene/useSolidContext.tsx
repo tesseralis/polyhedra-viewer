@@ -83,9 +83,9 @@ function getCapstoneColor(forme: CapstoneForme, face: Face) {
     const faceSides = face.numSides > 5 ? "secondary" : "primary"
     return scheme[faceSides].face
   } else if (forme.isContainedInEnd(face)) {
+    const cap = forme.containingEnd(face) as Cap
+    const top = cap.innerVertices()
     if (face.numSides === 3) {
-      const cap = forme.containingEnd(face) as Cap
-      const top = cap.innerVertices()
       return face.vertices.map((v) => {
         if (v.inSet(top)) {
           return scheme.primary.face
@@ -96,7 +96,11 @@ function getCapstoneColor(forme: CapstoneForme, face: Face) {
       // return scheme.primary.vertex
     } else if (face.numSides === 4) {
       // TODO need to distinguish this from the edge faces
-      return scheme.edge.ortho
+      return face.vertices.map((v) => {
+        return (v.inSet(top) ? scheme.edge.gyro : scheme.edge.ortho)
+          .clone()
+          .offsetHSL(0, 0, 0.15)
+      })
     } else {
       // TODO want this to be a separate color from the top face
       return colorScheme[5].primary.face
