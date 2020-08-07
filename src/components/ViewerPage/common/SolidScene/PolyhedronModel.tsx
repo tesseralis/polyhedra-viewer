@@ -13,23 +13,30 @@ import {
 } from "three"
 import { useFrame, useUpdate } from "react-three-fiber"
 
-function getColorAndMaterial(arg: ColorArg) {
-  if (arg instanceof Color) {
+function getColorAndMaterial(arg: AnyMatArg): ColorMatArg {
+  if (arg instanceof Array || arg instanceof Color) {
     return { color: arg, material: 0 }
   }
   return arg
 }
 
-function convertFace(face: number[], arg: ColorArg) {
+function convertFace(face: number[], arg: AnyMatArg) {
   const [v0, ...vs] = face
   const pairs = zip(vs.slice(0, vs.length - 1), vs.slice(1))
   const { color, material } = getColorAndMaterial(arg)
   return pairs.map(([v1, v2]) => {
-    return new Face3(v0, v1!, v2!, undefined, color, material)
+    if (color instanceof Color) {
+      return new Face3(v0, v1!, v2!, undefined, color, material)
+    } else {
+      const colorArray = [v0, v1!, v2!].map((v) => color[face.indexOf(v)])
+      // const colorArray = [color[v0], color[v1!], color[v2!]]
+      console.log(colorArray)
+      return new Face3(v0, v1!, v2!, undefined, colorArray, material)
+    }
   })
 }
 
-function convertFaces(faces: number[][], colors: ColorArg[]) {
+function convertFaces(faces: number[][], colors: AnyMatArg[]) {
   return zip(faces, colors).flatMap(([face, color]) =>
     convertFace(face!, color!),
   )
@@ -41,16 +48,18 @@ interface SolidConfig {
   showInnerFaces: boolean
 }
 
-interface MaterialArg {
-  color: Color
+type ColorOrColors = Color | Color[]
+
+interface ColorMatArg {
+  color: ColorOrColors
   material: number
 }
 
-type ColorArg = Color | MaterialArg
+type AnyMatArg = ColorOrColors | ColorMatArg
 
 interface Props {
   value: SolidData
-  colors: ColorArg[]
+  colors: AnyMatArg[]
   config: SolidConfig
   onClick?(point: Vector3): void
   onPointerMove?(point: Vector3): void
@@ -77,6 +86,7 @@ function SolidFaces({
     },
     [vertices, faces, colors],
   )
+  console.log(colors)
 
   const hasMoved = useRef(false)
   const { showFaces, showInnerFaces } = config

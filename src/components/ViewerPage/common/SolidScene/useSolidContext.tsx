@@ -2,7 +2,7 @@ import { Color } from "three"
 import { useMemo, useCallback } from "react"
 import Config from "components/ConfigCtx"
 import { PolyhedronCtx, OperationCtx, TransitionCtx } from "../../context"
-import { Polyhedron, Face } from "math/polyhedra"
+import { Polyhedron, Face, Cap } from "math/polyhedra"
 import ClassicalForme from "math/formes/ClassicalForme"
 import CapstoneForme from "math/formes/CapstoneForme"
 import CompositeForme from "math/formes/CompositeForme"
@@ -84,7 +84,16 @@ function getCapstoneColor(forme: CapstoneForme, face: Face) {
     return scheme[faceSides].face
   } else if (forme.isContainedInEnd(face)) {
     if (face.numSides === 3) {
-      return scheme.primary.vertex
+      const cap = forme.containingEnd(face) as Cap
+      const top = cap.innerVertices()
+      return face.vertices.map((v) => {
+        if (v.inSet(top)) {
+          return scheme.primary.face
+        } else {
+          return scheme.primary.vertex
+        }
+      })
+      // return scheme.primary.vertex
     } else if (face.numSides === 4) {
       // TODO need to distinguish this from the edge faces
       return scheme.edge.ortho
@@ -205,7 +214,7 @@ export default function useSolidContext() {
       formeColors ||
       operationColors ||
       geom.faces.map((f) => colors[f.numSides])
-    return rawColors.map(toColor)
+    return rawColors
   }, [formeColors, transitionColors, operationColors, geom, colors])
 
   return {
