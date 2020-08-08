@@ -36,13 +36,13 @@ export default class PolyhedronForme<
   }
 
   orient() {
-    const scale = mean(this.geom.edges.map((e) => e.distanceToCenter()))
     const startPose: Pose = {
+      // TODO correctly center diminished polyhedra
       origin: this.geom.centroid(),
-      // TODO this is still determined by the original model!
-      scale,
+      scale: mean(this.geom.edges.map((e) => e.distanceToCenter())),
       orientation: this.orientation(),
     }
+
     const endPose: Pose = {
       origin: new Vector3(),
       scale: 1,
