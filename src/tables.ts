@@ -46,13 +46,9 @@ export interface TableSection {
 function* classicalRow(operation: Operation) {
   for (const family of families) {
     if (Classical.hasFacet(operation)) {
-      if (family === 3) {
-        yield Classical.query.withData({ operation, family, facet: "face" })
-      } else {
-        yield facets.map((facet) =>
-          Classical.query.withData({ operation, family, facet }),
-        )
-      }
+      yield facets.map((facet) =>
+        Classical.query.withData({ operation, family, facet }),
+      )
     } else if (operation === "snub") {
       yield Classical.query.withData({ operation, family, twist: "left" })
     } else {
@@ -253,6 +249,7 @@ const capstonesBi: Table = {
 
 const augSources = [
   "triangular prism",
+  "square prism",
   "pentagonal prism",
   "hexagonal prism",
   "dodecahedron",

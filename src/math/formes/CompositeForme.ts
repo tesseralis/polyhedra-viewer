@@ -95,6 +95,16 @@ export default abstract class CompositeForme extends PolyhedronForme<
 }
 
 export class AugmentedPrismForme extends CompositeForme {
+  // @override
+  orientation() {
+    const caps = this.caps()
+    const normal =
+      this.specs.data.augmented === 2
+        ? getCentroid(caps.map((c) => c.normal()))
+        : caps[0].normal()
+    return [this.endFaces()[0].normal(), normal] as const
+  }
+
   caps() {
     return super.caps().filter((cap) => cap.type === "pyramid")
   }
@@ -107,8 +117,9 @@ export class AugmentedPrismForme extends CompositeForme {
     return this.caps()
   }
 
-  baseFaces = once(() => {
-    if (this.specs.sourcePrism().isTriangular()) {
+  endFaces = once(() => {
+    const source = this.specs.sourcePrism()
+    if (source.isPrimary() && source.isTriangular()) {
       for (const face1 of this.geom.faces) {
         for (const face2 of this.geom.faces) {
           if (isInverse(face1.normal(), face2.normal())) {
@@ -119,13 +130,15 @@ export class AugmentedPrismForme extends CompositeForme {
       throw new Error(`Could not find base faces for ${this.specs.name()}`)
     }
 
-    if (this.specs.sourcePrism().isSquare()) {
-      // FIXME why doesn't this work??
-      const face1 = this.geom.faceWithNumSides(4)
-      const face2 = find(this.geom.faces, (f) =>
-        isInverse(face1.normal(), f.normal()),
-      )
-      return [face1, face2] as const
+    if (source.isSquare()) {
+      for (const f1 of this.geom.facesWithNumSides(4)) {
+        for (const f2 of this.geom.facesWithNumSides(4)) {
+          if (isInverse(f1.normal(), f2.normal())) {
+            return [f1, f2] as const
+          }
+        }
+      }
+      throw new Error(`Error finding inverse faces`)
     }
 
     return this.geom.facesWithNumSides(
@@ -133,8 +146,8 @@ export class AugmentedPrismForme extends CompositeForme {
     ) as [Face, Face]
   })
 
-  isBaseFace(face: Face) {
-    return face.inSet(this.baseFaces())
+  isEndFace(face: Face) {
+    return face.inSet(this.endFaces())
   }
 
   isSideFace(face: Face) {
@@ -155,6 +168,23 @@ export class AugmentedPrismForme extends CompositeForme {
 }
 
 export class AugmentedClassicalForme extends CompositeForme {
+  // @override
+  orientation() {
+    const caps = this.caps()
+    if (this.specs.isTri()) {
+      const axis = getCentroid(caps.map((c) => c.normal()))
+      return [axis, caps[0].normal()] as const
+    }
+    if (this.specs.hasAlignment() && this.specs.isMeta()) {
+      const axis = getCentroid(caps.map((c) => c.normal()))
+      const cross = axis.clone().cross(caps[0].normal())
+      return [axis, cross] as const
+    }
+    const cap = caps[0]
+    const edge = find(cap.boundary().edges, (e) => e.face.numSides === 3)
+    return [cap.normal(), edge.normal()] as const
+  }
+
   hasAlignment() {
     return super.hasAlignment() && this.specs.sourceClassical().isIcosahedral()
   }
@@ -225,6 +255,21 @@ export class AugmentedClassicalForme extends CompositeForme {
 }
 
 export class DiminishedSolidForme extends CompositeForme {
+  // @override
+  orientation() {
+    const faces = this.diminishedFaces()
+    if (this.specs.isAugmented() || this.specs.isTri()) {
+      const normal = getCentroid(faces.map((f) => f.normal()))
+      return [normal, faces[0].normal()] as const
+    }
+    if (this.specs.hasAlignment() && this.specs.isMeta()) {
+      const axis = getCentroid(faces.map((f) => f.normal()))
+      const cross = axis.clone().cross(faces[0].normal())
+      return [axis, cross] as const
+    }
+    return [faces[0].normal(), faces[0].edges[0].normal()] as const
+  }
+
   // TODO dedupe with gyrate
   isDiminishedFace(face: Face) {
     return (
@@ -261,6 +306,18 @@ export class DiminishedSolidForme extends CompositeForme {
 }
 
 export class GyrateSolidForme extends CompositeForme {
+  // @override
+  orientation() {
+    const mods = this.modifications()
+    if (mods.length === 0) {
+      // TODO return orientation of the base
+      return [this.geom.faces[0].normal(), this.geom.faces[1].normal()] as const
+    }
+    // FIXME make this more sophisticated
+    const boundary = mods[0] instanceof Cap ? mods[0].boundary() : mods[0]
+    return [mods[0].normal(), boundary.edges[0].normal()] as const
+  }
+
   /** Return whether the given cap is gyrated */
   isGyrate(cap: Cap) {
     return cap.boundary().edges.every((edge) => {
@@ -273,6 +330,14 @@ export class GyrateSolidForme extends CompositeForme {
     return this.geom.caps().filter((cap) => this.isGyrate(cap))
   }
 
+  gyrateFaces = once(() => {
+    return this.gyrateCaps().flatMap((cap) => cap.faces())
+  })
+
+  isGyrateFace(face: Face) {
+    return face.inSet(this.gyrateFaces())
+  }
+
   isDiminishedFace(face: Face) {
     return (
       this.specs.isDiminished() &&
@@ -282,6 +347,18 @@ export class GyrateSolidForme extends CompositeForme {
 
   diminishedFaces() {
     return this.geom.faces.filter((f) => this.isDiminishedFace(f))
+  }
+
+  isFacetFace(face: Face, facet: "face" | "vertex") {
+    if (facet === "face") {
+      return face.numSides === 5
+    } else {
+      return face.numSides === 3
+    }
+  }
+
+  isEdgeFace(face: Face) {
+    return face.numSides === 4
   }
 
   /**

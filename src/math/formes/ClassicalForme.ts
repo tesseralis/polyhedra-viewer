@@ -154,6 +154,16 @@ export default abstract class ClassicalForme extends PolyhedronForme<
   snubAngle(facet: Facet) {
     return 0
   }
+
+  // @override
+  orientation() {
+    if (this.specs.isRegular() && this.specs.isVertex()) {
+      const v = this.geom.getVertex()
+      return [v.vec.clone().negate(), v.adjacentVertices()[0].vec] as const
+    }
+    const [f1, f2] = this.adjacentFacetFaces("face")
+    return [f1.normal().clone().negate(), f2.normal()] as const
+  }
 }
 
 class RegularForme extends ClassicalForme {
@@ -185,7 +195,14 @@ class TruncatedForme extends ClassicalForme {
   }
 
   adjacentFacetFace(face: Face, facet: Facet) {
-    return find(face.adjacentFaces(), (f) => this.isFacetFace(f, facet))
+    if (facet === this.specs.facet()) {
+      return find(face.adjacentFaces(), (f) => this.isFacetFace(f, facet))
+    } else {
+      return find(
+        face.adjacentFaces()[0].adjacentFaces(),
+        (f) => f.numSides === face.numSides && !f.equals(face),
+      )
+    }
   }
 }
 

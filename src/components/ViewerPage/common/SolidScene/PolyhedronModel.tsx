@@ -11,19 +11,13 @@ import {
   FrontSide,
   Geometry,
 } from "three"
+import { Appearance } from "./getFormeColors"
 import { useFrame, useUpdate } from "react-three-fiber"
 
-function getColorAndMaterial(arg: AnyMatArg): ColorMatArg {
-  if (arg instanceof Array || arg instanceof Color) {
-    return { color: arg, material: 0 }
-  }
-  return arg
-}
-
-function convertFace(face: number[], arg: AnyMatArg) {
+function convertFace(face: number[], appearance: Appearance) {
   const [v0, ...vs] = face
   const pairs = zip(vs.slice(0, vs.length - 1), vs.slice(1))
-  const { color, material } = getColorAndMaterial(arg)
+  const { color, material } = appearance
   return pairs.map(([v1, v2]) => {
     if (color instanceof Color) {
       return new Face3(v0, v1!, v2!, undefined, color, material)
@@ -34,7 +28,7 @@ function convertFace(face: number[], arg: AnyMatArg) {
   })
 }
 
-function convertFaces(faces: number[][], colors: AnyMatArg[]) {
+function convertFaces(faces: number[][], colors: Appearance[]) {
   return zip(faces, colors).flatMap(([face, color]) =>
     convertFace(face!, color!),
   )
@@ -46,18 +40,9 @@ interface SolidConfig {
   showInnerFaces: boolean
 }
 
-type ColorOrColors = Color | Color[]
-
-interface ColorMatArg {
-  color: ColorOrColors
-  material: number
-}
-
-type AnyMatArg = ColorOrColors | ColorMatArg
-
 interface Props {
   value: SolidData
-  colors: AnyMatArg[]
+  appearance: Appearance[]
   config: SolidConfig
   onClick?(point: Vector3): void
   onPointerMove?(point: Vector3): void
@@ -66,7 +51,7 @@ interface Props {
 
 function SolidFaces({
   value,
-  colors,
+  appearance,
   onClick,
   onPointerMove,
   onPointerOut,
@@ -77,12 +62,12 @@ function SolidFaces({
     (geom: Geometry) => {
       geom.vertices = vertices
       geom.verticesNeedUpdate = true
-      geom.faces = convertFaces(faces, colors)
+      geom.faces = convertFaces(faces, appearance)
       geom.elementsNeedUpdate = true
       geom.colorsNeedUpdate = true
       geom.computeFaceNormals()
     },
-    [vertices, faces, colors],
+    [vertices, faces, appearance],
   )
 
   const hasMoved = useRef(false)
