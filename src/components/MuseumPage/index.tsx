@@ -3,11 +3,12 @@ import { Canvas, extend, useThree, useFrame } from "react-three-fiber"
 import { useStyle } from "styles"
 import { TrackballControls } from "three/examples/jsm/controls/TrackballControls"
 import { tableSections } from "tables"
-import PolyhedronGroup from "./PolyhedronGroup"
+import PolyhedronTable from "./PolyhedronTable"
 import { useNavigate } from "react-router-dom"
 
 extend({ TrackballControls })
 
+// TODO deduplicate with the controls in the other scene
 function Controls() {
   const {
     camera,
@@ -34,6 +35,7 @@ function Controls() {
 
 const sectionSpacing = 40
 const subsecSpacing = 25
+// TODO why is this so slow to load??
 export default function MuseumScene() {
   const navigate = useNavigate()
   const style = useStyle({
@@ -55,7 +57,7 @@ export default function MuseumScene() {
             if (section.tables) {
               return section.tables.map((table, j) => (
                 <group key={table.caption} position={[j * subsecSpacing, 0, 0]}>
-                  <PolyhedronGroup navigate={navigate} table={table} />
+                  <PolyhedronTable navigate={navigate} table={table} />
                 </group>
               ))
             }
@@ -68,7 +70,7 @@ export default function MuseumScene() {
                         key={table.caption}
                         position={[k * subsecSpacing, 0, 0]}
                       >
-                        <PolyhedronGroup navigate={navigate} table={table} />
+                        <PolyhedronTable navigate={navigate} table={table} />
                       </group>
                     ))}
                   </group>

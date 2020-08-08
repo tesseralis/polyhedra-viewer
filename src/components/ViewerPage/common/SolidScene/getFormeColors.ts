@@ -5,7 +5,19 @@ import CapstoneForme from "math/formes/CapstoneForme"
 import CompositeForme from "math/formes/CompositeForme"
 import PolyhedronForme from "math/formes/PolyhedronForme"
 
-function toColor(color: any): Color {
+type FaceColor = Color | Color[]
+
+export interface Appearance {
+  color: FaceColor
+  material: number
+}
+
+const facetMaterial = 0
+const capMaterial = 0
+const edgeFaceMaterial = 1
+const prismMaterial = 1
+
+export function toColor(color: any): Color {
   if (color instanceof Color) return color
   if (color.color) {
     return { ...color, color: new Color(color.color) }
@@ -13,16 +25,25 @@ function toColor(color: any): Color {
   return new Color(color)
 }
 
-function lighten(color: Color, amount: number) {
+export function lighten(color: Color, amount: number) {
   return toColor(color)
     .clone()
     .offsetHSL(0, 0, amount / 100)
 }
 
-function darken(color: Color, amount: number) {
+export function darken(color: Color, amount: number) {
   return toColor(color)
     .clone()
     .offsetHSL(0, 0, -amount / 100)
+}
+
+export function mixColor(appearance: Appearance, mixer: (c: Color) => Color) {
+  const { color, material } = appearance
+  const newColor = color instanceof Color ? mixer(color) : color.map(mixer)
+  return {
+    color: newColor,
+    material,
+  }
 }
 
 function createFamilyColor(face: string, vertex: string) {
@@ -65,73 +86,98 @@ function getClassicalColor(forme: ClassicalForme, face: Face) {
   if (!facet) {
     return {
       color: scheme.edge[forme.specs.isSnub() ? "gyro" : "ortho"],
-      material: 1,
+      material: edgeFaceMaterial,
     }
   }
   const faceSides = face.numSides > 5 ? "secondary" : "primary"
   return {
     color: scheme[faceSides][facet],
-    material: 0,
+    material: facetMaterial,
   }
 }
 
-function getCapstoneColor(forme: CapstoneForme, face: Face) {
+function getCapstoneColor(forme: CapstoneForme, face: Face): Appearance {
   const scheme = colorScheme[forme.specs.data.base]
   if (forme.isTop(face)) {
     const faceSides = face.numSides > 5 ? "secondary" : "primary"
-    return scheme[faceSides].face
+    return {
+      color: scheme[faceSides].face,
+      material: capMaterial,
+    }
   } else if (forme.isContainedInEnd(face)) {
     const end = forme.containingEnd(face)
     if (end instanceof Cap) {
       const top = end.innerVertices()
       if (forme.isTop(face)) {
-        return scheme.primary.face
+        return {
+          color: scheme.primary.face,
+          material: capMaterial,
+        }
       } else if (face.numSides === 3) {
-        return face.vertices.map((v) => {
-          if (v.inSet(top)) {
-            return scheme.primary.face
-          } else {
-            return scheme.primary.vertex
-          }
-        })
+        return {
+          color: face.vertices.map((v) => {
+            if (v.inSet(top)) {
+              return scheme.primary.face
+            } else {
+              return scheme.primary.vertex
+            }
+          }),
+          material: capMaterial,
+        }
         // return scheme.primary.vertex
       } else if (face.numSides === 4) {
         // TODO need to distinguish this from the edge faces
-        return face.vertices.map((v) => {
-          return (v.inSet(top) ? scheme.edge.gyro : scheme.edge.ortho)
-            .clone()
-            .offsetHSL(0, 0, 0.15)
-        })
+        return {
+          color: face.vertices.map((v) => {
+            return (v.inSet(top) ? scheme.edge.gyro : scheme.edge.ortho)
+              .clone()
+              .offsetHSL(0, 0, 0.15)
+          }),
+          material: capMaterial,
+        }
       } else {
-        return new Color()
+        // FIXME
+        return {
+          color: new Color(),
+          material: prismMaterial,
+        }
       }
     } else {
       // TODO want this to be a separate color from the top face
-      return colorScheme[5].primary.face
+      return {
+        color: colorScheme[5].primary.face,
+        material: capMaterial,
+      }
     }
   } else {
-    const side = forme.specs.isElongated() ? "ortho" : ("gyro" as const)
+    const side = forme.specs.isElongated() ? "ortho" : "gyro"
     return {
       color: scheme.edge[side].clone().offsetHSL(0, -1 / 50, 1 / 100),
-      material: 1,
+      material: prismMaterial,
     }
   }
 }
 
-function getCompositeColor(forme: CompositeForme, face: Face) {
+function getCompositeColor(forme: CompositeForme, face: Face): Appearance {
   if (forme.isAugmentedPrism()) {
     const sourceSpecs = forme.specs.sourcePrism()
     const scheme = colorScheme[sourceSpecs.data.base]
     if (forme.isEndFace(face)) {
-      return scheme[sourceSpecs.data.type].face
+      return {
+        color: scheme[sourceSpecs.data.type].face,
+        material: capMaterial,
+      }
     } else if (forme.isSideFace(face)) {
       return {
         color: scheme.edge.ortho,
-        material: 1,
+        material: prismMaterial,
       }
     } else {
       // augmented face
-      return scheme.primary.vertex.clone().offsetHSL(0, 0, 1 / 4)
+      return {
+        color: scheme.primary.vertex.clone().offsetHSL(0, 0, 1 / 4),
+        material: capMaterial,
+      }
     }
   } else if (forme.isAugmentedClassical()) {
     const scheme = colorScheme[forme.specs.sourceClassical().data.family]
@@ -139,25 +185,46 @@ function getCompositeColor(forme: CompositeForme, face: Face) {
       ? "secondary"
       : ("primary" as const)
     if (forme.isMainFace(face)) {
-      return scheme[type].face
+      return {
+        color: scheme[type].face,
+        material: facetMaterial,
+      }
     } else if (forme.isMinorFace(face)) {
-      return scheme.primary.vertex
+      return {
+        color: scheme.primary.vertex,
+        material: facetMaterial,
+      }
     } else if (forme.isCapTop(face)) {
-      return lighten(scheme.primary.face, 25)
+      return {
+        color: lighten(scheme.primary.face, 25),
+        material: capMaterial,
+      }
     } else {
-      return lighten(
-        face.numSides === 3 ? scheme.primary.vertex : scheme.edge.ortho,
-        25,
-      )
+      return {
+        color: lighten(
+          face.numSides === 3 ? scheme.primary.vertex : scheme.edge.ortho,
+          25,
+        ),
+        material: capMaterial,
+      }
     }
   } else if (forme.isDiminishedSolid()) {
     const scheme = colorScheme[5]
     if (forme.isAugmentedFace(face)) {
-      return lighten(scheme.primary.vertex, 25)
+      return {
+        color: lighten(scheme.primary.vertex, 25),
+        material: facetMaterial,
+      }
     } else if (forme.isDiminishedFace(face)) {
-      return darken(scheme.primary.face, 25)
+      return {
+        color: darken(scheme.primary.face, 25),
+        material: facetMaterial,
+      }
     } else {
-      return scheme.primary.vertex
+      return {
+        color: scheme.primary.vertex,
+        material: capMaterial,
+      }
     }
   } else if (forme.isGyrateSolid()) {
     const scheme = colorScheme[5]
@@ -168,25 +235,37 @@ function getCompositeColor(forme: CompositeForme, face: Face) {
       return color
     }
     if (forme.isDiminishedFace(face)) {
-      return mix(scheme.secondary.face)
+      return {
+        color: mix(scheme.secondary.face),
+        material: facetMaterial,
+      }
     } else if (forme.isFacetFace(face, "face")) {
-      return mix(scheme.primary.face)
+      return {
+        color: mix(scheme.primary.face),
+        material: facetMaterial,
+      }
     } else if (forme.isFacetFace(face, "vertex")) {
-      return mix(scheme.primary.vertex)
+      return {
+        color: mix(scheme.primary.vertex),
+        material: facetMaterial,
+      }
     } else {
       return {
         color: mix(scheme.edge.ortho),
-        material: 1,
+        material: edgeFaceMaterial,
       }
     }
   }
-  return new Color()
+  return {
+    color: new Color(),
+    material: 0,
+  }
 }
 
 export default function getFormeColors(
   polyhedron: PolyhedronForme,
   face: Face,
-) {
+): Appearance {
   if (polyhedron.isClassical()) {
     return getClassicalColor(polyhedron, face)
   } else if (polyhedron.isCapstone()) {
@@ -194,6 +273,9 @@ export default function getFormeColors(
   } else if (polyhedron.isComposite()) {
     return getCompositeColor(polyhedron, face)
   } else {
-    return new Color()
+    return {
+      color: new Color(),
+      material: 0,
+    }
   }
 }

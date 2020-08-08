@@ -55,7 +55,7 @@ export default function ViewerScene() {
       <ambientLight />
       <ThreePolyhedron
         value={solidData}
-        colors={colors}
+        appearance={colors}
         config={pick(config, ["showFaces", "showEdges", "showInnerFaces"])}
         onPointerMove={setHitOption}
         onClick={applyWithHitOption}

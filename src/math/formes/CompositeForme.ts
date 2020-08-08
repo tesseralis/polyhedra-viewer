@@ -131,7 +131,6 @@ export class AugmentedPrismForme extends CompositeForme {
     }
 
     if (source.isSquare()) {
-      // FIXME why doesn't this work??
       for (const f1 of this.geom.facesWithNumSides(4)) {
         for (const f2 of this.geom.facesWithNumSides(4)) {
           if (isInverse(f1.normal(), f2.normal())) {
