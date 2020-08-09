@@ -1,8 +1,6 @@
 import { Polyhedron, Vertex } from "math/polyhedra"
 import Operation, { OpResult } from "./Operation"
-import { PolyhedronForme, createForme } from "math/formes"
-import { getGeometry } from "math/operations/operationUtils"
-import { getSpecs } from "specs"
+import { PolyhedronForme, fromName } from "math/formes"
 
 interface OpTestCases {
   pass: string[]
@@ -14,10 +12,7 @@ export function validateOpInputs(
   { pass, fail }: OpTestCases,
 ) {
   function canApplyTo(name: string) {
-    const specs = getSpecs(name)
-    const geom = getGeometry(specs)
-    const forme = createForme(specs, geom)
-    return operation.canApplyTo(forme)
+    return operation.canApplyTo(fromName(name))
   }
   for (const name of pass) {
     expect(name).toSatisfy(canApplyTo)
@@ -32,10 +27,7 @@ export function validateHasOptions(
   { pass, fail }: OpTestCases,
 ) {
   function hasOptions(name: string) {
-    const specs = getSpecs(name)
-    const geom = getGeometry(specs)
-    const forme = createForme(specs, geom)
-    return operation.hasOptions(forme)
+    return operation.hasOptions(fromName(name))
   }
   for (const name of pass) {
     expect(name).toSatisfy(hasOptions)

@@ -3,9 +3,8 @@ import React, { useRef, useState } from "react"
 import { Table } from "tables"
 import { Color } from "three"
 import PolyhedronModel from "components/ViewerPage/common/SolidScene/PolyhedronModel"
-import { getGeometry } from "math/operations/operationUtils"
 import ConfigCtx from "components/ConfigCtx"
-import { createForme } from "math/formes"
+import { fromSpecs } from "math/formes"
 
 import { useFrame } from "react-three-fiber"
 import getFormeColors, {
@@ -31,7 +30,7 @@ function PolyhedronEntry({ entry, position, navigate }: any) {
   // (it returns false for gyrobifastigium)
   const isDupe = entry.name() !== entry.canonicalName()
   // const geom = getGeometry(entry)
-  const forme = createForme(entry, getGeometry(entry))
+  const forme = fromSpecs(entry)
   const geom = forme.orient()
   // const geom = forme.geom
 

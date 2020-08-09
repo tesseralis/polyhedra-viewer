@@ -4,7 +4,8 @@ import CapstoneForme from "./CapstoneForme"
 import CompositeForme from "./CompositeForme"
 import ElementaryForme from "./ElementaryForme"
 
-import { PolyhedronSpecs } from "specs"
+import { PolyhedronSpecs, getSpecs } from "specs"
+import { getGeometry } from "math/operations/operationUtils"
 import { Polyhedron } from "math/polyhedra"
 
 // TODO figure out how to return the right forme without the `any` cast
@@ -17,4 +18,14 @@ export default function createForme<S extends PolyhedronSpecs>(
   if (specs.isComposite()) return CompositeForme.create(specs, geom) as any
   if (specs.isElementary()) return ElementaryForme.create(specs, geom) as any
   throw new Error(`Invalid specs: ${specs.name()}`)
+}
+
+export function fromSpecs<S extends PolyhedronSpecs>(
+  specs: S,
+): PolyhedronForme<S> {
+  return createForme(specs, getGeometry(specs))
+}
+
+export function fromName(name: string) {
+  return fromSpecs(getSpecs(name))
 }

@@ -2,8 +2,7 @@ import { FacetType } from "specs"
 import { getSpecs } from "specs"
 import { Polyhedron } from "math/polyhedra"
 import { OpName, operations } from "math/operations"
-import { getGeometry } from "math/operations/operationUtils"
-import { PolyhedronForme, createForme } from "math/formes"
+import { PolyhedronForme, createForme, fromName } from "math/formes"
 import { validateOperationApplication } from "../operationTestUtils"
 
 interface Args {
@@ -177,16 +176,16 @@ const chainedTests: OpTest[] = [
   },
 ]
 
-function doOperationStep(opInfo: OpInfo, polyhedron: PolyhedronForme) {
-  const { op, args, expected } = getOpInfo(opInfo, polyhedron.geom)
+function doOperationStep(opInfo: OpInfo, forme: PolyhedronForme) {
+  const { op, args, expected } = getOpInfo(opInfo, forme.geom)
   if (op === "forme") {
     const nextSpecs = getSpecs(expected)
-    expect(polyhedron.specs.canonicalName()).toEqual(nextSpecs.canonicalName())
-    return createForme(nextSpecs, polyhedron.geom)
+    expect(forme.specs.canonicalName()).toEqual(nextSpecs.canonicalName())
+    return createForme(nextSpecs, forme.geom)
   }
   const operation = operations[op]
-  expect(polyhedron).toSatisfy((p) => operation.canApplyTo(p))
-  const { result } = validateOperationApplication(operation, polyhedron, args)
+  expect(forme).toSatisfy((p) => operation.canApplyTo(p))
+  const { result } = validateOperationApplication(operation, forme, args)
 
   expect(result.specs.name()).toEqual(expected)
   return result
@@ -195,8 +194,7 @@ function doOperationStep(opInfo: OpInfo, polyhedron: PolyhedronForme) {
 describe("chained operations", () => {
   for (const test of chainedTests) {
     const { start, description, operations } = test
-    const specs = getSpecs(start)
-    let polyhedron = createForme(specs, getGeometry(specs))
+    let polyhedron = fromName(start)
     it(description, () => {
       for (const opInfo of operations) {
         polyhedron = doOperationStep(opInfo, polyhedron)
