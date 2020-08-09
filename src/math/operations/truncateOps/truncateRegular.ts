@@ -10,9 +10,7 @@ function getRegularPose(
   return {
     origin: forme.geom.centroid(),
     scale: forme.facetFace(facet).distanceToCenter(),
-    orientation: forme
-      .adjacentFacetFaces(facet)
-      .map((face) => face.normal()) as any,
+    orientation: forme.adjacentFacetFaces(facet),
   }
 }
 
