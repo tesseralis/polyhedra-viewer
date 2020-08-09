@@ -23,6 +23,8 @@ export default class Elementary extends Specs<ElementaryData> {
     super("elementary", data)
   }
 
+  unwrap = () => this
+
   static *getAll() {
     for (const base of bases) {
       yield new Elementary({ base })

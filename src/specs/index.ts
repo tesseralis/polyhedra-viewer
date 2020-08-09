@@ -16,7 +16,7 @@ export {
   oppositeTwist,
 } from "./common"
 
-export { default as PolyhedronSpecs } from "./PolyhedronSpecs"
+export type { PolyhedronSpecs } from "./PolyhedronSpecs"
 export { default as Classical, facetTypes, oppositeFacet } from "./Classical"
 export type { FacetType } from "./Classical"
 export {

@@ -57,6 +57,9 @@ export default class Capstone extends Specs<CapstoneData> {
     super("capstone", Capstone.cleanData(data))
   }
 
+  // @override
+  unwrap = () => this
+
   withData(data: Partial<CapstoneData>) {
     return Capstone.query.withData(
       Capstone.cleanData({ ...this.data, ...data }),

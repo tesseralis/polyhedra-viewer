@@ -5,6 +5,7 @@ import { Polyhedron } from "math/polyhedra"
 import type ClassicalForme from "./ClassicalForme"
 import type CapstoneForme from "./CapstoneForme"
 import type CompositeForme from "./CompositeForme"
+import type ElementaryForme from "./ElementaryForme"
 import { Vector3 } from "three"
 import {
   Orientation,
@@ -33,6 +34,10 @@ export default class PolyhedronForme<
 
   isComposite(): this is CompositeForme {
     return this.specs.isComposite()
+  }
+
+  isElementary(): this is ElementaryForme {
+    return this.specs.isElementary()
   }
 
   orientation(): Orientation {

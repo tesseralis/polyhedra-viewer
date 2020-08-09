@@ -182,9 +182,9 @@ class OpPair<
       // const middleSolid = normalizeIntermediate(getMiddle(entry))
       const inter = getMiddle(entry)
       const middleSolid =
-        inter instanceof PolyhedronSpecs
-          ? (createForme(inter, getGeometry(inter)) as Forme)
-          : inter
+        inter instanceof PolyhedronForme
+          ? inter
+          : (createForme(inter, getGeometry(inter)) as Forme)
 
       const alignedInter = alignPolyhedron(
         middleSolid.geom,

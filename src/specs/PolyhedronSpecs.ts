@@ -9,6 +9,8 @@ import getConwaySymbol from "./getConwaySymbol"
 import type { Symmetry } from "./symmetry"
 import { getAlternateNames, getCanonicalName } from "data/alternates"
 
+export type PolyhedronSpecs = Classical | Capstone | Composite | Elementary
+
 type PolyhedronType =
   | "classical"
   | "capstone"
@@ -16,7 +18,7 @@ type PolyhedronType =
   | "modified antiprism"
   | "elementary"
 
-export default abstract class PolyhedronSpecs<Data extends {} = {}> {
+export default abstract class Specs<Data extends {} = {}> {
   type: PolyhedronType
   data: Data
 
@@ -102,7 +104,5 @@ export default abstract class PolyhedronSpecs<Data extends {} = {}> {
     return this.type === "elementary"
   }
 
-  unwrap(): PolyhedronSpecs {
-    return this
-  }
+  abstract unwrap(): PolyhedronSpecs
 }

@@ -37,6 +37,8 @@ export default class Classical extends Specs<ClassicalData> {
     super("classical", Classical.cleanData(data))
   }
 
+  unwrap = () => this
+
   withData(data: Partial<ClassicalData>) {
     return Classical.query.withData(
       Classical.cleanData({ ...this.data, ...data }),
