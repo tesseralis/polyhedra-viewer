@@ -1,5 +1,5 @@
 import { once } from "lodash"
-import { angleBetween, getMidpoint, vecEquals } from "math/geom"
+import { angleBetween, getMidpoint } from "math/geom"
 import Facet from "./Facet"
 import type Vertex from "./Vertex"
 import { find } from "utils"
@@ -39,7 +39,7 @@ export default class Edge extends Facet {
   }
 
   isValid() {
-    return !vecEquals(this.v1.vec, this.v2.vec)
+    return !this.v1.isConcentric(this.v2)
   }
 
   midpoint() {

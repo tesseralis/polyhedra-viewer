@@ -1,6 +1,4 @@
-import { Vector3 } from "three"
-import { vecEquals } from "math/geom"
-import { Polyhedron } from "math/polyhedra"
+import { Polyhedron, Vertex } from "math/polyhedra"
 import Operation, { OpResult } from "./Operation"
 import PolyhedronForme from "math/formes/PolyhedronForme"
 import { getGeometry } from "math/operations/operationUtils"
@@ -48,16 +46,15 @@ export function validateHasOptions(
   }
 }
 
-function includesToPrecision(array: Vector3[], value: Vector3) {
-  return array.some((v) => vecEquals(v, value))
+function includesToPrecision(array: Vertex[], value: Vertex) {
+  return array.some((v) => value.isConcentric(v))
 }
 
 // TODO figure out some not n-squared test for this
-function expectVerticesMatch(test: Vector3[], ref: Vector3[]) {
+function expectVerticesMatch(test: Vertex[], ref: Vertex[]) {
   for (const vec of test) {
     expect(vec).toSatisfy((vec) => includesToPrecision(ref, vec))
   }
-  // expect(test).toSatisfyAll((vec) => includesToPrecision(ref, vec))
 }
 
 function expectValidAnimationData(
@@ -70,17 +67,13 @@ function expectValidAnimationData(
   const { start, endVertices } = animationData!
   // "Augment" has a weird start position so skip this check for it
   if (opName !== "augment") {
-    const startVertices = start.vertices.map((v) => v.vec)
-    expectVerticesMatch(
-      startVertices,
-      original.vertices.map((v) => v.vec),
-    )
+    expectVerticesMatch(start.vertices, original.vertices)
   }
   // "Diminish" has a weird end position so skip this check for it
   if (opName !== "diminish") {
     expectVerticesMatch(
-      endVertices,
-      result.geom.vertices.map((v) => v.vec),
+      original.withVertices(endVertices).vertices,
+      result.geom.vertices,
     )
   }
 }

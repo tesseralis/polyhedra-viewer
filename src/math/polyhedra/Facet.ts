@@ -48,13 +48,16 @@ export default abstract class Facet {
     return _v.clone().sub(this.centroid())
   }
 
-  isAligned(v: Facet | Vector3) {
-    const _v = v instanceof Facet ? v.normal() : v.clone().normalize()
-    return vecEquals(this.normal(), _v)
+  /** Returns whether the facets have the same normals */
+  isAligned(f: Facet) {
+    return vecEquals(this.normal(), f.normal())
   }
 
-  isInverse(v: Facet | Vector3) {
-    const _v = v instanceof Facet ? v.normal() : v.clone().normalize()
-    return vecEquals(this.normal().clone().negate(), _v)
+  isInverse(f: Facet) {
+    return vecEquals(this.normal().clone().negate(), f.normal())
+  }
+
+  isConcentric(f: Facet) {
+    return vecEquals(this.centroid(), f.centroid())
   }
 }

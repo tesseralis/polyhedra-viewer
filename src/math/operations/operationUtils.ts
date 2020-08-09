@@ -8,7 +8,7 @@ import {
   VertexList,
   VertexArg,
 } from "math/polyhedra"
-import { Transform, vecEquals, translateMat, scaleMat } from "math/geom"
+import { Transform, translateMat, scaleMat } from "math/geom"
 import { mapObject } from "utils"
 import { PolyhedronSpecs, Facet as FacetType, Twist } from "specs"
 
@@ -152,7 +152,7 @@ export function deduplicateVertices(polyhedron: Polyhedron) {
   const oldToNew: Record<number, number> = {}
 
   polyhedron.vertices.forEach((v, vIndex) => {
-    const match = unique.find((point) => vecEquals(v.vec, point.vec))
+    const match = unique.find((point) => v.isConcentric(point))
     if (match === undefined) {
       unique.push(v)
       oldToNew[vIndex] = vIndex
