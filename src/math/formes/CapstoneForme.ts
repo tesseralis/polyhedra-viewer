@@ -57,6 +57,18 @@ export default abstract class CapstoneForme extends PolyhedronForme<Capstone> {
     )
   })
 
+  private capOpts() {
+    return {
+      type: this.specs.data.type,
+      fastigium: this.specs.isDigonal(),
+      rotunda: this.specs.isPentagonal(),
+    }
+  }
+
+  protected caps = once(() => {
+    return this.geom.caps(this.capOpts())
+  })
+
   endCaps() {
     return this.ends().filter((end) => end instanceof Cap) as Cap[]
   }
@@ -191,7 +203,7 @@ class SnubCapstoneForme extends CapstoneForme {
 
 class MonoCapstoneForme extends CapstoneForme {
   *queryTops() {
-    yield* this.geom.caps()
+    yield* this.caps()
   }
 
   *queryBottoms() {
@@ -201,7 +213,7 @@ class MonoCapstoneForme extends CapstoneForme {
 
 class BiCapstoneForme extends CapstoneForme {
   *queryTops() {
-    const caps = this.geom.caps()
+    const caps = this.caps()
     if (this.specs.isCupolaRotunda()) {
       yield* caps.filter((cap) => cap.type === "rotunda")
     } else {
@@ -210,6 +222,6 @@ class BiCapstoneForme extends CapstoneForme {
   }
 
   *queryBottoms() {
-    yield* this.geom.caps()
+    yield* this.caps()
   }
 }

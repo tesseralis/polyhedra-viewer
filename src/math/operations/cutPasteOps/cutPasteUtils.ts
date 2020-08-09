@@ -123,7 +123,7 @@ function getModifiableCaps(forme: PolyhedronForme) {
   } else if (forme.isComposite()) {
     return forme.caps()
   } else {
-    return forme.geom.caps()
+    return forme.geom.caps({ type: "primary" })
   }
 }
 

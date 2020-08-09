@@ -10,7 +10,7 @@ import PolyhedronForme from "math/formes/PolyhedronForme"
 interface Args {
   face?: number
   facet?: FacetType
-  cap?: boolean
+  cap?: "primary" | "secondary"
 }
 
 type ChainedOpName = OpName | "forme"
@@ -30,7 +30,8 @@ function getArgs(args: Args, polyhedron: Polyhedron) {
     return { ...args, face: polyhedron.faceWithNumSides(args.face) }
   }
   if (args.cap) {
-    return { ...args, cap: polyhedron.caps()[0] }
+    // TODO support cupolae
+    return { ...args, cap: polyhedron.caps({ type: args.cap })[0] }
   }
   return args
 }
@@ -60,7 +61,7 @@ const chainedTests: OpTest[] = [
     start: "square pyramid",
     operations: [
       { op: "augment", args: { face: 4 }, expected: "square bipyramid" },
-      { op: "diminish", args: { cap: true }, expected: "square pyramid" },
+      { op: "diminish", args: { cap: "primary" }, expected: "square pyramid" },
       ["elongate", "elongated square pyramid"],
     ],
   },
@@ -136,7 +137,7 @@ const chainedTests: OpTest[] = [
       ["expand", "rhombicosidodecahedron"],
       {
         op: "diminish",
-        args: { cap: true },
+        args: { cap: "secondary" },
         expected: "diminished rhombicosidodecahedron",
       },
     ],
@@ -148,7 +149,7 @@ const chainedTests: OpTest[] = [
     operations: [
       {
         op: "diminish",
-        args: { cap: true },
+        args: { cap: "secondary" },
         expected: "metabiaugmented truncated dodecahedron",
       },
       ["sharpen", "metabiaugmented dodecahedron"],
@@ -160,10 +161,14 @@ const chainedTests: OpTest[] = [
     operations: [
       {
         op: "diminish",
-        args: { cap: true },
+        args: { cap: "primary" },
         expected: "elongated pentagonal pyramid",
       },
-      { op: "diminish", args: { cap: true }, expected: "pentagonal prism" },
+      {
+        op: "diminish",
+        args: { cap: "primary" },
+        expected: "pentagonal prism",
+      },
       {
         op: "augment",
         args: { face: 4 },

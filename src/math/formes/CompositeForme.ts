@@ -62,10 +62,7 @@ export default abstract class CompositeForme extends PolyhedronForme<
     )
   }
 
-  /** Get the caps associated with this forme */
-  caps() {
-    return this.geom.caps()
-  }
+  abstract caps(): Cap[]
 
   // TODO implement this for diminished/gyrate
   sourceCentroid() {
@@ -103,9 +100,9 @@ export class AugmentedPrismForme extends CompositeForme {
     return [this.endFaces()[0], normal] as const
   }
 
-  caps() {
-    return super.caps().filter((cap) => cap.type === "pyramid")
-  }
+  caps = once(() => {
+    return this.geom.caps({ type: "primary" })
+  })
 
   hasAlignment() {
     return super.hasAlignment() && this.specs.sourcePrism().isSecondary()
@@ -191,15 +188,17 @@ export class AugmentedClassicalForme extends CompositeForme {
     return this.caps()
   }
 
-  caps() {
-    const caps = super.caps()
+  caps = once(() => {
     const specs = this.specs.sourceClassical()
+    const caps = this.geom.caps({
+      type: specs.isTruncated() ? "secondary" : "primary",
+    })
     // If it's an augmented tetrahedron, only consider the first cap
     if (specs.isTetrahedral() && specs.isRegular()) {
       return this.specs.isAugmented() ? [caps[0]] : []
     }
     return caps
-  }
+  })
 
   // Functions that exclusive to augmented solids
 
@@ -253,6 +252,10 @@ export class AugmentedClassicalForme extends CompositeForme {
 }
 
 export class DiminishedSolidForme extends CompositeForme {
+  caps = once(() => {
+    return this.geom.caps({ type: "primary" })
+  })
+
   // @override
   orientation() {
     const faces = this.diminishedFaces()
@@ -304,6 +307,10 @@ export class DiminishedSolidForme extends CompositeForme {
 }
 
 export class GyrateSolidForme extends CompositeForme {
+  caps = once(() => {
+    return this.geom.caps({ type: "secondary" })
+  })
+
   // @override
   orientation() {
     const mods = this.modifications()
@@ -325,7 +332,7 @@ export class GyrateSolidForme extends CompositeForme {
   }
 
   gyrateCaps() {
-    return this.geom.caps().filter((cap) => this.isGyrate(cap))
+    return this.caps().filter((cap) => this.isGyrate(cap))
   }
 
   gyrateFaces = once(() => {

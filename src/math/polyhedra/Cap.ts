@@ -1,7 +1,7 @@
 import { once, countBy, isEqual } from "lodash-es"
 
 import { flatMapUniq, find } from "utils"
-import { CapType } from "specs"
+import { CapType, PolygonType } from "specs"
 import Facet from "./Facet"
 import type Polyhedron from "./Polyhedron"
 import type Face from "./Face"
@@ -51,23 +51,29 @@ function createMapper<T>(mapper: (p: Polyhedron) => T[], Base: Constructor<T>) {
   }
 }
 
+export interface CapSearchOpts {
+  type: PolygonType
+  rotunda?: boolean
+  fastigium?: boolean
+}
+
 export default abstract class Cap extends Facet {
   type: CapType
   private _innerVertices: Vertex[]
   private faceConfiguration: FaceConfiguration
 
-  static getAll(polyhedron: Polyhedron): Cap[] {
-    const pyramids = Pyramid.getAll(polyhedron)
-    if (pyramids.length > 0) return pyramids
+  static getAll(polyhedron: Polyhedron, opts: CapSearchOpts): Cap[] {
+    if (opts.type === "primary") {
+      return Pyramid.getAll(polyhedron)
+    }
 
-    const fastigium = Fastigium.getAll(polyhedron)
-    if (fastigium.length > 0) return fastigium
+    if (opts.fastigium) {
+      return Fastigium.getAll(polyhedron)
+    }
 
-    const cupolaRotunda = Cupola.getAll(polyhedron).concat(
-      Rotunda.getAll(polyhedron),
-    )
-    if (cupolaRotunda.length > 0) return cupolaRotunda
-    return []
+    const cupolae = Cupola.getAll(polyhedron)
+    const rotundae = opts.rotunda ? Rotunda.getAll(polyhedron) : []
+    return cupolae.concat(rotundae)
   }
 
   constructor(
@@ -89,7 +95,7 @@ export default abstract class Cap extends Facet {
     return this.allVertices()
   }
 
-  allVertices = once(() => {
+  private allVertices = once(() => {
     return this.innerVertices().concat(this.boundary().vertices)
   })
 
@@ -132,8 +138,7 @@ class Pyramid extends Cap {
 
 class Fastigium extends Cap {
   constructor(edge: Edge) {
-    const config = { "3": 1, "4": 2 }
-    super(edge.vertices, "cupola", config)
+    super(edge.vertices, "cupola", { "3": 1, "4": 2 })
   }
   static getAll = createMapper((p) => p.edges, Fastigium)
 }
