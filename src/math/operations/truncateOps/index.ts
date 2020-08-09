@@ -2,14 +2,14 @@ import { oppositeFacet } from "specs"
 import { combineOps } from "../operationPairs"
 import Operation, { OpArgs } from "../Operation"
 import { FacetOpts } from "../operationUtils"
-import { ClassicalForme, CompositeForme } from "math/formes"
+import { Classical, Composite } from "specs"
 import regs from "./truncateRegular"
 import ambos from "./truncateAmbo"
 import augTruncate from "./truncateAugmented"
 
 export const truncate = new Operation(
   "truncate",
-  combineOps<ClassicalForme | CompositeForme, any>([
+  combineOps<Classical | Composite, any>([
     regs.truncate.left,
     ambos.truncate.left,
     augTruncate.left,
@@ -26,7 +26,7 @@ export const rectify = new Operation(
   combineOps([regs.rectify.left, ambos.rectify.left]),
 )
 
-const hitOptArgs: Partial<OpArgs<FacetOpts, ClassicalForme>> = {
+const hitOptArgs: Partial<OpArgs<FacetOpts, Classical>> = {
   hitOption: "facet",
   getHitOption(forme, hitPoint) {
     const face = forme.geom.hitFace(hitPoint)
@@ -42,7 +42,7 @@ const hitOptArgs: Partial<OpArgs<FacetOpts, ClassicalForme>> = {
 }
 
 export const sharpen = new Operation("sharpen", {
-  ...combineOps<ClassicalForme | CompositeForme, Partial<FacetOpts>>([
+  ...combineOps<Classical | Composite, Partial<FacetOpts>>([
     regs.truncate.right,
     ambos.truncate.right,
     augTruncate.right,
@@ -58,7 +58,7 @@ export const sharpen = new Operation("sharpen", {
 
 // TODO why doesn't the typing work here?
 export const cosharpen = new Operation("cosharpen", {
-  ...combineOps<ClassicalForme, any>([
+  ...combineOps<Classical, any>([
     regs.cotruncate.right,
     ambos.cotruncate.right,
   ]),
@@ -66,6 +66,6 @@ export const cosharpen = new Operation("cosharpen", {
 })
 
 export const unrectify = new Operation("unrectify", {
-  ...combineOps<ClassicalForme, any>([regs.rectify.right, ambos.rectify.right]),
+  ...combineOps<Classical, any>([regs.rectify.right, ambos.rectify.right]),
   ...hitOptArgs,
 })

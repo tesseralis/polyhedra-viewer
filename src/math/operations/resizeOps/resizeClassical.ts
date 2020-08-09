@@ -43,7 +43,7 @@ function getClassicalPose(forme: ClassicalForme, facet: FacetType): Pose {
   }
 }
 
-type ResizeArgs<L, R> = Omit<OpPairInput<ClassicalForme, L, R>, "graph">
+type ResizeArgs<L, R> = Omit<OpPairInput<Classical, L, R>, "graph">
 
 function getResizeArgs<L, R>(
   getFacet: (opts: GraphOpts<L, R>) => FacetType,
@@ -62,7 +62,7 @@ function getResizeArgs<L, R>(
 const resizeArgs = getResizeArgs<{}, FacetOpts>((opts) => opts.right.facet)
 
 // Expansion of truncated to bevelled solids
-export const semiExpand = makeOpPair<ClassicalForme, {}, FacetOpts>({
+export const semiExpand = makeOpPair<Classical, {}, FacetOpts>({
   ...resizeArgs,
   graph: function* () {
     for (const entry of Classical.allWithOperation("truncate")) {
@@ -75,7 +75,7 @@ export const semiExpand = makeOpPair<ClassicalForme, {}, FacetOpts>({
   },
 })
 
-export const expand = makeOpPair<ClassicalForme, {}, FacetOpts>({
+export const expand = makeOpPair<Classical, {}, FacetOpts>({
   ...resizeArgs,
   graph: function* () {
     for (const entry of Classical.allWithOperation("regular")) {
@@ -88,7 +88,7 @@ export const expand = makeOpPair<ClassicalForme, {}, FacetOpts>({
   },
 })
 
-export const snub = makeOpPair<ClassicalForme, TwistOpts, FacetOpts>({
+export const snub = makeOpPair<Classical, TwistOpts, FacetOpts>({
   ...resizeArgs,
   graph: function* () {
     for (const entry of Classical.allWithOperation("regular")) {
@@ -108,7 +108,7 @@ export const snub = makeOpPair<ClassicalForme, TwistOpts, FacetOpts>({
   },
 })
 
-export const twist = makeOpPair<ClassicalForme, TwistOpts, {}>({
+export const twist = makeOpPair<Classical, TwistOpts, {}>({
   ...getResizeArgs(() => "face"),
   graph: function* () {
     for (const entry of Classical.allWithOperation("cantellate")) {

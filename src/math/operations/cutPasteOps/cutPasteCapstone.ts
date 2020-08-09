@@ -1,9 +1,8 @@
 import { Capstone } from "specs"
-import { CapstoneForme } from "math/formes"
 import { makeCutPastePair } from "./cutPasteUtils"
 import { capOrientation } from "./addCap"
 
-export default makeCutPastePair<CapstoneForme>({
+export default makeCutPastePair<Capstone>({
   graph: function* () {
     // Take every capstone solid that has at least one cap,
     // and ignore pure capstones

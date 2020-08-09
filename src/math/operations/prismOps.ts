@@ -70,7 +70,7 @@ interface PrismOpArgs {
 function makePrismOp({ query, rightElongation = "antiprism" }: PrismOpArgs) {
   const twist = rightElongation === "prism" ? undefined : "left"
   return (leftElongation: "prism" | "none") => {
-    return makeOpPair<CapstoneForme>({
+    return makeOpPair<Capstone>({
       graph: function* () {
         for (const item of Capstone.query.where(
           (s) =>
@@ -95,7 +95,7 @@ function makePrismOp({ query, rightElongation = "antiprism" }: PrismOpArgs) {
   }
 }
 
-const turnPrismatic = makeOpPair<CapstoneForme>({
+const turnPrismatic = makeOpPair<Capstone>({
   // Every unelongated capstone (except fastigium) can be elongated
   graph: function* () {
     for (const entry of Capstone.query.where(
@@ -136,7 +136,7 @@ const gyroelongCupola = cupolaOps("none")
 const turnCupola = cupolaOps("prism")
 
 function makeBicupolaPrismOp(leftElongation: "none" | "prism") {
-  return makeOpPair<CapstoneForme, TwistOpts>({
+  return makeOpPair<Capstone, TwistOpts>({
     graph: function* () {
       for (const entry of Capstone.query.where(
         (s) =>
@@ -197,7 +197,7 @@ export const shorten = makeOperation(
 
 export const turn = makeOperation(
   "turn",
-  combineOps<CapstoneForme, Partial<TwistOpts>>(
+  combineOps<Capstone, Partial<TwistOpts>>(
     [turnPrismatic, turnPyramid, turnCupola, turnBicupola].flatMap((op) => [
       op.left,
       op.right,

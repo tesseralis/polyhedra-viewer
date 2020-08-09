@@ -4,7 +4,7 @@ import { pickBy, mapValues, isMatch, compact, uniq } from "lodash-es"
 import { Polyhedron, Face, VertexArg, normalizeVertex } from "math/polyhedra"
 import { deduplicateVertices } from "./operationUtils"
 import { Polygon, PolyhedronSpecs } from "specs"
-import { PolyhedronForme, createForme } from "math/formes"
+import { PolyhedronForme as Forme, createForme } from "math/formes"
 import { find, EntryIters, cartesian } from "utils"
 
 type SelectState = "selected" | "selectable" | undefined
@@ -17,7 +17,7 @@ export interface AnimationData {
 }
 
 export interface OpResult {
-  result: PolyhedronForme
+  result: Forme
   animationData: AnimationData
 }
 
@@ -42,32 +42,32 @@ export interface GraphEntry<Specs, Opts> {
 
 export interface OpArgs<
   Options extends {},
-  Forme extends PolyhedronForme,
+  Specs extends PolyhedronSpecs,
   GraphOpts = Options
 > {
-  graph(): Generator<GraphEntry<Forme["specs"], GraphOpts>>
+  graph(): Generator<GraphEntry<Specs, GraphOpts>>
 
-  toGraphOpts(solid: Forme, opts: Options): GraphOpts
+  toGraphOpts(solid: Forme<Specs>, opts: Options): GraphOpts
 
   // Function to wrap a solid to create a forme of the correct type
-  wrap?(solid: PolyhedronForme): Forme | undefined
+  wrap?(solid: Forme<Specs>): Forme<Specs> | undefined
 
-  hasOptions?(info: Forme["specs"]): boolean
+  hasOptions?(info: Specs): boolean
 
-  apply(solid: Forme, options: Options): PartialOpResult
+  apply(solid: Forme<Specs>, options: Options): PartialOpResult
 
   /** Return an iterator of all possible options of each polyhedron */
-  allOptions?(solid: Forme): EntryIters<Options>
+  allOptions?(solid: Forme<Specs>): EntryIters<Options>
 
   hitOption?: keyof Options
 
-  getHitOption?(solid: Forme, hitPnt: Vector3): Partial<Options>
+  getHitOption?(solid: Forme<Specs>, hitPnt: Vector3): Partial<Options>
 
-  defaultOptions?(info: Forme["specs"]): Partial<Options>
+  defaultOptions?(info: Specs): Partial<Options>
 
   selectionState?(
     face: Face,
-    solid: Forme,
+    solid: Forme<Specs>,
     options: Partial<Options>,
   ): SelectState
 }
@@ -79,16 +79,16 @@ const methodDefaults = {
 }
 
 // TODO get this to return the correct type
-function fillDefaults<Options extends {}, Forme extends PolyhedronForme>(
-  op: OpArgs<Options, Forme, any>,
-): Required<OpArgs<Options, Forme>> {
+function fillDefaults<Options extends {}, Specs extends PolyhedronSpecs>(
+  op: OpArgs<Options, Specs, any>,
+): Required<OpArgs<Options, Specs>> {
   return {
     ...mapValues(
       methodDefaults,
       (fnDefault, fn: OperationArg) => op[fn] ?? (() => fnDefault),
     ),
     ...op,
-  } as Required<OpArgs<Options, Forme>>
+  } as Required<OpArgs<Options, Specs>>
 }
 
 function getCoplanarFaces(polyhedron: Polyhedron) {
@@ -157,16 +157,16 @@ export default class Operation<Options extends {} = {}> {
   name: string
   graph: GraphEntry<PolyhedronSpecs, Options>[]
   hitOption: keyof Options
-  private opArgs: Required<OpArgs<Options, PolyhedronForme>>
+  private opArgs: Required<OpArgs<Options, PolyhedronSpecs>>
 
-  constructor(name: string, opArgs: OpArgs<Options, PolyhedronForme, any>) {
+  constructor(name: string, opArgs: OpArgs<Options, PolyhedronSpecs, any>) {
     this.name = name
     this.opArgs = fillDefaults(opArgs)
     this.graph = [...this.opArgs.graph()]
     this.hitOption = this.opArgs.hitOption
   }
 
-  apply(solid: PolyhedronForme, options: Options) {
+  apply(solid: Forme, options: Options) {
     // get the next polyhedron name
     const next = this.getResult(solid, options)
 
@@ -175,21 +175,21 @@ export default class Operation<Options extends {} = {}> {
     return normalizeOpResult(opResult, next)
   }
 
-  private wrap(solid: PolyhedronForme) {
+  private wrap(solid: Forme) {
     return this.opArgs.wrap?.(solid) ?? solid
   }
 
-  getHitOption(solid: PolyhedronForme, hitPnt: Vector3) {
+  getHitOption(solid: Forme, hitPnt: Vector3) {
     return this.opArgs.getHitOption(this.wrap(solid), hitPnt)
   }
 
-  canApplyTo(solid: PolyhedronForme) {
+  canApplyTo(solid: Forme) {
     return this.graph.some((entry) =>
       entry.start.equals(this.wrap(solid).specs),
     )
   }
 
-  getEntry(solid: PolyhedronForme, opts: Options) {
+  getEntry(solid: Forme, opts: Options) {
     // FIXME optimize this and make error checking better
     // e.g. make it easier to type.
     return find(this.graph, ({ start, options }) => {
@@ -203,7 +203,7 @@ export default class Operation<Options extends {} = {}> {
     })
   }
 
-  getEntries(solid: PolyhedronForme) {
+  getEntries(solid: Forme) {
     return this.graph.filter((entry) => entry.start.equivalent(solid.specs))
   }
 
@@ -212,18 +212,18 @@ export default class Operation<Options extends {} = {}> {
     return uniq(this.graph.map((entry) => entry.start.unwrap()))
   }
 
-  getResult(solid: PolyhedronForme, options: Options) {
+  getResult(solid: Forme, options: Options) {
     return this.getEntry(solid, options).end.unwrap()
   }
 
-  hasOptions(solid: PolyhedronForme) {
+  hasOptions(solid: Forme) {
     if (this.opArgs.hasOptions) {
       return this.opArgs.hasOptions(this.wrap(solid).specs)
     }
     return this.getEntries(solid).length > 1
   }
 
-  allOptions(solid: PolyhedronForme, optionName: keyof Options) {
+  allOptions(solid: Forme, optionName: keyof Options) {
     if (!this.opArgs.allOptions)
       throw new Error(
         `Operation ${this.name} does not support getting individual options`,
@@ -235,7 +235,7 @@ export default class Operation<Options extends {} = {}> {
    * (Testing utility)
    * Return all possible options that can be used to apply this operation on the given solid.
    */
-  *allOptionCombos(solid: PolyhedronForme) {
+  *allOptionCombos(solid: Forme) {
     if (!this.opArgs.allOptions) {
       // If allOptions is not defined, default to listing the options of the solid graph
       for (const entry of this.getEntries(solid)) {
@@ -246,19 +246,19 @@ export default class Operation<Options extends {} = {}> {
     }
   }
 
-  defaultOptions(solid: PolyhedronForme) {
+  defaultOptions(solid: Forme) {
     return this.opArgs.defaultOptions(this.wrap(solid).specs)
   }
 
-  selectionState(face: Face, solid: PolyhedronForme, options: Options) {
+  selectionState(face: Face, solid: Forme, options: Options) {
     return this.opArgs.selectionState?.(face, this.wrap(solid), options)
   }
 }
 
 export function makeOperation<
   Options extends {} = {},
-  Forme extends PolyhedronForme = PolyhedronForme,
+  Specs extends PolyhedronSpecs = PolyhedronSpecs,
   GraphOpts = Options
->(name: string, opArgs: OpArgs<Options, Forme, GraphOpts>) {
+>(name: string, opArgs: OpArgs<Options, Specs, GraphOpts>) {
   return new Operation(name, opArgs)
 }

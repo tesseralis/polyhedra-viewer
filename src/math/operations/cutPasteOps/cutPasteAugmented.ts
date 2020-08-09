@@ -1,8 +1,7 @@
 import { Composite } from "specs"
-import { CompositeForme } from "math/formes"
 import { makeCutPastePair } from "./cutPasteUtils"
 
-export default makeCutPastePair<CompositeForme>({
+export default makeCutPastePair<Composite>({
   graph: function* () {
     // Take all augmented solids with at least one augmentation
     // and pair it with its diminishing

@@ -32,7 +32,7 @@ function doDualTransform(forme: ClassicalForme, result: Classical) {
   })
 }
 
-export default makeOpPair<ClassicalForme>({
+export default makeOpPair<Classical>({
   graph: function* () {
     for (const specs of Classical.query.where(
       (s) => s.isRegular() && !s.isVertex(),

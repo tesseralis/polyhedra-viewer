@@ -71,7 +71,7 @@ function* elongatedOrthobicupolae() {
   }
 }
 
-export const expand = makeOpPair<CapstoneForme, {}, FacetOpts>({
+export const expand = makeOpPair<Capstone, {}, FacetOpts>({
   graph: function* () {
     for (const specs of elongatedOrthobicupolae()) {
       yield {
@@ -101,7 +101,7 @@ export const expand = makeOpPair<CapstoneForme, {}, FacetOpts>({
   },
 })
 
-export const dual = makeOpPair<CapstoneForme>({
+export const dual = makeOpPair<Capstone>({
   graph: function* () {
     for (const specs of elongatedOrthobicupolae()) {
       yield {

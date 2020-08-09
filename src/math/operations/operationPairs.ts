@@ -8,7 +8,7 @@ import {
 } from "./Operation"
 import { Pose, alignPolyhedron, getGeometry } from "./operationUtils"
 import BaseForme from "math/formes/BaseForme"
-import { PolyhedronForme, createForme } from "math/formes"
+import { PolyhedronForme as Forme, createForme } from "math/formes"
 
 export type Side = "left" | "right"
 
@@ -45,28 +45,28 @@ export function toDirected<S extends Side, Specs, L, R>(
 
 export type GraphGenerator<Specs, L, R> = Generator<GraphEntry<Specs, L, R>>
 
-type MiddleGetter<Forme extends PolyhedronForme, L, R> = (
-  entry: GraphEntry<Forme["specs"], L, R>,
-) => Forme["specs"] | Forme
+type MiddleGetter<S extends PolyhedronSpecs, L, R> = (
+  entry: GraphEntry<S, L, R>,
+) => S | Forme<S>
 
-export interface OpPairInput<Forme extends PolyhedronForme, L = {}, R = L> {
+export interface OpPairInput<Specs extends PolyhedronSpecs, L = {}, R = L> {
   // The graph of what polyhedron spec inputs are allowed and what maps to each other
-  graph(): GraphGenerator<Forme["specs"], L, R>
+  graph(): GraphGenerator<Specs, L, R>
   // Get the intermediate polyhedron for the given graph entry
-  middle: Side | MiddleGetter<Forme, L, R>
+  middle: Side | MiddleGetter<Specs, L, R>
   // Get the pose of a left, right, or intermediate forme
-  getPose(solid: Forme, opts: GraphOpts<L, R>): Pose
+  getPose(solid: Forme<Specs>, opts: GraphOpts<L, R>): Pose
   // Move the intermediate figure to the left position
   toLeft?(
-    solid: Forme,
+    solid: Forme<Specs>,
     opts: GraphOpts<L, R>,
-    result: Forme["specs"],
+    result: Specs,
   ): VertexArg[]
   // Move the intermediate figure to the right position
   toRight?(
-    solid: Forme,
+    solid: Forme<Specs>,
     opts: GraphOpts<L, R>,
-    result: Forme["specs"],
+    result: Specs,
   ): VertexArg[]
 }
 
@@ -79,27 +79,23 @@ function defaultGetter<Specs extends PolyhedronSpecs>({
 type Opts<S extends Side, L, R> = S extends "left" ? L : R
 
 class OpPair<
-  Forme extends PolyhedronForme,
+  Specs extends PolyhedronSpecs,
   L extends {} = {},
   R extends {} = L
 > {
-  inputs: OpPairInput<Forme, L, R>
-  graph: GraphEntry<Forme["specs"], L, R>[]
+  inputs: OpPairInput<Specs, L, R>
+  graph: GraphEntry<Specs, L, R>[]
 
-  constructor(inputs: OpPairInput<Forme, L, R>) {
+  constructor(inputs: OpPairInput<Specs, L, R>) {
     this.inputs = inputs
     this.graph = [...this.inputs.graph()]
   }
 
-  private getEntries(side: Side, specs: Forme["specs"]) {
+  private getEntries(side: Side, specs: Specs) {
     return this.graph.filter((entry) => entry[side].equals(specs))
   }
 
-  findEntry<S extends Side>(
-    side: S,
-    specs: Forme["specs"],
-    opts?: Opts<S, L, R>,
-  ) {
+  findEntry<S extends Side>(side: S, specs: Specs, opts?: Opts<S, L, R>) {
     return this.graph.find(
       (entry) =>
         entry[side].equals(specs) &&
@@ -107,11 +103,7 @@ class OpPair<
     )
   }
 
-  getEntry<S extends Side>(
-    side: S,
-    specs: Forme["specs"],
-    opts?: Opts<S, L, R>,
-  ) {
+  getEntry<S extends Side>(side: S, specs: Specs, opts?: Opts<S, L, R>) {
     const entry = this.findEntry(side, specs, opts)
     if (!entry)
       throw new Error(
@@ -122,42 +114,36 @@ class OpPair<
     return entry
   }
 
-  hasOptions(side: Side, specs: Forme["specs"]) {
+  hasOptions(side: Side, specs: Specs) {
     return this.getEntries(side, specs).length > 1
   }
 
-  *allOptions<S extends Side>(
-    side: S,
-    specs: Forme["specs"],
-  ): Generator<Opts<S, L, R>> {
+  *allOptions<S extends Side>(side: S, specs: Specs): Generator<Opts<S, L, R>> {
     for (const entry of this.getEntries(side, specs)) {
       yield (entry.options?.[side] ?? {}) as Opts<S, L, R>
     }
   }
 
   canApplyTo(side: Side, specs: PolyhedronSpecs) {
-    return !!this.findEntry(side, specs as Forme["specs"])
+    return !!this.findEntry(side, specs as Specs)
   }
 
-  getOpposite<S extends Side>(
-    side: S,
-    specs: Forme["specs"],
-    options?: Opts<S, L, R>,
-  ) {
+  getOpposite<S extends Side>(side: S, specs: Specs, options?: Opts<S, L, R>) {
     return this.getEntry(side, specs, options)[oppositeSide(side)]
   }
 
-  apply<S extends Side>(side: S, solid: Forme, opts: Opts<S, L, R>) {
+  apply<S extends Side>(side: S, solid: Forme<Specs>, opts: Opts<S, L, R>) {
     const {
       middle: getMiddle,
       getPose,
       toLeft = defaultGetter,
       toRight = defaultGetter,
     } = this.inputs
-    const entry = this.getEntry(side, solid.specs, opts)
+    const specs = solid.specs as Specs
+    const entry = this.getEntry(side, specs, opts)
     const options =
       entry.options ?? ({ left: {}, right: {} } as GraphOpts<L, R>)
-    const solidForme = createForme(solid.specs, solid.geom) as Forme
+    const solidForme = createForme(specs, solid.geom)
     const startPose = getPose(solidForme, options)
 
     const endSide = oppositeSide(side)
@@ -165,18 +151,16 @@ class OpPair<
     const endGeom = getGeometry(endSpecs)
     const alignedEnd = alignPolyhedron(
       endGeom,
-      getPose(createForme(endSpecs, endGeom) as Forme, options),
+      getPose(createForme(endSpecs, endGeom), options),
       startPose,
     )
 
-    let middle
+    let middle: Forme<Specs>
     if (typeof getMiddle === "string") {
       // If we receive a Side argument, set the middle to whichever end polyhedron
       // matches the side
       middle =
-        getMiddle === side
-          ? solidForme
-          : (createForme(endSpecs, alignedEnd) as Forme)
+        getMiddle === side ? solidForme : createForme(endSpecs, alignedEnd)
     } else {
       // Otherwise, we have to fetch the intermediate solid ourselves
       const inter = getMiddle(entry)
@@ -184,14 +168,14 @@ class OpPair<
       const middleSolid =
         inter instanceof BaseForme
           ? inter
-          : (createForme(inter, getGeometry(inter)) as Forme)
+          : createForme(inter, getGeometry(inter))
 
       const alignedInter = alignPolyhedron(
         middleSolid.geom,
         getPose(middleSolid, options),
         startPose,
       )
-      middle = createForme(middleSolid.specs, alignedInter) as Forme
+      middle = createForme(middleSolid.specs as Specs, alignedInter)
     }
 
     const [startFn, endFn] =
@@ -199,7 +183,7 @@ class OpPair<
 
     return {
       animationData: {
-        start: middle.geom.withVertices(startFn(middle, options, solid.specs)),
+        start: middle.geom.withVertices(startFn(middle, options, specs)),
         endVertices: endFn(middle, options, endSpecs),
       },
       result: alignedEnd,
@@ -207,17 +191,17 @@ class OpPair<
   }
 }
 
-export type OpInput<O, F extends PolyhedronForme, GO = O> = Required<
-  Pick<OpArgs<O, F, GO>, "apply" | "graph" | "toGraphOpts">
+export type OpInput<O, S extends PolyhedronSpecs, GO = O> = Required<
+  Pick<OpArgs<O, S, GO>, "apply" | "graph" | "toGraphOpts">
 >
 
 /**
  * Turn an operation pair into the one-way operation corresponding to the given side
  */
-function makeOperation<S extends Side, Forme extends PolyhedronForme, L, R>(
+function makeOperation<S extends Side, Specs extends PolyhedronSpecs, L, R>(
   side: S,
-  op: OpPair<Forme, L, R>,
-): OpInput<Opts<S, L, R>, Forme> {
+  op: OpPair<Specs, L, R>,
+): OpInput<Opts<S, L, R>, Specs> {
   return {
     apply(solid, opts) {
       return op.apply(side, solid, opts)
@@ -232,24 +216,24 @@ function makeOperation<S extends Side, Forme extends PolyhedronForme, L, R>(
 /**
  * Takes the given input and creates a pair of inverse operations.
  */
-export function makeOpPair<Forme extends PolyhedronForme, L = {}, R = L>(
-  opInput: OpPairInput<Forme, L, R>,
+export function makeOpPair<Specs extends PolyhedronSpecs, L = {}, R = L>(
+  opInput: OpPairInput<Specs, L, R>,
 ) {
   const op = new OpPair(opInput)
   return { left: makeOperation("left", op), right: makeOperation("right", op) }
 }
 
-export function combineOps<F extends PolyhedronForme, O, GO extends {} = O>(
-  opArgs: OpInput<O, F, GO>[],
-): OpInput<O, F, GO> {
+export function combineOps<S extends PolyhedronSpecs, O, GO extends {} = O>(
+  opArgs: OpInput<O, S, GO>[],
+): OpInput<O, S, GO> {
   interface CallbackArg {
-    op: OpInput<O, F, GO>
-    forme: F
+    op: OpInput<O, S, GO>
+    forme: Forme<S>
     graphOpts: GO
   }
 
   function doWithRightForme<R>(
-    solid: F,
+    solid: Forme<S>,
     opts: O,
     callback: (args: CallbackArg) => R,
   ) {
@@ -258,7 +242,7 @@ export function combineOps<F extends PolyhedronForme, O, GO extends {} = O>(
       // version of the forme
       for (const { start, options = {} } of op.graph()) {
         if (!start.equivalent(solid.specs)) continue
-        const forme = createForme(start, solid.geom) as F
+        const forme = createForme(start, solid.geom) as any
         const graphOpts = op.toGraphOpts(forme, opts)
         if (isMatch(options, pickBy(graphOpts))) {
           return callback({ op, forme, graphOpts })

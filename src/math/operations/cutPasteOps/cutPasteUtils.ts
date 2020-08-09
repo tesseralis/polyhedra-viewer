@@ -11,7 +11,8 @@ import {
   gyrations,
 } from "specs"
 import { OpArgs } from "../Operation"
-import { PolyhedronForme, CapstoneForme, CompositeForme } from "math/formes"
+import { PolyhedronSpecs } from "specs"
+import { PolyhedronForme as Forme, CompositeForme } from "math/formes"
 import { GraphGenerator, OpInput, toDirected } from "../operationPairs"
 import removeCap from "./removeCap"
 import addCap, { CrossAxis } from "./addCap"
@@ -71,20 +72,20 @@ interface AugOptions {
 
 type AugDimGraphGenerator<S> = GraphGenerator<S, AugGraphOpts, DimGraphOpts>
 
-interface CutPastePairInput<F extends PolyhedronForme> {
+interface CutPastePairInput<S extends PolyhedronSpecs> {
   /** The bidirectional graph representing solids that can be augmented or diminished. */
-  graph(): AugDimGraphGenerator<F["specs"]>
+  graph(): AugDimGraphGenerator<S>
   /** How to transform the arguments to graph options for diminish */
-  toDimGraphOpts?(forme: F, options: CapOptions): DimGraphOpts
+  toDimGraphOpts?(forme: Forme<S>, options: CapOptions): DimGraphOpts
   /** How to transform the arguments to graph options for augment */
-  toAugGraphOpts?(forme: F, options: AugOptions): AugGraphOpts
+  toAugGraphOpts?(forme: Forme<S>, options: AugOptions): AugGraphOpts
   /** Get the axis of the polyhedron base when augmenting */
-  baseAxis?(forme: F, options: AugOptions): CrossAxis | undefined
+  baseAxis?(forme: Forme<S>, options: AugOptions): CrossAxis | undefined
 }
 
-interface CutPastePair<F extends PolyhedronForme> {
-  augment: OpInput<AugOptions, F, AugGraphOpts>
-  diminish: OpInput<CapOptions, F, DimGraphOpts>
+export interface CutPastePair<S extends PolyhedronSpecs> {
+  augment: OpInput<AugOptions, S, AugGraphOpts>
+  diminish: OpInput<CapOptions, S, DimGraphOpts>
 }
 
 function defaultGraphOpts() {
@@ -94,9 +95,9 @@ function defaultGraphOpts() {
 /**
  * Create a pair of augment/diminish operations.
  */
-export function makeCutPastePair<F extends PolyhedronForme>(
-  input: CutPastePairInput<F>,
-): CutPastePair<F> {
+export function makeCutPastePair<S extends PolyhedronSpecs>(
+  input: CutPastePairInput<S>,
+): CutPastePair<S> {
   return {
     augment: {
       graph: toDirected("left", input.graph),
@@ -115,7 +116,7 @@ export function makeCutPastePair<F extends PolyhedronForme>(
   }
 }
 
-function getModifiableCaps(forme: PolyhedronForme) {
+function getModifiableCaps(forme: Forme) {
   if (forme.isCapstone()) {
     return forme.endCaps()
   } else if (forme.isComposite()) {
@@ -125,11 +126,11 @@ function getModifiableCaps(forme: PolyhedronForme) {
   }
 }
 
-function getCapFaces(forme: PolyhedronForme) {
+function getCapFaces(forme: Forme) {
   return getModifiableCaps(forme).flatMap((cap) => cap.faces())
 }
 
-function getHitCap(forme: PolyhedronForme, hitPoint: Vector3) {
+function getHitCap(forme: Forme, hitPoint: Vector3) {
   const hitFace = forme.geom.hitFace(hitPoint)
   const caps = getModifiableCaps(forme).filter((cap) =>
     hitFace.inSet(cap.faces()),
@@ -140,16 +141,14 @@ function getHitCap(forme: PolyhedronForme, hitPoint: Vector3) {
   return minBy(caps, (cap) => cap.centroid().distanceToSquared(hitPoint))
 }
 
-function wrapForme(forme: PolyhedronForme) {
+function wrapForme(forme: Forme) {
   if (!Composite.hasSource(forme.specs as any)) return
   const specs = Composite.wrap(forme.specs as any)
   return CompositeForme.create(specs, forme.geom)
 }
 
-type CapOptionArgs = Partial<OpArgs<CapOptions, PolyhedronForme, DimGraphOpts>>
-type AugOptionArgs = Partial<
-  OpArgs<AugOptions, PolyhedronForme<CutPasteSpecs>, AugGraphOpts>
->
+type CapOptionArgs = Partial<OpArgs<CapOptions, PolyhedronSpecs, DimGraphOpts>>
+type AugOptionArgs = Partial<OpArgs<AugOptions, CutPasteSpecs, AugGraphOpts>>
 
 export const capOptionArgs: CapOptionArgs = {
   hitOption: "cap",
@@ -174,13 +173,13 @@ export const capOptionArgs: CapOptionArgs = {
   },
 }
 
-function canAugmentWrapped(prism: CapstoneForme, face: Face): boolean {
+function canAugmentWrapped(prism: Forme<Capstone>, face: Face): boolean {
   const wrapped = wrapForme(prism)
   if (!wrapped) return false
   return canAugment(wrapped, face)
 }
 
-function canAugment(forme: PolyhedronForme, face: Face): boolean {
+function canAugment(forme: Forme, face: Face): boolean {
   if (forme.isCapstone()) {
     return forme.isEndFace(face) || canAugmentWrapped(forme, face)
   } else if (forme.isComposite()) {

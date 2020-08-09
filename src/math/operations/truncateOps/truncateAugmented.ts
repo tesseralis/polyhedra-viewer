@@ -2,11 +2,10 @@ import { Composite } from "specs"
 import { makeOpPair } from "../operationPairs"
 import { getCentroid } from "math/geom"
 import { getTransformedVertices } from "../operationUtils"
-import { CompositeForme } from "math/formes"
 import { find } from "utils"
 import { getSharpenPoint, getSharpenPointEdge } from "./truncateHelpers"
 
-export default makeOpPair<CompositeForme>({
+export default makeOpPair<Composite>({
   graph: function* () {
     for (const entry of Composite.query.where(
       (s) =>

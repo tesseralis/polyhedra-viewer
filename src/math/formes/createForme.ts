@@ -8,12 +8,13 @@ import { PolyhedronSpecs } from "specs"
 import { Polyhedron } from "math/polyhedra"
 
 // TODO maybe we can do something to map the specs to the right forme?
-export default function createForme(
-  specs: PolyhedronSpecs,
+export default function createForme<S extends PolyhedronSpecs>(
+  specs: S,
   geom: Polyhedron,
-): PolyhedronForme {
-  if (specs.isClassical()) return ClassicalForme.create(specs, geom)
-  if (specs.isCapstone()) return CapstoneForme.create(specs, geom)
-  if (specs.isComposite()) return CompositeForme.create(specs, geom)
-  return ElementaryForme.create(specs, geom)
+): PolyhedronForme<S> {
+  if (specs.isClassical()) return ClassicalForme.create(specs, geom) as any
+  if (specs.isCapstone()) return CapstoneForme.create(specs, geom) as any
+  if (specs.isComposite()) return CompositeForme.create(specs, geom) as any
+  if (specs.isElementary()) return ElementaryForme.create(specs, geom) as any
+  throw new Error(`Invalid specs: ${specs.name()}`)
 }

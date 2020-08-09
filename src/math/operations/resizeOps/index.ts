@@ -1,16 +1,16 @@
 import { combineOps } from "../operationPairs"
 import { FacetOpts } from "../operationUtils"
 import Operation, { makeOperation } from "../Operation"
-import { ClassicalForme, CapstoneForme } from "math/formes"
+import { Classical, Capstone } from "specs"
 import * as classicals from "./resizeClassical"
 import * as prisms from "./resizePrism"
 import regularDual from "./dualRegular"
 
-type ResizeForme = ClassicalForme | CapstoneForme
+type ResizeSpecs = Classical | Capstone
 
 export const dual = new Operation(
   "dual",
-  combineOps<ResizeForme, {}>([
+  combineOps<ResizeSpecs, {}>([
     regularDual.left,
     regularDual.right,
     prisms.dual.left,
@@ -20,7 +20,7 @@ export const dual = new Operation(
 
 export const expand = new Operation(
   "expand",
-  combineOps<ResizeForme, {}>([
+  combineOps<ResizeSpecs, {}>([
     classicals.semiExpand.left,
     classicals.expand.left,
     prisms.expand.left,
@@ -34,8 +34,8 @@ export const twist = makeOperation(
   combineOps([classicals.twist.left, classicals.twist.right]),
 )
 
-export const contract = makeOperation<FacetOpts, ResizeForme>("contract", {
-  ...combineOps<ResizeForme, FacetOpts>(
+export const contract = makeOperation<FacetOpts, ResizeSpecs>("contract", {
+  ...combineOps<ResizeSpecs, FacetOpts>(
     [
       classicals.expand,
       classicals.snub,

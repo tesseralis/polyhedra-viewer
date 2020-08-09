@@ -1,10 +1,10 @@
 import { Polyhedron } from "math/polyhedra"
 import { mapObject } from "utils"
-import { Capstone, Composite } from "specs"
+import { PolyhedronSpecs, Capstone, Composite } from "specs"
 import { CapOptions, capOptionArgs } from "./cutPasteUtils"
 import { getTransformedVertices } from "../operationUtils"
 import { makeOperation } from "../Operation"
-import { CapstoneForme, CompositeForme, PolyhedronForme } from "math/formes"
+import { PolyhedronForme as Forme } from "math/formes"
 import {
   GraphGenerator,
   toDirected,
@@ -60,15 +60,15 @@ export interface GraphOpts {
 
 type GyrateGraphGenerator<S> = GraphGenerator<S, GraphOpts, GraphOpts>
 
-interface GyrateArgs<F extends PolyhedronForme> {
-  graph(): GyrateGraphGenerator<F["specs"]>
-  toGraphOpts(forme: F, options: CapOptions): GraphOpts
+interface GyrateArgs<S extends PolyhedronSpecs> {
+  graph(): GyrateGraphGenerator<S>
+  toGraphOpts(forme: Forme<S>, options: CapOptions): GraphOpts
 }
 
-function makeGyrateOp<F extends PolyhedronForme>({
+function makeGyrateOp<S extends PolyhedronSpecs>({
   graph,
   toGraphOpts,
-}: GyrateArgs<F>): GyrateOpArgs<F> {
+}: GyrateArgs<S>): GyrateOpArgs<S> {
   return {
     graph: function* () {
       yield* toDirected("left", graph)()
@@ -81,9 +81,9 @@ function makeGyrateOp<F extends PolyhedronForme>({
   }
 }
 
-type GyrateOpArgs<F extends PolyhedronForme> = OpInput<CapOptions, F, GraphOpts>
+type GyrateOpArgs<S extends PolyhedronSpecs> = OpInput<CapOptions, S, GraphOpts>
 
-const gyrateCapstone = makeGyrateOp<CapstoneForme>({
+const gyrateCapstone = makeGyrateOp<Capstone>({
   graph: function* () {
     for (const cap of Capstone.query.where(
       (s) => (s.hasGyrate() && s.isOrtho() && !s.isDigonal()) || s.isChiral(),
@@ -96,7 +96,7 @@ const gyrateCapstone = makeGyrateOp<CapstoneForme>({
   },
 })
 
-const gyrateComposite = makeGyrateOp<CompositeForme>({
+const gyrateComposite = makeGyrateOp<Composite>({
   graph: function* () {
     for (const solid of Composite.query.where(
       (s) => s.isGyrateSolid() && s.isGyrate(),
@@ -121,7 +121,7 @@ const gyrateComposite = makeGyrateOp<CompositeForme>({
 })
 
 export const gyrate = makeOperation("gyrate", {
-  ...combineOps<CapstoneForme | CompositeForme, CapOptions, GraphOpts>([
+  ...combineOps<Capstone | Composite, CapOptions, GraphOpts>([
     gyrateCapstone,
     gyrateComposite,
   ]),
