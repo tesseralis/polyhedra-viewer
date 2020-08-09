@@ -121,7 +121,7 @@ export default class Polyhedron {
   }
 
   caps(opts: CapSearchOpts) {
-    return Cap.getAll(this, opts)
+    return [...Cap.getAll(this, opts)]
   }
 
   // Search functions

@@ -45,9 +45,13 @@ interface Constructor<T> {
   new (arg: T): Cap
 }
 function createMapper<T>(mapper: (p: Polyhedron) => T[], Base: Constructor<T>) {
-  return (polyhedron: Polyhedron) => {
-    const values: T[] = mapper(polyhedron)
-    return values.map((arg) => new Base(arg)).filter((cap) => cap.isValid())
+  return function* (polyhedron: Polyhedron) {
+    for (const value of mapper(polyhedron)) {
+      const cap = new Base(value)
+      if (cap.isValid()) {
+        yield cap
+      }
+    }
   }
 }
 
@@ -62,18 +66,17 @@ export default abstract class Cap extends Facet {
   private _innerVertices: Vertex[]
   private faceConfiguration: FaceConfiguration
 
-  static getAll(polyhedron: Polyhedron, opts: CapSearchOpts): Cap[] {
+  static *getAll(polyhedron: Polyhedron, opts: CapSearchOpts) {
     if (opts.type === "primary") {
-      return Pyramid.getAll(polyhedron)
+      yield* Pyramid.getAll(polyhedron)
+    } else if (opts.fastigium) {
+      yield* Fastigium.getAll(polyhedron)
+    } else {
+      yield* Cupola.getAll(polyhedron)
+      if (opts.rotunda) {
+        yield* Rotunda.getAll(polyhedron)
+      }
     }
-
-    if (opts.fastigium) {
-      return Fastigium.getAll(polyhedron)
-    }
-
-    const cupolae = Cupola.getAll(polyhedron)
-    const rotundae = opts.rotunda ? Rotunda.getAll(polyhedron) : []
-    return cupolae.concat(rotundae)
   }
 
   constructor(
