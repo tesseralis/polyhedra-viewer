@@ -26,9 +26,7 @@ export type PolyhedronForme<
   ? ElementaryForme
   : never
 
-export default class BaseForme<
-  Specs extends PolyhedronSpecs = PolyhedronSpecs
-> {
+export default class BaseForme<Specs extends PolyhedronSpecs> {
   specs: Specs
   geom: Polyhedron
 

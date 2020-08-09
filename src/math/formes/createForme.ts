@@ -7,7 +7,7 @@ import ElementaryForme from "./ElementaryForme"
 import { PolyhedronSpecs } from "specs"
 import { Polyhedron } from "math/polyhedra"
 
-// TODO maybe we can do something to map the specs to the right forme?
+// TODO figure out how to return the right forme without the `any` cast
 export default function createForme<S extends PolyhedronSpecs>(
   specs: S,
   geom: Polyhedron,
