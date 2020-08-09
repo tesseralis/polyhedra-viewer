@@ -1,4 +1,4 @@
-import { Classical, Facet, twists, oppositeTwist } from "specs"
+import { Classical, FacetType, twists, oppositeTwist } from "specs"
 import { makeOpPair, OpPairInput, GraphOpts } from "../operationPairs"
 import {
   getTransformedVertices,
@@ -18,7 +18,7 @@ import ClassicalForme from "math/formes/ClassicalForme"
  */
 function getResizedVertices(
   forme: ClassicalForme,
-  facet: Facet,
+  facet: FacetType,
   result: Classical,
 ) {
   const resultForme = ClassicalForme.fromSpecs(result)
@@ -32,7 +32,7 @@ function getResizedVertices(
   })
 }
 
-function getClassicalPose(forme: ClassicalForme, facet: Facet): Pose {
+function getClassicalPose(forme: ClassicalForme, facet: FacetType): Pose {
   const { geom } = forme
   return {
     // Always centered on centroid
@@ -46,7 +46,7 @@ function getClassicalPose(forme: ClassicalForme, facet: Facet): Pose {
 type ResizeArgs<L, R> = Omit<OpPairInput<ClassicalForme, L, R>, "graph">
 
 function getResizeArgs<L, R>(
-  getFacet: (opts: GraphOpts<L, R>) => Facet,
+  getFacet: (opts: GraphOpts<L, R>) => FacetType,
 ): ResizeArgs<L, R> {
   return {
     middle: "right",

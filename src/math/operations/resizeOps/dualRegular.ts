@@ -1,9 +1,9 @@
-import { Classical, oppositeFacet, Facet } from "specs"
+import { Classical, oppositeFacet, FacetType } from "specs"
 import { makeOpPair } from "../operationPairs"
 import { Pose, getTransformedVertices } from "../operationUtils"
 import ClassicalForme from "math/formes/ClassicalForme"
 
-function getPose(forme: ClassicalForme, facet: Facet, scale: number): Pose {
+function getPose(forme: ClassicalForme, facet: FacetType, scale: number): Pose {
   const { geom } = forme
   return {
     // Always centered on centroid

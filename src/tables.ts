@@ -12,7 +12,7 @@ import {
   polygonTypes,
   PolygonType,
   prismaticTypes,
-  facets,
+  facetTypes,
   gyrations,
   alignments,
   getSpecs,
@@ -46,7 +46,7 @@ export interface TableSection {
 function* classicalRow(operation: Operation) {
   for (const family of families) {
     if (Classical.hasFacet(operation)) {
-      yield facets.map((facet) =>
+      yield facetTypes.map((facet) =>
         Classical.query.withData({ operation, family, facet }),
       )
     } else if (operation === "snub") {

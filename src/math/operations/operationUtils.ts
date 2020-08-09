@@ -10,7 +10,7 @@ import {
 } from "math/polyhedra"
 import { Transform, translateMat, scaleMat } from "math/geom"
 import { mapObject } from "utils"
-import { PolyhedronSpecs, Facet as FacetType, Twist } from "specs"
+import { PolyhedronSpecs, FacetType, Twist } from "specs"
 
 export interface FacetOpts {
   facet: FacetType

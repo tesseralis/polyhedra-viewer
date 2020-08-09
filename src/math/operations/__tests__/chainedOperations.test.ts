@@ -1,4 +1,4 @@
-import { Facet } from "specs"
+import { FacetType } from "specs"
 import { getSpecs } from "specs"
 import { Polyhedron } from "math/polyhedra"
 import { OpName, operations } from "math/operations"
@@ -9,7 +9,7 @@ import PolyhedronForme from "math/formes/PolyhedronForme"
 
 interface Args {
   face?: number
-  facet?: Facet
+  facet?: FacetType
   cap?: boolean
 }
 

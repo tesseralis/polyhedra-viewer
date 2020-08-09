@@ -1,12 +1,12 @@
 import { sum } from "lodash-es"
-import { facets } from "specs"
+import { facetTypes } from "specs"
 import { getTransformedVertices, Pose } from "../operationUtils"
 import ClassicalForme from "math/formes/ClassicalForme"
 import { makeTruncateTrio } from "./truncateHelpers"
 import { scaleMat } from "math/geom"
 
 function avgInradius(forme: ClassicalForme) {
-  return sum(facets.map((f) => forme.inradius(f))) / facets.length
+  return sum(facetTypes.map((f) => forme.inradius(f))) / facetTypes.length
 }
 
 function getAmboPose(forme: ClassicalForme): Pose {

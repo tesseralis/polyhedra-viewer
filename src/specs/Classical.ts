@@ -6,9 +6,9 @@ import Queries from "./Queries"
 export const families = primaryPolygons
 export type Family = PrimaryPolygon
 
-export const facets = ["face", "vertex"] as const
-export type Facet = Items<typeof facets>
-export function oppositeFacet(facet: Facet) {
+export const facetTypes = ["face", "vertex"] as const
+export type FacetType = Items<typeof facetTypes>
+export function oppositeFacet(facet: FacetType) {
   return facet === "face" ? "vertex" : "face"
 }
 
@@ -24,7 +24,7 @@ export type Operation = Items<typeof operations>
 
 interface ClassicalData {
   family: Family
-  facet?: Facet
+  facet?: FacetType
   operation: Operation
   twist?: Twist
 }
@@ -91,7 +91,7 @@ export default class Classical extends Specs<ClassicalData> {
     for (const operation of operations) {
       for (const family of families) {
         if (this.hasFacet(operation)) {
-          for (const facet of facets) {
+          for (const facet of facetTypes) {
             yield new Classical({ family, operation, facet })
           }
         } else if (operation === "snub") {

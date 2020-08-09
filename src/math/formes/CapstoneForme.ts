@@ -1,6 +1,6 @@
 import { once } from "lodash"
 import PolyhedronForme from "./PolyhedronForme"
-import { Capstone, Facet as FacetType } from "specs"
+import { Capstone, FacetType } from "specs"
 import { Polyhedron, Face, Edge, Cap, FaceLike, Facet } from "math/polyhedra"
 import { getCentroid } from "math/geom"
 import { getGeometry } from "math/operations/operationUtils"

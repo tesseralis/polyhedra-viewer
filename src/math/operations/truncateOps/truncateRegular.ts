@@ -1,11 +1,11 @@
-import { Facet } from "specs"
+import { FacetType } from "specs"
 import ClassicalForme from "math/formes/ClassicalForme"
 import { getTransformedVertices, Pose } from "../operationUtils"
 import { getSharpenPointEdge, makeTruncateTrio } from "./truncateHelpers"
 
 function getRegularPose(
   forme: ClassicalForme,
-  facet: Facet = forme.specs.facet(),
+  facet: FacetType = forme.specs.facet(),
 ): Pose {
   return {
     origin: forme.geom.centroid(),

@@ -17,8 +17,8 @@ export {
 } from "./common"
 
 export { default as PolyhedronSpecs } from "./PolyhedronSpecs"
-export { default as Classical, facets, oppositeFacet } from "./Classical"
-export type { Facet } from "./Classical"
+export { default as Classical, facetTypes, oppositeFacet } from "./Classical"
+export type { FacetType } from "./Classical"
 export {
   default as Capstone,
   prismaticTypes,
