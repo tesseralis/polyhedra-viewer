@@ -23,7 +23,7 @@ function getPose(forme: CapstoneForme): Pose {
   return {
     origin: forme.centroid(),
     scale: forme.geom.edgeLength(),
-    orientation: [top.normal(), top.to(crossAxis)],
+    orientation: [top, crossAxis],
   }
 }
 

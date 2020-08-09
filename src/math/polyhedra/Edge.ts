@@ -1,3 +1,4 @@
+import { once } from "lodash"
 import { angleBetween, getMidpoint, vecEquals } from "math/geom"
 import Facet from "./Facet"
 import type Vertex from "./Vertex"
@@ -22,7 +23,7 @@ export default class Edge extends Facet {
   }
 
   get face() {
-    return this.polyhedron.edgeToFaceGraph()[this.v1.index][this.v2.index]
+    return this.polyhedron.edgeToFaceGraph()[this.v1.index][this.v2.index]?.face
   }
 
   prev() {
@@ -45,9 +46,16 @@ export default class Edge extends Facet {
     return this.centroid()
   }
 
-  twin() {
-    return new Edge(this.v2, this.v1)
-  }
+  twin = once(() => {
+    const entry = this.polyhedron.edgeToFaceGraph()[this.v2.index][
+      this.v1.index
+    ]
+    // TODO add this to the graph if necessary? figure out why it's failing?
+    if (!entry) {
+      return new Edge(this.v2, this.v1)
+    }
+    return entry.edge
+  })
 
   twinFace() {
     return this.twin().face
@@ -72,9 +80,9 @@ export default class Edge extends Facet {
     )
   }
 
-  normal() {
-    return getMidpoint(this.face.normal(), this.twinFace().normal())
-  }
+  normal = once(() => {
+    return getMidpoint(this.face.normal(), this.twinFace().normal()).normalize()
+  })
 
   equals(edge: Edge) {
     return this.v1.equals(edge.v1) && this.v2.equals(edge.v2)

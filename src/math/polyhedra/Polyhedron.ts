@@ -87,10 +87,15 @@ export default class Polyhedron {
 
   // Memoized mapping of edges to faces, used for quickly finding adjacency
   edgeToFaceGraph = once(() => {
-    const edgesToFaces: NestedRecord<number, number, Face> = {}
+    const edgesToFaces: NestedRecord<
+      number,
+      number,
+      { edge: Edge; face: Face }
+    > = {}
     for (const face of this.faces) {
-      for (const { v1, v2 } of face.edges) {
-        set(edgesToFaces, [v1.index, v2.index], face)
+      for (const edge of face.edges) {
+        const { v1, v2 } = edge
+        set(edgesToFaces, [v1.index, v2.index], { edge, face })
       }
     }
     return edgesToFaces

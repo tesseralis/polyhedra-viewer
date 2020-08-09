@@ -29,10 +29,7 @@ function getCapstonePose(forme: CapstoneForme, twist?: Twist): Pose {
   return {
     origin: forme.centroid(),
     scale: forme.geom.edgeLength(),
-    orientation: [
-      top.normal(),
-      top.to(edge).applyAxisAngle(top.normal(), angle),
-    ],
+    orientation: [top, top.to(edge).applyAxisAngle(top.normal(), angle)],
   }
 }
 

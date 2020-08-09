@@ -84,7 +84,7 @@ export default abstract class ClassicalForme extends PolyhedronForme<
 
   protected abstract adjacentFacetFace(face: Face, facet: Facet): Face
 
-  adjacentFacetFaces(facet: Facet) {
+  adjacentFacetFaces(facet: Facet): [Face, Face] {
     const f0 = this.facetFace(facet)
     return [f0, this.adjacentFacetFace(f0, facet)]
   }
@@ -157,12 +157,13 @@ export default abstract class ClassicalForme extends PolyhedronForme<
 
   // @override
   orientation() {
+    // For the vertex-based Platonic solids, we want to center it on the vertex
     if (this.specs.isRegular() && this.specs.isVertex()) {
       const v = this.geom.getVertex()
-      return [v.vec.clone().negate(), v.adjacentVertices()[0].vec] as const
+      return [v.vec.clone().negate(), v.adjacentVertices()[0]] as const
     }
     const [f1, f2] = this.adjacentFacetFaces("face")
-    return [f1.normal().clone().negate(), f2.normal()] as const
+    return [f1.normal().clone().negate(), f2] as const
   }
 }
 

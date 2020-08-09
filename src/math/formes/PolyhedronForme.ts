@@ -6,7 +6,11 @@ import type ClassicalForme from "./ClassicalForme"
 import type CapstoneForme from "./CapstoneForme"
 import type CompositeForme from "./CompositeForme"
 import { Vector3 } from "three"
-import { Pose, alignPolyhedron } from "math/operations/operationUtils"
+import {
+  Orientation,
+  Pose,
+  alignPolyhedron,
+} from "math/operations/operationUtils"
 
 export default class PolyhedronForme<
   Specs extends PolyhedronSpecs = PolyhedronSpecs
@@ -31,8 +35,8 @@ export default class PolyhedronForme<
     return this.specs.isComposite()
   }
 
-  orientation(): readonly [Vector3, Vector3] {
-    return [this.geom.vertices[0].vec, this.geom.vertices[1].vec]
+  orientation(): Orientation {
+    return [this.geom.vertices[0], this.geom.vertices[1]]
   }
 
   orient() {

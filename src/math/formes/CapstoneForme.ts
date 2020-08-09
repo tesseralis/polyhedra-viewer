@@ -31,10 +31,11 @@ export default abstract class CapstoneForme extends PolyhedronForme<Capstone> {
 
   orientation() {
     if (this.specs.isSnub()) {
-      return [this.geom.vertices[0].vec, this.geom.vertices[1].vec] as const
+      const top = this.ends()[0]
+      return [top, top.vertices[0]] as const
     }
     const top = this.endBoundaries()[0]
-    return [top.normal(), top.to(top.edges[0])] as const
+    return [top, top.edges[0]] as const
   }
 
   abstract queryTops(): Generator<CapstoneEnd>
@@ -42,7 +43,6 @@ export default abstract class CapstoneForme extends PolyhedronForme<Capstone> {
     yield* this.queryTops()
   }
 
-  // abstract ends(): readonly [CapstoneEnd, CapstoneEnd]
   ends() {
     for (const top of this.queryTops()) {
       for (const bottom of this.queryBottoms()) {

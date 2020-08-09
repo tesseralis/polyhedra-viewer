@@ -39,9 +39,7 @@ function getClassicalPose(forme: ClassicalForme, facet: Facet): Pose {
     origin: geom.centroid(),
     // Use the normal of the given face as the first axis
     scale: geom.edgeLength(),
-    orientation: forme
-      .adjacentFacetFaces(facet)
-      .map((face) => face.normal()) as any,
+    orientation: forme.adjacentFacetFaces(facet),
   }
 }
 

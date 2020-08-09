@@ -13,9 +13,7 @@ function getAmboPose(forme: ClassicalForme): Pose {
   return {
     origin: forme.geom.centroid(),
     scale: avgInradius(forme),
-    orientation: forme
-      .adjacentFacetFaces("face")
-      .map((face) => face.normal()) as any,
+    orientation: forme.adjacentFacetFaces("face"),
   }
 }
 

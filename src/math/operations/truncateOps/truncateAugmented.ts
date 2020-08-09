@@ -40,13 +40,13 @@ export default makeOpPair<AugmentedClassicalForme>({
       crossAxis = caps[1].normal()
     } else {
       const edge = find(boundary.edges, (e) => forme.isMainFace(e.twinFace()))
-      crossAxis = boundary.to(edge)
+      crossAxis = edge.normal()
     }
 
     return {
       origin: centroid,
       scale: forme.mainFace().centroid().distanceTo(centroid),
-      orientation: [cap.normal(), crossAxis],
+      orientation: [cap, crossAxis],
     }
   },
   toLeft(forme) {

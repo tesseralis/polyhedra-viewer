@@ -1,12 +1,19 @@
 import { takeRight, dropRight, invert, isEmpty, uniq } from "lodash-es"
 import { Vector3, Matrix4 } from "three"
-import { Polyhedron, Edge, Vertex, VertexList, VertexArg } from "math/polyhedra"
+import {
+  Polyhedron,
+  Facet,
+  Edge,
+  Vertex,
+  VertexList,
+  VertexArg,
+} from "math/polyhedra"
 import { Transform, vecEquals, translateMat, scaleMat } from "math/geom"
 import { mapObject } from "utils"
-import { PolyhedronSpecs, Facet, Twist } from "specs"
+import { PolyhedronSpecs, Facet as FacetType, Twist } from "specs"
 
 export interface FacetOpts {
-  facet: Facet
+  facet: FacetType
 }
 
 export interface TwistOpts {
@@ -28,11 +35,13 @@ export function oppositeFace(edge: Edge, twist?: Twist) {
   }
 }
 
+export type Axis = Vector3 | Facet
+
 /**
  * Defines an orthonormal orientation.
  * An orientation [u, v] defineds the basis [u, v, u x v]
  */
-type Orientation = readonly [Vector3, Vector3]
+export type Orientation = readonly [Axis, Axis]
 
 /**
  * Defines a scale, origin, and orientation used to transform one polyhedron to another.
@@ -43,9 +52,13 @@ export interface Pose {
   orientation: Orientation
 }
 
-function normalizeOrientation([u1, u2]: Orientation): Orientation {
-  const _u1 = u1.clone().normalize()
-  const _u2 = u2.clone().projectOnPlane(_u1).normalize()
+function normalizeAxis(u: Axis) {
+  return u instanceof Facet ? u.normal() : u
+}
+
+function normalizeOrientation([u1, u2]: Orientation): [Vector3, Vector3] {
+  const _u1 = normalizeAxis(u1).clone().normalize()
+  const _u2 = normalizeAxis(u2).clone().projectOnPlane(_u1).normalize()
   return [_u1, _u2]
 }
 

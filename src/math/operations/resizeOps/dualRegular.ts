@@ -10,9 +10,7 @@ function getPose(forme: ClassicalForme, facet: Facet, scale: number): Pose {
     origin: geom.centroid(),
     // Use the normal of the given face as the first axis
     scale,
-    orientation: forme
-      .adjacentFacetFaces(facet)
-      .map((face) => face.normal()) as any,
+    orientation: forme.adjacentFacetFaces(facet),
   }
 }
 
@@ -53,11 +51,10 @@ export default makeOpPair<ClassicalForme>({
     }
     // for the vertex figure, pick a vertex and align it with that edge
     const vertex = geom.getVertex()
-    const v2 = vertex.adjacentVertices()[0]
     return {
       origin: geom.centroid(),
       scale: forme.midradius(),
-      orientation: [vertex.normal(), v2.normal()],
+      orientation: [vertex, vertex.adjacentVertices()[0]],
     }
   },
   toLeft: (forme, _, result) => doDualTransform(forme, result),

@@ -1,6 +1,7 @@
 import { pick } from "lodash-es"
 import React, { useRef, useState } from "react"
 import { Table } from "tables"
+import { Color } from "three"
 import PolyhedronModel from "components/ViewerPage/common/SolidScene/PolyhedronModel"
 import { getGeometry } from "math/operations/operationUtils"
 import ConfigCtx from "components/ConfigCtx"
@@ -15,7 +16,7 @@ const rowSpacing = 2
 const colSpacing = 7
 const innerSpacing = 3
 
-// FIXME add these typings
+// FIXME add these typings (once we have a more concrete design)
 function PolyhedronEntry({ entry, position, navigate }: any) {
   const ref = useRef<any>()
   const [hovered, setHovered] = useState(false)
@@ -26,13 +27,21 @@ function PolyhedronEntry({ entry, position, navigate }: any) {
     }
   })
   if (!entry || typeof entry === "string") return null
+  // TODO might as well make this an official method
+  // (it returns false for gyrobifastigium)
   const isDupe = entry.name() !== entry.canonicalName()
+  // const geom = getGeometry(entry)
   const forme = createForme(entry, getGeometry(entry))
   const geom = forme.orient()
+  // const geom = forme.geom
 
   const config = ConfigCtx.useState()
   const faceColors = geom.faces.map((face) => {
-    let color = getFormeColors(forme, face)
+    // let color = getFormeColors(forme, face)
+    let color: any = {
+      color: new Color(),
+      material: 1,
+    }
     if (isDupe) {
       color = mixColor(color, (c) => c.clone().offsetHSL(0, -0.25, 0.2))
     }
@@ -43,7 +52,11 @@ function PolyhedronEntry({ entry, position, navigate }: any) {
   })
 
   return (
-    <group ref={ref} position={position}>
+    <group
+      ref={ref}
+      position={position}
+      scale={isDupe ? [2 / 3, 2 / 3, 2 / 3] : [1, 1, 1]}
+    >
       <PolyhedronModel
         onClick={() => navigate(`/${escape(entry.name())}`)}
         onPointerMove={() => setHovered(true)}

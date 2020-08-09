@@ -102,7 +102,7 @@ export class AugmentedPrismForme extends CompositeForme {
       this.specs.data.augmented === 2
         ? getCentroid(caps.map((c) => c.normal()))
         : caps[0].normal()
-    return [this.endFaces()[0].normal(), normal] as const
+    return [this.endFaces()[0], normal] as const
   }
 
   caps() {
@@ -173,7 +173,7 @@ export class AugmentedClassicalForme extends CompositeForme {
     const caps = this.caps()
     if (this.specs.isTri()) {
       const axis = getCentroid(caps.map((c) => c.normal()))
-      return [axis, caps[0].normal()] as const
+      return [axis, caps[0]] as const
     }
     if (this.specs.hasAlignment() && this.specs.isMeta()) {
       const axis = getCentroid(caps.map((c) => c.normal()))
@@ -182,7 +182,7 @@ export class AugmentedClassicalForme extends CompositeForme {
     }
     const cap = caps[0]
     const edge = find(cap.boundary().edges, (e) => e.face.numSides === 3)
-    return [cap.normal(), edge.normal()] as const
+    return [cap, edge] as const
   }
 
   hasAlignment() {
@@ -260,14 +260,14 @@ export class DiminishedSolidForme extends CompositeForme {
     const faces = this.diminishedFaces()
     if (this.specs.isAugmented() || this.specs.isTri()) {
       const normal = getCentroid(faces.map((f) => f.normal()))
-      return [normal, faces[0].normal()] as const
+      return [normal, faces[0]] as const
     }
     if (this.specs.hasAlignment() && this.specs.isMeta()) {
       const axis = getCentroid(faces.map((f) => f.normal()))
       const cross = axis.clone().cross(faces[0].normal())
       return [axis, cross] as const
     }
-    return [faces[0].normal(), faces[0].edges[0].normal()] as const
+    return [faces[0], faces[0].edges[0]] as const
   }
 
   // TODO dedupe with gyrate
@@ -311,11 +311,11 @@ export class GyrateSolidForme extends CompositeForme {
     const mods = this.modifications()
     if (mods.length === 0) {
       // TODO return orientation of the base
-      return [this.geom.faces[0].normal(), this.geom.faces[1].normal()] as const
+      return [this.geom.faces[0], this.geom.faces[1]] as const
     }
     // FIXME make this more sophisticated
     const boundary = mods[0] instanceof Cap ? mods[0].boundary() : mods[0]
-    return [mods[0].normal(), boundary.edges[0].normal()] as const
+    return [mods[0], boundary.edges[0]] as const
   }
 
   /** Return whether the given cap is gyrated */
