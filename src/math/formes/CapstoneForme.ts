@@ -1,3 +1,4 @@
+import { once } from "lodash"
 import PolyhedronForme from "./PolyhedronForme"
 import { Capstone, Facet as FacetType } from "specs"
 import { Polyhedron, Face, Edge, Cap, FaceLike, Facet } from "math/polyhedra"
@@ -38,12 +39,12 @@ export default abstract class CapstoneForme extends PolyhedronForme<Capstone> {
     return [top, top.edges[0]] as const
   }
 
-  abstract queryTops(): Generator<CapstoneEnd>
-  *queryBottoms(): Generator<CapstoneEnd> {
+  protected abstract queryTops(): Generator<CapstoneEnd>
+  protected *queryBottoms(): Generator<CapstoneEnd> {
     yield* this.queryTops()
   }
 
-  ends() {
+  ends = once(() => {
     for (const top of this.queryTops()) {
       for (const bottom of this.queryBottoms()) {
         if (top.isInverse(bottom)) {
@@ -54,7 +55,7 @@ export default abstract class CapstoneForme extends PolyhedronForme<Capstone> {
     throw new Error(
       `Error finding two opposite ends for capstone ${this.specs.name()}`,
     )
-  }
+  })
 
   endCaps() {
     return this.ends().filter((end) => end instanceof Cap) as Cap[]
