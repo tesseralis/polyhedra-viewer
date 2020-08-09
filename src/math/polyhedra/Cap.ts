@@ -122,11 +122,7 @@ export default abstract class Cap extends Facet {
       const faceCount = countBy(vertex.adjacentFaces(), "numSides")
       return isEqual(faceCount, this.faceConfiguration)
     })
-    return (
-      matchFaces &&
-      this.faces().every((face) => face.isValid()) &&
-      this.boundary().isPlanar()
-    )
+    return matchFaces && this.boundary().isPlanar()
   }
 }
 
