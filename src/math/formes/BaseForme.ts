@@ -2,6 +2,7 @@ import { mean } from "lodash-es"
 import { PolyhedronSpecs } from "specs"
 import { Polyhedron } from "math/polyhedra"
 
+import { Classical, Capstone, Composite, Elementary } from "specs"
 import type ClassicalForme from "./ClassicalForme"
 import type CapstoneForme from "./CapstoneForme"
 import type CompositeForme from "./CompositeForme"
@@ -13,7 +14,19 @@ import {
   alignPolyhedron,
 } from "math/operations/operationUtils"
 
-export default class PolyhedronForme<
+export type PolyhedronForme<
+  S extends PolyhedronSpecs = PolyhedronSpecs
+> = S extends Classical
+  ? ClassicalForme
+  : S extends Capstone
+  ? CapstoneForme
+  : S extends Composite
+  ? CompositeForme
+  : S extends Elementary
+  ? ElementaryForme
+  : never
+
+export default class BaseForme<
   Specs extends PolyhedronSpecs = PolyhedronSpecs
 > {
   specs: Specs

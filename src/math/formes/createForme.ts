@@ -1,4 +1,4 @@
-import PolyhedronForme from "./PolyhedronForme"
+import { PolyhedronForme } from "./BaseForme"
 import ClassicalForme from "./ClassicalForme"
 import CapstoneForme from "./CapstoneForme"
 import CompositeForme from "./CompositeForme"
@@ -7,6 +7,7 @@ import ElementaryForme from "./ElementaryForme"
 import { PolyhedronSpecs } from "specs"
 import { Polyhedron } from "math/polyhedra"
 
+// TODO maybe we can do something to map the specs to the right forme?
 export default function createForme(
   specs: PolyhedronSpecs,
   geom: Polyhedron,

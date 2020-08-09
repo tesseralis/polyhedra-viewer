@@ -1,5 +1,5 @@
 import { forEach } from "lodash-es"
-import createForme from "math/formes/createForme"
+import { createForme } from "math/formes"
 import { getGeometry } from "math/operations/operationUtils"
 import { operations } from ".."
 import { validateOperationApplication } from "../operationTestUtils"

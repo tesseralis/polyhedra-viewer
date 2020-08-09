@@ -1,5 +1,5 @@
 import { once } from "lodash"
-import PolyhedronForme from "./PolyhedronForme"
+import BaseForme from "./BaseForme"
 import { Capstone, FacetType } from "specs"
 import { Polyhedron, Face, Edge, Cap, FaceLike, Facet } from "math/polyhedra"
 import { getCentroid } from "math/geom"
@@ -8,7 +8,7 @@ import { getGeometry } from "math/operations/operationUtils"
 type CapstoneEnd = Facet
 
 // TODO add more useful functions here
-export default abstract class CapstoneForme extends PolyhedronForme<Capstone> {
+export default abstract class CapstoneForme extends BaseForme<Capstone> {
   static create(specs: Capstone, geom: Polyhedron) {
     switch (specs.data.count) {
       case 0:

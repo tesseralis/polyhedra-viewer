@@ -10,11 +10,9 @@ import {
 import { Polyhedron, Face } from "math/polyhedra"
 import { angleBetween } from "math/geom"
 import { getGeometry, oppositeFace } from "math/operations/operationUtils"
-import PolyhedronForme from "./PolyhedronForme"
+import BaseForme from "./BaseForme"
 
-export default abstract class ClassicalForme extends PolyhedronForme<
-  Classical
-> {
+export default abstract class ClassicalForme extends BaseForme<Classical> {
   static create(specs: Classical, geom: Polyhedron) {
     switch (specs.data.operation) {
       case "regular":

@@ -2,11 +2,11 @@ import { Composite } from "specs"
 import { makeOpPair } from "../operationPairs"
 import { getCentroid } from "math/geom"
 import { getTransformedVertices } from "../operationUtils"
-import { AugmentedClassicalForme } from "math/formes/CompositeForme"
+import { CompositeForme } from "math/formes"
 import { find } from "utils"
 import { getSharpenPoint, getSharpenPointEdge } from "./truncateHelpers"
 
-export default makeOpPair<AugmentedClassicalForme>({
+export default makeOpPair<CompositeForme>({
   graph: function* () {
     for (const entry of Composite.query.where(
       (s) =>
@@ -39,18 +39,20 @@ export default makeOpPair<AugmentedClassicalForme>({
       // If metabiaugmented, use the normal of the other cap
       crossAxis = caps[1].normal()
     } else {
-      const edge = find(boundary.edges, (e) => forme.isMainFace(e.twinFace()))
+      const edge = find(boundary.edges, (e) =>
+        forme.isFacetFace(e.twinFace(), "face"),
+      )
       crossAxis = edge.normal()
     }
 
     return {
       origin: centroid,
-      scale: forme.mainFace().centroid().distanceTo(centroid),
+      scale: forme.facetFace("face").centroid().distanceTo(centroid),
       orientation: [cap, crossAxis],
     }
   },
   toLeft(forme) {
-    const truncatedFaces = forme.minorFaces()
+    const truncatedFaces = forme.facetFaces("vertex")
     // the inner faces of the caps
     const cupolaFaces = forme.capTops()
     return getTransformedVertices(
@@ -67,7 +69,9 @@ export default makeOpPair<AugmentedClassicalForme>({
 
           return getSharpenPoint(face, v.vec, otherFace.centroid())
         } else {
-          const edge = find(face.edges, (e) => forme.isMainFace(e.twinFace()))
+          const edge = find(face.edges, (e) =>
+            forme.isFacetFace(e.twinFace(), "face"),
+          )
           return getSharpenPointEdge(face, edge)
         }
       },

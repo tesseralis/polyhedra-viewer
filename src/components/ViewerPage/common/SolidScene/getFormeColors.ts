@@ -1,9 +1,11 @@
 import { Color } from "three"
 import { Face, Cap } from "math/polyhedra"
-import ClassicalForme from "math/formes/ClassicalForme"
-import CapstoneForme from "math/formes/CapstoneForme"
-import CompositeForme from "math/formes/CompositeForme"
-import PolyhedronForme from "math/formes/PolyhedronForme"
+import {
+  PolyhedronForme,
+  ClassicalForme,
+  CapstoneForme,
+  CompositeForme,
+} from "math/formes"
 
 type FaceColor = Color | Color[]
 
@@ -184,12 +186,12 @@ function getCompositeColor(forme: CompositeForme, face: Face): Appearance {
     const type = forme.specs.sourceClassical().isTruncated()
       ? "secondary"
       : ("primary" as const)
-    if (forme.isMainFace(face)) {
+    if (forme.isFacetFace(face, "face")) {
       return {
         color: scheme[type].face,
         material: facetMaterial,
       }
-    } else if (forme.isMinorFace(face)) {
+    } else if (forme.isFacetFace(face, "vertex")) {
       return {
         color: scheme.primary.vertex,
         material: facetMaterial,

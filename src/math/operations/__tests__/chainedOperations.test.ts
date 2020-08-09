@@ -3,9 +3,8 @@ import { getSpecs } from "specs"
 import { Polyhedron } from "math/polyhedra"
 import { OpName, operations } from "math/operations"
 import { getGeometry } from "math/operations/operationUtils"
-import createForme from "math/formes/createForme"
+import { PolyhedronForme, createForme } from "math/formes"
 import { validateOperationApplication } from "../operationTestUtils"
-import PolyhedronForme from "math/formes/PolyhedronForme"
 
 interface Args {
   face?: number

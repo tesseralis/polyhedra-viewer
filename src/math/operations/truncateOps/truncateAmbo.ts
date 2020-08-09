@@ -1,7 +1,7 @@
 import { sum } from "lodash-es"
 import { facetTypes } from "specs"
 import { getTransformedVertices, Pose } from "../operationUtils"
-import ClassicalForme from "math/formes/ClassicalForme"
+import { ClassicalForme } from "math/formes"
 import { makeTruncateTrio } from "./truncateHelpers"
 import { scaleMat } from "math/geom"
 

@@ -1,5 +1,5 @@
 import { FacetType } from "specs"
-import ClassicalForme from "math/formes/ClassicalForme"
+import { ClassicalForme } from "math/formes"
 import { getTransformedVertices, Pose } from "../operationUtils"
 import { getSharpenPointEdge, makeTruncateTrio } from "./truncateHelpers"
 

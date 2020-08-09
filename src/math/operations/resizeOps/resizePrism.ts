@@ -1,7 +1,7 @@
 import { Capstone } from "specs"
 import { makeOpPair } from "../operationPairs"
 import { Pose, getTransformedVertices, FacetOpts } from "../operationUtils"
-import CapstoneForme from "math/formes/CapstoneForme"
+import { CapstoneForme } from "math/formes"
 
 function getCapstoneCrossAxis(forme: CapstoneForme) {
   const topBoundary = forme.endBoundaries()[0]

@@ -11,12 +11,10 @@ import {
   gyrations,
 } from "specs"
 import { OpArgs } from "../Operation"
-import PolyhedronForme from "math/formes/PolyhedronForme"
+import { PolyhedronForme, CapstoneForme, CompositeForme } from "math/formes"
 import { GraphGenerator, OpInput, toDirected } from "../operationPairs"
 import removeCap from "./removeCap"
 import addCap, { CrossAxis } from "./addCap"
-import CompositeForme from "math/formes/CompositeForme"
-import CapstoneForme from "math/formes/CapstoneForme"
 
 function hasRotunda(info: CutPasteSpecs) {
   if (info.isCapstone()) {

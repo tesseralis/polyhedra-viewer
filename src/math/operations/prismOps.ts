@@ -1,6 +1,6 @@
 import { find } from "utils"
 import { Capstone, Twist, twists, oppositeTwist } from "specs"
-import CapstoneForme from "math/formes/CapstoneForme"
+import { CapstoneForme } from "math/formes"
 import { combineOps, makeOpPair } from "./operationPairs"
 import { makeOperation } from "./Operation"
 import { Pose, TwistOpts, getTransformedVertices } from "./operationUtils"

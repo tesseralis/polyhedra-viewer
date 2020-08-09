@@ -1,8 +1,8 @@
 import { Composite } from "specs"
-import { DiminishedSolidForme } from "math/formes/CompositeForme"
+import { CompositeForme } from "math/formes"
 import { makeCutPastePair } from "./cutPasteUtils"
 
-export default makeCutPastePair<DiminishedSolidForme>({
+export default makeCutPastePair<CompositeForme>({
   graph: function* () {
     // Pick every diminished icosahedron except the tridiminished augmented
     for (const solid of Composite.query.where(

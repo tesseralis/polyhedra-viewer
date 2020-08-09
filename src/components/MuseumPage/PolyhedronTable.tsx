@@ -5,7 +5,7 @@ import { Color } from "three"
 import PolyhedronModel from "components/ViewerPage/common/SolidScene/PolyhedronModel"
 import { getGeometry } from "math/operations/operationUtils"
 import ConfigCtx from "components/ConfigCtx"
-import createForme from "math/formes/createForme"
+import { createForme } from "math/formes"
 
 import { useFrame } from "react-three-fiber"
 import getFormeColors, {

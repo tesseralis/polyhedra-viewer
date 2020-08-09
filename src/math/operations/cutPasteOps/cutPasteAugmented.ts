@@ -1,5 +1,5 @@
 import { Composite } from "specs"
-import CompositeForme from "math/formes/CompositeForme"
+import { CompositeForme } from "math/formes"
 import { makeCutPastePair } from "./cutPasteUtils"
 
 export default makeCutPastePair<CompositeForme>({

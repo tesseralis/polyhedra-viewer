@@ -1,7 +1,6 @@
 import { createHookedContext } from "components/common"
-import PolyhedronForme from "math/formes/PolyhedronForme"
-import createForme from "math/formes/createForme"
 import { getSpecs } from "specs"
+import { PolyhedronForme, createForme } from "math/formes"
 import { getGeometry } from "math/operations/operationUtils"
 
 const defaultProps = { name: "tetrahedron" }

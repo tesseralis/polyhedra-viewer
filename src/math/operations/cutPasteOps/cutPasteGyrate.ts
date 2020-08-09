@@ -1,8 +1,8 @@
 import { Composite, gyrations } from "specs"
-import { GyrateSolidForme } from "math/formes/CompositeForme"
+import { CompositeForme } from "math/formes"
 import { makeCutPastePair } from "./cutPasteUtils"
 
-export default makeCutPastePair<GyrateSolidForme>({
+export default makeCutPastePair<CompositeForme>({
   graph: function* () {
     for (const solid of Composite.query.where(
       (s) => s.isGyrateSolid() && s.isDiminished(),

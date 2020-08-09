@@ -4,8 +4,7 @@ import { pickBy, mapValues, isMatch, compact, uniq } from "lodash-es"
 import { Polyhedron, Face, VertexArg, normalizeVertex } from "math/polyhedra"
 import { deduplicateVertices } from "./operationUtils"
 import { Polygon, PolyhedronSpecs } from "specs"
-import PolyhedronForme from "math/formes/PolyhedronForme"
-import createForme from "math/formes/createForme"
+import { PolyhedronForme, createForme } from "math/formes"
 import { find, EntryIters, cartesian } from "utils"
 
 type SelectState = "selected" | "selectable" | undefined

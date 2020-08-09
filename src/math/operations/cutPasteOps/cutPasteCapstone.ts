@@ -1,5 +1,5 @@
 import { Capstone } from "specs"
-import CapstoneForme from "math/formes/CapstoneForme"
+import { CapstoneForme } from "math/formes"
 import { makeCutPastePair } from "./cutPasteUtils"
 import { capOrientation } from "./addCap"
 

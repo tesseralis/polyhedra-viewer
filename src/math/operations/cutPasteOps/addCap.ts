@@ -1,7 +1,7 @@
 import { repeat, find } from "utils"
 import { Polyhedron, Face, FaceLike, Edge } from "math/polyhedra"
 import { Capstone, CapType } from "specs"
-import CapstoneForme from "math/formes/CapstoneForme"
+import { CapstoneForme } from "math/formes"
 import { deduplicateVertices, alignPolyhedron, Pose } from "../operationUtils"
 
 export type CrossAxis = (edge: Edge) => boolean

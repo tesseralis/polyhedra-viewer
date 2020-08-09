@@ -7,8 +7,8 @@ import {
   GraphEntry as DirectedGraphEntry,
 } from "./Operation"
 import { Pose, alignPolyhedron, getGeometry } from "./operationUtils"
-import PolyhedronForme from "math/formes/PolyhedronForme"
-import createForme from "math/formes/createForme"
+import BaseForme from "math/formes/BaseForme"
+import { PolyhedronForme, createForme } from "math/formes"
 
 export type Side = "left" | "right"
 
@@ -179,10 +179,10 @@ class OpPair<
           : (createForme(endSpecs, alignedEnd) as Forme)
     } else {
       // Otherwise, we have to fetch the intermediate solid ourselves
-      // const middleSolid = normalizeIntermediate(getMiddle(entry))
       const inter = getMiddle(entry)
+      // TODO figure out a way to get this without importing the base constructor?
       const middleSolid =
-        inter instanceof PolyhedronForme
+        inter instanceof BaseForme
           ? inter
           : (createForme(inter, getGeometry(inter)) as Forme)
 

@@ -1,16 +1,14 @@
 import { once } from "lodash-es"
 import { find, getSingle } from "utils"
-import PolyhedronForme from "./PolyhedronForme"
+import BaseForme from "./BaseForme"
 import { getGeometry } from "math/operations/operationUtils"
-import { Composite } from "specs"
+import { Composite, FacetType } from "specs"
 import { Polyhedron, Face, Cap } from "math/polyhedra"
 import { getCentroid } from "math/geom"
 
 type Base = Cap | Face
 
-export default abstract class CompositeForme extends PolyhedronForme<
-  Composite
-> {
+export default abstract class CompositeForme extends BaseForme<Composite> {
   static create(specs: Composite, geom: Polyhedron) {
     // TODO lol maybe it's time for a visitor
     if (specs.isAugmentedPrism()) {
@@ -87,6 +85,29 @@ export default abstract class CompositeForme extends PolyhedronForme<
   }
 
   abstract canAugment(face: Face): boolean
+
+  abstract isFacetFace(face: Face, facet: FacetType): boolean
+
+  facetFaces(facet: FacetType) {
+    return this.geom.faces.filter((f) => this.isFacetFace(f, facet))
+  }
+
+  facetFace(facet: FacetType) {
+    return find(this.geom.faces, (f) => this.isFacetFace(f, facet))
+  }
+
+  isCapTop(face: Face) {
+    // if (this.specs.sourceClassical().isRegular()) return false
+    return face.vertices.every((v) => this.capInnerVertIndices().has(v.index))
+  }
+
+  capTops() {
+    return this.geom.faces.filter((f) => this.isCapTop(f))
+  }
+
+  isGyrate(cap: Cap) {
+    return false
+  }
 }
 
 export class AugmentedPrismForme extends CompositeForme {
@@ -98,6 +119,11 @@ export class AugmentedPrismForme extends CompositeForme {
         ? getCentroid(caps.map((c) => c.normal()))
         : caps[0].normal()
     return [this.endFaces()[0], normal] as const
+  }
+
+  // @override
+  isFacetFace(face: Face, facet: FacetType): boolean {
+    throw new Error(`Augmented prisms do not have facet faces`)
   }
 
   caps = once(() => {
@@ -202,46 +228,20 @@ export class AugmentedClassicalForme extends CompositeForme {
 
   // Functions that exclusive to augmented solids
 
-  isMainFace(face: Face) {
-    // Only source faces re main faces
+  isFacetFace(face: Face, facet: FacetType): boolean {
     if (!this.isSourceFace(face)) return false
-    // All regular faces are main faces
-    if (this.specs.sourceClassical().isRegular()) return true
-    // It's a main face if it's not a truncated face
-    return face.numSides !== 3
-  }
-
-  mainFace() {
-    return find(this.geom.faces, (f) => this.isMainFace(f))
-  }
-
-  mainFaces() {
-    return this.geom.faces.filter((f) => this.isMainFace(f))
-  }
-
-  isMinorFace(face: Face) {
-    return this.isSourceFace(face) && !this.isMainFace(face)
-  }
-
-  minorFace() {
-    return find(this.geom.faces, (f) => this.isMinorFace(f))
-  }
-
-  minorFaces() {
-    return this.geom.faces.filter((f) => this.isMinorFace(f))
-  }
-
-  isCapTop(face: Face) {
-    if (this.specs.sourceClassical().isRegular()) return false
-    return face.vertices.every((v) => this.capInnerVertIndices().has(v.index))
-  }
-
-  capTops() {
-    return this.geom.faces.filter((f) => this.isCapTop(f))
+    if (facet === "face") {
+      // Only source faces re main faces
+      // All regular faces are main faces
+      if (this.specs.sourceClassical().isRegular()) return true
+      // It's a main face if it's not a truncated face
+      return face.numSides !== 3
+    }
+    return !this.isFacetFace(face, "face")
   }
 
   canAugment(face: Face) {
-    if (!this.isMainFace(face)) return false
+    if (!this.isFacetFace(face, "face")) return false
     return this.caps().every((cap) =>
       cap
         .boundary()
@@ -255,6 +255,12 @@ export class DiminishedSolidForme extends CompositeForme {
   caps = once(() => {
     return this.geom.caps({ type: "primary" })
   })
+
+  // @override
+  isFacetFace(face: Face, facet: FacetType) {
+    if (facet === "vertex") return false
+    return this.isSourceFace(face)
+  }
 
   // @override
   orientation() {

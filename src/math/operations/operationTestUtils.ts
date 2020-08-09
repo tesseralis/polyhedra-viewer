@@ -1,9 +1,8 @@
 import { Polyhedron, Vertex } from "math/polyhedra"
 import Operation, { OpResult } from "./Operation"
-import PolyhedronForme from "math/formes/PolyhedronForme"
+import { PolyhedronForme, createForme } from "math/formes"
 import { getGeometry } from "math/operations/operationUtils"
 import { getSpecs } from "specs"
-import createForme from "math/formes/createForme"
 
 interface OpTestCases {
   pass: string[]

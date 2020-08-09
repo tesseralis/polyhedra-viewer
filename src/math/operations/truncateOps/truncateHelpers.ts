@@ -4,7 +4,7 @@ import Classical, { Operation as OpName } from "specs/Classical"
 import { makeOpPair } from "../operationPairs"
 import { angleBetween } from "math/geom"
 import { Pose } from "../operationUtils"
-import ClassicalForme from "math/formes/ClassicalForme"
+import { ClassicalForme } from "math/formes"
 const { PI, tan } = Math
 
 /**

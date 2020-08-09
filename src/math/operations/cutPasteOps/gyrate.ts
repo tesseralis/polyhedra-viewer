@@ -4,15 +4,13 @@ import { Capstone, Composite } from "specs"
 import { CapOptions, capOptionArgs } from "./cutPasteUtils"
 import { getTransformedVertices } from "../operationUtils"
 import { makeOperation } from "../Operation"
-import CapstoneForme from "math/formes/CapstoneForme"
-import CompositeForme, { GyrateSolidForme } from "math/formes/CompositeForme"
+import { CapstoneForme, CompositeForme, PolyhedronForme } from "math/formes"
 import {
   GraphGenerator,
   toDirected,
   combineOps,
   OpInput,
 } from "../operationPairs"
-import PolyhedronForme from "math/formes/PolyhedronForme"
 
 const TAU = 2 * Math.PI
 
@@ -98,7 +96,7 @@ const gyrateCapstone = makeGyrateOp<CapstoneForme>({
   },
 })
 
-const gyrateComposite = makeGyrateOp<GyrateSolidForme>({
+const gyrateComposite = makeGyrateOp<CompositeForme>({
   graph: function* () {
     for (const solid of Composite.query.where(
       (s) => s.isGyrateSolid() && s.isGyrate(),

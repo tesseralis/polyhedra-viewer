@@ -3,7 +3,7 @@ import { useStyle, scales } from "styles"
 
 import { TransitionCtx, PolyhedronCtx } from "components/ViewerPage/context"
 
-import createForme from "math/formes/createForme"
+import { createForme } from "math/formes"
 import { Polyhedron } from "math/polyhedra"
 import { andaleMono } from "styles/fonts"
 import { hover } from "styles/common"

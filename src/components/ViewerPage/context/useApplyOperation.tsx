@@ -1,6 +1,6 @@
 import { useCallback } from "react"
 import { Operation } from "math/operations"
-import PolyhedronForme from "math/formes/PolyhedronForme"
+import { PolyhedronForme } from "math/formes"
 import PolyhedronCtx from "./PolyhedronCtx"
 import OperationCtx from "./OperationCtx"
 import TransitionCtx from "./TransitionCtx"
