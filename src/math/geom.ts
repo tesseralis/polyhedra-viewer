@@ -10,10 +10,6 @@ export function vecEquals(v1: Vector3, v2: Vector3) {
 export const getMidpoint = (v1: Vector3, v2: Vector3) =>
   new Vector3().addVectors(v1, v2).divideScalar(2)
 
-export function isInverse(v1: Vector3, v2: Vector3) {
-  return vecEquals(v1.clone().negate(), v2)
-}
-
 export function angleBetween(o: Vector3, a: Vector3, b: Vector3) {
   // colinear points return NaN, so return 0 instead
   return a.clone().sub(o).angleTo(b.clone().sub(o))

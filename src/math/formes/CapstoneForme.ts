@@ -1,7 +1,7 @@
 import PolyhedronForme from "./PolyhedronForme"
 import { Capstone, Facet as FacetType } from "specs"
 import { Polyhedron, Face, Edge, Cap, FaceLike, Facet } from "math/polyhedra"
-import { vecEquals, isInverse, getCentroid } from "math/geom"
+import { getCentroid } from "math/geom"
 import { getGeometry } from "math/operations/operationUtils"
 
 type CapstoneEnd = Facet
@@ -46,7 +46,7 @@ export default abstract class CapstoneForme extends PolyhedronForme<Capstone> {
   ends() {
     for (const top of this.queryTops()) {
       for (const bottom of this.queryBottoms()) {
-        if (isInverse(top.normal(), bottom.normal())) {
+        if (top.isInverse(bottom)) {
           return [top, bottom]
         }
       }
@@ -61,7 +61,7 @@ export default abstract class CapstoneForme extends PolyhedronForme<Capstone> {
   }
 
   isEndCap(cap: Cap) {
-    return this.endCaps().some((c) => vecEquals(c.normal(), cap.normal()))
+    return this.endCaps().some((c) => c.isAligned(cap))
   }
 
   endFaces() {
@@ -120,7 +120,7 @@ export default abstract class CapstoneForme extends PolyhedronForme<Capstone> {
     if (end instanceof Face) return end.equals(face)
     if (end instanceof Cap) {
       if (end.type === "pyramid") return false
-      return vecEquals(face.normal(), end.normal())
+      return face.isAligned(end)
     }
     return false
   }

@@ -4,7 +4,7 @@ import PolyhedronForme from "./PolyhedronForme"
 import { getGeometry } from "math/operations/operationUtils"
 import { Composite } from "specs"
 import { Polyhedron, Face, Cap } from "math/polyhedra"
-import { getCentroid, isInverse } from "math/geom"
+import { getCentroid } from "math/geom"
 
 type Base = Cap | Face
 
@@ -86,9 +86,7 @@ export default abstract class CompositeForme extends PolyhedronForme<
 
   alignment(cap: Base) {
     if (!this.hasAlignment()) return undefined
-    return isInverse(cap.normal(), getSingle(this.modifications()).normal())
-      ? "para"
-      : "meta"
+    return cap.isInverse(getSingle(this.modifications())) ? "para" : "meta"
   }
 
   abstract canAugment(face: Face): boolean
@@ -122,7 +120,7 @@ export class AugmentedPrismForme extends CompositeForme {
     if (source.isPrimary() && source.isTriangular()) {
       for (const face1 of this.geom.faces) {
         for (const face2 of this.geom.faces) {
-          if (isInverse(face1.normal(), face2.normal())) {
+          if (face1.isInverse(face2)) {
             return [face1, face2] as const
           }
         }
@@ -133,7 +131,7 @@ export class AugmentedPrismForme extends CompositeForme {
     if (source.isSquare()) {
       for (const f1 of this.geom.facesWithNumSides(4)) {
         for (const f2 of this.geom.facesWithNumSides(4)) {
-          if (isInverse(f1.normal(), f2.normal())) {
+          if (f1.isInverse(f2)) {
             return [f1, f2] as const
           }
         }

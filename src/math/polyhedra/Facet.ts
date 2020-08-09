@@ -1,6 +1,6 @@
 import { once } from "lodash-es"
 import { Vector3, Ray, Matrix4 } from "three"
-import { translateMat, getCentroid, withOrigin } from "math/geom"
+import { translateMat, getCentroid, withOrigin, vecEquals } from "math/geom"
 import type Polyhedron from "./Polyhedron"
 import type Vertex from "./Vertex"
 
@@ -46,5 +46,15 @@ export default abstract class Facet {
   to(v: Facet | Vector3) {
     const _v = v instanceof Facet ? v.centroid() : v
     return _v.clone().sub(this.centroid())
+  }
+
+  isAligned(v: Facet | Vector3) {
+    const _v = v instanceof Facet ? v.normal() : v.clone().normalize()
+    return vecEquals(this.normal(), _v)
+  }
+
+  isInverse(v: Facet | Vector3) {
+    const _v = v instanceof Facet ? v.normal() : v.clone().normalize()
+    return vecEquals(this.normal().clone().negate(), _v)
   }
 }

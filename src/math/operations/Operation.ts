@@ -1,7 +1,6 @@
 import { Vector3 } from "three"
 import { pickBy, mapValues, isMatch, compact, uniq } from "lodash-es"
 
-import { vecEquals } from "math/geom"
 import { Polyhedron, Face, VertexArg, normalizeVertex } from "math/polyhedra"
 import { deduplicateVertices } from "./operationUtils"
 import { Polygon, PolyhedronSpecs } from "specs"
@@ -101,7 +100,7 @@ function getCoplanarFaces(polyhedron: Polyhedron) {
 
     f1.adjacentFaces().forEach((f2) => {
       if (!f2 || !f2.isValid()) return
-      if (vecEquals(f1.normal(), f2.normal())) {
+      if (f1.isAligned(f2)) {
         pairs.push([f1, f2])
         found.push(f1)
         found.push(f2)
