@@ -3,6 +3,7 @@ import { Vector3, Ray, Matrix4 } from "three"
 import { translateMat, getCentroid, withOrigin, vecEquals } from "math/geom"
 import type Polyhedron from "./Polyhedron"
 import type Vertex from "./Vertex"
+import type Face from "./Face"
 
 export default abstract class Facet {
   polyhedron: Polyhedron
@@ -14,6 +15,8 @@ export default abstract class Facet {
   abstract normal(): Vector3
 
   abstract get vertices(): Vertex[]
+
+  abstract adjacentFaces(): Face[]
 
   centroid = once(() => getCentroid(this.vertices.map((v) => v.vec)))
 

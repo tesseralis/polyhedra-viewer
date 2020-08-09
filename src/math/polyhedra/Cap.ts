@@ -113,9 +113,9 @@ export default abstract class Cap extends Facet {
   // NOTE for convenience, this calculates the centroid of the *boundary* not of all the vertices
   centroid = () => this.boundary().centroid()
 
-  normal() {
-    return this.boundary().normal()
-  }
+  normal = () => this.boundary().normal()
+
+  adjacentFaces = () => this.boundary().adjacentFaces()
 
   isValid() {
     const matchFaces = this.innerVertices().every((vertex) => {
