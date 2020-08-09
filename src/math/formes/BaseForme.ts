@@ -66,7 +66,7 @@ export default class BaseForme<Specs extends PolyhedronSpecs> {
     const endPose: Pose = {
       origin: new Vector3(),
       scale: 1,
-      orientation: [new Vector3(0, 1, 0), new Vector3(1, 0, 0)],
+      orientation: [new Vector3(0, 1, 0), new Vector3(0, 0, 1)],
     }
     return alignPolyhedron(this.geom, startPose, endPose)
   }

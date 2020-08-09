@@ -31,8 +31,8 @@ function PolyhedronEntry({ entry, position, navigate }: any) {
   const isDupe = entry.name() !== entry.canonicalName()
   // const geom = getGeometry(entry)
   const forme = fromSpecs(entry)
-  const geom = forme.orient()
-  // const geom = forme.geom
+  // const geom = forme.orient()
+  const geom = forme.geom
 
   const config = ConfigCtx.useState()
   const faceColors = geom.faces.map((face) => {
