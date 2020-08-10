@@ -39,7 +39,7 @@ class Sphenocorona extends ElementaryForme {
 class AugmentedSphenocorona extends ElementaryForme {
   orientation() {
     const face = this.geom.faceWithNumSides(4)
-    const cap = this.geom.caps({ type: "primary" })[0]
+    const cap = this.geom.caps({ type: "primary", base: 4 })[0]
     return [face.normal().clone().negate(), cap] as const
   }
 }

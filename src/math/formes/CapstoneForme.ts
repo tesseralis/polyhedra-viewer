@@ -59,6 +59,7 @@ export default abstract class CapstoneForme extends BaseForme<Capstone> {
 
   private capOpts() {
     return {
+      base: this.specs.data.base,
       type: this.specs.data.type,
       fastigium: this.specs.isDigonal(),
       rotunda: this.specs.isPentagonal(),

@@ -127,7 +127,7 @@ export class AugmentedPrismForme extends CompositeForme {
   }
 
   caps = once(() => {
-    return this.geom.caps({ type: "primary" })
+    return this.geom.caps({ type: "primary", base: 4 })
   })
 
   hasAlignment() {
@@ -218,6 +218,7 @@ export class AugmentedClassicalForme extends CompositeForme {
     const specs = this.specs.sourceClassical()
     const caps = this.geom.caps({
       type: specs.isTruncated() ? "secondary" : "primary",
+      base: specs.data.family,
     })
     // If it's an augmented tetrahedron, only consider the first cap
     if (specs.isTetrahedral() && specs.isRegular()) {
@@ -253,7 +254,7 @@ export class AugmentedClassicalForme extends CompositeForme {
 
 export class DiminishedSolidForme extends CompositeForme {
   caps = once(() => {
-    return this.geom.caps({ type: "primary" })
+    return this.geom.caps({ type: "primary", base: 5 })
   })
 
   // @override
@@ -314,7 +315,7 @@ export class DiminishedSolidForme extends CompositeForme {
 
 export class GyrateSolidForme extends CompositeForme {
   caps = once(() => {
-    return this.geom.caps({ type: "secondary" })
+    return this.geom.caps({ type: "secondary", base: 5 })
   })
 
   // @override

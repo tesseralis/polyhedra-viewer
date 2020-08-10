@@ -122,7 +122,8 @@ function getModifiableCaps(forme: Forme) {
   } else if (forme.isComposite()) {
     return forme.caps()
   } else {
-    return forme.geom.caps({ type: "primary" })
+    // TODO we have an elementary forme now
+    return forme.geom.caps({ type: "primary", base: 4 })
   }
 }
 

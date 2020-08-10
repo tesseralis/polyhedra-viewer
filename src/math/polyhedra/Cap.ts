@@ -1,7 +1,7 @@
 import { once, countBy, isEqual } from "lodash-es"
 
 import { flatMapUniq, find } from "utils"
-import { CapType, PolygonType } from "specs"
+import { CapType, PolygonType, PrimaryPolygon } from "specs"
 import Facet from "./Facet"
 import type Polyhedron from "./Polyhedron"
 import type Face from "./Face"
@@ -41,13 +41,18 @@ function getBoundary(faces: Face[]) {
   )
 }
 
+type CapBase = 2 | PrimaryPolygon
+
 interface Constructor<T> {
-  new (arg: T): Cap
+  new (facet: T, base: CapBase): Cap
 }
-function createMapper<T>(mapper: (p: Polyhedron) => T[], Base: Constructor<T>) {
-  return function* (polyhedron: Polyhedron) {
-    for (const value of mapper(polyhedron)) {
-      const cap = new Base(value)
+function createMapper<T>(
+  mapper: (p: Polyhedron, base: CapBase) => T[],
+  Base: Constructor<T>,
+) {
+  return function* (polyhedron: Polyhedron, opts: CapSearchOpts) {
+    for (const value of mapper(polyhedron, opts.base)) {
+      const cap = new Base(value, opts.base)
       if (cap.isValid()) {
         yield cap
       }
@@ -56,6 +61,7 @@ function createMapper<T>(mapper: (p: Polyhedron) => T[], Base: Constructor<T>) {
 }
 
 export interface CapSearchOpts {
+  base: CapBase
   type: PolygonType
   rotunda?: boolean
   fastigium?: boolean
@@ -68,13 +74,13 @@ export default abstract class Cap extends Facet {
 
   static *getAll(polyhedron: Polyhedron, opts: CapSearchOpts) {
     if (opts.type === "primary") {
-      yield* Pyramid.getAll(polyhedron)
+      yield* Pyramid.getAll(polyhedron, opts)
     } else if (opts.fastigium) {
-      yield* Fastigium.getAll(polyhedron)
+      yield* Fastigium.getAll(polyhedron, opts)
     } else {
-      yield* Cupola.getAll(polyhedron)
+      yield* Cupola.getAll(polyhedron, opts)
       if (opts.rotunda) {
-        yield* Rotunda.getAll(polyhedron)
+        yield* Rotunda.getAll(polyhedron, opts)
       }
     }
   }
@@ -118,44 +124,56 @@ export default abstract class Cap extends Facet {
   adjacentFaces = () => this.boundary().adjacentFaces()
 
   isValid() {
-    const matchFaces = this.innerVertices().every((vertex) => {
+    return this.innerVertices().every((vertex) => {
       const faceCount = countBy(vertex.adjacentFaces(), "numSides")
       return isEqual(faceCount, this.faceConfiguration)
     })
-    return matchFaces && this.boundary().isPlanar()
   }
 }
 
 class Pyramid extends Cap {
-  constructor(vertex: Vertex) {
+  constructor(vertex: Vertex, base: CapBase) {
     super([vertex], "pyramid", {
-      "3": vertex.adjacentEdges().length,
+      "3": base,
     })
   }
-  static getAll = createMapper((p) => p.vertices, Pyramid)
+  static getAll = createMapper(
+    (p, base) => p.vertices.filter((v) => v.adjacentFaces().length === base),
+    Pyramid,
+  )
 }
 
 class Fastigium extends Cap {
-  constructor(edge: Edge) {
+  constructor(edge: Edge, base: CapBase) {
     super(edge.vertices, "cupola", { "3": 1, "4": 2 })
   }
-  static getAll = createMapper((p) => p.edges, Fastigium)
+  static getAll = createMapper(
+    (p, base) =>
+      p.edges.filter((e) => e.adjacentFaces().every((f) => f.numSides === 4)),
+    Fastigium,
+  )
 }
 
 class Cupola extends Cap {
-  constructor(face: Face) {
-    super(face.vertices, "cupola", countBy([3, 4, 4, face.numSides]))
+  constructor(face: Face, base: CapBase) {
+    super(face.vertices, "cupola", countBy([3, 4, 4, base]))
   }
-  static getAll = createMapper((p) => p.faces, Cupola)
+  static getAll = createMapper(
+    (p, base) =>
+      p
+        .facesWithNumSides(base)
+        .filter((f) => f.adjacentFaces().every((f2) => f2.numSides === 4)),
+    Cupola,
+  )
 }
 
 class Rotunda extends Cap {
-  constructor(face: Face) {
+  constructor(face: Face, base: CapBase) {
     super(
       flatMapUniq(face.vertices, (v) => v.adjacentVertices(), "index"),
       "rotunda",
       { "5": 2, "3": 2 },
     )
   }
-  static getAll = createMapper((p) => p.faces, Rotunda)
+  static getAll = createMapper((p, base) => p.facesWithNumSides(base), Rotunda)
 }

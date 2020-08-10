@@ -8,7 +8,10 @@ import { validateOperationApplication } from "../operationTestUtils"
 interface Args {
   face?: number
   facet?: FacetType
-  cap?: "primary" | "secondary"
+  cap?: {
+    type: "primary" | "secondary"
+    base: 2 | 3 | 4 | 5
+  }
 }
 
 type ChainedOpName = OpName | "forme"
@@ -29,7 +32,7 @@ function getArgs(args: Args, polyhedron: Polyhedron) {
   }
   if (args.cap) {
     // TODO support cupolae
-    return { ...args, cap: polyhedron.caps({ type: args.cap })[0] }
+    return { ...args, cap: polyhedron.caps(args.cap)[0] }
   }
   return args
 }
@@ -59,7 +62,11 @@ const chainedTests: OpTest[] = [
     start: "square pyramid",
     operations: [
       { op: "augment", args: { face: 4 }, expected: "square bipyramid" },
-      { op: "diminish", args: { cap: "primary" }, expected: "square pyramid" },
+      {
+        op: "diminish",
+        args: { cap: { type: "primary", base: 4 } },
+        expected: "square pyramid",
+      },
       ["elongate", "elongated square pyramid"],
     ],
   },
@@ -135,7 +142,7 @@ const chainedTests: OpTest[] = [
       ["expand", "rhombicosidodecahedron"],
       {
         op: "diminish",
-        args: { cap: "secondary" },
+        args: { cap: { type: "secondary", base: 5 } },
         expected: "diminished rhombicosidodecahedron",
       },
     ],
@@ -147,7 +154,7 @@ const chainedTests: OpTest[] = [
     operations: [
       {
         op: "diminish",
-        args: { cap: "secondary" },
+        args: { cap: { type: "secondary", base: 5 } },
         expected: "metabiaugmented truncated dodecahedron",
       },
       ["sharpen", "metabiaugmented dodecahedron"],
@@ -159,12 +166,12 @@ const chainedTests: OpTest[] = [
     operations: [
       {
         op: "diminish",
-        args: { cap: "primary" },
+        args: { cap: { type: "primary", base: 5 } },
         expected: "elongated pentagonal pyramid",
       },
       {
         op: "diminish",
-        args: { cap: "primary" },
+        args: { cap: { type: "primary", base: 5 } },
         expected: "pentagonal prism",
       },
       {
