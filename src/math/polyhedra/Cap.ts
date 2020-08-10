@@ -1,4 +1,4 @@
-import { once, countBy, isEqual } from "lodash-es"
+import { once } from "lodash-es"
 
 import { flatMapUniq, find } from "utils"
 import { CapType, PolygonType, PrimaryPolygon } from "specs"
@@ -8,8 +8,6 @@ import type Face from "./Face"
 import type Vertex from "./Vertex"
 import type Edge from "./Edge"
 import FaceLike from "./FaceLike"
-
-type FaceConfiguration = { [key: string]: number }
 
 // Find the boundary of a connected set of faces
 function getBoundary(faces: Face[]) {
@@ -52,10 +50,7 @@ function createMapper<T>(
 ) {
   return function* (polyhedron: Polyhedron, opts: CapSearchOpts) {
     for (const value of mapper(polyhedron, opts.base)) {
-      const cap = new Base(value, opts.base)
-      if (cap.isValid()) {
-        yield cap
-      }
+      yield new Base(value, opts.base)
     }
   }
 }
@@ -70,7 +65,6 @@ export interface CapSearchOpts {
 export default abstract class Cap extends Facet {
   type: CapType
   private _innerVertices: Vertex[]
-  private faceConfiguration: FaceConfiguration
 
   static *getAll(polyhedron: Polyhedron, opts: CapSearchOpts) {
     if (opts.type === "primary") {
@@ -85,15 +79,10 @@ export default abstract class Cap extends Facet {
     }
   }
 
-  constructor(
-    innerVertices: Vertex[],
-    type: CapType,
-    faceConfiguration: FaceConfiguration,
-  ) {
+  constructor(innerVertices: Vertex[], type: CapType) {
     super(innerVertices[0].polyhedron)
     this._innerVertices = innerVertices
     this.type = type
-    this.faceConfiguration = faceConfiguration
   }
 
   innerVertices() {
@@ -122,30 +111,25 @@ export default abstract class Cap extends Facet {
   normal = () => this.boundary().normal()
 
   adjacentFaces = () => this.boundary().adjacentFaces()
-
-  isValid() {
-    return this.innerVertices().every((vertex) => {
-      const faceCount = countBy(vertex.adjacentFaces(), "numSides")
-      return isEqual(faceCount, this.faceConfiguration)
-    })
-  }
 }
 
 class Pyramid extends Cap {
   constructor(vertex: Vertex, base: CapBase) {
-    super([vertex], "pyramid", {
-      "3": base,
-    })
+    super([vertex], "pyramid")
   }
   static getAll = createMapper(
-    (p, base) => p.vertices.filter((v) => v.adjacentFaces().length === base),
+    (p, base) =>
+      p.vertices.filter((v) => {
+        const faces = v.adjacentFaces()
+        return faces.length === base && faces.every((f) => f.numSides === 3)
+      }),
     Pyramid,
   )
 }
 
 class Fastigium extends Cap {
   constructor(edge: Edge, base: CapBase) {
-    super(edge.vertices, "cupola", { "3": 1, "4": 2 })
+    super(edge.vertices, "cupola")
   }
   static getAll = createMapper(
     (p, base) =>
@@ -156,7 +140,7 @@ class Fastigium extends Cap {
 
 class Cupola extends Cap {
   constructor(face: Face, base: CapBase) {
-    super(face.vertices, "cupola", countBy([3, 4, 4, base]))
+    super(face.vertices, "cupola")
   }
   static getAll = createMapper(
     (p, base) =>
@@ -172,8 +156,19 @@ class Rotunda extends Cap {
     super(
       flatMapUniq(face.vertices, (v) => v.adjacentVertices(), "index"),
       "rotunda",
-      { "5": 2, "3": 2 },
     )
   }
-  static getAll = createMapper((p, base) => p.facesWithNumSides(base), Rotunda)
+  static getAll = createMapper(
+    (p) =>
+      p.facesWithNumSides(5).filter((face) => {
+        return face
+          .adjacentFaces()
+          .every(
+            (f3) =>
+              f3.numSides === 3 &&
+              f3.adjacentFaces().every((f5) => f5.numSides === 5),
+          )
+      }),
+    Rotunda,
+  )
 }
