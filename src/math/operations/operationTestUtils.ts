@@ -51,7 +51,9 @@ function expectVerticesMatch(test: Vertex[], ref: Vertex[]) {
 
 function expectNormalsMatch(test: Face[], ref: Face[]) {
   for (const face of test) {
-    expect(face).toSatisfy((face) => ref.some((f) => face.isAligned(f)))
+    if (face.edges.filter((e) => e.isValid()).length < 3) continue
+    expect(ref.some((f) => face.isAligned(f))).toBeTrue()
+    // expect(face).toSatisfy((face) => ref.some((f) => face.isAligned(f)))
   }
 }
 
@@ -66,16 +68,15 @@ function expectValidAnimationData(
   // "Augment" has a weird start position so skip this check for it
   if (opName !== "augment") {
     expectVerticesMatch(start.vertices, original.vertices)
-    // expectNormalsMatch(start.faces, original.faces)
+    expectNormalsMatch(start.faces, original.faces)
   }
   // "Diminish" has a weird end position so skip this check for it
   if (opName !== "diminish") {
     expectVerticesMatch(
-      // TODO shouldn't this be
       start.withVertices(endVertices).vertices,
       result.geom.vertices,
     )
-    // expectNormalsMatch(original.withVertices(endVertices).faces, result.geom.faces)
+    expectNormalsMatch(start.withVertices(endVertices).faces, result.geom.faces)
   }
 }
 

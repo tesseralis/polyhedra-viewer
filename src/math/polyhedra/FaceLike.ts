@@ -1,5 +1,6 @@
 import { Plane, Vector3 } from "three"
 
+import { find } from "utils"
 import { isPlanar, getNormal } from "math/geom"
 import Facet from "./Facet"
 import type Edge from "./Edge"
@@ -67,7 +68,9 @@ export default class FaceLike extends Facet {
 
   /** Return the normal of the face given by the face index */
   normal() {
-    return getNormal(this.vectors)
+    const edge: Edge = find(this.edges, (e) => e.isValid())
+    return getNormal([this.centroid(), edge.v1.vec, edge.v2.vec])
+    // return getNormal(this.vectors)
   }
 
   isValid() {
