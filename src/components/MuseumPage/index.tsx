@@ -1,38 +1,12 @@
-import React, { useRef } from "react"
-import { Canvas, extend, useThree, useFrame } from "react-three-fiber"
+import React from "react"
+import { Canvas } from "react-three-fiber"
 import { useStyle } from "styles"
-import { TrackballControls } from "three/examples/jsm/controls/TrackballControls"
 import { tableSections } from "tables"
 import PolyhedronTable from "./PolyhedronTable"
 import { useNavigate } from "react-router-dom"
-
-extend({ TrackballControls })
+import { TrackballControls } from "drei"
 
 // TODO deduplicate with the controls in the other scene
-function Controls() {
-  const {
-    camera,
-    gl: { domElement },
-  } = useThree()
-  const controls = useRef<TrackballControls | undefined>()
-
-  useFrame(() => {
-    camera.updateMatrixWorld()
-    controls.current?.update()
-  })
-
-  return (
-    <trackballControls
-      ref={controls}
-      args={[camera, domElement]}
-      enabled
-      noRotate
-      rotateSpeed={8.0}
-      // staticMoving // TODO make this configurable
-    />
-  )
-}
-
 const sectionSpacing = 40
 const subsecSpacing = 25
 // TODO why is this so slow to load??
@@ -49,9 +23,8 @@ export default function MuseumScene() {
   return (
     <div {...style()}>
       <Canvas>
-        <Controls />
-        <ambientLight />
-        <pointLight position={[10, 10, 10]} />
+        <TrackballControls enabled noRotate />
+        <directionalLight position={[0, 0.5, 1]} />
         <group>
           {tableSections.map((section, i) => {
             if (section.tables) {

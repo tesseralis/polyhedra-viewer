@@ -94,13 +94,11 @@ function SolidFaces({
       <meshPhongMaterial
         side={showInnerFaces ? DoubleSide : FrontSide}
         attachArray="material"
-        color="grey"
         args={[{ vertexColors: true }]}
       />
       <meshStandardMaterial
         side={showInnerFaces ? DoubleSide : FrontSide}
         attachArray="material"
-        color="grey"
         args={[{ vertexColors: true }]}
         transparent
         opacity={7 / 8}
@@ -135,7 +133,7 @@ function SolidEdges({ value, config }: Props) {
       }
     })
     edgeGeom.setDrawRange(0, edges.length * 2)
-    edgeGeom.attributes.position.needsUpdate = true
+    ;(edgeGeom.attributes.position as any).needsUpdate = true
   })
 
   return (
