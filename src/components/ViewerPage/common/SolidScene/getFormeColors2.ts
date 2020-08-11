@@ -93,7 +93,7 @@ function getFaceAppearance(faceType: FaceType): FaceColor {
               return scheme.edge.prism.clone().lerp(scheme.primary.vertex, 0.5)
             case "base":
               // FIXME base this on the inner color
-              return scheme.edge.antiprism
+              return scheme.primary.face
           }
           throw new Error(`blah`)
         })
@@ -104,7 +104,7 @@ function getFaceAppearance(faceType: FaceType): FaceColor {
             case "top":
               return scheme.primary.face
             case "base":
-              return scheme.edge.prism
+              return scheme.secondary.vertex
             default:
               throw new Error(`Square cap face in rotunda?`)
           }
@@ -118,7 +118,7 @@ function getFaceAppearance(faceType: FaceType): FaceColor {
             case "middle":
               return scheme.edge.prism.clone().lerp(scheme.primary.face, 0.5)
             case "base":
-              return scheme.edge.prism
+              return scheme.secondary.vertex
           }
           throw new Error(`blaaah`)
         })
