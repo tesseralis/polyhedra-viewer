@@ -15,6 +15,13 @@ describe("truncate", () => {
       fail: [],
     })
   })
+
+  it("hasOptions", () => {
+    validateHasOptions(truncate, {
+      pass: [],
+      fail: ["tetrahedron", "icosahedron", "cuboctahedron"],
+    })
+  })
 })
 
 describe("rectify", () => {
