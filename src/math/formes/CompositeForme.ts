@@ -195,6 +195,36 @@ export class AugmentedPrismForme extends CompositeForme {
         .every((f) => !f.equals(face)),
     )
   }
+
+  faceAppearance(face: Face): any {
+    const source = this.specs.sourcePrism()
+    if (this.isEndFace(face)) {
+      return {
+        type: "capstone",
+        base: source.data.base,
+        polygonType: source.data.type,
+        capPosition: "prism",
+      }
+    } else if (this.isSideFace(face)) {
+      return {
+        type: "capstone",
+        base: source.data.base,
+        polygonType: source.data.type,
+        elongation: "prism",
+      }
+    } else {
+      const cap = find(this.caps(), (cap) => face.inSet(cap.faces()))
+      return {
+        type: "capstone",
+        base: 4,
+        polygonType: "primary",
+        capPosition: "side",
+        sideColors: face.vertices.map((v) => {
+          return v.inSet(cap.innerVertices()) ? "top" : "base"
+        }),
+      }
+    }
+  }
 }
 
 export class AugmentedClassicalForme extends CompositeForme {

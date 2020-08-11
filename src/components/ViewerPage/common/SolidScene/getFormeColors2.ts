@@ -120,7 +120,6 @@ function getFaceAppearance(faceType: FaceType): FaceColor {
             case "base":
               return scheme.secondary.vertex
           }
-          throw new Error(`blaaah`)
         })
       }
       throw new Error(`Invalid numsides for side face`)
@@ -129,7 +128,7 @@ function getFaceAppearance(faceType: FaceType): FaceColor {
       return scheme.edge[faceType.elongation]
     }
   }
-  throw new Error(`Unknown face type`)
+  throw new Error(`Unknown face type: ${JSON.stringify(faceType)}`)
 }
 
 export default function getFormeColors(forme: Forme, face: Face): Appearance {
