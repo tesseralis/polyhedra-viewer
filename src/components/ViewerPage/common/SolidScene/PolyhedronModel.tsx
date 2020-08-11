@@ -135,7 +135,7 @@ function SolidEdges({ value, config }: Props) {
       }
     })
     edgeGeom.setDrawRange(0, edges.length * 2)
-    edgeGeom.attributes.position.needsUpdate = true
+    ;(edgeGeom.attributes.position as any).needsUpdate = true
   })
 
   return (
