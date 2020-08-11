@@ -110,11 +110,56 @@ export default abstract class CompositeForme extends BaseForme<Composite> {
   }
 
   faceAppearance(face: Face): any {
-    return {
-      type: "classical",
-      family: 3,
-      polygonType: "primary",
-      facet: "face",
+    const source = this.specs.sourceClassical()
+    const polygonType = this.specs.sourceClassical().isTruncated()
+      ? "secondary"
+      : "primary"
+
+    if (this.isSourceFace(face)) {
+      if (this.isFacetFace(face, "face")) {
+        return {
+          type: "classical",
+          family: source.data.family,
+          polygonType: face.numSides > 5 ? "secondary" : "primary",
+          facet: "face",
+        }
+      } else if (this.isFacetFace(face, "vertex")) {
+        return {
+          type: "classical",
+          family: source.data.family,
+          polygonType: face.numSides > 5 ? "secondary" : "primary",
+          facet: "vertex",
+        }
+      } else {
+        return {
+          type: "classical",
+          family: source.data.family,
+          polygonType: face.numSides > 5 ? "secondary" : "primary",
+          expansion: "prism",
+        }
+      }
+    } else if (
+      (this.isDiminishedSolid() || this.isGyrateSolid()) &&
+      this.isDiminishedFace(face)
+    ) {
+      return {
+        type: "classical",
+        family: source.data.family,
+        polygonType: face.numSides > 5 ? "secondary" : "primary",
+        facet: "face",
+      }
+    } else {
+      // augmented cap face
+      const cap = find(this.caps(), (cap) => face.inSet(cap.faces()))
+      return {
+        type: "capstone",
+        base: source.data.family,
+        polygonType,
+        capPosition: "side",
+        sideColors: face.vertices.map((v) =>
+          v.inSet(cap.innerVertices()) ? "top" : "base",
+        ),
+      }
     }
   }
 }
