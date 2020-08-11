@@ -65,13 +65,13 @@ function PolyhedronEntry({ entry, position, navigate }: any) {
         config={pick(config, ["showFaces", "showEdges", "showInnerFaces"])}
       />
       {/* TODO renders a "trophy stand" */}
-      {/* <mesh position={[0, -2, 0]}>
+      <mesh position={[0, -2, 0]}>
         <cylinderBufferGeometry
           attach="geometry"
           args={[1.25, 1.5, 0.1, 50, 1]}
         />
-        <meshPhongMaterial attach="material" color="#8a8357" metal={true} />
-      </mesh> */}
+        <meshStandardMaterial attach="material" color="#8a8357" />
+      </mesh>
     </group>
   )
 }
