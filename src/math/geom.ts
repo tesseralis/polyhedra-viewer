@@ -4,7 +4,7 @@ export const PRECISION_DIGITS = 3
 export const PRECISION = 10 ** -PRECISION_DIGITS
 
 export function vecEquals(v1: Vector3, v2: Vector3) {
-  return v1.distanceToSquared(v2) < PRECISION
+  return v1.distanceTo(v2) < PRECISION
 }
 
 export const getMidpoint = (v1: Vector3, v2: Vector3) =>
