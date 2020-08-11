@@ -10,11 +10,7 @@ import PolyhedronCtx from "./PolyhedronCtx"
 import transition from "transition"
 import { Polyhedron, SolidData } from "math/polyhedra"
 import { AnimationData } from "math/operations"
-
-// Get the colors for each face given our current configuration
-function getFaceColors(mapping: number[], colors: any) {
-  return mapping.map((f) => new Color(colors[f]))
-}
+import { getFaceAppearance } from "components/ViewerPage/common/SolidScene/getFormeColors"
 
 const defaultState = {
   solidData: undefined,
@@ -23,7 +19,7 @@ const defaultState = {
 }
 interface State {
   solidData?: SolidData
-  faceColors?: any[]
+  faceColors?: Color[]
   isTransitioning: boolean
 }
 const InterpModel = createHookedContext<State, "set" | "reset">(
@@ -44,7 +40,7 @@ function InnerProvider({ children }: ChildrenProp) {
   const transitionId = useRef<ReturnType<typeof transition> | null>(null)
   const { setPolyhedron } = PolyhedronCtx.useActions()
   const config = Config.useState()
-  const { colors, animationSpeed, enableAnimation } = config
+  const { animationSpeed, enableAnimation } = config
   const anim = InterpModel.useActions()
 
   // Cancel the animation if the component we're a part of gets rerendered.
@@ -64,13 +60,19 @@ function InnerProvider({ children }: ChildrenProp) {
       }
 
       const { start, endVertices, startColors, endColors } = animationData
-      const startFaceColors = getFaceColors(startColors, colors)
-      const endFaceColors = getFaceColors(endColors, colors)
+      const startFaceColors = startColors.map(getFaceAppearance)
+      const endFaceColors = endColors.map(getFaceAppearance)
       anim.set(start.solidData, startFaceColors)
       function lerpColors(t: number) {
-        return startFaceColors.map((color, i) =>
-          color.clone().lerp(endFaceColors[i], t),
-        )
+        return startFaceColors.map((color, i) => {
+          if (color instanceof Color) {
+            return color.clone().lerp(endFaceColors[i] as any, t)
+          } else {
+            return color.map((c, j) =>
+              c.clone().lerp((endFaceColors[i] as any)[j], t),
+            )
+          }
+        })
       }
       transitionId.current = transition(
         {
@@ -95,7 +97,7 @@ function InnerProvider({ children }: ChildrenProp) {
         },
       )
     },
-    [anim, animationSpeed, colors, enableAnimation, setPolyhedron],
+    [anim, animationSpeed, enableAnimation, setPolyhedron],
   )
 
   return (

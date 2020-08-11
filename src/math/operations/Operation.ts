@@ -3,8 +3,9 @@ import { pickBy, mapValues, isMatch, compact, uniq } from "lodash-es"
 
 import { Polyhedron, Face, VertexArg, normalizeVertex } from "math/polyhedra"
 import { deduplicateVertices } from "./operationUtils"
-import { Polygon, PolyhedronSpecs } from "specs"
+import { PolyhedronSpecs } from "specs"
 import { PolyhedronForme as Forme, createForme } from "math/formes"
+import { FaceType } from "math/formes/BaseForme"
 import { find, EntryIters, cartesian } from "utils"
 
 type SelectState = "selected" | "selectable" | undefined
@@ -12,8 +13,8 @@ type SelectState = "selected" | "selectable" | undefined
 export interface AnimationData {
   start: Polyhedron
   endVertices: Vector3[]
-  startColors: Polygon[]
-  endColors: Polygon[]
+  startColors: FaceType[]
+  endColors: FaceType[]
 }
 
 export interface OpResult {
@@ -91,59 +92,37 @@ function fillDefaults<Options extends {}, Specs extends PolyhedronSpecs>(
   } as Required<OpArgs<Options, Specs>>
 }
 
-function getCoplanarFaces(polyhedron: Polyhedron) {
-  const found: Face[] = []
-  const pairs: [Face, Face][] = []
-  polyhedron.faces.forEach((f1) => {
-    if (f1.inSet(found) || !f1.isValid()) return
-
-    f1.adjacentFaces().forEach((f2) => {
-      if (!f2 || !f2.isValid()) return
-      if (f1.isAligned(f2)) {
-        pairs.push([f1, f2])
-        found.push(f1)
-        found.push(f2)
-        return
-      }
-    })
+function getSourceAppearances(geom: Polyhedron, base: Forme) {
+  return geom.faces.map((face) => {
+    if (!face.isValid()) return undefined
+    const aligned = base.geom.faces.find((f) => f.isAligned(face))
+    if (!aligned) return undefined
+    return base.faceAppearance(aligned)
   })
-  return pairs
 }
 
-function getFaceColors(polyhedron: Polyhedron): Polygon[] {
-  const pairs = getCoplanarFaces(polyhedron)
-  const mapping: Record<number, Polygon> = {}
-  for (const [f1, f2] of pairs) {
-    const numSides = (f1.numSides + f2.numSides - 2) as Polygon
-    mapping[f1.index] = numSides
-    mapping[f2.index] = numSides
-  }
-
-  return polyhedron.faces.map(
-    (face) => mapping[face.index] ?? face.numUniqueSides(),
-  )
-}
-
-function arrayDefaults(first: Polygon[], second: Polygon[]) {
-  return first.map((item, i) => (item >= 3 ? item : second[i]))
+function arrayDefaults<T>(first: T[], second: T[]) {
+  return first.map((item, i) => item ?? second[i])
 }
 
 function normalizeOpResult(
   opResult: PartialOpResult,
   newSpecs: PolyhedronSpecs,
+  original: Forme,
 ): OpResult {
   const { result, animationData } = opResult
   const { start, endVertices } = animationData
 
   const end = start.withVertices(endVertices)
   const normedResult = result ?? deduplicateVertices(end)
+  const resultForme = createForme(newSpecs, normedResult)
 
   // Populate the how the faces in the start and end vertices should be colored
-  const startColors = getFaceColors(start)
-  const endColors = getFaceColors(end)
+  const startColors = getSourceAppearances(start, original)
+  const endColors = getSourceAppearances(end, resultForme)
 
   return {
-    result: createForme(newSpecs, normedResult),
+    result: resultForme,
     animationData: {
       start,
       endVertices: endVertices.map(normalizeVertex),
@@ -172,7 +151,7 @@ export default class Operation<Options extends {} = {}> {
 
     // Get the actual operation result
     const opResult = this.opArgs.apply(this.wrap(solid), options ?? {})
-    return normalizeOpResult(opResult, next)
+    return normalizeOpResult(opResult, next, solid)
   }
 
   private wrap(solid: Forme) {

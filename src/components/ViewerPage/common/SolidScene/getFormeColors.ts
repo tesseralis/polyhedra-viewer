@@ -85,7 +85,7 @@ export function mixColor(appearance: Appearance, mixer: (c: Color) => Color) {
 }
 
 // TODO this is still REALLY UGLY and I dunno what to do for cap faces
-function getFaceAppearance(faceType: FaceType): FaceColor {
+export function getFaceAppearance(faceType: FaceType): FaceColor {
   if (faceType.type === "classical") {
     const scheme = colorScheme[faceType.family]
     if (faceType.facet) {

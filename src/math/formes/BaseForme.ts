@@ -43,7 +43,7 @@ interface CapstoneFace {
   sideColors?: ("top" | "middle" | "base")[]
 }
 
-type FaceType = ClassicalFace | CapstoneFace
+export type FaceType = ClassicalFace | CapstoneFace
 
 export default abstract class BaseForme<Specs extends PolyhedronSpecs> {
   specs: Specs
