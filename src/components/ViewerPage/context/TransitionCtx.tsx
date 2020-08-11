@@ -60,8 +60,12 @@ function InnerProvider({ children }: ChildrenProp) {
       }
 
       const { start, endVertices, startColors, endColors } = animationData
-      const startFaceColors = startColors.map(getFaceAppearance)
-      const endFaceColors = endColors.map(getFaceAppearance)
+      const startFaceColors = startColors.map((c) =>
+        c ? getFaceAppearance(c) : new Color(),
+      )
+      const endFaceColors = endColors.map((c) =>
+        c ? getFaceAppearance(c) : new Color(),
+      )
       anim.set(start.solidData, startFaceColors)
       function lerpColors(t: number) {
         return startFaceColors.map((color, i) => {
