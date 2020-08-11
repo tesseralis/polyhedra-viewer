@@ -1,4 +1,5 @@
 import { Color } from "three"
+import { PolyhedronForme as Forme } from "math/formes"
 
 interface ClassicalFace {
   type: "classical"
@@ -127,4 +128,6 @@ function getFaceAppearance(faceType: FaceType) {
   }
 }
 
-export default function getFormeColors() {}
+export default function getFormeColors(forme: Forme) {
+  return forme.geom.faces.map((f) => getFaceAppearance(forme.getFaceType(f)))
+}
