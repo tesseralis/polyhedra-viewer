@@ -1,6 +1,6 @@
 import { mean } from "lodash-es"
 import { PolyhedronSpecs } from "specs"
-import { Polyhedron } from "math/polyhedra"
+import { Polyhedron, Face } from "math/polyhedra"
 
 import { Classical, Capstone, Composite, Elementary } from "specs"
 import type ClassicalForme from "./ClassicalForme"
@@ -26,7 +26,26 @@ export type PolyhedronForme<
   ? ElementaryForme
   : never
 
-export default class BaseForme<Specs extends PolyhedronSpecs> {
+interface ClassicalFace {
+  type: "classical"
+  family: 3 | 4 | 5
+  polygonType: "primary" | "secondary"
+  facet?: "face" | "vertex"
+  expansion?: "prism" | "antiprism"
+}
+
+interface CapstoneFace {
+  type: "capstone"
+  polygonType: "primary" | "secondary"
+  base: 2 | 3 | 4 | 5
+  elongation?: "prism" | "antiprism"
+  capPosition?: "prism" | "top" | "side"
+  sideColors?: ("top" | "middle" | "base")[]
+}
+
+type FaceType = ClassicalFace | CapstoneFace
+
+export default abstract class BaseForme<Specs extends PolyhedronSpecs> {
   specs: Specs
   geom: Polyhedron
 
@@ -51,9 +70,7 @@ export default class BaseForme<Specs extends PolyhedronSpecs> {
     return this.specs.isElementary()
   }
 
-  orientation(): Orientation {
-    return [this.geom.vertices[0], this.geom.vertices[1]]
-  }
+  abstract orientation(): Orientation
 
   orient() {
     const startPose: Pose = {
@@ -70,4 +87,6 @@ export default class BaseForme<Specs extends PolyhedronSpecs> {
     }
     return alignPolyhedron(this.geom, startPose, endPose)
   }
+
+  abstract faceAppearance(face: Face): FaceType
 }

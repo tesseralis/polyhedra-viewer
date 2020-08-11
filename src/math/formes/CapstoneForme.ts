@@ -178,6 +178,41 @@ export default abstract class CapstoneForme extends BaseForme<Capstone> {
   isAnyFacetFace(face: Face) {
     return this.isFacetFace(face, "face") || this.isFacetFace(face, "vertex")
   }
+
+  faceAppearance(face: Face): any {
+    const props = {
+      type: "capstone",
+      polygonType: this.specs.data.type,
+      base: this.specs.data.base,
+    }
+    if (this.isSideFace(face)) {
+      return {
+        ...props,
+        elongation: face.numSides === 3 ? "antiprism" : "prism",
+      }
+    }
+    // otherwise it's a cap face
+    if (this.isEndFace(face)) {
+      return {
+        ...props,
+        capPosition: "prism",
+      }
+    }
+    if (this.isTop(face)) {
+      return {
+        ...props,
+        capPosition: "top",
+      }
+    }
+    const cap = this.containingEnd(face) as Cap
+    return {
+      ...props,
+      capPosition: "side",
+      sideColors: face.vertices.map((v) =>
+        v.inSet(cap.innerVertices()) ? "top" : "base",
+      ),
+    }
+  }
 }
 
 class PrismaticForme extends CapstoneForme {

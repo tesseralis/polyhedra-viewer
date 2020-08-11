@@ -108,6 +108,15 @@ export default abstract class CompositeForme extends BaseForme<Composite> {
   isGyrate(cap: Cap) {
     return false
   }
+
+  faceAppearance(face: Face): any {
+    return {
+      type: "classical",
+      family: 3,
+      polygonType: "primary",
+      facet: "face",
+    }
+  }
 }
 
 export class AugmentedPrismForme extends CompositeForme {

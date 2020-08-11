@@ -169,6 +169,20 @@ export default abstract class ClassicalForme extends BaseForme<Classical> {
     const [f1, f2] = this.adjacentFacetFaces("face")
     return [f1.normal().clone().negate(), f2] as const
   }
+
+  faceAppearance(face: Face): any {
+    return {
+      type: "classical",
+      family: this.specs.data.family,
+      facet: this.getFacet(face),
+      polygonType: face.numSides > 5 ? "secondary" : "primary",
+      expansion: this.isEdgeFace(face)
+        ? face.numSides === 3
+          ? "antiprism"
+          : "prism"
+        : undefined,
+    }
+  }
 }
 
 class RegularForme extends ClassicalForme {

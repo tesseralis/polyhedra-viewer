@@ -1,10 +1,10 @@
 import { Elementary } from "specs"
 import BaseForme from "./BaseForme"
-import { Polyhedron } from "math/polyhedra"
+import { Polyhedron, Face } from "math/polyhedra"
 import { find } from "utils"
 import { isEqual } from "lodash-es"
 
-export default class ElementaryForme extends BaseForme<Elementary> {
+export default abstract class ElementaryForme extends BaseForme<Elementary> {
   static create(specs: Elementary, geom: Polyhedron) {
     switch (specs.name()) {
       case "sphenocorona":
@@ -23,6 +23,14 @@ export default class ElementaryForme extends BaseForme<Elementary> {
         return new TriangularHebesphenorotunda(specs, geom)
       default:
         throw new Error(`Undefined specs: ${specs.name()}`)
+    }
+  }
+  faceAppearance(face: Face): any {
+    return {
+      type: "classical",
+      family: 3,
+      polygonType: "primary",
+      facet: "face",
     }
   }
 }

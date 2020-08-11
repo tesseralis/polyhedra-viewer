@@ -3,7 +3,8 @@ import { useMemo, useCallback } from "react"
 import Config from "components/ConfigCtx"
 import { PolyhedronCtx, OperationCtx, TransitionCtx } from "../../context"
 import { Polyhedron, Face } from "math/polyhedra"
-import getFormeColors, { Appearance, mixColor, lighten } from "./getFormeColors"
+import { Appearance, mixColor, lighten } from "./getFormeColors"
+import getFormeColors from "./getFormeColors2"
 
 // Hook that takes data from Polyhedron and Animation states and decides which to use.
 export default function useSolidContext() {

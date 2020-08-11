@@ -1,5 +1,6 @@
 import { Color } from "three"
 import { PolyhedronForme as Forme } from "math/formes"
+import { Face } from "math/polyhedra"
 
 interface ClassicalFace {
   type: "classical"
@@ -61,7 +62,7 @@ const colorScheme = {
 }
 
 // TODO this is still REALLY UGLY and I dunno what to do for cap faces
-function getFaceAppearance(faceType: FaceType) {
+function getFaceAppearance(faceType: FaceType): FaceColor {
   if (faceType.type === "classical") {
     const scheme = colorScheme[faceType.family]
     if (faceType.facet) {
@@ -94,6 +95,7 @@ function getFaceAppearance(faceType: FaceType) {
               // FIXME base this on the inner color
               return scheme.edge.antiprism
           }
+          throw new Error(`blah`)
         })
       }
       if (n === 4) {
@@ -103,7 +105,7 @@ function getFaceAppearance(faceType: FaceType) {
               return scheme.primary.face
             case "base":
               return scheme.edge.prism
-            case "middle":
+            default:
               throw new Error(`Square cap face in rotunda?`)
           }
         })
@@ -118,6 +120,7 @@ function getFaceAppearance(faceType: FaceType) {
             case "base":
               return scheme.edge.prism
           }
+          throw new Error(`blaaah`)
         })
       }
       throw new Error(`Invalid numsides for side face`)
@@ -126,8 +129,12 @@ function getFaceAppearance(faceType: FaceType) {
       return scheme.edge[faceType.elongation]
     }
   }
+  throw new Error(`Unknown face type`)
 }
 
-export default function getFormeColors(forme: Forme) {
-  return forme.geom.faces.map((f) => getFaceAppearance(forme.getFaceType(f)))
+export default function getFormeColors(forme: Forme, face: Face): Appearance {
+  return {
+    color: getFaceAppearance(forme.faceAppearance(face)),
+    material: 1,
+  }
 }

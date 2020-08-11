@@ -1,15 +1,13 @@
 import { pick } from "lodash-es"
 import React, { useRef, useState } from "react"
 import { Table } from "tables"
-import { Color } from "three"
 import PolyhedronModel from "components/ViewerPage/common/SolidScene/PolyhedronModel"
 import ConfigCtx from "components/ConfigCtx"
 import { fromSpecs } from "math/formes"
 
 import { useFrame } from "react-three-fiber"
-import getFormeColors, {
-  mixColor,
-} from "components/ViewerPage/common/SolidScene/getFormeColors"
+import getFormeColors from "components/ViewerPage/common/SolidScene/getFormeColors2"
+import { mixColor } from "components/ViewerPage/common/SolidScene/getFormeColors"
 
 const rowSpacing = 2
 const colSpacing = 7
@@ -35,20 +33,26 @@ function PolyhedronEntry({ entry, position, navigate }: any) {
   // const geom = forme.geom
 
   const config = ConfigCtx.useState()
-  const faceColors = geom.faces.map((face) => {
-    let color = getFormeColors(forme, face)
-    // let color: any = {
-    //   color: new Color(),
-    //   material: 1,
-    // }
-    if (isDupe) {
-      color = mixColor(color, (c) => c.clone().offsetHSL(0, -0.25, 0.2))
-    }
-    if (hovered) {
-      color = mixColor(color, (c) => c.clone().offsetHSL(0, 0, 0.2))
-    }
-    return color
-  })
+  let faceColors
+  try {
+    faceColors = geom.faces.map((face) => {
+      let color = getFormeColors(forme, face)
+      // let color: any = {
+      //   color: new Color(),
+      //   material: 1,
+      // }
+      if (isDupe) {
+        color = mixColor(color, (c) => c.clone().offsetHSL(0, -0.25, 0.2))
+      }
+      if (hovered) {
+        color = mixColor(color, (c) => c.clone().offsetHSL(0, 0, 0.2))
+      }
+      return color
+    })
+  } catch (e) {
+    console.log(entry.name())
+    throw e
+  }
 
   return (
     <group
