@@ -110,6 +110,7 @@ function getCapstoneColor(forme: CapstoneForme, face: Face): Appearance {
     const end = forme.containingEnd(face)
     if (end instanceof Cap) {
       const top = end.innerVertices()
+      const boundary = end.boundary()
       if (forme.isTop(face)) {
         return {
           color: scheme.primary.face,
@@ -119,29 +120,34 @@ function getCapstoneColor(forme: CapstoneForme, face: Face): Appearance {
         return {
           color: face.vertices.map((v) => {
             if (v.inSet(top)) {
-              return scheme.primary.face
-            } else {
               return scheme.primary.vertex
+            } else if (v.inSet(boundary.vertices)) {
+              return scheme.primary.face
+                .clone()
+                .lerp(scheme.primary.vertex, 0.5)
+            } else {
+              return scheme.primary.face
             }
           }),
           material: capMaterial,
         }
-        // return scheme.primary.vertex
       } else if (face.numSides === 4) {
-        // TODO need to distinguish this from the edge faces
         return {
           color: face.vertices.map((v) => {
-            return (v.inSet(top) ? scheme.edge.gyro : scheme.edge.ortho)
-              .clone()
-              .offsetHSL(0, 0, 0.15)
+            return v.inSet(top) ? scheme.primary.face : scheme.primary.vertex
           }),
           material: capMaterial,
         }
       } else {
-        // FIXME
         return {
-          color: new Color(),
-          material: prismMaterial,
+          color: face.vertices.map((v) => {
+            return v.inSet(top)
+              ? scheme.primary.face
+              : v.inSet(boundary.vertices)
+              ? scheme.primary.vertex
+              : scheme.primary.vertex.clone().lerp(scheme.primary.face, 0.5)
+          }),
+          material: capMaterial,
         }
       }
     } else {
