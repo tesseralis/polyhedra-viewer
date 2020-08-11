@@ -36,11 +36,11 @@ function PolyhedronEntry({ entry, position, navigate }: any) {
 
   const config = ConfigCtx.useState()
   const faceColors = geom.faces.map((face) => {
-    // let color = getFormeColors(forme, face)
-    let color: any = {
-      color: new Color(),
-      material: 1,
-    }
+    let color = getFormeColors(forme, face)
+    // let color: any = {
+    //   color: new Color(),
+    //   material: 1,
+    // }
     if (isDupe) {
       color = mixColor(color, (c) => c.clone().offsetHSL(0, -0.25, 0.2))
     }
@@ -64,13 +64,12 @@ function PolyhedronEntry({ entry, position, navigate }: any) {
         appearance={faceColors}
         config={pick(config, ["showFaces", "showEdges", "showInnerFaces"])}
       />
-      {/* TODO renders a "trophy stand" */}
       <mesh position={[0, -2, 0]}>
         <cylinderBufferGeometry
           attach="geometry"
           args={[1.25, 1.5, 0.1, 50, 1]}
         />
-        <meshStandardMaterial attach="material" color="#8a8357" />
+        <meshPhongMaterial attach="material" color="#ad9b13" />
       </mesh>
     </group>
   )

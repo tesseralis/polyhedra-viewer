@@ -94,13 +94,11 @@ function SolidFaces({
       <meshPhongMaterial
         side={showInnerFaces ? DoubleSide : FrontSide}
         attachArray="material"
-        color="grey"
         args={[{ vertexColors: true }]}
       />
       <meshStandardMaterial
         side={showInnerFaces ? DoubleSide : FrontSide}
         attachArray="material"
-        color="grey"
         args={[{ vertexColors: true }]}
         transparent
         opacity={7 / 8}

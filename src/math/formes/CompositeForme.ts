@@ -254,7 +254,9 @@ export class AugmentedClassicalForme extends CompositeForme {
 
 export class DiminishedSolidForme extends CompositeForme {
   caps = once(() => {
-    return this.geom.caps({ type: "primary", base: 5 })
+    return this.geom
+      .caps({ type: "primary", base: 5 })
+      .concat(this.geom.caps({ type: "primary", base: 3 }))
   })
 
   // @override

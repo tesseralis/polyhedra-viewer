@@ -24,7 +24,7 @@ export default function MuseumScene() {
     <div {...style()}>
       <Canvas>
         <TrackballControls enabled noRotate />
-        <directionalLight position={[0, 0, 1]} />
+        <directionalLight position={[0, 0.5, 1]} />
         <group>
           {tableSections.map((section, i) => {
             if (section.tables) {
