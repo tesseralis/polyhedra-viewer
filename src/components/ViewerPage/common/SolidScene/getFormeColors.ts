@@ -1,51 +1,31 @@
 import { Color } from "three"
-import { Face, Cap } from "math/polyhedra"
-import {
-  PolyhedronForme,
-  ClassicalForme,
-  CapstoneForme,
-  CompositeForme,
-} from "math/formes"
+import { PolyhedronForme as Forme } from "math/formes"
+import { Face } from "math/polyhedra"
+
+interface ClassicalFace {
+  type: "classical"
+  family: 3 | 4 | 5
+  polygonType: "primary" | "secondary"
+  facet?: "face" | "vertex"
+  expansion?: "prism" | "antiprism"
+}
+
+interface CapstoneFace {
+  type: "capstone"
+  polygonType: "primary" | "secondary"
+  base: 2 | 3 | 4 | 5
+  elongation?: "prism" | "antiprism"
+  capPosition?: "prism" | "top" | "side"
+  sideColors?: ("top" | "middle" | "base")[]
+}
+
+type FaceType = ClassicalFace | CapstoneFace
 
 type FaceColor = Color | Color[]
 
 export interface Appearance {
   color: FaceColor
   material: number
-}
-
-const facetMaterial = 0
-const capMaterial = 0
-const edgeFaceMaterial = 1
-const prismMaterial = 1
-
-export function toColor(color: any): Color {
-  if (color instanceof Color) return color
-  if (color.color) {
-    return { ...color, color: new Color(color.color) }
-  }
-  return new Color(color)
-}
-
-export function lighten(color: Color, amount: number) {
-  return toColor(color)
-    .clone()
-    .offsetHSL(0, 0, amount / 100)
-}
-
-export function darken(color: Color, amount: number) {
-  return toColor(color)
-    .clone()
-    .offsetHSL(0, 0, -amount / 100)
-}
-
-export function mixColor(appearance: Appearance, mixer: (c: Color) => Color) {
-  const { color, material } = appearance
-  const newColor = color instanceof Color ? mixer(color) : color.map(mixer)
-  return {
-    color: newColor,
-    material,
-  }
 }
 
 function createFamilyColor(face: string, vertex: string) {
@@ -58,11 +38,11 @@ function createFamilyColor(face: string, vertex: string) {
       vertex: vertexColor.clone().offsetHSL(0, 0, -1 / 3),
     },
     edge: {
-      ortho: faceColor
+      prism: faceColor
         .clone()
         .lerp(vertexColor, 1 / 3)
         .offsetHSL(0, -1 / 4, 0),
-      gyro: faceColor
+      antiprism: faceColor
         .clone()
         .lerp(vertexColor, 3 / 3)
         .offsetHSL(0, -1 / 4, 0),
@@ -81,209 +61,104 @@ const colorScheme = {
   5: createFamilyColor("#1c7bff", "#1bcc3b"),
 }
 
-function getClassicalColor(forme: ClassicalForme, face: Face) {
-  const scheme = colorScheme[forme.specs.data.family]
-  const facet = forme.getFacet(face)
-  // thing for the edge face
-  if (!facet) {
-    return {
-      color: scheme.edge[forme.specs.isSnub() ? "gyro" : "ortho"],
-      material: edgeFaceMaterial,
-    }
+export function toColor(color: any): Color {
+  if (color instanceof Color) return color
+  if (color.color) {
+    return { ...color, color: new Color(color.color) }
   }
-  const faceSides = face.numSides > 5 ? "secondary" : "primary"
+  return new Color(color)
+}
+
+export function lighten(color: Color, amount: number) {
+  return toColor(color)
+    .clone()
+    .offsetHSL(0, 0, amount / 100)
+}
+
+export function mixColor(appearance: Appearance, mixer: (c: Color) => Color) {
+  const { color, material } = appearance
+  const newColor = color instanceof Color ? mixer(color) : color.map(mixer)
   return {
-    color: scheme[faceSides][facet],
-    material: facetMaterial,
+    color: newColor,
+    material,
   }
 }
 
-function getCapstoneColor(forme: CapstoneForme, face: Face): Appearance {
-  const scheme = colorScheme[forme.specs.data.base]
-  if (forme.isTop(face)) {
-    const faceSides = face.numSides > 5 ? "secondary" : "primary"
-    return {
-      color: scheme[faceSides].face,
-      material: capMaterial,
+// TODO this is still REALLY UGLY and I dunno what to do for cap faces
+function getFaceAppearance(faceType: FaceType): FaceColor {
+  if (faceType.type === "classical") {
+    const scheme = colorScheme[faceType.family]
+    if (faceType.facet) {
+      // TODO primary material
+      return scheme[faceType.polygonType][faceType.facet]
+    } else {
+      // TODO secondary material
+      return scheme.edge[faceType.expansion!]
     }
-  } else if (forme.isContainedInEnd(face)) {
-    const end = forme.containingEnd(face)
-    if (end instanceof Cap) {
-      const top = end.innerVertices()
-      const boundary = end.boundary()
-      if (forme.isTop(face)) {
-        return {
-          color: scheme.primary.face,
-          material: capMaterial,
-        }
-      } else if (face.numSides === 3) {
-        return {
-          color: face.vertices.map((v) => {
-            if (v.inSet(top)) {
+  }
+  if (faceType.type === "capstone") {
+    const scheme = colorScheme[faceType.base]
+    if (faceType.capPosition === "prism") {
+      return scheme[faceType.polygonType].face
+    }
+    if (faceType.capPosition === "top") {
+      return scheme.primary.face
+    }
+    if (faceType.capPosition === "side") {
+      const sideColors = faceType.sideColors!
+      const n = sideColors.length
+      if (n === 3) {
+        return sideColors.map((col) => {
+          switch (col) {
+            case "top":
               return scheme.primary.vertex
-            } else if (v.inSet(boundary.vertices)) {
+            case "middle":
+              return scheme.edge.prism.clone().lerp(scheme.primary.vertex, 0.5)
+            case "base":
+              // FIXME base this on the inner color
               return scheme.primary.face
-                .clone()
-                .lerp(scheme.primary.vertex, 0.5)
-            } else {
+          }
+          throw new Error(`blah`)
+        })
+      }
+      if (n === 4) {
+        return sideColors.map((col) => {
+          switch (col) {
+            case "top":
               return scheme.primary.face
-            }
-          }),
-          material: capMaterial,
-        }
-      } else if (face.numSides === 4) {
-        return {
-          color: face.vertices.map((v) => {
-            return v.inSet(top) ? scheme.primary.face : scheme.primary.vertex
-          }),
-          material: capMaterial,
-        }
-      } else {
-        return {
-          color: face.vertices.map((v) => {
-            return v.inSet(top)
-              ? scheme.primary.face
-              : v.inSet(boundary.vertices)
-              ? scheme.primary.vertex
-              : scheme.primary.vertex.clone().lerp(scheme.primary.face, 0.5)
-          }),
-          material: capMaterial,
-        }
+            case "base":
+              return scheme.secondary.vertex
+            default:
+              throw new Error(`Square cap face in rotunda?`)
+          }
+        })
       }
-    } else {
-      // TODO want this to be a separate color from the top face
-      return {
-        color: colorScheme[5].primary.face,
-        material: capMaterial,
+      if (n === 5) {
+        return sideColors.map((col) => {
+          switch (col) {
+            case "top":
+              return scheme.primary.face
+            case "middle":
+              return scheme.edge.prism.clone().lerp(scheme.primary.face, 0.5)
+            case "base":
+              return scheme.secondary.vertex
+            default:
+              throw new Error(`blah`)
+          }
+        })
       }
+      throw new Error(`Invalid numsides for side face`)
     }
-  } else {
-    const side = forme.specs.isElongated() ? "ortho" : "gyro"
-    return {
-      color: scheme.edge[side].clone().offsetHSL(0, -1 / 50, 1 / 100),
-      material: prismMaterial,
+    if (faceType.elongation) {
+      return scheme.edge[faceType.elongation]
     }
   }
+  throw new Error(`Unknown face type: ${JSON.stringify(faceType)}`)
 }
 
-function getCompositeColor(forme: CompositeForme, face: Face): Appearance {
-  if (forme.isAugmentedPrism()) {
-    const sourceSpecs = forme.specs.sourcePrism()
-    const scheme = colorScheme[sourceSpecs.data.base]
-    if (forme.isEndFace(face)) {
-      return {
-        color: scheme[sourceSpecs.data.type].face,
-        material: capMaterial,
-      }
-    } else if (forme.isSideFace(face)) {
-      return {
-        color: scheme.edge.ortho,
-        material: prismMaterial,
-      }
-    } else {
-      // augmented face
-      return {
-        color: scheme.primary.vertex.clone().offsetHSL(0, 0, 1 / 4),
-        material: capMaterial,
-      }
-    }
-  } else if (forme.isAugmentedClassical()) {
-    const scheme = colorScheme[forme.specs.sourceClassical().data.family]
-    const type = forme.specs.sourceClassical().isTruncated()
-      ? "secondary"
-      : ("primary" as const)
-    if (forme.isFacetFace(face, "face")) {
-      return {
-        color: scheme[type].face,
-        material: facetMaterial,
-      }
-    } else if (forme.isFacetFace(face, "vertex")) {
-      return {
-        color: scheme.primary.vertex,
-        material: facetMaterial,
-      }
-    } else if (forme.isCapTop(face)) {
-      return {
-        color: lighten(scheme.primary.face, 25),
-        material: capMaterial,
-      }
-    } else {
-      return {
-        color: lighten(
-          face.numSides === 3 ? scheme.primary.vertex : scheme.edge.ortho,
-          25,
-        ),
-        material: capMaterial,
-      }
-    }
-  } else if (forme.isDiminishedSolid()) {
-    const scheme = colorScheme[5]
-    if (forme.isAugmentedFace(face)) {
-      return {
-        color: lighten(scheme.primary.vertex, 25),
-        material: facetMaterial,
-      }
-    } else if (forme.isDiminishedFace(face)) {
-      return {
-        color: darken(scheme.primary.face, 25),
-        material: facetMaterial,
-      }
-    } else {
-      return {
-        color: scheme.primary.vertex,
-        material: capMaterial,
-      }
-    }
-  } else if (forme.isGyrateSolid()) {
-    const scheme = colorScheme[5]
-    const mix = (color: Color) => {
-      if (forme.isGyrateFace(face)) {
-        return color.clone().offsetHSL(0, 0, 0.25)
-      }
-      return color
-    }
-    if (forme.isDiminishedFace(face)) {
-      return {
-        color: mix(scheme.secondary.face),
-        material: facetMaterial,
-      }
-    } else if (forme.isFacetFace(face, "face")) {
-      return {
-        color: mix(scheme.primary.face),
-        material: facetMaterial,
-      }
-    } else if (forme.isFacetFace(face, "vertex")) {
-      return {
-        color: mix(scheme.primary.vertex),
-        material: facetMaterial,
-      }
-    } else {
-      return {
-        color: mix(scheme.edge.ortho),
-        material: edgeFaceMaterial,
-      }
-    }
-  }
+export default function getFormeColors(forme: Forme, face: Face): Appearance {
   return {
-    color: new Color(),
-    material: 0,
-  }
-}
-
-export default function getFormeColors(
-  polyhedron: PolyhedronForme,
-  face: Face,
-): Appearance {
-  if (polyhedron.isClassical()) {
-    return getClassicalColor(polyhedron, face)
-  } else if (polyhedron.isCapstone()) {
-    return getCapstoneColor(polyhedron, face)
-  } else if (polyhedron.isComposite()) {
-    return getCompositeColor(polyhedron, face)
-  } else {
-    return {
-      color: new Color(),
-      material: 0,
-    }
+    color: getFaceAppearance(forme.faceAppearance(face)),
+    material: 1,
   }
 }

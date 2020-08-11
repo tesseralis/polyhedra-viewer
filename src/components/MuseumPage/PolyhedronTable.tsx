@@ -6,8 +6,9 @@ import ConfigCtx from "components/ConfigCtx"
 import { fromSpecs } from "math/formes"
 
 import { useFrame } from "react-three-fiber"
-import getFormeColors from "components/ViewerPage/common/SolidScene/getFormeColors2"
-import { mixColor } from "components/ViewerPage/common/SolidScene/getFormeColors"
+import getFormeColors, {
+  mixColor,
+} from "components/ViewerPage/common/SolidScene/getFormeColors"
 
 const rowSpacing = 2
 const colSpacing = 7
