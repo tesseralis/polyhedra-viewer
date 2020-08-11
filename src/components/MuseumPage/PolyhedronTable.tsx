@@ -33,26 +33,20 @@ function PolyhedronEntry({ entry, position, navigate }: any) {
   // const geom = forme.geom
 
   const config = ConfigCtx.useState()
-  let faceColors
-  try {
-    faceColors = geom.faces.map((face) => {
-      let color = getFormeColors(forme, face)
-      // let color: any = {
-      //   color: new Color(),
-      //   material: 1,
-      // }
-      if (isDupe) {
-        color = mixColor(color, (c) => c.clone().offsetHSL(0, -0.25, 0.2))
-      }
-      if (hovered) {
-        color = mixColor(color, (c) => c.clone().offsetHSL(0, 0, 0.2))
-      }
-      return color
-    })
-  } catch (e) {
-    console.log(entry.name())
-    throw e
-  }
+  const faceColors = geom.faces.map((face) => {
+    let color = getFormeColors(forme, face)
+    // let color: any = {
+    //   color: new Color(),
+    //   material: 1,
+    // }
+    if (isDupe) {
+      color = mixColor(color, (c) => c.clone().offsetHSL(0, -0.25, 0.2))
+    }
+    if (hovered) {
+      color = mixColor(color, (c) => c.clone().offsetHSL(0, 0, 0.2))
+    }
+    return color
+  })
 
   return (
     <group

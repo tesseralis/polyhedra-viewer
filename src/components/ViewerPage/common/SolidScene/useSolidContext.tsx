@@ -35,7 +35,6 @@ export default function useSolidContext() {
 
   const formeColors = useMemo(() => {
     if (!enableFormeColors) return
-    console.log(polyhedron.geom.faces.map((f) => getFormeColors(polyhedron, f)))
     // FIXME not this isn't working right now
     return polyhedron.geom.faces.map((f) =>
       getSelectionColor(f, getFormeColors(polyhedron, f)),
