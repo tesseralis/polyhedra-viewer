@@ -21,7 +21,42 @@ const opLayout: OpName[][] = [
   ["augment", "augment", "diminish", "gyrate"],
 ]
 
+const shortcutKeys: Record<string, OpName> = {
+  e: "expand",
+  a: "rectify",
+  s: "snub",
+  t: "truncate",
+}
+
 const opList = uniq(opLayout.flat())
+
+const Shortcuts = function () {
+  const polyhedron = PolyhedronCtx.useState()
+  const applyOperation = useApplyOperation()
+  const { setOperation } = OperationCtx.useActions()
+
+  const selectOperation = (name: OpName) => {
+    const operation = operations[name]
+    if (!operation.canApplyTo(polyhedron)) return
+
+    if (operation.hasOptions(polyhedron)) {
+      setOperation(operation, polyhedron)
+    } else {
+      applyOperation(operation)
+    }
+  }
+
+  React.useEffect(() => {
+    document.onkeydown = (e) => {
+      if (shortcutKeys[e.key]) {
+        selectOperation(shortcutKeys[e.key])
+      }
+      e.preventDefault()
+    }
+  })
+
+  return null
+}
 
 interface Props {
   name: OpName
@@ -67,10 +102,22 @@ const OpButton = memo(function ({ name, disabled }: Props) {
       setOperation(operation, polyhedron)
     }
   }
+
+  const createTitle = () => {
+    if (!operation.canApplyTo(polyhedron) || disabled) return
+    const key = Object.keys(shortcutKeys).find((k) => shortcutKeys[k] === name)
+
+    if (key && shortcutKeys[key] === name) {
+      return `${name} (${key})`
+    }
+
+    return name
+  }
   return (
     <button
       {...css()}
       style={{ gridArea: name }}
+      title={createTitle()}
       onClick={selectOperation}
       disabled={!operation.canApplyTo(polyhedron) || disabled}
     >
@@ -107,6 +154,7 @@ export default function OpGrid() {
   })
   return (
     <div {...css()}>
+      <Shortcuts />
       {opList.map((name) => (
         <OpButton key={name} name={name} disabled={isTransitioning} />
       ))}
