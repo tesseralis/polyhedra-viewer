@@ -1,12 +1,6 @@
 import { find } from "utils"
 import { Vector3 } from "three"
-import {
-  Classical,
-  FacetType,
-  facetTypes,
-  oppositeFacet,
-  oppositeTwist,
-} from "specs"
+import { Classical, FacetType, oppositeFacet, oppositeTwist } from "specs"
 import { Polyhedron, Face } from "math/polyhedra"
 import { angleBetween } from "math/geom"
 import { getGeometry, oppositeFace } from "math/operations/operationUtils"
@@ -42,36 +36,19 @@ export default abstract class ClassicalForme extends BaseForme<Classical> {
     return facet === "vertex" ? 3 : this.specs.data.family
   }
 
-  /**
-   * Define a facet face for a non-tetrahedral solid
-   */
-  protected _isFacetFace(face: Face, facet: FacetType) {
-    return face.numSides === this.faceType(facet)
-  }
-
-  /**
-   * Return whether the given face corresponds to the given facet
-   */
-  isFacetFace(face: Face, facet: FacetType) {
-    if (this.specs.isTetrahedral()) {
-      return face.inSet(this.tetrahedralFacetFaces(facet))
-    }
-    // This should be overriden by subclasses
-    return this._isFacetFace(face, facet)
-  }
-
-  isAnyFacetFace(face: Face) {
-    return facetTypes.some((facet) => this.isFacetFace(face, facet))
-  }
-
-  getFacet(face: Face) {
-    if (this.isFacetFace(face, "vertex")) return "vertex"
-    if (this.isFacetFace(face, "face")) return "face"
+  protected _getFacet(face: Face) {
+    if (face.numSides === this.faceType("face")) return "face"
+    if (face.numSides === this.faceType("vertex")) return "vertex"
     return null
   }
 
-  facetFace(facet: FacetType) {
-    return find(this.geom.faces, (face) => this.isFacetFace(face, facet))
+  getFacet(face: Face) {
+    if (this.specs.isTetrahedral()) {
+      if (face.inSet(this.tetrahedralFacetFaces("face"))) return "face"
+      if (face.inSet(this.tetrahedralFacetFaces("vertex"))) return "vertex"
+      return null
+    }
+    return this._getFacet(face)
   }
 
   /**
@@ -83,7 +60,7 @@ export default abstract class ClassicalForme extends BaseForme<Classical> {
 
   facetFaces(facet: FacetType) {
     if (this.specs.isTetrahedral()) return this.tetrahedralFacetFaces(facet)
-    return this.geom.faces.filter((face) => this.isFacetFace(face, facet))
+    return super.facetFaces(facet)
   }
 
   protected abstract adjacentFacetFace(face: Face, facet: FacetType): Face
@@ -186,8 +163,8 @@ export default abstract class ClassicalForme extends BaseForme<Classical> {
 }
 
 class RegularForme extends ClassicalForme {
-  _isFacetFace(face: Face, facet: FacetType) {
-    return facet === this.specs.facet()
+  _getFacet(face: Face) {
+    return this.specs.facet()
   }
 
   tetrahedralFacetFaces(facet: FacetType) {
@@ -205,8 +182,9 @@ class RegularForme extends ClassicalForme {
 }
 
 class TruncatedForme extends ClassicalForme {
-  _isFacetFace(face: Face, facet: FacetType) {
-    return this.specs.facet() === facet ? face.numSides > 5 : face.numSides <= 5
+  faceType(facet: FacetType) {
+    const faceType = super.faceType(facet)
+    return this.specs.facet() === facet ? 2 * faceType : faceType
   }
 
   tetrahedralFacetFaces(facet: FacetType) {
@@ -266,11 +244,10 @@ class BevelledForme extends ClassicalForme {
 }
 
 class CantellatedForme extends ClassicalForme {
-  _isFacetFace(face: Face, facet: FacetType) {
-    return (
-      super._isFacetFace(face, facet) &&
-      face.adjacentFaces().every((f) => f.numSides === 4)
-    )
+  _getFacet(face: Face) {
+    const facet = super._getFacet(face)
+    if (facet !== "face") return facet
+    return face.adjacentFaces().every((f) => f.numSides === 4) ? facet : null
   }
 
   tetrahedralFacetFaces(facet: FacetType) {
@@ -287,11 +264,10 @@ class CantellatedForme extends ClassicalForme {
 }
 
 class SnubForme extends ClassicalForme {
-  _isFacetFace(face: Face, facet: FacetType) {
-    return (
-      super._isFacetFace(face, facet) &&
-      face.adjacentFaces().every((f) => f.numSides === 3)
-    )
+  _getFacet(face: Face) {
+    const facet = super._getFacet(face)
+    if (facet !== "vertex") return facet
+    return face.adjacentFaces().every((f) => f.numSides === 3) ? facet : null
   }
 
   tetrahedralFacetFaces = (facet: FacetType) => {
