@@ -10,11 +10,12 @@ type CapstoneEnd = Facet
 // TODO add more useful functions here
 export default abstract class CapstoneForme extends BaseForme<Capstone> {
   static create(specs: Capstone, geom: Polyhedron) {
+    if (specs.isSnub()) {
+      return new SnubCapstoneForme(specs, geom)
+    }
     switch (specs.data.count) {
       case 0:
-        return specs.isSnub()
-          ? new SnubCapstoneForme(specs, geom)
-          : new PrismaticForme(specs, geom)
+        return new PrismaticForme(specs, geom)
       case 1:
         return new MonoCapstoneForme(specs, geom)
       case 2:
