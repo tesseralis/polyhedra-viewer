@@ -102,18 +102,6 @@ export default abstract class ClassicalForme extends BaseForme<Classical> {
     return this.facetFaces(this.minorFacet())
   }
 
-  isEdgeFace(face: Face) {
-    return !this.isAnyFacetFace(face)
-  }
-
-  edgeFace() {
-    return find(this.geom.faces, (face) => this.isEdgeFace(face))
-  }
-
-  edgeFaces() {
-    return this.geom.faces.filter((f) => this.isEdgeFace(f))
-  }
-
   /** Return the inradius of the given type of face */
   inradius(facet: FacetType) {
     return this.facetFace(facet).distanceToCenter()

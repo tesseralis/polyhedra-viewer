@@ -95,6 +95,14 @@ export default abstract class CompositeForme extends BaseForme<Composite> {
     return this.geom.faces.filter((f) => this.isCapTop(f))
   }
 
+  isDiminished(face: Face) {
+    return false
+  }
+
+  diminishedFaces() {
+    return this.geom.faces.filter((f) => this.isDiminished(f))
+  }
+
   isGyrate(cap: Cap) {
     return false
   }
@@ -128,10 +136,7 @@ export default abstract class CompositeForme extends BaseForme<Composite> {
           expansion: "prism",
         }
       }
-    } else if (
-      (this.isDiminishedSolid() || this.isGyrateSolid()) &&
-      this.isDiminishedFace(face)
-    ) {
+    } else if (this.isDiminished(face)) {
       return {
         type: "classical",
         family: source.data.family,
@@ -349,7 +354,7 @@ export class DiminishedSolidForme extends CompositeForme {
   }
 
   // TODO dedupe with gyrate
-  isDiminishedFace(face: Face) {
+  isDiminished(face: Face) {
     return (
       this.specs.isDiminished() &&
       face.numSides === this.geom.largestFace().numSides
@@ -359,10 +364,6 @@ export class DiminishedSolidForme extends CompositeForme {
   augmentedCaps() {
     if (!this.specs.isAugmented()) return []
     return this.caps().filter((cap) => cap.boundary().numSides === 3)
-  }
-
-  diminishedFaces() {
-    return this.geom.faces.filter((f) => this.isDiminishedFace(f))
   }
 
   isAugmentedFace(face: Face) {
@@ -377,7 +378,7 @@ export class DiminishedSolidForme extends CompositeForme {
   canAugment(face: Face) {
     if (this.specs.isAugmented()) return false
     return (
-      this.isDiminishedFace(face) ||
+      this.isDiminished(face) ||
       face.adjacentFaces().every((f) => f.numSides === 5)
     )
   }
@@ -420,15 +421,11 @@ export class GyrateSolidForme extends CompositeForme {
     return face.inSet(this.gyrateFaces())
   }
 
-  isDiminishedFace(face: Face) {
+  isDiminished(face: Face) {
     return (
       this.specs.isDiminished() &&
       face.numSides === this.geom.largestFace().numSides
     )
-  }
-
-  diminishedFaces() {
-    return this.geom.faces.filter((f) => this.isDiminishedFace(f))
   }
 
   // @override
@@ -436,10 +433,6 @@ export class GyrateSolidForme extends CompositeForme {
     if (face.numSides === 5) return "face"
     if (face.numSides === 3) return "vertex"
     return null
-  }
-
-  isEdgeFace(face: Face) {
-    return face.numSides === 4
   }
 
   /**
@@ -450,6 +443,6 @@ export class GyrateSolidForme extends CompositeForme {
   }
 
   canAugment(face: Face) {
-    return this.isDiminishedFace(face)
+    return this.isDiminished(face)
   }
 }

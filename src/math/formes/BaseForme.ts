@@ -91,12 +91,33 @@ export default abstract class BaseForme<Specs extends PolyhedronSpecs> {
 
   abstract faceAppearance(face: Face): FaceType
 
+  // Face Facets
+  // ===========
+  // A set of methods for getting the "facets" of polyhedral faces
+
+  /**
+   * Return whether the given face is a `face` facet or a `vertex` facet.
+   *
+   * This method should be implemented by subclasses
+   */
   getFacet(face: Face): FacetType | null {
     throw new Error(`Forme ${this.specs.name()} does not support getFacet`)
   }
 
   isFacetFace(face: Face, facet: FacetType) {
     return this.getFacet(face) === facet
+  }
+
+  isEdgeFace(face: Face) {
+    return !this.getFacet(face)
+  }
+
+  edgeFace() {
+    return find(this.geom.faces, (face) => this.isEdgeFace(face))
+  }
+
+  edgeFaces() {
+    return this.geom.faces.filter((f) => this.isEdgeFace(f))
   }
 
   isAnyFacetFace(face: Face) {
