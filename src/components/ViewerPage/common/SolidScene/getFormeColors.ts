@@ -38,14 +38,10 @@ function createFamilyColor(face: string, vertex: string) {
       vertex: vertexColor.clone().offsetHSL(0, 0, -1 / 3),
     },
     edge: {
-      prism: faceColor
-        .clone()
-        .lerp(vertexColor, 1 / 3)
-        .offsetHSL(0, -1 / 4, 0),
-      antiprism: faceColor
-        .clone()
-        .lerp(vertexColor, 3 / 3)
-        .offsetHSL(0, -1 / 4, 0),
+      prism: faceColor.clone().lerp(vertexColor, 1 / 3),
+      // .offsetHSL(0, -1 / 4, 0),
+      antiprism: faceColor.clone().lerp(vertexColor, 2 / 3),
+      // .offsetHSL(0, -1 / 4, 0),
     },
   }
 }
@@ -56,9 +52,9 @@ const colorScheme = {
   // yellow + orange
   3: createFamilyColor("#ffe100", "#ff8400"),
   // red + purple
-  4: createFamilyColor("#ff3d3d", "#c616f2"),
-  // blue + green
-  5: createFamilyColor("#1c7bff", "#1bcc3b"),
+  4: createFamilyColor("#ff3d3d", "#a719ff"),
+  // blue + teal
+  5: createFamilyColor("#1c7bff", "#42f5ce"),
 }
 
 export function toColor(color: any): Color {
@@ -159,6 +155,6 @@ export function getFaceAppearance(faceType: FaceType): FaceColor {
 export default function getFormeColors(forme: Forme, face: Face): Appearance {
   return {
     color: getFaceAppearance(forme.faceAppearance(face)),
-    material: 1,
+    material: 0,
   }
 }

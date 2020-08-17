@@ -160,11 +160,6 @@ export class AugmentedPrismForme extends CompositeForme {
     return [this.endFaces()[0], normal] as const
   }
 
-  // @override
-  isFacetFace(face: Face, facet: FacetType): boolean {
-    throw new Error(`Augmented prisms do not have facet faces`)
-  }
-
   caps = once(() => {
     return this.geom.caps({ type: "primary", base: 4 })
   })
@@ -329,7 +324,7 @@ export class DiminishedSolidForme extends CompositeForme {
 
   // @override
   getFacet(face: Face) {
-    return this.isSourceFace(face) ? "face" : null
+    return this.isSourceFace(face) ? "vertex" : null
   }
 
   // @override

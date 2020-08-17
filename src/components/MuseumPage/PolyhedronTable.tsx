@@ -1,4 +1,5 @@
 import { pick } from "lodash-es"
+import { Color } from "three"
 import React, { useRef, useState } from "react"
 import { Table } from "tables"
 import PolyhedronModel from "components/ViewerPage/common/SolidScene/PolyhedronModel"
@@ -38,11 +39,11 @@ function PolyhedronEntry({ entry, position, navigate }: any) {
     let color = getFormeColors(forme, face)
     // let color: any = {
     //   color: new Color(),
-    //   material: 1,
+    //   material: 0,
     // }
-    if (isDupe) {
-      color = mixColor(color, (c) => c.clone().offsetHSL(0, -0.25, 0.2))
-    }
+    // if (isDupe) {
+    //   color = mixColor(color, (c) => c.clone().offsetHSL(0, -0.25, 0.2))
+    // }
     if (hovered) {
       color = mixColor(color, (c) => c.clone().offsetHSL(0, 0, 0.2))
     }
@@ -63,13 +64,13 @@ function PolyhedronEntry({ entry, position, navigate }: any) {
         appearance={faceColors}
         config={pick(config, ["showFaces", "showEdges", "showInnerFaces"])}
       />
-      <mesh position={[0, -2, 0]}>
+      {/* <mesh position={[0, -2, 0]}>
         <cylinderBufferGeometry
           attach="geometry"
           args={[1.25, 1.5, 0.1, 50, 1]}
         />
         <meshPhongMaterial attach="material" color="#ad9b13" />
-      </mesh>
+      </mesh> */}
     </group>
   )
 }
