@@ -43,7 +43,7 @@ export default function useSolidContext() {
   // Colors when animation is being applied
   const transitionColors = useMemo(() => {
     return (
-      isTransitioning && faceColors.map((color) => ({ color, material: 1 }))
+      isTransitioning && faceColors.map((color) => ({ color, material: 0 }))
     )
   }, [faceColors, isTransitioning])
   const geom: Polyhedron = polyhedron.geom

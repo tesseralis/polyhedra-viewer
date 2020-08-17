@@ -37,6 +37,10 @@ function createFamilyColor(face: string, vertex: string) {
       face: faceColor.clone().offsetHSL(0, 0, -1 / 3),
       vertex: vertexColor.clone().offsetHSL(0, 0, -1 / 3),
     },
+    light: {
+      face: faceColor.clone().offsetHSL(0, 0, 1 / 8),
+      vertex: vertexColor.clone().offsetHSL(0, 0, 1 / 8),
+    },
     edge: {
       prism: faceColor.clone().lerp(vertexColor, 1 / 3),
       // .offsetHSL(0, -1 / 4, 0),
@@ -107,12 +111,13 @@ export function getFaceAppearance(faceType: FaceType): FaceColor {
         return sideColors.map((col) => {
           switch (col) {
             case "top":
-              return scheme.primary.vertex
+              return scheme.light.vertex
             case "middle":
-              return scheme.edge.prism.clone().lerp(scheme.primary.vertex, 0.5)
+              return scheme.primary.vertex
             case "base":
               // FIXME base this on the inner color
-              return scheme.primary.face
+              return scheme.secondary.vertex
+            // return scheme.primary.face
           }
           throw new Error(`blah`)
         })
@@ -121,9 +126,9 @@ export function getFaceAppearance(faceType: FaceType): FaceColor {
         return sideColors.map((col) => {
           switch (col) {
             case "top":
-              return scheme.primary.face
+              return scheme.light.face
             case "base":
-              return scheme.secondary.vertex
+              return scheme.secondary.face
             default:
               throw new Error(`Square cap face in rotunda?`)
           }
@@ -133,11 +138,11 @@ export function getFaceAppearance(faceType: FaceType): FaceColor {
         return sideColors.map((col) => {
           switch (col) {
             case "top":
-              return scheme.primary.face
+              return scheme.light.face
             case "middle":
-              return scheme.edge.prism.clone().lerp(scheme.primary.face, 0.5)
+              return scheme.primary.face
             case "base":
-              return scheme.secondary.vertex
+              return scheme.secondary.face
             default:
               throw new Error(`blah`)
           }

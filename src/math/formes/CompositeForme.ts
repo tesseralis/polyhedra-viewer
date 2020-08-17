@@ -133,6 +133,13 @@ export default abstract class CompositeForme extends BaseForme<Composite> {
         polygonType: face.numSides > 5 ? "secondary" : "primary",
         facet: "face",
       }
+    } else if (this.isCapTop(face)) {
+      return {
+        type: "capstone",
+        base: source.data.family,
+        polygonType,
+        capPosition: "top",
+      }
     } else {
       // augmented cap face
       const cap = find(this.augmentedCaps(), (cap) => face.inSet(cap.faces()))
