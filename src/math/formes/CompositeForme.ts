@@ -32,22 +32,6 @@ export default abstract class CompositeForme extends BaseForme<Composite> {
     return this.fromSpecs(specs)
   }
 
-  isAugmentedClassical(): this is AugmentedClassicalForme {
-    return this.specs.isAugmentedClassical()
-  }
-
-  isAugmentedPrism(): this is AugmentedPrismForme {
-    return this.specs.isAugmentedPrism()
-  }
-
-  isDiminishedSolid(): this is DiminishedSolidForme {
-    return this.specs.isDiminishedSolid()
-  }
-
-  isGyrateSolid(): this is GyrateSolidForme {
-    return this.specs.isGyrateSolid()
-  }
-
   protected capInnerVertIndices = once(() => {
     return new Set(
       this.caps().flatMap((cap) => cap.innerVertices().map((v) => v.index)),
