@@ -86,16 +86,6 @@ export default abstract class CompositeForme extends BaseForme<Composite> {
 
   abstract canAugment(face: Face): boolean
 
-  abstract isFacetFace(face: Face, facet: FacetType): boolean
-
-  facetFaces(facet: FacetType) {
-    return this.geom.faces.filter((f) => this.isFacetFace(f, facet))
-  }
-
-  facetFace(facet: FacetType) {
-    return find(this.geom.faces, (f) => this.isFacetFace(f, facet))
-  }
-
   isCapTop(face: Face) {
     // if (this.specs.sourceClassical().isRegular()) return false
     return face.vertices.every((v) => this.capInnerVertIndices().has(v.index))
@@ -311,18 +301,13 @@ export class AugmentedClassicalForme extends CompositeForme {
     return caps
   })
 
-  // Functions that exclusive to augmented solids
-
-  isFacetFace(face: Face, facet: FacetType): boolean {
-    if (!this.isSourceFace(face)) return false
-    if (facet === "face") {
-      // Only source faces re main faces
-      // All regular faces are main faces
-      if (this.specs.sourceClassical().isRegular()) return true
-      // It's a main face if it's not a truncated face
-      return face.numSides !== 3
+  getFacet(face: Face) {
+    if (!this.isSourceFace(face)) return null
+    if (this.specs.sourceClassical().isRegular() || face.numSides !== 3) {
+      return "face"
+    } else {
+      return "vertex"
     }
-    return !this.isFacetFace(face, "face")
   }
 
   canAugment(face: Face) {
@@ -344,9 +329,8 @@ export class DiminishedSolidForme extends CompositeForme {
   })
 
   // @override
-  isFacetFace(face: Face, facet: FacetType) {
-    if (facet === "vertex") return false
-    return this.isSourceFace(face)
+  getFacet(face: Face) {
+    return this.isSourceFace(face) ? "face" : null
   }
 
   // @override
@@ -447,12 +431,11 @@ export class GyrateSolidForme extends CompositeForme {
     return this.geom.faces.filter((f) => this.isDiminishedFace(f))
   }
 
-  isFacetFace(face: Face, facet: "face" | "vertex") {
-    if (facet === "face") {
-      return face.numSides === 5
-    } else {
-      return face.numSides === 3
-    }
+  // @override
+  getFacet(face: Face) {
+    if (face.numSides === 5) return "face"
+    if (face.numSides === 3) return "vertex"
+    return null
   }
 
   isEdgeFace(face: Face) {

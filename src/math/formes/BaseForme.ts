@@ -1,5 +1,5 @@
 import { mean } from "lodash-es"
-import { PolyhedronSpecs } from "specs"
+import { PolyhedronSpecs, FacetType } from "specs"
 import { Polyhedron, Face } from "math/polyhedra"
 
 import { Classical, Capstone, Composite, Elementary } from "specs"
@@ -13,6 +13,7 @@ import {
   Pose,
   alignPolyhedron,
 } from "math/operations/operationUtils"
+import { find } from "utils"
 
 export type PolyhedronForme<
   S extends PolyhedronSpecs = PolyhedronSpecs
@@ -89,4 +90,24 @@ export default abstract class BaseForme<Specs extends PolyhedronSpecs> {
   }
 
   abstract faceAppearance(face: Face): FaceType
+
+  getFacet(face: Face): FacetType | null {
+    throw new Error(`Forme ${this.specs.name()} does not support getFacet`)
+  }
+
+  isFacetFace(face: Face, facet: FacetType) {
+    return this.getFacet(face) === facet
+  }
+
+  isAnyFacetFace(face: Face) {
+    return !!this.getFacet(face)
+  }
+
+  facetFace(facet: FacetType) {
+    return find(this.geom.faces, (face) => this.isFacetFace(face, facet))
+  }
+
+  facetFaces(facet: FacetType) {
+    return this.geom.faces.filter((face) => this.isFacetFace(face, facet))
+  }
 }

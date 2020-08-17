@@ -1,6 +1,6 @@
 import { once } from "lodash"
 import BaseForme from "./BaseForme"
-import { Capstone, FacetType } from "specs"
+import { Capstone } from "specs"
 import { Polyhedron, Face, Edge, Cap, FaceLike, Facet } from "math/polyhedra"
 import { getCentroid } from "math/geom"
 import { getGeometry } from "math/operations/operationUtils"
@@ -147,36 +147,32 @@ export default abstract class CapstoneForme extends BaseForme<Capstone> {
     return getCentroid(this.ends().map((end) => end.centroid()))
   }
 
-  // Utilities for determining "facet faces" analogous to thoes in classical formes
-  // TODO these should only work with elongated orthobicupolae
-  // TODO deduplicate these functions with ClassicalForme
-
-  isFacetFace(face: Face, facet: FacetType) {
-    if (facet === "face") {
-      return (
-        this.isTop(face) ||
-        (this.isSideFace(face) &&
-          face.adjacentFaces().every((f) => f.numSides === 4))
-      )
-    } else {
-      return (
-        this.isContainedInEnd(face) && face.numSides === 3 && !this.isTop(face)
-      )
-    }
-  }
-
-  facetFaces(facet: FacetType) {
-    return this.geom.faces.filter((f) => this.isFacetFace(f, facet))
+  hasFaceFacets() {
+    const specs = this.specs
+    // Return only the solids for which we can calculate the duals
+    if (specs.isPrism() && specs.isPrimary()) return true
+    if (specs.isPyramid() && specs.isBi()) return true
+    if (specs.isCupola() && specs.isBi() && specs.isOrtho()) return true
+    return false
   }
 
   getFacet(face: Face) {
-    if (this.isFacetFace(face, "face")) return "face"
-    if (this.isFacetFace(face, "vertex")) return "vertex"
+    if (!this.hasFaceFacets()) return super.getFacet(face)
+    if (
+      this.isTop(face) ||
+      (this.isSideFace(face) &&
+        face.adjacentFaces().every((f) => f.numSides === 4))
+    ) {
+      return "face"
+    }
+    if (
+      this.isContainedInEnd(face) &&
+      face.numSides === 3 &&
+      !this.isTop(face)
+    ) {
+      return "vertex"
+    }
     return null
-  }
-
-  isAnyFacetFace(face: Face) {
-    return this.isFacetFace(face, "face") || this.isFacetFace(face, "vertex")
   }
 
   faceAppearance(face: Face): any {
