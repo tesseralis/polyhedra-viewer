@@ -34,7 +34,9 @@ export default abstract class CompositeForme extends BaseForme<Composite> {
 
   protected capInnerVertIndices = once(() => {
     return new Set(
-      this.caps().flatMap((cap) => cap.innerVertices().map((v) => v.index)),
+      this.augmentedCaps().flatMap((cap) =>
+        cap.innerVertices().map((v) => v.index),
+      ),
     )
   })
 
@@ -45,6 +47,10 @@ export default abstract class CompositeForme extends BaseForme<Composite> {
   }
 
   abstract caps(): Cap[]
+
+  augmentedCaps() {
+    return this.caps()
+  }
 
   // TODO implement this for diminished/gyrate
   sourceCentroid() {
@@ -129,7 +135,7 @@ export default abstract class CompositeForme extends BaseForme<Composite> {
       }
     } else {
       // augmented cap face
-      const cap = find(this.caps(), (cap) => face.inSet(cap.faces()))
+      const cap = find(this.augmentedCaps(), (cap) => face.inSet(cap.faces()))
       return {
         type: "capstone",
         base: source.data.family,
@@ -317,6 +323,10 @@ export class DiminishedSolidForme extends CompositeForme {
       .concat(this.geom.caps({ type: "primary", base: 3 }))
   })
 
+  augmentedCaps = once(() => {
+    return this.geom.caps({ type: "primary", base: 3 })
+  })
+
   // @override
   getFacet(face: Face) {
     return this.isSourceFace(face) ? "face" : null
@@ -345,11 +355,6 @@ export class DiminishedSolidForme extends CompositeForme {
     )
   }
 
-  augmentedCaps() {
-    if (!this.specs.isAugmented()) return []
-    return this.caps().filter((cap) => cap.boundary().numSides === 3)
-  }
-
   isAugmentedFace(face: Face) {
     if (!this.specs.isAugmented()) return false
     return face.inSet(this.augmentedCaps()[0].faces())
@@ -372,6 +377,8 @@ export class GyrateSolidForme extends CompositeForme {
   caps = once(() => {
     return this.geom.caps({ type: "secondary", base: 5 })
   })
+
+  augmentedCaps = () => []
 
   // @override
   orientation() {
@@ -428,5 +435,27 @@ export class GyrateSolidForme extends CompositeForme {
 
   canAugment(face: Face) {
     return this.isDiminished(face)
+  }
+
+  faceAppearance(face: Face) {
+    const source = this.specs.sourceClassical()
+    if (this.isGyrateFace(face)) {
+      if (face.numSides === 4) {
+        return {
+          type: "classical",
+          family: source.data.family,
+          polygonType: "primary",
+          expansion: "prism",
+        }
+      }
+      return {
+        type: "classical",
+        family: source.data.family,
+        polygonType: "primary",
+        facet: face.numSides === 5 ? "face" : "vertex",
+      }
+    } else {
+      return super.faceAppearance(face)
+    }
   }
 }
