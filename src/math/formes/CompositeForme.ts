@@ -349,6 +349,10 @@ export class DiminishedSolidForme extends CompositeForme {
     return [faces[0], faces[0].edges[0]] as const
   }
 
+  isSourceFace(face: Face) {
+    return face.numSides === 3 && super.isSourceFace(face)
+  }
+
   // TODO dedupe with gyrate
   isDiminished(face: Face) {
     return (
@@ -409,6 +413,10 @@ export class GyrateSolidForme extends CompositeForme {
   gyrateFaces = once(() => {
     return this.gyrateCaps().flatMap((cap) => cap.faces())
   })
+
+  isSourceFace(face: Face) {
+    return face.numSides <= 5 && super.isSourceFace(face)
+  }
 
   isGyrateFace(face: Face) {
     return face.inSet(this.gyrateFaces())

@@ -54,7 +54,7 @@ const colorScheme = {
   // black + white
   2: createFamilyColor("#000000", "#ffffff"),
   // yellow + orange
-  3: createFamilyColor("#ffe100", "#ff8400"),
+  3: createFamilyColor("#ffe100", "#ff6f00"),
   // red + purple
   4: createFamilyColor("#ff3d3d", "#a719ff"),
   // blue + teal
