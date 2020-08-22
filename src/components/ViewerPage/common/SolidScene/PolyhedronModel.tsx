@@ -91,7 +91,7 @@ function SolidFaces({
       }}
     >
       <geometry ref={ref} attach="geometry" />
-      <meshStandardMaterial
+      <meshLambertMaterial
         side={showInnerFaces ? DoubleSide : FrontSide}
         attachArray="material"
         args={[{ vertexColors: true }]}
