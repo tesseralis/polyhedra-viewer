@@ -14,8 +14,10 @@ export default function createForme<S extends PolyhedronSpecs>(
   geom: Polyhedron,
 ): PolyhedronForme<S> {
   if (specs.isClassical()) return ClassicalForme.create(specs, geom) as any
-  if (specs.isCapstone()) return CapstoneForme.create(specs, geom) as any
-  if (specs.isComposite()) return CompositeForme.create(specs, geom) as any
+  if (specs.isCapstone())
+    return CapstoneForme.create(specs, geom).normalize() as any
+  if (specs.isComposite())
+    return CompositeForme.create(specs, geom).normalize() as any
   if (specs.isElementary()) return ElementaryForme.create(specs, geom) as any
   throw new Error(`Invalid specs: ${specs.name()}`)
 }

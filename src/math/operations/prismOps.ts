@@ -1,6 +1,6 @@
 import { find } from "utils"
 import { Capstone, Twist, twists, oppositeTwist } from "specs"
-import { CapstoneForme } from "math/formes"
+import { CapstoneForme, fromSpecs } from "math/formes"
 import { combineOps, makeOpPair } from "./operationPairs"
 import { makeOperation } from "./Operation"
 import { Pose, TwistOpts, getTransformedVertices } from "./operationUtils"
@@ -53,7 +53,7 @@ function doPrismTransform(
   result: Capstone,
   twist?: Twist,
 ) {
-  const resultForme = CapstoneForme.fromSpecs(result)
+  const resultForme = fromSpecs(result)
   const resultHeight =
     (resultForme.prismaticHeight() / resultForme.geom.edgeLength()) *
     forme.geom.edgeLength()

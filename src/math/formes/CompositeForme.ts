@@ -1,8 +1,8 @@
 import { once } from "lodash-es"
-import { find, getSingle } from "utils"
+import { pivot, find, getSingle } from "utils"
 import BaseForme from "./BaseForme"
 import { getGeometry } from "math/operations/operationUtils"
-import { Composite, FacetType } from "specs"
+import { Composite } from "specs"
 import { Polyhedron, Face, Cap } from "math/polyhedra"
 import { getCentroid } from "math/geom"
 
@@ -77,7 +77,6 @@ export default abstract class CompositeForme extends BaseForme<Composite> {
   abstract canAugment(face: Face): boolean
 
   isCapTop(face: Face) {
-    // if (this.specs.sourceClassical().isRegular()) return false
     return face.vertices.every((v) => this.capInnerVertIndices().has(v.index))
   }
 
@@ -95,6 +94,21 @@ export default abstract class CompositeForme extends BaseForme<Composite> {
 
   isGyrate(cap: Cap) {
     return false
+  }
+
+  normalize(): any {
+    const newGeom = this.geom.withFaces(
+      this.geom.faces.map((f) => {
+        if (this.isCapTop(f)) return f
+        const cap = this.augmentedCaps().find((cap) => f.inSet(cap.faces()))
+        if (!cap) return f
+        const pivotVertex = find(f.vertices, (v) =>
+          v.inSet(cap.innerVertices()),
+        )
+        return pivot(f.vertices, pivotVertex)
+      }),
+    )
+    return CompositeForme.create(this.specs, newGeom)
   }
 
   faceAppearance(face: Face): any {

@@ -1,3 +1,4 @@
+import { find, pivot } from "utils"
 import { once } from "lodash"
 import BaseForme from "./BaseForme"
 import { Capstone } from "specs"
@@ -174,6 +175,23 @@ export default abstract class CapstoneForme extends BaseForme<Capstone> {
       return "vertex"
     }
     return null
+  }
+
+  normalize(): any {
+    const newGeom = this.geom.withFaces(
+      this.geom.faces.map((f) => {
+        if (this.isTop(f)) return f
+        const end = this.containingEnd(f)
+        if (!end) return f
+        if (end instanceof Face) return f
+        const cap = end as Cap
+        const pivotVertex = find(f.vertices, (v) =>
+          v.inSet(cap.innerVertices()),
+        )
+        return pivot(f.vertices, pivotVertex)
+      }),
+    )
+    return CapstoneForme.create(this.specs, newGeom)
   }
 
   faceAppearance(face: Face): any {

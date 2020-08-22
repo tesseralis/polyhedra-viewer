@@ -89,6 +89,12 @@ export default abstract class BaseForme<Specs extends PolyhedronSpecs> {
     return alignPolyhedron(this.geom, startPose, endPose)
   }
 
+  // Normalize the geometry of this forme
+  // (e.g. make sure all the faces are in the right positions)
+  normalize(): this {
+    return this
+  }
+
   abstract faceAppearance(face: Face): FaceType
 
   // Face Facets
