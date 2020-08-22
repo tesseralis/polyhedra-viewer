@@ -1,13 +1,14 @@
 import { mean } from "lodash-es"
+import { Vector3 } from "three"
 import { PolyhedronSpecs, FacetType } from "specs"
+import { Classical, Capstone, Composite, Elementary } from "specs"
 import { Polyhedron, Face } from "math/polyhedra"
 
-import { Classical, Capstone, Composite, Elementary } from "specs"
 import type ClassicalForme from "./ClassicalForme"
 import type CapstoneForme from "./CapstoneForme"
 import type CompositeForme from "./CompositeForme"
 import type ElementaryForme from "./ElementaryForme"
-import { Vector3 } from "three"
+import { FaceType } from "./FaceType"
 import {
   Orientation,
   Pose,
@@ -26,25 +27,6 @@ export type PolyhedronForme<
   : S extends Elementary
   ? ElementaryForme
   : never
-
-interface ClassicalFace {
-  type: "classical"
-  family: 3 | 4 | 5
-  polygonType: "primary" | "secondary"
-  facet?: "face" | "vertex"
-  expansion?: "prism" | "antiprism"
-}
-
-interface CapstoneFace {
-  type: "capstone"
-  polygonType: "primary" | "secondary"
-  base: 2 | 3 | 4 | 5
-  elongation?: "prism" | "antiprism"
-  capPosition?: "prism" | "top" | "side"
-  sideColors?: ("top" | "middle" | "base")[]
-}
-
-export type FaceType = ClassicalFace | CapstoneFace
 
 export default abstract class BaseForme<Specs extends PolyhedronSpecs> {
   specs: Specs

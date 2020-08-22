@@ -5,6 +5,14 @@ import { getGeometry } from "math/operations/operationUtils"
 import { Composite } from "specs"
 import { Polyhedron, Face, Cap } from "math/polyhedra"
 import { getCentroid } from "math/geom"
+import {
+  classicalFacet,
+  classicalEdge,
+  capstoneCapTop,
+  capstoneCapSide,
+  capstonePrismBase,
+  capstoneSide,
+} from "./FaceType"
 
 type Base = Cap | Face
 
@@ -118,54 +126,24 @@ export default abstract class CompositeForme extends BaseForme<Composite> {
       : "primary"
 
     if (this.isSourceFace(face)) {
-      if (this.isFacetFace(face, "face")) {
-        return {
-          type: "classical",
-          family: source.data.family,
-          polygonType: face.numSides > 5 ? "secondary" : "primary",
-          facet: "face",
-        }
-      } else if (this.isFacetFace(face, "vertex")) {
-        return {
-          type: "classical",
-          family: source.data.family,
-          polygonType: face.numSides > 5 ? "secondary" : "primary",
-          facet: "vertex",
-        }
+      const facet = this.getFacet(face)
+      const polygonType = face.numSides > 5 ? "secondary" : "primary"
+      if (facet) {
+        return classicalFacet(source.data.family, polygonType, "face")
       } else {
-        return {
-          type: "classical",
-          family: source.data.family,
-          polygonType: face.numSides > 5 ? "secondary" : "primary",
-          expansion: "prism",
-        }
+        return classicalEdge(source.data.family, "prism")
       }
     } else if (this.isDiminished(face)) {
-      return {
-        type: "classical",
-        family: source.data.family,
-        polygonType: face.numSides > 5 ? "secondary" : "primary",
-        facet: "face",
-      }
+      return classicalFacet(source.data.family, polygonType, "face")
     } else if (this.isCapTop(face)) {
-      return {
-        type: "capstone",
-        base: source.data.family,
-        polygonType,
-        capPosition: "top",
-      }
+      return capstoneCapTop(source.data.family, polygonType)
     } else {
       // augmented cap face
       const cap = find(this.augmentedCaps(), (cap) => face.inSet(cap.faces()))
-      return {
-        type: "capstone",
-        base: source.data.family,
-        polygonType,
-        capPosition: "side",
-        sideColors: face.vertices.map((v) =>
-          v.inSet(cap.innerVertices()) ? "top" : "base",
-        ),
-      }
+      const sideColors = face.vertices.map((v) =>
+        v.inSet(cap.innerVertices()) ? "top" : "base",
+      )
+      return capstoneCapSide(source.data.family, polygonType, sideColors)
     }
   }
 }
@@ -242,33 +220,18 @@ export class AugmentedPrismForme extends CompositeForme {
     )
   }
 
-  faceAppearance(face: Face): any {
+  faceAppearance(face: Face) {
     const source = this.specs.sourcePrism()
     if (this.isEndFace(face)) {
-      return {
-        type: "capstone",
-        base: source.data.base,
-        polygonType: source.data.type,
-        capPosition: "prism",
-      }
+      return capstonePrismBase(source.data.base, source.data.type)
     } else if (this.isSideFace(face)) {
-      return {
-        type: "capstone",
-        base: source.data.base,
-        polygonType: source.data.type,
-        elongation: "prism",
-      }
+      return capstoneSide(source.data.base, "prism")
     } else {
       const cap = find(this.caps(), (cap) => face.inSet(cap.faces()))
-      return {
-        type: "capstone",
-        base: 4,
-        polygonType: "primary",
-        capPosition: "side",
-        sideColors: face.vertices.map((v) => {
-          return v.inSet(cap.innerVertices()) ? "top" : "base"
-        }),
-      }
+      const sideColors = face.vertices.map((v) => {
+        return v.inSet(cap.innerVertices()) ? "top" : "base"
+      })
+      return capstoneCapSide(4, "primary", sideColors)
     }
   }
 }
@@ -465,19 +428,13 @@ export class GyrateSolidForme extends CompositeForme {
     const source = this.specs.sourceClassical()
     if (this.isGyrateFace(face)) {
       if (face.numSides === 4) {
-        return {
-          type: "classical",
-          family: source.data.family,
-          polygonType: "primary",
-          expansion: "prism",
-        }
+        return classicalEdge(source.data.family, "prism")
       }
-      return {
-        type: "classical",
-        family: source.data.family,
-        polygonType: "primary",
-        facet: face.numSides === 5 ? "face" : "vertex",
-      }
+      return classicalFacet(
+        source.data.family,
+        "primary",
+        face.numSides === 5 ? "face" : "vertex",
+      )
     } else {
       return super.faceAppearance(face)
     }

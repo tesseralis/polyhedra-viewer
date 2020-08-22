@@ -5,6 +5,12 @@ import { Capstone } from "specs"
 import { Polyhedron, Face, Edge, Cap, FaceLike, Facet } from "math/polyhedra"
 import { getCentroid } from "math/geom"
 import { getGeometry } from "math/operations/operationUtils"
+import {
+  capstoneSide,
+  capstonePrismBase,
+  capstoneCapTop,
+  capstoneCapSide,
+} from "./FaceType"
 
 type CapstoneEnd = Facet
 
@@ -194,39 +200,24 @@ export default abstract class CapstoneForme extends BaseForme<Capstone> {
     return CapstoneForme.create(this.specs, newGeom)
   }
 
-  faceAppearance(face: Face): any {
-    const props = {
-      type: "capstone",
-      polygonType: this.specs.data.type,
-      base: this.specs.data.base,
-    }
+  faceAppearance(face: Face) {
+    const base = this.specs.data.base
+    const polygonType = this.specs.data.type
     if (this.isSideFace(face)) {
-      return {
-        ...props,
-        elongation: face.numSides === 3 ? "antiprism" : "prism",
-      }
+      return capstoneSide(base, face.numSides === 3 ? "antiprism" : "prism")
     }
     // otherwise it's a cap face
     if (this.isEndFace(face)) {
-      return {
-        ...props,
-        capPosition: "prism",
-      }
+      return capstonePrismBase(base, polygonType)
     }
     if (this.isTop(face)) {
-      return {
-        ...props,
-        capPosition: "top",
-      }
+      return capstoneCapTop(base, polygonType)
     }
     const cap = this.containingEnd(face) as Cap
-    return {
-      ...props,
-      capPosition: "side",
-      sideColors: face.vertices.map((v) =>
-        v.inSet(cap.innerVertices()) ? "top" : "base",
-      ),
-    }
+    const sideColors = face.vertices.map((v) =>
+      v.inSet(cap.innerVertices()) ? "top" : "base",
+    )
+    return capstoneCapSide(base, polygonType, sideColors)
   }
 }
 

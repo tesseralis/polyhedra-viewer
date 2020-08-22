@@ -5,7 +5,7 @@ import { Polyhedron, Face, VertexArg, normalizeVertex } from "math/polyhedra"
 import { deduplicateVertices } from "./operationUtils"
 import { PolyhedronSpecs } from "specs"
 import { PolyhedronForme as Forme, createForme } from "math/formes"
-import { FaceType } from "math/formes/BaseForme"
+import { FaceType } from "math/formes/FaceType"
 import { find, EntryIters, cartesian } from "utils"
 
 type SelectState = "selected" | "selectable" | undefined

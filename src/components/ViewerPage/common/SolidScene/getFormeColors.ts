@@ -1,25 +1,6 @@
 import { Color } from "three"
-import { PolyhedronForme as Forme } from "math/formes"
+import { PolyhedronForme as Forme, FaceType } from "math/formes"
 import { Face } from "math/polyhedra"
-
-interface ClassicalFace {
-  type: "classical"
-  family: 3 | 4 | 5
-  polygonType: "primary" | "secondary"
-  facet?: "face" | "vertex"
-  expansion?: "prism" | "antiprism"
-}
-
-interface CapstoneFace {
-  type: "capstone"
-  polygonType: "primary" | "secondary"
-  base: 2 | 3 | 4 | 5
-  elongation?: "prism" | "antiprism"
-  capPosition?: "prism" | "top" | "side"
-  sideColors?: ("top" | "middle" | "base")[]
-}
-
-type FaceType = ClassicalFace | CapstoneFace
 
 type FaceColor = Color | Color[]
 
@@ -88,18 +69,18 @@ export function mixColor(appearance: Appearance, mixer: (c: Color) => Color) {
 export function getFaceAppearance(faceType: FaceType): FaceColor {
   if (faceType.type === "classical") {
     const scheme = colorScheme[faceType.family]
-    if (faceType.facet) {
+    if (faceType.faceType === "facet") {
       // TODO primary material
       return scheme[faceType.polygonType][faceType.facet]
     } else {
       // TODO secondary material
-      return scheme.edge[faceType.expansion!]
+      return scheme.edge[faceType.expansion]
     }
   }
   if (faceType.type === "capstone") {
     const scheme = colorScheme[faceType.base]
     if (faceType.capPosition === "prism") {
-      return scheme[faceType.polygonType].face
+      return scheme[faceType.polygonType!].face
     }
     if (faceType.capPosition === "top") {
       return scheme.primary.face
