@@ -2,7 +2,7 @@ import { mean } from "lodash-es"
 import { Vector3 } from "three"
 import { PolyhedronSpecs, FacetType } from "specs"
 import { Classical, Capstone, Composite, Elementary } from "specs"
-import { Polyhedron, Face } from "math/polyhedra"
+import { Polyhedron, Face, Cap } from "math/polyhedra"
 
 import type ClassicalForme from "./ClassicalForme"
 import type CapstoneForme from "./CapstoneForme"
@@ -75,6 +75,10 @@ export default abstract class BaseForme<Specs extends PolyhedronSpecs> {
   // (e.g. make sure all the faces are in the right positions)
   normalize(): this {
     return this
+  }
+
+  caps(): Cap[] {
+    throw new Error(`Cannot get caps for ${this.specs.name()}`)
   }
 
   abstract faceAppearance(face: Face): FaceType

@@ -165,6 +165,11 @@ class RegularForme extends ClassicalForme {
   midradius() {
     return this.geom.getEdge().distanceToCenter()
   }
+
+  caps() {
+    if (this.specs.isFace()) return []
+    return this.geom.caps({ base: this.specs.data.family, type: "primary" })
+  }
 }
 
 class TruncatedForme extends ClassicalForme {
@@ -246,6 +251,10 @@ class CantellatedForme extends ClassicalForme {
 
   adjacentFacetFace(face: Face, facet: FacetType) {
     return oppositeFace(face.edges[0])
+  }
+
+  caps() {
+    return this.geom.caps({ base: this.specs.data.family, type: "secondary" })
   }
 }
 

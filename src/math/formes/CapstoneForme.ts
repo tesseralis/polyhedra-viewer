@@ -69,12 +69,16 @@ export default abstract class CapstoneForme extends BaseForme<Capstone> {
     }
   }
 
-  protected caps = once(() => {
+  _caps = once(() => {
     return this.geom.caps(this.capOpts())
   })
 
   endCaps() {
     return this.ends().filter((end) => end instanceof Cap) as Cap[]
+  }
+
+  caps() {
+    return this.endCaps()
   }
 
   isEndCap(cap: Cap) {
@@ -243,7 +247,7 @@ class SnubCapstoneForme extends CapstoneForme {
 
 class MonoCapstoneForme extends CapstoneForme {
   *queryTops() {
-    yield* this.caps()
+    yield* this._caps()
   }
 
   *queryBottoms() {
@@ -253,7 +257,7 @@ class MonoCapstoneForme extends CapstoneForme {
 
 class BiCapstoneForme extends CapstoneForme {
   *queryTops() {
-    const caps = this.caps()
+    const caps = this._caps()
     if (this.specs.isCupolaRotunda()) {
       yield* caps.filter((cap) => cap.type === "rotunda")
     } else {
@@ -262,6 +266,6 @@ class BiCapstoneForme extends CapstoneForme {
   }
 
   *queryBottoms() {
-    yield* this.caps()
+    yield* this._caps()
   }
 }
