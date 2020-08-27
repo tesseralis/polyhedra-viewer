@@ -13,8 +13,8 @@ type SelectState = "selected" | "selectable" | undefined
 export interface AnimationData {
   start: Polyhedron
   endVertices: Vector3[]
-  startColors: FaceType[]
-  endColors: FaceType[]
+  startColors: (FaceType | undefined)[]
+  endColors: (FaceType | undefined)[]
 }
 
 export interface OpResult {

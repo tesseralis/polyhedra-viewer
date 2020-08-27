@@ -178,7 +178,7 @@ export default abstract class CapstoneForme extends BaseForme<Capstone> {
     return null
   }
 
-  normalize(): any {
+  normalize(): this {
     const newGeom = this.geom.withFaces(
       this.geom.faces.map((f) => {
         if (this.isTop(f)) return f
@@ -192,7 +192,7 @@ export default abstract class CapstoneForme extends BaseForme<Capstone> {
         return pivot(f.vertices, pivotVertex)
       }),
     )
-    return CapstoneForme.create(this.specs, newGeom)
+    return CapstoneForme.create(this.specs, newGeom) as any
   }
 
   faceAppearance(face: Face) {

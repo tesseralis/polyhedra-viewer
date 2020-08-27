@@ -5,7 +5,7 @@ import { getGeometry } from "math/operations/operationUtils"
 import { Composite } from "specs"
 import { Polyhedron, Face, Cap } from "math/polyhedra"
 import { getCentroid } from "math/geom"
-import { ClassicalFace, CapstoneFace } from "./FaceType"
+import { FaceType, ClassicalFace, CapstoneFace } from "./FaceType"
 
 type Base = Cap | Face
 
@@ -97,7 +97,7 @@ export default abstract class CompositeForme extends BaseForme<Composite> {
     return false
   }
 
-  normalize(): any {
+  normalize(): this {
     const newGeom = this.geom.withFaces(
       this.geom.faces.map((f) => {
         if (this.isCapTop(f)) return f
@@ -109,10 +109,10 @@ export default abstract class CompositeForme extends BaseForme<Composite> {
         return pivot(f.vertices, pivotVertex)
       }),
     )
-    return CompositeForme.create(this.specs, newGeom)
+    return CompositeForme.create(this.specs, newGeom) as any
   }
 
-  faceAppearance(face: Face): any {
+  faceAppearance(face: Face): FaceType {
     const source = this.specs.sourceClassical()
     const polygonType = this.specs.sourceClassical().isTruncated()
       ? "secondary"
