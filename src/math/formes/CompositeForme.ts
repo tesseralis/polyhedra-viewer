@@ -136,14 +136,14 @@ export default abstract class CompositeForme extends BaseForme<Composite> {
     } else if (this.isDiminished(face)) {
       return classicalFacet(source.data.family, polygonType, "face")
     } else if (this.isCapTop(face)) {
-      return capstoneCapTop(source.data.family, polygonType)
+      return capstoneCapTop(source.data.family)
     } else {
       // augmented cap face
       const cap = find(this.augmentedCaps(), (cap) => face.inSet(cap.faces()))
       const sideColors = face.vertices.map((v) =>
         v.inSet(cap.innerVertices()) ? "top" : "base",
       )
-      return capstoneCapSide(source.data.family, polygonType, sideColors)
+      return capstoneCapSide(source.data.family, sideColors)
     }
   }
 }
@@ -231,7 +231,7 @@ export class AugmentedPrismForme extends CompositeForme {
       const sideColors = face.vertices.map((v) => {
         return v.inSet(cap.innerVertices()) ? "top" : "base"
       })
-      return capstoneCapSide(4, "primary", sideColors)
+      return capstoneCapSide(4, sideColors)
     }
   }
 }

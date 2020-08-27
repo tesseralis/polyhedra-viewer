@@ -11,19 +11,17 @@ interface ClassicalFacet extends BaseClassical {
   facet: FacetType
 }
 
-interface ClassicalEdge extends BaseClassical {
-  faceType: "edge"
-  expansion: PrismaticType
-}
-
-type ClassicalFace = ClassicalFacet | ClassicalEdge
-
 export function classicalFacet(
   family: PrimaryPolygon,
   polygonType: PolygonType,
   facet: FacetType,
 ): ClassicalFace {
   return { type: "classical", faceType: "facet", family, polygonType, facet }
+}
+
+interface ClassicalEdge extends BaseClassical {
+  faceType: "edge"
+  expansion: PrismaticType
 }
 
 export function classicalEdge(
@@ -33,46 +31,64 @@ export function classicalEdge(
   return { type: "classical", faceType: "edge", family, expansion }
 }
 
-interface CapstoneFace {
+type ClassicalFace = ClassicalFacet | ClassicalEdge
+
+interface BaseCapstone {
   type: "capstone"
-  polygonType?: PolygonType
   base: 2 | PrimaryPolygon
-  elongation?: PrismaticType
-  capPosition?: "prism" | "top" | "side"
-  sideColors?: ("top" | "middle" | "base")[]
 }
+
+interface CapstoneElongation extends BaseCapstone {
+  faceType: "elongation"
+  elongation: PrismaticType
+}
+
+interface CapstonePrismBase extends BaseCapstone {
+  faceType: "prism"
+  polygonType: PolygonType
+}
+
+interface CapstoneCapTop extends BaseCapstone {
+  faceType: "top"
+}
+
+interface CapstoneCapSide extends BaseCapstone {
+  faceType: "side"
+  sideColors: ("top" | "middle" | "base")[]
+}
+
+type CapstoneFace =
+  | CapstoneElongation
+  | CapstonePrismBase
+  | CapstoneCapTop
+  | CapstoneCapSide
 
 export function capstoneSide(
   base: 2 | PrimaryPolygon,
   elongation: PrismaticType,
 ): CapstoneFace {
-  return { type: "capstone", base, elongation }
+  return { type: "capstone", faceType: "elongation", base, elongation }
 }
 
 export function capstonePrismBase(
   base: 2 | PrimaryPolygon,
   polygonType: PolygonType,
 ): CapstoneFace {
-  return { type: "capstone", base, polygonType, capPosition: "prism" }
+  return { type: "capstone", faceType: "prism", base, polygonType }
 }
 
-export function capstoneCapTop(
-  base: 2 | PrimaryPolygon,
-  polygonType: PolygonType,
-): CapstoneFace {
-  return { type: "capstone", base, polygonType, capPosition: "top" }
+export function capstoneCapTop(base: 2 | PrimaryPolygon): CapstoneFace {
+  return { type: "capstone", faceType: "top", base }
 }
 
 export function capstoneCapSide(
   base: 2 | PrimaryPolygon,
-  polygonType: PolygonType,
   sideColors: ("top" | "middle" | "base")[],
 ): CapstoneFace {
   return {
     type: "capstone",
+    faceType: "side",
     base,
-    polygonType,
-    capPosition: "side",
     sideColors,
   }
 }

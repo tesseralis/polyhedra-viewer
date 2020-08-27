@@ -70,7 +70,6 @@ export default class FaceLike extends Facet {
   normal() {
     const edge: Edge = find(this.edges, (e) => e.isValid())
     return getNormal([this.centroid(), edge.v1.vec, edge.v2.vec])
-    // return getNormal(this.vectors)
   }
 
   isValid() {

@@ -79,60 +79,62 @@ export function getFaceAppearance(faceType: FaceType): FaceColor {
   }
   if (faceType.type === "capstone") {
     const scheme = colorScheme[faceType.base]
-    if (faceType.capPosition === "prism") {
-      return scheme[faceType.polygonType!].face
-    }
-    if (faceType.capPosition === "top") {
-      return scheme.primary.face
-    }
-    if (faceType.capPosition === "side") {
-      const sideColors = faceType.sideColors!
-      const n = sideColors.length
-      if (n === 3) {
-        return sideColors.map((col) => {
-          switch (col) {
-            case "top":
-              return scheme.light.vertex
-            case "middle":
-              return scheme.primary.vertex
-            case "base":
-              // FIXME base this on the inner color
-              return scheme.secondary.vertex
-            // return scheme.primary.face
-          }
-          throw new Error(`blah`)
-        })
+    switch (faceType.faceType) {
+      case "elongation": {
+        return scheme.edge[faceType.elongation]
       }
-      if (n === 4) {
-        return sideColors.map((col) => {
-          switch (col) {
-            case "top":
-              return scheme.light.face
-            case "base":
-              return scheme.secondary.face
-            default:
-              throw new Error(`Square cap face in rotunda?`)
-          }
-        })
+      case "prism": {
+        return scheme[faceType.polygonType].face
       }
-      if (n === 5) {
-        return sideColors.map((col) => {
-          switch (col) {
-            case "top":
-              return scheme.light.face
-            case "middle":
-              return scheme.primary.face
-            case "base":
-              return scheme.secondary.face
-            default:
-              throw new Error(`blah`)
-          }
-        })
+      case "top": {
+        return scheme.primary.face
       }
-      throw new Error(`Invalid numsides for side face`)
-    }
-    if (faceType.elongation) {
-      return scheme.edge[faceType.elongation]
+      case "side": {
+        const sideColors = faceType.sideColors
+        const n = sideColors.length
+        if (n === 3) {
+          return sideColors.map((col) => {
+            switch (col) {
+              case "top":
+                return scheme.light.vertex
+              case "middle":
+                return scheme.primary.vertex
+              case "base":
+                // FIXME base this on the inner color
+                return scheme.secondary.vertex
+              // return scheme.primary.face
+            }
+            throw new Error(`blah`)
+          })
+        }
+        if (n === 4) {
+          return sideColors.map((col) => {
+            switch (col) {
+              case "top":
+                return scheme.light.face
+              case "base":
+                return scheme.secondary.face
+              default:
+                throw new Error(`Square cap face in rotunda?`)
+            }
+          })
+        }
+        if (n === 5) {
+          return sideColors.map((col) => {
+            switch (col) {
+              case "top":
+                return scheme.light.face
+              case "middle":
+                return scheme.primary.face
+              case "base":
+                return scheme.secondary.face
+              default:
+                throw new Error(`blah`)
+            }
+          })
+        }
+        throw new Error(`Invalid numsides for side face`)
+      }
     }
   }
   throw new Error(`Unknown face type: ${JSON.stringify(faceType)}`)

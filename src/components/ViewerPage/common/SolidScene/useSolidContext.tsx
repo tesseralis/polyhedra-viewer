@@ -70,11 +70,6 @@ export default function useSolidContext() {
     )
   }, [formeColors, transitionColors, operationColors, geom, colors])
 
-  const _normalizedColors = geom.faces.map((f) => ({
-    color: new Color(),
-    material: 0,
-  }))
-
   return {
     colors: normalizedColors,
     solidData: isTransitioning ? solidData! : polyhedron.geom.solidData,

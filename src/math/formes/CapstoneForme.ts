@@ -211,13 +211,13 @@ export default abstract class CapstoneForme extends BaseForme<Capstone> {
       return capstonePrismBase(base, polygonType)
     }
     if (this.isTop(face)) {
-      return capstoneCapTop(base, polygonType)
+      return capstoneCapTop(base)
     }
     const cap = this.containingEnd(face) as Cap
     const sideColors = face.vertices.map((v) =>
       v.inSet(cap.innerVertices()) ? "top" : "base",
     )
-    return capstoneCapSide(base, polygonType, sideColors)
+    return capstoneCapSide(base, sideColors)
   }
 }
 

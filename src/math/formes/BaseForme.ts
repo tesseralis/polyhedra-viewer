@@ -82,6 +82,7 @@ export default abstract class BaseForme<Specs extends PolyhedronSpecs> {
   // Face Facets
   // ===========
   // A set of methods for getting the "facets" of polyhedral faces
+  // TODO make this a mixin instead!
 
   /**
    * Return whether the given face is a `face` facet or a `vertex` facet.
