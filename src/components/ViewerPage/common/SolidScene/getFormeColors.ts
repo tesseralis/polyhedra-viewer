@@ -69,6 +69,7 @@ export function mixColor(appearance: Appearance, mixer: (c: Color) => Color) {
 export function getFaceAppearance(faceType: FaceType): FaceColor {
   if (faceType.type === "classical") {
     const scheme = colorScheme[faceType.family]
+    // TODO lol rename this!!
     if (faceType.faceType === "facet") {
       // TODO primary material
       return scheme[faceType.polygonType][faceType.facet]
@@ -102,9 +103,9 @@ export function getFaceAppearance(faceType: FaceType): FaceColor {
               case "base":
                 // FIXME base this on the inner color
                 return scheme.secondary.vertex
-              // return scheme.primary.face
+              default:
+                throw new Error(`Impossible`)
             }
-            throw new Error(`blah`)
           })
         }
         if (n === 4) {
