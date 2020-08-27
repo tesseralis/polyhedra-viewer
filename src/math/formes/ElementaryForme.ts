@@ -26,6 +26,8 @@ export default abstract class ElementaryForme extends BaseForme<Elementary> {
         throw new Error(`Undefined specs: ${specs.name()}`)
     }
   }
+
+  // TODO decide on the right face colors for this
   faceAppearance(face: Face) {
     return ClassicalFace.facet(3, "primary", "face")
   }
