@@ -1,7 +1,6 @@
 import { Polyhedron, Vertex, Face } from "math/polyhedra"
 import Operation, { OpResult } from "./Operation"
 import { PolyhedronForme, fromName } from "math/formes"
-import { features } from "process"
 
 interface OpTestCases {
   pass: string[]
