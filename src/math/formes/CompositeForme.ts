@@ -129,7 +129,7 @@ export default abstract class CompositeForme extends BaseForme<Composite> {
       const facet = this.getFacet(face)
       const polygonType = face.numSides > 5 ? "secondary" : "primary"
       if (facet) {
-        return classicalFacet(source.data.family, polygonType, "face")
+        return classicalFacet(source.data.family, polygonType, facet)
       } else {
         return classicalEdge(source.data.family, "prism")
       }
