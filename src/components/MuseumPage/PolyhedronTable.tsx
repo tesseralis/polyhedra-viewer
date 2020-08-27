@@ -1,14 +1,15 @@
 import { pick } from "lodash-es"
 import React, { useRef, useState } from "react"
 import { Table } from "tables"
-import PolyhedronModel from "components/ViewerPage/common/SolidScene/PolyhedronModel"
 import ConfigCtx from "components/ConfigCtx"
 import { fromSpecs } from "math/formes"
 
 import { useFrame } from "react-three-fiber"
+// FIXME edit these imports
 import getFormeColors, {
   mixColor,
 } from "components/ViewerPage/common/SolidScene/getFormeColors"
+import PolyhedronModel from "components/ViewerPage/common/SolidScene/PolyhedronModel"
 
 const rowSpacing = 2
 const colSpacing = 7
@@ -28,10 +29,8 @@ function PolyhedronEntry({ entry, position, navigate }: any) {
   // TODO might as well make this an official method
   // (it returns false for gyrobifastigium)
   const isDupe = entry.name() !== entry.canonicalName()
-  // const geom = getGeometry(entry)
   const forme = fromSpecs(entry)
   const geom = forme.orient()
-  // const geom = forme.geom
 
   const config = ConfigCtx.useState()
   const faceColors = geom.faces.map((face) => {
