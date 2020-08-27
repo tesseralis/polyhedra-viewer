@@ -60,6 +60,8 @@ function InnerProvider({ children }: ChildrenProp) {
       }
 
       const { start, endVertices, startColors, endColors } = animationData
+      // TODO I *think* we have to do this for duals;
+      // remove this when we have some way to fill the duals in.
       const startFaceColors = startColors.map((c) =>
         c ? getFaceAppearance(c) : new Color(),
       )

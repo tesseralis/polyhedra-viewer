@@ -6,32 +6,32 @@ interface BaseClassical {
 }
 
 interface ClassicalFacet extends BaseClassical {
-  faceType: "facet"
+  subtype: "facet"
   polygonType: PolygonType
   facet: FacetType
 }
+
+interface ClassicalEdge extends BaseClassical {
+  subtype: "edge"
+  expansion: PrismaticType
+}
+
+type ClassicalFace = ClassicalFacet | ClassicalEdge
 
 export function classicalFacet(
   family: PrimaryPolygon,
   polygonType: PolygonType,
   facet: FacetType,
 ): ClassicalFace {
-  return { type: "classical", faceType: "facet", family, polygonType, facet }
-}
-
-interface ClassicalEdge extends BaseClassical {
-  faceType: "edge"
-  expansion: PrismaticType
+  return { type: "classical", subtype: "facet", family, polygonType, facet }
 }
 
 export function classicalEdge(
   family: PrimaryPolygon,
   expansion: PrismaticType,
 ): ClassicalFace {
-  return { type: "classical", faceType: "edge", family, expansion }
+  return { type: "classical", subtype: "edge", family, expansion }
 }
-
-type ClassicalFace = ClassicalFacet | ClassicalEdge
 
 interface BaseCapstone {
   type: "capstone"

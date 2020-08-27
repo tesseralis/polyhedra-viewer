@@ -69,8 +69,7 @@ export function mixColor(appearance: Appearance, mixer: (c: Color) => Color) {
 export function getFaceAppearance(faceType: FaceType): FaceColor {
   if (faceType.type === "classical") {
     const scheme = colorScheme[faceType.family]
-    // TODO lol rename this!!
-    if (faceType.faceType === "facet") {
+    if (faceType.subtype === "facet") {
       // TODO primary material
       return scheme[faceType.polygonType][faceType.facet]
     } else {

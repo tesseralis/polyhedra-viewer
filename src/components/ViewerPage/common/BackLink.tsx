@@ -9,12 +9,6 @@ interface Props {
 }
 
 export default function BackLink({ solid }: Props) {
-  return (
-    <IconLink
-      iconOnly
-      iconName={mdiChevronLeft}
-      title="Back"
-      to={`/#${escape(solid)}`}
-    />
-  )
+  // TODO focus on the correct solid through URL state
+  return <IconLink iconOnly iconName={mdiChevronLeft} title="Back" to="/" />
 }
