@@ -1,5 +1,4 @@
 import { pick } from "lodash-es"
-import { Color } from "three"
 import React, { useRef, useState } from "react"
 import { Table } from "tables"
 import PolyhedronModel from "components/ViewerPage/common/SolidScene/PolyhedronModel"
@@ -37,10 +36,6 @@ function PolyhedronEntry({ entry, position, navigate }: any) {
   const config = ConfigCtx.useState()
   const faceColors = geom.faces.map((face) => {
     let color = getFormeColors(forme, face)
-    // let color: any = {
-    //   color: new Color(),
-    //   material: 0,
-    // }
     // if (isDupe) {
     //   color = mixColor(color, (c) => c.clone().offsetHSL(0, -0.25, 0.2))
     // }

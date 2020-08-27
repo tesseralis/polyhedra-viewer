@@ -5,7 +5,7 @@ import { Polyhedron, Face } from "math/polyhedra"
 import { angleBetween } from "math/geom"
 import { getGeometry, oppositeFace } from "math/operations/operationUtils"
 import BaseForme from "./BaseForme"
-import { classicalFacet, classicalEdge } from "./FaceType"
+import { ClassicalFace } from "./FaceType"
 
 export default abstract class ClassicalForme extends BaseForme<Classical> {
   static create(specs: Classical, geom: Polyhedron) {
@@ -140,10 +140,10 @@ export default abstract class ClassicalForme extends BaseForme<Classical> {
     const facet = this.getFacet(face)
     if (facet) {
       const polygonType = face.numSides > 5 ? "secondary" : "primary"
-      return classicalFacet(this.specs.data.family, polygonType, facet)
+      return ClassicalFace.facet(this.specs.data.family, polygonType, facet)
     } else {
       const expansion = face.numSides === 3 ? "antiprism" : "prism"
-      return classicalEdge(this.specs.data.family, expansion)
+      return ClassicalFace.edge(this.specs.data.family, expansion)
     }
   }
 }

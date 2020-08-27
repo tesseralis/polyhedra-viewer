@@ -1,6 +1,5 @@
 import React from "react"
 import { mdiChevronLeft } from "@mdi/js"
-import { escape } from "utils"
 
 import IconLink from "./IconLink"
 

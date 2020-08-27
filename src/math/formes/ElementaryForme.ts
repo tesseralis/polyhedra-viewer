@@ -3,7 +3,7 @@ import BaseForme from "./BaseForme"
 import { Polyhedron, Face } from "math/polyhedra"
 import { find } from "utils"
 import { isEqual } from "lodash-es"
-import { classicalFacet } from "./FaceType"
+import { ClassicalFace } from "./FaceType"
 
 export default abstract class ElementaryForme extends BaseForme<Elementary> {
   static create(specs: Elementary, geom: Polyhedron) {
@@ -27,7 +27,7 @@ export default abstract class ElementaryForme extends BaseForme<Elementary> {
     }
   }
   faceAppearance(face: Face) {
-    return classicalFacet(3, "primary", "face")
+    return ClassicalFace.facet(3, "primary", "face")
   }
 }
 

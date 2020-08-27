@@ -5,12 +5,7 @@ import { Capstone } from "specs"
 import { Polyhedron, Face, Edge, Cap, FaceLike, Facet } from "math/polyhedra"
 import { getCentroid } from "math/geom"
 import { getGeometry } from "math/operations/operationUtils"
-import {
-  capstoneSide,
-  capstonePrismBase,
-  capstoneCapTop,
-  capstoneCapSide,
-} from "./FaceType"
+import { CapstoneFace } from "./FaceType"
 
 type CapstoneEnd = Facet
 
@@ -204,20 +199,23 @@ export default abstract class CapstoneForme extends BaseForme<Capstone> {
     const base = this.specs.data.base
     const polygonType = this.specs.data.type
     if (this.isSideFace(face)) {
-      return capstoneSide(base, face.numSides === 3 ? "antiprism" : "prism")
+      return CapstoneFace.side(
+        base,
+        face.numSides === 3 ? "antiprism" : "prism",
+      )
     }
     // otherwise it's a cap face
     if (this.isEndFace(face)) {
-      return capstonePrismBase(base, polygonType)
+      return CapstoneFace.prismBase(base, polygonType)
     }
     if (this.isTop(face)) {
-      return capstoneCapTop(base)
+      return CapstoneFace.capTop(base)
     }
     const cap = this.containingEnd(face) as Cap
     const sideColors = face.vertices.map((v) =>
       v.inSet(cap.innerVertices()) ? "top" : "base",
     )
-    return capstoneCapSide(base, sideColors)
+    return CapstoneFace.capSide(base, sideColors)
   }
 }
 

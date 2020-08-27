@@ -5,14 +5,7 @@ import { getGeometry } from "math/operations/operationUtils"
 import { Composite } from "specs"
 import { Polyhedron, Face, Cap } from "math/polyhedra"
 import { getCentroid } from "math/geom"
-import {
-  classicalFacet,
-  classicalEdge,
-  capstoneCapTop,
-  capstoneCapSide,
-  capstonePrismBase,
-  capstoneSide,
-} from "./FaceType"
+import { ClassicalFace, CapstoneFace } from "./FaceType"
 
 type Base = Cap | Face
 
@@ -129,21 +122,21 @@ export default abstract class CompositeForme extends BaseForme<Composite> {
       const facet = this.getFacet(face)
       const polygonType = face.numSides > 5 ? "secondary" : "primary"
       if (facet) {
-        return classicalFacet(source.data.family, polygonType, facet)
+        return ClassicalFace.facet(source.data.family, polygonType, facet)
       } else {
-        return classicalEdge(source.data.family, "prism")
+        return ClassicalFace.edge(source.data.family, "prism")
       }
     } else if (this.isDiminished(face)) {
-      return classicalFacet(source.data.family, polygonType, "face")
+      return ClassicalFace.facet(source.data.family, polygonType, "face")
     } else if (this.isCapTop(face)) {
-      return capstoneCapTop(source.data.family)
+      return CapstoneFace.capTop(source.data.family)
     } else {
       // augmented cap face
       const cap = find(this.augmentedCaps(), (cap) => face.inSet(cap.faces()))
       const sideColors = face.vertices.map((v) =>
         v.inSet(cap.innerVertices()) ? "top" : "base",
       )
-      return capstoneCapSide(source.data.family, sideColors)
+      return CapstoneFace.capSide(source.data.family, sideColors)
     }
   }
 }
@@ -223,15 +216,15 @@ export class AugmentedPrismForme extends CompositeForme {
   faceAppearance(face: Face) {
     const source = this.specs.sourcePrism()
     if (this.isEndFace(face)) {
-      return capstonePrismBase(source.data.base, source.data.type)
+      return CapstoneFace.prismBase(source.data.base, source.data.type)
     } else if (this.isSideFace(face)) {
-      return capstoneSide(source.data.base, "prism")
+      return CapstoneFace.side(source.data.base, "prism")
     } else {
       const cap = find(this.caps(), (cap) => face.inSet(cap.faces()))
       const sideColors = face.vertices.map((v) => {
         return v.inSet(cap.innerVertices()) ? "top" : "base"
       })
-      return capstoneCapSide(4, sideColors)
+      return CapstoneFace.capSide(4, sideColors)
     }
   }
 }
@@ -426,11 +419,12 @@ export class GyrateSolidForme extends CompositeForme {
 
   faceAppearance(face: Face) {
     const source = this.specs.sourceClassical()
+    // TODO distinguish this in some way
     if (this.isGyrateFace(face)) {
       if (face.numSides === 4) {
-        return classicalEdge(source.data.family, "prism")
+        return ClassicalFace.edge(source.data.family, "prism")
       }
-      return classicalFacet(
+      return ClassicalFace.facet(
         source.data.family,
         "primary",
         face.numSides === 5 ? "face" : "vertex",
