@@ -58,13 +58,6 @@ function PolyhedronEntry({ entry, position, navigate }: any) {
         appearance={faceColors}
         config={pick(config, ["showFaces", "showEdges", "showInnerFaces"])}
       />
-      {/* <mesh position={[0, -2, 0]}>
-        <cylinderBufferGeometry
-          attach="geometry"
-          args={[1.25, 1.5, 0.1, 50, 1]}
-        />
-        <meshPhongMaterial attach="material" color="#ad9b13" />
-      </mesh> */}
     </group>
   )
 }

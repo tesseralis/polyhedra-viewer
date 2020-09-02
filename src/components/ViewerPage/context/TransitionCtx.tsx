@@ -10,7 +10,23 @@ import PolyhedronCtx from "./PolyhedronCtx"
 import transition from "transition"
 import { Polyhedron, SolidData } from "math/polyhedra"
 import { AnimationData } from "math/operations"
-import { getFaceAppearance } from "components/ViewerPage/common/SolidScene/getFormeColors"
+import {
+  FaceColor,
+  getFaceAppearance,
+} from "components/ViewerPage/common/SolidScene/getFormeColors"
+
+function normFaceColor(col: FaceColor) {
+  return col instanceof Color ? [col, col, col] : col
+}
+
+function interpFaceColors(col1: FaceColor, col2: FaceColor, t: number) {
+  if (col1 instanceof Color && col2 instanceof Color) {
+    return col1.clone().lerp(col2, t)
+  }
+  const _col1 = normFaceColor(col1)
+  const _col2 = normFaceColor(col2)
+  return _col1.map((c, j) => c.clone().lerp(_col2[j], t))
+}
 
 const defaultState = {
   solidData: undefined,
@@ -68,17 +84,13 @@ function InnerProvider({ children }: ChildrenProp) {
       const endFaceColors = endColors.map((c) =>
         c ? getFaceAppearance(c) : new Color(),
       )
+
+      // console.log({ startFaceColors, endFaceColors })
       anim.set(start.solidData, startFaceColors)
       function lerpColors(t: number) {
-        return startFaceColors.map((color, i) => {
-          if (color instanceof Color) {
-            return color.clone().lerp(endFaceColors[i] as any, t)
-          } else {
-            return color.map((c, j) =>
-              c.clone().lerp((endFaceColors[i] as any)[j], t),
-            )
-          }
-        })
+        return startFaceColors.map((color, i) =>
+          interpFaceColors(color, endFaceColors[i], t),
+        )
       }
       transitionId.current = transition(
         {

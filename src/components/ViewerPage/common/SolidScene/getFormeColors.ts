@@ -2,7 +2,7 @@ import { Color } from "three"
 import { PolyhedronForme as Forme, FaceType } from "math/formes"
 import { Face } from "math/polyhedra"
 
-type FaceColor = Color | Color[]
+export type FaceColor = Color | Color[]
 
 export interface Appearance {
   color: FaceColor

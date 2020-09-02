@@ -94,7 +94,9 @@ function fillDefaults<Options extends {}, Specs extends PolyhedronSpecs>(
 
 function getSourceAppearances(geom: Polyhedron, base: Forme) {
   return geom.faces.map((face, i) => {
+    // Ignore invalid faces
     if (face.edges.filter((e) => e.isValid()).length < 3) return undefined
+    // TODO alignment when augmenting/diminishing
     const aligned = base.geom.faces.find((f) => f.isAligned(face))
     if (!aligned) {
       return undefined
