@@ -1,7 +1,7 @@
 import { Classical, oppositeFacet, FacetType } from "specs"
 import { makeOpPair } from "../operationPairs"
 import { Pose, getTransformedVertices } from "../operationUtils"
-import { ClassicalForme } from "math/formes"
+import { ClassicalForme, fromSpecs } from "math/formes"
 
 function getPose(forme: ClassicalForme, facet: FacetType, scale: number): Pose {
   const { geom } = forme
@@ -22,7 +22,7 @@ function getCantellatedMidradius(forme: ClassicalForme) {
  * Take the cantellated intermediate solid and convert it to either dual
  */
 function doDualTransform(forme: ClassicalForme, result: Classical) {
-  const resultForme = ClassicalForme.fromSpecs(result)
+  const resultForme = fromSpecs(result)
   const resultSideLength =
     getCantellatedMidradius(forme) / resultForme.midradius()
   const scale = resultSideLength * resultForme.circumradius()

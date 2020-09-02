@@ -65,15 +65,13 @@ export function mixColor(appearance: Appearance, mixer: (c: Color) => Color) {
   }
 }
 
-// TODO this is still REALLY UGLY and I dunno what to do for cap faces
+// TODO return materials
 export function getFaceAppearance(faceType: FaceType): FaceColor {
   if (faceType.type === "classical") {
     const scheme = colorScheme[faceType.family]
     if (faceType.subtype === "facet") {
-      // TODO primary material
       return scheme[faceType.polygonType][faceType.facet]
     } else {
-      // TODO secondary material
       return scheme.edge[faceType.expansion]
     }
   }

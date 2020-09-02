@@ -35,8 +35,9 @@ function PolyhedronEntry({ entry, position, navigate }: any) {
   const config = ConfigCtx.useState()
   const faceColors = geom.faces.map((face) => {
     let color = getFormeColors(forme, face)
+    // FIXME desaturate if it's a duplicate
     // if (isDupe) {
-    //   color = mixColor(color, (c) => c.clone().offsetHSL(0, -0.25, 0.2))
+    //   color = mixColor(color, (c) => c.clone().offsetHSL(0, -0.25, -0.1))
     // }
     if (hovered) {
       color = mixColor(color, (c) => c.clone().offsetHSL(0, 0, 0.2))

@@ -86,7 +86,6 @@ function InnerProvider({ children }: ChildrenProp) {
         c ? getFaceAppearance(c) : new Color(),
       )
 
-      console.log({ startFaceColors, endFaceColors })
       anim.set(start.solidData, startFaceColors)
       function lerpColors(t: number) {
         return startFaceColors.map((color, i) =>

@@ -9,7 +9,7 @@ import { getGeometry } from "math/operations/operationUtils"
 import { Polyhedron } from "math/polyhedra"
 
 // TODO figure out how to return the right forme without the `any` cast
-// FIXME figure out the right place to normalize solids
+// TODO figure out the most optimal place to normalize solids
 export default function createForme<S extends PolyhedronSpecs>(
   specs: S,
   geom: Polyhedron,
