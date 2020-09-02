@@ -7,7 +7,6 @@ import getFormeColors, { Appearance, mixColor, lighten } from "./getFormeColors"
 
 // Hook that takes data from Polyhedron and Animation states and decides which to use.
 export default function useSolidContext() {
-  const { enableFormeColors, colors } = Config.useState()
   const polyhedron = PolyhedronCtx.useState()
 
   const {
@@ -33,12 +32,11 @@ export default function useSolidContext() {
   )
 
   const formeColors = useMemo(() => {
-    if (!enableFormeColors) return
     // FIXME not this isn't working right now
     return polyhedron.geom.faces.map((f) =>
       getSelectionColor(f, getFormeColors(polyhedron, f)),
     )
-  }, [polyhedron, enableFormeColors, getSelectionColor])
+  }, [polyhedron, getSelectionColor])
 
   // Colors when animation is being applied
   const transitionColors = useMemo(() => {
@@ -52,11 +50,11 @@ export default function useSolidContext() {
   const operationColors = useMemo(() => {
     return geom.faces.map((face) =>
       getSelectionColor(face, {
-        color: new Color(colors[face.numSides]) || new Color(),
+        color: new Color(),
         material: 0,
       }),
     )
-  }, [colors, geom.faces, getSelectionColor])
+  }, [geom.faces, getSelectionColor])
 
   const normalizedColors: Appearance[] = useMemo(() => {
     return (
@@ -64,11 +62,11 @@ export default function useSolidContext() {
       formeColors ||
       operationColors ||
       geom.faces.map((f) => ({
-        color: new Color(colors[f.numSides]),
+        color: new Color(),
         material: 0,
       }))
     )
-  }, [formeColors, transitionColors, operationColors, geom, colors])
+  }, [formeColors, transitionColors, operationColors, geom])
 
   return {
     colors: normalizedColors,
