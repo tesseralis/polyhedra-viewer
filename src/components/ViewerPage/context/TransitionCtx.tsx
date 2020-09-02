@@ -16,7 +16,8 @@ import {
 } from "components/ViewerPage/common/SolidScene/getFormeColors"
 
 function normFaceColor(col: FaceColor) {
-  return col instanceof Color ? [col, col, col] : col
+  // FIXME use a generator or something for the repetition
+  return col instanceof Color ? [col, col, col, col] : col
 }
 
 function interpFaceColors(col1: FaceColor, col2: FaceColor, t: number) {
@@ -85,7 +86,7 @@ function InnerProvider({ children }: ChildrenProp) {
         c ? getFaceAppearance(c) : new Color(),
       )
 
-      // console.log({ startFaceColors, endFaceColors })
+      console.log({ startFaceColors, endFaceColors })
       anim.set(start.solidData, startFaceColors)
       function lerpColors(t: number) {
         return startFaceColors.map((color, i) =>
