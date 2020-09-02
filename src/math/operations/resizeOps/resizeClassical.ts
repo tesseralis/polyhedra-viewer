@@ -6,7 +6,7 @@ import {
   TwistOpts,
   Pose,
 } from "../operationUtils"
-import { ClassicalForme } from "math/formes"
+import { ClassicalForme, fromSpecs } from "math/formes"
 
 /**
  * Return the expanded vertices of the polyhedron resized to the given distance-from-center
@@ -21,7 +21,7 @@ function getResizedVertices(
   facet: FacetType,
   result: Classical,
 ) {
-  const resultForme = ClassicalForme.fromSpecs(result)
+  const resultForme = fromSpecs(result)
   const angle = forme.snubAngle(facet)
   const distance = resultForme.inradius(facet) / resultForme.geom.edgeLength()
   const scale = forme.geom.edgeLength() * distance - forme.inradius(facet)

@@ -17,7 +17,6 @@ export default function ViewerScene() {
       <PerspectiveCamera makeDefault position={[0, 0, 5]}>
         <pointLight />
       </PerspectiveCamera>
-      <ambientLight />
       <ThreePolyhedron
         value={solidData}
         appearance={colors}

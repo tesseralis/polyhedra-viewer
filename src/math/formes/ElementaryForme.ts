@@ -1,10 +1,11 @@
 import { Elementary } from "specs"
 import BaseForme from "./BaseForme"
-import { Polyhedron } from "math/polyhedra"
+import { Polyhedron, Face } from "math/polyhedra"
 import { find } from "utils"
 import { isEqual } from "lodash-es"
+import { ClassicalFace } from "./FaceType"
 
-export default class ElementaryForme extends BaseForme<Elementary> {
+export default abstract class ElementaryForme extends BaseForme<Elementary> {
   static create(specs: Elementary, geom: Polyhedron) {
     switch (specs.name()) {
       case "sphenocorona":
@@ -24,6 +25,11 @@ export default class ElementaryForme extends BaseForme<Elementary> {
       default:
         throw new Error(`Undefined specs: ${specs.name()}`)
     }
+  }
+
+  // TODO decide on the right face colors for this
+  faceAppearance(face: Face) {
+    return ClassicalFace.facet(3, "primary", "face")
   }
 }
 

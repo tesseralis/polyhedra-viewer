@@ -10,10 +10,23 @@ import PolyhedronCtx from "./PolyhedronCtx"
 import transition from "transition"
 import { Polyhedron, SolidData } from "math/polyhedra"
 import { AnimationData } from "math/operations"
+import {
+  FaceColor,
+  getFaceAppearance,
+} from "components/ViewerPage/common/SolidScene/getFormeColors"
 
-// Get the colors for each face given our current configuration
-function getFaceColors(mapping: number[], colors: any) {
-  return mapping.map((f) => new Color(colors[f]))
+function normFaceColor(col: FaceColor) {
+  // FIXME use a generator or something for the repetition
+  return col instanceof Color ? [col, col, col, col] : col
+}
+
+function interpFaceColors(col1: FaceColor, col2: FaceColor, t: number) {
+  if (col1 instanceof Color && col2 instanceof Color) {
+    return col1.clone().lerp(col2, t)
+  }
+  const _col1 = normFaceColor(col1)
+  const _col2 = normFaceColor(col2)
+  return _col1.map((c, j) => c.clone().lerp(_col2[j], t))
 }
 
 const defaultState = {
@@ -23,7 +36,7 @@ const defaultState = {
 }
 interface State {
   solidData?: SolidData
-  faceColors?: any[]
+  faceColors?: Color[]
   isTransitioning: boolean
 }
 const InterpModel = createHookedContext<State, "set" | "reset">(
@@ -44,7 +57,7 @@ function InnerProvider({ children }: ChildrenProp) {
   const transitionId = useRef<ReturnType<typeof transition> | null>(null)
   const { setPolyhedron } = PolyhedronCtx.useActions()
   const config = Config.useState()
-  const { colors, animationSpeed, enableAnimation } = config
+  const { animationSpeed, enableAnimation } = config
   const anim = InterpModel.useActions()
 
   // Cancel the animation if the component we're a part of gets rerendered.
@@ -64,12 +77,19 @@ function InnerProvider({ children }: ChildrenProp) {
       }
 
       const { start, endVertices, startColors, endColors } = animationData
-      const startFaceColors = getFaceColors(startColors, colors)
-      const endFaceColors = getFaceColors(endColors, colors)
+      // TODO I *think* we have to do this for duals;
+      // remove this when we have some way to fill the duals in.
+      const startFaceColors = startColors.map((c) =>
+        c ? getFaceAppearance(c) : new Color(),
+      )
+      const endFaceColors = endColors.map((c) =>
+        c ? getFaceAppearance(c) : new Color(),
+      )
+
       anim.set(start.solidData, startFaceColors)
       function lerpColors(t: number) {
         return startFaceColors.map((color, i) =>
-          color.clone().lerp(endFaceColors[i], t),
+          interpFaceColors(color, endFaceColors[i], t),
         )
       }
       transitionId.current = transition(
@@ -95,7 +115,7 @@ function InnerProvider({ children }: ChildrenProp) {
         },
       )
     },
-    [anim, animationSpeed, colors, enableAnimation, setPolyhedron],
+    [anim, animationSpeed, enableAnimation, setPolyhedron],
   )
 
   return (

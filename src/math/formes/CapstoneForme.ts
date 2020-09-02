@@ -1,20 +1,23 @@
+import { find, pivot } from "utils"
 import { once } from "lodash"
 import BaseForme from "./BaseForme"
-import { Capstone, FacetType } from "specs"
+import { Capstone } from "specs"
 import { Polyhedron, Face, Edge, Cap, FaceLike, Facet } from "math/polyhedra"
 import { getCentroid } from "math/geom"
 import { getGeometry } from "math/operations/operationUtils"
+import { CapstoneFace } from "./FaceType"
 
 type CapstoneEnd = Facet
 
 // TODO add more useful functions here
 export default abstract class CapstoneForme extends BaseForme<Capstone> {
   static create(specs: Capstone, geom: Polyhedron) {
+    if (specs.isSnub()) {
+      return new SnubCapstoneForme(specs, geom)
+    }
     switch (specs.data.count) {
       case 0:
-        return specs.isSnub()
-          ? new SnubCapstoneForme(specs, geom)
-          : new PrismaticForme(specs, geom)
+        return new PrismaticForme(specs, geom)
       case 1:
         return new MonoCapstoneForme(specs, geom)
       case 2:
@@ -66,12 +69,16 @@ export default abstract class CapstoneForme extends BaseForme<Capstone> {
     }
   }
 
-  protected caps = once(() => {
+  _caps = once(() => {
     return this.geom.caps(this.capOpts())
   })
 
   endCaps() {
     return this.ends().filter((end) => end instanceof Cap) as Cap[]
+  }
+
+  caps() {
+    return this.endCaps()
   }
 
   isEndCap(cap: Cap) {
@@ -147,36 +154,72 @@ export default abstract class CapstoneForme extends BaseForme<Capstone> {
     return getCentroid(this.ends().map((end) => end.centroid()))
   }
 
-  // Utilities for determining "facet faces" analogous to thoes in classical formes
-  // TODO these should only work with elongated orthobicupolae
-  // TODO deduplicate these functions with ClassicalForme
-
-  isFacetFace(face: Face, facet: FacetType) {
-    if (facet === "face") {
-      return (
-        this.isTop(face) ||
-        (this.isSideFace(face) &&
-          face.adjacentFaces().every((f) => f.numSides === 4))
-      )
-    } else {
-      return (
-        this.isContainedInEnd(face) && face.numSides === 3 && !this.isTop(face)
-      )
-    }
-  }
-
-  facetFaces(facet: FacetType) {
-    return this.geom.faces.filter((f) => this.isFacetFace(f, facet))
+  hasFaceFacets() {
+    const specs = this.specs
+    // Return only the solids for which we can calculate the duals
+    if (specs.isPrism() && specs.isPrimary()) return true
+    if (specs.isPyramid() && specs.isBi()) return true
+    if (specs.isCupola() && specs.isBi() && specs.isOrtho()) return true
+    return false
   }
 
   getFacet(face: Face) {
-    if (this.isFacetFace(face, "face")) return "face"
-    if (this.isFacetFace(face, "vertex")) return "vertex"
+    if (!this.hasFaceFacets()) return super.getFacet(face)
+    if (
+      this.isTop(face) ||
+      (this.isSideFace(face) &&
+        face.adjacentFaces().every((f) => f.numSides === 4))
+    ) {
+      return "face"
+    }
+    if (
+      this.isContainedInEnd(face) &&
+      face.numSides === 3 &&
+      !this.isTop(face)
+    ) {
+      return "vertex"
+    }
     return null
   }
 
-  isAnyFacetFace(face: Face) {
-    return this.isFacetFace(face, "face") || this.isFacetFace(face, "vertex")
+  normalize(): this {
+    const newGeom = this.geom.withFaces(
+      this.geom.faces.map((f) => {
+        if (this.isTop(f)) return f
+        const end = this.containingEnd(f)
+        if (!end) return f
+        if (end instanceof Face) return f
+        const cap = end as Cap
+        const pivotVertex = find(f.vertices, (v) =>
+          v.inSet(cap.innerVertices()),
+        )
+        return pivot(f.vertices, pivotVertex)
+      }),
+    )
+    return CapstoneForme.create(this.specs, newGeom) as any
+  }
+
+  faceAppearance(face: Face) {
+    const base = this.specs.data.base
+    const polygonType = this.specs.data.type
+    if (this.isSideFace(face)) {
+      return CapstoneFace.side(
+        base,
+        face.numSides === 3 ? "antiprism" : "prism",
+      )
+    }
+    // otherwise it's a cap face
+    if (this.isEndFace(face)) {
+      return CapstoneFace.prismBase(base, polygonType)
+    }
+    if (this.isTop(face)) {
+      return CapstoneFace.capTop(base)
+    }
+    const cap = this.containingEnd(face) as Cap
+    const sideColors = face.vertices.map((v) =>
+      v.inSet(cap.innerVertices()) ? "top" : "base",
+    )
+    return CapstoneFace.capSide(base, sideColors)
   }
 }
 
@@ -204,7 +247,7 @@ class SnubCapstoneForme extends CapstoneForme {
 
 class MonoCapstoneForme extends CapstoneForme {
   *queryTops() {
-    yield* this.caps()
+    yield* this._caps()
   }
 
   *queryBottoms() {
@@ -214,7 +257,7 @@ class MonoCapstoneForme extends CapstoneForme {
 
 class BiCapstoneForme extends CapstoneForme {
   *queryTops() {
-    const caps = this.caps()
+    const caps = this._caps()
     if (this.specs.isCupolaRotunda()) {
       yield* caps.filter((cap) => cap.type === "rotunda")
     } else {
@@ -223,6 +266,6 @@ class BiCapstoneForme extends CapstoneForme {
   }
 
   *queryBottoms() {
-    yield* this.caps()
+    yield* this._caps()
   }
 }

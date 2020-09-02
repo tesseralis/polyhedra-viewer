@@ -1,6 +1,5 @@
 import { FacetType } from "specs"
 import { getSpecs } from "specs"
-import { Polyhedron } from "math/polyhedra"
 import { OpName, operations } from "math/operations"
 import { PolyhedronForme, createForme, fromName } from "math/formes"
 import { validateOperationApplication } from "../operationTestUtils"
@@ -8,10 +7,7 @@ import { validateOperationApplication } from "../operationTestUtils"
 interface Args {
   face?: number
   facet?: FacetType
-  cap?: {
-    type: "primary" | "secondary"
-    base: 2 | 3 | 4 | 5
-  }
+  cap?: boolean
 }
 
 type ChainedOpName = OpName | "forme"
@@ -26,18 +22,18 @@ interface OpInfoObject {
 type OpInfo = OpInfoArray | OpInfoObject
 
 // Translate the test argument into an operation argument
-function getArgs(args: Args, polyhedron: Polyhedron) {
+function getArgs(args: Args, polyhedron: PolyhedronForme) {
   if (args.face) {
-    return { ...args, face: polyhedron.faceWithNumSides(args.face) }
+    return { ...args, face: polyhedron.geom.faceWithNumSides(args.face) }
   }
   if (args.cap) {
     // TODO support cupolae
-    return { ...args, cap: polyhedron.caps(args.cap)[0] }
+    return { ...args, cap: polyhedron.caps()[0] }
   }
   return args
 }
 
-function getOpInfo(opInfo: OpInfo, polyhedron: Polyhedron) {
+function getOpInfo(opInfo: OpInfo, polyhedron: PolyhedronForme) {
   if (Array.isArray(opInfo)) {
     const [op, expected] = opInfo
     return { op, expected }
@@ -54,6 +50,7 @@ interface OpTest {
   description: string
   start: string
   operations: OpInfo[]
+  skip?: boolean
 }
 
 const chainedTests: OpTest[] = [
@@ -64,7 +61,7 @@ const chainedTests: OpTest[] = [
       { op: "augment", args: { face: 4 }, expected: "square bipyramid" },
       {
         op: "diminish",
-        args: { cap: { type: "primary", base: 4 } },
+        args: { cap: true },
         expected: "square pyramid",
       },
       ["elongate", "elongated square pyramid"],
@@ -92,7 +89,7 @@ const chainedTests: OpTest[] = [
         expected: "gyroelongated pentagonal bipyramid",
       },
       ["forme", "snub tetratetrahedron"],
-      ["contract", "tetrahedron"],
+      { op: "contract", args: { facet: "face" }, expected: "tetrahedron" },
     ],
   },
   {
@@ -142,7 +139,7 @@ const chainedTests: OpTest[] = [
       ["expand", "rhombicosidodecahedron"],
       {
         op: "diminish",
-        args: { cap: { type: "secondary", base: 5 } },
+        args: { cap: true },
         expected: "diminished rhombicosidodecahedron",
       },
     ],
@@ -154,7 +151,7 @@ const chainedTests: OpTest[] = [
     operations: [
       {
         op: "diminish",
-        args: { cap: { type: "secondary", base: 5 } },
+        args: { cap: true },
         expected: "metabiaugmented truncated dodecahedron",
       },
       ["sharpen", "metabiaugmented dodecahedron"],
@@ -166,12 +163,12 @@ const chainedTests: OpTest[] = [
     operations: [
       {
         op: "diminish",
-        args: { cap: { type: "primary", base: 5 } },
+        args: { cap: true },
         expected: "elongated pentagonal pyramid",
       },
       {
         op: "diminish",
-        args: { cap: { type: "primary", base: 5 } },
+        args: { cap: true },
         expected: "pentagonal prism",
       },
       {
@@ -184,7 +181,7 @@ const chainedTests: OpTest[] = [
 ]
 
 function doOperationStep(opInfo: OpInfo, forme: PolyhedronForme) {
-  const { op, args, expected } = getOpInfo(opInfo, forme.geom)
+  const { op, args, expected } = getOpInfo(opInfo, forme)
   if (op === "forme") {
     const nextSpecs = getSpecs(expected)
     expect(forme.specs.canonicalName()).toEqual(nextSpecs.canonicalName())
@@ -200,7 +197,11 @@ function doOperationStep(opInfo: OpInfo, forme: PolyhedronForme) {
 
 describe("chained operations", () => {
   for (const test of chainedTests) {
-    const { start, description, operations } = test
+    const { start, description, operations, skip } = test
+    if (skip) {
+      xit(description, () => {})
+      continue
+    }
     let polyhedron = fromName(start)
     it(description, () => {
       for (const opInfo of operations) {

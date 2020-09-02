@@ -1,4 +1,4 @@
-import { Polyhedron, Vertex } from "math/polyhedra"
+import { Polyhedron, Vertex, Face } from "math/polyhedra"
 import Operation, { OpResult } from "./Operation"
 import { PolyhedronForme, fromName } from "math/formes"
 
@@ -48,6 +48,14 @@ function expectVerticesMatch(test: Vertex[], ref: Vertex[]) {
   }
 }
 
+function expectNormalsMatch(test: Face[], ref: Face[]) {
+  for (const face of test) {
+    if (face.edges.filter((e) => e.isValid()).length < 3) continue
+    expect(ref.some((f) => face.isAligned(f))).toBeTrue()
+    // expect(face).toSatisfy((face) => ref.some((f) => face.isAligned(f)))
+  }
+}
+
 function expectValidAnimationData(
   opName: string,
   opResult: OpResult,
@@ -59,13 +67,18 @@ function expectValidAnimationData(
   // "Augment" has a weird start position so skip this check for it
   if (opName !== "augment") {
     expectVerticesMatch(start.vertices, original.vertices)
+    // TODO why does this fail again?
+    if (opName !== "diminish") {
+      expectNormalsMatch(start.faces, original.faces)
+    }
   }
   // "Diminish" has a weird end position so skip this check for it
   if (opName !== "diminish") {
-    expectVerticesMatch(
-      original.withVertices(endVertices).vertices,
-      result.geom.vertices,
-    )
+    const end = start.withVertices(endVertices)
+    expectVerticesMatch(end.vertices, result.geom.vertices)
+    if (opName !== "augment") {
+      expectNormalsMatch(end.faces, result.geom.faces)
+    }
   }
 }
 

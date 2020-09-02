@@ -1,15 +1,15 @@
 import { pick } from "lodash-es"
 import React, { useRef, useState } from "react"
 import { Table } from "tables"
-import { Color } from "three"
-import PolyhedronModel from "components/ViewerPage/common/SolidScene/PolyhedronModel"
 import ConfigCtx from "components/ConfigCtx"
 import { fromSpecs } from "math/formes"
 
 import { useFrame } from "react-three-fiber"
+// FIXME edit these imports
 import getFormeColors, {
   mixColor,
 } from "components/ViewerPage/common/SolidScene/getFormeColors"
+import PolyhedronModel from "components/ViewerPage/common/SolidScene/PolyhedronModel"
 
 const rowSpacing = 2
 const colSpacing = 7
@@ -29,21 +29,16 @@ function PolyhedronEntry({ entry, position, navigate }: any) {
   // TODO might as well make this an official method
   // (it returns false for gyrobifastigium)
   const isDupe = entry.name() !== entry.canonicalName()
-  // const geom = getGeometry(entry)
   const forme = fromSpecs(entry)
   const geom = forme.orient()
-  // const geom = forme.geom
 
   const config = ConfigCtx.useState()
   const faceColors = geom.faces.map((face) => {
     let color = getFormeColors(forme, face)
-    // let color: any = {
-    //   color: new Color(),
-    //   material: 1,
+    // FIXME desaturate if it's a duplicate
+    // if (isDupe) {
+    //   color = mixColor(color, (c) => c.clone().offsetHSL(0, -0.25, -0.1))
     // }
-    if (isDupe) {
-      color = mixColor(color, (c) => c.clone().offsetHSL(0, -0.25, 0.2))
-    }
     if (hovered) {
       color = mixColor(color, (c) => c.clone().offsetHSL(0, 0, 0.2))
     }
@@ -64,13 +59,6 @@ function PolyhedronEntry({ entry, position, navigate }: any) {
         appearance={faceColors}
         config={pick(config, ["showFaces", "showEdges", "showInnerFaces"])}
       />
-      <mesh position={[0, -2, 0]}>
-        <cylinderBufferGeometry
-          attach="geometry"
-          args={[1.25, 1.5, 0.1, 50, 1]}
-        />
-        <meshPhongMaterial attach="material" color="#ad9b13" />
-      </mesh>
     </group>
   )
 }

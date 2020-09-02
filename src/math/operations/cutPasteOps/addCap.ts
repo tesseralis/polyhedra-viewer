@@ -1,7 +1,7 @@
 import { repeat, find } from "utils"
 import { Polyhedron, Face, FaceLike, Edge } from "math/polyhedra"
 import { Capstone, CapType } from "specs"
-import { CapstoneForme } from "math/formes"
+import { fromSpecs } from "math/formes"
 import { deduplicateVertices, alignPolyhedron, Pose } from "../operationUtils"
 
 export type CrossAxis = (edge: Edge) => boolean
@@ -23,7 +23,7 @@ function defaultCapType(numSides: number) {
 }
 
 function getCap(type: CapType, base: number) {
-  return CapstoneForme.fromSpecs(
+  return fromSpecs(
     Capstone.query.where(
       (s) =>
         s.isMono() &&

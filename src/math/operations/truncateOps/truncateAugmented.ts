@@ -10,6 +10,7 @@ export default makeOpPair<Composite>({
     for (const entry of Composite.query.where(
       (s) =>
         s.isAugmentedClassical() &&
+        s.isAugmented() && // exclude the wrapper solids
         s.data.source.isClassical() &&
         s.data.source.isRegular(),
     )) {
