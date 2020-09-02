@@ -1,6 +1,5 @@
 import { Color } from "three"
 import { useMemo, useCallback } from "react"
-import Config from "components/ConfigCtx"
 import { PolyhedronCtx, OperationCtx, TransitionCtx } from "../../context"
 import { Polyhedron, Face } from "math/polyhedra"
 import getFormeColors, { Appearance, mixColor, lighten } from "./getFormeColors"
