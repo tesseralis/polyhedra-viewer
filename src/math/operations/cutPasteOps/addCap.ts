@@ -84,6 +84,7 @@ export default function doAugment(
       start: polyhedron.addPolyhedron(capInitial),
       endVertices: endResult.vertices,
     },
+    axis: base.normal(),
     result: deduplicateVertices(endResult.withoutFaces([base])),
   }
 }

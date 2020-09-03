@@ -31,10 +31,12 @@ export type PolyhedronForme<
 export default abstract class BaseForme<Specs extends PolyhedronSpecs> {
   specs: Specs
   geom: Polyhedron
+  axis?: Vector3
 
-  constructor(specs: Specs, geom: Polyhedron) {
+  constructor(specs: Specs, geom: Polyhedron, axis?: Vector3) {
     this.specs = specs
     this.geom = geom
+    this.axis = axis
   }
 
   isClassical(): this is ClassicalForme {

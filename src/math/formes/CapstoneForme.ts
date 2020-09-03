@@ -2,8 +2,9 @@ import { find, pivot } from "utils"
 import { once } from "lodash"
 import BaseForme from "./BaseForme"
 import { Capstone } from "specs"
+import { Vector3 } from "three"
 import { Polyhedron, Face, Edge, Cap, FaceLike, Facet } from "math/polyhedra"
-import { getCentroid } from "math/geom"
+import { getCentroid, vecEquals } from "math/geom"
 import { getGeometry } from "math/operations/operationUtils"
 import { CapstoneFace } from "./FaceType"
 
@@ -11,17 +12,17 @@ type CapstoneEnd = Facet
 
 // TODO add more useful functions here
 export default abstract class CapstoneForme extends BaseForme<Capstone> {
-  static create(specs: Capstone, geom: Polyhedron) {
+  static create(specs: Capstone, geom: Polyhedron, axis?: Vector3) {
     if (specs.isSnub()) {
-      return new SnubCapstoneForme(specs, geom)
+      return new SnubCapstoneForme(specs, geom, axis)
     }
     switch (specs.data.count) {
       case 0:
-        return new PrismaticForme(specs, geom)
+        return new PrismaticForme(specs, geom, axis)
       case 1:
-        return new MonoCapstoneForme(specs, geom)
+        return new MonoCapstoneForme(specs, geom, axis)
       case 2:
-        return new BiCapstoneForme(specs, geom)
+        return new BiCapstoneForme(specs, geom, axis)
     }
   }
 
@@ -49,6 +50,10 @@ export default abstract class CapstoneForme extends BaseForme<Capstone> {
 
   ends = once(() => {
     for (const top of this.queryTops()) {
+      // FIXME this still doesn't work...
+      if (this.axis && !vecEquals(top.normal(), this.axis)) {
+        continue
+      }
       for (const bottom of this.queryBottoms()) {
         if (top.isInverse(bottom)) {
           return [top, bottom]

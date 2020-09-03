@@ -23,6 +23,7 @@ export interface OpResult {
 
 interface PartialOpResult {
   result?: Polyhedron
+  axis?: Vector3
   animationData: {
     start: Polyhedron
     endVertices: VertexArg[]
@@ -113,12 +114,12 @@ function normalizeOpResult(
   newSpecs: PolyhedronSpecs,
   original: Forme,
 ): OpResult {
-  const { result, animationData } = opResult
+  const { result, animationData, axis } = opResult
   const { start, endVertices } = animationData
 
   const end = start.withVertices(endVertices)
   const normedResult = result ?? deduplicateVertices(end)
-  const resultForme = createForme(newSpecs, normedResult)
+  const resultForme = createForme(newSpecs, normedResult, axis)
 
   // Populate the how the faces in the start and end vertices should be colored
   const startColors = getSourceAppearances(start, original)

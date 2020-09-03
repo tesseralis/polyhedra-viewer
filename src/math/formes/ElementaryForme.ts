@@ -1,4 +1,5 @@
 import { Elementary } from "specs"
+import { Vector3 } from "three"
 import BaseForme from "./BaseForme"
 import { Polyhedron, Face } from "math/polyhedra"
 import { find } from "utils"
@@ -6,22 +7,22 @@ import { isEqual } from "lodash-es"
 import { ClassicalFace } from "./FaceType"
 
 export default abstract class ElementaryForme extends BaseForme<Elementary> {
-  static create(specs: Elementary, geom: Polyhedron) {
+  static create(specs: Elementary, geom: Polyhedron, axis?: Vector3) {
     switch (specs.name()) {
       case "sphenocorona":
-        return new Sphenocorona(specs, geom)
+        return new Sphenocorona(specs, geom, axis)
       case "augmented sphenocorona":
-        return new AugmentedSphenocorona(specs, geom)
+        return new AugmentedSphenocorona(specs, geom, axis)
       case "sphenomegacorona":
-        return new Sphenomegacorona(specs, geom)
+        return new Sphenomegacorona(specs, geom, axis)
       case "hebesphenomegacorona":
-        return new Hebesphenomegacorona(specs, geom)
+        return new Hebesphenomegacorona(specs, geom, axis)
       case "disphenocingulum":
-        return new Disphenocingulum(specs, geom)
+        return new Disphenocingulum(specs, geom, axis)
       case "bilunabirotunda":
-        return new Bilunabirotunda(specs, geom)
+        return new Bilunabirotunda(specs, geom, axis)
       case "triangular hebesphenorotunda":
-        return new TriangularHebesphenorotunda(specs, geom)
+        return new TriangularHebesphenorotunda(specs, geom, axis)
       default:
         throw new Error(`Undefined specs: ${specs.name()}`)
     }

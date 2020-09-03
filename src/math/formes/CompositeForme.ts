@@ -1,4 +1,5 @@
 import { once } from "lodash-es"
+import { Vector3 } from "three"
 import { pivot, find, getSingle } from "utils"
 import BaseForme from "./BaseForme"
 import { getGeometry } from "math/operations/operationUtils"
@@ -10,16 +11,16 @@ import { FaceType, ClassicalFace, CapstoneFace } from "./FaceType"
 type Base = Cap | Face
 
 export default abstract class CompositeForme extends BaseForme<Composite> {
-  static create(specs: Composite, geom: Polyhedron) {
+  static create(specs: Composite, geom: Polyhedron, axis?: Vector3) {
     // TODO lol maybe it's time for a visitor
     if (specs.isAugmentedPrism()) {
-      return new AugmentedPrismForme(specs, geom)
+      return new AugmentedPrismForme(specs, geom, axis)
     } else if (specs.isAugmentedClassical()) {
-      return new AugmentedClassicalForme(specs, geom)
+      return new AugmentedClassicalForme(specs, geom, axis)
     } else if (specs.isDiminishedSolid()) {
-      return new DiminishedSolidForme(specs, geom)
+      return new DiminishedSolidForme(specs, geom, axis)
     } else if (specs.isGyrateSolid()) {
-      return new GyrateSolidForme(specs, geom)
+      return new GyrateSolidForme(specs, geom, axis)
     }
     throw new Error(`Invalid composite specs: ${specs.name()}`)
   }

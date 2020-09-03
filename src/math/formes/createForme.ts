@@ -1,3 +1,5 @@
+import { Vector3 } from "three"
+
 import { PolyhedronForme } from "./BaseForme"
 import ClassicalForme from "./ClassicalForme"
 import CapstoneForme from "./CapstoneForme"
@@ -13,13 +15,16 @@ import { Polyhedron } from "math/polyhedra"
 export default function createForme<S extends PolyhedronSpecs>(
   specs: S,
   geom: Polyhedron,
+  axis?: Vector3,
 ): PolyhedronForme<S> {
-  if (specs.isClassical()) return ClassicalForme.create(specs, geom) as any
+  if (specs.isClassical())
+    return ClassicalForme.create(specs, geom, axis) as any
   if (specs.isCapstone())
-    return CapstoneForme.create(specs, geom).normalize() as any
+    return CapstoneForme.create(specs, geom, axis).normalize() as any
   if (specs.isComposite())
-    return CompositeForme.create(specs, geom).normalize() as any
-  if (specs.isElementary()) return ElementaryForme.create(specs, geom) as any
+    return CompositeForme.create(specs, geom, axis).normalize() as any
+  if (specs.isElementary())
+    return ElementaryForme.create(specs, geom, axis) as any
   throw new Error(`Invalid specs: ${specs.name()}`)
 }
 

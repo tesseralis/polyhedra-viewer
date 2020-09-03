@@ -8,20 +8,20 @@ import BaseForme from "./BaseForme"
 import { ClassicalFace } from "./FaceType"
 
 export default abstract class ClassicalForme extends BaseForme<Classical> {
-  static create(specs: Classical, geom: Polyhedron) {
+  static create(specs: Classical, geom: Polyhedron, axis?: Vector3) {
     switch (specs.data.operation) {
       case "regular":
-        return new RegularForme(specs, geom)
+        return new RegularForme(specs, geom, axis)
       case "truncate":
-        return new TruncatedForme(specs, geom)
+        return new TruncatedForme(specs, geom, axis)
       case "rectify":
-        return new RectifiedForme(specs, geom)
+        return new RectifiedForme(specs, geom, axis)
       case "bevel":
-        return new BevelledForme(specs, geom)
+        return new BevelledForme(specs, geom, axis)
       case "cantellate":
-        return new CantellatedForme(specs, geom)
+        return new CantellatedForme(specs, geom, axis)
       case "snub":
-        return new SnubForme(specs, geom)
+        return new SnubForme(specs, geom, axis)
     }
   }
 
