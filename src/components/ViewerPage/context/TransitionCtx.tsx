@@ -1,9 +1,9 @@
 import { noop } from "lodash-es"
-
 import { Vector3, Color } from "three"
 import React, { useRef, useEffect, useContext, useCallback } from "react"
-import { ChildrenProp } from "types"
 
+import { ChildrenProp } from "types"
+import { repeat } from "utils"
 import { createHookedContext } from "components/common"
 import Config from "components/ConfigCtx"
 import PolyhedronCtx from "./PolyhedronCtx"
@@ -15,18 +15,21 @@ import {
   getFaceAppearance,
 } from "components/ViewerPage/common/SolidScene/getFormeColors"
 
-function normFaceColor(col: FaceColor) {
-  // FIXME use a generator or something for the repetition
-  return col instanceof Color ? [col, col, col, col] : col
-}
-
 function interpFaceColors(col1: FaceColor, col2: FaceColor, t: number) {
   if (col1 instanceof Color && col2 instanceof Color) {
     return col1.clone().lerp(col2, t)
   }
-  const _col1 = normFaceColor(col1)
-  const _col2 = normFaceColor(col2)
-  return _col1.map((c, j) => c.clone().lerp(_col2[j], t))
+  if (col1 instanceof Array && col2 instanceof Color) {
+    const _col2 = repeat(col2, col1.length)
+    return col1.map((c, j) => c.clone().lerp(_col2[j], t))
+  }
+  if (col2 instanceof Array && col1 instanceof Color) {
+    const _col1 = repeat(col1, col2.length)
+    return _col1.map((c, j) => c.clone().lerp(col2[j], t))
+  }
+  return (col1 as Color[]).map((c, j) =>
+    c.clone().lerp((col2 as Color[])[j], t),
+  )
 }
 
 const defaultState = {
