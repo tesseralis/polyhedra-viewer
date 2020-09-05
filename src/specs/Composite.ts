@@ -33,10 +33,7 @@ const diminishedNames = ["octahedron", "icosahedron"]
 const diminishedBases = diminishedNames.map((name) =>
   Classical.query.withName(name),
 )
-const rhombicosidodecahedron = Classical.query.withName(
-  "rhombicosidodecahedron",
-)
-const gyrateBases = [rhombicosidodecahedron]
+const gyrateBases = Classical.query.where((s) => s.isCantellated())
 
 const sources = [
   ...prismaticBases,
@@ -59,6 +56,7 @@ export default class Composite extends Specs<CompositeData> {
   }
 
   withData(data: Partial<CompositeData>) {
+    console.log(data)
     return Composite.query.withData(
       Composite.cleanData({ ...this.data, ...data }),
     )
@@ -161,6 +159,7 @@ export default class Composite extends Specs<CompositeData> {
   }
 
   augmentGyrate(gyrate: "ortho" | "gyro") {
+    console.log(this.name())
     if (!this.isGyrateSolid())
       throw new Error(`augmentGyrate() only implemented for gyrate solids`)
     if (gyrate === "ortho") {
@@ -241,13 +240,17 @@ export default class Composite extends Specs<CompositeData> {
   ): Generator<{ diminished?: Count; gyrate?: Count }> {
     switch (source.data.family) {
       case 3: {
+        yield {}
         yield { gyrate: 1 }
         yield { diminished: 1 }
         break
       }
       case 4: {
+        yield {}
         yield { gyrate: 1 }
+        yield { gyrate: 2 }
         yield { diminished: 1 }
+        yield { gyrate: 1, diminished: 1 }
         yield { diminished: 2 }
         break
       }
