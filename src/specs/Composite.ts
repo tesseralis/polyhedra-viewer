@@ -36,12 +36,13 @@ const diminishedBases = diminishedNames.map((name) =>
 const rhombicosidodecahedron = Classical.query.withName(
   "rhombicosidodecahedron",
 )
+const gyrateBases = [rhombicosidodecahedron]
 
 const sources = [
   ...prismaticBases,
   ...augmentedClassicalBases,
   ...diminishedBases,
-  rhombicosidodecahedron,
+  ...gyrateBases,
 ]
 
 function limitCount(limit: number) {
@@ -253,16 +254,16 @@ export default class Composite extends Specs<CompositeData> {
       }
     }
 
-    // TODO add more diminished and gyrate polyhedra
-
-    // rhombicosidodecahedra
-    for (const gyrate of counts) {
-      for (const diminished of limitCount(3 - gyrate)) {
-        yield* this.getWithAlignments({
-          source: rhombicosidodecahedron,
-          gyrate,
-          diminished,
-        })
+    // Gyrate and diminished solids
+    for (const source of gyrateBases) {
+      for (const gyrate of counts) {
+        for (const diminished of limitCount(3 - gyrate)) {
+          yield* this.getWithAlignments({
+            source,
+            gyrate,
+            diminished,
+          })
+        }
       }
     }
   }
