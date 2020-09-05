@@ -236,6 +236,32 @@ export default class Composite extends Specs<CompositeData> {
     return source.isIcosahedral() ? 3 : 1
   }
 
+  static *gyrateMods(
+    source: Classical,
+  ): Generator<{ diminished?: Count; gyrate?: Count }> {
+    switch (source.data.family) {
+      case 3: {
+        yield { gyrate: 1 }
+        yield { diminished: 1 }
+        break
+      }
+      case 4: {
+        yield { gyrate: 1 }
+        yield { diminished: 1 }
+        yield { diminished: 2 }
+        break
+      }
+      case 5: {
+        for (const gyrate of counts) {
+          for (const diminished of limitCount(3 - gyrate)) {
+            yield { gyrate, diminished }
+          }
+        }
+        break
+      }
+    }
+  }
+
   static *getAll() {
     // Augmented solids
     for (const source of [...prismaticBases, ...augmentedClassicalBases]) {
@@ -256,14 +282,11 @@ export default class Composite extends Specs<CompositeData> {
 
     // Gyrate and diminished solids
     for (const source of gyrateBases) {
-      for (const gyrate of counts) {
-        for (const diminished of limitCount(3 - gyrate)) {
-          yield* this.getWithAlignments({
-            source,
-            gyrate,
-            diminished,
-          })
-        }
+      for (const mods of this.gyrateMods(source)) {
+        yield* this.getWithAlignments({
+          source,
+          ...mods,
+        })
       }
     }
   }
