@@ -36,7 +36,9 @@ export const alternateNamesMapping: Record<string, string[]> = {
   "pentagonal antiprism": ["parabidiminished icosahedron"],
   "gyroelongated pentagonal pyramid": ["diminished icosahedron"],
 
-  // Gyrate solids
+  // Gyrate and diminished solids
+  "triangular orthobicupola": ["gyrate rhombitetratetrahedron"],
+  "triangular cupola": ["diminished rhombitetratetrahedron"],
   "elongated square gyrobicupola": ["gyrate rhombicuboctahedron"],
   "elongated square cupola": ["diminished rhombicuboctahedron"],
   "octagonal prism": ["bidiminished rhombicuboctahedron"],
