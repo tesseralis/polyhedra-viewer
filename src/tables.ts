@@ -249,14 +249,14 @@ const capstonesBi: Table = {
 
 const augSources = [
   "triangular prism",
+  "hexagonal prism",
   "square prism",
   "pentagonal prism",
-  "hexagonal prism",
   "tetrahedron",
-  "cube",
-  "dodecahedron",
   "truncated tetrahedron",
+  "cube",
   "truncated cube",
+  "dodecahedron",
   "truncated dodecahedron",
 ]
 
