@@ -308,6 +308,7 @@ function diminishedEntry(diminished: Count) {
         Composite.query.where(
           (s) =>
             s.isDiminishedSolid() &&
+            s.sourceClassical().isIcosahedral() &&
             s.data.diminished === diminished &&
             s.data.augmented === augmented,
         )[0],
@@ -318,13 +319,17 @@ function diminishedEntry(diminished: Count) {
         Composite.query.where(
           (s) =>
             s.isDiminishedSolid() &&
+            s.sourceClassical().isIcosahedral() &&
             s.data.align === align &&
             s.data.diminished === diminished,
         )[0],
     )
   } else {
     return Composite.query.where(
-      (s) => s.isDiminishedSolid() && s.data.diminished === diminished,
+      (s) =>
+        s.isDiminishedSolid() &&
+        s.sourceClassical().isIcosahedral() &&
+        s.data.diminished === diminished,
     )[0]
   }
 }
@@ -335,8 +340,9 @@ function* diminishedRow() {
   }
 }
 
-const icosahedra: Table = {
-  caption: "Diminished Icosahedra",
+// TODO add the rest here
+const diminished: Table = {
+  caption: "Diminished Platonic Solids",
   rows: ["icosahedron"],
   columns: [
     "diminished",
@@ -459,10 +465,10 @@ export const tableSections: TableSection[] = [
       {
         id: "composite",
         header: "Augmented, Diminished, and Gyrate Polyhedra",
-        tables: [augmented, icosahedra, rhombicosidodecahedra],
+        tables: [augmented, diminished, rhombicosidodecahedra],
         narrowTables: [
           augmented,
-          icosahedra,
+          diminished,
           gyrateRhombicosidodecahedra,
           diminishedRhombicosidodecahedra,
         ],
