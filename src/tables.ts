@@ -252,6 +252,8 @@ const augSources = [
   "square prism",
   "pentagonal prism",
   "hexagonal prism",
+  "tetrahedron",
+  "cube",
   "dodecahedron",
   "truncated tetrahedron",
   "truncated cube",

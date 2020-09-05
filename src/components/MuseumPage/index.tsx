@@ -4,10 +4,10 @@ import { useStyle } from "styles"
 import { tableSections } from "tables"
 import PolyhedronTable from "./PolyhedronTable"
 import { useNavigate } from "react-router-dom"
-import { TrackballControls } from "drei"
+import { PerspectiveCamera, TrackballControls } from "drei"
 
 // TODO deduplicate with the controls in the other scene
-const sectionSpacing = 40
+const sectionSpacing = 50
 const subsecSpacing = 25
 // TODO why is this so slow to load??
 export default function MuseumScene() {
@@ -23,8 +23,11 @@ export default function MuseumScene() {
   return (
     <div {...style()}>
       <Canvas>
-        <TrackballControls enabled noRotate />
+        <PerspectiveCamera makeDefault position={[0, 0, 100]}>
+          {[]}
+        </PerspectiveCamera>
         <directionalLight position={[0, 0.5, 1]} />
+        <TrackballControls enabled noRotate />
         <group>
           {tableSections.map((section, i) => {
             if (section.tables) {
