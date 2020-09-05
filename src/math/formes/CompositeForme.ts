@@ -53,6 +53,10 @@ export default abstract class CompositeForme extends BaseForme<Composite> {
     return this.caps()
   }
 
+  gyrateCaps(): Cap[] {
+    return []
+  }
+
   // TODO implement this for diminished/gyrate
   sourceCentroid() {
     return getCentroid(this.sourceVertices().map((v) => v.vec))
@@ -68,7 +72,13 @@ export default abstract class CompositeForme extends BaseForme<Composite> {
     return this.specs.isMono()
   }
 
-  abstract modifications(): Base[]
+  modifications(): Base[] {
+    return [
+      ...this.augmentedCaps(),
+      ...this.diminishedFaces(),
+      ...this.gyrateCaps(),
+    ]
+  }
 
   alignment(cap: Base) {
     if (!this.hasAlignment()) return undefined
@@ -160,10 +170,6 @@ export class AugmentedPrismForme extends CompositeForme {
     return super.hasAlignment() && this.specs.sourcePrism().isSecondary()
   }
 
-  modifications() {
-    return this.caps()
-  }
-
   endFaces = once(() => {
     const source = this.specs.sourcePrism()
     if (source.isPrimary() && source.isTriangular()) {
@@ -251,10 +257,6 @@ export class AugmentedClassicalForme extends CompositeForme {
     return super.hasAlignment() && this.specs.sourceClassical().isIcosahedral()
   }
 
-  modifications() {
-    return this.caps()
-  }
-
   caps = once(() => {
     const specs = this.specs.sourceClassical()
     const caps = this.geom.caps({
@@ -338,10 +340,6 @@ export class DiminishedSolidForme extends CompositeForme {
     return face.inSet(this.augmentedCaps()[0].faces())
   }
 
-  modifications() {
-    return [...this.diminishedFaces(), ...this.augmentedCaps()]
-  }
-
   canAugment(face: Face) {
     if (this.specs.isAugmented()) return false
     return (
@@ -406,13 +404,6 @@ export class GyrateSolidForme extends CompositeForme {
     if (face.numSides === 5) return "face"
     if (face.numSides === 3) return "vertex"
     return null
-  }
-
-  /**
-   * Returns the single diminished or gyrate face of this polyhedron.
-   */
-  modifications() {
-    return [...this.gyrateCaps(), ...this.diminishedFaces()]
   }
 
   canAugment(face: Face) {
