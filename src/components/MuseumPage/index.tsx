@@ -23,7 +23,7 @@ export default function MuseumScene() {
   return (
     <div {...style()}>
       <Canvas>
-        <PerspectiveCamera makeDefault position={[0, 0, 100]}>
+        <PerspectiveCamera makeDefault position={[0, 0, 75]}>
           {[]}
         </PerspectiveCamera>
         <directionalLight position={[0, 0.5, 1]} />
