@@ -351,7 +351,10 @@ export class DiminishedSolidForme extends CompositeForme {
 
 export class GyrateSolidForme extends CompositeForme {
   caps = once(() => {
-    return this.geom.caps({ type: "secondary", base: 5 })
+    return this.geom.caps({
+      type: "secondary",
+      base: this.specs.sourceClassical().data.family,
+    })
   })
 
   augmentedCaps = () => []
@@ -370,6 +373,7 @@ export class GyrateSolidForme extends CompositeForme {
 
   /** Return whether the given cap is gyrated */
   isGyrate(cap: Cap) {
+    // FIXME!! special handling for when it's not icosahedral
     return cap.boundary().edges.every((edge) => {
       const [n1, n2] = edge.adjacentFaces().map((f) => f.numSides)
       return (n1 === 4) === (n2 === 4)
@@ -401,7 +405,8 @@ export class GyrateSolidForme extends CompositeForme {
 
   // @override
   getFacet(face: Face) {
-    if (face.numSides === 5) return "face"
+    const { family } = this.specs.sourceClassical().data
+    if (face.numSides === family) return "face"
     if (face.numSides === 3) return "vertex"
     return null
   }
@@ -420,7 +425,7 @@ export class GyrateSolidForme extends CompositeForme {
       return ClassicalFace.facet(
         source.data.family,
         "primary",
-        face.numSides === 5 ? "face" : "vertex",
+        face.numSides === source.data.family ? "face" : "vertex",
       )
     } else {
       return super.faceAppearance(face)
