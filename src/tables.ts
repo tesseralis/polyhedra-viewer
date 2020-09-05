@@ -279,7 +279,7 @@ function augmentEntry(source: PolyhedronSpecs, augmented: Count) {
 }
 
 function* augmentedRow(source: PolyhedronSpecs) {
-  for (const augmented of range(1, Composite.modifyLimit(source as any) + 1)) {
+  for (const augmented of range(1, Composite.augmentLimit(source as any) + 1)) {
     yield augmentEntry(source, augmented as any)
   }
 }

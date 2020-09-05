@@ -29,7 +29,10 @@ const prismaticBases = Capstone.query.where(
 const augmentedClassicalBases = Classical.query.where(
   (s) => s.hasFacet() && !s.isVertex(),
 )
-const icosahedron = Classical.query.withName("icosahedron")
+const diminishedNames = ["octahedron", "icosahedron"]
+const diminishedBases = diminishedNames.map((name) =>
+  Classical.query.withName(name),
+)
 const rhombicosidodecahedron = Classical.query.withName(
   "rhombicosidodecahedron",
 )
@@ -37,7 +40,7 @@ const rhombicosidodecahedron = Classical.query.withName(
 const sources = [
   ...prismaticBases,
   ...augmentedClassicalBases,
-  icosahedron,
+  ...diminishedBases,
   rhombicosidodecahedron,
 ]
 
@@ -223,26 +226,34 @@ export default class Composite extends Specs<CompositeData> {
     }
   }
 
-  static modifyLimit(source: Capstone | Classical) {
+  static augmentLimit(source: Capstone | Classical) {
     if (source.isCapstone()) return source.data.base % 3 === 0 ? 3 : 2
     return source.data.family - 2
+  }
+
+  static diminishLimit(source: Classical) {
+    return source.isIcosahedral() ? 3 : 1
   }
 
   static *getAll() {
     // Augmented solids
     for (const source of [...prismaticBases, ...augmentedClassicalBases]) {
-      for (const augmented of limitCount(this.modifyLimit(source))) {
+      for (const augmented of limitCount(this.augmentLimit(source))) {
         yield* this.getWithAlignments({ source, augmented })
       }
     }
 
-    // TODO add more diminished and gyrate polyhedra
-
-    // diminished icosahedra
-    for (const diminished of counts) {
-      yield* this.getWithAlignments({ source: icosahedron, diminished })
+    // Diminished solids
+    for (const source of diminishedBases) {
+      for (const diminished of limitCount(this.diminishLimit(source))) {
+        yield* this.getWithAlignments({ source, diminished })
+      }
+      if (source.isIcosahedral()) {
+        yield new Composite({ source, diminished: 3, augmented: 1 })
+      }
     }
-    yield new Composite({ source: icosahedron, diminished: 3, augmented: 1 })
+
+    // TODO add more diminished and gyrate polyhedra
 
     // rhombicosidodecahedra
     for (const gyrate of counts) {

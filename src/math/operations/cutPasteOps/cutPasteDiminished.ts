@@ -7,7 +7,8 @@ export default makeCutPastePair<Composite>({
     for (const solid of Composite.query.where(
       (s) => s.isDiminishedSolid() && s.isDiminished() && !s.isAugmented(),
     )) {
-      const options = solid.isTri() ? [3, 5] : [5]
+      const faceType = solid.sourceClassical().data.family
+      const options = solid.isTri() ? [3, faceType] : [faceType]
       for (const faceType of options) {
         yield {
           left: solid,

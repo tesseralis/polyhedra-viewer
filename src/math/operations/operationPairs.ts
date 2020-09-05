@@ -241,7 +241,9 @@ export function combineOps<S extends PolyhedronSpecs, O, GO extends {} = O>(
       // Finagle with the arguments to get the correctly (un)wrapped
       // version of the forme
       for (const { start, options = {} } of op.graph()) {
-        if (!start.equivalent(solid.specs)) continue
+        if (!start.equivalent(solid.specs)) {
+          continue
+        }
         const forme = createForme(start, solid.geom)
         const graphOpts = op.toGraphOpts(forme, opts)
         if (isMatch(options, pickBy(graphOpts))) {

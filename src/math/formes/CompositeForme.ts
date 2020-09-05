@@ -291,12 +291,14 @@ export class AugmentedClassicalForme extends CompositeForme {
 export class DiminishedSolidForme extends CompositeForme {
   caps = once(() => {
     return this.geom
-      .caps({ type: "primary", base: 5 })
-      .concat(this.geom.caps({ type: "primary", base: 3 }))
+      .caps({ type: "primary", base: this.specs.sourceClassical().data.family })
+      .concat(this.augmentedCaps())
   })
 
   augmentedCaps = once(() => {
-    return this.geom.caps({ type: "primary", base: 3 })
+    return this.specs.sourceClassical().isIcosahedral()
+      ? this.geom.caps({ type: "primary", base: 3 })
+      : []
   })
 
   // @override
