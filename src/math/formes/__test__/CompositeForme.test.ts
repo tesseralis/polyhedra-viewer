@@ -30,4 +30,47 @@ describe("CompositeForme", () => {
       expect(faces).toSatisfyAll(canAugment)
     })
   })
+
+  describe("caps", () => {
+    describe("rhombitetratetrahedron", () => {
+      xit("only counts one cap for gyrate", () => {
+        const forme = CompositeForme.fromName("gyrate rhombitetratetrahedron")
+        expect(forme.caps()).toHaveLength(1)
+      })
+
+      xit("counts no caps for diminished", () => {
+        const forme = CompositeForme.fromName(
+          "diminished rhombitetratetrahedron",
+        )
+        expect(forme.caps()).toHaveLength(0)
+      })
+    })
+
+    describe("rhombicuboctahedron", () => {
+      xit("only counts two opposite caps for bigyrate", () => {
+        const forme = CompositeForme.fromName("bigyrate rhombicuboctahedron")
+        const caps = forme.caps()
+        expect(caps).toHaveLength(2)
+        const [c1, c2] = caps
+        expect(c1.isInverse(c2)).toBeTrue()
+      })
+    })
+  })
+
+  describe("gyrateCaps", () => {
+    xit("returns 1 for gyrate tetratetrahedron", () => {
+      const forme = CompositeForme.fromName("gyrate rhombitetratetrahedron")
+      expect(forme.gyrateCaps()).toHaveLength(1)
+    })
+
+    xit("returns one for gyrate rhombicuboctahedron", () => {
+      const forme = CompositeForme.fromName("gyrate rhombicuboctahedron")
+      expect(forme.gyrateCaps()).toHaveLength(1)
+    })
+
+    xit("returns two for gyrate rhombicuboctahedron", () => {
+      const forme = CompositeForme.fromName("bigyrate rhombicuboctahedron")
+      expect(forme.gyrateCaps()).toHaveLength(2)
+    })
+  })
 })

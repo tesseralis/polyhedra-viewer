@@ -34,7 +34,7 @@ const diminishedBases = diminishedNames.map((name) =>
   Classical.query.withName(name),
 )
 const gyrateBases = Classical.query.where(
-  (s) => s.isCantellated() && s.isIcosahedral(),
+  (s) => s.isCantellated() /* && s.isIcosahedral(), */,
 )
 
 const sources = [

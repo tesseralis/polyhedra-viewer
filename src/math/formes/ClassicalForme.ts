@@ -167,6 +167,7 @@ class RegularForme extends ClassicalForme {
   }
 
   caps() {
+    // FIXME!! return only four on rhombitetratetrahedron
     if (this.specs.isFace()) return []
     return this.geom.caps({ base: this.specs.data.family, type: "primary" })
   }
