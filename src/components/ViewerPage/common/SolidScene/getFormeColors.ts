@@ -68,12 +68,13 @@ export function mixColor(appearance: Appearance, mixer: (c: Color) => Color) {
 // TODO return materials
 export function getFaceAppearance(faceType: FaceType): FaceColor {
   if (faceType.type === "classical") {
+    const gyrate = faceType.gyrate
     const scheme = colorScheme[faceType.family]
-    if (faceType.subtype === "facet") {
-      return scheme[faceType.polygonType][faceType.facet]
-    } else {
-      return scheme.edge[faceType.expansion]
-    }
+    const baseColor =
+      faceType.subtype === "facet"
+        ? scheme[faceType.polygonType][faceType.facet]
+        : scheme.edge[faceType.expansion]
+    return gyrate ? baseColor.clone().offsetHSL(0.5, 0, 0) : baseColor
   }
   if (faceType.type === "capstone") {
     const scheme = colorScheme[faceType.base]

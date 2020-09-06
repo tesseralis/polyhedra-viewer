@@ -3,6 +3,7 @@ import { PrimaryPolygon, FacetType, PolygonType, PrismaticType } from "specs"
 interface BaseClassical {
   type: "classical"
   family: PrimaryPolygon
+  gyrate?: boolean
 }
 
 interface ClassicalFacet extends BaseClassical {
@@ -23,12 +24,24 @@ export const ClassicalFace = {
     family: PrimaryPolygon,
     polygonType: PolygonType,
     facet: FacetType,
+    gyrate?: boolean,
   ): ClassicalFaceType {
-    return { type: "classical", subtype: "facet", family, polygonType, facet }
+    return {
+      type: "classical",
+      subtype: "facet",
+      family,
+      polygonType,
+      facet,
+      gyrate,
+    }
   },
 
-  edge(family: PrimaryPolygon, expansion: PrismaticType): ClassicalFaceType {
-    return { type: "classical", subtype: "edge", family, expansion }
+  edge(
+    family: PrimaryPolygon,
+    expansion: PrismaticType,
+    gyrate?: boolean,
+  ): ClassicalFaceType {
+    return { type: "classical", subtype: "edge", family, expansion, gyrate }
   },
 }
 

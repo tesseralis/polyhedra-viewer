@@ -417,15 +417,15 @@ export class GyrateSolidForme extends CompositeForme {
 
   faceAppearance(face: Face) {
     const source = this.specs.sourceClassical()
-    // TODO distinguish this in some way
     if (this.isGyrateFace(face)) {
       if (face.numSides === 4) {
-        return ClassicalFace.edge(source.data.family, "prism")
+        return ClassicalFace.edge(source.data.family, "prism", true)
       }
       return ClassicalFace.facet(
         source.data.family,
         "primary",
         face.numSides === source.data.family ? "face" : "vertex",
+        true,
       )
     } else {
       return super.faceAppearance(face)
