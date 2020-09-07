@@ -29,8 +29,10 @@ export default makeCutPastePair<Composite>({
       return { gyrate: "gyro", align: forme.alignment(cap) }
     }
   },
-  baseAxis($, { gyrate }) {
+  baseAxis(forme, { gyrate }) {
+    const { family } = forme.specs.sourceClassical().data
     // If ortho, line the square face of the cupola with a square face here
-    return (edge) => edge.twinFace().numSides === (gyrate === "ortho" ? 4 : 5)
+    return (edge) =>
+      edge.twinFace().numSides === (gyrate === "ortho" ? 4 : family)
   },
 })

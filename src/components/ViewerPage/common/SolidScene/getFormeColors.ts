@@ -74,7 +74,7 @@ export function getFaceAppearance(faceType: FaceType): FaceColor {
       faceType.subtype === "facet"
         ? scheme[faceType.polygonType][faceType.facet]
         : scheme.edge[faceType.expansion]
-    return gyrate ? baseColor.clone().offsetHSL(0.5, 0, 0) : baseColor
+    return gyrate ? baseColor.clone().offsetHSL(0, -0.5, 0) : baseColor
   }
   if (faceType.type === "capstone") {
     const scheme = colorScheme[faceType.base]
