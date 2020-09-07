@@ -460,6 +460,7 @@ export class GyrateSolidForme extends CompositeForme {
 
   // @override
   getFacet(face: Face) {
+    // FIXME needs to handle non-icosahedral cases
     const { family } = this.specs.sourceClassical().data
     if (face.numSides === family) return "face"
     if (face.numSides === 3) return "vertex"
@@ -473,15 +474,12 @@ export class GyrateSolidForme extends CompositeForme {
   faceAppearance(face: Face) {
     const source = this.specs.sourceClassical()
     if (this.isGyrateFace(face)) {
-      if (face.numSides === 4) {
+      const facet = this.getFacet(face)
+      if (facet) {
+        return ClassicalFace.facet(source.data.family, "primary", facet, true)
+      } else {
         return ClassicalFace.edge(source.data.family, "prism", true)
       }
-      return ClassicalFace.facet(
-        source.data.family,
-        "primary",
-        face.numSides === source.data.family ? "face" : "vertex",
-        true,
-      )
     } else {
       return super.faceAppearance(face)
     }
