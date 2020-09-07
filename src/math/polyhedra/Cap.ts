@@ -97,6 +97,10 @@ export default abstract class Cap extends Facet {
     return this.innerVertices().concat(this.boundary().vertices)
   })
 
+  topFace(): Face {
+    throw new Error(`Cap type ${this.type} does not have a top face`)
+  }
+
   faces = once(() => {
     return flatMapUniq(this.innerVertices(), (v) => v.adjacentFaces(), "index")
   })
@@ -139,9 +143,16 @@ class Fastigium extends Cap {
 }
 
 class Cupola extends Cap {
+  private _topFace: Face
   constructor(face: Face, base: CapBase) {
     super(face.vertices, "cupola")
+    this._topFace = face
   }
+
+  topFace() {
+    return this._topFace
+  }
+
   static getAll = createMapper(
     (p, base) =>
       p
@@ -152,12 +163,19 @@ class Cupola extends Cap {
 }
 
 class Rotunda extends Cap {
+  private _topFace: Face
   constructor(face: Face, base: CapBase) {
     super(
       flatMapUniq(face.vertices, (v) => v.adjacentVertices(), "index"),
       "rotunda",
     )
+    this._topFace = face
   }
+
+  topFace() {
+    return this._topFace
+  }
+
   static getAll = createMapper(
     (p) =>
       p.facesWithNumSides(5).filter((face) => {

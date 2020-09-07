@@ -33,6 +33,11 @@ describe("CompositeForme", () => {
 
   describe("caps", () => {
     describe("rhombitetratetrahedron", () => {
+      it("only counts four caps for unmodified", () => {
+        const forme = CompositeForme.fromName("rhombitetratetrahedron")
+        expect(forme.caps()).toHaveLength(4)
+      })
+
       it("only counts one cap for gyrate", () => {
         const forme = CompositeForme.fromName("gyrate rhombitetratetrahedron")
         expect(forme.caps()).toHaveLength(1)

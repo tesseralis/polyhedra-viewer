@@ -6,6 +6,7 @@ import { Composite } from "specs"
 import { Polyhedron, Face, Cap } from "math/polyhedra"
 import { getCentroid } from "math/geom"
 import { FaceType, ClassicalFace, CapstoneFace } from "./FaceType"
+import ClassicalForme from "./ClassicalForme"
 
 type Base = Cap | Face
 
@@ -358,17 +359,18 @@ export class GyrateSolidForme extends CompositeForme {
   })
 
   private tetrahedralCaps() {
-    const allCaps = this.geomCaps()
     if (this.specs.isDiminished()) {
       // Discount the diminished caps
       return []
     } else if (this.specs.isGyrate()) {
       // Only count the first returned cap and consider it the gyrate cap
-      return [allCaps[0]]
+      return [this.geomCaps()[0]]
     } else {
-      // FIXME need to edit this method for classical as well
-      // (or have classical call this method)
-      return allCaps
+      // delegate to classical method if normal
+      return ClassicalForme.create(
+        this.specs.sourceClassical(),
+        this.geom,
+      ).caps()
     }
   }
 

@@ -167,7 +167,6 @@ class RegularForme extends ClassicalForme {
   }
 
   caps() {
-    // FIXME!! return only four on rhombitetratetrahedron
     if (this.specs.isFace()) return []
     return this.geom.caps({ base: this.specs.data.family, type: "primary" })
   }
@@ -255,7 +254,13 @@ class CantellatedForme extends ClassicalForme {
   }
 
   caps() {
-    return this.geom.caps({ base: this.specs.data.family, type: "secondary" })
+    const caps = this.geom.caps({
+      base: this.specs.data.family,
+      type: "secondary",
+    })
+    if (!this.specs.isTetrahedral()) return caps
+    // If tetrahedral, only count caps with a *face* facet as a top
+    return caps.filter((cap) => this.isFacetFace(cap.topFace(), "face"))
   }
 }
 
