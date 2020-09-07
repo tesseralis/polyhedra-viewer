@@ -33,12 +33,12 @@ describe("CompositeForme", () => {
 
   describe("caps", () => {
     describe("rhombitetratetrahedron", () => {
-      xit("only counts one cap for gyrate", () => {
+      it("only counts one cap for gyrate", () => {
         const forme = CompositeForme.fromName("gyrate rhombitetratetrahedron")
         expect(forme.caps()).toHaveLength(1)
       })
 
-      xit("counts no caps for diminished", () => {
+      it("counts no caps for diminished", () => {
         const forme = CompositeForme.fromName(
           "diminished rhombitetratetrahedron",
         )
@@ -47,7 +47,7 @@ describe("CompositeForme", () => {
     })
 
     describe("rhombicuboctahedron", () => {
-      xit("only counts two opposite caps for bigyrate", () => {
+      it("only counts two opposite caps for bigyrate", () => {
         const forme = CompositeForme.fromName("bigyrate rhombicuboctahedron")
         const caps = forme.caps()
         expect(caps).toHaveLength(2)

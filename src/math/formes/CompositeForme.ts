@@ -350,11 +350,51 @@ export class DiminishedSolidForme extends CompositeForme {
 }
 
 export class GyrateSolidForme extends CompositeForme {
-  caps = once(() => {
+  private geomCaps = once(() => {
     return this.geom.caps({
       type: "secondary",
       base: this.specs.sourceClassical().data.family,
     })
+  })
+
+  private tetrahedralCaps() {
+    const allCaps = this.geomCaps()
+    if (this.specs.isDiminished()) {
+      // Discount the diminished caps
+      return []
+    } else if (this.specs.isGyrate()) {
+      // Only count the first returned cap and consider it the gyrate cap
+      return [allCaps[0]]
+    } else {
+      // FIXME need to edit this method for classical as well
+      // (or have classical call this method)
+      return allCaps
+    }
+  }
+
+  private octahedralCaps() {
+    const allCaps = this.geomCaps()
+    if (this.specs.data.gyrate === 2) {
+      // If bigyrate, count opposite caps as gyrate caps
+      // which will be two out of many caps
+      const [cap, ...rest] = allCaps
+      return [cap, find(rest, (c) => cap.isInverse(c))]
+    } else {
+      // In all other cases, there is no ambiguity
+      return allCaps
+    }
+  }
+
+  caps = once(() => {
+    switch (this.specs.sourceClassical().data.family) {
+      case 3:
+        return this.tetrahedralCaps()
+      case 4:
+        return this.octahedralCaps()
+      case 5:
+        // no need to filter for icosahedral
+        return this.geomCaps()
+    }
   })
 
   augmentedCaps = () => []
