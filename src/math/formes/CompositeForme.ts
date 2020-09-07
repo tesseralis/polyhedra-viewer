@@ -415,7 +415,20 @@ export class GyrateSolidForme extends CompositeForme {
 
   /** Return whether the given cap is gyrated */
   isGyrate(cap: Cap) {
-    // FIXME!! special handling for when it's not icosahedral
+    const source = this.specs.sourceClassical()
+    if (source.isTetrahedral()) {
+      return this.specs.isGyrate()
+    }
+    if (source.isOctahedral()) {
+      switch (this.specs.data.gyrate) {
+        case 0:
+          return false
+        case 1:
+          return cap === this.caps()[0]
+        case 2:
+          return true
+      }
+    }
     return cap.boundary().edges.every((edge) => {
       const [n1, n2] = edge.adjacentFaces().map((f) => f.numSides)
       return (n1 === 4) === (n2 === 4)

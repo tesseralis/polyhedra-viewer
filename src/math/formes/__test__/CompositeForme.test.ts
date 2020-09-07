@@ -63,17 +63,24 @@ describe("CompositeForme", () => {
   })
 
   describe("gyrateCaps", () => {
-    xit("returns 1 for gyrate tetratetrahedron", () => {
+    it("returns 1 for gyrate tetratetrahedron", () => {
       const forme = CompositeForme.fromName("gyrate rhombitetratetrahedron")
       expect(forme.gyrateCaps()).toHaveLength(1)
     })
 
-    xit("returns one for gyrate rhombicuboctahedron", () => {
+    it("returns one for gyrate rhombicuboctahedron", () => {
       const forme = CompositeForme.fromName("gyrate rhombicuboctahedron")
       expect(forme.gyrateCaps()).toHaveLength(1)
     })
 
-    xit("returns two for gyrate rhombicuboctahedron", () => {
+    it("returns one for gyrate diminished rhombicuboctahedron", () => {
+      const forme = CompositeForme.fromName(
+        "gyrate diminished rhombicuboctahedron",
+      )
+      expect(forme.gyrateCaps()).toHaveLength(1)
+    })
+
+    it("returns two for bigyrate rhombicuboctahedron", () => {
       const forme = CompositeForme.fromName("bigyrate rhombicuboctahedron")
       expect(forme.gyrateCaps()).toHaveLength(2)
     })
