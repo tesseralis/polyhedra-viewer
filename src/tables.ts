@@ -358,6 +358,7 @@ function gyrateEntry(gyrate: Count, diminished: Count) {
       return Composite.query.where(
         (s) =>
           s.isGyrateSolid() &&
+          s.sourceClassical().isIcosahedral() &&
           s.data.align === align &&
           s.data.gyrate === gyrate &&
           s.data.diminished === diminished,
@@ -367,6 +368,7 @@ function gyrateEntry(gyrate: Count, diminished: Count) {
     return Composite.query.where(
       (s) =>
         s.isGyrateSolid() &&
+        s.sourceClassical().isIcosahedral() &&
         s.data.gyrate === gyrate &&
         s.data.diminished === diminished,
     )[0]

@@ -460,7 +460,7 @@ export class GyrateSolidForme extends CompositeForme {
 
   // @override
   getFacet(face: Face) {
-    // FIXME needs to handle non-icosahedral cases
+    // FIXME!! needs to handle non-icosahedral cases
     const { family } = this.specs.sourceClassical().data
     if (face.numSides === family) return "face"
     if (face.numSides === 3) return "vertex"
