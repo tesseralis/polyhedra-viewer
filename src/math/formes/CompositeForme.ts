@@ -387,6 +387,10 @@ export class GyrateSolidForme extends CompositeForme {
     }
   }
 
+  hasAlignment() {
+    return this.specs.sourceClassical().isIcosahedral() && super.hasAlignment()
+  }
+
   caps = once(() => {
     switch (this.specs.sourceClassical().data.family) {
       case 3:
