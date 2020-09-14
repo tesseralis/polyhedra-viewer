@@ -34,6 +34,7 @@ export default abstract class CompositeForme extends BaseForme<Composite> {
     return this.fromSpecs(specs)
   }
 
+  // TODO this doesn't work for diminished solids
   protected capInnerVertIndices = once(() => {
     return new Set(
       this.augmentedCaps().flatMap((cap) =>
@@ -105,6 +106,10 @@ export default abstract class CompositeForme extends BaseForme<Composite> {
   }
 
   isGyrate(cap: Cap) {
+    return false
+  }
+
+  isGyrateFace(face: Face) {
     return false
   }
 
@@ -462,13 +467,34 @@ export class GyrateSolidForme extends CompositeForme {
     )
   }
 
+  getFacetTetrahedral(face: Face) {
+    if (face.numSides !== 3) return null
+    // TODO handle case of unmodified forme
+    if (this.isGyrateFace(face)) {
+      // for a gyrated face, the "top" face of the cap is face-facet
+      return face.adjacentFaces().every((f) => f.numSides === 4)
+        ? "face"
+        : "vertex"
+    } else {
+      return face.adjacentFaces().every((f) => f.numSides === 4)
+        ? "vertex"
+        : "face"
+    }
+  }
+
   // @override
   getFacet(face: Face) {
-    // FIXME!! needs to handle non-icosahedral cases
-    const { family } = this.specs.sourceClassical().data
-    if (face.numSides === family) return "face"
-    if (face.numSides === 3) return "vertex"
-    return null
+    switch (this.specs.sourceClassical().data.family) {
+      case 3:
+        return this.getFacetTetrahedral(face)
+      default: {
+        // FIXME!! needs to handle non-icosahedral cases
+        const { family } = this.specs.sourceClassical().data
+        if (face.numSides === family) return "face"
+        if (face.numSides === 3) return "vertex"
+        return null
+      }
+    }
   }
 
   canAugment(face: Face) {

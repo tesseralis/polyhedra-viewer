@@ -1,3 +1,4 @@
+import { find } from "utils"
 import CompositeForme from "../CompositeForme"
 import { Face } from "math/polyhedra"
 
@@ -28,6 +29,61 @@ describe("CompositeForme", () => {
         return forme.canAugment(face)
       }
       expect(faces).toSatisfyAll(canAugment)
+    })
+  })
+
+  describe("getFacet", () => {
+    describe("rhombitetratetrahedra", () => {
+      it("works for gyrate", () => {
+        const forme = CompositeForme.fromName("gyrate rhombitetratetrahedron")
+        const facets = forme.geom.faces.map((face) => forme.getFacet(face))
+
+        // make sure there are an equal number of face and facet vertices
+        expect(facets.filter((f) => f === "face")).toHaveLength(4)
+        expect(facets.filter((f) => f === "vertex")).toHaveLength(4)
+
+        // Make sure there are 3-1 ratios on the gyrated cap and the source face
+        // make sure the face facet is the center of the gyrate cap
+        const gyrateFaceFacet = find(
+          forme.geom.faces,
+          (face) => forme.isGyrateFace(face) && forme.isFacetFace(face, "face"),
+        )
+        const gyrateAdjFaces = gyrateFaceFacet.vertexAdjacentFaces()
+        expect(
+          gyrateAdjFaces.filter((face) => forme.isFacetFace(face, "vertex")),
+        ).toHaveLength(3)
+
+        // make sure the vertex facet is an inner face in the source
+        const sourceVertexFacet = find(
+          forme.geom.faces,
+          (face) =>
+            !forme.isGyrateFace(face) && forme.isFacetFace(face, "vertex"),
+        )
+        const sourceAdjFaces = sourceVertexFacet.vertexAdjacentFaces()
+        expect(
+          sourceAdjFaces.filter((face) => forme.isFacetFace(face, "face")),
+        ).toHaveLength(3)
+      })
+
+      it("works for diminished", () => {
+        const forme = CompositeForme.fromName(
+          "diminished rhombitetratetrahedron",
+        )
+        const facets = forme.geom.faces.map((face) => forme.getFacet(face))
+
+        // check there are three face facets, one vertex facet
+        expect(facets.filter((f) => f === "face")).toHaveLength(3)
+        expect(facets.filter((f) => f === "vertex")).toHaveLength(1)
+
+        // make sure the vertex facet is surrounded by the others
+        const vertexFacet = find(forme.geom.faces, (face) =>
+          forme.isFacetFace(face, "vertex"),
+        )
+        const adjFaces = vertexFacet.vertexAdjacentFaces()
+        expect(
+          adjFaces.filter((face) => forme.isFacetFace(face, "face")),
+        ).toHaveLength(3)
+      })
     })
   })
 
