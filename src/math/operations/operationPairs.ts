@@ -246,7 +246,6 @@ export function combineOps<S extends PolyhedronSpecs, O, GO extends {} = O>(
         }
         const forme = createForme(start, solid.geom)
         const graphOpts = op.toGraphOpts(forme, opts)
-        console.log({ options, graphOpts })
         if (isMatch(options, pickBy(graphOpts))) {
           return callback({ op, forme, graphOpts })
         }
