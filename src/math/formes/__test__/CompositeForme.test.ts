@@ -85,6 +85,129 @@ describe("CompositeForme", () => {
         ).toHaveLength(3)
       })
     })
+
+    xdescribe("cuboctahedron", () => {
+      it("works with gyrate", () => {
+        const forme = CompositeForme.fromName("gyrate cuboctahedron")
+
+        // Assert the right number of face and edge facets
+        const faceFacets = forme.geom.faces.filter((f) =>
+          forme.isFacetFace(f, "face"),
+        )
+        expect(faceFacets).toHaveLength(8)
+
+        const edgeFaces = forme.geom.faces.filter((f) => forme.isEdgeFace(f))
+        expect(edgeFaces).toHaveLength(12)
+
+        // Make sure the gyrated faces are aligned correctly
+        const triangFaces = forme.geom.faces.filter(
+          (f) => forme.isGyrateFace(f) && f.numSides === 3,
+        )
+        for (const triangFace of triangFaces) {
+          const adjFacets = triangFace
+            .adjacentFaces()
+            .filter((f) => forme.isFacetFace(f, "face"))
+          expect(adjFacets).toHaveLength(1)
+        }
+      })
+
+      it("works with diminished", () => {
+        const forme = CompositeForme.fromName("diminished cuboctahedron")
+        // Make sure the face facets are not connected to any triangular faces
+        const faceFacets = forme.geom.faces.filter((f) =>
+          forme.isFacetFace(f, "face"),
+        )
+        for (const face of faceFacets) {
+          const adjTriang = face.adjacentFaces().filter((f) => f.numSides === 3)
+          expect(adjTriang).toHaveLength(0)
+        }
+        // Make sure edge faces are connected to at least one triangular face
+        const edgeFaces = forme.geom.faces.filter(
+          (f) => f.numSides === 4 && !forme.isAnyFacetFace(f),
+        )
+        for (const face of edgeFaces) {
+          const adjTriang = face.adjacentFaces().filter((f) => f.numSides === 3)
+          expect(adjTriang).not.toHaveLength(0)
+        }
+      })
+
+      it("works with gyrate diminished", () => {
+        // FIXME!! these checks can definitely be factored out
+        const forme = CompositeForme.fromName("gyrate diminished cuboctahedron")
+
+        // Make sure there's an equal number of each facet on source ring
+        const sourceFaces = forme.geom.faces.filter(
+          (f) => !forme.isGyrateFace(f) && f.numSides === 4,
+        )
+        const faceFacets = sourceFaces.filter((f) =>
+          forme.isFacetFace(f, "face"),
+        )
+        expect(faceFacets).toHaveLength(4)
+        const vertexFacets = sourceFaces.filter((f) =>
+          forme.isFacetFace(f, "vertex"),
+        )
+        expect(vertexFacets).toHaveLength(4)
+        // FIXME!! more checks here
+
+        // Check that all the caps are gyrated correctly
+        const triangFaces = forme.geom.faces.filter((f) => f.numSides === 3)
+        for (const triangFace of triangFaces) {
+          const adjFacets = triangFace
+            .adjacentFaces()
+            .filter((f) => forme.isFacetFace(f, "face"))
+          expect(adjFacets).toHaveLength(1)
+        }
+      })
+
+      it("works with bigyrate", () => {
+        const forme = CompositeForme.fromName("bigyrate cuboctahedron")
+
+        // Make sure there's an equal number of each facet on source ring
+        const sourceFaces = forme.geom.faces.filter(
+          (f) => !forme.isGyrateFace(f),
+        )
+        const faceFacets = sourceFaces.filter((f) =>
+          forme.isFacetFace(f, "face"),
+        )
+        expect(faceFacets).toHaveLength(4)
+        const vertexFacets = sourceFaces.filter((f) =>
+          forme.isFacetFace(f, "vertex"),
+        )
+        expect(vertexFacets).toHaveLength(4)
+        // FIXME!! more checks here
+
+        // Check that all the caps are gyrated correctly
+        const triangFaces = forme.geom.faces.filter((f) => f.numSides === 3)
+        for (const triangFace of triangFaces) {
+          const adjFacets = triangFace
+            .adjacentFaces()
+            .filter((f) => forme.isFacetFace(f, "face"))
+          expect(adjFacets).toHaveLength(1)
+        }
+      })
+
+      it("works with bidiminished", () => {
+        const forme = CompositeForme.fromName("bidiminished cuboctahedron")
+        const faceFacets = forme.geom.faces.filter((f) =>
+          forme.isFacetFace(f, "face"),
+        )
+        expect(faceFacets).toHaveLength(4)
+        const vertexFacets = forme.geom.faces.filter((f) =>
+          forme.isFacetFace(f, "vertex"),
+        )
+        expect(vertexFacets).toHaveLength(4)
+
+        for (const face of faceFacets) {
+          const nbrs = face.adjacentFaces().filter((f) => f.numSides === 4)
+          expect(nbrs).toSatisfyAll((f) => forme.isFacetFace(f, "vertex"))
+        }
+
+        for (const face of vertexFacets) {
+          const nbrs = face.adjacentFaces().filter((f) => f.numSides === 4)
+          expect(nbrs).toSatisfyAll((f) => forme.isFacetFace(f, "face"))
+        }
+      })
+    })
   })
 
   describe("caps", () => {
