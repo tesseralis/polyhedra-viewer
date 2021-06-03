@@ -386,7 +386,8 @@ function drawIcon(name: OpName) {
         </>
       )
     default:
-      throw new Error(`Unknown operation: ${name}`)
+      return <DualIcon />
+    // throw new Error(`Unknown operation: ${name}`)
   }
 }
 

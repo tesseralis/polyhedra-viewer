@@ -9,6 +9,7 @@ import {
 import { dual, expand, snub, contract, twist } from "./resizeOps"
 import { elongate, gyroelongate, shorten, turn } from "./prismOps"
 import { augment, diminish, gyrate } from "./cutPasteOps"
+import { double, halve } from "./doubleOps"
 
 export type { default as Operation, AnimationData } from "./Operation"
 
@@ -28,6 +29,8 @@ export const operations = {
   gyroelongate,
   shorten,
   turn,
+  double,
+  halve,
   augment,
   diminish,
   gyrate,
