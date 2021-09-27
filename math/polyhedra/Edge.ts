@@ -1,4 +1,4 @@
-import { once } from "lodash"
+import { once } from "lodash-es"
 import { angleBetween, getMidpoint } from "math/geom"
 import Facet from "./Facet"
 import type Vertex from "./Vertex"

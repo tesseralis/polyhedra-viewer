@@ -1,4 +1,4 @@
-import type { ValueIteratee } from "lodash"
+import type { ValueIteratee } from "lodash-es"
 import { uniqBy } from "lodash-es"
 import { MathUtils } from "three"
 
