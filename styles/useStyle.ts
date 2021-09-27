@@ -42,7 +42,7 @@ import { css, CSSObject } from "@emotion/css"
 export default function useStyle(styles: CSSObject, deps: unknown[] = []) {
   return useMemo(() => {
     return (prop = "className") => ({
-      [prop]: css({ styles }),
+      [prop]: css(styles),
     })
     // eslint-disable-next-line
   }, [styles, ...deps])
