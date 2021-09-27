@@ -1,6 +1,6 @@
 import React from "react"
 
-import { useStyle, fonts, scales } from "../styles"
+import { useStyle, fonts, scales } from "styles"
 
 import Icon from "@mdi/react"
 import { mdiHexagonOutline } from "@mdi/js"

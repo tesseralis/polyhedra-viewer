@@ -1,8 +1,8 @@
-import { Composite } from "../specs"
+import { Composite } from "specs"
 import { makeOpPair } from "../operationPairs"
-import { getCentroid } from "../math/geom"
+import { getCentroid } from "math/geom"
 import { getTransformedVertices } from "../operationUtils"
-import { find } from "utils"
+import { find } from "lib/utils"
 import { getSharpenPoint, getSharpenPointEdge } from "./truncateHelpers"
 
 export default makeOpPair<Composite>({

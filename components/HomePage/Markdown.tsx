@@ -3,8 +3,8 @@ import Markdown from "react-markdown"
 import { CSSProperties } from "aphrodite"
 
 import { ExternalLink } from "components/common"
-import { useStyle, fonts, scales } from "../styles"
-import { marginHoriz, link } from "../styles/common"
+import { useStyle, fonts, scales } from "styles"
+import { marginHoriz, link } from "styles/common"
 
 function styled(el: ReactType, styles: CSSProperties) {
   const El = el

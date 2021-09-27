@@ -1,14 +1,14 @@
 import { isMatch, pickBy } from "lodash-es"
-import { PolyhedronSpecs } from "../specs"
-import { VertexArg } from "../math/polyhedra"
+import { PolyhedronSpecs } from "specs"
+import { VertexArg } from "math/polyhedra"
 import {
   OpArgs,
   SolidArgs,
   GraphEntry as DirectedGraphEntry,
 } from "./Operation"
 import { Pose, alignPolyhedron, getGeometry } from "./operationUtils"
-import BaseForme from "../math/formes/BaseForme"
-import { PolyhedronForme as Forme, createForme } from "../math/formes"
+import BaseForme from "math/formes/BaseForme"
+import { PolyhedronForme as Forme, createForme } from "math/formes"
 
 export type Side = "left" | "right"
 

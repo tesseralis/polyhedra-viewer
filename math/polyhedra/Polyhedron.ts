@@ -10,10 +10,10 @@ import {
 } from "lodash-es"
 import { Vector3 } from "three"
 
-import { Point } from "types"
-import { getSolidData } from "../data/common"
-import { polygons } from "../specs"
-import { getCentroid } from "../math/geom"
+import { Point } from "lib/types"
+import { getSolidData } from "data/common"
+import { polygons } from "specs"
+import { getCentroid } from "math/geom"
 
 import { SolidData, RawSolidData } from "./solidTypes"
 import Face from "./Face"
@@ -22,7 +22,7 @@ import Edge from "./Edge"
 import Cap, { CapSearchOpts } from "./Cap"
 import Builder from "./SolidBuilder"
 import { VertexArg, FaceArg } from "./SolidBuilder"
-import { find } from "utils"
+import { find } from "lib/utils"
 const { PI, cbrt } = Math
 
 function calculateEdges(faces: Face[]) {

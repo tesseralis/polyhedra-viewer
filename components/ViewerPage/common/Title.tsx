@@ -1,8 +1,8 @@
 import { capitalize } from "lodash-es"
 import React from "react"
-import { useStyle, scales } from "../styles"
+import { useStyle, scales } from "styles"
 
-import { media, fonts } from "../styles"
+import { media, fonts } from "styles"
 
 function Title({ name }: { name: string }) {
   const css = useStyle({

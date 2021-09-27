@@ -1,8 +1,8 @@
 import React, { memo } from "react"
 import { CSSProperties } from "aphrodite"
 
-import { useStyle, media, scales } from "../styles"
-import { scroll, paddingHoriz, flexRow } from "../styles/common"
+import { useStyle, media, scales } from "styles"
+import { scroll, paddingHoriz, flexRow } from "styles/common"
 import {
   BackLink,
   Title,

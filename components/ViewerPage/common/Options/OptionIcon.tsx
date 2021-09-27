@@ -2,7 +2,7 @@ import { take } from "lodash-es"
 
 import React, { memo } from "react"
 
-import { useStyle, scales } from "../styles"
+import { useStyle, scales } from "styles"
 import {
   Point2D,
   Polygon,
@@ -10,7 +10,7 @@ import {
   PolyShape,
   polygonPoints,
 } from "components/svg"
-import { square } from "../styles/common"
+import { square } from "styles/common"
 
 interface Props {
   name: string

@@ -1,6 +1,6 @@
 import { BiMap } from "../lib/bimap"
-import { allSolidNames } from "../data/common"
-import { getCanonicalSpecs } from "../specs"
+import { allSolidNames } from "data/common"
+import { getCanonicalSpecs } from "specs"
 
 function getConwayNotation(name: string) {
   return getCanonicalSpecs(name).conwaySymbol()

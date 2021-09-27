@@ -2,7 +2,7 @@ import { capitalize } from "lodash-es"
 import React, { useEffect } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 
-import { escape } from "utils"
+import { escape } from "lib/utils"
 import { wrapProviders } from "components/common"
 import { OperationCtx, TransitionCtx, PolyhedronCtx } from "./context"
 import DesktopViewer from "./DesktopViewer"

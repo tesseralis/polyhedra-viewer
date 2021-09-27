@@ -4,9 +4,9 @@ import CapstoneForme from "./CapstoneForme"
 import CompositeForme from "./CompositeForme"
 import ElementaryForme from "./ElementaryForme"
 
-import { PolyhedronSpecs, getSpecs } from "../specs"
-import { getGeometry } from "../math/operations/operationUtils"
-import { Polyhedron } from "../math/polyhedra"
+import { PolyhedronSpecs, getSpecs } from "specs"
+import { getGeometry } from "math/operations/operationUtils"
+import { Polyhedron } from "math/polyhedra"
 
 // TODO figure out how to return the right forme without the `any` cast
 // TODO figure out the most optimal place to normalize solids

@@ -1,6 +1,6 @@
-import { find } from "utils"
+import { find } from "lib/utils"
 import CompositeForme from "../CompositeForme"
-import { Face } from "../math/polyhedra"
+import { Face } from "math/polyhedra"
 
 describe("CompositeForme", () => {
   describe("canAugment", () => {

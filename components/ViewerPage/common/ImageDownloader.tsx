@@ -2,8 +2,8 @@ import * as React from "react"
 import JSZip from "jszip"
 import FileSaver from "file-saver"
 
-import { escape } from "utils"
-import { allSolidNames } from "../data/common"
+import { escape } from "lib/utils"
+import { allSolidNames } from "data/common"
 
 /**
  * Utility class to download image thumbnails. Do NOT use in production

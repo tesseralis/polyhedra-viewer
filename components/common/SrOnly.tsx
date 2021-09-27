@@ -1,6 +1,6 @@
 import React from "react"
-import { useStyle } from "../styles"
-import { ChildrenProp } from "types"
+import { useStyle } from "styles"
+import { ChildrenProp } from "lib/types"
 
 export default function SrOnly({ children }: ChildrenProp) {
   const css = useStyle({

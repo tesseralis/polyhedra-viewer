@@ -1,4 +1,4 @@
-import { Classical, FacetType, twists, oppositeTwist } from "../specs"
+import { Classical, FacetType, twists, oppositeTwist } from "specs"
 import { makeOpPair, OpPairInput, GraphOpts } from "../operationPairs"
 import {
   getTransformedVertices,
@@ -6,7 +6,7 @@ import {
   TwistOpts,
   Pose,
 } from "../operationUtils"
-import { ClassicalForme, fromSpecs } from "../math/formes"
+import { ClassicalForme, fromSpecs } from "math/formes"
 
 /**
  * Return the expanded vertices of the polyhedron resized to the given distance-from-center

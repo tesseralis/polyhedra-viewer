@@ -1,7 +1,7 @@
 import { once } from "lodash-es"
 
-import { flatMapUniq, find } from "utils"
-import { CapType, PolygonType, PrimaryPolygon } from "../specs"
+import { flatMapUniq, find } from "lib/utils"
+import { CapType, PolygonType, PrimaryPolygon } from "specs"
 import Facet from "./Facet"
 import type Polyhedron from "./Polyhedron"
 import type Face from "./Face"

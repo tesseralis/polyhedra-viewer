@@ -2,7 +2,7 @@ import React from "react"
 import Icon from "@mdi/react"
 import { mdiFacebook, mdiTwitter, mdiReddit } from "@mdi/js"
 
-import { useStyle, fonts, scales } from "../styles"
+import { useStyle, fonts, scales } from "styles"
 import { ExternalLink, SrOnly } from "components/common"
 
 const url = "http://polyhedra.tessera.li"

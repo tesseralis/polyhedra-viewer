@@ -1,10 +1,10 @@
 import { findKey, countBy } from "lodash-es"
 import { Vector3 } from "three"
-import { getCentroid } from "../math/geom"
+import { getCentroid } from "math/geom"
 import { VIndex } from "./solidTypes"
 import Facet from "./Facet"
 import type Polyhedron from "./Polyhedron"
-import { splitAt } from "utils"
+import { splitAt } from "lib/utils"
 
 function getCycles<T>(array: T[]) {
   return array.map((val, i) => {

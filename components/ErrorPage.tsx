@@ -1,8 +1,8 @@
 import React from "react"
 import { Link } from "react-router-dom"
 
-import { useStyle, fonts, scales, media } from "../styles"
-import { square, link } from "../styles/common"
+import { useStyle, fonts, scales, media } from "styles"
+import { square, link } from "styles/common"
 import image from "images/sad-scutoid.png"
 import { usePageTitle } from "components/common"
 

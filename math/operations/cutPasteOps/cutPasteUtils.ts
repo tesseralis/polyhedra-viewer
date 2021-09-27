@@ -1,6 +1,6 @@
 import { minBy, pickBy } from "lodash-es"
 import { Vector3 } from "three"
-import { Face, Cap } from "../math/polyhedra"
+import { Face, Cap } from "math/polyhedra"
 import {
   Capstone,
   Composite,
@@ -9,10 +9,10 @@ import {
   Align,
   Gyration,
   gyrations,
-} from "../specs"
+} from "specs"
 import { OpArgs } from "../Operation"
-import { PolyhedronSpecs } from "../specs"
-import { PolyhedronForme as Forme, CompositeForme } from "../math/formes"
+import { PolyhedronSpecs } from "specs"
+import { PolyhedronForme as Forme, CompositeForme } from "math/formes"
 import { GraphGenerator, OpInput, toDirected } from "../operationPairs"
 import removeCap from "./removeCap"
 import addCap, { CrossAxis } from "./addCap"

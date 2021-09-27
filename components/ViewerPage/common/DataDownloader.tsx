@@ -1,12 +1,12 @@
 import React from "react"
 import Icon from "@mdi/react"
 
-import { useStyle, scales } from "../styles"
+import { useStyle, scales } from "styles"
 import { SrOnly } from "components/common"
-import { fonts } from "../styles"
+import { fonts } from "styles"
 
-import { RawSolidData } from "../math/polyhedra"
-import { hover } from "../styles/common"
+import { RawSolidData } from "math/polyhedra"
+import { hover } from "styles/common"
 import { mdiDownload } from "@mdi/js"
 
 function formatDecimal(number: number) {

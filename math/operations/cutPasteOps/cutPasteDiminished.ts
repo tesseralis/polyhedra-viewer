@@ -1,4 +1,4 @@
-import { Composite } from "../specs"
+import { Composite } from "specs"
 import { makeCutPastePair } from "./cutPasteUtils"
 
 export default makeCutPastePair<Composite>({

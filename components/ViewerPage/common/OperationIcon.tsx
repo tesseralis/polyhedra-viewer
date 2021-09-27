@@ -3,10 +3,10 @@ import { range } from "lodash-es"
 import React, { memo, ComponentType } from "react"
 import { StyleSheet, css } from "aphrodite/no-important"
 
-import { OpName } from "../math/operations"
+import { OpName } from "math/operations"
 import { Polygon, PolyLine } from "components/svg"
-import { square } from "../styles/common"
-import { scales } from "../styles"
+import { square } from "styles/common"
+import { scales } from "styles"
 const { sqrt } = Math
 
 type SheetDefinition = { [key: string]: {} }

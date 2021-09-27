@@ -1,4 +1,4 @@
-import { escape } from "utils"
+import { escape } from "lib/utils"
 export const getPolyhedraNames = (groupName: string): string[] =>
   require(`./names/${groupName}.json`)
 

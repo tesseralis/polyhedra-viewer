@@ -1,11 +1,11 @@
 import React from "react"
 import { NavLink, NavLinkProps } from "react-router-dom"
-import { useStyle, scales } from "../styles"
+import { useStyle, scales } from "styles"
 import Icon from "@mdi/react"
 
-import { media, fonts } from "../styles"
+import { media, fonts } from "styles"
 import { SrOnly } from "components/common"
-import { colorFill, flexColumn } from "../styles/common"
+import { colorFill, flexColumn } from "styles/common"
 
 interface Props extends NavLinkProps {
   iconName: string

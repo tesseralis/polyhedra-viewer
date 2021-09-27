@@ -7,9 +7,9 @@ import {
   useLocation,
 } from "react-router-dom"
 
-import { escape, choose } from "utils"
-import { isValidSolid, allSolidNames } from "../data/common"
-import { isAlternateName } from "../data/alternates"
+import { escape, choose } from "lib/utils"
+import { isValidSolid, allSolidNames } from "data/common"
+import { isAlternateName } from "data/alternates"
 import { isConwayNotation, fromConwayNotation } from "./conway"
 
 import ErrorPage from "components/ErrorPage"

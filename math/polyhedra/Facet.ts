@@ -1,6 +1,6 @@
 import { once } from "lodash-es"
 import { Vector3, Ray, Matrix4 } from "three"
-import { translateMat, getCentroid, withOrigin, vecEquals } from "../math/geom"
+import { translateMat, getCentroid, withOrigin, vecEquals } from "math/geom"
 import type Polyhedron from "./Polyhedron"
 import type Vertex from "./Vertex"
 import type Face from "./Face"

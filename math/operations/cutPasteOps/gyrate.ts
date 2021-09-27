@@ -1,10 +1,10 @@
-import { Polyhedron } from "../math/polyhedra"
-import { mapObject } from "utils"
-import { PolyhedronSpecs, Capstone, Composite } from "../specs"
+import { Polyhedron } from "math/polyhedra"
+import { mapObject } from "lib/utils"
+import { PolyhedronSpecs, Capstone, Composite } from "specs"
 import { CapOptions, capOptionArgs } from "./cutPasteUtils"
 import { getTransformedVertices } from "../operationUtils"
 import { makeOperation } from "../Operation"
-import { PolyhedronForme as Forme } from "../math/formes"
+import { PolyhedronForme as Forme } from "math/formes"
 import {
   GraphGenerator,
   toDirected,

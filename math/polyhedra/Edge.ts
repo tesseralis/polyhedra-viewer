@@ -1,8 +1,8 @@
 import { once } from "lodash"
-import { angleBetween, getMidpoint } from "../math/geom"
+import { angleBetween, getMidpoint } from "math/geom"
 import Facet from "./Facet"
 import type Vertex from "./Vertex"
-import { find } from "utils"
+import { find } from "lib/utils"
 
 export default class Edge extends Facet {
   v1: Vertex

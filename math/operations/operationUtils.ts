@@ -7,10 +7,10 @@ import {
   Vertex,
   VertexList,
   VertexArg,
-} from "../math/polyhedra"
-import { Transform, translateMat, scaleMat } from "../math/geom"
-import { mapObject } from "utils"
-import { PolyhedronSpecs, FacetType, Twist } from "../specs"
+} from "math/polyhedra"
+import { Transform, translateMat, scaleMat } from "math/geom"
+import { mapObject } from "lib/utils"
+import { PolyhedronSpecs, FacetType, Twist } from "specs"
 
 export interface FacetOpts {
   facet: FacetType

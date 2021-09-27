@@ -1,13 +1,13 @@
 import React from "react"
 import { CSSProperties } from "aphrodite"
-import { useStyle, scales } from "../styles"
+import { useStyle, scales } from "styles"
 
-import { Table, TableSection as TableSectionType } from "tables"
-import { media, fonts } from "../styles"
+import { Table, TableSection as TableSectionType } from "lib/tables"
+import { media, fonts } from "styles"
 import * as text from "./text"
 import Description from "./Description"
 import PolyhedronTable from "./PolyhedronTable"
-import { flexColumn, paddingHoriz } from "../styles/common"
+import { flexColumn, paddingHoriz } from "styles/common"
 
 const gridAreaMapping: Record<string, string> = {
   "Platonic and Archimedean Solids": "plato",

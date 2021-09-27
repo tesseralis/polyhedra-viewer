@@ -9,8 +9,8 @@ import {
   createEvent,
   getByTestId,
 } from "@testing-library/react"
-import { Polyhedron, Face } from "../math/polyhedra"
-import { Point } from "types"
+import { Polyhedron, Face } from "math/polyhedra"
+import { Point } from "lib/types"
 
 import { MemoryRouter, Routes, Route } from "react-router-dom"
 import ViewerPage from "../ViewerPage"

@@ -2,8 +2,8 @@ import React, { useState } from "react"
 import Icon from "@mdi/react"
 import { mdiMenuDown } from "@mdi/js"
 
-import { useStyle, fonts, scales } from "../styles"
-import { flexRow, flexColumn, link } from "../styles/common"
+import { useStyle, fonts, scales } from "styles"
+import { flexRow, flexColumn, link } from "styles/common"
 import { SrOnly } from "components/common"
 import Markdown from "./Markdown"
 

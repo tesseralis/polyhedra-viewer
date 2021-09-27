@@ -1,5 +1,5 @@
 import { pickBy, isMatch } from "lodash-es"
-import { getSingle } from "utils"
+import { getSingle } from "lib/utils"
 import type Specs from "./PolyhedronSpecs"
 
 type Predicate<T> = (arg: T) => boolean

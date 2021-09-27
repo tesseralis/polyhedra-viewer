@@ -1,7 +1,7 @@
-import { Elementary } from "../specs"
+import { Elementary } from "specs"
 import BaseForme from "./BaseForme"
-import { Polyhedron, Face } from "../math/polyhedra"
-import { find } from "utils"
+import { Polyhedron, Face } from "math/polyhedra"
+import { find } from "lib/utils"
 import { isEqual } from "lodash-es"
 import { ClassicalFace } from "./FaceType"
 

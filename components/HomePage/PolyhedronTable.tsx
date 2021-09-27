@@ -1,9 +1,9 @@
 import React, { ThHTMLAttributes } from "react"
 
-import { Table } from "tables"
-import { PolyhedronSpecs, getCanonicalSpecs } from "../specs"
+import { Table } from "lib/tables"
+import { PolyhedronSpecs, getCanonicalSpecs } from "specs"
 import PolyhedronLink from "./PolyhedronLink"
-import { media, fonts, useStyle, scales } from "../styles"
+import { media, fonts, useStyle, scales } from "styles"
 
 function useCellStyle() {
   return useStyle({

@@ -1,4 +1,4 @@
-import { PrimaryPolygon, FacetType, PolygonType, PrismaticType } from "../specs"
+import { PrimaryPolygon, FacetType, PolygonType, PrismaticType } from "specs"
 
 interface BaseClassical {
   type: "classical"

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from "react"
-import { media } from "../styles"
-import { ChildrenProp } from "types"
+import { media } from "styles"
+import { ChildrenProp } from "lib/types"
 
 function getWindowWidth() {
   return window.innerWidth > 0 ? window.innerWidth : window.screen.width

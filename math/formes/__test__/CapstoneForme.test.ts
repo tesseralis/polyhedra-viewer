@@ -1,4 +1,4 @@
-import { Edge } from "../math/polyhedra"
+import { Edge } from "math/polyhedra"
 import CapstoneForme from "../CapstoneForme"
 
 describe("CapstoneForme", () => {

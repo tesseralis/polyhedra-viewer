@@ -1,11 +1,11 @@
 import { Vector3 } from "three"
 import { pickBy, mapValues, isMatch, compact, uniq } from "lodash-es"
 
-import { Polyhedron, Face, VertexArg, normalizeVertex } from "../math/polyhedra"
+import { Polyhedron, Face, VertexArg, normalizeVertex } from "math/polyhedra"
 import { deduplicateVertices } from "./operationUtils"
-import { PolyhedronSpecs } from "../specs"
-import { PolyhedronForme as Forme, createForme, FaceType } from "../math/formes"
-import { find, EntryIters, cartesian } from "utils"
+import { PolyhedronSpecs } from "specs"
+import { PolyhedronForme as Forme, createForme, FaceType } from "math/formes"
+import { find, EntryIters, cartesian } from "lib/utils"
 
 type SelectState = "selected" | "selectable" | undefined
 

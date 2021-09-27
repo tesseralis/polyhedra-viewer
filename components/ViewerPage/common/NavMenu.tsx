@@ -8,7 +8,7 @@ import {
   mdiCubeOutline,
 } from "@mdi/js"
 
-import { useStyle } from "../styles"
+import { useStyle } from "styles"
 import IconLink from "./IconLink"
 
 interface Props {

@@ -1,5 +1,5 @@
 import { zip } from "lodash-es"
-import { SolidData } from "../math/polyhedra"
+import { SolidData } from "math/polyhedra"
 import React, { useRef, useMemo } from "react"
 import {
   Color,

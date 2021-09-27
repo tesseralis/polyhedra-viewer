@@ -2,8 +2,8 @@ import React, { ComponentType } from "react"
 import { round } from "lodash-es"
 import { Link } from "react-router-dom"
 
-import { escape } from "utils"
-import { fonts, useStyle, scales } from "../styles"
+import { escape } from "lib/utils"
+import { fonts, useStyle, scales } from "styles"
 
 import {
   Sup,

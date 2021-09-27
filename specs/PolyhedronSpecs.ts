@@ -7,7 +7,7 @@ import getSymmetry from "./getSymmetry"
 import getName from "./getName"
 import getConwaySymbol from "./getConwaySymbol"
 import type { Symmetry } from "./symmetry"
-import { getAlternateNames, getCanonicalName } from "../data/alternates"
+import { getAlternateNames, getCanonicalName } from "data/alternates"
 
 export type PolyhedronSpecs = Classical | Capstone | Composite | Elementary
 

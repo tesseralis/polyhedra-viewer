@@ -1,7 +1,7 @@
 import React from "react"
-import { useStyle, scales } from "../styles"
+import { useStyle, scales } from "styles"
 
-import { media, fonts } from "../styles"
+import { media, fonts } from "styles"
 import { OperationCtx } from "components/ViewerPage/context"
 
 function getMessage(opName: string) {

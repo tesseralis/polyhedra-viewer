@@ -1,10 +1,10 @@
 import React from "react"
 import { Link } from "react-router-dom"
 
-import { escape } from "utils"
-import { square, hover, flexRow } from "../styles/common"
-import { useStyle, media } from "../styles"
-import { PolyhedronSpecs } from "../specs"
+import { escape } from "lib/utils"
+import { square, hover, flexRow } from "styles/common"
+import { useStyle, media } from "styles"
+import { PolyhedronSpecs } from "specs"
 
 interface Props {
   specs: PolyhedronSpecs

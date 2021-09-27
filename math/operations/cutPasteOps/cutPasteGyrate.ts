@@ -1,4 +1,4 @@
-import { Composite, gyrations } from "../specs"
+import { Composite, gyrations } from "specs"
 import { makeCutPastePair } from "./cutPasteUtils"
 
 export default makeCutPastePair<Composite>({

@@ -1,5 +1,5 @@
 import { range } from "lodash-es"
-import { Items } from "types"
+import { Items } from "lib/types"
 import Specs from "./PolyhedronSpecs"
 import Queries from "./Queries"
 import {

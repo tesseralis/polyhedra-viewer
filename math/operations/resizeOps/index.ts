@@ -1,7 +1,7 @@
 import { combineOps } from "../operationPairs"
 import { FacetOpts } from "../operationUtils"
 import Operation, { makeOperation } from "../Operation"
-import { Classical, Capstone } from "../specs"
+import { Classical, Capstone } from "specs"
 import * as classicals from "./resizeClassical"
 import * as prisms from "./resizePrism"
 import regularDual from "./dualRegular"

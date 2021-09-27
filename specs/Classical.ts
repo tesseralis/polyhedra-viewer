@@ -1,4 +1,4 @@
-import { Items } from "types"
+import { Items } from "lib/types"
 import { PrimaryPolygon, primaryPolygons, Twist, twists } from "./common"
 import Specs from "./PolyhedronSpecs"
 import Queries from "./Queries"

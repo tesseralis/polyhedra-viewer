@@ -1,10 +1,10 @@
 import React, { ButtonHTMLAttributes } from "react"
-import { useStyle, scales } from "../styles"
+import { useStyle, scales } from "styles"
 
 import { PolyhedronCtx, OperationCtx } from "components/ViewerPage/context"
 import OptionIcon from "./OptionIcon"
-import { verdana } from "../styles/fonts"
-import { hover, square, flexRow, flexColumn } from "../styles/common"
+import { verdana } from "styles/fonts"
+import { hover, square, flexRow, flexColumn } from "styles/common"
 
 interface BtnProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   optValue: string

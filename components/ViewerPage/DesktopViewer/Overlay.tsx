@@ -1,9 +1,9 @@
 //@flow
 
 import React from "react"
-import { useStyle, scales } from "../styles"
+import { useStyle, scales } from "styles"
 
-import { absolute, absoluteFull, paddingHoriz } from "../styles/common"
+import { absolute, absoluteFull, paddingHoriz } from "styles/common"
 import { BackLink, Title, Options, Prompt } from "../common"
 
 interface Props {

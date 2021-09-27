@@ -1,4 +1,4 @@
-import { Point } from "types"
+import { Point } from "lib/types"
 import { Vector3 } from "three"
 export type VIndex = number
 export type FIndex = number

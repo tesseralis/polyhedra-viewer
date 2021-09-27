@@ -1,6 +1,6 @@
 import { Color } from "three"
-import { PolyhedronForme as Forme, FaceType } from "../math/formes"
-import { Face } from "../math/polyhedra"
+import { PolyhedronForme as Forme, FaceType } from "math/formes"
+import { Face } from "math/polyhedra"
 
 export type FaceColor = Color | Color[]
 

@@ -1,8 +1,8 @@
 import { mean } from "lodash-es"
 import { Vector3 } from "three"
-import { PolyhedronSpecs, FacetType } from "../specs"
-import { Classical, Capstone, Composite, Elementary } from "../specs"
-import { Polyhedron, Face, Cap } from "../math/polyhedra"
+import { PolyhedronSpecs, FacetType } from "specs"
+import { Classical, Capstone, Composite, Elementary } from "specs"
+import { Polyhedron, Face, Cap } from "math/polyhedra"
 
 import type ClassicalForme from "./ClassicalForme"
 import type CapstoneForme from "./CapstoneForme"
@@ -13,8 +13,8 @@ import {
   Orientation,
   Pose,
   alignPolyhedron,
-} from "../math/operations/operationUtils"
-import { find } from "utils"
+} from "math/operations/operationUtils"
+import { find } from "lib/utils"
 
 export type PolyhedronForme<
   S extends PolyhedronSpecs = PolyhedronSpecs

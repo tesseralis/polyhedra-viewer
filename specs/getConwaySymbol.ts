@@ -1,5 +1,5 @@
 import type Specs from "./PolyhedronSpecs"
-import { getPolyhedraNames } from "../data/common"
+import { getPolyhedraNames } from "data/common"
 const johnsonSolids = getPolyhedraNames("johnson")
 
 const operationMapping = {

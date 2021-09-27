@@ -1,8 +1,8 @@
 import { pick } from "lodash-es"
 import React, { useRef, useState } from "react"
-import { Table } from "tables"
+import { Table } from "lib/tables"
 import ConfigCtx from "components/ConfigCtx"
-import { fromSpecs } from "../math/formes"
+import { fromSpecs } from "math/formes"
 
 import { useFrame } from "react-three-fiber"
 // FIXME edit these imports
@@ -53,7 +53,7 @@ function PolyhedronEntry({ entry, position, navigate }: any) {
       scale={isDupe ? [2 / 3, 2 / 3, 2 / 3] : [1, 1, 1]}
     >
       <PolyhedronModel
-        onClick={() => navigate(`/${escape(entry.name())}`)}
+        onClick={() => navigate.push(`/${escape(entry.name())}`)}
         onPointerMove={() => setHovered(true)}
         onPointerOut={() => setHovered(false)}
         value={geom.solidData}
@@ -109,7 +109,7 @@ function PolyhedronRow({ row, position, navigate }: any) {
 interface Props {
   table: Table
   // FIXME figure out how not to need to pass this all the way down
-  navigate: (blah: any) => void
+  navigate: any
 }
 
 export default function PolyhedronTable({ table, navigate }: Props) {

@@ -1,7 +1,7 @@
-import { FacetType } from "../specs"
-import { getSpecs } from "../specs"
-import { OpName, operations } from "../math/operations"
-import { PolyhedronForme, createForme, fromName } from "../math/formes"
+import { FacetType } from "specs"
+import { getSpecs } from "specs"
+import { OpName, operations } from "math/operations"
+import { PolyhedronForme, createForme, fromName } from "math/formes"
 import { validateOperationApplication } from "../operationTestUtils"
 
 interface Args {

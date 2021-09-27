@@ -1,8 +1,8 @@
 import React from "react"
-import { useStyle, scales } from "../styles"
+import { useStyle, scales } from "styles"
 
 import { NavMenu, Panels, useHiddenHeading } from "../common"
-import { paddingHoriz, scroll } from "../styles/common"
+import { paddingHoriz, scroll } from "styles/common"
 
 import OperationsPanel from "./OperationsPanel"
 

@@ -1,4 +1,4 @@
-import { Items } from "types"
+import { Items } from "lib/types"
 import { BiMap } from "../lib/bimap"
 
 export const polygonNames = new BiMap([

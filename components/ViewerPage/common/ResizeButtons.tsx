@@ -1,12 +1,12 @@
 import React, { ButtonHTMLAttributes } from "react"
-import { useStyle, scales } from "../styles"
+import { useStyle, scales } from "styles"
 
 import { TransitionCtx, PolyhedronCtx } from "components/ViewerPage/context"
 
-import { createForme } from "../math/formes"
-import { Polyhedron } from "../math/polyhedra"
-import { andaleMono } from "../styles/fonts"
-import { hover } from "../styles/common"
+import { createForme } from "math/formes"
+import { Polyhedron } from "math/polyhedra"
+import { andaleMono } from "styles/fonts"
+import { hover } from "styles/common"
 
 function ResetButton(props: ButtonHTMLAttributes<Element>) {
   const css = useStyle({

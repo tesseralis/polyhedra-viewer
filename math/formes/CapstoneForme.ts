@@ -1,10 +1,10 @@
-import { find, pivot } from "utils"
+import { find, pivot } from "lib/utils"
 import { once } from "lodash"
 import BaseForme from "./BaseForme"
-import { Capstone } from "../specs"
-import { Polyhedron, Face, Edge, Cap, FaceLike, Facet } from "../math/polyhedra"
-import { getCentroid } from "../math/geom"
-import { getGeometry } from "../math/operations/operationUtils"
+import { Capstone } from "specs"
+import { Polyhedron, Face, Edge, Cap, FaceLike, Facet } from "math/polyhedra"
+import { getCentroid } from "math/geom"
+import { getGeometry } from "math/operations/operationUtils"
 import { CapstoneFace } from "./FaceType"
 
 type CapstoneEnd = Facet

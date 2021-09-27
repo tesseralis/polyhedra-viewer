@@ -1,6 +1,6 @@
 import { countBy } from "lodash-es"
 
-import { getCyclic, flatMapUniq } from "utils"
+import { getCyclic, flatMapUniq } from "lib/utils"
 import { VIndex, FIndex } from "./solidTypes"
 import type Polyhedron from "./Polyhedron"
 import FaceLike from "./FaceLike"

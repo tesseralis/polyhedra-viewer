@@ -2,9 +2,9 @@ import React, { memo, useState, InputHTMLAttributes } from "react"
 import Icon from "@mdi/react"
 import { mdiMagnify } from "@mdi/js"
 
-import { useStyle, scales } from "../styles"
-import { andaleMono } from "../styles/fonts"
-import { flexRow } from "../styles/common"
+import { useStyle, scales } from "styles"
+import { andaleMono } from "styles/fonts"
+import { flexRow } from "styles/common"
 
 const duration = "0.35s"
 

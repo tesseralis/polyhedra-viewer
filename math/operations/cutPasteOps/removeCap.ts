@@ -1,6 +1,6 @@
 import { range } from "lodash-es"
-import { mapObject } from "utils"
-import { Polyhedron, Cap } from "../math/polyhedra"
+import { mapObject } from "lib/utils"
+import { Polyhedron, Cap } from "math/polyhedra"
 import {
   getTransformedVertices,
   removeExtraneousVertices,

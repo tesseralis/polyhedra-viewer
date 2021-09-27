@@ -1,9 +1,9 @@
 import { sum } from "lodash-es"
-import { facetTypes } from "../specs"
+import { facetTypes } from "specs"
 import { getTransformedVertices, Pose } from "../operationUtils"
-import { ClassicalForme, fromSpecs } from "../math/formes"
+import { ClassicalForme, fromSpecs } from "math/formes"
 import { makeTruncateTrio } from "./truncateHelpers"
-import { scaleMat } from "../math/geom"
+import { scaleMat } from "math/geom"
 
 function avgInradius(forme: ClassicalForme) {
   return sum(facetTypes.map((f) => forme.inradius(f))) / facetTypes.length

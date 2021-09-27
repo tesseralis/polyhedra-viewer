@@ -3,10 +3,10 @@ import { Link } from "react-router-dom"
 
 import { SrOnly, ExternalLink } from "components/common"
 import Markdown from "./Markdown"
-import { useStyle, media, fonts, scales } from "../styles"
+import { useStyle, media, fonts, scales } from "styles"
 import * as text from "./text"
 import video from "images/transitions.mp4"
-import { flexRow, flexColumn, padding, link } from "../styles/common"
+import { flexRow, flexColumn, padding, link } from "styles/common"
 
 const videoHeight = 300
 

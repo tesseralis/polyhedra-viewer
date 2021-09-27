@@ -1,4 +1,4 @@
-import { Operation } from "../math/operations"
+import { Operation } from "math/operations"
 import { createHookedContext } from "components/common"
 
 const defaultState = {

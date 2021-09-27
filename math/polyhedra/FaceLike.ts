@@ -1,7 +1,7 @@
 import { Plane, Vector3 } from "three"
 
-import { find } from "utils"
-import { isPlanar, getNormal } from "../math/geom"
+import { find } from "lib/utils"
+import { isPlanar, getNormal } from "math/geom"
 import Facet from "./Facet"
 import type Edge from "./Edge"
 import type Vertex from "./Vertex"

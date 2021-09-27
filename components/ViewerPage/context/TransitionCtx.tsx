@@ -2,14 +2,14 @@ import { noop } from "lodash-es"
 import { Vector3, Color } from "three"
 import React, { useRef, useEffect, useContext, useCallback } from "react"
 
-import { ChildrenProp } from "types"
-import { repeat } from "utils"
+import { ChildrenProp } from "lib/types"
+import { repeat } from "lib/utils"
 import { createHookedContext } from "components/common"
 import Config from "components/ConfigCtx"
 import PolyhedronCtx from "./PolyhedronCtx"
 import transition from "transition"
-import { Polyhedron, SolidData } from "../math/polyhedra"
-import { AnimationData } from "../math/operations"
+import { Polyhedron, SolidData } from "math/polyhedra"
+import { AnimationData } from "math/operations"
 import {
   FaceColor,
   getFaceAppearance,

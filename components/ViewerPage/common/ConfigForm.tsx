@@ -1,5 +1,5 @@
 import React, { memo, useCallback, ButtonHTMLAttributes } from "react"
-import { useStyle, scales } from "../styles"
+import { useStyle, scales } from "styles"
 import { get, pick } from "lodash-es"
 
 import Config from "components/ConfigCtx"
@@ -7,8 +7,8 @@ import {
   configInputs,
   ConfigInput as InputType,
 } from "components/configOptions"
-import { hover, flexRow, flexColumn } from "../styles/common"
-import { andaleMono } from "../styles/fonts"
+import { hover, flexRow, flexColumn } from "styles/common"
+import { andaleMono } from "styles/fonts"
 
 function getInputValue<T>(input: InputType<T>, el: HTMLInputElement) {
   switch (input.type) {

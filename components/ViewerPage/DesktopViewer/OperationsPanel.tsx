@@ -1,8 +1,8 @@
 import React from "react"
-import { useStyle, scales } from "../styles"
+import { useStyle, scales } from "styles"
 
 import { ResizeButtons, OpGrid } from "../common"
-import { flexColumn } from "../styles/common"
+import { flexColumn } from "styles/common"
 
 export default function OperationsPanel() {
   const css = useStyle({

@@ -1,12 +1,12 @@
 import React from "react"
-import { useStyle, scales, media } from "../styles"
+import { useStyle, scales, media } from "styles"
 import { capitalize } from "lodash-es"
 
-import { fonts } from "../styles"
+import { fonts } from "styles"
 
 import { PolyhedronCtx } from "components/ViewerPage/context"
-import DataDownloader from "../DataDownloader"
-import { flexColumn } from "../styles/common"
+import DataDownloader from "dataDownloader"
+import { flexColumn } from "styles/common"
 
 import { RenderProps } from "./renderFuncs"
 import DataList from "./DataList"

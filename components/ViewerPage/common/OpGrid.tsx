@@ -2,10 +2,10 @@ import { uniq } from "lodash-es"
 
 import React, { memo } from "react"
 
-import { useStyle, scales } from "../styles"
-import { media, fonts } from "../styles"
-import { hover, scroll, square, flexColumn, flexRow } from "../styles/common"
-import { operations, OpName } from "../math/operations"
+import { useStyle, scales } from "styles"
+import { media, fonts } from "styles"
+import { hover, scroll, square, flexColumn, flexRow } from "styles/common"
+import { operations, OpName } from "math/operations"
 import {
   useApplyOperation,
   OperationCtx,

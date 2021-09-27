@@ -1,8 +1,8 @@
 import React, { useEffect } from "react"
 import { useLocation } from "react-router-dom"
 
-import { useStyle, scales } from "../styles"
-import { tableSections } from "tables"
+import { useStyle, scales } from "styles"
+import { tableSections } from "lib/tables"
 
 import useMediaInfo from "components/useMediaInfo"
 import { usePageTitle } from "components/common"
@@ -12,7 +12,7 @@ import TableSection from "./TableSection"
 import * as text from "./text"
 import Masthead from "./Masthead"
 import ShareLinks from "./ShareLinks"
-import { flexColumn, paddingVert } from "../styles/common"
+import { flexColumn, paddingVert } from "styles/common"
 
 function Main() {
   const { device, orientation } = useMediaInfo()

@@ -1,9 +1,9 @@
 import React from "react"
 import { Canvas } from "react-three-fiber"
-import { useStyle } from "../styles"
-import { tableSections } from "tables"
+import { useRouter } from "next/router"
+import { useStyle } from "styles"
+import { tableSections } from "lib/tables"
 import PolyhedronTable from "./PolyhedronTable"
-import { useNavigate } from "react-router-dom"
 import { OrthographicCamera, TrackballControls } from "drei"
 
 // TODO deduplicate with the controls in the other scene
@@ -11,7 +11,7 @@ const sectionSpacing = 50
 const subsecSpacing = 25
 // TODO why is this so slow to load??
 export default function MuseumScene() {
-  const navigate = useNavigate()
+  const router = useRouter()
   const style = useStyle({
     position: "absolute",
     backgroundColor: "#111",
@@ -33,7 +33,7 @@ export default function MuseumScene() {
             if (section.tables) {
               return section.tables.map((table, j) => (
                 <group key={table.caption} position={[j * subsecSpacing, 0, 0]}>
-                  <PolyhedronTable navigate={navigate} table={table} />
+                  <PolyhedronTable navigate={router} table={table} />
                 </group>
               ))
             }
@@ -46,7 +46,7 @@ export default function MuseumScene() {
                         key={table.caption}
                         position={[k * subsecSpacing, 0, 0]}
                       >
-                        <PolyhedronTable navigate={navigate} table={table} />
+                        <PolyhedronTable navigate={router} table={table} />
                       </group>
                     ))}
                   </group>
