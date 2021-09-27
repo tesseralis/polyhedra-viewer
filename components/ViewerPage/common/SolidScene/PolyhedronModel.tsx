@@ -8,6 +8,7 @@ import {
   DoubleSide,
   BufferGeometry,
   FrontSide,
+  Float32BufferAttribute,
 } from "three"
 import { Appearance } from "./getFormeColors"
 import { useFrame } from "@react-three/fiber"
@@ -28,9 +29,9 @@ function convertFace(face: number[], appearance: Appearance) {
 }
 
 function convertFaces(faces: number[][], colors: Appearance[]) {
-  return zip(faces, colors).flatMap(([face, color]) =>
-    convertFace(face!, color!),
-  )
+  return zip(faces, colors)
+    .flatMap(([face, color]) => convertFace(face!, color!))
+    .flat()
 }
 
 interface SolidConfig {
@@ -60,12 +61,20 @@ function SolidFaces({
   const ref = useRef<any>()
   useLayoutEffect(() => {
     if (ref.current) {
-      const geom = ref.current
-      geom.vertices = vertices
-      geom.verticesNeedUpdate = true
-      geom.setIndex(convertFaces(faces, appearance))
-      geom.elementsNeedUpdate = true
-      geom.colorsNeedUpdate = true
+      // console.log("using layout effect")
+      // ref.current.vertices = vertices
+      const vertexArray = vertices.flatMap((v) => v.toArray())
+      const verticesBuffer = new Float32BufferAttribute(vertexArray, 3)
+      ref.current.setAttribute("position", verticesBuffer)
+      // ref.current.verticesNeedUpdate = true
+      ref.current.setIndex(convertFaces(faces, appearance))
+      // console.log(convertFaces(faces, appearance))
+      ref.current.computeVertexNormals()
+      const colorArray = vertices.map((_) => [1, 0, 0]).flat()
+      const colorBuffer = new Float32BufferAttribute(colorArray, 3)
+      ref.current.setAttribute("color", colorBuffer)
+      // ref.current.elementsNeedUpdate = true
+      // ref.current.colorsNeedUpdate = true
       // geom.computeFaceNormals()
     }
   }, [vertices, faces, appearance])
@@ -74,7 +83,7 @@ function SolidFaces({
   const { showFaces, showInnerFaces } = config
   return (
     <mesh
-      visible={showFaces}
+      visible={true}
       onPointerDown={(e) => {
         hasMoved.current = false
       }}
@@ -96,13 +105,13 @@ function SolidFaces({
         attachArray="material"
         args={[{ vertexColors: true }]}
       />
-      <meshStandardMaterial
+      {/* <meshStandardMaterial
         side={showInnerFaces ? DoubleSide : FrontSide}
         attachArray="material"
         args={[{ vertexColors: true }]}
         transparent
         opacity={7 / 8}
-      />
+      /> */}
     </mesh>
   )
 }
