@@ -1,3 +1,5 @@
+import HomePage from "components/MuseumPage"
+
 export default function Page() {
-  return <div>'sup</div>
+  return <HomePage />
 }

@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "es6",
     "lib": ["es2019", "dom"],
-    "baseUrl": "src",
+    "baseUrl": ".",
     "allowJs": true,
     "skipLibCheck": false,
     "esModuleInterop": true,
@@ -18,6 +18,6 @@
     "isolatedModules": true,
     "typeRoots": ["node_modules/@types", "types"]
   },
-  "include": ["src"],
+  "include": ["**/*.ts", "**/*.tsx"],
   "exclude": ["node_modules"]
 }

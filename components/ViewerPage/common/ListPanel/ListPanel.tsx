@@ -2,11 +2,11 @@ import { capitalize } from "lodash-es"
 
 import React, { useState } from "react"
 import { NavLink } from "react-router-dom"
-import { fonts, useStyle, scales } from "styles"
+import { fonts, useStyle, scales } from "../styles"
 
 import { PolyhedronGroup, PolyhedronSubgroup, groups } from "../data/list"
 import { escape } from "utils"
-import { hover, padding, paddingVert, margin, marginVert } from "styles/common"
+import { hover, padding, paddingVert, margin, marginVert } from "../styles/common"
 
 import SearchBar from "./SearchBar"
 
