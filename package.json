@@ -37,7 +37,7 @@
     "react-markdown": "^4.3.1",
     "react-three-fiber": "^4.2.20",
     "three": "^0.118.3",
-    "typescript": "^3.9.5",
+    "typescript": "^4.4.3",
     "what-input": "^5.2.10"
   },
   "scripts": {
@@ -67,10 +67,5 @@
     "*.{ts,tsx}": [
       "eslint --fix"
     ]
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
   }
 }
