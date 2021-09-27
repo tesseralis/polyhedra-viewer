@@ -12,8 +12,7 @@
     "jest-extended": "^0.11.5",
     "lint-staged": "^10.2.10",
     "mutationobserver-shim": "^0.3.7",
-    "prettier": "^2.0.5",
-    "react-scripts": "^3.4.1"
+    "prettier": "^2.0.5"
   },
   "dependencies": {
     "@mdi/js": "^5.3.45",
@@ -32,20 +31,20 @@
     "history": "^5.0.0",
     "jszip": "^3.4.0",
     "lodash-es": "^4.17.15",
-    "react": "^16.13.1",
-    "react-dom": "^16.13.1",
-    "react-ga": "^3.0.0",
+    "next": "^11.1.2",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
     "react-markdown": "^4.3.1",
-    "react-router-dom": "^6.0.0-beta.0",
     "react-three-fiber": "^4.2.20",
     "three": "^0.118.3",
     "typescript": "^3.9.5",
     "what-input": "^5.2.10"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test --transformIgnorePatterns \"node_modules/(?!(lodash-es))/\"",
+    "dev": "next dev",
+    "start": "next start",
+    "build": "next build",
+    "test": "jest --transformIgnorePatterns \"node_modules/(?!(lodash-es))/\"",
     "prettier": "prettier 'src/**/*.{json,css}'",
     "eslint": "eslint 'src/**/*.{ts,tsx}'",
     "lint:code": "yarn eslint",
