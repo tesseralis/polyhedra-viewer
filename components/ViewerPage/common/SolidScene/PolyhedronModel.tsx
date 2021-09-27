@@ -12,7 +12,7 @@ import {
   Geometry,
 } from "three"
 import { Appearance } from "./getFormeColors"
-import { useFrame, useUpdate } from "react-three-fiber"
+import { useFrame, useUpdate } from "@react-three/fiber"
 
 function convertFace(face: number[], appearance: Appearance) {
   const [v0, ...vs] = face

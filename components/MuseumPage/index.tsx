@@ -1,10 +1,10 @@
 import React from "react"
-import { Canvas } from "react-three-fiber"
+import { Canvas } from "@react-three/fiber"
 import { useRouter } from "next/router"
 import { useStyle } from "styles"
 import { tableSections } from "lib/tables"
 import PolyhedronTable from "./PolyhedronTable"
-import { OrthographicCamera, TrackballControls } from "drei"
+import { OrthographicCamera, TrackballControls } from "@react-three/drei"
 
 // TODO deduplicate with the controls in the other scene
 const sectionSpacing = 50

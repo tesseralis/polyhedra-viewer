@@ -4,7 +4,7 @@ import { Table } from "lib/tables"
 import ConfigCtx from "components/ConfigCtx"
 import { fromSpecs } from "math/formes"
 
-import { useFrame } from "react-three-fiber"
+import { useFrame } from "@react-three/fiber"
 // FIXME edit these imports
 import getFormeColors, {
   mixColor,
