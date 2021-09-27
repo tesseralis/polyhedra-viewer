@@ -4,7 +4,7 @@ import { useStyle } from "styles"
 import { tableSections } from "tables"
 import PolyhedronTable from "./PolyhedronTable"
 import { useNavigate } from "react-router-dom"
-import { PerspectiveCamera, TrackballControls } from "drei"
+import { OrthographicCamera, TrackballControls } from "drei"
 
 // TODO deduplicate with the controls in the other scene
 const sectionSpacing = 50
@@ -23,11 +23,11 @@ export default function MuseumScene() {
   return (
     <div {...style()}>
       <Canvas>
-        <PerspectiveCamera makeDefault position={[0, 0, 75]}>
+        <OrthographicCamera makeDefault position={[0, 0, 75]}>
           {[]}
-        </PerspectiveCamera>
+        </OrthographicCamera>
         <directionalLight position={[0, 0.5, 1]} />
-        <TrackballControls enabled noRotate />
+        <TrackballControls enabled noRotate panSpeed={5} />
         <group>
           {tableSections.map((section, i) => {
             if (section.tables) {
