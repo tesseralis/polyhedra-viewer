@@ -1,30 +1,29 @@
 import { zip } from "lodash-es"
 import { SolidData } from "math/polyhedra"
-import React, { useRef, useMemo } from "react"
+import React, { useRef, useLayoutEffect, useMemo } from "react"
 import {
   Color,
   Vector3,
   BufferAttribute,
   DoubleSide,
-  Face3,
   BufferGeometry,
   FrontSide,
-  Geometry,
 } from "three"
 import { Appearance } from "./getFormeColors"
-import { useFrame, useUpdate } from "@react-three/fiber"
+import { useFrame } from "@react-three/fiber"
 
 function convertFace(face: number[], appearance: Appearance) {
   const [v0, ...vs] = face
   const pairs = zip(vs.slice(0, vs.length - 1), vs.slice(1))
   const { color, material } = appearance
   return pairs.map(([v1, v2]) => {
-    if (color instanceof Color) {
-      return new Face3(v0, v1!, v2!, undefined, color, material)
-    } else {
-      const colorArray = [v0, v1!, v2!].map((v) => color[face.indexOf(v)])
-      return new Face3(v0, v1!, v2!, undefined, colorArray, material)
-    }
+    return [v0, v1, v2]
+    // if (color instanceof Color) {
+    // return new Face3(v0, v1!, v2!, undefined, color, material)
+    // } else {
+    // const colorArray = [v0, v1!, v2!].map((v) => color[face.indexOf(v)])
+    // return new Face3(v0, v1!, v2!, undefined, colorArray, material)
+    // }
   })
 }
 
@@ -58,17 +57,18 @@ function SolidFaces({
   config,
 }: Props) {
   const { vertices, faces } = value
-  const ref = useUpdate(
-    (geom: Geometry) => {
+  const ref = useRef<any>()
+  useLayoutEffect(() => {
+    if (ref.current) {
+      const geom = ref.current
       geom.vertices = vertices
       geom.verticesNeedUpdate = true
-      geom.faces = convertFaces(faces, appearance)
+      geom.setIndex(convertFaces(faces, appearance))
       geom.elementsNeedUpdate = true
       geom.colorsNeedUpdate = true
-      geom.computeFaceNormals()
-    },
-    [vertices, faces, appearance],
-  )
+      // geom.computeFaceNormals()
+    }
+  }, [vertices, faces, appearance])
 
   const hasMoved = useRef(false)
   const { showFaces, showInnerFaces } = config
@@ -90,7 +90,7 @@ function SolidFaces({
         onPointerOut?.(e.point)
       }}
     >
-      <geometry ref={ref} attach="geometry" />
+      <bufferGeometry ref={ref} attach="geometry" />
       <meshLambertMaterial
         side={showInnerFaces ? DoubleSide : FrontSide}
         attachArray="material"
