@@ -78,7 +78,7 @@ export function alignPolyhedron(
 ) {
   const oldMat = getTransform(oldPose)
   const newMat = getTransform(newPose)
-  const oldMatInv = oldMat.getInverse(oldMat)
+  const oldMatInv = new Matrix4().copy(oldMat).invert()
   // Un-apply the original pose, then apply the new pose
   const newVertices = solid.vertices.map((v) =>
     v.vec.clone().applyMatrix4(oldMatInv).applyMatrix4(newMat),

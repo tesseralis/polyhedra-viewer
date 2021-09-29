@@ -17,15 +17,17 @@ function convertFace(face: number[], appearance: Appearance) {
   const [v0, ...vs] = face
   const pairs = zip(vs.slice(0, vs.length - 1), vs.slice(1))
   const { color, material } = appearance
-  return pairs.map(([v1, v2]) => {
-    return [v0, v1, v2]
-    // if (color instanceof Color) {
-    // return new Face3(v0, v1!, v2!, undefined, color, material)
-    // } else {
-    // const colorArray = [v0, v1!, v2!].map((v) => color[face.indexOf(v)])
-    // return new Face3(v0, v1!, v2!, undefined, colorArray, material)
-    // }
-  })
+  return pairs
+    .map(([v1, v2]) => {
+      return [v0, v1, v2]
+      // if (color instanceof Color) {
+      // return new Face3(v0, v1!, v2!, undefined, color, material)
+      // } else {
+      // const colorArray = [v0, v1!, v2!].map((v) => color[face.indexOf(v)])
+      // return new Face3(v0, v1!, v2!, undefined, colorArray, material)
+      // }
+    })
+    .flat()
 }
 
 function convertFaces(faces: number[][], colors: Appearance[]) {
@@ -59,24 +61,25 @@ function SolidFaces({
 }: Props) {
   const { vertices, faces } = value
   const ref = useRef<any>()
+  if (vertices.length <= 4) {
+    console.log(vertices.flatMap((v) => v.toArray()))
+  }
+  const vertexArray = new Float32Array(vertices.flatMap((v) => v.toArray()))
   useLayoutEffect(() => {
-    if (ref.current) {
-      // console.log("using layout effect")
-      // ref.current.vertices = vertices
-      const vertexArray = vertices.flatMap((v) => v.toArray())
-      const verticesBuffer = new Float32BufferAttribute(vertexArray, 3)
-      ref.current.setAttribute("position", verticesBuffer)
-      // ref.current.verticesNeedUpdate = true
-      ref.current.setIndex(convertFaces(faces, appearance))
-      // console.log(convertFaces(faces, appearance))
-      ref.current.computeVertexNormals()
-      const colorArray = vertices.map((_) => [1, 0, 0]).flat()
-      const colorBuffer = new Float32BufferAttribute(colorArray, 3)
-      ref.current.setAttribute("color", colorBuffer)
-      // ref.current.elementsNeedUpdate = true
-      // ref.current.colorsNeedUpdate = true
-      // geom.computeFaceNormals()
-    }
+    console.log("using layout effect")
+    // ref.current.vertices = vertices
+    // const verticesBuffer = new Float32BufferAttribute(vertexArray, 3)
+    // ref.current.setAttribute("position", verticesBuffer)
+    // ref.current.verticesNeedUpdate = true
+    ref.current.setIndex(convertFaces(faces, appearance))
+    // console.log(convertFaces(faces, appearance))
+    ref.current.computeVertexNormals()
+    // const colorArray = vertices.map((_) => [1, 0, 0]).flat()
+    // const colorBuffer = new Float32BufferAttribute(colorArray, 3)
+    // ref.current.setAttribute("color", colorBuffer)
+    // ref.current.elementsNeedUpdate = true
+    // ref.current.colorsNeedUpdate = true
+    // geom.computeFaceNormals()
   }, [vertices, faces, appearance])
 
   const hasMoved = useRef(false)
@@ -99,7 +102,12 @@ function SolidFaces({
         onPointerOut?.(e.point)
       }}
     >
-      <bufferGeometry ref={ref} attach="geometry" />
+      <bufferGeometry ref={ref} attach="geometry">
+        <bufferAttribute
+          attachObject={["attributes", "position"]}
+          args={[vertexArray, 3]}
+        />
+      </bufferGeometry>
       <meshLambertMaterial
         side={showInnerFaces ? DoubleSide : FrontSide}
         attachArray="material"
