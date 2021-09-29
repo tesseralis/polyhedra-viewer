@@ -1,4 +1,4 @@
-import { BiMap } from "../lib/bimap"
+import { BiMap } from "lib/bimap"
 import { allSolidNames } from "data/common"
 import { getCanonicalSpecs } from "specs"
 

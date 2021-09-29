@@ -1,11 +1,4 @@
 import React from "react"
-import {
-  Routes,
-  Route,
-  Navigate,
-  useParams,
-  useLocation,
-} from "react-router-dom"
 
 import { escape, choose } from "lib/utils"
 import { isValidSolid, allSolidNames } from "data/common"
@@ -30,26 +23,26 @@ function resolveSolidName(solid: string) {
   return null
 }
 
-export default function ViewerPage() {
-  const params = useParams()
-  const { pathname } = useLocation()
-  const solidParam = unescapeName(params.solid)
+export default function ViewerPage({ name, panel }: any) {
+  const solidParam = unescapeName(name)
   const solid = resolveSolidName(solidParam)
 
   if (!solid) {
     return <ErrorPage />
   }
 
-  if (solid !== solidParam) {
-    return (
-      <Navigate replace to={pathname.replace(params.solid, escape(solid))} />
-    )
-  }
+  return <Viewer solid={solid} panel={panel} />
 
-  return (
-    <Routes>
-      <Route path="/" element={<Navigate replace to="operations" />} />
-      <Route path=":panel" element={<Viewer solid={solid} />} />
-    </Routes>
-  )
+  // if (solid !== solidParam) {
+  //   return (
+  //     <Navigate replace to={pathname.replace(params.solid, escape(solid))} />
+  //   )
+  // }
+
+  // return (
+  //   <Routes>
+  //     <Route path="/" element={<Navigate replace to="operations" />} />
+  //     <Route path=":panel" element={<Viewer solid={solid} />} />
+  //   </Routes>
+  // )
 }

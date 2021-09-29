@@ -1,5 +1,6 @@
 import React from "react"
-import { NavLink, NavLinkProps } from "react-router-dom"
+import Link from "next/link"
+// import { NavLink, NavLinkProps } from "react-router-dom"
 import { useStyle, scales } from "styles"
 import Icon from "@mdi/react"
 
@@ -7,11 +8,11 @@ import { media, fonts } from "styles"
 import { SrOnly } from "components/common"
 import { colorFill, flexColumn } from "styles/common"
 
-interface Props extends NavLinkProps {
-  iconName: string
-  iconOnly?: boolean
-  title: string
-}
+// interface Props extends NavLinkProps {
+//   iconName: string
+//   iconOnly?: boolean
+//   title: string
+// }
 
 function LinkText({ text, hidden }: { text: string; hidden: boolean }) {
   const css = useStyle({
@@ -34,7 +35,7 @@ export default function IconLink({
   replace,
   onClick,
   iconOnly = false,
-}: Props) {
+}: any) {
   const css = useStyle({
     ...flexColumn("center"),
     ...colorFill("DimGray"),
@@ -45,20 +46,17 @@ export default function IconLink({
       padding: 0,
       flexDirection: "row",
     },
-  })
+  } as any)
 
-  const activeCss = useStyle(colorFill("DarkSlateGray"))
+  const activeCss = useStyle(colorFill("DarkSlateGray") as any)
 
+  // FIXME active styles
   return (
-    <NavLink
-      to={to}
-      replace={replace}
-      {...css()}
-      {...activeCss("activeClassName")}
-      onClick={onClick}
-    >
-      <Icon path={iconName} size={scales.size[2]} />
-      <LinkText text={title} hidden={iconOnly} />
-    </NavLink>
+    <Link href={to} replace={replace} passHref>
+      <a {...css()} {...activeCss("activeClassName")} onClick={onClick}>
+        <Icon path={iconName} size={scales.size[2]} />
+        <LinkText text={title} hidden={iconOnly} />
+      </a>
+    </Link>
   )
 }

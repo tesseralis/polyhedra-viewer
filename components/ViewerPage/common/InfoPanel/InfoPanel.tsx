@@ -5,7 +5,7 @@ import { capitalize } from "lodash-es"
 import { fonts } from "styles"
 
 import { PolyhedronCtx } from "components/ViewerPage/context"
-import DataDownloader from "dataDownloader"
+import DataDownloader from "../DataDownloader"
 import { flexColumn } from "styles/common"
 
 import { RenderProps } from "./renderFuncs"

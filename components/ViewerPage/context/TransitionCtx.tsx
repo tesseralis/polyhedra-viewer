@@ -7,7 +7,7 @@ import { repeat } from "lib/utils"
 import { createHookedContext } from "components/common"
 import Config from "components/ConfigCtx"
 import PolyhedronCtx from "./PolyhedronCtx"
-import transition from "transition"
+import transition from "lib/transition"
 import { Polyhedron, SolidData } from "math/polyhedra"
 import { AnimationData } from "math/operations"
 import {

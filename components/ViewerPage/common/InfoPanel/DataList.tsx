@@ -1,6 +1,6 @@
 import React, { ComponentType } from "react"
 import { round } from "lodash-es"
-import { Link } from "react-router-dom"
+import Link from "next/link"
 
 import { escape } from "lib/utils"
 import { fonts, useStyle, scales } from "styles"
@@ -92,7 +92,9 @@ const infoRows: InfoRow[] = [
         <ul>
           {alts.map((alt) => (
             <li key={alt}>
-              <Link to={`/${escape(alt)}/info`}>{alt}</Link>
+              <Link href={`/${escape(alt)}/info`}>
+                <a>{alt}</a>
+              </Link>
             </li>
           ))}
         </ul>

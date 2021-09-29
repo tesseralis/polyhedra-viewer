@@ -1,7 +1,7 @@
 import { capitalize } from "lodash-es"
 
 import React, { useState } from "react"
-import { NavLink } from "react-router-dom"
+import Link from "next/link"
 import { fonts, useStyle, scales } from "styles"
 
 import { PolyhedronGroup, PolyhedronSubgroup, groups } from "data/list"
@@ -46,7 +46,7 @@ function PolyhedronLink({ name }: { name: string }) {
     overflow: "hidden",
     textOverflow: "ellipsis",
     whiteSpace: "nowrap",
-  })
+  } as any)
 
   const activeCss = useStyle({
     color: "DarkSlateGray",
@@ -54,13 +54,11 @@ function PolyhedronLink({ name }: { name: string }) {
   })
 
   return (
-    <NavLink
-      to={`../../${escape(name)}/list`}
-      {...css()}
-      {...activeCss("activeClassName")}
-    >
-      {capitalize(name)}
-    </NavLink>
+    <Link href={`../../${escape(name)}/list`} passHref>
+      <a {...css()} {...activeCss("activeClassName")}>
+        {capitalize(name)}
+      </a>
+    </Link>
   )
 }
 
@@ -81,12 +79,12 @@ function SubgroupHeader({ name }: { name: string }) {
     ...margin(scales.spacing[1], scales.spacing[3]),
     fontFamily: fonts.times,
     fontSize: scales.font[5],
-  })
+  } as any)
   return <h3 {...css()}>{capitalize(name)}</h3>
 }
 
 function Subgroup({ name, polyhedra }: PolyhedronSubgroup) {
-  const css = useStyle(marginVert(scales.spacing[3]))
+  const css = useStyle(marginVert(scales.spacing[3]) as any)
 
   return (
     <div {...css()}>
@@ -101,7 +99,7 @@ function GroupHeader({ text }: { text: string }) {
     ...margin(scales.spacing[1], scales.spacing[3]),
     fontFamily: fonts.times,
     fontSize: scales.font[4],
-  })
+  } as any)
   return <h2 {...css()}>{text}</h2>
 }
 
@@ -124,7 +122,7 @@ export default function ListPanel() {
   const filteredGroups =
     filterText === "" ? groups : filterGroups(groups, filterText)
 
-  const css = useStyle(paddingVert(scales.spacing[2]))
+  const css = useStyle(paddingVert(scales.spacing[2]) as any)
 
   return (
     <section {...css()}>

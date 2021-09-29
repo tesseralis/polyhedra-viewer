@@ -1,5 +1,5 @@
 import React from "react"
-import { Link } from "react-router-dom"
+import Link from "next/link"
 
 import { useStyle, fonts, scales, media } from "styles"
 import { square, link } from "styles/common"
@@ -7,8 +7,8 @@ import image from "images/sad-scutoid.png"
 import { usePageTitle } from "components/common"
 
 function Image() {
-  const css = useStyle(square(scales.size[5]))
-  return <img {...css()} src={image} alt="" />
+  const css = useStyle(square(scales.size[5]) as any)
+  return <img {...css()} src={image as any} alt="" />
 }
 
 function Title() {
@@ -25,13 +25,13 @@ function Title() {
 
 function BackLink() {
   const css = useStyle({
-    fontFamily: fonts.andaleMono,
+    fontFamily: fonts.andaleMono as any,
     fontSize: scales.font[4],
     ...link,
-  })
+  } as any)
   return (
-    <Link {...css()} to="/">
-      Go back
+    <Link href="/" passHref>
+      <a {...css()}>Go back</a>
     </Link>
   )
 }
