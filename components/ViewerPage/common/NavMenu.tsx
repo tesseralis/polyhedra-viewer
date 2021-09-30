@@ -1,4 +1,5 @@
 import { capitalize } from "lodash-es"
+import { useRouter } from "next/router"
 import React from "react"
 import {
   mdiFormatListBulleted,
@@ -25,6 +26,7 @@ const links = [
 ]
 
 export default function NavMenu({ compact = false, onClick }: Props) {
+  const router = useRouter()
   const css = useStyle({
     // Using grid here bc it's easier to get evenly spaced than flex
     display: "grid",
@@ -39,7 +41,7 @@ export default function NavMenu({ compact = false, onClick }: Props) {
         <IconLink
           key={name}
           replace
-          to={`../${name}`}
+          to={`/${router.query.polyhedron}/${name}`}
           title={capitalize(title)}
           iconName={icon}
           iconOnly={compact}

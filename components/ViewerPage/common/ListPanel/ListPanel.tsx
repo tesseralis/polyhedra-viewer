@@ -54,7 +54,7 @@ function PolyhedronLink({ name }: { name: string }) {
   })
 
   return (
-    <Link href={`../../${escape(name)}/list`} passHref>
+    <Link href={`/${escape(name)}/list`} passHref>
       <a {...css()} {...activeCss("activeClassName")}>
         {capitalize(name)}
       </a>

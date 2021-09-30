@@ -19,7 +19,7 @@ function VideoLink() {
     overflow: "hidden",
   })
   return (
-    <Link {...css()} to="random">
+    <Link {...css()} to="/random">
       <SrOnly>View random polyhedron</SrOnly>
       <video muted autoPlay playsInline src={video} height={videoHeight} />
     </Link>
