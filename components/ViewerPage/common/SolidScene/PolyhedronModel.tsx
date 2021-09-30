@@ -101,7 +101,7 @@ function SolidFaces({
         onPointerOut?.(e.point)
       }}
     >
-      <bufferGeometry ref={ref} attach="geometry">
+      <bufferGeometry ref={ref}>
         <bufferAttribute
           attachObject={["attributes", "position"]}
           args={[vertexArray, 3]}
@@ -112,6 +112,7 @@ function SolidFaces({
         attachArray="material"
         args={[{ vertexColors: true }]}
       />
+      <meshNormalMaterial />
       {/* <meshStandardMaterial
         side={showInnerFaces ? DoubleSide : FrontSide}
         attachArray="material"
@@ -156,7 +157,7 @@ function SolidEdges({ value, config }: Props) {
     <lineSegments geometry={edgeGeom}>
       <lineBasicMaterial
         attach="material"
-        color={0x555555}
+        color={0x888888}
         linewidth={1}
         transparent
         visible={showEdges}
@@ -169,8 +170,8 @@ function SolidEdges({ value, config }: Props) {
 export default function PolyhedronModel(props: Props) {
   return (
     <group>
-      <SolidFaces {...props} />
-      <SolidEdges {...props} />
+      <SolidFaces { ...props }/>
+      <SolidEdges {...props}/>
     </group>
   )
 }
