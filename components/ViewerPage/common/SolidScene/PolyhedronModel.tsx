@@ -60,9 +60,6 @@ function SolidFaces({
 }: Props) {
   const { vertices, faces } = value
   const ref = useRef<any>()
-  if (vertices.length <= 4) {
-    console.log(vertices.flatMap((v) => v.toArray()))
-  }
   const vertexArray = new Float32Array(vertices.flatMap((v) => v.toArray()))
 
   const colorArray = vertices.map((_) => [1, 0, 0]).flat()
