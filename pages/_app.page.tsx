@@ -1,6 +1,7 @@
 import React from "react"
 import Head from "next/head"
 import type { AppProps } from "next/app"
+import { Global, css } from "@emotion/react"
 import "what-input"
 import "styles/reset.css"
 import "styles/box-sizing.css"
@@ -10,6 +11,14 @@ import "styles/a11y.css"
 export default function App({ Component, pageProps }: AppProps) {
   return (
     <>
+      {/* FIXME figure out why imports don't work */}
+      <Global
+        styles={css`
+          body {
+            margin: 0;
+          }
+        `}
+      />
       <Head>
         <meta
           name="viewport"
