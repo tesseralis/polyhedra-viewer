@@ -1,7 +1,7 @@
-import { range } from "lodash-es"
+import { range, mapValues } from "lodash-es"
 
 import React, { memo, ComponentType } from "react"
-// import { StyleSheet, css } from "aphrodite/no-important"
+import { css } from "@emotion/css"
 
 import { OpName } from "math/operations"
 import { Polygon, PolyLine } from "components/svg"
@@ -11,17 +11,13 @@ const { sqrt } = Math
 
 type SheetDefinition = { [key: string]: {} }
 
-type KeyType = string | false
+type KeyType = string
 
-// TODO usually we would do `useStyle`, but I can't figure out
-// how to make it look reasonable. Plus, I'm thinking of redoing these anyway.
 function makeStyles(inputStyles: SheetDefinition) {
-  // const styles = StyleSheet.create(inputStyles)
-
-  // return (...keys: KeyType[]) => {
-  //   return css(...keys.map((key) => !!key && styles[key]))
-  // }
-  return (k: any) => "hello"
+  const styles = mapValues(inputStyles, (x) => css(x))
+  return (key: KeyType) => {
+    return styles[key]
+  }
 }
 
 const color = "DimGray"
