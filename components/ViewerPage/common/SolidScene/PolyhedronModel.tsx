@@ -64,17 +64,17 @@ function SolidFaces({
     console.log(vertices.flatMap((v) => v.toArray()))
   }
   const vertexArray = new Float32Array(vertices.flatMap((v) => v.toArray()))
+
+  const colorArray = vertices.map((_) => [1, 0, 0]).flat()
+  const colorBuffer = new Float32Array(colorArray)
   useLayoutEffect(() => {
-    console.log("using layout effect")
     // ref.current.vertices = vertices
     // const verticesBuffer = new Float32BufferAttribute(vertexArray, 3)
     // ref.current.setAttribute("position", verticesBuffer)
-    // ref.current.verticesNeedUpdate = true
+    ref.current.verticesNeedUpdate = true
     ref.current.setIndex(convertFaces(faces, appearance))
     // console.log(convertFaces(faces, appearance))
     ref.current.computeVertexNormals()
-    // const colorArray = vertices.map((_) => [1, 0, 0]).flat()
-    // const colorBuffer = new Float32BufferAttribute(colorArray, 3)
     // ref.current.setAttribute("color", colorBuffer)
     // ref.current.elementsNeedUpdate = true
     // ref.current.colorsNeedUpdate = true
@@ -106,13 +106,14 @@ function SolidFaces({
           attachObject={["attributes", "position"]}
           args={[vertexArray, 3]}
         />
+        <bufferAttribute attachObject={["attributes", "color"]}
+        args={[colorBuffer, 3]} />
       </bufferGeometry>
       <meshLambertMaterial
         side={showInnerFaces ? DoubleSide : FrontSide}
-        attachArray="material"
         args={[{ vertexColors: true }]}
       />
-      <meshNormalMaterial />
+      {/* <meshNormalMaterial /> */}
       {/* <meshStandardMaterial
         side={showInnerFaces ? DoubleSide : FrontSide}
         attachArray="material"
