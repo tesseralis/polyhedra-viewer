@@ -8,7 +8,6 @@ import {
   DoubleSide,
   BufferGeometry,
   FrontSide,
-  Float32BufferAttribute,
 } from "three"
 import { Appearance } from "./getFormeColors"
 import { useFrame } from "@react-three/fiber"
