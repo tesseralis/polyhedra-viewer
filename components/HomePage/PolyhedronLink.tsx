@@ -1,5 +1,5 @@
 import React from "react"
-import { Link } from "react-router-dom"
+import Link from "next/link"
 
 import { escape } from "lib/utils"
 import { square, hover, flexRow } from "styles/common"
@@ -24,7 +24,7 @@ function Image({ name }: { name: string }) {
     [media.mobile]: {
       height: mobThumbnailSize,
     },
-  })
+  } as any)
   const escapedName = escape(name)
   return (
     <img
@@ -50,17 +50,18 @@ export default function PolyhedronLink({ specs, isDuplicate }: Props) {
       borderRadius: ".5rem",
       [media.notMobile]: square(thumbnailSize),
       [media.mobile]: square(mobThumbnailSize),
-    },
+    } as any,
     [isDuplicate],
   )
   return (
-    <Link
-      {...css()}
-      id={!isDuplicate ? escapedName : undefined}
-      to={"/" + escapedName}
-      title={specs.name()}
-    >
-      <Image name={escape(specs.canonicalName())} />
+    <Link href={"/" + escapedName} passHref>
+      <a
+        id={!isDuplicate ? escapedName : undefined}
+        title={specs.name()}
+        {...css()}
+      >
+        <Image name={escape(specs.canonicalName())} />
+      </a>
     </Link>
   )
 }

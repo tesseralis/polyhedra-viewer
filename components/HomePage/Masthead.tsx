@@ -1,5 +1,5 @@
 import React from "react"
-import { Link } from "react-router-dom"
+import Link from "next/link"
 
 import { SrOnly, ExternalLink } from "components/common"
 import Markdown from "./Markdown"
@@ -17,11 +17,13 @@ function VideoLink() {
     height: videoHeight - 2,
     width: videoHeight - 2,
     overflow: "hidden",
-  })
+  } as any)
   return (
-    <Link {...css()} to="/random">
-      <SrOnly>View random polyhedron</SrOnly>
-      <video muted autoPlay playsInline src={video} height={videoHeight} />
+    <Link href="/random" passHref>
+      <a {...css()}>
+        <SrOnly>View random polyhedron</SrOnly>
+        <video muted autoPlay playsInline src={video} height={videoHeight} />
+      </a>
     </Link>
   )
 }
@@ -49,7 +51,7 @@ function Subtitle() {
     fontColor: "DimGray",
   })
 
-  const author = useStyle(link)
+  const author = useStyle(link as any)
 
   return (
     <p {...css()}>
@@ -65,7 +67,7 @@ function Abstract() {
   const css = useStyle({
     ...flexColumn("center"),
     maxWidth: scales.size[6],
-  })
+  } as any)
   return (
     <div {...css()}>
       <Title />
@@ -85,7 +87,7 @@ export default function Masthead() {
     [media.mobilePortrait]: {
       flexDirection: "column-reverse",
     },
-  })
+  } as any)
 
   return (
     <div {...css()}>

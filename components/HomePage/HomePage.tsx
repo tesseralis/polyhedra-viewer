@@ -1,5 +1,4 @@
 import React, { useEffect } from "react"
-import { useLocation } from "react-router-dom"
 
 import { useStyle, scales } from "styles"
 import { tableSections } from "lib/tables"
@@ -19,7 +18,7 @@ function Main() {
   const narrow = device === "mobile" && orientation === "portrait"
 
   const css = useStyle({ width: "100%" })
-  const sections = useStyle(paddingVert(scales.spacing[4]))
+  const sections = useStyle(paddingVert(scales.spacing[4]) as any)
   return (
     <main {...css()}>
       <Masthead />
@@ -58,20 +57,20 @@ function Footer() {
 }
 
 export default function HomePage() {
-  const hash = useLocation().hash.substring(1)
-  useEffect(() => {
-    const el = document.getElementById(hash)
-    if (el !== null) {
-      el.scrollIntoView(false)
-    }
-  }, [hash])
+  // const hash = useLocation().hash.substring(1)
+  // useEffect(() => {
+  //   const el = document.getElementById(hash)
+  //   if (el !== null) {
+  //     el.scrollIntoView(false)
+  //   }
+  // }, [hash])
 
   usePageTitle("Polyhedra Viewer")
 
   const css = useStyle({
     ...flexColumn("center", "center"),
     width: "100vw",
-  })
+  } as any)
 
   return (
     <div {...css()}>
