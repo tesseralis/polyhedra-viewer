@@ -1,4 +1,3 @@
-import type { ValueIteratee } from "lodash-es"
 import { uniqBy } from "lodash-es"
 import { MathUtils } from "three"
 
@@ -27,6 +26,9 @@ export function mapObject<T, U>(
 ): { [key: string]: U } {
   return Object.fromEntries(arr.map(iteratee))
 }
+
+// FIXME fix this typing
+type ValueIteratee<U> = any
 
 export function flatMapUniq<T, U>(
   arr: T[],

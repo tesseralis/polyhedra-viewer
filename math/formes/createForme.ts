@@ -20,7 +20,7 @@ export default function createForme<S extends PolyhedronSpecs>(
   if (specs.isComposite())
     return CompositeForme.create(specs, geom).normalize() as any
   if (specs.isElementary()) return ElementaryForme.create(specs, geom) as any
-  throw new Error(`Invalid specs: ${specs.name()}`)
+  throw new Error(`Invalid specs`)
 }
 
 export function fromSpecs<S extends PolyhedronSpecs>(
