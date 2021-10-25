@@ -56,7 +56,6 @@ export function scaleMat(s: number) {
 }
 
 export function withOrigin(o: Vector3, m: Matrix4): Matrix4 {
-  console.log("calling withOrigin")
   const mat = translateMat(o)
   const matInv = new Matrix4().copy(mat).invert()
   return matInv.premultiply(m).premultiply(mat)
