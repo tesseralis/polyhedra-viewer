@@ -121,7 +121,7 @@ export default function PolyhedronTable({ table, navigate }: Props) {
           key={i}
           row={row}
           navigate={navigate}
-          position={[0, -i * rowSpacing, 0]}
+          position={[-25, 5 - i * rowSpacing, 0]}
         />
       ))}
     </group>

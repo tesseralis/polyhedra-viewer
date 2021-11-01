@@ -455,37 +455,26 @@ export const tableSections: TableSection[] = [
     tables: [classical, prisms],
   },
   {
-    id: "johnson",
-    header: "Johnson Solids",
-    subsections: [
-      {
-        id: "capstones",
-        header: "Pyramids, Cupolæ, and Rotundæ",
-        tables: [capstones],
-        narrowTables: [capstonesMono, capstonesBi],
-      },
-      {
-        id: "composite",
-        header: "Augmented, Diminished, and Gyrate Polyhedra",
-        tables: [augmented, diminished, rhombicosidodecahedra],
-        narrowTables: [
-          augmented,
-          diminished,
-          gyrateRhombicosidodecahedra,
-          diminishedRhombicosidodecahedra,
-        ],
-      },
-      {
-        id: "elementary",
-        header: "Elementary Johnson Solids",
-        tables: [snubAntiprisms, others],
-        narrowTables: [snubAntiprisms, othersTwoRows],
-      },
+    id: "capstones",
+    header: "Pyramids, Cupolæ, and Rotundæ",
+    tables: [capstones],
+    narrowTables: [capstonesMono, capstonesBi],
+  },
+  {
+    id: "composite",
+    header: "Augmented, Diminished, and Gyrate Polyhedra",
+    tables: [augmented, diminished, rhombicosidodecahedra],
+    narrowTables: [
+      augmented,
+      diminished,
+      gyrateRhombicosidodecahedra,
+      diminishedRhombicosidodecahedra,
     ],
   },
   {
-    id: "more",
-    header: "And Many More...",
-    sticky: true,
+    id: "elementary",
+    header: "Elementary Johnson Solids",
+    tables: [snubAntiprisms, others],
+    narrowTables: [snubAntiprisms, othersTwoRows],
   },
 ]
