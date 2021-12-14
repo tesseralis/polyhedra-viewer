@@ -15,16 +15,9 @@ import { useFrame } from "@react-three/fiber"
 function convertFace(face: number[]) {
   const [v0, ...vs] = face
   const pairs = zip(vs.slice(0, vs.length - 1), vs.slice(1))
-  // const { color, material } = appearance
   return pairs
     .map(([v1, v2]) => {
       return [v0, v1!, v2!]
-      // if (color instanceof Color) {
-      // return new Face3(v0, v1!, v2!, undefined, color, material)
-      // } else {
-      // const colorArray = [v0, v1!, v2!].map((v) => color[face.indexOf(v)])
-      // return new Face3(v0, v1!, v2!, undefined, colorArray, material)
-      // }
     })
     .flat()
 }
@@ -40,20 +33,7 @@ function getFaceColors(face: number[], appearance: Appearance) {
       } else {
         return [v0, v1!, v2!].map((v) => color[face.indexOf(v)])
       }
-      // return [v0, v1!, v2!]
-      // if (color instanceof Color) {
-      // return new Face3(v0, v1!, v2!, undefined, color, material)
-      // } else {
-      // const colorArray = [v0, v1!, v2!].map((v) => color[face.indexOf(v)])
-      // return new Face3(v0, v1!, v2!, undefined, colorArray, material)
-      // }
     })
-    .flat()
-}
-
-function convertFaces(faces: number[][], colors: Appearance[]) {
-  return zip(faces, colors)
-    .flatMap(([face]) => convertFace(face!))
     .flat()
 }
 
@@ -150,14 +130,6 @@ function SolidFaces({
         side={showInnerFaces ? DoubleSide : FrontSide}
         args={[{ vertexColors: true }]}
       />
-      {/* <meshNormalMaterial /> */}
-      {/* <meshStandardMaterial
-        side={showInnerFaces ? DoubleSide : FrontSide}
-        attachArray="material"
-        args={[{ vertexColors: true }]}
-        transparent
-        opacity={7 / 8}
-      /> */}
     </mesh>
   )
 }
