@@ -110,10 +110,15 @@ interface Props {
   table: Table
   // FIXME figure out how not to need to pass this all the way down
   navigate: any
+  colSpacing?: number
 }
 
-export default function PolyhedronTable({ table, navigate }: Props) {
-  const { data, colSpacing } = table
+export default function PolyhedronTable({
+  table,
+  navigate,
+  colSpacing,
+}: Props) {
+  const { data } = table
   return (
     <group>
       {data.map((row, i) => (

@@ -443,7 +443,7 @@ export const others: Table = {
 }
 
 const elementaryTwoRows = chunk(elementaryTable[0], 4)
-const othersTwoRows: Table = {
+export const othersTwoRows: Table = {
   caption: "Other Johnson Solids",
   rows: [""],
   columns: ["", "", "", ""],

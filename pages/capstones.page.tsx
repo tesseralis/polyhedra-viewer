@@ -4,7 +4,7 @@ import PolyhedronTable from "components/MuseumPage/PolyhedronTable"
 
 export default function UniformPage() {
   return (
-    <GroupLayout position={[-1, 0, 5]} zoom={23}>
+    <GroupLayout position={[-8, -3, 5]} zoom={23} aspectRatio={"5 / 4"}>
       {(router: any) => {
         return (
           <group position={[0, 0, 0]}>
