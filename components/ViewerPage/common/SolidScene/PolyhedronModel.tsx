@@ -99,12 +99,13 @@ function SolidFaces({
     vertices.map((v) => v.toArray()),
   )
   const vertexArray = new Float32Array(faceVertices.flat())
-  // const vertexArray = new Float32Array(vertices.flatMap((v) => v.toArray()))
 
-  // FIXME set colors based on appearance
-  // const colorArray = faceVertices.map((_) => [1, 0, 0]).flat()
   const colorArray = getColorsFromFaces(faces, appearance)
-  const colorBuffer = new Float32Array(colorArray.flatMap((x) => x.toArray()))
+  // https://www.donmccurdy.com/2020/06/17/color-management-in-threejs/
+  // TODO Is there a better place to put the conversion call?
+  const colorBuffer = new Float32Array(
+    colorArray.flatMap((x) => x.clone().convertSRGBToLinear().toArray()),
+  )
   useLayoutEffect(() => {
     ref.current.verticesNeedUpdate = true
     // ref.current.setIndex(convertFaces(faces, appearance))
