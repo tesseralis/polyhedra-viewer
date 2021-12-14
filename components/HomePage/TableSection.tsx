@@ -1,5 +1,4 @@
 import React from "react"
-import { CSSProperties } from "aphrodite"
 import { useStyle, scales } from "styles"
 
 import { Table, TableSection as TableSectionType } from "lib/tables"
@@ -23,6 +22,7 @@ const gridAreaMapping: Record<string, string> = {
   "Other Johnson Solids": "other",
 }
 
+type CSSProperties = Record<string, any>
 const sectionStyles: Record<string, CSSProperties> = {
   // Section styles
   uniform: {

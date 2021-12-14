@@ -1,45 +1,44 @@
-import { CSSProperties } from "aphrodite"
-
+import { CSSObject } from "@emotion/css"
 type Value = string | number
 
 /* Spacing utilities */
 
-export function marginVert(m: Value): CSSProperties {
+export function marginVert(m: Value): CSSObject {
   return {
     marginTop: m,
     marginBottom: m,
   }
 }
 
-export function marginHoriz(m: Value): CSSProperties {
+export function marginHoriz(m: Value): CSSObject {
   return {
     marginLeft: m,
     marginRight: m,
   }
 }
 
-export function margin(vert: Value, horiz: Value = vert): CSSProperties {
+export function margin(vert: Value, horiz: Value = vert): CSSObject {
   return {
     ...marginVert(vert),
     ...marginHoriz(horiz),
   }
 }
 
-export function paddingVert(p: Value): CSSProperties {
+export function paddingVert(p: Value): CSSObject {
   return {
     paddingTop: p,
     paddingBottom: p,
   }
 }
 
-export function paddingHoriz(p: Value): CSSProperties {
+export function paddingHoriz(p: Value): CSSObject {
   return {
     paddingLeft: p,
     paddingRight: p,
   }
 }
 
-export function padding(vert: Value, horiz: Value = vert): CSSProperties {
+export function padding(vert: Value, horiz: Value = vert): CSSObject {
   return {
     ...paddingHoriz(horiz),
     ...paddingVert(vert),
@@ -48,7 +47,7 @@ export function padding(vert: Value, horiz: Value = vert): CSSProperties {
 
 /* Layout utlities */
 
-export function square(size: Value): CSSProperties {
+export function square(size: Value): CSSObject {
   return {
     width: size,
     height: size,
@@ -58,9 +57,9 @@ export function square(size: Value): CSSProperties {
 /* Display utilities */
 
 export function flexRow(
-  alignItems?: CSSProperties["alignItems"],
-  justifyContent?: CSSProperties["justifyContent"],
-): CSSProperties {
+  alignItems?: CSSObject["alignItems"],
+  justifyContent?: CSSObject["justifyContent"],
+): CSSObject {
   return {
     display: "flex",
     flexDirection: "row",
@@ -70,9 +69,9 @@ export function flexRow(
 }
 
 export function flexColumn(
-  alignItems?: CSSProperties["alignItems"],
-  justifyContent?: CSSProperties["justifyContent"],
-): CSSProperties {
+  alignItems?: CSSObject["alignItems"],
+  justifyContent?: CSSObject["justifyContent"],
+): CSSObject {
   return {
     display: "flex",
     flexDirection: "column",
@@ -92,7 +91,7 @@ export const fullScreen = {
 export function absolute(
   vert: "top" | "bottom",
   horiz: "left" | "right",
-): CSSProperties {
+): CSSObject {
   return {
     position: "absolute",
     [vert]: 0,
@@ -100,7 +99,7 @@ export function absolute(
   }
 }
 
-export const absoluteFull: CSSProperties = {
+export const absoluteFull: CSSObject = {
   position: "absolute",
   top: 0,
   left: 0,
@@ -125,7 +124,7 @@ export function scroll(direction?: "x" | "y") {
  * Populate the `color` and `fill` properties (useful for icons).
  * @param color the color to fill in
  */
-export function colorFill(color: string): CSSProperties {
+export function colorFill(color: string): CSSObject {
   return {
     color,
     fill: color,

@@ -1,6 +1,4 @@
 import React, { memo } from "react"
-import { CSSProperties } from "aphrodite"
-
 import { useStyle, media, scales } from "styles"
 import { scroll, paddingHoriz, flexRow } from "styles/common"
 import {
@@ -16,7 +14,7 @@ import OperationsPanel from "./OperationsPanel"
 
 const titleHeight = "3rem"
 
-function mobile(styles: (navH: string) => CSSProperties) {
+function mobile(styles: (navH: string) => Record<string, any>) {
   return {
     [media.mobileLandscape]: styles("3rem"),
     [media.mobilePortrait]: styles(scales.size[3]),

@@ -1,6 +1,5 @@
 import { useMemo } from "react"
-// import { StyleSheet, css, CSSProperties } from "aphrodite/no-important"
-import { css, CSSObject } from "@emotion/css"
+import { css } from "@emotion/css"
 
 /**
  * Hook that allows you to define dynamic (or static) css for use in a component.

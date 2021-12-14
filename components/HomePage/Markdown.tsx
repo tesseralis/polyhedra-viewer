@@ -1,12 +1,11 @@
-import React, { HTMLAttributes, ReactType } from "react"
+import React, { HTMLAttributes, ElementType } from "react"
 import Markdown from "react-markdown"
-import { CSSProperties } from "aphrodite"
 
 import { ExternalLink } from "components/common"
 import { useStyle, fonts, scales } from "styles"
 import { marginHoriz, link } from "styles/common"
 
-function styled(el: ReactType, styles: CSSProperties) {
+function styled(el: ElementType, styles: Record<string, any>) {
   const El = el
   return (props: any) => {
     const css = useStyle(styles)
