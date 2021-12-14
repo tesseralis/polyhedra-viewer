@@ -91,7 +91,7 @@ function PolyhedronEntryGroup({ entry, position, navigate }: any) {
   )
 }
 
-function PolyhedronRow({ row, position, navigate }: any) {
+function PolyhedronRow({ row, position, navigate, colSpacing = 7 }: any) {
   return (
     <group position={position}>
       {row.map((entry: any, i: number) => (
@@ -113,13 +113,14 @@ interface Props {
 }
 
 export default function PolyhedronTable({ table, navigate }: Props) {
-  const { data } = table
+  const { data, colSpacing } = table
   return (
     <group>
       {data.map((row, i) => (
         <PolyhedronRow
           key={i}
           row={row}
+          colSpacing={colSpacing}
           navigate={navigate}
           position={[-25, 5 - i * rowSpacing, 0]}
         />

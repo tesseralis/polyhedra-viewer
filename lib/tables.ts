@@ -32,6 +32,7 @@ export interface Table {
   rows: string[]
   columns: Column[]
   data: DataRow[]
+  colSpacing?: number
 }
 
 export interface TableSection {
@@ -114,6 +115,7 @@ const prisms: Table = {
   ],
   columns: ["prism", "antiprism"],
   data: [...prismaticRows()],
+  colSpacing: 4,
 }
 
 function capstoneEntry(

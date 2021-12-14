@@ -41,4 +41,4 @@ export default function GroupPage({ group }: any) {
 
 // TODO deduplicate with the controls in the other scene
 const sectionSpacing = 50
-const subsecSpacing = 25
+const subsecSpacing = 20
