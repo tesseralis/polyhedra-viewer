@@ -74,8 +74,8 @@ function SolidFaces({
 }: Props) {
   const { vertices, faces } = value
   const geomRef = useRef<BufferGeometry>()
-  const positionArray = useMemo(() => new Float32Array(400 * 3), [])
-  const colorArray = useMemo(() => new Float32Array(400 * 3), [])
+  const positionArray = useMemo(() => new Float32Array(500 * 3), [])
+  const colorArray = useMemo(() => new Float32Array(500 * 3), [])
 
   useFrame(() => {
     const faceVertices = getVerticesFromFaces(
