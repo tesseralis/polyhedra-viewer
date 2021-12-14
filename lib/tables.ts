@@ -64,7 +64,7 @@ function* classicalRows() {
   }
 }
 
-const classical: Table = {
+export const classical: Table = {
   caption: "Platonic and Archimedean Solids",
   rows: [
     "regular",
@@ -103,7 +103,7 @@ function* prismaticRows() {
   }
 }
 
-const prisms: Table = {
+export const prisms: Table = {
   caption: "Prisms and Antiprisms",
   rows: [
     "triangular",
@@ -183,7 +183,7 @@ function* capstoneRows() {
 
 const capstoneTable = [...capstoneRows()]
 
-const capstones: Table = {
+export const capstones: Table = {
   caption: "Pyramids, Cupolæ, and Rotundæ",
   rows: [
     "triangular pyramid",
@@ -292,7 +292,7 @@ function* augmentedRows() {
   }
 }
 
-const augmented: Table = {
+export const augmented: Table = {
   caption: "Augmented Polyhedra",
   rows: augSources,
   columns: [
@@ -343,7 +343,7 @@ function* diminishedRow() {
 }
 
 // TODO add the rest here
-const diminished: Table = {
+export const diminished: Table = {
   caption: "Diminished Platonic Solids",
   rows: ["icosahedron"],
   columns: [
@@ -392,7 +392,7 @@ function* gyrateRows() {
 }
 
 const gyrateTable = [...gyrateRows()]
-const rhombicosidodecahedra: Table = {
+export const rhombicosidodecahedra: Table = {
   caption: "Gyrate and Diminished Rhombicosidodecahedra",
   rows: ["--", "gyrate", "bigyrate", "trigyrate"],
   columns: [
@@ -428,14 +428,14 @@ function snubAntiprismRow() {
   return Capstone.query.where((cap) => cap.isSnub())
 }
 
-const snubAntiprisms: Table = {
+export const snubAntiprisms: Table = {
   caption: "Snub Antiprisms",
   rows: ["snub"],
   columns: ["digonal", "triangular", "square"],
   data: [snubAntiprismRow()],
 }
 const elementaryTable = [[...Elementary.getAll()]]
-const others: Table = {
+export const others: Table = {
   caption: "Other Johnson Solids",
   rows: [""],
   columns: ["", "", "", "", "", "", ""],
