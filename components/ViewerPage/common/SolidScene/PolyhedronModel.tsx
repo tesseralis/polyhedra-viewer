@@ -130,18 +130,13 @@ function SolidFaces({
 }
 
 function SolidEdges({ value, config }: Props) {
+  const geomRef = useRef<BufferGeometry>()
   const { vertices, edges = [] } = value
   const { showEdges } = config
-
-  const edgeGeom = useMemo(() => {
-    const geom = new BufferGeometry()
-    const positions = new Float32Array(300 * 3) // 3 vertices per point
-    geom.setAttribute("position", new BufferAttribute(positions, 3))
-    return geom
-  }, [])
+  const vertexArray = useMemo(() => new Float32Array(300 * 3), [])
 
   useFrame(() => {
-    const positions = edgeGeom.attributes.position.array as number[]
+    const positions = geomRef.current?.attributes.position.array as number[]
     edges.forEach((edge: [number, number], i: number) => {
       const [i1, i2] = edge
       // Scale edges slightly so they don't overlap
@@ -154,12 +149,20 @@ function SolidEdges({ value, config }: Props) {
         positions[i * 6 + j] = vs[j]
       }
     })
-    edgeGeom.setDrawRange(0, edges.length * 2)
-    edgeGeom.attributes.position.needsUpdate = true
+    if (geomRef.current) {
+      geomRef.current.setDrawRange(0, edges.length * 2)
+      geomRef.current.attributes.position.needsUpdate = true
+    }
   })
 
   return (
-    <lineSegments geometry={edgeGeom}>
+    <lineSegments>
+      <bufferGeometry ref={geomRef}>
+        <bufferAttribute
+          attachObject={["attributes", "position"]}
+          args={[vertexArray, 3]}
+        />
+      </bufferGeometry>
       <lineBasicMaterial
         attach="material"
         color={0x444444}
