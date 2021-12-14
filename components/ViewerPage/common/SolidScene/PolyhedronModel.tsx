@@ -195,7 +195,7 @@ function SolidEdges({ value, config }: Props) {
     <lineSegments geometry={edgeGeom}>
       <lineBasicMaterial
         attach="material"
-        color={0x888888}
+        color={0x444444}
         linewidth={1}
         transparent
         visible={showEdges}
