@@ -1,10 +1,17 @@
 import GroupLayout from "./[polyhedron]/GroupLayout"
 import { augmented, diminished, rhombicosidodecahedra } from "lib/tables"
 import PolyhedronTable from "components/MuseumPage/PolyhedronTable"
+import { composite } from "components/HomePage/text"
 
 export default function UniformPage() {
   return (
-    <GroupLayout position={[-7, -7, 5]} zoom={22.5} aspectRatio={"8 / 7"}>
+    <GroupLayout
+      position={[-7, -7, 5]}
+      zoom={22.5}
+      aspectRatio="8 / 7"
+      title="Augmented, Diminished and Gyrate Solids"
+      text={composite}
+    >
       {(router: any) => {
         return (
           <>

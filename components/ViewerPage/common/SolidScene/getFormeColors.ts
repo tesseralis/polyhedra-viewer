@@ -15,8 +15,8 @@ function createFamilyColor(face: string, vertex: string) {
   return {
     primary: { face: faceColor, vertex: vertexColor },
     secondary: {
-      face: faceColor.clone().offsetHSL(0, 0, -1 / 3),
-      vertex: vertexColor.clone().offsetHSL(0, 0, -1 / 3),
+      face: faceColor.clone().offsetHSL(0, 0, -1 / 4),
+      vertex: vertexColor.clone().offsetHSL(0, 0, -1 / 4),
     },
     light: {
       face: faceColor.clone().offsetHSL(0, 0, 1 / 8),
@@ -33,7 +33,7 @@ function createFamilyColor(face: string, vertex: string) {
 
 const colorScheme = {
   // black + white
-  2: createFamilyColor("#000000", "#ffffff"),
+  2: createFamilyColor("#444444", "#ffffff"),
   // yellow + orange
   3: createFamilyColor("#ffe100", "#ff6f00"),
   // red + purple

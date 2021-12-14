@@ -1,10 +1,17 @@
 import GroupLayout from "./[polyhedron]/GroupLayout"
 import { snubAntiprisms, othersTwoRows } from "lib/tables"
 import PolyhedronTable from "components/MuseumPage/PolyhedronTable"
+import { elementary } from "components/HomePage/text"
 
 export default function UniformPage() {
   return (
-    <GroupLayout position={[-15, 6, 5]} zoom={40} aspectRatio={"4 / 2"}>
+    <GroupLayout
+      position={[-15, 6, 5]}
+      zoom={40}
+      aspectRatio="2 / 1"
+      title="Elementary Johnson Solids"
+      text={elementary}
+    >
       {(router: any) => {
         return (
           <>

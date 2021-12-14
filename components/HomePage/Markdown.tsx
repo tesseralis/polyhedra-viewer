@@ -1,4 +1,4 @@
-import React, { HTMLAttributes, ElementType } from "react"
+import { HTMLAttributes, ElementType } from "react"
 import Markdown from "react-markdown"
 
 import { ExternalLink } from "components/common"
@@ -24,7 +24,6 @@ const List = styled("ul", {
 const ListItem = styled("li", {
   fontSize: scales.font[5],
   fontFamily: fonts.times,
-  color: "DimGrey",
   lineHeight: 1.5,
 })
 
@@ -37,7 +36,6 @@ const renderers = {
   paragraph: styled("p", {
     fontSize: scales.font[5],
     fontFamily: fonts.times,
-    color: "DimGrey",
     lineHeight: 1.5,
     ":not(:last-child)": {
       marginBottom: scales.spacing[3],

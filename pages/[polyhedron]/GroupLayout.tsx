@@ -2,12 +2,15 @@ import { css } from "@emotion/react"
 import { Canvas } from "@react-three/fiber"
 import { OrthographicCamera } from "@react-three/drei"
 import { useRouter } from "next/router"
+import Markdown from "components/HomePage/Markdown"
 
 export default function GroupLayout({
   position,
   zoom,
   children,
   aspectRatio = "1 / 1",
+  title,
+  text,
 }: any) {
   const router = useRouter()
   return (
@@ -22,6 +25,7 @@ export default function GroupLayout({
 
         display: grid;
         grid-template-columns: 1fr 20rem;
+        color: #999999;
       `}
     >
       <div
@@ -46,8 +50,20 @@ export default function GroupLayout({
           </Canvas>
         </div>
       </div>
-      <section>
-        <h1>This is content</h1>
+      <section
+        css={css`
+          display: relative;
+          overflow: scroll;
+          padding: 1rem;
+
+          > h1 {
+            font-size: 1.25rem;
+            padding-bottom: 1rem;
+          }
+        `}
+      >
+        <h1>{title}</h1>
+        <Markdown source={text} />
       </section>
     </div>
   )
