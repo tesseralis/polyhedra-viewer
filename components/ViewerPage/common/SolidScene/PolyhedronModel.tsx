@@ -12,13 +12,35 @@ import {
 import { Appearance } from "./getFormeColors"
 import { useFrame } from "@react-three/fiber"
 
-function convertFace(face: number[], appearance: Appearance) {
+function convertFace(face: number[]) {
+  const [v0, ...vs] = face
+  const pairs = zip(vs.slice(0, vs.length - 1), vs.slice(1))
+  // const { color, material } = appearance
+  return pairs
+    .map(([v1, v2]) => {
+      return [v0, v1!, v2!]
+      // if (color instanceof Color) {
+      // return new Face3(v0, v1!, v2!, undefined, color, material)
+      // } else {
+      // const colorArray = [v0, v1!, v2!].map((v) => color[face.indexOf(v)])
+      // return new Face3(v0, v1!, v2!, undefined, colorArray, material)
+      // }
+    })
+    .flat()
+}
+
+function getFaceColors(face: number[], appearance: Appearance) {
   const [v0, ...vs] = face
   const pairs = zip(vs.slice(0, vs.length - 1), vs.slice(1))
   const { color, material } = appearance
   return pairs
     .map(([v1, v2]) => {
-      return [v0, v1, v2]
+      if (color instanceof Color) {
+        return [color, color, color]
+      } else {
+        return [v0, v1!, v2!].map((v) => color[face.indexOf(v)])
+      }
+      // return [v0, v1!, v2!]
       // if (color instanceof Color) {
       // return new Face3(v0, v1!, v2!, undefined, color, material)
       // } else {
@@ -31,8 +53,20 @@ function convertFace(face: number[], appearance: Appearance) {
 
 function convertFaces(faces: number[][], colors: Appearance[]) {
   return zip(faces, colors)
-    .flatMap(([face, color]) => convertFace(face!, color!))
+    .flatMap(([face]) => convertFace(face!))
     .flat()
+}
+
+function getVerticesFromFaces(faces: number[][], vertices: number[][]) {
+  return faces.flatMap((face) => {
+    return convertFace(face).map((i) => vertices[i])
+  })
+}
+
+function getColorsFromFaces(faces: number[][], appearances: Appearance[]) {
+  return faces.flatMap((face, i) => {
+    return getFaceColors(face, appearances[i])
+  })
 }
 
 interface SolidConfig {
@@ -60,19 +94,22 @@ function SolidFaces({
 }: Props) {
   const { vertices, faces } = value
   const ref = useRef<any>()
-  const vertexArray = new Float32Array(vertices.flatMap((v) => v.toArray()))
+  const faceVertices = getVerticesFromFaces(
+    faces,
+    vertices.map((v) => v.toArray()),
+  )
+  const vertexArray = new Float32Array(faceVertices.flat())
+  // const vertexArray = new Float32Array(vertices.flatMap((v) => v.toArray()))
 
-  const colorArray = vertices.map((_) => [1, 0, 0]).flat()
-  const colorBuffer = new Float32Array(colorArray)
+  // FIXME set colors based on appearance
+  // const colorArray = faceVertices.map((_) => [1, 0, 0]).flat()
+  const colorArray = getColorsFromFaces(faces, appearance)
+  const colorBuffer = new Float32Array(colorArray.flatMap((x) => x.toArray()))
   useLayoutEffect(() => {
-    // ref.current.vertices = vertices
-    // const verticesBuffer = new Float32BufferAttribute(vertexArray, 3)
-    // ref.current.setAttribute("position", verticesBuffer)
     ref.current.verticesNeedUpdate = true
-    ref.current.setIndex(convertFaces(faces, appearance))
+    // ref.current.setIndex(convertFaces(faces, appearance))
     // console.log(convertFaces(faces, appearance))
     ref.current.computeVertexNormals()
-    // ref.current.setAttribute("color", colorBuffer)
     // ref.current.elementsNeedUpdate = true
     // ref.current.colorsNeedUpdate = true
     // geom.computeFaceNormals()
@@ -103,10 +140,12 @@ function SolidFaces({
           attachObject={["attributes", "position"]}
           args={[vertexArray, 3]}
         />
-        <bufferAttribute attachObject={["attributes", "color"]}
-        args={[colorBuffer, 3]} />
+        <bufferAttribute
+          attachObject={["attributes", "color"]}
+          args={[colorBuffer, 3]}
+        />
       </bufferGeometry>
-      <meshLambertMaterial
+      <meshStandardMaterial
         side={showInnerFaces ? DoubleSide : FrontSide}
         args={[{ vertexColors: true }]}
       />
@@ -168,8 +207,8 @@ function SolidEdges({ value, config }: Props) {
 export default function PolyhedronModel(props: Props) {
   return (
     <group>
-      <SolidFaces { ...props }/>
-      <SolidEdges {...props}/>
+      <SolidFaces {...props} />
+      <SolidEdges {...props} />
     </group>
   )
 }
