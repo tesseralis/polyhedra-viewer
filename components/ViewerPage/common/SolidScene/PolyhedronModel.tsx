@@ -1,6 +1,6 @@
 import { zip } from "lodash-es"
 import { SolidData } from "math/polyhedra"
-import React, { useRef, useLayoutEffect, useMemo } from "react"
+import { useRef, useLayoutEffect, useMemo } from "react"
 import {
   Color,
   Vector3,
@@ -88,12 +88,7 @@ function SolidFaces({
   )
   useLayoutEffect(() => {
     ref.current.verticesNeedUpdate = true
-    // ref.current.setIndex(convertFaces(faces, appearance))
-    // console.log(convertFaces(faces, appearance))
     ref.current.computeVertexNormals()
-    // ref.current.elementsNeedUpdate = true
-    // ref.current.colorsNeedUpdate = true
-    // geom.computeFaceNormals()
   }, [vertices, faces, appearance])
 
   const hasMoved = useRef(false)
@@ -160,7 +155,7 @@ function SolidEdges({ value, config }: Props) {
       }
     })
     edgeGeom.setDrawRange(0, edges.length * 2)
-    ;(edgeGeom.attributes.position as any).needsUpdate = true
+    edgeGeom.attributes.position.needsUpdate = true
   })
 
   return (
