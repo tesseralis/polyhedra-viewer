@@ -87,7 +87,8 @@ function SolidFaces({
     colorArray.flatMap((x) => x.clone().convertSRGBToLinear().toArray()),
   )
   useLayoutEffect(() => {
-    ref.current.verticesNeedUpdate = true
+    ref.current.attributes.position.needsUpdate = true
+    ref.current.attributes.color.needsUpdate = true
     ref.current.computeVertexNormals()
   }, [vertices, faces, appearance])
 
@@ -96,7 +97,7 @@ function SolidFaces({
   return (
     <mesh
       visible={true}
-      onPointerDown={(e) => {
+      onPointerDown={() => {
         hasMoved.current = false
       }}
       onPointerUp={(e) => {
@@ -136,20 +137,17 @@ function SolidEdges({ value, config }: Props) {
   const vertexArray = useMemo(() => new Float32Array(300 * 3), [])
 
   useFrame(() => {
-    const positions = geomRef.current?.attributes.position.array as number[]
-    edges.forEach((edge: [number, number], i: number) => {
+    const edgeVertices = edges.flatMap((edge) => {
       const [i1, i2] = edge
-      // Scale edges slightly so they don't overlap
-      // TODO do this in a way that doesn't rely on it being centered
-      const vs = [
+      return [
         ...vertices[i1].clone().multiplyScalar(1.001).toArray(),
         ...vertices[i2].clone().multiplyScalar(1.001).toArray(),
       ]
-      for (let j = 0; j < 6; j++) {
-        positions[i * 6 + j] = vs[j]
-      }
     })
     if (geomRef.current) {
+      ;(geomRef.current.attributes.position as BufferAttribute).set(
+        edgeVertices,
+      )
       geomRef.current.setDrawRange(0, edges.length * 2)
       geomRef.current.attributes.position.needsUpdate = true
     }
