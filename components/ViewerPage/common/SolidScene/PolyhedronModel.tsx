@@ -1,6 +1,6 @@
 import { zip } from "lodash-es"
 import { SolidData } from "math/polyhedra"
-import { useRef, useLayoutEffect, useMemo } from "react"
+import { useRef, useMemo } from "react"
 import {
   Color,
   Vector3,
@@ -73,24 +73,29 @@ function SolidFaces({
   config,
 }: Props) {
   const { vertices, faces } = value
-  const ref = useRef<any>()
-  const faceVertices = getVerticesFromFaces(
-    faces,
-    vertices.map((v) => v.toArray()),
-  )
-  const vertexArray = new Float32Array(faceVertices.flat())
+  const geomRef = useRef<BufferGeometry>()
+  const positionArray = useMemo(() => new Float32Array(400 * 3), [])
+  const colorArray = useMemo(() => new Float32Array(400 * 3), [])
 
-  const colorArray = getColorsFromFaces(faces, appearance)
-  // https://www.donmccurdy.com/2020/06/17/color-management-in-threejs/
-  // TODO Is there a better place to put the conversion call?
-  const colorBuffer = new Float32Array(
-    colorArray.flatMap((x) => x.clone().convertSRGBToLinear().toArray()),
-  )
-  useLayoutEffect(() => {
-    ref.current.attributes.position.needsUpdate = true
-    ref.current.attributes.color.needsUpdate = true
-    ref.current.computeVertexNormals()
-  }, [vertices, faces, appearance])
+  useFrame(() => {
+    const faceVertices = getVerticesFromFaces(
+      faces,
+      vertices.map((v) => v.toArray()),
+    )
+    const faceColors = getColorsFromFaces(faces, appearance).flatMap((x) =>
+      x.clone().convertSRGBToLinear().toArray(),
+    )
+    if (geomRef.current) {
+      const position = geomRef.current.attributes.position as BufferAttribute
+      position.set(faceVertices.flat())
+      const color = geomRef.current.attributes.color as BufferAttribute
+      color.set(faceColors)
+      geomRef.current.setDrawRange(0, faceVertices.length)
+      position.needsUpdate = true
+      color.needsUpdate = true
+      geomRef.current.computeVertexNormals()
+    }
+  })
 
   const hasMoved = useRef(false)
   const { showFaces, showInnerFaces } = config
@@ -112,14 +117,14 @@ function SolidFaces({
         onPointerOut?.(e.point)
       }}
     >
-      <bufferGeometry ref={ref}>
+      <bufferGeometry ref={geomRef}>
         <bufferAttribute
           attachObject={["attributes", "position"]}
-          args={[vertexArray, 3]}
+          args={[positionArray, 3]}
         />
         <bufferAttribute
           attachObject={["attributes", "color"]}
-          args={[colorBuffer, 3]}
+          args={[colorArray, 3]}
         />
       </bufferGeometry>
       <meshStandardMaterial
