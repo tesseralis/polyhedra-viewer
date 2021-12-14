@@ -145,11 +145,10 @@ function SolidEdges({ value, config }: Props) {
       ]
     })
     if (geomRef.current) {
-      ;(geomRef.current.attributes.position as BufferAttribute).set(
-        edgeVertices,
-      )
+      const position = geomRef.current.attributes.position as BufferAttribute
+      position.set(edgeVertices)
       geomRef.current.setDrawRange(0, edges.length * 2)
-      geomRef.current.attributes.position.needsUpdate = true
+      position.needsUpdate = true
     }
   })
 
