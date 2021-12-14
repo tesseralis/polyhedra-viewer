@@ -74,8 +74,8 @@ function SolidFaces({
 }: Props) {
   const { vertices, faces } = value
   const geomRef = useRef<BufferGeometry>()
-  const positionArray = useMemo(() => new Float32Array(500 * 3), [])
-  const colorArray = useMemo(() => new Float32Array(500 * 3), [])
+  const positionArray = useMemo(() => new Float32Array(1000 * 3), [])
+  const colorArray = useMemo(() => new Float32Array(1000 * 3), [])
 
   useFrame(() => {
     const faceVertices = getVerticesFromFaces(
@@ -86,11 +86,12 @@ function SolidFaces({
       x.clone().convertSRGBToLinear().toArray(),
     )
     if (geomRef.current) {
+      geomRef.current.setDrawRange(0, faceVertices.length)
       const position = geomRef.current.attributes.position as BufferAttribute
+      console.log(faceVertices.flat().length)
       position.set(faceVertices.flat())
       const color = geomRef.current.attributes.color as BufferAttribute
       color.set(faceColors)
-      geomRef.current.setDrawRange(0, faceVertices.length)
       position.needsUpdate = true
       color.needsUpdate = true
       geomRef.current.computeVertexNormals()
