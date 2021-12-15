@@ -167,6 +167,11 @@ export default class Capstone extends Specs<CapstoneData> {
       data.rotundaCount = 0
     }
     if (!data.rotundaCount) data.rotundaCount = 0
+    if (data.elongation === "snub") {
+      data.type = "primary"
+      data.count = 0
+      data.rotundaCount = 0
+    }
     return data
   }
 
