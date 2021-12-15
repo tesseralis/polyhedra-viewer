@@ -2,9 +2,9 @@
   "compilerOptions": {
     "target": "es6",
     "lib": ["es2019", "dom"],
-    "baseUrl": "src",
+    "baseUrl": ".",
     "allowJs": true,
-    "skipLibCheck": false,
+    "skipLibCheck": true,
     "esModuleInterop": true,
     "downlevelIteration": true,
     "allowSyntheticDefaultImports": true,
@@ -15,8 +15,11 @@
     "resolveJsonModule": true,
     "noEmit": true,
     "jsx": "preserve",
+    "jsxImportSource": "@emotion/react",
     "isolatedModules": true,
-    "typeRoots": ["node_modules/@types", "types"]
+    "typeRoots": ["node_modules/@types", "types"],
+    "incremental": true
   },
-  "include": ["src"]
+  "include": ["**/*.ts", "**/*.tsx"],
+  "exclude": ["node_modules"]
 }
