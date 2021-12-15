@@ -140,7 +140,7 @@ function SolidEdges({ value, config }: Props) {
   const geomRef = useRef<BufferGeometry>()
   const { vertices, edges = [] } = value
   const { showEdges } = config
-  const vertexArray = useMemo(() => new Float32Array(300 * 3), [])
+  const vertexArray = useMemo(() => new Float32Array(500 * 3), [])
 
   useFrame(() => {
     const edgeVertices = edges.flatMap((edge) => {
