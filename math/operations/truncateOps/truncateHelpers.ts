@@ -31,7 +31,11 @@ export function getSharpenPointEdge(face: Face, edge: Edge) {
 interface TrioOpArgs<Op, Opts = any> {
   operation: Op
   // pose(solid: ClassicalForme, opts: Opts): Pose
-  transformer(solid: ClassicalForme, opts: Opts, result: Classical): VertexArg[]
+  transformer(
+    solid: ClassicalForme,
+    opts: Opts,
+    result: ClassicalForme,
+  ): VertexArg[]
   options?(entry: Classical): Opts
 }
 
@@ -76,7 +80,8 @@ export function makeTruncateTrio<
       // If this is the left-right operation, then the intermediate
       // is going to be the middle operation
       middle:
-        middleArg ?? ((entry) => entry.left.withOperation(middle.operation)),
+        middleArg ??
+        ((entry) => (entry.left as any).withOperation(middle.operation)),
       getPose,
       toLeft: leftOp === "left" ? left.transformer : undefined,
       toRight: rightOp === "right" ? right.transformer : undefined,

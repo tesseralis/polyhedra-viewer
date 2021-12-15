@@ -89,7 +89,7 @@ function makePrismOp({ query, rightElongation = "antiprism" }: PrismOpArgs) {
         return getCapstonePose(forme, twist)
       },
       toLeft(forme, $, result) {
-        return doPrismTransform(forme, result, twist)
+        return doPrismTransform(forme, result.specs, twist)
       },
     })
   }
@@ -111,7 +111,7 @@ const turnPrismatic = makeOpPair<Capstone>({
   getPose(forme) {
     return getCapstonePose(forme, "left")
   },
-  toLeft: (forme, $, result) => doPrismTransform(forme, result, "left"),
+  toLeft: (forme, $, result) => doPrismTransform(forme, result.specs, "left"),
 })
 
 const _elongate = makePrismOp({
@@ -167,7 +167,7 @@ function makeBicupolaPrismOp(leftElongation: "none" | "prism") {
       return getCapstonePose(forme, twist)
     },
     toLeft: (forme, { right: { twist } }, result) => {
-      return doPrismTransform(forme, result, twist)
+      return doPrismTransform(forme, result.specs, twist)
     },
   })
 }

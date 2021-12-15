@@ -54,7 +54,7 @@ function getResizeArgs<L, R>(
       return getClassicalPose(forme, getFacet(options))
     },
     toLeft(forme, options, result) {
-      return getResizedVertices(forme, getFacet(options), result)
+      return getResizedVertices(forme, getFacet(options), result.specs)
     },
   }
 }

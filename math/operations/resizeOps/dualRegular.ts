@@ -57,6 +57,6 @@ export default makeOpPair<Classical>({
       orientation: [vertex, vertex.adjacentVertices()[0]],
     }
   },
-  toLeft: (forme, _, result) => doDualTransform(forme, result),
-  toRight: (forme, _, result) => doDualTransform(forme, result),
+  toLeft: (forme, _, result) => doDualTransform(forme, result.specs),
+  toRight: (forme, _, result) => doDualTransform(forme, result.specs),
 })

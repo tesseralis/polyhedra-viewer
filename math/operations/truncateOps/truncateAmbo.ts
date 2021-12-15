@@ -32,7 +32,7 @@ export default makeTruncateTrio(getAmboPose, {
   left: {
     operation: "rectify",
     transformer(forme, $, result) {
-      const refForme = fromSpecs(result)
+      const refForme = fromSpecs(result.specs)
       const refInradius = avgInradius(refForme)
       const inradius = avgInradius(forme)
       const scale = (refForme.circumradius() / refInradius) * inradius
@@ -47,7 +47,7 @@ export default makeTruncateTrio(getAmboPose, {
   right: {
     operation: "cantellate",
     transformer(forme, $, result) {
-      const refForme = fromSpecs(result)
+      const refForme = fromSpecs(result.specs)
       const edgeFace = refForme.edgeFace()
       const refMidradius = edgeFace.distanceToCenter()
       const scale = avgInradius(forme) / avgInradius(refForme)
