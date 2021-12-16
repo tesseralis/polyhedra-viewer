@@ -38,7 +38,12 @@ export const snub = makeOperation(
 
 export const twist = makeOperation(
   "twist",
-  combineOps([classicals.twist.left, classicals.twist.right]),
+  combineOps<ResizeSpecs, {}>([
+    classicals.twist.left,
+    classicals.twist.right,
+    pyramids.twist.left,
+    pyramids.twist.right,
+  ]),
 )
 
 export const contract = makeOperation<FacetOpts, ResizeSpecs>("contract", {

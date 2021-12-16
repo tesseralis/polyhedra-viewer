@@ -17,7 +17,11 @@ import { isCodirectional } from "math/geom"
  */
 function getResizedVertices(forme: CapstoneForme, result: CapstoneForme) {
   const isSnub = forme.specs.isSnub()
-  const facePairs = getFacePairs(forme.geom.faces, result.geom.faces, isSnub)
+  const facePairs = getFacePairs(
+    forme.geom.faces,
+    getFacesToMap(result),
+    isSnub,
+  )
 
   // create a map from the initial vertices to the end vertices
   const mapping: Vertex[] = []
@@ -114,6 +118,31 @@ export const twist = makeOpPair<Capstone, TwistOpts, {}>({
     }
   },
 })
+
+// get the result faces to map the start faces too
+function getFacesToMap(result: CapstoneForme) {
+  if (result.specs.isPyramid()) {
+    return result.geom.faces
+  }
+  // for a twist operation, the end result is the bicupola
+  return result.caps().flatMap((cap) => {
+    return [
+      ...cap
+        .boundary()
+        .adjacentFaces()
+        .filter((f) => f.numSides === 3),
+      cap.topFace(),
+    ]
+  })
+  // return [
+  //   ...top
+  //     .boundary()
+  //     .adjacentFaces()
+  //     .filter((f) => f.numSides === 3),
+  //   bottom.topFace(),
+  // ]
+  // return []
+}
 
 // Find the faces in the first set that map onto the second set
 function getFacePairs(first: Face[], second: Face[], isSnub?: boolean) {
