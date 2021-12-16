@@ -121,9 +121,6 @@ const gyrateComposite = makeGyrateOp<Composite>({
 })
 
 export const gyrate = makeOperation("gyrate", {
-  ...combineOps<Capstone | Composite, CapOptions, GraphOpts>([
-    gyrateCapstone,
-    gyrateComposite,
-  ]),
+  ...combineOps<CapOptions, GraphOpts>([gyrateCapstone, gyrateComposite]),
   ...capOptionArgs,
 })

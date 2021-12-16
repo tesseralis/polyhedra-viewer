@@ -7,11 +7,9 @@ import * as prisms from "./resizePrism"
 import * as pyramids from "./resizePyramid"
 import regularDual from "./dualRegular"
 
-type ResizeSpecs = Classical | Capstone
-
 export const dual = new Operation(
   "dual",
-  combineOps<ResizeSpecs, {}>([
+  combineOps([
     regularDual.left,
     regularDual.right,
     prisms.dual.left,
@@ -21,7 +19,7 @@ export const dual = new Operation(
 
 export const expand = new Operation(
   "expand",
-  combineOps<ResizeSpecs, {}>(
+  combineOps(
     [
       classicals.semiExpand,
       classicals.expand,
@@ -33,12 +31,12 @@ export const expand = new Operation(
 
 export const snub = makeOperation(
   "snub",
-  combineOps<ResizeSpecs, {}>([classicals.snub.left, pyramids.snub.left]),
+  combineOps([classicals.snub.left, pyramids.snub.left]),
 )
 
 export const twist = makeOperation(
   "twist",
-  combineOps<ResizeSpecs, {}>([
+  combineOps([
     classicals.twist.left,
     classicals.twist.right,
     pyramids.twist.left,
@@ -46,8 +44,8 @@ export const twist = makeOperation(
   ]),
 )
 
-export const contract = makeOperation<FacetOpts, ResizeSpecs>("contract", {
-  ...combineOps<ResizeSpecs, FacetOpts>(
+export const contract = makeOperation<FacetOpts>("contract", {
+  ...combineOps<FacetOpts>(
     [
       classicals.expand,
       classicals.snub,

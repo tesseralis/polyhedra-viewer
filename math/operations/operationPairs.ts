@@ -223,17 +223,17 @@ export function makeOpPair<Specs extends PolyhedronSpecs, L = {}, R = L>(
   return { left: makeOperation("left", op), right: makeOperation("right", op) }
 }
 
-export function combineOps<S extends PolyhedronSpecs, O, GO extends {} = O>(
-  opArgs: OpInput<O, S, GO>[],
-): OpInput<O, S, GO> {
+export function combineOps<O, GO extends {} = O>(
+  opArgs: OpInput<O, PolyhedronSpecs, GO>[],
+): OpInput<O, PolyhedronSpecs, GO> {
   interface CallbackArg {
-    op: OpInput<O, S, GO>
-    forme: Forme<S>
+    op: OpInput<O, PolyhedronSpecs, GO>
+    forme: Forme<PolyhedronSpecs>
     graphOpts: GO
   }
 
   function doWithRightForme<R>(
-    solid: Forme<S>,
+    solid: Forme<PolyhedronSpecs>,
     opts: O,
     callback: (args: CallbackArg) => R,
   ) {

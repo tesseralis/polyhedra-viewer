@@ -1,6 +1,6 @@
 import { find } from "lib/utils"
 import { Capstone, Twist, twists, oppositeTwist } from "specs"
-import { CapstoneForme, fromSpecs } from "math/formes"
+import { CapstoneForme } from "math/formes"
 import { combineOps, makeOpPair } from "./operationPairs"
 import { makeOperation } from "./Operation"
 import { Pose, TwistOpts, getTransformedVertices } from "./operationUtils"
@@ -196,7 +196,7 @@ export const shorten = makeOperation(
 
 export const turn = makeOperation(
   "turn",
-  combineOps<Capstone, Partial<TwistOpts>>(
+  combineOps<Partial<TwistOpts>>(
     [turnPrismatic, turnPyramid, turnCupola, turnBicupola].flatMap((op) => [
       op.left,
       op.right,

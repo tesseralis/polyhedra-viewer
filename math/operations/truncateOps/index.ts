@@ -9,11 +9,7 @@ import augTruncate from "./truncateAugmented"
 
 export const truncate = new Operation(
   "truncate",
-  combineOps<any, any>([
-    regs.truncate.left,
-    ambos.truncate.left,
-    augTruncate.left,
-  ]),
+  combineOps([regs.truncate.left, ambos.truncate.left, augTruncate.left]),
 )
 
 export const cotruncate = new Operation(
@@ -42,7 +38,7 @@ const hitOptArgs: Partial<OpArgs<FacetOpts, Classical>> = {
 }
 
 export const sharpen = new Operation("sharpen", {
-  ...combineOps<any, Partial<FacetOpts>>([
+  ...combineOps<Partial<FacetOpts>>([
     regs.truncate.right,
     ambos.truncate.right,
     augTruncate.right,
@@ -58,11 +54,11 @@ export const sharpen = new Operation("sharpen", {
 
 // TODO why doesn't the typing work here?
 export const cosharpen = new Operation("cosharpen", {
-  ...combineOps<any, any>([regs.cotruncate.right, ambos.cotruncate.right]),
+  ...combineOps<any>([regs.cotruncate.right, ambos.cotruncate.right]),
   ...hitOptArgs,
 })
 
 export const unrectify = new Operation("unrectify", {
-  ...combineOps<any, any>([regs.rectify.right, ambos.rectify.right]),
+  ...combineOps<any>([regs.rectify.right, ambos.rectify.right]),
   ...hitOptArgs,
 })
