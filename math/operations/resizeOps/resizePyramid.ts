@@ -3,7 +3,7 @@ import { getCyclic } from "lib/utils"
 import { Capstone } from "specs"
 import { makeOpPair, OpPairInput } from "../operationPairs"
 import { FacetOpts, TwistOpts, Pose } from "../operationUtils"
-import { Face, Vertex } from "math/polyhedra"
+import { Face, Edge, Vertex } from "math/polyhedra"
 import { CapstoneForme } from "math/formes"
 import { isCodirectional } from "math/geom"
 
@@ -51,8 +51,8 @@ function getCapstonePose(forme: CapstoneForme): Pose {
 function getCrossAxis(forme: CapstoneForme) {
   if (forme.specs.isSnub()) {
     // If it's snub, use the top to find the facet face
-    const top = forme.ends()[0] as Face
-    const e = top.edges[0]
+    const top = forme.ends()[0]
+    const e = top instanceof Face ? top.edges[0] : (top as Edge)
     return e.twin().next().twinFace()
   } else {
     const top = forme.caps()[0]
@@ -126,22 +126,15 @@ function getFacesToMap(result: CapstoneForme) {
   }
   // for a twist operation, the end result is the bicupola
   return result.caps().flatMap((cap) => {
-    return [
-      ...cap
-        .boundary()
-        .adjacentFaces()
-        .filter((f) => f.numSides === 3),
-      cap.topFace(),
-    ]
+    const items = cap
+      .boundary()
+      .adjacentFaces()
+      .filter((f) => f.numSides === 3)
+    if (!result.specs.isDigonal()) {
+      items.push(cap.topFace())
+    }
+    return items
   })
-  // return [
-  //   ...top
-  //     .boundary()
-  //     .adjacentFaces()
-  //     .filter((f) => f.numSides === 3),
-  //   bottom.topFace(),
-  // ]
-  // return []
 }
 
 // Find the faces in the first set that map onto the second set
