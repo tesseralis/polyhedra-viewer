@@ -1,4 +1,3 @@
-import React from "react"
 import Icon from "@mdi/react"
 import { mdiFacebook, mdiTwitter, mdiReddit } from "@mdi/js"
 

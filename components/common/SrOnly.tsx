@@ -1,4 +1,3 @@
-import React from "react"
 import { useStyle } from "styles"
 import { ChildrenProp } from "lib/types"
 

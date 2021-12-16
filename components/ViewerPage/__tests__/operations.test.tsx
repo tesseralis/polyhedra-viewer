@@ -1,7 +1,7 @@
 import { Vector3 } from "three"
 import { capitalize } from "lodash-es"
 import "mutationobserver-shim"
-import React from "react"
+
 import {
   render,
   screen,

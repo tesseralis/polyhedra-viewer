@@ -1,4 +1,3 @@
-import React from "react"
 import { useStyle, scales, media } from "styles"
 import { capitalize } from "lodash-es"
 

@@ -1,4 +1,3 @@
-import React from "react"
 import { useStyle, scales } from "styles"
 
 import { OpGrid, Prompt, Options, ResizeButtons } from "../common"

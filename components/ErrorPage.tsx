@@ -1,4 +1,3 @@
-import React from "react"
 import Link from "next/link"
 
 import { useStyle, fonts, scales, media } from "styles"

@@ -1,5 +1,5 @@
 import { capitalize } from "lodash-es"
-import React from "react"
+
 import { useStyle, scales } from "styles"
 
 import { media, fonts } from "styles"

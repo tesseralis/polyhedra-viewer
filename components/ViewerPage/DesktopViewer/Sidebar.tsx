@@ -1,4 +1,3 @@
-import React from "react"
 import { useStyle, scales } from "styles"
 
 import { NavMenu, Panels, useHiddenHeading } from "../common"

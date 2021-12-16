@@ -1,4 +1,3 @@
-import React from "react"
 import { Canvas } from "@react-three/fiber"
 import { useRouter } from "next/router"
 import { useStyle } from "styles"

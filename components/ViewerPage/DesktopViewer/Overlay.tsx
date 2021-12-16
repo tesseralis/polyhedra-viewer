@@ -1,6 +1,5 @@
 //@flow
 
-import React from "react"
 import { useStyle, scales } from "styles"
 
 import { absolute, absoluteFull, paddingHoriz } from "styles/common"

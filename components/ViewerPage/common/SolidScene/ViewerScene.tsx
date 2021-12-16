@@ -1,5 +1,5 @@
 import { pick } from "lodash-es"
-import React from "react"
+
 import { Canvas } from "@react-three/fiber"
 import { TrackballControls, PerspectiveCamera } from "@react-three/drei"
 import ThreePolyhedron from "./PolyhedronModel"

@@ -1,4 +1,3 @@
-import React from "react"
 import { capitalize, map } from "lodash-es"
 import { ChildrenProp } from "lib/types"
 import { PolyhedronSpecs, polygonNames } from "specs"

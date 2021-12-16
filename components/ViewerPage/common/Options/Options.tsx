@@ -1,5 +1,3 @@
-import React from "react"
-
 import { OperationCtx } from "components/ViewerPage/context"
 import TwistOptions from "./TwistOptions"
 import AugmentOptions from "./AugmentOptions"

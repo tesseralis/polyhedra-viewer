@@ -1,4 +1,3 @@
-import React from "react"
 import Link from "next/link"
 import { useStyle, scales } from "styles"
 import Icon from "@mdi/react"

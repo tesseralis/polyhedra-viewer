@@ -1,5 +1,3 @@
-import React from "react"
-
 import { escape, choose } from "lib/utils"
 import { isValidSolid, allSolidNames } from "data/common"
 import { isAlternateName } from "data/alternates"
