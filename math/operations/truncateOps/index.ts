@@ -2,14 +2,14 @@ import { oppositeFacet } from "specs"
 import { combineOps } from "../operationPairs"
 import Operation, { OpArgs } from "../Operation"
 import { FacetOpts } from "../operationUtils"
-import { Classical, Composite } from "specs"
+import { Classical } from "specs"
 import regs from "./truncateRegular"
 import ambos from "./truncateAmbo"
 import augTruncate from "./truncateAugmented"
 
 export const truncate = new Operation(
   "truncate",
-  combineOps<Classical | Composite, any>([
+  combineOps<any, any>([
     regs.truncate.left,
     ambos.truncate.left,
     augTruncate.left,
@@ -42,7 +42,7 @@ const hitOptArgs: Partial<OpArgs<FacetOpts, Classical>> = {
 }
 
 export const sharpen = new Operation("sharpen", {
-  ...combineOps<Classical | Composite, Partial<FacetOpts>>([
+  ...combineOps<any, Partial<FacetOpts>>([
     regs.truncate.right,
     ambos.truncate.right,
     augTruncate.right,
@@ -58,14 +58,11 @@ export const sharpen = new Operation("sharpen", {
 
 // TODO why doesn't the typing work here?
 export const cosharpen = new Operation("cosharpen", {
-  ...combineOps<Classical, any>([
-    regs.cotruncate.right,
-    ambos.cotruncate.right,
-  ]),
+  ...combineOps<any, any>([regs.cotruncate.right, ambos.cotruncate.right]),
   ...hitOptArgs,
 })
 
 export const unrectify = new Operation("unrectify", {
-  ...combineOps<Classical, any>([regs.rectify.right, ambos.rectify.right]),
+  ...combineOps<any, any>([regs.rectify.right, ambos.rectify.right]),
   ...hitOptArgs,
 })
