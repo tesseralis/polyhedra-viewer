@@ -21,14 +21,12 @@ function getCantellatedMidradius(forme: ClassicalForme) {
 /**
  * Take the cantellated intermediate solid and convert it to either dual
  */
-function doDualTransform(forme: ClassicalForme, result: Classical) {
-  const resultForme = fromSpecs(result)
-  const resultSideLength =
-    getCantellatedMidradius(forme) / resultForme.midradius()
-  const scale = resultSideLength * resultForme.circumradius()
-  const faces = forme.facetFaces(oppositeFacet(result.facet()))
+function doDualTransform(start: ClassicalForme, result: ClassicalForme) {
+  const resultSideLength = getCantellatedMidradius(start) / result.midradius()
+  const scale = resultSideLength * result.circumradius()
+  const faces = start.facetFaces(oppositeFacet(result.specs.facet()))
   return getTransformedVertices(faces, (f) => {
-    return forme.geom.centroid().clone().addScaledVector(f.normal(), scale)
+    return start.geom.centroid().clone().addScaledVector(f.normal(), scale)
   })
 }
 
@@ -57,6 +55,6 @@ export default makeOpPair<Classical>({
       orientation: [vertex, vertex.adjacentVertices()[0]],
     }
   },
-  toLeft: (forme, _, result) => doDualTransform(forme, result.specs),
-  toRight: (forme, _, result) => doDualTransform(forme, result.specs),
+  toLeft: (forme, _, result) => doDualTransform(forme, result),
+  toRight: (forme, _, result) => doDualTransform(forme, result),
 })

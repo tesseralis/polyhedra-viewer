@@ -17,15 +17,14 @@ import { ClassicalForme, fromSpecs } from "math/formes"
  * @param angle the angle to twist the faces by
  */
 function getResizedVertices(
-  forme: ClassicalForme,
+  start: ClassicalForme,
   facet: FacetType,
-  result: Classical,
+  result: ClassicalForme,
 ) {
-  const resultForme = fromSpecs(result)
-  const angle = forme.snubAngle(facet)
-  const distance = resultForme.inradius(facet) / resultForme.geom.edgeLength()
-  const scale = forme.geom.edgeLength() * distance - forme.inradius(facet)
-  return getTransformedVertices(forme.facetFaces(facet), (f) => {
+  const angle = start.snubAngle(facet)
+  const distance = result.inradius(facet) / result.geom.edgeLength()
+  const scale = start.geom.edgeLength() * distance - start.inradius(facet)
+  return getTransformedVertices(start.facetFaces(facet), (f) => {
     const rotateM = f.rotateNormal(angle)
     const translateM = f.translateNormal(scale)
     return f.withCentroidOrigin(rotateM.premultiply(translateM))
@@ -54,7 +53,7 @@ function getResizeArgs<L, R>(
       return getClassicalPose(forme, getFacet(options))
     },
     toLeft(forme, options, result) {
-      return getResizedVertices(forme, getFacet(options), result.specs)
+      return getResizedVertices(forme, getFacet(options), result)
     },
   }
 }

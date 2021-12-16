@@ -50,10 +50,9 @@ function getScaledPrismVertices(
 
 function doPrismTransform(
   forme: CapstoneForme,
-  result: Capstone,
+  resultForme: CapstoneForme,
   twist?: Twist,
 ) {
-  const resultForme = fromSpecs(result)
   const resultHeight =
     (resultForme.prismaticHeight() / resultForme.geom.edgeLength()) *
     forme.geom.edgeLength()
@@ -89,7 +88,7 @@ function makePrismOp({ query, rightElongation = "antiprism" }: PrismOpArgs) {
         return getCapstonePose(forme, twist)
       },
       toLeft(forme, $, result) {
-        return doPrismTransform(forme, result.specs, twist)
+        return doPrismTransform(forme, result, twist)
       },
     })
   }
@@ -111,7 +110,7 @@ const turnPrismatic = makeOpPair<Capstone>({
   getPose(forme) {
     return getCapstonePose(forme, "left")
   },
-  toLeft: (forme, $, result) => doPrismTransform(forme, result.specs, "left"),
+  toLeft: (forme, $, result) => doPrismTransform(forme, result, "left"),
 })
 
 const _elongate = makePrismOp({
@@ -167,7 +166,7 @@ function makeBicupolaPrismOp(leftElongation: "none" | "prism") {
       return getCapstonePose(forme, twist)
     },
     toLeft: (forme, { right: { twist } }, result) => {
-      return doPrismTransform(forme, result.specs, twist)
+      return doPrismTransform(forme, result, twist)
     },
   })
 }
