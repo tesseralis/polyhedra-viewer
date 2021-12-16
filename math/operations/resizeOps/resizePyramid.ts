@@ -1,6 +1,6 @@
 import { getCyclic } from "lib/utils"
-import { Capstone, FacetType } from "specs"
-import { makeOpPair, OpPairInput, GraphOpts } from "../operationPairs"
+import { Capstone } from "specs"
+import { makeOpPair, OpPairInput } from "../operationPairs"
 import { FacetOpts, TwistOpts, Pose } from "../operationUtils"
 import { Face, Vertex } from "math/polyhedra"
 import { CapstoneForme } from "math/formes"
@@ -63,10 +63,8 @@ function getResizedVertices(forme: CapstoneForme, result: CapstoneForme): any {
 
 function getCapstonePose(forme: CapstoneForme): Pose {
   const { geom } = forme
-  // TODO handle other thing
   const top = forme.caps()[0]
   return {
-    // FIXME this should be on the base of the cap
     origin: top.boundary().centroid(),
     // Use the normal of the given face as the first axis
     scale: geom.edgeLength(),
@@ -151,10 +149,11 @@ function getFacePairs(first: Face[], second: Face[]) {
 
 function getVertexPairs(f1: Face, f2: Face) {
   const v0 = f1.vertices[0]
-  console.log(f1.vertices.map((v) => v.vec))
-  console.log(f2.vertices.map((v) => v.vec))
   const partnerIndex = f2.vertices.findIndex((v) =>
-    isCodirectional(f1.centroid().sub(v0.vec), f2.centroid().sub(v.vec)),
+    isCodirectional(
+      f1.centroid().clone().sub(v0.vec),
+      f2.centroid().clone().sub(v.vec),
+    ),
   )
   if (partnerIndex < 0) {
     throw new Error("Something went wrong finding a partner vertex")
