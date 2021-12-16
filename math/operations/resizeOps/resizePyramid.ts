@@ -2,7 +2,7 @@ import { minBy, range } from "lodash-es"
 import { getCyclic } from "lib/utils"
 import { Capstone } from "specs"
 import { makeOpPair, OpPairInput } from "../operationPairs"
-import { FacetOpts, TwistOpts, Pose } from "../operationUtils"
+import { FacetOpts, Pose } from "../operationUtils"
 import { Face, Edge, Vertex } from "math/polyhedra"
 import { CapstoneForme } from "math/formes"
 import { isCodirectional } from "math/geom"
@@ -90,7 +90,7 @@ export const expand = makeOpPair<Capstone, {}, FacetOpts>({
   },
 })
 
-export const snub = makeOpPair<Capstone, TwistOpts, FacetOpts>({
+export const snub = makeOpPair<Capstone, {}, FacetOpts>({
   ...resizeArgs,
   graph: function* () {
     for (const entry of Capstone.query.where(
@@ -105,11 +105,16 @@ export const snub = makeOpPair<Capstone, TwistOpts, FacetOpts>({
   },
 })
 
-export const twist = makeOpPair<Capstone, TwistOpts, {}>({
+export const twist = makeOpPair<Capstone, {}, {}>({
   ...getResizeArgs(),
   graph: function* () {
     for (const entry of Capstone.query.where(
-      (c) => c.isCupola() && c.isBi() && c.isShortened() && !c.isPentagonal(),
+      (c) =>
+        c.isCupola() &&
+        c.isGyro() &&
+        c.isBi() &&
+        c.isShortened() &&
+        !c.isPentagonal(),
     )) {
       yield {
         left: entry,
