@@ -1,7 +1,6 @@
 import { combineOps } from "../operationPairs"
 import { FacetOpts } from "../operationUtils"
 import Operation, { makeOperation } from "../Operation"
-import { Classical, Capstone } from "specs"
 import * as classicals from "./resizeClassical"
 import * as prisms from "./resizePrism"
 import * as pyramids from "./resizePyramid"
@@ -45,7 +44,7 @@ export const twist = makeOperation(
 )
 
 export const contract = makeOperation<FacetOpts>("contract", {
-  ...combineOps<FacetOpts>(
+  ...combineOps<any>(
     [
       classicals.expand,
       classicals.snub,

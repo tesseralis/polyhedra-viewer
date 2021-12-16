@@ -2,7 +2,7 @@ import { minBy, range } from "lodash-es"
 import { getCyclic } from "lib/utils"
 import { Capstone } from "specs"
 import { makeOpPair, OpPairInput } from "../operationPairs"
-import { FacetOpts, Pose } from "../operationUtils"
+import { Pose } from "../operationUtils"
 import { Face, Edge, Vertex } from "math/polyhedra"
 import { CapstoneForme } from "math/formes"
 import { isCodirectional } from "math/geom"
@@ -74,9 +74,9 @@ function getResizeArgs<L, R>(): ResizeArgs<L, R> {
   }
 }
 
-const resizeArgs = getResizeArgs<{}, FacetOpts>()
+const resizeArgs = getResizeArgs()
 
-export const expand = makeOpPair<Capstone, {}, FacetOpts>({
+export const expand = makeOpPair<Capstone>({
   ...resizeArgs,
   graph: function* () {
     for (const entry of Capstone.query.where(
@@ -90,7 +90,7 @@ export const expand = makeOpPair<Capstone, {}, FacetOpts>({
   },
 })
 
-export const snub = makeOpPair<Capstone, {}, FacetOpts>({
+export const snub = makeOpPair<Capstone>({
   ...resizeArgs,
   graph: function* () {
     for (const entry of Capstone.query.where(
@@ -105,7 +105,7 @@ export const snub = makeOpPair<Capstone, {}, FacetOpts>({
   },
 })
 
-export const twist = makeOpPair<Capstone, {}, {}>({
+export const twist = makeOpPair<Capstone>({
   ...getResizeArgs(),
   graph: function* () {
     for (const entry of Capstone.query.where(
