@@ -1,7 +1,7 @@
 import { Classical, oppositeFacet, FacetType } from "specs"
 import { makeOpPair } from "../operationPairs"
 import { Pose, getTransformedVertices } from "../operationUtils"
-import { ClassicalForme, fromSpecs } from "math/formes"
+import { ClassicalForme } from "math/formes"
 
 function getPose(forme: ClassicalForme, facet: FacetType, scale: number): Pose {
   const { geom } = forme

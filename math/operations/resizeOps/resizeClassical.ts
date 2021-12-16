@@ -6,7 +6,7 @@ import {
   TwistOpts,
   Pose,
 } from "../operationUtils"
-import { ClassicalForme, fromSpecs } from "math/formes"
+import { ClassicalForme } from "math/formes"
 
 /**
  * Return the expanded vertices of the polyhedron resized to the given distance-from-center
