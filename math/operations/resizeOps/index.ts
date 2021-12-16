@@ -31,7 +31,10 @@ export const expand = new Operation(
   ),
 )
 
-export const snub = makeOperation("snub", classicals.snub.left)
+export const snub = makeOperation(
+  "snub",
+  combineOps<ResizeSpecs, {}>([classicals.snub.left, pyramids.snub.left]),
+)
 
 export const twist = makeOperation(
   "twist",
@@ -46,6 +49,7 @@ export const contract = makeOperation<FacetOpts, ResizeSpecs>("contract", {
       classicals.semiExpand,
       prisms.expand,
       pyramids.expand,
+      pyramids.snub,
     ].map((op) => op.right),
   ),
 

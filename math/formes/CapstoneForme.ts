@@ -240,6 +240,7 @@ class SnubCapstoneForme extends CapstoneForme {
         e.vertices.every((v) => v.adjacentFaces().length === 4),
       )
     } else {
+      // FIXME this doesn't work for icosahedron
       yield* this.geom.facesWithNumSides(this.specs.baseSides())
     }
   }
