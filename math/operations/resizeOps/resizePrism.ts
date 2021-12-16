@@ -61,9 +61,7 @@ export const expand = makeOpPair<Capstone, {}, FacetOpts>({
   },
   middle: "right",
   getPose,
-  toLeft(forme, $, result) {
-    return getResizedVertices(forme, result)
-  },
+  toLeft: getResizedVertices,
 })
 
 export const dual = makeOpPair<Capstone>({
@@ -82,12 +80,8 @@ export const dual = makeOpPair<Capstone>({
       gyrate: "ortho",
     }),
   getPose,
-  toLeft(forme, $, result) {
-    return getResizedVertices(forme, result)
-  },
-  toRight(forme, $, result) {
-    return getResizedVertices(forme, result)
-  },
+  toLeft: getResizedVertices,
+  toRight: getResizedVertices,
 })
 
 // get the result faces to map the start faces too

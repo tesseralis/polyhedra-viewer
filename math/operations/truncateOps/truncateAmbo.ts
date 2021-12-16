@@ -31,7 +31,7 @@ function getAmboPose(forme: ClassicalForme): Pose {
 export default makeTruncateTrio(getAmboPose, {
   left: {
     operation: "rectify",
-    transformer(forme, $, result) {
+    transformer(forme, result) {
       const refForme = fromSpecs(result.specs)
       const refInradius = avgInradius(refForme)
       const inradius = avgInradius(forme)
@@ -46,7 +46,7 @@ export default makeTruncateTrio(getAmboPose, {
   middle: { operation: "bevel" },
   right: {
     operation: "cantellate",
-    transformer(forme, $, result) {
+    transformer(forme, result) {
       const refForme = fromSpecs(result.specs)
       const edgeFace = refForme.edgeFace()
       const refMidradius = edgeFace.distanceToCenter()

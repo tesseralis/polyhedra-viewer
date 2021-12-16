@@ -27,9 +27,7 @@ function getResizeArgs<L, R>(
     getPose(forme, options) {
       return getClassicalPose(forme, getFacet(options))
     },
-    toLeft(forme, $, result) {
-      return getResizedVertices(forme, result)
-    },
+    toLeft: getResizedVertices,
   }
 }
 
@@ -122,12 +120,8 @@ export const dual = makeOpPair<Classical>({
       orientation: [vertex, vertex.adjacentVertices()[0]],
     }
   },
-  toLeft(forme, _, result) {
-    return getResizedVertices(forme, result)
-  },
-  toRight(forme, _, result) {
-    return getResizedVertices(forme, result)
-  },
+  toLeft: getResizedVertices,
+  toRight: getResizedVertices,
 })
 
 function getCantellatedMidradius(forme: ClassicalForme) {

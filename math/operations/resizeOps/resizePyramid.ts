@@ -39,9 +39,7 @@ function getResizeArgs<L, R>(): ResizeArgs<L, R> {
     getPose(forme) {
       return getCapstonePose(forme)
     },
-    toLeft(forme, $, result) {
-      return getResizedVertices(forme, result)
-    },
+    toLeft: getResizedVertices,
   }
 }
 

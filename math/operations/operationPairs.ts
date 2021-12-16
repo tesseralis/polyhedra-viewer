@@ -59,14 +59,14 @@ export interface OpPairInput<Specs extends PolyhedronSpecs, L = {}, R = L> {
   // Move the intermediate figure to the left position
   toLeft?(
     solid: Forme<Specs>,
-    opts: GraphOpts<L, R>,
     result: Forme<Specs>,
+    opts: GraphOpts<L, R>,
   ): VertexArg[]
   // Move the intermediate figure to the right position
   toRight?(
     solid: Forme<Specs>,
-    opts: GraphOpts<L, R>,
     result: Forme<Specs>,
+    opts: GraphOpts<L, R>,
   ): VertexArg[]
 }
 
@@ -183,8 +183,8 @@ class OpPair<
 
     return {
       animationData: {
-        start: middle.geom.withVertices(startFn(middle, options, solid)),
-        endVertices: endFn(middle, options, createForme(endSpecs, alignedEnd)),
+        start: middle.geom.withVertices(startFn(middle, solid, options)),
+        endVertices: endFn(middle, createForme(endSpecs, alignedEnd), options),
       },
       result: alignedEnd,
     }

@@ -33,8 +33,8 @@ interface TrioOpArgs<Op, Opts = any> {
   // pose(solid: ClassicalForme, opts: Opts): Pose
   transformer(
     solid: ClassicalForme,
-    opts: Opts,
     result: ClassicalForme,
+    opts: Opts,
   ): VertexArg[]
   options?(entry: Classical): Opts
 }
