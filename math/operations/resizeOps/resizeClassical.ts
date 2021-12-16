@@ -151,10 +151,16 @@ function getDualPose(
 
 // get the result faces to map the start faces too
 function getFacesToMap(result: ClassicalForme) {
+  // If contracting to a regular solid, use all faces
   if (result.specs.isRegular()) {
     return result.geom.faces
   }
-  // for a twist operation, the "end" is a cantellated solid
+  // If semi-contracting to a truncated solid,
+  // use the faces corresponding to the main facet
+  if (result.specs.isTruncated()) {
+    return result.facetFaces(result.specs.facet())
+  }
+  // for a twist operation, the result is a cantellated solid,
   // so return all facet-faces.
   return [...result.facetFaces("face"), ...result.facetFaces("vertex")]
 }
