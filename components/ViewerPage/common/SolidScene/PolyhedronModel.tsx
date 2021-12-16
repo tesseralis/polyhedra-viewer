@@ -88,7 +88,6 @@ function SolidFaces({
     if (geomRef.current) {
       geomRef.current.setDrawRange(0, faceVertices.length)
       const position = geomRef.current.attributes.position as BufferAttribute
-      console.log(faceVertices.flat().length)
       position.set(faceVertices.flat())
       const color = geomRef.current.attributes.color as BufferAttribute
       color.set(faceColors)

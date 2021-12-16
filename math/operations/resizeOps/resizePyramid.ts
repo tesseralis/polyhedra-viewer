@@ -17,14 +17,38 @@ import { isCodirectional } from "math/geom"
 function getResizedVertices(forme: CapstoneForme, result: CapstoneForme): any {
   // Exapnd/contract:
   // Get the side faces from the top and the top face of the bottom
-  const [top, bottom] = forme.caps()
+  let [top, bottom] = forme.caps()
+  const endTop = result.caps()[0]
+  // If the top is misaligned, switch the bottom and top
+  if (
+    !top
+      .adjacentFaces()
+      .filter((f) => f.numSides === 3)
+      .some((f) =>
+        isCodirectional(
+          f.normal(),
+          endTop.boundary().adjacentFaces()[0].normal(),
+        ),
+      )
+  ) {
+    ;[bottom, top] = [top, bottom]
+  }
   const startFaces = top
     .boundary()
     .adjacentFaces()
     .filter((f) => f.numSides === 3)
-    .concat(bottom.topFace())
 
-  const facePairs = getFacePairs(startFaces, result.geom.faces)
+  const endBottomFace = result.ends()[1] as Face
+  const bottomFace = forme.geom.faces.find((f) =>
+    isCodirectional(f.normal(), endBottomFace.normal()),
+  )
+  if (!bottomFace) {
+    throw new Error("Error finding the bottom face of the start polyhedron")
+  }
+  const facePairs = getFacePairs(startFaces, result.caps()[0].faces()).concat([
+    [bottomFace, endBottomFace],
+  ])
+
   // create a map from the initial vertices to the end vertices
   const mapping: Vertex[] = []
   for (const [f1, f2] of facePairs) {
@@ -42,8 +66,8 @@ function getCapstonePose(forme: CapstoneForme): Pose {
   // TODO handle other thing
   const top = forme.caps()[0]
   return {
-    // Always centered on centroid
-    origin: geom.centroid(),
+    // FIXME this should be on the base of the cap
+    origin: top.boundary().centroid(),
     // Use the normal of the given face as the first axis
     scale: geom.edgeLength(),
     orientation: [
@@ -92,7 +116,7 @@ export const snub = makeOpPair<Capstone, TwistOpts, FacetOpts>({
     )) {
       yield {
         left: entry,
-        right: entry.withData({ elongation: "snub" }),
+        right: entry.withElongation("snub"),
       }
     }
   },
@@ -127,6 +151,8 @@ function getFacePairs(first: Face[], second: Face[]) {
 
 function getVertexPairs(f1: Face, f2: Face) {
   const v0 = f1.vertices[0]
+  console.log(f1.vertices.map((v) => v.vec))
+  console.log(f2.vertices.map((v) => v.vec))
   const partnerIndex = f2.vertices.findIndex((v) =>
     isCodirectional(f1.centroid().sub(v0.vec), f2.centroid().sub(v.vec)),
   )
