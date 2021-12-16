@@ -1,10 +1,10 @@
-import { getCyclic } from "lib/utils"
 import { Capstone } from "specs"
 import { makeOpPair } from "../operationPairs"
 import { Pose, FacetOpts } from "../operationUtils"
 import { CapstoneForme } from "math/formes"
-import { Face, Vertex } from "math/polyhedra"
-import { isCodirectional } from "math/geom"
+import { getResizeFunction } from "./resizeUtils"
+
+const getResizedVertices = getResizeFunction(getFacesToMap)
 
 function getCapstoneCrossAxis(forme: CapstoneForme) {
   const topBoundary = forme.endBoundaries()[0]
@@ -90,74 +90,7 @@ export const dual = makeOpPair<Capstone>({
   },
 })
 
-function getResizedVertices(forme: CapstoneForme, result: CapstoneForme) {
-  const facePairs = getFacePairs(forme.geom.faces, getFacesToMap(result))
-
-  // create a map from the initial vertices to the end vertices
-  const mapping: Vertex[] = []
-  for (const [f1, f2] of facePairs) {
-    for (const [v1, v2] of getVertexPairs(f1, f2)) {
-      mapping[v1.index] = v2
-    }
-  }
-  const res = forme.geom.vertices.map((v) => {
-    return mapping[v.index]
-  })
-  return res
-}
-
 // get the result faces to map the start faces too
 function getFacesToMap(result: CapstoneForme) {
-  if (result.specs.isPyramid()) {
-    return result.geom.faces
-  }
-  // for a twist operation, the end result is the bicupola
-  return result.caps().flatMap((cap) => {
-    const items = cap
-      .boundary()
-      .adjacentFaces()
-      .filter((f) => f.numSides === 3)
-    if (!result.specs.isDigonal()) {
-      items.push(cap.topFace())
-    }
-    return items
-  })
-}
-
-// Find the faces in the first set that map onto the second set
-function getFacePairs(first: Face[], second: Face[]) {
-  return second.map((face) => {
-    return [findFacePartner(face, first), face]
-  })
-}
-
-function findFacePartner(face: Face, candidates: Face[]) {
-  const partner = candidates.find((face2) =>
-    isCodirectional(face.normal(), face2.normal()),
-  )
-  if (!partner) {
-    throw new Error("Something went wrong finding a partner face")
-  }
-  return partner
-}
-
-function getVertexPairs(f1: Face, f2: Face) {
-  const partnerIndex = getPartnerVertexIndex(f1, f2)
-  return f1.vertices.map((v, i) => {
-    return [v, getCyclic(f2.vertices, i + partnerIndex)] as [Vertex, Vertex]
-  })
-}
-
-function getPartnerVertexIndex(f1: Face, f2: Face) {
-  const v0 = f1.vertices[0]
-  const partnerIndex = f2.vertices.findIndex((v) =>
-    isCodirectional(
-      f1.centroid().clone().sub(v0.vec),
-      f2.centroid().clone().sub(v.vec),
-    ),
-  )
-  if (partnerIndex < 0) {
-    throw new Error("Something went wrong finding a partner vertex")
-  }
-  return partnerIndex
+  return result.geom.faces
 }

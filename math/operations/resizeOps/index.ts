@@ -4,13 +4,12 @@ import Operation, { makeOperation } from "../Operation"
 import * as classicals from "./resizeClassical"
 import * as prisms from "./resizePrism"
 import * as pyramids from "./resizePyramid"
-import regularDual from "./dualRegular"
 
 export const dual = new Operation(
   "dual",
   combineOps([
-    regularDual.left,
-    regularDual.right,
+    classicals.dual.left,
+    classicals.dual.right,
     prisms.dual.left,
     prisms.dual.right,
   ]),
