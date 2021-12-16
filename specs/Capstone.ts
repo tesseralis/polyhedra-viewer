@@ -61,12 +61,13 @@ export default class Capstone extends Specs<CapstoneData> {
   unwrap = () => this
 
   withData(data: Partial<CapstoneData>) {
+    console.log(Capstone.cleanData({ ...this.data, ...data }))
     return Capstone.query.withData(
       Capstone.cleanData({ ...this.data, ...data }),
     )
   }
 
-  withElongation(elongation: PrismaticType | "none", twist?: Twist) {
+  withElongation(elongation: Elongation, twist?: Twist) {
     return this.withData({ elongation, twist })
   }
 
@@ -171,6 +172,7 @@ export default class Capstone extends Specs<CapstoneData> {
       data.type = "primary"
       data.count = 0
       data.rotundaCount = 0
+      delete data.gyrate
     }
     return data
   }

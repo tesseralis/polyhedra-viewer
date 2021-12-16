@@ -2,6 +2,7 @@ import { Matrix4, Vector3, Plane, Ray } from "three"
 
 export const PRECISION_DIGITS = 3
 export const PRECISION = 10 ** -PRECISION_DIGITS
+export const ORIGIN = new Vector3(0, 0)
 
 export function vecEquals(v1: Vector3, v2: Vector3) {
   return v1.distanceTo(v2) < PRECISION
@@ -11,8 +12,11 @@ export const getMidpoint = (v1: Vector3, v2: Vector3) =>
   new Vector3().addVectors(v1, v2).divideScalar(2)
 
 export function angleBetween(o: Vector3, a: Vector3, b: Vector3) {
-  // colinear points return NaN, so return 0 instead
   return a.clone().sub(o).angleTo(b.clone().sub(o))
+}
+
+export function isCodirectional(a: Vector3, b: Vector3) {
+  return angleBetween(ORIGIN, a, b) < PRECISION
 }
 
 // Get the plane containing the given points

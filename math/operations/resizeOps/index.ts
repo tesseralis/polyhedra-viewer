@@ -4,6 +4,7 @@ import Operation, { makeOperation } from "../Operation"
 import { Classical, Capstone } from "specs"
 import * as classicals from "./resizeClassical"
 import * as prisms from "./resizePrism"
+import * as pyramids from "./resizePyramid"
 import regularDual from "./dualRegular"
 
 type ResizeSpecs = Classical | Capstone
@@ -20,11 +21,14 @@ export const dual = new Operation(
 
 export const expand = new Operation(
   "expand",
-  combineOps<ResizeSpecs, {}>([
-    classicals.semiExpand.left,
-    classicals.expand.left,
-    prisms.expand.left,
-  ]),
+  combineOps<ResizeSpecs, {}>(
+    [
+      classicals.semiExpand,
+      classicals.expand,
+      prisms.expand,
+      pyramids.expand,
+    ].map((op) => op.left),
+  ),
 )
 
 export const snub = makeOperation("snub", classicals.snub.left)
@@ -41,6 +45,7 @@ export const contract = makeOperation<FacetOpts, ResizeSpecs>("contract", {
       classicals.snub,
       classicals.semiExpand,
       prisms.expand,
+      pyramids.expand,
     ].map((op) => op.right),
   ),
 
