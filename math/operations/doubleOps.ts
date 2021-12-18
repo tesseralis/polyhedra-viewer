@@ -6,27 +6,12 @@ import { Cap, Face } from "math/polyhedra"
 import { TwistOpts } from "./operationUtils"
 import { getResizeFunction } from "./resizeOps/resizeUtils"
 
-function getFacesToMap(result: CapstoneForme) {
-  if (result.specs.isBi()) {
-    return result.geom.faces
-  }
-  if (result.specs.isMono()) {
-    // For mono-capstones, include the top cap
-    const cap = result.caps()[0]
-    let faces = cap.faces()
-    // If (gyro-)elongated, add the side faces as well.
-    if (!result.specs.isShortened()) {
-      faces = faces.concat(result.sideFaces())
-    }
-    return faces
-  }
-  // For prismatic polyhedra, return their sides
-  return result.sideFaces()
-}
+const getResizedVertices = getResizeFunction(
+  getEndFacesToMap,
+  getStartFacesToMap,
+)
 
-const getResizedVertices = getResizeFunction(getFacesToMap)
-
-const _double = makeOpPair<Capstone, TwistOpts>({
+const doubleHalve = makeOpPair<Capstone, TwistOpts>({
   graph: function* () {
     for (const entry of Capstone.query.where(
       (s) => s.isPrimary() && !s.isSnub(),
@@ -79,5 +64,49 @@ const _double = makeOpPair<Capstone, TwistOpts>({
   toLeft: getResizedVertices,
 })
 
-export const double = makeOperation("double", _double.left)
-export const halve = makeOperation("halve", _double.right)
+export const double = makeOperation("double", doubleHalve.left)
+export const halve = makeOperation("halve", doubleHalve.right)
+
+function getEndFacesToMap(forme: CapstoneForme) {
+  if (forme.specs.isBi()) {
+    return forme.geom.faces
+  }
+  if (forme.specs.isMono()) {
+    // For mono-capstones, include the top cap
+    const cap = forme.caps()[0]
+    let faces = cap.faces()
+    // If (gyro-)elongated, add the side faces as well.
+    if (!forme.specs.isShortened()) {
+      faces = faces.concat(forme.sideFaces())
+    }
+    return faces
+  }
+  // For prismatic polyhedra, return their sides
+  return forme.sideFaces()
+}
+
+function getStartFacesToMap(forme: CapstoneForme) {
+  // For most things, we can just use the default and use all the faces
+  if (!forme.specs.isGyroelongated()) {
+    return forme.geom.faces
+  }
+  // gyroelongated bicupolae also have enough information to restrict
+  if (forme.specs.isBi()) {
+    return forme.geom.faces
+  }
+  // Otherwise, return every other face
+  if (forme.specs.isMono()) {
+    const cap = forme.caps()[0]
+    return cap
+      .boundary()
+      .edges.filter((e) => e.face.numSides === 3)
+      .flatMap((e) => {
+        return [e.face, e.twinFace(), e.twin().next().twinFace()]
+      })
+  } else {
+    const end = forme.ends()[0] as Face
+    return end.edges
+      .filter((e, i) => i % 2 === 0)
+      .flatMap((e) => [e.twinFace(), e.twin().next().twinFace()])
+  }
+}

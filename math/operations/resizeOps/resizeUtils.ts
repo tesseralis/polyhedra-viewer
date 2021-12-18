@@ -10,10 +10,14 @@ type GetFaces<Forme> = (forme: Forme) => Face[]
  * and rotated by the given angle
  */
 export function getResizeFunction<Forme extends PolyhedronForme>(
-  getFacesToMap: GetFaces<Forme>,
+  getEndFacesToMap: GetFaces<Forme>,
+  getStartFacesToMap: GetFaces<Forme> = (forme) => forme.geom.faces,
 ) {
-  return function getResizedVertices(forme: Forme, result: Forme) {
-    const facePairs = getFacePairs(forme.geom.faces, getFacesToMap(result))
+  return function getResizedVertices(start: Forme, end: Forme) {
+    const facePairs = getFacePairs(
+      getStartFacesToMap(start),
+      getEndFacesToMap(end),
+    )
 
     // create a map from the initial vertices to the end vertices
     const mapping: Vertex[] = []
@@ -22,7 +26,7 @@ export function getResizeFunction<Forme extends PolyhedronForme>(
         mapping[v1.index] = v2
       }
     }
-    const res = forme.geom.vertices.map((v) => {
+    const res = start.geom.vertices.map((v) => {
       return mapping[v.index]
     })
     return res
