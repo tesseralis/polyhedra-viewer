@@ -3,7 +3,14 @@ import TwistOptions from "./TwistOptions"
 import AugmentOptions from "./AugmentOptions"
 
 function hasTwist(opName: string) {
-  return ["snub", "twist", "gyroelongate", "shorten", "turn"].includes(opName)
+  return [
+    "snub",
+    "twist",
+    "gyroelongate",
+    "shorten",
+    "turn",
+    "double",
+  ].includes(opName)
 }
 
 export default function Options() {

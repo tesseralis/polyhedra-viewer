@@ -150,6 +150,12 @@ export default abstract class CapstoneForme extends BaseForme<Capstone> {
     return !this.isContainedInEnd(face)
   }
 
+  sideFaces() {
+    // TODO this could probably be faster since the predicate
+    // isn't that fast
+    return this.geom.faces.filter((f) => this.isSideFace(f))
+  }
+
   centroid() {
     return getCentroid(this.ends().map((end) => end.centroid()))
   }

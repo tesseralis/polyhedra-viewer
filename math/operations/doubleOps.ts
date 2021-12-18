@@ -1,8 +1,9 @@
-import { Capstone } from "specs"
+import { Capstone, twists } from "specs"
 import { makeOpPair } from "./operationPairs"
 import { makeOperation } from "./Operation"
 import { CapstoneForme } from "math/formes"
 import { Cap, Face } from "math/polyhedra"
+import { TwistOpts } from "./operationUtils"
 import { getResizeFunction } from "./resizeOps/resizeUtils"
 
 function getFacesToMap(result: CapstoneForme) {
@@ -10,38 +11,57 @@ function getFacesToMap(result: CapstoneForme) {
     return result.geom.faces
   }
   if (result.specs.isMono()) {
+    // For mono-capstones, include the top cap
     const cap = result.caps()[0]
-    if (result.specs.isElongated()) {
-      // For elongated mono, include everything but the bottom cap
-      return cap.boundary().edges.flatMap((e) => {
-        return [e.face, e.twinFace()]
-      })
+    let faces = cap.faces()
+    // If (gyro-)elongated, add the side faces as well.
+    if (!result.specs.isShortened()) {
+      faces = faces.concat(result.sideFaces())
     }
-    // For pure pyramids, return all the faces of the cap
-    return cap.faces()
+    return faces
   }
-  // Otherwise, it's a prism, so return the side faces
-  const end = result.ends()[0] as Face
-  return end.adjacentFaces()
+  // For prismatic polyhedra, return their sides
+  return result.sideFaces()
 }
 
 const getResizedVertices = getResizeFunction(getFacesToMap)
 
-const _double = makeOpPair<Capstone>({
+const _double = makeOpPair<Capstone, TwistOpts>({
   graph: function* () {
     for (const entry of Capstone.query.where(
-      (s) => s.isPrimary() && !s.isGyroelongated() && !s.isSnub(),
+      (s) => s.isPrimary() && !s.isSnub(),
     )) {
-      yield {
-        left: entry,
-        right: entry.withData({ type: "secondary", gyrate: "ortho" }),
+      if (entry.isGyroelongated()) {
+        // FIXME digonal antiprism
+        if (entry.isDigonal()) {
+          continue
+        }
+        if (entry.isPrismatic()) {
+          yield {
+            left: entry,
+            right: entry.withData({ type: "secondary" }),
+          }
+        } else {
+          for (const twist of twists) {
+            // console.log(entry.data)
+            yield {
+              left: entry,
+              right: entry.withData({ type: "secondary", twist }),
+              options: { left: { twist } } as any,
+            }
+          }
+        }
+      } else {
+        yield {
+          left: entry,
+          right: entry.withData({ type: "secondary", gyrate: "ortho" }),
+        }
       }
     }
   },
   middle: "right",
   getPose(forme) {
     // Make sure the pyramid is facing up and pick a side
-    // FIXME support prisms as well
     const [top] = forme.ends()
     let crossAxis
     if (top instanceof Cap) {

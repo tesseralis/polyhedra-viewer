@@ -54,10 +54,6 @@ export default class Queries<S extends Specs> {
     // Remove nullish elements from the filter
     const compact = pickBy(data, (data) => data !== undefined)
     const entries = this.entries.filter((item) => isMatch(item.data, compact))
-    if (entries.length !== 1) {
-      console.log({ data })
-      console.log({ entries })
-    }
     return getSingle(entries)
   }
 
