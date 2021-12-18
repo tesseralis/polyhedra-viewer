@@ -3,9 +3,9 @@ import { makeOpPair, OpPairInput } from "../operationPairs"
 import { Pose } from "../operationUtils"
 import { Face, Edge } from "math/polyhedra"
 import { CapstoneForme } from "math/formes"
-import { getResizeFunction } from "./resizeUtils"
+import { getMorphFunction } from "../morph"
 
-const getResizedVertices = getResizeFunction(getFacesToMap)
+const getResizedVertices = getMorphFunction(getFacesToMap)
 
 function getCapstonePose(forme: CapstoneForme): Pose {
   const { geom } = forme

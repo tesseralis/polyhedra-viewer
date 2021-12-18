@@ -6,17 +6,18 @@ import { PolyhedronForme } from "math/formes"
 type GetFaces<Forme> = (forme: Forme) => Face[]
 
 /**
- * Return the expanded vertices of the polyhedron resized to the given distance-from-center
- * and rotated by the given angle
+ * Create a morph function that maps faces from the start polyhedron
+ * to the end polyhedron. It is assumed that the start polyhedron
+ * has more faces and collapses into the end polyhedron.
  */
-export function getResizeFunction<Forme extends PolyhedronForme>(
-  getEndFacesToMap: GetFaces<Forme>,
-  getStartFacesToMap: GetFaces<Forme> = (forme) => forme.geom.faces,
+export function getMorphFunction<Forme extends PolyhedronForme>(
+  endFacesToMorph: GetFaces<Forme>,
+  startFacesToMorph: GetFaces<Forme> = (forme) => forme.geom.faces,
 ) {
-  return function getResizedVertices(start: Forme, end: Forme) {
+  return function getMorphedVertices(start: Forme, end: Forme) {
     const facePairs = getFacePairs(
-      getStartFacesToMap(start),
-      getEndFacesToMap(end),
+      startFacesToMorph(start),
+      endFacesToMorph(end),
     )
 
     // create a map from the initial vertices to the end vertices

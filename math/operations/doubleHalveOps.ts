@@ -4,9 +4,9 @@ import { makeOperation } from "./Operation"
 import { CapstoneForme } from "math/formes"
 import { Cap, Face, Edge } from "math/polyhedra"
 import { TwistOpts } from "./operationUtils"
-import { getResizeFunction } from "./resizeOps/resizeUtils"
+import { getMorphFunction } from "./morph"
 
-const getResizedVertices = getResizeFunction(
+const getResizedVertices = getMorphFunction(
   getEndFacesToMap,
   getStartFacesToMap,
 )

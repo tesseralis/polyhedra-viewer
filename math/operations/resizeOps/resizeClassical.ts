@@ -2,9 +2,9 @@ import { Classical, FacetType, twists, oppositeTwist } from "specs"
 import { makeOpPair, OpPairInput, GraphOpts } from "../operationPairs"
 import { FacetOpts, TwistOpts, Pose } from "../operationUtils"
 import { ClassicalForme } from "math/formes"
-import { getResizeFunction } from "./resizeUtils"
+import { getMorphFunction } from "../morph"
 
-const getResizedVertices = getResizeFunction(getFacesToMap)
+const getResizedVertices = getMorphFunction(getFacesToMap)
 
 function getClassicalPose(forme: ClassicalForme, facet: FacetType): Pose {
   const { geom } = forme

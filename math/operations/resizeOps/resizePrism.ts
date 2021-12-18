@@ -2,9 +2,9 @@ import { Capstone } from "specs"
 import { makeOpPair } from "../operationPairs"
 import { Pose, FacetOpts } from "../operationUtils"
 import { CapstoneForme } from "math/formes"
-import { getResizeFunction } from "./resizeUtils"
+import { getMorphFunction } from "../morph"
 
-const getResizedVertices = getResizeFunction(getFacesToMap)
+const getResizedVertices = getMorphFunction(getFacesToMap)
 
 function getCapstoneCrossAxis(forme: CapstoneForme) {
   const topBoundary = forme.endBoundaries()[0]

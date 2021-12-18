@@ -2,10 +2,10 @@ import { prismaticTypes, Capstone } from "specs"
 import { makeOpPair } from "./operationPairs"
 import { Cap, Face, Edge } from "math/polyhedra"
 import { CapstoneForme } from "math/formes"
-import { getResizeFunction } from "./resizeOps/resizeUtils"
+import { getMorphFunction } from "./morph"
 import { makeOperation } from "./Operation"
 
-const getResizedVertices = getResizeFunction(
+const getResizedVertices = getMorphFunction(
   getEndFacesToMap,
   getStartFacesToMap,
 )
