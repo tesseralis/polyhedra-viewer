@@ -2,7 +2,7 @@ import { Capstone, twists } from "specs"
 import { makeOpPair } from "./operationPairs"
 import { makeOperation } from "./Operation"
 import { CapstoneForme } from "math/formes"
-import { Cap, Face } from "math/polyhedra"
+import { Cap, Face, Edge } from "math/polyhedra"
 import { TwistOpts } from "./operationUtils"
 import { getResizeFunction } from "./resizeOps/resizeUtils"
 
@@ -17,8 +17,11 @@ const doubleHalve = makeOpPair<Capstone, TwistOpts>({
       (s) => s.isPrimary() && !s.isSnub(),
     )) {
       if (entry.isGyroelongated()) {
-        // FIXME digonal antiprism
         if (entry.isDigonal()) {
+          yield {
+            left: entry,
+            right: entry.withData({ base: 4 }),
+          }
           continue
         }
         if (!entry.isBi()) {
@@ -52,8 +55,12 @@ const doubleHalve = makeOpPair<Capstone, TwistOpts>({
       crossAxis = forme.specs.isPyramid()
         ? top.boundary().edges[0]
         : top.boundary().edges.find((e) => e.face.numSides === 3)!
+    } else if (top instanceof Face) {
+      crossAxis = top.edges[0]
     } else {
-      crossAxis = (top as Face).edges[0]
+      // TODO antiprism are asymmetric:
+      // the aligned end is matched and the bottom end twists
+      crossAxis = (top as Edge).face
     }
     return {
       scale: forme.geom.edgeLength(),
