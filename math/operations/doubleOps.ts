@@ -36,14 +36,13 @@ const _double = makeOpPair<Capstone, TwistOpts>({
         if (entry.isDigonal()) {
           continue
         }
-        if (entry.isPrismatic()) {
+        if (!entry.isBi()) {
           yield {
             left: entry,
             right: entry.withData({ type: "secondary" }),
           }
         } else {
           for (const twist of twists) {
-            // console.log(entry.data)
             yield {
               left: entry,
               right: entry.withData({ type: "secondary", twist }),
