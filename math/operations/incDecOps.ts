@@ -1,20 +1,19 @@
-import { Capstone } from "specs"
+import { prismaticTypes, Capstone } from "specs"
 import { makeOpPair } from "./operationPairs"
-import { Cap, Face } from "math/polyhedra"
+import { Cap, Face, Edge } from "math/polyhedra"
 import { CapstoneForme } from "math/formes"
 import { getResizeFunction } from "./resizeOps/resizeUtils"
 import { makeOperation } from "./Operation"
 
-const getResizedVertices = getResizeFunction(getFacesToMap)
+const getResizedVertices = getResizeFunction(
+  getEndFacesToMap,
+  getStartFacesToMap,
+)
 
 const incDec = makeOpPair<Capstone>({
   graph: function* () {
     for (const entry of Capstone.query.where(
-      (c) =>
-        c.isPrimary() &&
-        !c.isPentagonal() &&
-        !c.isGyroelongated() &&
-        !c.isSnub(),
+      (c) => c.isPrimary() && !c.isPentagonal() && !c.isSnub(),
     )) {
       yield {
         left: entry,
@@ -22,21 +21,23 @@ const incDec = makeOpPair<Capstone>({
       }
     }
     // Expand the pentagonal prism to the hexagonal prism
-    yield {
-      left: Capstone.query.withData({
-        base: 5,
-        type: "primary",
-        count: 0,
-        elongation: "prism",
-        rotundaCount: 0,
-      }),
-      right: Capstone.query.withData({
-        base: 3,
-        type: "secondary",
-        count: 0,
-        elongation: "prism",
-        rotundaCount: 0,
-      }),
+    for (const elongation of prismaticTypes) {
+      yield {
+        left: Capstone.query.withData({
+          base: 5,
+          type: "primary",
+          count: 0,
+          elongation,
+          rotundaCount: 0,
+        }),
+        right: Capstone.query.withData({
+          base: 3,
+          type: "secondary",
+          count: 0,
+          elongation,
+          rotundaCount: 0,
+        }),
+      }
     }
   },
   middle: "right",
@@ -54,25 +55,53 @@ const incDec = makeOpPair<Capstone>({
   toLeft: getResizedVertices,
 })
 
-function getFacesToMap(result: CapstoneForme) {
-  if (result.specs.isBi()) {
-    return result.geom.faces
-  }
-  if (result.specs.isMono()) {
-    const cap = result.caps()[0]
-    if (result.specs.isElongated()) {
-      // For elongated mono, include everything but the bottom cap
-      return cap.boundary().edges.flatMap((e) => {
-        return [e.face, e.twinFace()]
-      })
-    }
-    // For pure pyramids, return all the faces of the cap
-    return cap.faces()
-  }
-  // Otherwise, it's a prism, so return the side faces
-  const end = result.ends()[0] as Face
-  return end.adjacentFaces()
-}
-
 export const increment = makeOperation("increment", incDec.left)
 export const decrement = makeOperation("decrement", incDec.right)
+
+function getEndFacesToMap(forme: CapstoneForme) {
+  if (forme.specs.isBi()) {
+    return forme.geom.faces
+  }
+  if (forme.specs.isMono()) {
+    // For mono-capstones, include the top cap
+    const cap = forme.caps()[0]
+    let faces = cap.faces()
+    // If (gyro-)elongated, add the side faces as well.
+    if (!forme.specs.isShortened()) {
+      faces = faces.concat(forme.sideFaces())
+    }
+    return faces
+  }
+  // For prismatic polyhedra, return their sides
+  return forme.sideFaces()
+}
+
+function getStartFacesToMap(forme: CapstoneForme) {
+  if (!forme.specs.isGyroelongated()) {
+    return forme.geom.faces
+  }
+  // If gyroelongated, choose one side opposite the aligned axis to exclude
+  // FIXME digonal antiprism errors out
+  const end = forme.ends()[0]
+  const edges =
+    end instanceof Cap
+      ? end.boundary().edges
+      : end instanceof Face
+      ? end.edges
+      : [end as Edge]
+  const edge = edges[Math.floor(edges.length / 2)]
+
+  const faces = [edge.twinFace(), edge.twin().next().twinFace()]
+  // If bi, add the face on the opposite end
+  if (forme.specs.isBi()) {
+    faces.push(edge.twin().next().twin().prev().twinFace())
+  }
+  if (!forme.specs.isPrismatic()) {
+    faces.push(edge.twinFace())
+  }
+
+  const indices = new Set(faces.map((f) => f.index))
+
+  // FIXME square -> pentagonal still doesn't work
+  return forme.geom.faces.filter((f) => !indices.has(f.index))
+}
