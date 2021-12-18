@@ -60,6 +60,7 @@ const doubleHalve = makeOpPair<Capstone, TwistOpts>({
     } else {
       // TODO antiprism are asymmetric:
       // the aligned end is matched and the bottom end twists
+      // This might also be causing the pentagonal class to be broken?
       crossAxis = (top as Edge).face
     }
     return {
