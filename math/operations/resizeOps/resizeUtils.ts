@@ -1,7 +1,6 @@
 import { minBy, range } from "lodash-es"
 import { getCyclic } from "lib/utils"
 import { Face, Vertex } from "math/polyhedra"
-import { isCodirectional } from "math/geom"
 import { PolyhedronForme } from "math/formes"
 
 type GetFaces<Forme> = (forme: Forme) => Face[]
