@@ -11,7 +11,7 @@ type GetFaces<Forme> = (forme: Forme) => Face[]
  * has more faces and collapses into the end polyhedron.
  */
 export function getMorphFunction<Forme extends PolyhedronForme>(
-  endFacesToMorph: GetFaces<Forme>,
+  endFacesToMorph: GetFaces<Forme> = (forme) => forme.geom.faces,
   startFacesToMorph: GetFaces<Forme> = (forme) => forme.geom.faces,
 ) {
   return function getMorphedVertices(start: Forme, end: Forme) {

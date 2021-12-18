@@ -4,7 +4,7 @@ import Operation, { OpArgs } from "../Operation"
 import { FacetOpts } from "../operationUtils"
 import { Classical } from "specs"
 import regs from "./truncateRegular"
-import ambos from "./truncateAmbo"
+import ambos, { semisnubAmbo } from "./truncateAmbo"
 import augTruncate from "./truncateAugmented"
 
 export const truncate = new Operation(
@@ -20,6 +20,11 @@ export const cotruncate = new Operation(
 export const rectify = new Operation(
   "rectify",
   combineOps([regs.rectify.left, ambos.rectify.left]),
+)
+
+export const semisnub = new Operation(
+  "semisnub",
+  combineOps([semisnubAmbo.left]),
 )
 
 const hitOptArgs: Partial<OpArgs<FacetOpts, Classical>> = {
@@ -44,6 +49,7 @@ export const sharpen = new Operation("sharpen", {
     augTruncate.right,
     regs.rectify.right,
     ambos.rectify.right,
+    semisnubAmbo.right,
   ]),
   // TODO split up sharpening rectified and sharpening truncated
   ...hitOptArgs,

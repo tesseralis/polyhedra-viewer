@@ -1,21 +1,13 @@
 import { sum } from "lodash-es"
-import { facetTypes } from "specs"
-import { getTransformedVertices, Pose } from "../operationUtils"
+import { Classical, facetTypes, twists } from "specs"
+import { getTransformedVertices, Pose, TwistOpts } from "../operationUtils"
 import { ClassicalForme, fromSpecs } from "math/formes"
 import { makeTruncateTrio } from "./truncateHelpers"
 import { scaleMat } from "math/geom"
+import { getMorphFunction } from "../morph"
+import { makeOpPair } from "../operationPairs"
 
-function avgInradius(forme: ClassicalForme) {
-  return sum(facetTypes.map((f) => forme.inradius(f))) / facetTypes.length
-}
-
-function getAmboPose(forme: ClassicalForme): Pose {
-  return {
-    origin: forme.geom.centroid(),
-    scale: avgInradius(forme),
-    orientation: forme.adjacentFacetFaces("face"),
-  }
-}
+const getMorphedVertices = getMorphFunction()
 
 /**
  * A trio of operations that describe the truncation behavior on a quasi-regular polyhedron
@@ -63,3 +55,32 @@ export default makeTruncateTrio(getAmboPose, {
     },
   },
 })
+
+export const semisnubAmbo = makeOpPair<Classical, TwistOpts>({
+  graph: function* () {
+    for (const entry of Classical.allWithOperation("rectify")) {
+      for (const twist of twists) {
+        yield {
+          left: entry,
+          right: entry.withOperation("snub", twist),
+          options: { left: { twist } } as any,
+        }
+      }
+    }
+  },
+  middle: "right",
+  getPose: getAmboPose,
+  toLeft: getMorphedVertices,
+})
+
+function avgInradius(forme: ClassicalForme) {
+  return sum(facetTypes.map((f) => forme.inradius(f))) / facetTypes.length
+}
+
+function getAmboPose(forme: ClassicalForme): Pose {
+  return {
+    origin: forme.geom.centroid(),
+    scale: avgInradius(forme),
+    orientation: forme.adjacentFacetFaces("face"),
+  }
+}

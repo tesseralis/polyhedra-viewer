@@ -4,7 +4,7 @@ import { Pose, FacetOpts } from "../operationUtils"
 import { CapstoneForme } from "math/formes"
 import { getMorphFunction } from "../morph"
 
-const getResizedVertices = getMorphFunction(getFacesToMap)
+const getResizedVertices = getMorphFunction()
 
 function getCapstoneCrossAxis(forme: CapstoneForme) {
   const topBoundary = forme.endBoundaries()[0]
@@ -83,8 +83,3 @@ export const dual = makeOpPair<Capstone>({
   toLeft: getResizedVertices,
   toRight: getResizedVertices,
 })
-
-// get the result faces to map the start faces too
-function getFacesToMap(result: CapstoneForme) {
-  return result.geom.faces
-}
