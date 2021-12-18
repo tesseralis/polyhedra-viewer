@@ -383,7 +383,16 @@ function drawIcon(name: OpName) {
         </>
       )
     default:
-      return <DualIcon />
+      return (
+        <Polygon
+          className={styles("added")}
+          n={6}
+          r={80}
+          a={90}
+          cx={100}
+          cy={100}
+        />
+      )
     // throw new Error(`Unknown operation: ${name}`)
   }
 }
