@@ -4,8 +4,12 @@ import { CapstoneForme } from "math/formes"
 import { combineOps, makeOpPair } from "./operationPairs"
 import { makeOperation } from "./Operation"
 import { Pose, TwistOpts, getTransformedVertices } from "./operationUtils"
+import { getMorphFunction } from "./morph"
+import { Face, Cap } from "math/polyhedra"
 
 const { PI } = Math
+
+const morphVertices = getMorphFunction(morphEndFaces)
 
 function getTwistMult(twist?: Twist) {
   switch (twist) {
@@ -31,33 +35,6 @@ function getCapstonePose(forme: CapstoneForme, twist?: Twist): Pose {
     scale: forme.geom.edgeLength(),
     orientation: [top, top.to(edge).applyAxisAngle(top.normal(), angle)],
   }
-}
-
-function getScaledPrismVertices(
-  forme: CapstoneForme,
-  scale: number,
-  twist?: Twist,
-) {
-  const vertexSets = forme.ends()
-  const angle = (getTwistMult(twist) * PI) / forme.specs.baseSides()
-
-  return getTransformedVertices(vertexSets, (set) => {
-    const rotateM = set.rotateNormal(angle / 2)
-    const translateM = set.translateNormal(scale / 2)
-    return set.withCentroidOrigin(rotateM.premultiply(translateM))
-  })
-}
-
-function doPrismTransform(
-  forme: CapstoneForme,
-  resultForme: CapstoneForme,
-  twist?: Twist,
-) {
-  const resultHeight =
-    (resultForme.prismaticHeight() / resultForme.geom.edgeLength()) *
-    forme.geom.edgeLength()
-  const scale = resultHeight - forme.prismaticHeight()
-  return getScaledPrismVertices(forme, scale, twist)
 }
 
 interface PrismOpArgs {
@@ -87,9 +64,7 @@ function makePrismOp({ query, rightElongation = "antiprism" }: PrismOpArgs) {
       getPose(forme) {
         return getCapstonePose(forme, twist)
       },
-      toLeft(forme, result) {
-        return doPrismTransform(forme, result, twist)
-      },
+      toLeft: morphVertices,
     })
   }
 }
@@ -110,7 +85,8 @@ const turnPrismatic = makeOpPair<Capstone>({
   getPose(forme) {
     return getCapstonePose(forme, "left")
   },
-  toLeft: (forme, result) => doPrismTransform(forme, result, "left"),
+  toLeft: morphVertices,
+  // toLeft: (forme, result) => doPrismTransform(forme, result, "left"),
 })
 
 const _elongate = makePrismOp({
@@ -165,9 +141,7 @@ function makeBicupolaPrismOp(leftElongation: "none" | "prism") {
     getPose(forme, { right: { twist } }) {
       return getCapstonePose(forme, twist)
     },
-    toLeft: (forme, result, { right: { twist } }) => {
-      return doPrismTransform(forme, result, twist)
-    },
+    toLeft: morphVertices,
   })
 }
 
@@ -203,3 +177,14 @@ export const turn = makeOperation(
     ]),
   ),
 )
+
+function morphEndFaces(forme: CapstoneForme) {
+  // For most things, it suffices to just return all the faces
+  if (forme.specs.isShortened()) {
+    return forme.geom.faces
+  }
+  // However, for un-turning, we only want to morph the end faces
+  return forme.ends().flatMap((end) => {
+    return end instanceof Cap ? end.faces() : [end as Face]
+  })
+}
