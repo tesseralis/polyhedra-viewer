@@ -1,4 +1,4 @@
-import { Capstone, twists } from "specs"
+import { Capstone, Composite, twists } from "specs"
 import { makeOpPair } from "./operationPairs"
 import { makeOperation } from "./Operation"
 import { CapstoneForme } from "math/formes"
@@ -6,10 +6,7 @@ import { Cap, Face, Edge } from "math/polyhedra"
 import { TwistOpts } from "./operationUtils"
 import { getMorphFunction } from "./morph"
 
-const getResizedVertices = getMorphFunction(
-  getEndFacesToMap,
-  getStartFacesToMap,
-)
+const morphVertices = getMorphFunction(getEndFacesToMap, getStartFacesToMap)
 
 const doubleHalve = makeOpPair<Capstone, TwistOpts>({
   graph: function* () {
@@ -69,7 +66,31 @@ const doubleHalve = makeOpPair<Capstone, TwistOpts>({
       orientation: [top.normal(), crossAxis],
     }
   },
-  toLeft: getResizedVertices,
+  toLeft: morphVertices,
+})
+
+const doubleHalveComposite = makeOpPair<Composite>({
+  graph: function* () {
+    // TODO will this catch the wrapped source?
+    for (const entry of Composite.query.where(
+      (e) => e.data.source.isCapstone() && e.data.source.isTriangular(),
+    )) {
+      return {
+        left: entry,
+        // Augmented triangular prism -> augmented hexagonal prism
+        right: entry.withData({
+          source: entry.sourcePrism().withData({ type: "secondary" }),
+        }),
+      }
+    }
+  },
+  middle: "right",
+  getPose() {
+    throw new Error("not implemented")
+  },
+  toLeft() {
+    throw new Error("not implemented")
+  },
 })
 
 export const double = makeOperation("double", doubleHalve.left)
