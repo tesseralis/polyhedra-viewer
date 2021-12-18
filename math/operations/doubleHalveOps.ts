@@ -1,13 +1,13 @@
 import { Capstone, Composite, twists } from "specs"
 import { makeOpPair, combineOps } from "./operationPairs"
 import { makeOperation } from "./Operation"
-import { CapstoneForme } from "math/formes"
+import { CapstoneForme, CompositeForme } from "math/formes"
 import { Cap, Face, Edge } from "math/polyhedra"
 import { TwistOpts } from "./operationUtils"
 import { getMorphFunction } from "./morph"
+import { AugmentedPrismForme } from "math/formes/CompositeForme"
 
-const morphVertices = getMorphFunction(getEndFacesToMap, getStartFacesToMap)
-
+const morphVertices = getMorphFunction(endMorphFaces, startMorphFaces)
 const doubleHalve = makeOpPair<Capstone, TwistOpts>({
   graph: function* () {
     for (const entry of Capstone.query.where(
@@ -69,11 +69,15 @@ const doubleHalve = makeOpPair<Capstone, TwistOpts>({
   toLeft: morphVertices,
 })
 
+const morphVerticesComposite = getMorphFunction(compositeEndMorphFaces)
 const doubleHalveComposite = makeOpPair<Composite>({
   graph: function* () {
     // TODO will this catch the wrapped source?
     for (const entry of Composite.query.where(
-      (e) => e.data.source.isCapstone() && e.data.source.isTriangular(),
+      (e) =>
+        e.data.source.isCapstone() &&
+        e.data.source.isTriangular() &&
+        e.data.source.isPrimary(),
     )) {
       yield {
         left: entry,
@@ -86,12 +90,14 @@ const doubleHalveComposite = makeOpPair<Composite>({
     }
   },
   middle: "right",
-  getPose() {
-    throw new Error("not implemented")
+  getPose(forme) {
+    return {
+      origin: forme.sourceCentroid(),
+      scale: forme.geom.edgeLength(),
+      orientation: forme.orientation(),
+    }
   },
-  toLeft() {
-    throw new Error("not implemented")
-  },
+  toLeft: morphVerticesComposite,
 })
 
 export const double = makeOperation(
@@ -103,7 +109,7 @@ export const halve = makeOperation(
   combineOps([doubleHalve.right, doubleHalveComposite.right]),
 )
 
-function getEndFacesToMap(forme: CapstoneForme) {
+function endMorphFaces(forme: CapstoneForme) {
   if (forme.specs.isBi()) {
     return forme.geom.faces
   }
@@ -121,7 +127,7 @@ function getEndFacesToMap(forme: CapstoneForme) {
   return forme.sideFaces()
 }
 
-function getStartFacesToMap(forme: CapstoneForme) {
+function startMorphFaces(forme: CapstoneForme) {
   // For most things, we can just use the default and use all the faces
   if (!forme.specs.isGyroelongated()) {
     return forme.geom.faces
@@ -145,4 +151,10 @@ function getStartFacesToMap(forme: CapstoneForme) {
       .filter((e, i) => i % 2 === 0)
       .flatMap((e) => [e.twinFace(), e.twin().next().twinFace()])
   }
+}
+
+function compositeEndMorphFaces(forme: AugmentedPrismForme) {
+  // The forme is an (mono-/bi-/tri-)augmented triangular prism.
+  // Return everything *except* the ends of the triangular prism
+  return forme.geom.faces.filter((face) => !forme.isEndFace(face))
 }
