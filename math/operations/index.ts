@@ -9,7 +9,7 @@ import {
 import { dual, expand, snub, contract, twist } from "./resizeOps"
 import { elongate, gyroelongate, shorten, turn } from "./prismOps"
 import { augment, diminish, gyrate } from "./cutPasteOps"
-import { double, halve } from "./doubleOps"
+import { double, halve } from "./doubleHalveOps"
 import { increment, decrement } from "./incDecOps"
 
 export type { default as Operation, AnimationData } from "./Operation"
