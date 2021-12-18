@@ -1,5 +1,5 @@
 import { Capstone, Composite, twists } from "specs"
-import { makeOpPair } from "./operationPairs"
+import { makeOpPair, combineOps } from "./operationPairs"
 import { makeOperation } from "./Operation"
 import { CapstoneForme } from "math/formes"
 import { Cap, Face, Edge } from "math/polyhedra"
@@ -75,11 +75,12 @@ const doubleHalveComposite = makeOpPair<Composite>({
     for (const entry of Composite.query.where(
       (e) => e.data.source.isCapstone() && e.data.source.isTriangular(),
     )) {
-      return {
+      yield {
         left: entry,
         // Augmented triangular prism -> augmented hexagonal prism
         right: entry.withData({
           source: entry.sourcePrism().withData({ type: "secondary" }),
+          align: "meta",
         }),
       }
     }
@@ -93,8 +94,14 @@ const doubleHalveComposite = makeOpPair<Composite>({
   },
 })
 
-export const double = makeOperation("double", doubleHalve.left)
-export const halve = makeOperation("halve", doubleHalve.right)
+export const double = makeOperation(
+  "double",
+  combineOps([doubleHalve.left, doubleHalveComposite.left]),
+)
+export const halve = makeOperation(
+  "halve",
+  combineOps([doubleHalve.right, doubleHalveComposite.right]),
+)
 
 function getEndFacesToMap(forme: CapstoneForme) {
   if (forme.specs.isBi()) {
