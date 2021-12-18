@@ -3,7 +3,7 @@ import { Capstone, Twist, twists, oppositeTwist } from "specs"
 import { CapstoneForme } from "math/formes"
 import { combineOps, makeOpPair } from "./operationPairs"
 import { makeOperation } from "./Operation"
-import { Pose, TwistOpts, getTransformedVertices } from "./operationUtils"
+import { Pose, TwistOpts } from "./operationUtils"
 import { getMorphFunction } from "./morph"
 import { Face, Cap } from "math/polyhedra"
 
@@ -86,7 +86,6 @@ const turnPrismatic = makeOpPair<Capstone>({
     return getCapstonePose(forme, "left")
   },
   toLeft: morphVertices,
-  // toLeft: (forme, result) => doPrismTransform(forme, result, "left"),
 })
 
 const _elongate = makePrismOp({
