@@ -47,9 +47,9 @@ export const sharpen = new Operation("sharpen", {
     regs.truncate.right,
     ambos.truncate.right,
     augTruncate.right,
-    regs.rectify.right,
-    ambos.rectify.right,
-    semisnubAmbo.right,
+    // regs.rectify.right,
+    // ambos.rectify.right,
+    // semisnubAmbo.right,
   ]),
   // TODO split up sharpening rectified and sharpening truncated
   ...hitOptArgs,
@@ -65,6 +65,10 @@ export const cosharpen = new Operation("cosharpen", {
 })
 
 export const unrectify = new Operation("unrectify", {
-  ...combineOps<any>([regs.rectify.right, ambos.rectify.right]),
+  ...combineOps<any>([
+    regs.rectify.right,
+    ambos.rectify.right,
+    semisnubAmbo.right,
+  ]),
   ...hitOptArgs,
 })

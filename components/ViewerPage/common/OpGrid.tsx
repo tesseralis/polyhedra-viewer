@@ -15,8 +15,8 @@ import {
 import OperationIcon from "./OperationIcon"
 
 const opLayout: OpName[][] = [
-  ["truncate", "sharpen", "sharpen", "dual"],
-  ["rectify", "semisnub", "semisnub", "semisnub"],
+  ["truncate", "cotruncate", "sharpen", "cosharpen"],
+  ["rectify", "semisnub", "unrectify", "dual"],
   ["expand", "snub", "contract", "twist"],
   ["elongate", "gyroelongate", "shorten", "turn"],
   ["double", "halve", "increment", "decrement"],

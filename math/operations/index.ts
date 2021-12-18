@@ -1,10 +1,10 @@
 import {
   truncate,
-  // cotruncate,
+  cotruncate,
   sharpen,
-  // cosharpen,
+  cosharpen,
   rectify,
-  // unrectify,
+  unrectify,
   semisnub,
 } from "./truncateOps"
 import { dual, expand, snub, contract, twist } from "./resizeOps"
@@ -18,12 +18,12 @@ export type { default as Operation, AnimationData } from "./Operation"
 export const operations = {
   dual,
   truncate,
-  // cotruncate,
+  cotruncate,
   sharpen,
-  // cosharpen,
+  cosharpen,
   rectify,
-  // unrectify,
   semisnub,
+  unrectify,
   expand,
   snub,
   contract,
