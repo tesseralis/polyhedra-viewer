@@ -42,9 +42,12 @@ const incDec = makeOpPair<Capstone>({
   },
   middle: "right",
   getPose(forme) {
-    const top = forme.ends()[0]
-    const crossAxis =
-      top instanceof Cap ? top.boundary().edges[0] : (top as Face).edges[0]
+    const top = forme.endBoundaries()[0]
+    let crossAxis = top.edges[0]
+    // If gyrolongated, we want to center on an edge
+    if (forme.specs.isGyroelongated()) {
+      crossAxis = crossAxis.twin().next()
+    }
     return {
       // TODO should be base center
       origin: forme.centroid(),
