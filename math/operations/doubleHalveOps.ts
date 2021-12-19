@@ -5,7 +5,7 @@ import { Capstone, Composite, twists } from "specs"
 import { makeOpPair, combineOps } from "./operationPairs"
 import { makeOperation } from "./Operation"
 import { CapstoneForme } from "math/formes"
-import { Face } from "math/polyhedra"
+import { Edge, Face } from "math/polyhedra"
 import { TwistOpts } from "./operationUtils"
 import { getMorphFunction } from "./morph"
 import { AugmentedPrismForme } from "math/formes/CompositeForme"
@@ -146,6 +146,16 @@ function compositeEndMorphFaces(forme: AugmentedPrismForme) {
 // TODO these are duplicated from operations/prismOps.
 // Maybe this can be the default pose generated for a capstone?
 function getCapstonePose(forme: CapstoneForme, twist?: Twist): Pose {
+  // special case for digonal antiprism
+  if (forme.specs.isDigonal()) {
+    const top = forme.ends()[0] as Edge
+    const crossAxis = top.next()
+    return {
+      origin: forme.centroid(),
+      scale: forme.geom.edgeLength(),
+      orientation: [top, crossAxis],
+    }
+  }
   const [top] = forme.endBoundaries()
   const edge = forme.specs.isPrismatic()
     ? top.edges[0]
