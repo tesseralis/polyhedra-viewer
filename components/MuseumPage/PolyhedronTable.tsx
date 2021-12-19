@@ -1,9 +1,10 @@
 import { pick } from "lodash-es"
-import React, { useRef, useState } from "react"
+import { useRef, useState } from "react"
 import { Table } from "lib/tables"
 import ConfigCtx from "components/ConfigCtx"
 import { fromSpecs } from "math/formes"
 
+import { escape } from "lib/utils"
 import { useFrame } from "@react-three/fiber"
 // FIXME edit these imports
 import getFormeColors, {
