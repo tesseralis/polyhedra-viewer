@@ -143,17 +143,8 @@ function compositeEndMorphFaces(forme: AugmentedPrismForme) {
   return forme.geom.faces.filter((face) => !forme.isEndFace(face))
 }
 
-function getTwistMult(twist?: Twist) {
-  switch (twist) {
-    case "left":
-      return 1
-    case "right":
-      return -1
-    default:
-      return 0
-  }
-}
-
+// TODO these are duplicated from operations/prismOps.
+// Maybe this can be the default pose generated for a capstone?
 function getCapstonePose(forme: CapstoneForme, twist?: Twist): Pose {
   const [top] = forme.endBoundaries()
   const edge = forme.specs.isPrismatic()
@@ -168,5 +159,16 @@ function getCapstonePose(forme: CapstoneForme, twist?: Twist): Pose {
     origin: forme.centroid(),
     scale: forme.geom.edgeLength(),
     orientation: [top, top.to(edge).applyAxisAngle(top.normal(), angle)],
+  }
+}
+
+function getTwistMult(twist?: Twist) {
+  switch (twist) {
+    case "left":
+      return 1
+    case "right":
+      return -1
+    default:
+      return 0
   }
 }
