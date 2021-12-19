@@ -1,8 +1,11 @@
+import { find } from "lib/utils"
+import { Twist } from "specs"
+import { Pose } from "./operationUtils"
 import { Capstone, Composite, twists } from "specs"
 import { makeOpPair, combineOps } from "./operationPairs"
 import { makeOperation } from "./Operation"
-import { CapstoneForme, CompositeForme } from "math/formes"
-import { Cap, Face, Edge } from "math/polyhedra"
+import { CapstoneForme } from "math/formes"
+import { Face } from "math/polyhedra"
 import { TwistOpts } from "./operationUtils"
 import { getMorphFunction } from "./morph"
 import { AugmentedPrismForme } from "math/formes/CompositeForme"
@@ -44,27 +47,8 @@ const doubleHalve = makeOpPair<Capstone, TwistOpts>({
     }
   },
   middle: "right",
-  getPose(forme) {
-    // Make sure the pyramid is facing up and pick a side
-    const [top] = forme.ends()
-    let crossAxis
-    if (top instanceof Cap) {
-      crossAxis = forme.specs.isPyramid()
-        ? top.boundary().edges[0]
-        : top.boundary().edges.find((e) => e.face.numSides === 3)!
-    } else if (top instanceof Face) {
-      crossAxis = top.edges[0]
-    } else {
-      // TODO antiprism are asymmetric:
-      // the aligned end is matched and the bottom end twists
-      // This might also be causing the pentagonal class to be broken?
-      crossAxis = (top as Edge).face
-    }
-    return {
-      scale: forme.geom.edgeLength(),
-      origin: forme.centroid(),
-      orientation: [top.normal(), crossAxis],
-    }
+  getPose(forme, { left: { twist } }) {
+    return getCapstonePose(forme, twist)
   },
   toLeft: morphVertices,
 })
@@ -157,4 +141,32 @@ function compositeEndMorphFaces(forme: AugmentedPrismForme) {
   // The forme is an (mono-/bi-/tri-)augmented triangular prism.
   // Return everything *except* the ends of the triangular prism
   return forme.geom.faces.filter((face) => !forme.isEndFace(face))
+}
+
+function getTwistMult(twist?: Twist) {
+  switch (twist) {
+    case "left":
+      return 1
+    case "right":
+      return -1
+    default:
+      return 0
+  }
+}
+
+function getCapstonePose(forme: CapstoneForme, twist?: Twist): Pose {
+  const [top] = forme.endBoundaries()
+  const edge = forme.specs.isPrismatic()
+    ? top.edges[0]
+    : find(top.edges, (e) => e.face.numSides === 3)
+  const n = top.numSides
+  const angle =
+    (forme.specs.isGyroelongated() ? 1 : 0) *
+    getTwistMult(twist) *
+    (Math.PI / n / 2)
+  return {
+    origin: forme.centroid(),
+    scale: forme.geom.edgeLength(),
+    orientation: [top, top.to(edge).applyAxisAngle(top.normal(), angle)],
+  }
 }

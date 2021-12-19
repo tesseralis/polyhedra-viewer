@@ -7,8 +7,6 @@ import { Pose, TwistOpts } from "./operationUtils"
 import { getMorphFunction } from "./morph"
 import { Face, Cap } from "math/polyhedra"
 
-const { PI } = Math
-
 const morphVertices = getMorphFunction(morphEndFaces)
 
 function getTwistMult(twist?: Twist) {
@@ -29,7 +27,9 @@ function getCapstonePose(forme: CapstoneForme, twist?: Twist): Pose {
     : find(top.edges, (e) => e.face.numSides === 3)
   const n = top.numSides
   const angle =
-    (forme.specs.isGyroelongated() ? 1 : 0) * getTwistMult(twist) * (PI / n / 2)
+    (forme.specs.isGyroelongated() ? 1 : 0) *
+    getTwistMult(twist) *
+    (Math.PI / n / 2)
   return {
     origin: forme.centroid(),
     scale: forme.geom.edgeLength(),
