@@ -42,6 +42,16 @@ const incDec = makeOpPair<Capstone>({
   },
   middle: "right",
   getPose(forme) {
+    // special case for digonal antiprism
+    if (forme.specs.isDigonal()) {
+      const top = forme.ends()[0] as Edge
+      const crossAxis = top.next()
+      return {
+        origin: forme.centroid(),
+        scale: forme.geom.edgeLength(),
+        orientation: [top, crossAxis],
+      }
+    }
     const top = forme.endBoundaries()[0]
     let crossAxis = top.edges[0]
     // If gyrolongated, we want to center on an edge
