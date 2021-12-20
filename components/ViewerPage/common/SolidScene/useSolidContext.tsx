@@ -39,6 +39,7 @@ export default function useSolidContext() {
 
   // Colors when animation is being applied
   const transitionColors = useMemo(() => {
+    // FIXME use the intermediate's material
     return (
       isTransitioning && faceColors.map((color) => ({ color, material: 0 }))
     )
