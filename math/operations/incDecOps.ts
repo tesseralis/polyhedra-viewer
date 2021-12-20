@@ -60,7 +60,7 @@ const incDec = makeOpPair<Capstone>({
     }
     return {
       // TODO should be base center
-      origin: forme.centroid(),
+      origin: forme.origin(),
       scale: forme.geom.edgeLength(),
       orientation: [top, crossAxis],
     }

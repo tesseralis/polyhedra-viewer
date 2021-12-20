@@ -8,13 +8,11 @@ import { getMorphFunction } from "../morph"
 const getResizedVertices = getMorphFunction(getFacesToMap)
 
 function getCapstonePose(forme: CapstoneForme): Pose {
-  const { geom } = forme
   const top = forme.ends()[0]
   return {
-    // TODO handle pyramid
-    origin: geom.centroid(),
+    origin: forme.origin(),
     // Use the normal of the given face as the first axis
-    scale: geom.edgeLength(),
+    scale: forme.geom.edgeLength(),
     orientation: [top, getCrossAxis(forme)],
   }
 }

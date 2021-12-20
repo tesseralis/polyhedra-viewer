@@ -31,7 +31,7 @@ function getCapstonePose(forme: CapstoneForme, twist?: Twist): Pose {
     getTwistMult(twist) *
     (Math.PI / n / 2)
   return {
-    origin: forme.centroid(),
+    origin: forme.origin(),
     scale: forme.geom.edgeLength(),
     orientation: [top, top.to(edge).applyAxisAngle(top.normal(), angle)],
   }

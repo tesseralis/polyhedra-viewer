@@ -64,6 +64,10 @@ export default abstract class CompositeForme extends BaseForme<Composite> {
     return getCentroid(this.sourceVertices().map((v) => v.vec))
   }
 
+  origin() {
+    return this.sourceCentroid()
+  }
+
   /** Returns whether the given face is part of the source polyhedron (as opposed to a cap) */
   isSourceFace(face: Face) {
     return face.vertices.every((v) => !this.capInnerVertIndices().has(v.index))

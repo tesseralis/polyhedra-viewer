@@ -103,9 +103,20 @@ export default abstract class CapstoneForme extends BaseForme<Capstone> {
     ) as [FaceLike, FaceLike]
   }
 
+  /**
+   * Return the height of the prismatic (elongation) component of the capstone.
+   */
   prismaticHeight() {
     const [top, bot] = this.ends()
     return top.centroid().distanceTo(bot.centroid())
+  }
+
+  /**
+   * A capstone's standard origin point is the midpoint between its top and bottom ends.
+   */
+  origin() {
+    const [top, bot] = this.ends()
+    return getCentroid([top.centroid(), bot.centroid()])
   }
 
   /**

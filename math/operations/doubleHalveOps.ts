@@ -151,7 +151,7 @@ function getCapstonePose(forme: CapstoneForme, twist?: Twist): Pose {
     const top = forme.ends()[0] as Edge
     const crossAxis = top.next()
     return {
-      origin: forme.centroid(),
+      origin: forme.origin(),
       scale: forme.geom.edgeLength(),
       orientation: [top, crossAxis],
     }

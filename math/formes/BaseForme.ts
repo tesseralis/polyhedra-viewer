@@ -55,10 +55,18 @@ export default abstract class BaseForme<Specs extends PolyhedronSpecs> {
 
   abstract orientation(): Orientation
 
+  /**
+   * The "center" point of the polyhedron to use in calculating canonical orientation.
+   * Defaults to the geometric centroid.
+   */
+  origin() {
+    return this.geom.centroid()
+  }
+
   orient() {
     const startPose: Pose = {
       // TODO correctly center diminished polyhedra and capstones
-      origin: this.geom.centroid(),
+      origin: this.origin(),
       scale: mean(this.geom.edges.map((e) => e.distanceToCenter())),
       orientation: this.orientation(),
     }

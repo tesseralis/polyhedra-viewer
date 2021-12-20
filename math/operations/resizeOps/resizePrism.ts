@@ -24,7 +24,7 @@ function getPose(forme: CapstoneForme): Pose {
   const top = forme.ends()[0]
   const crossAxis = getCapstoneCrossAxis(forme)
   return {
-    origin: forme.centroid(),
+    origin: forme.origin(),
     scale: forme.geom.edgeLength(),
     orientation: [top, crossAxis],
   }
