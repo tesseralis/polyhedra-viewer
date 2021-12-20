@@ -12,22 +12,22 @@ const naughtyList = [
   ["gyrate", "gyrate diminished rhombicuboctahedron"],
 ]
 
+function shouldSkip(opName: string, solid: string) {
+  return naughtyList.some(
+    ([naughtyOp, naughtySolid]) =>
+      opName === naughtyOp && solid === naughtySolid,
+  )
+}
+
 describe("applyOperation", () => {
   forEach(operations, (operation, opName) => {
     describe(opName, () => {
       // TODO determine solid names from the graph instead
       for (const specs of operation.allInputs()) {
-        if (
-          naughtyList.some(
-            ([naughtyOp, naughtySolid]) =>
-              opName === naughtyOp && specs.name() === naughtySolid,
-          )
-        ) {
-          continue
-        }
         const polyhedron = fromSpecs(specs)
         if (operation.canApplyTo(polyhedron)) {
-          it(polyhedron.specs.name(), () => {
+          const fn = shouldSkip(opName, specs.name()) ? it.skip : it
+          fn(polyhedron.specs.name(), () => {
             for (const options of operation.allOptionCombos(polyhedron)) {
               validateOperationApplication(operation, polyhedron, options)
             }
