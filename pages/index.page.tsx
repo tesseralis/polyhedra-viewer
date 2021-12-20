@@ -17,7 +17,7 @@ export default function Page() {
       <ul>
         {sections.map((section) => {
           return (
-            <li>
+            <li key={section}>
               <Link href={`/${section}`}>
                 <a>{section}</a>
               </Link>
