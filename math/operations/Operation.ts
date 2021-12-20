@@ -202,14 +202,6 @@ export default class Operation<Options extends {} = {}> {
     if (this.opArgs.hasOptions) {
       return this.opArgs.hasOptions(this.wrap(solid).specs)
     }
-    console.log(
-      this.getEntries(solid).map((entry) => {
-        return {
-          start: entry.start.data,
-          end: entry.end.data,
-        }
-      }),
-    )
     return this.getEntries(solid).length > 1
   }
 
