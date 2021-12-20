@@ -95,12 +95,12 @@ export function getFaceAppearance(faceType: FaceType): FaceColor {
           return sideColors.map((col) => {
             switch (col) {
               case "top":
-                return scheme.light.vertex
+                return scheme.primary.face
               case "middle":
                 return scheme.primary.vertex
               case "base":
                 // FIXME base this on the inner color
-                return scheme.secondary.vertex
+                return scheme.primary.vertex
               default:
                 throw new Error(`Impossible`)
             }
@@ -110,9 +110,9 @@ export function getFaceAppearance(faceType: FaceType): FaceColor {
           return sideColors.map((col) => {
             switch (col) {
               case "top":
-                return scheme.light.face
+                return scheme.primary.face
               case "base":
-                return scheme.secondary.face
+                return scheme.primary.vertex
               default:
                 throw new Error(`Square cap face in rotunda?`)
             }
