@@ -39,7 +39,7 @@ export default abstract class CapstoneForme extends BaseForme<Capstone> {
       return [top, top.vertices[0]] as const
     }
     const top = this.endBoundaries()[0]
-    return [top, top.edges[0]] as const
+    return [top, top.edges.find((e) => e.face.numSides === 3)!] as const
   }
 
   protected abstract queryTops(): Generator<CapstoneEnd>

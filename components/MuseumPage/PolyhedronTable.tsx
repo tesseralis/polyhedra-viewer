@@ -13,7 +13,6 @@ import getFormeColors, {
 import PolyhedronModel from "components/ViewerPage/common/SolidScene/PolyhedronModel"
 
 const rowSpacing = 1.75
-const colSpacing = 7
 const innerSpacing = 3
 
 // FIXME add these typings (once we have a more concrete design)
@@ -24,7 +23,8 @@ function PolyhedronEntry({ entry, position, navigate }: any) {
     const rotation = ref.current?.rotation
     if (rotation) {
       rotation.x = 0.1
-      rotation.y += 0.0025
+      rotation.y = 0
+      // rotation.y += 0.0025
     }
   })
   if (!entry || typeof entry === "string") return null
