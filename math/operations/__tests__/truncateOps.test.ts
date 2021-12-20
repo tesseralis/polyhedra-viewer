@@ -1,4 +1,4 @@
-import { truncate, rectify, sharpen } from "../truncateOps"
+import { truncate, rectify, sharpen, unrectify } from "../truncateOps"
 import { validateOpInputs, validateHasOptions } from "../operationTestUtils"
 
 describe("truncate", () => {
@@ -51,13 +51,6 @@ describe("sharpen", () => {
         // bevelled solids
         "truncated cuboctahedron",
         "truncated icosidodecahedron",
-        // rectified solids
-        "tetratetrahedron",
-        "cuboctahedron",
-        "icosidodecahedron",
-        // cantellated solids
-        "rhombicuboctahedron",
-        "rhombicosidodecahedron",
       ],
       fail: [],
     })
@@ -65,11 +58,39 @@ describe("sharpen", () => {
 
   it("hasOptions", () => {
     validateHasOptions(sharpen, {
-      pass: ["cuboctahedron", "icosidodecahedron"],
+      pass: [],
       fail: [
         "truncated tetratetrahedron",
         "truncated cuboctahedron",
         "truncated icosahedron",
+      ],
+    })
+  })
+})
+
+describe("unrectify", () => {
+  it("canApplyTo", () => {
+    validateOpInputs(unrectify, {
+      pass: [
+        "cuboctahedron",
+        "icosidodecahedron",
+        "rhombicuboctahedron",
+        "rhombicosidodecahedron",
+        "snub cuboctahedron",
+        "snub icosidodecahedron",
+      ],
+      fail: [],
+    })
+  })
+
+  it("hasOptions", () => {
+    validateHasOptions(unrectify, {
+      pass: ["cuboctahedron", "icosidodecahedron"],
+      fail: [
+        "rhombicuboctahedron",
+        "rhombicosidodecahedron",
+        "snub cuboctahedron",
+        "snub icosidodecahedron",
       ],
     })
   })
