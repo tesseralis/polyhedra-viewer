@@ -224,7 +224,7 @@ export default class Operation<Options extends {} = {}> {
         yield entry.options
       }
     } else {
-      return cartesian(this.opArgs.allOptions(this.wrap(solid)))
+      yield* cartesian(this.opArgs.allOptions(this.wrap(solid)))
     }
   }
 
