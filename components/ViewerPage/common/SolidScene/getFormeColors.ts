@@ -39,7 +39,7 @@ const colorScheme = {
   // red + purple
   4: createFamilyColor("#ff3d3d", "#a719ff"),
   // blue + teal
-  5: createFamilyColor("#1c7bff", "#42f5ce"),
+  5: createFamilyColor("#1c7bff", "#00eb7d"),
 }
 
 export function toColor(color: any): Color {
