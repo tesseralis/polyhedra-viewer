@@ -65,6 +65,14 @@ export function mixColor(appearance: Appearance, mixer: (c: Color) => Color) {
   }
 }
 
+function getFaceMaterial(faceType: FaceType): number {
+  if (faceType.type === "classical") {
+    return faceType.subtype === "facet" ? 0 : 1
+  } else {
+    return faceType.faceType === "elongation" ? 1 : 0
+  }
+}
+
 // TODO return materials
 export function getFaceAppearance(faceType: FaceType): FaceColor {
   if (faceType.type === "classical") {
@@ -142,6 +150,6 @@ export function getFaceAppearance(faceType: FaceType): FaceColor {
 export default function getFormeColors(forme: Forme, face: Face): Appearance {
   return {
     color: getFaceAppearance(forme.faceAppearance(face)),
-    material: 0,
+    material: getFaceMaterial(forme.faceAppearance(face)),
   }
 }

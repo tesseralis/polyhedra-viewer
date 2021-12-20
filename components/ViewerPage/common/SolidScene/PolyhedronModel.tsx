@@ -1,6 +1,6 @@
 import { zip } from "lodash-es"
 import { SolidData } from "math/polyhedra"
-import { useRef, useMemo } from "react"
+import { useRef, useMemo, useLayoutEffect } from "react"
 import {
   Color,
   Vector3,
@@ -12,41 +12,13 @@ import {
 import { Appearance } from "./getFormeColors"
 import { useFrame } from "@react-three/fiber"
 
-function convertFace(face: number[]) {
-  const [v0, ...vs] = face
-  const pairs = zip(vs.slice(0, vs.length - 1), vs.slice(1))
-  return pairs
-    .map(([v1, v2]) => {
-      return [v0, v1!, v2!]
-    })
-    .flat()
-}
-
-function getFaceColors(face: number[], appearance: Appearance) {
-  const [v0, ...vs] = face
-  const pairs = zip(vs.slice(0, vs.length - 1), vs.slice(1))
-  const { color, material } = appearance
-  return pairs
-    .map(([v1, v2]) => {
-      if (color instanceof Color) {
-        return [color, color, color]
-      } else {
-        return [v0, v1!, v2!].map((v) => color[face.indexOf(v)])
-      }
-    })
-    .flat()
-}
-
-function getVerticesFromFaces(faces: number[][], vertices: number[][]) {
-  return faces.flatMap((face) => {
-    return convertFace(face).map((i) => vertices[i])
-  })
-}
-
-function getColorsFromFaces(faces: number[][], appearances: Appearance[]) {
-  return faces.flatMap((face, i) => {
-    return getFaceColors(face, appearances[i])
-  })
+interface Props {
+  value: SolidData
+  appearance: Appearance[]
+  config: SolidConfig
+  onClick?(point: Vector3): void
+  onPointerMove?(point: Vector3): void
+  onPointerOut?(point: Vector3): void
 }
 
 interface SolidConfig {
@@ -55,13 +27,13 @@ interface SolidConfig {
   showInnerFaces: boolean
 }
 
-interface Props {
-  value: SolidData
-  appearance: Appearance[]
-  config: SolidConfig
-  onClick?(point: Vector3): void
-  onPointerMove?(point: Vector3): void
-  onPointerOut?(point: Vector3): void
+export default function PolyhedronModel(props: Props) {
+  return (
+    <group>
+      <SolidFaces {...props} />
+      <SolidEdges {...props} />
+    </group>
+  )
 }
 
 function SolidFaces({
@@ -76,6 +48,20 @@ function SolidFaces({
   const geomRef = useRef<BufferGeometry>()
   const positionArray = useMemo(() => new Float32Array(1000 * 3), [])
   const colorArray = useMemo(() => new Float32Array(1000 * 3), [])
+
+  useLayoutEffect(() => {
+    if (geomRef.current) {
+      geomRef.current.clearGroups()
+      let i = 0
+      getMaterialsFromFaces(faces, appearance).forEach(
+        ({ count, material }) => {
+          console.log({ count, material })
+          geomRef.current?.addGroup(i, count, material)
+          i += count
+        },
+      )
+    }
+  }, [faces, appearance])
 
   useFrame(() => {
     const faceVertices = getVerticesFromFaces(
@@ -98,7 +84,7 @@ function SolidFaces({
   })
 
   const hasMoved = useRef(false)
-  const { showFaces, showInnerFaces } = config
+  const { showInnerFaces } = config
   return (
     <mesh
       visible={true}
@@ -127,7 +113,16 @@ function SolidFaces({
           args={[colorArray, 3]}
         />
       </bufferGeometry>
+      <meshPhongMaterial
+        shininess={25}
+        attachArray="material"
+        side={showInnerFaces ? DoubleSide : FrontSide}
+        args={[{ vertexColors: true }]}
+      />
       <meshStandardMaterial
+        attachArray="material"
+        opacity={0.9}
+        transparent={true}
         side={showInnerFaces ? DoubleSide : FrontSide}
         args={[{ vertexColors: true }]}
       />
@@ -177,11 +172,50 @@ function SolidEdges({ value, config }: Props) {
   )
 }
 
-export default function PolyhedronModel(props: Props) {
-  return (
-    <group>
-      <SolidFaces {...props} />
-      <SolidEdges {...props} />
-    </group>
-  )
+function convertFace(face: number[]) {
+  const [v0, ...vs] = face
+  const pairs = zip(vs.slice(0, vs.length - 1), vs.slice(1))
+  return pairs
+    .map(([v1, v2]) => {
+      return [v0, v1!, v2!]
+    })
+    .flat()
+}
+
+function getVerticesFromFaces(faces: number[][], vertices: number[][]) {
+  return faces.flatMap((face) => {
+    return convertFace(face).map((i) => vertices[i])
+  })
+}
+
+function getMaterialsFromFaces(faces: number[][], appearances: Appearance[]) {
+  return faces.flatMap((face, i) => {
+    return getFaceMaterial(face, appearances[i])
+  })
+}
+
+function getColorsFromFaces(faces: number[][], appearances: Appearance[]) {
+  return faces.flatMap((face, i) => {
+    return getFaceColors(face, appearances[i])
+  })
+}
+
+function getFaceMaterial(face: number[], appearance: Appearance) {
+  const { material } = appearance
+  return { count: 3 * (face.length - 2), material }
+}
+
+function getFaceColors(face: number[], appearance: Appearance) {
+  const [v0, ...vs] = face
+  const pairs = zip(vs.slice(0, vs.length - 1), vs.slice(1))
+  const { color } = appearance
+  return pairs
+    .map(([v1, v2]) => {
+      if (color instanceof Color) {
+        return [color, color, color]
+      } else {
+        return [v0, v1!, v2!].map((v) => color[face.indexOf(v)])
+      }
+    })
+    .flat()
 }

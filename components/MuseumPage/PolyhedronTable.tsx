@@ -23,8 +23,8 @@ function PolyhedronEntry({ entry, position, navigate }: any) {
     const rotation = ref.current?.rotation
     if (rotation) {
       rotation.x = 0.1
-      rotation.y = 0
-      // rotation.y += 0.0025
+      // rotation.y = 0
+      rotation.y += 0.0025
     }
   })
   if (!entry || typeof entry === "string") return null
