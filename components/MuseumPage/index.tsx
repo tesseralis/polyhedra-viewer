@@ -13,11 +13,8 @@ export default function MuseumScene() {
   const router = useRouter()
   const style = useStyle({
     position: "absolute",
+    inset: 0,
     backgroundColor: "#111",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
   })
   return (
     <div {...style()}>
