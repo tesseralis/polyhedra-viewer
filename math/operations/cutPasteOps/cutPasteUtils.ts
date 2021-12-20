@@ -17,33 +17,33 @@ import { GraphGenerator, OpInput, toDirected } from "../operationPairs"
 import removeCap from "./removeCap"
 import addCap, { CrossAxis } from "./addCap"
 
-function hasRotunda(info: CutPasteSpecs) {
-  if (info.isCapstone()) {
-    return info.isSecondary() && info.isPentagonal()
+function hasRotunda(specs: CutPasteSpecs) {
+  if (specs.isCapstone()) {
+    return specs.isSecondary() && specs.isPentagonal()
   }
   return false
 }
 
-function getUsingOpts(info: CutPasteSpecs): CapType[] | null {
-  if (hasRotunda(info)) {
+function getUsingOpts(specs: CutPasteSpecs): CapType[] | null {
+  if (hasRotunda(specs)) {
     return ["cupola", "rotunda"]
-  } else if (info.isCapstone()) {
-    return [info.capType()]
+  } else if (specs.isCapstone()) {
+    return [specs.capType()]
   }
   return null
 }
 
-function hasGyrateOpts(info: CutPasteSpecs) {
-  if (info.isCapstone()) {
-    if (!info.isMono()) return false
+function hasGyrateOpts(specs: CutPasteSpecs) {
+  if (specs.isCapstone()) {
+    if (!specs.isMono()) return false
     // Gyroelongated capstones are always gyro
-    if (info.isGyroelongated()) return false
+    if (specs.isGyroelongated()) return false
     // Cupolae and rotundae (that are not the gyrobifastigium) always have gyrate opts
-    if (!info.isDigonal() && info.isSecondary()) return true
+    if (!specs.isDigonal() && specs.isSecondary()) return true
     return false
   }
-  if (info.isComposite()) {
-    return info.isGyrateSolid()
+  if (specs.isComposite()) {
+    return specs.isGyrateSolid()
   }
   return false
 }
@@ -208,15 +208,15 @@ export const augOptionArgs: AugOptionArgs = {
     const { specs, geom } = forme
     return {
       gyrate: hasGyrateOpts(specs) ? gyrations : [undefined],
+      // FIXME this doesn't get that a hexagonal prism can have both pyramid and cupola options
+      // and fails the unit test (but I got it to work in prod)
       using: getUsingOpts(specs) ?? [undefined],
       face: geom.faces.filter((face) => canAugment(forme, face)),
     }
   },
-  defaultOptions(info) {
-    const usingOpts = getUsingOpts(info) ?? []
+  defaultOptions(specs) {
     return pickBy({
-      gyrate: hasGyrateOpts(info) && "gyro",
-      using: usingOpts[0],
+      gyrate: hasGyrateOpts(specs) && "gyro",
     })
   },
   wrap(forme) {

@@ -15,6 +15,7 @@ export default makeCutPastePair<Composite>({
           left: {
             align: solid.data.align,
             faceType: solid.augmentFaceType(),
+            using: "pyramid",
           },
           right: {},
         },
