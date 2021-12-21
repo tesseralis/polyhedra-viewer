@@ -133,7 +133,8 @@ export function colorFill(color: string): CSSObject {
 
 export const hover = {
   ":hover:not(:disabled)": {
-    backgroundColor: "LightGray",
+    backgroundColor: "#333",
+    cursor: "pointer",
   },
 }
 

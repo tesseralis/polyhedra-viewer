@@ -20,7 +20,7 @@ function makeStyles(inputStyles: SheetDefinition) {
   }
 }
 
-const color = "DimGray"
+const color = "#999"
 const styles = makeStyles({
   operationIcon: square(scales.size[3]),
 

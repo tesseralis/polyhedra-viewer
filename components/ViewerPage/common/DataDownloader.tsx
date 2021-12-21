@@ -61,8 +61,8 @@ function DownloadLink({
     width: scales.size[4],
 
     textDecoration: "none",
-    border: "1px LightGray solid",
-    color: "black",
+    border: "1px #444 solid",
+    color: "#999",
     fontFamily: fonts.andaleMono,
     ...hover,
 

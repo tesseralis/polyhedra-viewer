@@ -1,3 +1,4 @@
+import { css } from "@emotion/react"
 import { useStyle, scales } from "styles"
 
 import { NavMenu, Panels, useHiddenHeading } from "../common"
@@ -16,25 +17,12 @@ const menuH = scales.size[3]
 export default function Sidebar({ panel, solid, compact }: Props) {
   const [header, focusOnHeader] = useHiddenHeading(panel)
 
-  const css = useStyle(
-    {
-      width: "100%",
-      height: "100%",
-      position: "relative",
-      display: "grid",
-      gridTemplateRows: `${menuH} 1fr`,
-      gridTemplateAreas: '"menu" "content"',
-      borderLeft: compact ? undefined : "1px solid LightGray",
-    },
-    [compact],
-  )
-
   const navCss = useStyle(
     {
       ...paddingHoriz(scales.spacing[2]),
       gridArea: "menu",
       height: menuH,
-      borderBottom: compact ? undefined : "1px solid LightGray",
+      borderBottom: compact ? undefined : "1px solid #333",
     },
     [compact],
   )
@@ -45,7 +33,19 @@ export default function Sidebar({ panel, solid, compact }: Props) {
     position: "relative",
   })
   return (
-    <section {...css()}>
+    <section
+      css={css`
+        width: 100%;
+        height: 100%;
+        position: relative;
+        display: grid;
+        grid-template-rows: ${menuH} 1fr;
+        grid-template-areas: "menu" "content";
+        border-left: ${compact ? undefined : "1px solid #333"};
+        background-color: #111;
+        color: #999;
+      `}
+    >
       <div {...navCss()}>
         <NavMenu compact={compact} onClick={focusOnHeader} />
       </div>

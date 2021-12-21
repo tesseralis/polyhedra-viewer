@@ -12,11 +12,12 @@ function ResetButton(props: ButtonHTMLAttributes<Element>) {
   const css = useStyle({
     ...hover,
     alignSelf: "flex-end",
-    backgroundColor: "white",
-    border: "1px LightGray solid",
+    background: "none",
+    border: "1px #333 solid",
     padding: scales.spacing[2],
     fontSize: scales.font[6],
     fontFamily: andaleMono,
+    color: "#999",
   })
   return <button {...props} {...css()} />
 }

@@ -30,7 +30,7 @@ export default function IconLink({
 }: any) {
   const css = useStyle({
     ...flexColumn("center"),
-    ...colorFill("DimGray"),
+    ...colorFill("#999"),
     textDecoration: "none",
     padding: scales.spacing[2],
 

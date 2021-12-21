@@ -42,11 +42,11 @@ const OpButton = memo(function ({ name, disabled }: Props) {
       ...flexColumn("center", "center"),
       ...hover,
       ...square("5rem"),
-      border: isCurrent ? "2px DarkSlateGray solid" : "1px LightGray solid",
+      border: isCurrent ? "2px #888 solid" : "1px #555 solid",
       fontFamily: fonts.verdana,
       fontSize: scales.font[7],
-      color: "DimGray",
-      backgroundColor: "white",
+      color: "#aaa",
+      backgroundColor: "#222",
 
       ":disabled": { opacity: 0.3 },
       // add spacing since we're displayed in a row
