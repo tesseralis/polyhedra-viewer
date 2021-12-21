@@ -255,6 +255,73 @@ function drawIcon(name: OpName) {
   switch (name) {
     case "truncate":
       return <TruncateIcon styled="subtracted" />
+    case "sharpen":
+      return <TruncateIcon styled="added" />
+    case "buff":
+      return (
+        <>
+          <Polygon
+            className={styles("invariant")}
+            n={3}
+            r={65}
+            a={-30}
+            cx={100}
+            cy={100}
+          />
+          <Polygon
+            className={styles("subtracted")}
+            n={6}
+            r={80}
+            a={0}
+            cx={100}
+            cy={100}
+          />
+        </>
+      )
+    case "alternate":
+      return (
+        <>
+          <Polygon
+            className={styles("invariant")}
+            n={3}
+            r={75}
+            a={0}
+            cx={100}
+            cy={100}
+          />
+          <Polygon
+            className={styles("subtracted")}
+            n={6}
+            r={80}
+            a={0}
+            cx={100}
+            cy={100}
+          />
+        </>
+      )
+
+    case "pinch":
+      return (
+        <>
+          <Polygon
+            className={styles("invariant")}
+            n={3}
+            r={65}
+            a={-30}
+            cx={100}
+            cy={100}
+          />
+          <Polygon
+            className={styles("added")}
+            n={6}
+            r={80}
+            a={0}
+            cx={100}
+            cy={100}
+          />
+        </>
+      )
+
     case "rectify":
       return (
         <TruncateIcon
@@ -264,8 +331,37 @@ function drawIcon(name: OpName) {
           innerAngle={90}
         />
       )
-    case "sharpen":
-      return <TruncateIcon styled="added" />
+    case "semisnub":
+      return (
+        <>
+          <Polygon
+            className={styles("subtracted")}
+            n={3}
+            r={100}
+            a={-90}
+            cx={100}
+            cy={120}
+          />
+          <Polygon
+            className={styles("invariant")}
+            n={3}
+            r={55}
+            a={0}
+            cx={100}
+            cy={120}
+          />
+        </>
+      )
+
+    case "connect":
+      return (
+        <TruncateIcon
+          styled="added"
+          innerSides={3}
+          innerScale={1 / 2}
+          innerAngle={90}
+        />
+      )
     case "dual":
       return <DualIcon />
     case "expand": {

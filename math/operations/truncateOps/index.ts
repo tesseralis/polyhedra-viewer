@@ -12,10 +12,18 @@ export const truncate = new Operation(
   combineOps([regs.truncate.left, ambos.truncate.left, augTruncate.left]),
 )
 
-export const cotruncate = new Operation(
-  "cotruncate",
+export const buff = new Operation(
+  "buff",
   combineOps([regs.cotruncate.left, ambos.cotruncate.left]),
 )
+
+export const alternate = new Operation("alternate", {
+  graph: function* () {},
+  toGraphOpts() {},
+  apply() {
+    throw new Error("Not implemented")
+  },
+})
 
 export const rectify = new Operation(
   "rectify",
@@ -47,9 +55,6 @@ export const sharpen = new Operation("sharpen", {
     regs.truncate.right,
     ambos.truncate.right,
     augTruncate.right,
-    // regs.rectify.right,
-    // ambos.rectify.right,
-    // semisnubAmbo.right,
   ]),
   // TODO split up sharpening rectified and sharpening truncated
   ...hitOptArgs,
@@ -59,12 +64,12 @@ export const sharpen = new Operation("sharpen", {
 // and need to be integrated into the app
 
 // TODO why doesn't the typing work here?
-export const cosharpen = new Operation("cosharpen", {
+export const pinch = new Operation("pinch", {
   ...combineOps<any>([regs.cotruncate.right, ambos.cotruncate.right]),
   ...hitOptArgs,
 })
 
-export const unrectify = new Operation("unrectify", {
+export const connect = new Operation("connect", {
   ...combineOps<any>([
     regs.rectify.right,
     ambos.rectify.right,

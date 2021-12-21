@@ -1,4 +1,4 @@
-import { truncate, rectify, sharpen, unrectify } from "../truncateOps"
+import { truncate, rectify, sharpen, connect } from "../truncateOps"
 import { validateOpInputs, validateHasOptions } from "../operationTestUtils"
 
 describe("truncate", () => {
@@ -70,7 +70,7 @@ describe("sharpen", () => {
 
 describe("unrectify", () => {
   it("canApplyTo", () => {
-    validateOpInputs(unrectify, {
+    validateOpInputs(connect, {
       pass: [
         "cuboctahedron",
         "icosidodecahedron",
@@ -84,7 +84,7 @@ describe("unrectify", () => {
   })
 
   it("hasOptions", () => {
-    validateHasOptions(unrectify, {
+    validateHasOptions(connect, {
       pass: ["cuboctahedron", "icosidodecahedron"],
       fail: [
         "rhombicuboctahedron",

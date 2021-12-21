@@ -14,13 +14,14 @@ import {
 } from "components/ViewerPage/context"
 import OperationIcon from "./OperationIcon"
 
-const opLayout: OpName[][] = [
-  ["truncate", "cotruncate", "sharpen", "cosharpen"],
-  ["rectify", "semisnub", "unrectify", "dual"],
-  ["expand", "snub", "contract", "twist"],
+const opLayout: (OpName | ".")[][] = [
+  ["truncate", ".", "sharpen", "."],
+  ["buff", "alternate", "pinch", "."],
+  ["rectify", "semisnub", "connect", "twist"],
+  ["expand", "snub", "contract", "dual"],
   ["elongate", "gyroelongate", "shorten", "turn"],
   ["double", "halve", "increment", "decrement"],
-  ["augment", "augment", "diminish", "gyrate"],
+  ["augment", "diminish", "gyrate", "."],
 ]
 
 const opList = uniq(opLayout.flat())
@@ -109,9 +110,12 @@ export default function OpGrid() {
   })
   return (
     <div {...css()}>
-      {opList.map((name) => (
-        <OpButton key={name} name={name} disabled={isTransitioning} />
-      ))}
+      {opList.map((name) => {
+        if (name === ".") {
+          return <div />
+        }
+        return <OpButton key={name} name={name} disabled={isTransitioning} />
+      })}
     </div>
   )
 }
