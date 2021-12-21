@@ -22,9 +22,6 @@ export default function GroupLayout({
         left: 0;
         right: 0;
         bottom: 0;
-
-        display: grid;
-        grid-template-columns: 1fr 20rem;
         color: #999999;
       `}
     >
@@ -50,7 +47,7 @@ export default function GroupLayout({
           </Canvas>
         </div>
       </div>
-      <section
+      {/* <section
         css={css`
           display: relative;
           overflow: scroll;
@@ -64,7 +61,7 @@ export default function GroupLayout({
       >
         <h1>{title}</h1>
         <Markdown source={text} />
-      </section>
+      </section> */}
     </div>
   )
 }

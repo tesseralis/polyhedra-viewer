@@ -6,8 +6,8 @@ import { uniform } from "components/HomePage/text"
 export default function UniformPage() {
   return (
     <GroupLayout
-      position={[-10, 0, 5]}
-      zoom={25}
+      position={[-12, 2, 10]}
+      zoom={35}
       aspectRatio={`8 / 5`}
       title="Uniform Polyhedra"
       text={uniform}

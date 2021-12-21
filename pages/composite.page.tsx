@@ -7,7 +7,7 @@ export default function UniformPage() {
   return (
     <GroupLayout
       position={[-7, -7, 5]}
-      zoom={22.5}
+      zoom={30}
       aspectRatio="8 / 7"
       title="Augmented, Diminished and Gyrate Solids"
       text={composite}
