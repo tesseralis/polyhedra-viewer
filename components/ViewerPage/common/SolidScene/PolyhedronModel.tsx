@@ -52,14 +52,16 @@ function SolidFaces({
   useLayoutEffect(() => {
     if (geomRef.current) {
       geomRef.current.clearGroups()
-      let i = 0
-      getMaterialsFromFaces(faces, appearance).forEach(
-        ({ count, material }) => {
-          console.log({ count, material })
-          geomRef.current?.addGroup(i, count, material)
-          i += count
-        },
-      )
+      // Disable materials for now since it breaks animation
+      geomRef.current?.addGroup(0, Infinity, 0)
+      // let i = 0
+      // getMaterialsFromFaces(faces, appearance).forEach(
+      //   ({ count, material }) => {
+      //     console.log({ count, material })
+      //     geomRef.current?.addGroup(i, count, material)
+      //     i += count
+      //   },
+      // )
     }
   }, [faces, appearance])
 
@@ -113,15 +115,15 @@ function SolidFaces({
           args={[colorArray, 3]}
         />
       </bufferGeometry>
-      <meshPhongMaterial
+      {/* <meshPhongMaterial
         shininess={25}
         attachArray="material"
         side={showInnerFaces ? DoubleSide : FrontSide}
         args={[{ vertexColors: true }]}
-      />
+      /> */}
       <meshStandardMaterial
         attachArray="material"
-        opacity={0.9}
+        // opacity={0.9}
         transparent={true}
         side={showInnerFaces ? DoubleSide : FrontSide}
         args={[{ vertexColors: true }]}
