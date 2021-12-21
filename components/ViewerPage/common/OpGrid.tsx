@@ -15,13 +15,16 @@ import {
 import OperationIcon from "./OperationIcon"
 
 const opLayout: (OpName | ".")[][] = [
+  // Conway operations
   ["truncate", ".", "sharpen", "."],
   ["buff", "alternate", "pinch", "."],
   ["rectify", "semisnub", "connect", "twist"],
   ["expand", "snub", "contract", "dual"],
+  // Cut & Paste operations
+  ["augment", "diminish", "gyrate", "."],
+  // Bilateral operations
   ["elongate", "gyroelongate", "shorten", "turn"],
   ["double", "halve", "increment", "decrement"],
-  ["augment", "diminish", "gyrate", "."],
 ]
 
 const opList = uniq(opLayout.flat())
