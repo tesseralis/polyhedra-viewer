@@ -1,9 +1,8 @@
 import { Composite } from "specs"
 import { makeOpPair } from "../operationPairs"
 import { getCentroid } from "math/geom"
-import { getTransformedVertices } from "../operationUtils"
 import { find } from "lib/utils"
-import { getSharpenPoint, getSharpenPointEdge } from "./truncateHelpers"
+import { getMorphFunction } from "../morph"
 
 export default makeOpPair<Composite>({
   graph: function* () {
@@ -51,30 +50,5 @@ export default makeOpPair<Composite>({
       orientation: [cap, crossAxis],
     }
   },
-  toLeft(forme) {
-    const truncatedFaces = forme.facetFaces("vertex")
-    // the inner faces of the caps
-    const cupolaFaces = forme.capTops()
-    return getTransformedVertices(
-      [...truncatedFaces, ...cupolaFaces],
-      (face) => {
-        if (cupolaFaces.some((f) => f.equals(face))) {
-          // Sharpen the cupola faces
-          const v = face.vertices[0]
-          // Find a triangular cupola face
-          const otherFace = find(
-            v.adjacentFaces(),
-            (f) => f.numSides === 3 && !f.equals(face),
-          )!
-
-          return getSharpenPoint(face, v.vec, otherFace.centroid())
-        } else {
-          const edge = find(face.edges, (e) =>
-            forme.isFacetFace(e.twinFace(), "face"),
-          )
-          return getSharpenPointEdge(face, edge)
-        }
-      },
-    )
-  },
+  toLeft: getMorphFunction((end) => end.geom.vertices),
 })

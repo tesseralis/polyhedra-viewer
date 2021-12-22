@@ -1,58 +1,26 @@
 import { sum } from "lodash-es"
 import { Classical, facetTypes, twists } from "specs"
-import { getTransformedVertices, Pose, TwistOpts } from "../operationUtils"
-import { ClassicalForme, fromSpecs } from "math/formes"
+import { Pose, TwistOpts } from "../operationUtils"
+import { ClassicalForme } from "math/formes"
 import { makeTruncateTrio } from "./truncateHelpers"
-import { scaleMat } from "math/geom"
 import { getMorphFunction } from "../morph"
 import { makeOpPair } from "../operationPairs"
-
-const getMorphedVertices = getMorphFunction()
 
 /**
  * A trio of operations that describe the truncation behavior on a quasi-regular polyhedron
  * (tetratetrahedron, cuboctahedron, and icosidodecahedron).
- *
- * A raw truncation on one of these doesn't yield a CRF solid. We need to do some fudging
- * in order to everything to align correctly.
- *
- * We calculate the average inradius between the face-facet faces and the vertex-facet faces
- * and use that as a scale. For both, we use a reference polyhedron and calculate the vertex
- * transformations based on them.
  */
 export default makeTruncateTrio(getAmboPose, {
   left: {
     operation: "rectify",
-    transformer(forme, result) {
-      const refForme = fromSpecs(result.specs)
-      const refInradius = avgInradius(refForme)
-      const inradius = avgInradius(forme)
-      const scale = (refForme.circumradius() / refInradius) * inradius
-      // Sharpen each of the faces to a point aligning with the vertices
-      // of the rectified solid
-      return getTransformedVertices(forme.edgeFaces(), (f) =>
-        forme.geom.centroid().clone().addScaledVector(f.normal(), scale),
-      )
-    },
+    // When morphing back to a rectified solid, track the vertices
+    transformer: getMorphFunction((end) => end.geom.vertices),
   },
   middle: { operation: "bevel" },
   right: {
     operation: "cantellate",
-    transformer(forme, result) {
-      const refForme = fromSpecs(result.specs)
-      const edgeFace = refForme.edgeFace()
-      const refMidradius = edgeFace.distanceToCenter()
-      const scale = avgInradius(forme) / avgInradius(refForme)
-      return getTransformedVertices(forme.edgeFaces(), (f) => {
-        const translateM = f.translateNormal(
-          refMidradius * scale - f.distanceToCenter(),
-        )
-        const scaleM = f.withCentroidOrigin(
-          scaleMat((edgeFace.radius() * scale) / f.radius()),
-        )
-        return translateM.multiply(scaleM)
-      })
-    },
+    // For morphing into a cantellated solid, track the edge faces
+    transformer: getMorphFunction((end) => end.edgeFaces()),
   },
 })
 
@@ -70,12 +38,9 @@ export const semisnubAmbo = makeOpPair<Classical, TwistOpts>({
   },
   middle: "right",
   getPose: getAmboPose,
-  toLeft: getMorphedVertices,
+  // Using the default parameters (end result faces) works for semisnub
+  toLeft: getMorphFunction(),
 })
-
-function avgInradius(forme: ClassicalForme) {
-  return sum(facetTypes.map((f) => forme.inradius(f))) / facetTypes.length
-}
 
 function getAmboPose(forme: ClassicalForme): Pose {
   return {
@@ -83,4 +48,8 @@ function getAmboPose(forme: ClassicalForme): Pose {
     scale: avgInradius(forme),
     orientation: forme.adjacentFacetFaces("face"),
   }
+}
+
+function avgInradius(forme: ClassicalForme) {
+  return sum(facetTypes.map((f) => forme.inradius(f))) / facetTypes.length
 }

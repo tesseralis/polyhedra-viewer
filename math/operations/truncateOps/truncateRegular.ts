@@ -23,10 +23,7 @@ export default makeTruncateTrio(
   {
     left: {
       operation: "regular",
-      transformer(forme, result) {
-        const morphToRegular = getMorphFunction((forme) => forme.geom.vertices)
-        return morphToRegular(forme, result)
-      },
+      transformer: getMorphFunction((forme) => forme.geom.vertices),
     },
     middle: { operation: "truncate" },
     right: {
