@@ -257,7 +257,7 @@ function drawIcon(name: OpName) {
       return <TruncateIcon styled="subtracted" />
     case "sharpen":
       return <TruncateIcon styled="added" />
-    case "buff":
+    case "pare":
       return (
         <>
           <Polygon

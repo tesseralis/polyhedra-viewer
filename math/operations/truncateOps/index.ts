@@ -12,8 +12,8 @@ export const truncate = new Operation(
   combineOps([regs.truncate.left, ambos.truncate.left, augTruncate.left]),
 )
 
-export const buff = new Operation(
-  "buff",
+export const pare = new Operation(
+  "pare",
   combineOps([regs.cotruncate.left, ambos.cotruncate.left]),
 )
 

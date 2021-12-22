@@ -17,7 +17,7 @@ import OperationIcon from "./OperationIcon"
 const opLayout: (OpName | ".")[][] = [
   // Conway operations
   ["truncate", ".", "sharpen", "."],
-  ["buff", "alternate", "pinch", "."],
+  ["pare", "alternate", "pinch", "."],
   ["rectify", "semisnub", "connect", "twist"],
   ["expand", "snub", "contract", "dual"],
   // Cut & Paste operations

@@ -1,7 +1,7 @@
 import {
   truncate,
   sharpen,
-  buff,
+  pare,
   alternate,
   pinch,
   rectify,
@@ -19,9 +19,9 @@ export type { default as Operation, AnimationData } from "./Operation"
 export const operations = {
   dual,
   truncate,
-  alternate,
-  buff,
   sharpen,
+  pare,
+  alternate,
   pinch,
   rectify,
   semisnub,
