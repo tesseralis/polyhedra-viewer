@@ -10,7 +10,6 @@ import { TwistOpts } from "./operationUtils"
 import { getMorphFunction } from "./morph"
 import { AugmentedPrismForme } from "math/formes/CompositeForme"
 
-const morphVertices = getMorphFunction(endMorphFaces, startMorphFaces)
 const doubleHalve = makeOpPair<Capstone, TwistOpts>({
   graph: function* () {
     for (const entry of Capstone.query.where(
@@ -50,10 +49,9 @@ const doubleHalve = makeOpPair<Capstone, TwistOpts>({
   getPose(forme, { left: { twist } }) {
     return getCapstonePose(forme, twist)
   },
-  toLeft: morphVertices,
+  toLeft: getMorphFunction(endMorphFaces, startMorphFaces),
 })
 
-const morphVerticesComposite = getMorphFunction(compositeEndMorphFaces)
 const doubleHalveComposite = makeOpPair<Composite>({
   graph: function* () {
     // TODO will this catch the wrapped source?
@@ -81,7 +79,7 @@ const doubleHalveComposite = makeOpPair<Composite>({
       orientation: forme.orientation(),
     }
   },
-  toLeft: morphVerticesComposite,
+  toLeft: getMorphFunction(compositeEndMorphFaces),
 })
 
 export const double = makeOperation(

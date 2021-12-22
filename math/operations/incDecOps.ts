@@ -5,11 +5,6 @@ import { CapstoneForme } from "math/formes"
 import { getMorphFunction } from "./morph"
 import { makeOperation } from "./Operation"
 
-const getResizedVertices = getMorphFunction(
-  getEndFacesToMap,
-  getStartFacesToMap,
-)
-
 const incDec = makeOpPair<Capstone>({
   graph: function* () {
     for (const entry of Capstone.query.where(
@@ -65,7 +60,7 @@ const incDec = makeOpPair<Capstone>({
       orientation: [top, crossAxis],
     }
   },
-  toLeft: getResizedVertices,
+  toLeft: getMorphFunction(getEndFacesToMap, getStartFacesToMap),
 })
 
 export const increment = makeOperation("increment", incDec.left)
@@ -94,7 +89,6 @@ function getStartFacesToMap(forme: CapstoneForme) {
     return forme.geom.faces
   }
   // If gyroelongated, choose one side opposite the aligned axis to exclude
-  // FIXME digonal antiprism errors out
   const end = forme.ends()[0]
   const edges =
     end instanceof Cap
@@ -114,7 +108,5 @@ function getStartFacesToMap(forme: CapstoneForme) {
   }
 
   const indices = new Set(faces.map((f) => f.index))
-
-  // FIXME square -> pentagonal still doesn't work
   return forme.geom.faces.filter((f) => !indices.has(f.index))
 }

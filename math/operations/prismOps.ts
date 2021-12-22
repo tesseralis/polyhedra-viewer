@@ -7,7 +7,7 @@ import { Pose, TwistOpts } from "./operationUtils"
 import { getMorphFunction } from "./morph"
 import { Face, Cap } from "math/polyhedra"
 
-const morphVertices = getMorphFunction(morphEndFaces)
+const morph = getMorphFunction(morphEndFaces)
 
 function getTwistMult(twist?: Twist) {
   switch (twist) {
@@ -64,7 +64,7 @@ function makePrismOp({ query, rightElongation = "antiprism" }: PrismOpArgs) {
       getPose(forme) {
         return getCapstonePose(forme, twist)
       },
-      toLeft: morphVertices,
+      toLeft: morph,
     })
   }
 }
@@ -85,7 +85,7 @@ const turnPrismatic = makeOpPair<Capstone>({
   getPose(forme) {
     return getCapstonePose(forme, "left")
   },
-  toLeft: morphVertices,
+  toLeft: morph,
 })
 
 const _elongate = makePrismOp({
@@ -140,7 +140,7 @@ function makeBicupolaPrismOp(leftElongation: "none" | "prism") {
     getPose(forme, { right: { twist } }) {
       return getCapstonePose(forme, twist)
     },
-    toLeft: morphVertices,
+    toLeft: morph,
   })
 }
 
