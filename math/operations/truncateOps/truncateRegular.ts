@@ -1,7 +1,8 @@
 import { FacetType } from "specs"
 import { ClassicalForme } from "math/formes"
-import { getTransformedVertices, Pose } from "../operationUtils"
-import { getSharpenPointEdge, makeTruncateTrio } from "./truncateHelpers"
+import { Pose } from "../operationUtils"
+import { makeTruncateTrio } from "./truncateHelpers"
+import { getMorphFunction } from "../morph"
 
 function getRegularPose(
   forme: ClassicalForme,
@@ -22,10 +23,9 @@ export default makeTruncateTrio(
   {
     left: {
       operation: "regular",
-      transformer(forme) {
-        return getTransformedVertices(forme.minorFacetFaces(), (face) =>
-          getSharpenPointEdge(face, face.edges[0]),
-        )
+      transformer(forme, result) {
+        const morphToRegular = getMorphFunction((forme) => forme.geom.vertices)
+        return morphToRegular(forme, result)
       },
     },
     middle: { operation: "truncate" },
@@ -34,13 +34,15 @@ export default makeTruncateTrio(
       // The rectified version is the only thing we need to choose an option for
       // when we move out of it
       options: (entry) => ({ facet: entry.facet() }),
-      transformer(forme) {
-        // All edges that between two truncated faces
-        const edges = forme.geom.edges.filter((e) =>
-          e.adjacentFaces().every((f) => forme.isMainFacetFace(f)),
+      transformer(start, end) {
+        // Track the facet type that's *opposite* of the intermediate's facet
+        // (i.e. a truncated cube should track the triangular faces)
+        const morphToRectified = getMorphFunction((endForme) =>
+          endForme.facetFaces(
+            start.specs.facet() === "face" ? "vertex" : "face",
+          ),
         )
-        // Move each edge to its midpoint
-        return getTransformedVertices(edges, (e) => e.midpoint())
+        return morphToRectified(start, end)
       },
     },
   },
