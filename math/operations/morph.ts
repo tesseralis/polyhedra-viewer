@@ -3,6 +3,7 @@ import { getCyclic } from "lib/utils"
 import { Face, Vertex } from "math/polyhedra"
 import { PolyhedronForme } from "math/formes"
 
+type GetFacets<Forme> = (forme: Forme) => (Face | Vertex)[]
 type GetFaces<Forme> = (forme: Forme) => Face[]
 
 /**
@@ -11,19 +12,19 @@ type GetFaces<Forme> = (forme: Forme) => Face[]
  * has more faces and collapses into the end polyhedron.
  */
 export function getMorphFunction<Forme extends PolyhedronForme>(
-  endFacesToMorph: GetFaces<Forme> = (forme) => forme.geom.faces,
+  endFacetsToMorph: GetFacets<Forme> = (forme) => forme.geom.faces,
   startFacesToMorph: GetFaces<Forme> = (forme) => forme.geom.faces,
 ) {
   return function getMorphedVertices(start: Forme, end: Forme) {
-    const facePairs = getFacePairs(
+    const facePairs = getFacetPairs(
       startFacesToMorph(start),
-      endFacesToMorph(end),
+      endFacetsToMorph(end),
     )
 
     // create a map from the initial vertices to the end vertices
     const mapping: Vertex[] = []
-    for (const [f1, f2] of facePairs) {
-      for (const [v1, v2] of getVertexPairs(f1, f2)) {
+    for (const [face, facet] of facePairs) {
+      for (const [v1, v2] of getVertexPairs(face, facet)) {
         mapping[v1.index] = v2
       }
     }
@@ -35,22 +36,29 @@ export function getMorphFunction<Forme extends PolyhedronForme>(
 }
 
 // Find the faces in the first set that map onto the second set
-function getFacePairs(first: Face[], second: Face[]) {
-  return second.map((face) => {
-    return [findFacePartner(face, first), face]
+function getFacetPairs(start: Face[], end: (Face | Vertex)[]) {
+  return end.map((facet) => {
+    return [findFacePartner(facet, start), facet] as const
   })
 }
 
-function findFacePartner(face: Face, candidates: Face[]) {
+// Find the partner facet
+function findFacePartner(facet: Face | Vertex, candidates: Face[]) {
   return minBy(candidates, (face2) => {
-    return face.normal().angleTo(face2.normal())
+    return facet.normal().angleTo(face2.normal())
   })!
 }
 
-function getVertexPairs(f1: Face, f2: Face) {
-  const partnerIndex = getPartnerVertexIndex(f1, f2)
-  return f1.vertices.map((v, i) => {
-    return [v, getCyclic(f2.vertices, i + partnerIndex)] as [Vertex, Vertex]
+function getVertexPairs(startFace: Face, endFacet: Face | Vertex) {
+  if (endFacet instanceof Vertex) {
+    return startFace.vertices.map((v) => [v, endFacet])
+  }
+  const partnerIndex = getPartnerVertexIndex(startFace, endFacet)
+  return startFace.vertices.map((v, i) => {
+    return [v, getCyclic(endFacet.vertices, i + partnerIndex)] as [
+      Vertex,
+      Vertex,
+    ]
   })
 }
 
