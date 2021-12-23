@@ -1,6 +1,6 @@
 import { take } from "lodash-es"
 
-import React, { memo } from "react"
+import { memo } from "react"
 
 import { useStyle, scales } from "styles"
 import {

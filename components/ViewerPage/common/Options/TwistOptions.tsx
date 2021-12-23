@@ -1,4 +1,4 @@
-import React, { useCallback } from "react"
+import { useCallback } from "react"
 import Icon from "@mdi/react"
 import { mdiRotateLeft, mdiRotateRight } from "@mdi/js"
 

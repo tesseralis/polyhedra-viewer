@@ -1,4 +1,4 @@
-import React, { memo, useState, InputHTMLAttributes } from "react"
+import { memo, useState, InputHTMLAttributes } from "react"
 import Icon from "@mdi/react"
 import { mdiMagnify } from "@mdi/js"
 

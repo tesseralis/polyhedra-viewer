@@ -1,4 +1,4 @@
-import React, { ComponentType } from "react"
+import { ComponentType } from "react"
 import { round } from "lodash-es"
 import Link from "next/link"
 

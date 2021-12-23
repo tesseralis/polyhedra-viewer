@@ -1,6 +1,6 @@
 import { capitalize } from "lodash-es"
 
-import React, { useState } from "react"
+import { useState } from "react"
 import Link from "next/link"
 import { fonts, useStyle, scales } from "styles"
 

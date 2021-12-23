@@ -1,6 +1,12 @@
 import { noop } from "lodash-es"
 import { Vector3, Color } from "three"
-import React, { useRef, useEffect, useContext, useCallback } from "react"
+import {
+  createContext,
+  useRef,
+  useEffect,
+  useContext,
+  useCallback,
+} from "react"
 
 import { ChildrenProp } from "lib/types"
 import { repeat } from "lib/utils"
@@ -54,7 +60,7 @@ const InterpModel = createHookedContext<State, "set" | "reset">(
   defaultState,
 )
 
-const TransitionContext = React.createContext(noop)
+const TransitionContext = createContext(noop)
 
 function InnerProvider({ children }: ChildrenProp) {
   const transitionId = useRef<ReturnType<typeof transition> | null>(null)

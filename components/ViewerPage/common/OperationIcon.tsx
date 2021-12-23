@@ -1,6 +1,6 @@
 import { range, mapValues } from "lodash-es"
 
-import React, { memo, ComponentType } from "react"
+import { memo, ComponentType } from "react"
 import { css } from "@emotion/css"
 
 import { OpName } from "math/operations"
