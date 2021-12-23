@@ -116,18 +116,24 @@ function duplicateVertices(polyhedron: Polyhedron) {
 
   return polyhedron.withChanges((solid) => {
     return solid
-      .withVertices(polyhedron.vertices.flatMap((v) => repeat(v.vec, count)))
+      .withVertices(
+        polyhedron.vertices.flatMap((v) =>
+          repeat(v.vec, v.adjacentFaces().length),
+        ),
+      )
       .mapFaces((face) => {
         return face.vertices.flatMap((v) => {
+          // FIXME oh god this needs to be mapped better
           const base = count * v.index
           const j = mapping[face.index][v.index]
           return [base + ((j + 1) % count), base + j]
         })
       })
       .addFaces(
-        polyhedron.vertices.map((v) =>
-          range(v.index * count, (v.index + 1) * count),
-        ),
+        polyhedron.vertices.map((v) => {
+          const count = v.adjacentFaces().length
+          return range(v.index * count, (v.index + 1) * count)
+        }),
       )
   })
 }
