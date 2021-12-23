@@ -6,6 +6,7 @@ import { Classical } from "specs"
 import regs from "./truncateRegular"
 import ambos, { semisnubAmbo } from "./truncateAmbo"
 import augTruncate from "./truncateAugmented"
+import * as capstones from "./truncateCapstone"
 
 export const truncate = new Operation(
   "truncate",
@@ -69,11 +70,15 @@ export const pinch = new Operation("pinch", {
 
 export const rectify = new Operation(
   "rectify",
-  combineOps([regs.rectify.left, ambos.rectify.left]),
+  combineOps([regs.rectify.left, ambos.rectify.left, capstones.rectify.left]),
 )
 
 export const unrectify = new Operation("connect", {
-  ...combineOps<any>([regs.rectify.right, ambos.rectify.right]),
+  ...combineOps<any>([
+    regs.rectify.right,
+    ambos.rectify.right,
+    capstones.rectify.right,
+  ]),
   ...hitOptArgs,
 })
 

@@ -1,4 +1,7 @@
-import { VertexArg } from "math/polyhedra"
+import { PRECISION } from "math/geom"
+import { range, set } from "lodash-es"
+import { find, repeat } from "lib/utils"
+import { Polyhedron, VertexArg } from "math/polyhedra"
 import Classical, { Operation as OpName } from "specs/Classical"
 import { makeOpPair } from "../operationPairs"
 import { Pose } from "../operationUtils"
@@ -69,4 +72,62 @@ export function makeTruncateTrio<
     pare: makePair("middle", "right"),
     rectify: makePair("left", "right"),
   }
+}
+
+// Perform a raw, geometric truncation on the given polyhedral geometry
+export function rawTruncate(polyhedron: Polyhedron) {
+  const truncateLength = getTruncateLength(polyhedron)
+  const oldSideLength = polyhedron.edgeLength()
+  const truncateScale = (oldSideLength - truncateLength) / 2 / oldSideLength
+  const duplicated = duplicateVertices(polyhedron)
+  const transform = (v: any) => v
+
+  const truncatedVertices = duplicated.vertices.map((vertex) => {
+    const adjacentVertices = vertex.adjacentVertices()
+    const v = vertex.vec
+    const v1 = find(
+      adjacentVertices,
+      (adj) => adj.vec.distanceTo(v) > PRECISION,
+    )
+    const truncated = v
+      .clone()
+      .add(v1.vec.clone().sub(v).multiplyScalar(truncateScale))
+    return !!transform ? transform(truncated) : truncated
+  })
+  return duplicated.withVertices(truncatedVertices)
+}
+
+function getTruncateLength(polyhedron: Polyhedron) {
+  const face = polyhedron.smallestFace()
+  const n = face.numSides
+  const theta = Math.PI / n
+  const newTheta = theta / 2
+  return 2 * face.apothem() * Math.tan(newTheta)
+}
+
+function duplicateVertices(polyhedron: Polyhedron) {
+  const mapping: NestedRecord<number, number, number> = {}
+  const count = polyhedron.getVertex().adjacentFaces().length
+  polyhedron.vertices.forEach((v) => {
+    v.adjacentFaces().forEach((face, i) => {
+      set(mapping, [face.index, v.index], i)
+    })
+  })
+
+  return polyhedron.withChanges((solid) => {
+    return solid
+      .withVertices(polyhedron.vertices.flatMap((v) => repeat(v.vec, count)))
+      .mapFaces((face) => {
+        return face.vertices.flatMap((v) => {
+          const base = count * v.index
+          const j = mapping[face.index][v.index]
+          return [base + ((j + 1) % count), base + j]
+        })
+      })
+      .addFaces(
+        polyhedron.vertices.map((v) =>
+          range(v.index * count, (v.index + 1) * count),
+        ),
+      )
+  })
 }
