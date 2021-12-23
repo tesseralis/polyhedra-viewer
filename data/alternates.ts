@@ -25,7 +25,7 @@ export const alternateNamesMapping: Record<string, string[]> = {
 
   // fastigium
   "triangular prism": ["fastigium", "digonal cupola"],
-  gyrobifastigium: ["digonal gyrobicupola"],
+  "digonal gyrobicupola": ["gyrobifastigium"],
 
   // Augmented solids
   "triangular bipyramid": ["augmented tetrahedron"],
@@ -50,7 +50,7 @@ export const alternateNamesMapping: Record<string, string[]> = {
   "octagonal prism": ["bidiminished rhombicuboctahedron"],
 
   // Snub antiprisms
-  "snub disphenoid": ["snub digonal antiprism"],
+  "snub digonal antiprism": ["snub disphenoid"],
 }
 function* getCanonicalMapping() {
   for (const [canonical, alts] of Object.entries(alternateNamesMapping)) {

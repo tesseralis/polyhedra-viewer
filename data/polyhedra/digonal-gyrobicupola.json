@@ -25,7 +25,7 @@
     [-0.57735, 0.0, -1.0],
     [0.57735, 0.0, -1.0]
   ],
-  "name": "gyrobifastigium",
+  "name": "digonal gyrobicupola",
   "faces": [
     [4, 1, 0],
     [5, 3, 2],
