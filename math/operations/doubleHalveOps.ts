@@ -17,37 +17,38 @@ const doubleHalve = makeOpPair<Capstone, TwistOpts, {}>({
     for (const entry of Capstone.query.where(
       (s) => s.isPrimary() && !s.isSnub(),
     )) {
-      if (entry.isGyroelongated()) {
-        // Special case for the digonal antiprism (tetrahedron):
-        // It doubles into the square antiprism, which is also a "primary" capstone
-        if (entry.isDigonal()) {
-          yield {
-            left: entry,
-            right: entry.withData({ base: 4 }),
-          }
-          continue
-        }
-        if (!entry.isBi()) {
-          yield {
-            left: entry,
-            right: entry.withData({ type: "secondary" }),
-          }
-        } else {
-          // Gyroelong. bicupolae are chiral, so doubling can yield two chiral results.
-          // Have the user specify which one using a twist option.
-          for (const twist of twists) {
-            yield {
-              left: entry,
-              right: entry.withData({ type: "secondary", twist }),
-              options: { left: { twist }, right: {} },
-            }
-          }
-        }
-      } else {
+      // For non-gyroelongated capstones, just expand it to the equivalent (ortho) secondary version
+      if (!entry.isGyroelongated()) {
         yield {
           left: entry,
           right: entry.withData({ type: "secondary", gyrate: "ortho" }),
         }
+        continue
+      }
+      // Special case for the digonal antiprism (tetrahedron):
+      // It doubles into the square antiprism, which is also a "primary" capstone
+      if (entry.isDigonal()) {
+        yield {
+          left: entry,
+          right: entry.withData({ base: 4 }),
+        }
+        continue
+      }
+      // Gyroelong. bicupolae are chiral, so doubling can yield two chiral results.
+      // Have the user specify which one using a twist option.
+      if (entry.isBi()) {
+        for (const twist of twists) {
+          yield {
+            left: entry,
+            right: entry.withData({ type: "secondary", twist }),
+            options: { left: { twist }, right: {} },
+          }
+        }
+        continue
+      }
+      yield {
+        left: entry,
+        right: entry.withData({ type: "secondary" }),
       }
     }
   },
