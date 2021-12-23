@@ -16,6 +16,7 @@ interface Props {
   value: SolidData
   appearance: Appearance[]
   config: SolidConfig
+  opacity?: number
   onClick?(point: Vector3): void
   onPointerMove?(point: Vector3): void
   onPointerOut?(point: Vector3): void
@@ -43,6 +44,7 @@ function SolidFaces({
   onPointerMove,
   onPointerOut,
   config,
+  opacity = 1,
 }: Props) {
   const { vertices, faces } = value
   const geomRef = useRef<BufferGeometry>()
@@ -123,7 +125,7 @@ function SolidFaces({
       /> */}
       <meshStandardMaterial
         attachArray="material"
-        // opacity={0.9}
+        opacity={opacity * 1}
         transparent={true}
         side={showInnerFaces ? DoubleSide : FrontSide}
         args={[{ vertexColors: true }]}

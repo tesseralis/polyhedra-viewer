@@ -37,10 +37,10 @@ function PolyhedronEntry({ entry, position, navigate }: any) {
   const config = ConfigCtx.useState()
   const faceColors = geom.faces.map((face) => {
     let color = getFormeColors(forme, face)
-    // FIXME desaturate if it's a duplicate
-    // if (isDupe) {
-    //   color = mixColor(color, (c) => c.clone().offsetHSL(0, -0.25, -0.1))
-    // }
+    // desaturate if it's a duplicate and decrease opacity
+    if (isDupe) {
+      color = mixColor(color, (c) => c.clone().offsetHSL(0, -0.5, -0.1))
+    }
     if (hovered) {
       color = mixColor(color, (c) => c.clone().offsetHSL(0, 0, 0.2))
     }
@@ -48,11 +48,7 @@ function PolyhedronEntry({ entry, position, navigate }: any) {
   })
 
   return (
-    <group
-      ref={ref}
-      position={position}
-      scale={isDupe ? [2 / 3, 2 / 3, 2 / 3] : [1, 1, 1]}
-    >
+    <group ref={ref} position={position}>
       <PolyhedronModel
         onClick={() => navigate.push(`/${escape(entry.name())}`)}
         onPointerMove={() => setHovered(true)}
@@ -60,6 +56,7 @@ function PolyhedronEntry({ entry, position, navigate }: any) {
         value={geom.solidData}
         appearance={faceColors}
         config={pick(config, ["showFaces", "showEdges", "showInnerFaces"])}
+        opacity={isDupe ? 0.33 : 1}
       />
     </group>
   )
