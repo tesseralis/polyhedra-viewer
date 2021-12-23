@@ -150,6 +150,16 @@ class OpPair<
       toRight = defaultGetter,
     } = this.inputs
 
+    // Alternate strategy that keeps things consistent
+    // maybe a possible option?
+    // function getPose(forme: any, options: any, side: any) {
+    //   return {
+    //     ..._getPose(forme, options, side),
+    //     scale: mean(forme.geom.edges.map((e: any) => e.distanceToCenter())),
+    //     origin: forme.geom.centroid(),
+    //   }
+    // }
+
     const specs = start.specs as Specs
     const entry = this.getEntry(side, specs, opts)
     const options =
