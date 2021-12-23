@@ -299,7 +299,27 @@ function drawIcon(name: OpName) {
           />
         </>
       )
-
+    case "unalternate":
+      return (
+        <>
+          <Polygon
+            className={styles("invariant")}
+            n={3}
+            r={75}
+            a={0}
+            cx={100}
+            cy={100}
+          />
+          <Polygon
+            className={styles("added")}
+            n={6}
+            r={80}
+            a={0}
+            cx={100}
+            cy={100}
+          />
+        </>
+      )
     case "pinch":
       return (
         <>
@@ -352,8 +372,28 @@ function drawIcon(name: OpName) {
           />
         </>
       )
-
-    case "connect":
+    case "unsnub":
+      return (
+        <>
+          <Polygon
+            className={styles("added")}
+            n={3}
+            r={100}
+            a={-90}
+            cx={100}
+            cy={120}
+          />
+          <Polygon
+            className={styles("invariant")}
+            n={3}
+            r={55}
+            a={0}
+            cx={100}
+            cy={120}
+          />
+        </>
+      )
+    case "unrectify":
       return (
         <TruncateIcon
           styled="added"

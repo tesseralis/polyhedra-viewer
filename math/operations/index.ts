@@ -3,10 +3,12 @@ import {
   sharpen,
   pare,
   alternate,
+  unalternate,
   pinch,
   rectify,
-  connect,
+  unrectify,
   semisnub,
+  unsnub,
 } from "./truncateOps"
 import { dual, expand, snub, contract, twist } from "./resizeOps"
 import { elongate, gyroelongate, shorten, turn } from "./prismOps"
@@ -22,10 +24,12 @@ export const operations = {
   sharpen,
   pare,
   alternate,
+  unalternate,
   pinch,
   rectify,
+  unrectify,
   semisnub,
-  connect,
+  unsnub,
   expand,
   snub,
   contract,

@@ -16,14 +16,14 @@ import OperationIcon from "./OperationIcon"
 
 const opLayout: (OpName | ".")[][] = [
   // Conway operations
-  ["truncate", ".", "sharpen", "."],
-  ["pare", "alternate", "pinch", "."],
-  ["rectify", "semisnub", "connect", "twist"],
-  ["expand", "snub", "contract", "dual"],
+  ["truncate", "sharpen", ".", "dual"],
+  ["pare", "pinch", "alternate", "unalternate"],
+  ["rectify", "unrectify", "semisnub", "unsnub"],
+  ["expand", "contract", "snub", "twist"],
   // Cut & Paste operations
-  ["augment", "diminish", "gyrate", "."],
+  ["augment", "diminish", ".", "gyrate"],
   // Bilateral operations
-  ["elongate", "gyroelongate", "shorten", "turn"],
+  ["elongate", "shorten", "gyroelongate", "turn"],
   ["double", "halve", "increment", "decrement"],
 ]
 

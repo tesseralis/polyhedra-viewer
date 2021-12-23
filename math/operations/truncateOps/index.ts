@@ -25,15 +25,13 @@ export const alternate = new Operation("alternate", {
   },
 })
 
-export const rectify = new Operation(
-  "rectify",
-  combineOps([regs.rectify.left, ambos.rectify.left]),
-)
-
-export const semisnub = new Operation(
-  "semisnub",
-  combineOps([semisnubAmbo.left]),
-)
+export const unalternate = new Operation("alternate", {
+  graph: function* () {},
+  toGraphOpts() {},
+  apply() {
+    throw new Error("Not implemented")
+  },
+})
 
 const hitOptArgs: Partial<OpArgs<FacetOpts, Classical>> = {
   hitOption: "facet",
@@ -69,11 +67,22 @@ export const pinch = new Operation("pinch", {
   ...hitOptArgs,
 })
 
-export const connect = new Operation("connect", {
-  ...combineOps<any>([
-    regs.rectify.right,
-    ambos.rectify.right,
-    semisnubAmbo.right,
-  ]),
+export const rectify = new Operation(
+  "rectify",
+  combineOps([regs.rectify.left, ambos.rectify.left]),
+)
+
+export const unrectify = new Operation("connect", {
+  ...combineOps<any>([regs.rectify.right, ambos.rectify.right]),
+  ...hitOptArgs,
+})
+
+export const semisnub = new Operation(
+  "semisnub",
+  combineOps([semisnubAmbo.left]),
+)
+
+export const unsnub = new Operation("unsnub", {
+  ...combineOps<any>([semisnubAmbo.right]),
   ...hitOptArgs,
 })

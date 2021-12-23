@@ -1,4 +1,4 @@
-import { truncate, rectify, sharpen, connect } from "../truncateOps"
+import { truncate, rectify, sharpen, unrectify, unsnub } from "../truncateOps"
 import { validateOpInputs, validateHasOptions } from "../operationTestUtils"
 
 describe("truncate", () => {
@@ -70,28 +70,37 @@ describe("sharpen", () => {
 
 describe("unrectify", () => {
   it("canApplyTo", () => {
-    validateOpInputs(connect, {
+    validateOpInputs(unrectify, {
       pass: [
         "cuboctahedron",
         "icosidodecahedron",
         "rhombicuboctahedron",
         "rhombicosidodecahedron",
-        "snub cuboctahedron",
-        "snub icosidodecahedron",
       ],
       fail: [],
     })
   })
 
   it("hasOptions", () => {
-    validateHasOptions(connect, {
+    validateHasOptions(unrectify, {
       pass: ["cuboctahedron", "icosidodecahedron"],
-      fail: [
-        "rhombicuboctahedron",
-        "rhombicosidodecahedron",
-        "snub cuboctahedron",
-        "snub icosidodecahedron",
-      ],
+      fail: ["rhombicuboctahedron", "rhombicosidodecahedron"],
+    })
+  })
+})
+
+describe("unsnub", () => {
+  it("canApplyTo", () => {
+    validateOpInputs(unrectify, {
+      pass: ["snub cuboctahedron", "snub icosidodecahedron"],
+      fail: [],
+    })
+  })
+
+  it("hasOptions", () => {
+    validateHasOptions(unsnub, {
+      pass: [],
+      fail: ["snub cuboctahedron", "snub icosidodecahedron"],
     })
   })
 })

@@ -107,7 +107,7 @@ const chainedTests: OpTest[] = [
     start: "dodecahedron",
     operations: [
       ["rectify", "icosidodecahedron"],
-      { op: "connect", args: { facet: "vertex" }, expected: "icosahedron" },
+      { op: "unrectify", args: { facet: "vertex" }, expected: "icosahedron" },
       ["forme", "snub tetratetrahedron"],
       ["contract", "tetrahedron"],
     ],
@@ -123,7 +123,7 @@ const chainedTests: OpTest[] = [
       ["forme", "cuboctahedron"],
       ["truncate", "truncated cuboctahedron"],
       ["sharpen", "cuboctahedron"],
-      { op: "connect", args: { facet: "face" }, expected: "cube" },
+      { op: "unrectify", args: { facet: "face" }, expected: "cube" },
       ["truncate", "truncated cube"],
       {
         op: "augment",
