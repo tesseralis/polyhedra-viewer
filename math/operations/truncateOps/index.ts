@@ -14,7 +14,7 @@ export const truncate = new Operation(
 
 export const pare = new Operation(
   "pare",
-  combineOps([regs.cotruncate.left, ambos.cotruncate.left]),
+  combineOps([regs.pare.left, ambos.pare.left]),
 )
 
 export const alternate = new Operation("alternate", {
@@ -63,7 +63,7 @@ export const sharpen = new Operation("sharpen", {
 
 // TODO why doesn't the typing work here?
 export const pinch = new Operation("pinch", {
-  ...combineOps<any>([regs.cotruncate.right, ambos.cotruncate.right]),
+  ...combineOps<any>([regs.pare.right, ambos.pare.right]),
   ...hitOptArgs,
 })
 

@@ -22,7 +22,7 @@ interface TrioArgs<L, M, R> {
 }
 
 /**
- * Create a trio of truncation OpPairs: truncate, buff, and rectify.
+ * Create a trio of truncation OpPairs: truncate, pare, and rectify.
  * Given the functions to use for operations, poses, and transformers,
  * generate the triplet of OpPairs to use.
  */
@@ -66,7 +66,7 @@ export function makeTruncateTrio<
 
   return {
     truncate: makePair("left", "middle"),
-    cotruncate: makePair("middle", "right"),
+    pare: makePair("middle", "right"),
     rectify: makePair("left", "right"),
   }
 }
