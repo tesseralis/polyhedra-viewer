@@ -2,7 +2,6 @@ import { css } from "@emotion/react"
 import { Canvas } from "@react-three/fiber"
 import { OrthographicCamera } from "@react-three/drei"
 import { useRouter } from "next/router"
-import Markdown from "components/HomePage/Markdown"
 
 export default function GroupLayout({
   position,

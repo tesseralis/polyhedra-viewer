@@ -1,23 +1,31 @@
+import { css } from "@emotion/react"
 import Link from "next/link"
-import { useStyle, scales } from "styles"
+import { useRouter } from "next/router"
+import { scales } from "styles"
 import Icon from "@mdi/react"
 
 import { media, fonts } from "styles"
 import { SrOnly } from "components/common"
-import { colorFill, flexColumn } from "styles/common"
 
 function LinkText({ text, hidden }: { text: string; hidden: boolean }) {
-  const css = useStyle({
-    marginTop: scales.spacing[1],
-    fontSize: scales.font[7],
-    fontFamily: fonts.verdana,
+  return hidden ? (
+    <SrOnly>{text}</SrOnly>
+  ) : (
+    <div
+      css={css`
+        margin-top: ${scales.spacing[1]};
+        font-size: ${scales.font[7]};
+        font-family: ${fonts.verdana};
 
-    [media.mobileLandscape]: {
-      marginTop: 0,
-      paddingLeft: scales.spacing[1],
-    },
-  })
-  return hidden ? <SrOnly>{text}</SrOnly> : <div {...css()}>{text}</div>
+        ${media.mobileLandscape} {
+          margin-top: 0;
+          padding-left: ${scales.spacing[1]};
+        }
+      `}
+    >
+      {text}
+    </div>
+  )
 }
 
 export default function IconLink({
@@ -28,24 +36,30 @@ export default function IconLink({
   onClick,
   iconOnly = false,
 }: any) {
-  const css = useStyle({
-    ...flexColumn("center"),
-    ...colorFill("#999"),
-    textDecoration: "none",
-    padding: scales.spacing[2],
+  const router = useRouter()
+  const isActive = router.asPath.endsWith(to)
+  const color = isActive ? "#ccc" : "#999"
 
-    [media.mobileLandscape]: {
-      padding: 0,
-      flexDirection: "row",
-    },
-  } as any)
-
-  const activeCss = useStyle(colorFill("DarkSlateGray") as any)
-
-  // FIXME active styles
   return (
     <Link href={to} replace={replace} passHref>
-      <a {...css()} {...activeCss("activeClassName")} onClick={onClick}>
+      <a
+        onClick={onClick}
+        css={css`
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          color: ${color};
+          fill: ${color};
+          text-decoration: none;
+          padding: ${scales.spacing[2]};
+          transition: color 250ms;
+
+          ${media.mobileLandscape} {
+            padding: 0;
+            flex-direction: row;
+          }
+        `}
+      >
         <Icon path={iconName} size={scales.size[2]} />
         <LinkText text={title} hidden={iconOnly} />
       </a>

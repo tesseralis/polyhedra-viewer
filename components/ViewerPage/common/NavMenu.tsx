@@ -1,3 +1,4 @@
+import { css } from "@emotion/react"
 import { capitalize } from "lodash-es"
 import { useRouter } from "next/router"
 
@@ -9,7 +10,6 @@ import {
   mdiCubeOutline,
 } from "@mdi/js"
 
-import { useStyle } from "styles"
 import IconLink from "./IconLink"
 
 interface Props {
@@ -27,16 +27,15 @@ const links = [
 
 export default function NavMenu({ compact = false, onClick }: Props) {
   const router = useRouter()
-  const css = useStyle({
-    // Using grid here bc it's easier to get evenly spaced than flex
-    display: "grid",
-    gridTemplateColumns: `repeat(${links.length}, 1fr)`,
-    justifyItems: "center",
-    width: "100%",
-  })
-
   return (
-    <nav {...css()}>
+    <nav
+      css={css`
+        display: grid;
+        grid-template-columns: repeat(${links.length}, 1fr);
+        justify-items: center;
+        width: 100%;
+      `}
+    >
       {links.map(({ name, title = name, icon }) => (
         <IconLink
           key={name}
