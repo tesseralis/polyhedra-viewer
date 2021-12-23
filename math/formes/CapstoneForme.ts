@@ -6,6 +6,7 @@ import { Polyhedron, Face, Edge, Cap, FaceLike, Facet } from "math/polyhedra"
 import { getCentroid } from "math/geom"
 import { getGeometry } from "math/operations/operationUtils"
 import { CapstoneFace } from "./FaceType"
+import { repeat } from "lib/utils"
 
 type CapstoneEnd = Facet
 
@@ -259,9 +260,24 @@ class SnubCapstoneForme extends CapstoneForme {
         e.vertices.every((v) => v.adjacentFaces().length === 4),
       )
     } else {
-      // FIXME this doesn't work for icosahedron
+      // FIXME this shouldn't work for icosahedron?
       yield* this.geom.facesWithNumSides(this.specs.baseSides())
     }
+  }
+
+  faceAppearance(face: Face) {
+    const base = this.specs.data.base
+    if (this.isTop(face)) {
+      return CapstoneFace.capTop(base)
+    }
+
+    const endVertices = this.ends().flatMap((end) => end.vertices)
+    return CapstoneFace.capSide(
+      base,
+      face.vertices.map((v) => {
+        return v.inSet(endVertices) ? "top" : "base"
+      }),
+    )
   }
 }
 
