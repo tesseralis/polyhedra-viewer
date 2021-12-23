@@ -91,7 +91,7 @@ describe("unrectify", () => {
 
 describe("unsnub", () => {
   it("canApplyTo", () => {
-    validateOpInputs(unrectify, {
+    validateOpInputs(unsnub, {
       pass: ["snub cuboctahedron", "snub icosidodecahedron"],
       fail: [],
     })
