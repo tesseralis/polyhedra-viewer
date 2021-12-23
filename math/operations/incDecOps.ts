@@ -35,7 +35,7 @@ const incDec = makeOpPair<Capstone>({
       }
     }
   },
-  middle: "right",
+  intermediate: "right",
   getPose(forme) {
     // special case for digonal antiprism
     if (forme.specs.isDigonal()) {

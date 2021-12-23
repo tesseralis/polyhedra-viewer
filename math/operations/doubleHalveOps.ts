@@ -52,7 +52,7 @@ const doubleHalve = makeOpPair<Capstone, TwistOpts, {}>({
       }
     }
   },
-  middle: "right",
+  intermediate: "right",
   getPose(forme, { left: { twist } }) {
     return getCapstonePose(forme, twist)
   },
@@ -80,7 +80,7 @@ const doubleHalveComposite = makeOpPair<Composite>({
       }
     }
   },
-  middle: "right",
+  intermediate: "right",
   getPose(forme) {
     return {
       origin: forme.sourceCentroid(),

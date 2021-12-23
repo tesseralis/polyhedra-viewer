@@ -21,7 +21,7 @@ export default makeOpPair<Composite>({
       }
     }
   },
-  middle: "right",
+  intermediate: "right",
   getPose(forme) {
     const { specs } = forme
     const caps = forme.caps()

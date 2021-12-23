@@ -14,7 +14,7 @@ export const expand = makeOpPair<Classical, {}, FacetOpts>({
       }
     }
   },
-  middle: "right",
+  intermediate: "right",
   getPose(forme, options) {
     return getClassicalPose(forme, options.right.facet)
   },
@@ -38,7 +38,7 @@ export const snub = makeOpPair<Classical, TwistOpts, FacetOpts>({
       }
     }
   },
-  middle: "right",
+  intermediate: "right",
   getPose(forme, options) {
     return getClassicalPose(forme, options.right.facet)
   },
@@ -57,7 +57,7 @@ export const twist = makeOpPair<Classical, TwistOpts, {}>({
       }
     }
   },
-  middle: "right",
+  intermediate: "right",
   getPose(forme) {
     return getClassicalPose(forme, "face")
   },
@@ -76,7 +76,7 @@ export const dual = makeOpPair<Classical>({
       yield { left: specs, right: specs.withData({ facet: "vertex" }) }
     }
   },
-  middle: (entry) => entry.left.withOperation("cantellate"),
+  intermediate: (entry) => entry.left.withOperation("cantellate"),
   getPose(forme) {
     const { geom } = forme
     if (forme.specs.isCantellated()) {
@@ -108,7 +108,7 @@ export const semiExpand = makeOpPair<Classical, {}, FacetOpts>({
       }
     }
   },
-  middle: "right",
+  intermediate: "right",
   getPose(forme, options) {
     return getClassicalPose(forme, options.right.facet)
   },

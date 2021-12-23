@@ -55,7 +55,7 @@ export function makeTruncateTrio<
       },
       // If this is the left-right operation, then the intermediate
       // is going to be the middle operation
-      middle:
+      intermediate:
         middleArg ??
         ((entry) => (entry.left as any).withOperation(middle.operation)),
       getPose,

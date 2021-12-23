@@ -36,7 +36,7 @@ export const semisnubAmbo = makeOpPair<Classical, TwistOpts>({
       }
     }
   },
-  middle: "right",
+  intermediate: "right",
   getPose: getAmboPose,
   // Using the default parameters (end result faces) works for semisnub
   toLeft: getMorphFunction(),

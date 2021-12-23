@@ -27,7 +27,7 @@ export const expand = makeOpPair<Capstone, {}, FacetOpts>({
       }
     }
   },
-  middle: "right",
+  intermediate: "right",
   getPose,
   toLeft: morph,
 })
@@ -41,7 +41,7 @@ export const dual = makeOpPair<Capstone>({
       }
     }
   },
-  middle: (entry) =>
+  intermediate: (entry) =>
     entry.right.withData({
       elongation: "prism",
       type: "secondary",

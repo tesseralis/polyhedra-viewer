@@ -16,7 +16,7 @@ export const expand = makeOpPair<Capstone>({
       }
     }
   },
-  middle: "right",
+  intermediate: "right",
   getPose,
   toLeft: getMorphFunction(),
 })
@@ -33,7 +33,7 @@ export const snub = makeOpPair<Capstone>({
       }
     }
   },
-  middle: "right",
+  intermediate: "right",
   getPose,
   toLeft: getMorphFunction(),
 })
@@ -54,7 +54,7 @@ export const twist = makeOpPair<Capstone>({
       }
     }
   },
-  middle: "right",
+  intermediate: "right",
   getPose,
   toLeft: getMorphFunction((result) => {
     // The end result is the gyrobicupola, so only track the triangular faces of the caps.
