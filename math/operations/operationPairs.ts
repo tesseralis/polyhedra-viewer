@@ -31,7 +31,11 @@ export interface OpPairInput<Specs extends PolyhedronSpecs, L = {}, R = L> {
    * Defines how to align the solid for the purposes of interpolating the intermediate forme into
    * the left and right formes.
    */
-  getPose(solid: Forme<Specs>, opts: GraphOpts<L, R>): Pose
+  getPose(
+    solid: Forme<Specs>,
+    opts: GraphOpts<L, R>,
+    side: Side | "intermediate",
+  ): Pose
   /**
    * Define how to interpolate the intermediate forme into the left forme.
    * If undefined, the intermediate is assumed to be identical to the left forme.
@@ -150,7 +154,7 @@ class OpPair<
     const entry = this.getEntry(side, specs, opts)
     const options =
       entry.options ?? ({ left: {}, right: {} } as GraphOpts<L, R>)
-    const startPose = getPose(start, options)
+    const startPose = getPose(start, options, side)
 
     // Get the aligned version of the end forme
     const endSpecs = entry[oppositeSide(side)]
@@ -158,7 +162,7 @@ class OpPair<
     const alignedEndGeom = alignPolyhedron(
       endGeom,
       // TODO make an ".align()" method on Formes to simplify this
-      getPose(createForme(endSpecs, endGeom), options),
+      getPose(createForme(endSpecs, endGeom), options, oppositeSide(side)),
       startPose,
     )
     const end = createForme(endSpecs, alignedEndGeom)
@@ -179,7 +183,7 @@ class OpPair<
 
       const alignedInter = alignPolyhedron(
         middleSolid.geom,
-        getPose(middleSolid, options),
+        getPose(middleSolid, options, "intermediate"),
         startPose,
       )
       intermediate = createForme(middleSolid.specs as Specs, alignedInter)

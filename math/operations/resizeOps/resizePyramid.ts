@@ -71,6 +71,34 @@ export const twist = makeOpPair<Capstone>({
   }),
 })
 
+export const dual = makeOpPair<Capstone>({
+  graph: function* () {
+    for (const entry of Capstone.query.where(
+      (c) => c.isPyramid() && c.isMono() && c.isShortened(),
+    )) {
+      yield { left: entry, right: entry }
+    }
+  },
+  intermediate: (entry) =>
+    entry.left.withData({ type: "secondary", count: 2, gyrate: "gyro" }),
+  getPose(forme, $, side) {
+    if (side === "right") {
+      const top = forme.caps()[0]
+      return {
+        origin: forme.origin(),
+        scale: forme.geom.edgeLength(),
+        orientation: [
+          top.normal().clone().negate(),
+          top.boundary().vertices[0],
+        ],
+      }
+    }
+    return getPose(forme)
+  },
+  toLeft: getMorphFunction(),
+  toRight: getMorphFunction(),
+})
+
 function getPose(forme: CapstoneForme): Pose {
   const top = forme.ends()[0]
   return {

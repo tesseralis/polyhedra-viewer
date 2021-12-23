@@ -12,6 +12,7 @@ export const dual = new Operation(
     classicals.dual.right,
     prisms.dual.left,
     prisms.dual.right,
+    pyramids.dual.left,
   ]),
 )
 
