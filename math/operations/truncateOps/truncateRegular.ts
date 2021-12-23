@@ -4,17 +4,6 @@ import { Pose } from "../operationUtils"
 import { makeTruncateTrio } from "./truncateHelpers"
 import { getMorphFunction } from "../morph"
 
-function getRegularPose(
-  forme: ClassicalForme,
-  facet: FacetType = forme.specs.facet(),
-): Pose {
-  return {
-    origin: forme.geom.centroid(),
-    scale: forme.facetFace(facet).distanceToCenter(),
-    orientation: forme.adjacentFacetFaces(facet),
-  }
-}
-
 /**
  * Describes the truncation operations on a Platonic solid.
  */
@@ -44,3 +33,14 @@ export default makeTruncateTrio(
     },
   },
 )
+
+function getRegularPose(
+  forme: ClassicalForme,
+  facet: FacetType = forme.specs.facet(),
+): Pose {
+  return {
+    origin: forme.geom.centroid(),
+    scale: forme.facetFace(facet).distanceToCenter(),
+    orientation: forme.adjacentFacetFaces(facet),
+  }
+}

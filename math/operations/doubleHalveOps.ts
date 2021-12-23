@@ -65,6 +65,7 @@ const doubleHalveComposite = makeOpPair<Composite>({
   graph: function* () {
     for (const entry of Composite.query.where(
       (e) =>
+        e.isAugmented() &&
         e.data.source.isCapstone() &&
         e.data.source.isTriangular() &&
         e.data.source.isPrimary(),
