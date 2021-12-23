@@ -17,37 +17,6 @@ import { GraphGenerator, OpInput, toDirected } from "../operationPairs"
 import removeCap from "./removeCap"
 import addCap, { CrossAxis } from "./addCap"
 
-function hasRotunda(specs: CutPasteSpecs) {
-  if (specs.isCapstone()) {
-    return specs.isSecondary() && specs.isPentagonal()
-  }
-  return false
-}
-
-function getUsingOpts(specs: CutPasteSpecs): CapType[] | null {
-  if (hasRotunda(specs)) {
-    return ["cupola", "rotunda"]
-  } else if (specs.isCapstone()) {
-    return [specs.capType()]
-  }
-  return null
-}
-
-function hasGyrateOpts(specs: CutPasteSpecs) {
-  if (specs.isCapstone()) {
-    if (!specs.isMono()) return false
-    // Gyroelongated capstones are always gyro
-    if (specs.isGyroelongated()) return false
-    // Cupolae and rotundae (that are not the gyrobifastigium) always have gyrate opts
-    if (!specs.isDigonal() && specs.isSecondary()) return true
-    return false
-  }
-  if (specs.isComposite()) {
-    return specs.isGyrateSolid()
-  }
-  return false
-}
-
 export type CutPasteSpecs = Capstone | Composite | Elementary
 
 export interface CapOptions {
@@ -86,10 +55,6 @@ interface CutPastePairInput<S extends PolyhedronSpecs> {
 export interface CutPastePair<S extends PolyhedronSpecs> {
   augment: OpInput<AugOptions, S, AugGraphOpts>
   diminish: OpInput<CapOptions, S, DimGraphOpts>
-}
-
-function defaultGraphOpts() {
-  return {}
 }
 
 /**
@@ -224,4 +189,39 @@ export const augOptionArgs: AugOptionArgs = {
       return wrapForme(forme)
     }
   },
+}
+
+function hasRotunda(specs: CutPasteSpecs) {
+  if (specs.isCapstone()) {
+    return specs.isSecondary() && specs.isPentagonal()
+  }
+  return false
+}
+
+function getUsingOpts(specs: CutPasteSpecs): CapType[] | null {
+  if (hasRotunda(specs)) {
+    return ["cupola", "rotunda"]
+  } else if (specs.isCapstone()) {
+    return [specs.capType()]
+  }
+  return null
+}
+
+function hasGyrateOpts(specs: CutPasteSpecs) {
+  if (specs.isCapstone()) {
+    if (!specs.isMono()) return false
+    // Gyroelongated capstones are always gyro
+    if (specs.isGyroelongated()) return false
+    // Cupolae and rotundae (that are not the gyrobifastigium) always have gyrate opts
+    if (!specs.isDigonal() && specs.isSecondary()) return true
+    return false
+  }
+  if (specs.isComposite()) {
+    return specs.isGyrateSolid()
+  }
+  return false
+}
+
+function defaultGraphOpts() {
+  return {}
 }
