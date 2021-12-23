@@ -10,12 +10,16 @@ import { TwistOpts } from "./operationUtils"
 import { getMorphFunction } from "./morph"
 import { AugmentedPrismForme } from "math/formes/CompositeForme"
 
-const doubleHalve = makeOpPair<Capstone, TwistOpts>({
+// Expand out the faces of primary (pyramid) capstone
+// into its equivalent secondary (cupola) capstone.
+const doubleHalve = makeOpPair<Capstone, TwistOpts, {}>({
   graph: function* () {
     for (const entry of Capstone.query.where(
       (s) => s.isPrimary() && !s.isSnub(),
     )) {
       if (entry.isGyroelongated()) {
+        // Special case for the digonal antiprism (tetrahedron):
+        // It doubles into the square antiprism, which is also a "primary" capstone
         if (entry.isDigonal()) {
           yield {
             left: entry,
@@ -29,11 +33,13 @@ const doubleHalve = makeOpPair<Capstone, TwistOpts>({
             right: entry.withData({ type: "secondary" }),
           }
         } else {
+          // Gyroelong. bicupolae are chiral, so doubling can yield two chiral results.
+          // Have the user specify which one using a twist option.
           for (const twist of twists) {
             yield {
               left: entry,
               right: entry.withData({ type: "secondary", twist }),
-              options: { left: { twist } } as any,
+              options: { left: { twist }, right: {} },
             }
           }
         }
@@ -52,9 +58,10 @@ const doubleHalve = makeOpPair<Capstone, TwistOpts>({
   toLeft: getMorphFunction(endMorphFaces, startMorphFaces),
 })
 
+// Expand out the faces of an augmented triangular prism into
+// the equivalent augmented hexagonal prism.
 const doubleHalveComposite = makeOpPair<Composite>({
   graph: function* () {
-    // TODO will this catch the wrapped source?
     for (const entry of Composite.query.where(
       (e) =>
         e.data.source.isCapstone() &&
@@ -79,7 +86,11 @@ const doubleHalveComposite = makeOpPair<Composite>({
       orientation: forme.orientation(),
     }
   },
-  toLeft: getMorphFunction(compositeEndMorphFaces),
+  toLeft: getMorphFunction((forme: AugmentedPrismForme) => {
+    // The forme is an (mono-/bi-/tri-)augmented triangular prism.
+    // Return everything *except* the ends of the triangular prism
+    return forme.geom.faces.filter((face) => !forme.isEndFace(face))
+  }),
 })
 
 export const double = makeOperation(
@@ -133,12 +144,6 @@ function startMorphFaces(forme: CapstoneForme) {
       .filter((e, i) => i % 2 === 0)
       .flatMap((e) => [e.twinFace(), e.twin().next().twinFace()])
   }
-}
-
-function compositeEndMorphFaces(forme: AugmentedPrismForme) {
-  // The forme is an (mono-/bi-/tri-)augmented triangular prism.
-  // Return everything *except* the ends of the triangular prism
-  return forme.geom.faces.filter((face) => !forme.isEndFace(face))
 }
 
 // TODO these are duplicated from operations/prismOps.
