@@ -67,7 +67,8 @@ export default abstract class BaseForme<Specs extends PolyhedronSpecs> {
     const startPose: Pose = {
       // TODO correctly center diminished polyhedra and capstones
       origin: this.origin(),
-      scale: mean(this.geom.edges.map((e) => e.distanceToCenter())),
+      scale: Math.max(...this.geom.vertices.map((v) => v.distanceToCenter())),
+      // scale: mean(this.geom.edges.map((e) => e.distanceToCenter())),
       orientation: this.orientation(),
     }
 
