@@ -2,7 +2,7 @@ import { Polyhedron } from "math/polyhedra"
 import { mapObject } from "lib/utils"
 import { PolyhedronSpecs, Capstone, Composite } from "specs"
 import { CapOptions, capOptionArgs } from "./cutPasteUtils"
-import { getTransformedVertices } from "../operationUtils"
+import { deduplicateVertices, getTransformedVertices } from "../operationUtils"
 import { makeOperation } from "../Operation"
 import { PolyhedronForme as Forme } from "math/formes"
 import {
@@ -118,6 +118,7 @@ function applyGyrate(polyhedron: Polyhedron, { cap }: CapOptions) {
   // TODO the animation makes the cupola shrink and expand.
   // Make it not do that.
   return {
+    result: deduplicateVertices(mockPolyhedron.withVertices(endVertices)),
     animationData: {
       start: mockPolyhedron,
       endVertices,

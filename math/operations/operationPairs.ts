@@ -190,14 +190,13 @@ class OpPair<
       side === "left" ? [toLeft, toRight] : [toRight, toLeft]
 
     return {
+      result: end,
       animationData: {
         start: intermediate.geom.withVertices(
           toStart(intermediate, start, options),
         ),
         endVertices: toEnd(intermediate, end, options),
       },
-      // TODO can we return a forme here?
-      result: alignedEndGeom,
     }
   }
 }

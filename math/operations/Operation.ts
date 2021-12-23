@@ -2,9 +2,13 @@ import { Vector3 } from "three"
 import { pickBy, mapValues, isMatch, compact, uniq } from "lodash-es"
 
 import { Polyhedron, Face, VertexArg, normalizeVertex } from "math/polyhedra"
-import { deduplicateVertices } from "./operationUtils"
 import { PolyhedronSpecs } from "specs"
-import { PolyhedronForme as Forme, createForme, FaceType } from "math/formes"
+import {
+  PolyhedronForme as Forme,
+  createForme,
+  FaceType,
+  PolyhedronForme,
+} from "math/formes"
 import { find, EntryIters, cartesian } from "lib/utils"
 
 type SelectState = "selected" | "selectable" | undefined
@@ -22,7 +26,7 @@ export interface OpResult {
 }
 
 interface PartialOpResult {
-  result?: Polyhedron
+  result: Polyhedron | PolyhedronForme
   animationData: {
     start: Polyhedron
     endVertices: VertexArg[]
@@ -117,8 +121,8 @@ function normalizeOpResult(
   const { start, endVertices } = animationData
 
   const end = start.withVertices(endVertices)
-  const normedResult = result ?? deduplicateVertices(end)
-  const resultForme = createForme(newSpecs, normedResult)
+  const resultForme =
+    result instanceof Polyhedron ? createForme(newSpecs, result) : result
 
   // Populate the how the faces in the start and end vertices should be colored
   const startColors = getSourceAppearances(start, original)
