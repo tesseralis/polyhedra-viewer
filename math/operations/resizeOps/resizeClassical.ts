@@ -1,54 +1,10 @@
 import { Classical, FacetType, twists, oppositeTwist } from "specs"
-import { makeOpPair, OpPairInput, GraphOpts } from "../operationPairs"
+import { makeOpPair } from "../operationPairs"
 import { FacetOpts, TwistOpts, Pose } from "../operationUtils"
 import { ClassicalForme } from "math/formes"
 import { getMorphFunction } from "../morph"
 
-const getResizedVertices = getMorphFunction(getFacesToMap)
-
-function getClassicalPose(forme: ClassicalForme, facet: FacetType): Pose {
-  const { geom } = forme
-  return {
-    // Always centered on centroid
-    origin: geom.centroid(),
-    // Use the normal of the given face as the first axis
-    scale: geom.edgeLength(),
-    orientation: forme.adjacentFacetFaces(facet),
-  }
-}
-
-type ResizeArgs<L, R> = Omit<OpPairInput<Classical, L, R>, "graph">
-
-function getResizeArgs<L, R>(
-  getFacet: (opts: GraphOpts<L, R>) => FacetType,
-): ResizeArgs<L, R> {
-  return {
-    middle: "right",
-    getPose(forme, options) {
-      return getClassicalPose(forme, getFacet(options))
-    },
-    toLeft: getResizedVertices,
-  }
-}
-
-const resizeArgs = getResizeArgs<{}, FacetOpts>((opts) => opts.right.facet)
-
-// Expansion of truncated to bevelled solids
-export const semiExpand = makeOpPair<Classical, {}, FacetOpts>({
-  ...resizeArgs,
-  graph: function* () {
-    for (const entry of Classical.allWithOperation("truncate")) {
-      yield {
-        left: entry,
-        right: entry.withOperation("bevel"),
-        options: { left: {}, right: { facet: entry.facet() } },
-      }
-    }
-  },
-})
-
 export const expand = makeOpPair<Classical, {}, FacetOpts>({
-  ...resizeArgs,
   graph: function* () {
     for (const entry of Classical.allWithOperation("regular")) {
       yield {
@@ -58,10 +14,14 @@ export const expand = makeOpPair<Classical, {}, FacetOpts>({
       }
     }
   },
+  middle: "right",
+  getPose(forme, options) {
+    return getClassicalPose(forme, options.right.facet)
+  },
+  toLeft: getMorphFunction(),
 })
 
 export const snub = makeOpPair<Classical, TwistOpts, FacetOpts>({
-  ...resizeArgs,
   graph: function* () {
     for (const entry of Classical.allWithOperation("regular")) {
       for (const twist of twists) {
@@ -78,10 +38,14 @@ export const snub = makeOpPair<Classical, TwistOpts, FacetOpts>({
       }
     }
   },
+  middle: "right",
+  getPose(forme, options) {
+    return getClassicalPose(forme, options.right.facet)
+  },
+  toLeft: getMorphFunction(),
 })
 
 export const twist = makeOpPair<Classical, TwistOpts, {}>({
-  ...getResizeArgs(() => "face"),
   graph: function* () {
     for (const entry of Classical.allWithOperation("cantellate")) {
       for (const twist of twists) {
@@ -93,6 +57,15 @@ export const twist = makeOpPair<Classical, TwistOpts, {}>({
       }
     }
   },
+  middle: "right",
+  getPose(forme) {
+    return getClassicalPose(forme, "face")
+  },
+  toLeft: getMorphFunction((result) => {
+    // for a twist operation, the result is a cantellated solid,
+    // so track all facet-faces.
+    return [...result.facetFaces("face"), ...result.facetFaces("vertex")]
+  }),
 })
 
 export const dual = makeOpPair<Classical>({
@@ -120,12 +93,39 @@ export const dual = makeOpPair<Classical>({
       orientation: [vertex, vertex.adjacentVertices()[0]],
     }
   },
-  toLeft: getResizedVertices,
-  toRight: getResizedVertices,
+  toLeft: getMorphFunction(),
+  toRight: getMorphFunction(),
 })
 
-function getCantellatedMidradius(forme: ClassicalForme) {
-  return forme.edgeFace().distanceToCenter()
+// Expansion of truncated to bevelled solids
+export const semiExpand = makeOpPair<Classical, {}, FacetOpts>({
+  graph: function* () {
+    for (const entry of Classical.allWithOperation("truncate")) {
+      yield {
+        left: entry,
+        right: entry.withOperation("bevel"),
+        options: { left: {}, right: { facet: entry.facet() } },
+      }
+    }
+  },
+  middle: "right",
+  getPose(forme, options) {
+    return getClassicalPose(forme, options.right.facet)
+  },
+  // If semi-contracting to a truncated solid,
+  // use the faces corresponding to the main facet
+  toLeft: getMorphFunction((end) => end.facetFaces(end.specs.facet())),
+})
+
+function getClassicalPose(forme: ClassicalForme, facet: FacetType): Pose {
+  const { geom } = forme
+  return {
+    // Always centered on centroid
+    origin: geom.centroid(),
+    // Use the normal of the given face as the first axis
+    scale: geom.edgeLength(),
+    orientation: forme.adjacentFacetFaces(facet),
+  }
 }
 
 function getDualPose(
@@ -143,18 +143,6 @@ function getDualPose(
   }
 }
 
-// get the result faces to map the start faces too
-function getFacesToMap(result: ClassicalForme) {
-  // If contracting to a regular solid, use all faces
-  if (result.specs.isRegular()) {
-    return result.geom.faces
-  }
-  // If semi-contracting to a truncated solid,
-  // use the faces corresponding to the main facet
-  if (result.specs.isTruncated()) {
-    return result.facetFaces(result.specs.facet())
-  }
-  // for a twist operation, the result is a cantellated solid,
-  // so return all facet-faces.
-  return [...result.facetFaces("face"), ...result.facetFaces("vertex")]
+function getCantellatedMidradius(forme: ClassicalForme) {
+  return forme.edgeFace().distanceToCenter()
 }
