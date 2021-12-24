@@ -6,6 +6,7 @@ import { fromSpecs } from "math/formes"
 
 import { escape } from "lib/utils"
 import { useFrame } from "@react-three/fiber"
+import { Text } from "@react-three/drei"
 // FIXME edit these imports
 import getFormeColors, {
   mixColor,
@@ -47,17 +48,36 @@ function PolyhedronEntry({ entry, position, navigate }: any) {
     return color
   })
 
+  const textColor = isDupe ? "#444" : "#aaa"
+
   return (
-    <group ref={ref} position={position}>
-      <PolyhedronModel
-        onClick={() => navigate.push(`/${escape(entry.name())}`)}
-        onPointerMove={() => setHovered(true)}
-        onPointerOut={() => setHovered(false)}
-        value={geom.solidData}
-        appearance={faceColors}
-        config={pick(config, ["showFaces", "showEdges", "showInnerFaces"])}
-        opacity={isDupe ? 0.33 : 1}
-      />
+    <group position={position}>
+      <Text
+        color={textColor}
+        fontSize={0.3}
+        maxWidth={2}
+        textAlign="center"
+        position={[0, -1.5, 0]}
+      >
+        {forme.specs.name()}
+      </Text>
+      {/* TODO duped johnson solids don't have a symbol */}
+      {!isDupe && (
+        <Text color={textColor} fontSize={0.75} position={[-1, -0.5, 1]}>
+          {forme.specs.conwaySymbol()}
+        </Text>
+      )}
+      <group ref={ref}>
+        <PolyhedronModel
+          onClick={() => navigate.push(`/${escape(entry.name())}`)}
+          onPointerMove={() => setHovered(true)}
+          onPointerOut={() => setHovered(false)}
+          value={geom.solidData}
+          appearance={faceColors}
+          config={pick(config, ["showFaces", "showEdges", "showInnerFaces"])}
+          opacity={isDupe ? 0.33 : 1}
+        />
+      </group>
     </group>
   )
 }
