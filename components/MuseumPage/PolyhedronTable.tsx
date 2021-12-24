@@ -57,7 +57,8 @@ function PolyhedronEntry({ entry, position, navigate }: any) {
         fontSize={0.3}
         maxWidth={2}
         textAlign="center"
-        position={[0, -1.5, 0]}
+        anchorY="top"
+        position={[0, -1.25, 0]}
       >
         {forme.specs.name()}
       </Text>
