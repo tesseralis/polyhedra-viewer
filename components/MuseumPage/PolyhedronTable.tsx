@@ -53,12 +53,12 @@ function PolyhedronEntry({ entry, position, navigate }: any) {
   return (
     <group position={position}>
       <Text
-        color={textColor}
+        position={[0, -1.125, 0]}
         fontSize={0.3}
-        maxWidth={2}
+        maxWidth={2.75}
+        color={textColor}
         textAlign="center"
         anchorY="top"
-        position={[0, -1.25, 0]}
       >
         {forme.specs.name()}
       </Text>
