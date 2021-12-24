@@ -41,7 +41,7 @@ export default function GroupLayout({
           <Canvas>
             <OrthographicCamera makeDefault position={position} zoom={zoom} />
             <directionalLight position={[0, 0.5, 1]} />
-            {/* <TrackballControls enabled noRotate panSpeed={5} /> */}
+            {/* <MapControls /> */}
             <group>{children(router)}</group>
           </Canvas>
         </div>
