@@ -2,9 +2,6 @@ import { Capstone } from "specs"
 import { makeOpPair } from "../operationPairs"
 import { Pose, FacetOpts } from "../operationUtils"
 import { CapstoneForme } from "math/formes"
-import { getMorphFunction } from "../morph"
-
-const morph = getMorphFunction()
 
 export const expand = makeOpPair<Capstone, {}, FacetOpts>({
   graph: function* () {
@@ -29,7 +26,6 @@ export const expand = makeOpPair<Capstone, {}, FacetOpts>({
   },
   intermediate: "right",
   getPose,
-  toLeft: morph,
 })
 
 export const dual = makeOpPair<Capstone>({
@@ -48,8 +44,6 @@ export const dual = makeOpPair<Capstone>({
       gyrate: "ortho",
     }),
   getPose,
-  toLeft: morph,
-  toRight: morph,
 })
 
 function getPose(forme: CapstoneForme): Pose {

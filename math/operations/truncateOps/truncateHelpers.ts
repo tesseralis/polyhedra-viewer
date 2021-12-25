@@ -1,17 +1,11 @@
-import { VertexArg } from "math/polyhedra"
 import Classical, { Operation as OpName } from "specs/Classical"
-import { makeOpPair } from "../operationPairs"
+import { MorphDefinition, makeOpPair } from "../operationPairs"
 import { Pose } from "../operationUtils"
 import { ClassicalForme } from "math/formes"
 
 interface TrioOpArgs<Op, Opts = any> {
   operation: Op
-  // pose(solid: ClassicalForme, opts: Opts): Pose
-  transformer(
-    solid: ClassicalForme,
-    result: ClassicalForme,
-    opts: Opts,
-  ): VertexArg[]
+  transformer: MorphDefinition<Classical>
   options?(entry: Classical): Opts
 }
 

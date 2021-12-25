@@ -1,6 +1,6 @@
 import { isMatch, pickBy } from "lodash-es"
 import { PolyhedronSpecs } from "specs"
-import { VertexArg } from "math/polyhedra"
+import { Face, Vertex } from "math/polyhedra"
 import {
   OpArgs,
   SolidArgs,
@@ -9,6 +9,7 @@ import {
 import { Pose, alignPolyhedron, getGeometry } from "./operationUtils"
 import BaseForme from "math/formes/BaseForme"
 import { PolyhedronForme as Forme, createForme } from "math/formes"
+import { getMorphFunction } from "./morph"
 
 /**
  * Defines a pair of inverse operations based on the given parameters.
@@ -40,20 +41,20 @@ export interface OpPairInput<Specs extends PolyhedronSpecs, L = {}, R = L> {
    * Define how to interpolate the intermediate forme into the left forme.
    * If undefined, the intermediate is assumed to be identical to the left forme.
    */
-  toLeft?(
-    start: Forme<Specs>,
-    end: Forme<Specs>,
-    opts: GraphOpts<L, R>,
-  ): VertexArg[]
+  toLeft?: MorphDefinition<Specs>
   /**
    * Define how to interpolate the intermediate forme into the right forme.
    * If undefined, the intermediate is assumed to be identical to the right forme.
    */
-  toRight?(
-    start: Forme<Specs>,
-    end: Forme<Specs>,
-    opts: GraphOpts<L, R>,
-  ): VertexArg[]
+  toRight?: MorphDefinition<Specs>
+}
+
+export interface MorphDefinition<Specs extends PolyhedronSpecs> {
+  intermediateFaces?(forme: Forme<Specs>): Face[]
+  sideFacets?(
+    forme: Forme<Specs>,
+    intermediate: Forme<Specs>,
+  ): (Face | Vertex)[]
 }
 
 export type GraphGenerator<Specs, L, R> = Generator<GraphEntry<Specs, L, R>>
@@ -143,11 +144,11 @@ class OpPair<
   }
 
   apply<S extends Side>(side: S, start: Forme<Specs>, opts: Opts<S, L, R>) {
-    const {
+    let {
       intermediate: getIntermediate,
       getPose,
-      toLeft = defaultGetter,
-      toRight = defaultGetter,
+      toLeft = {},
+      toRight = {},
     } = this.inputs
 
     // Alternate strategy that keeps things consistent
@@ -199,17 +200,26 @@ class OpPair<
       intermediate = createForme(middleSolid.specs as Specs, alignedInter)
     }
 
+    const leftTransformer =
+      getIntermediate === "left"
+        ? defaultGetter
+        : getMorphFunction(toLeft.sideFacets, toLeft.intermediateFaces)
+    const rightTransformer =
+      getIntermediate === "right"
+        ? defaultGetter
+        : getMorphFunction(toRight.sideFacets, toRight.intermediateFaces)
+
     // Disambiguate the interpolators to the start and end based on direction
-    const [toStart, toEnd] =
-      side === "left" ? [toLeft, toRight] : [toRight, toLeft]
+    const [startFn, endFn] =
+      side === "left"
+        ? [leftTransformer, rightTransformer]
+        : [rightTransformer, leftTransformer]
 
     return {
       result: end,
       animationData: {
-        start: intermediate.geom.withVertices(
-          toStart(intermediate, start, options),
-        ),
-        endVertices: toEnd(intermediate, end, options),
+        start: intermediate.geom.withVertices(startFn(intermediate, start)),
+        endVertices: endFn(intermediate, end),
       },
     }
   }

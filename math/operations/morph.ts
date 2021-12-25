@@ -3,7 +3,7 @@ import { getCyclic } from "lib/utils"
 import { Face, Vertex } from "math/polyhedra"
 import { PolyhedronForme } from "math/formes"
 
-type GetFacets<Forme> = (forme: Forme) => (Face | Vertex)[]
+type GetFacets<Forme> = (forme: Forme, start: Forme) => (Face | Vertex)[]
 type GetFaces<Forme> = (forme: Forme) => Face[]
 
 /**
@@ -18,7 +18,7 @@ export function getMorphFunction<Forme extends PolyhedronForme>(
   return function getMorphedVertices(start: Forme, end: Forme) {
     const facePairs = getFacetPairs(
       startFacesToMorph(start),
-      endFacetsToMorph(end),
+      endFacetsToMorph(end, start),
     )
 
     // create a map from the initial vertices to the end vertices

@@ -2,7 +2,6 @@ import { Classical, FacetType, twists, oppositeTwist } from "specs"
 import { makeOpPair } from "../operationPairs"
 import { FacetOpts, TwistOpts, Pose } from "../operationUtils"
 import { ClassicalForme } from "math/formes"
-import { getMorphFunction } from "../morph"
 
 export const expand = makeOpPair<Classical, {}, FacetOpts>({
   graph: function* () {
@@ -18,7 +17,6 @@ export const expand = makeOpPair<Classical, {}, FacetOpts>({
   getPose(forme, options) {
     return getClassicalPose(forme, options.right.facet)
   },
-  toLeft: getMorphFunction(),
 })
 
 export const snub = makeOpPair<Classical, TwistOpts, FacetOpts>({
@@ -42,7 +40,6 @@ export const snub = makeOpPair<Classical, TwistOpts, FacetOpts>({
   getPose(forme, options) {
     return getClassicalPose(forme, options.right.facet)
   },
-  toLeft: getMorphFunction(),
 })
 
 export const twist = makeOpPair<Classical, TwistOpts, {}>({
@@ -61,11 +58,13 @@ export const twist = makeOpPair<Classical, TwistOpts, {}>({
   getPose(forme) {
     return getClassicalPose(forme, "face")
   },
-  toLeft: getMorphFunction((result) => {
+  toLeft: {
     // for a twist operation, the result is a cantellated solid,
     // so track all facet-faces.
-    return [...result.facetFaces("face"), ...result.facetFaces("vertex")]
-  }),
+    sideFacets(result) {
+      return [...result.facetFaces("face"), ...result.facetFaces("vertex")]
+    },
+  },
 })
 
 export const dual = makeOpPair<Classical>({
@@ -93,8 +92,6 @@ export const dual = makeOpPair<Classical>({
       orientation: [vertex, vertex.adjacentVertices()[0]],
     }
   },
-  toLeft: getMorphFunction(),
-  toRight: getMorphFunction(),
 })
 
 // Expansion of truncated to bevelled solids
@@ -114,7 +111,11 @@ export const semiExpand = makeOpPair<Classical, {}, FacetOpts>({
   },
   // If semi-contracting to a truncated solid,
   // use the faces corresponding to the main facet
-  toLeft: getMorphFunction((end) => end.facetFaces(end.specs.facet())),
+  toLeft: {
+    sideFacets(end) {
+      return end.facetFaces(end.specs.facet())
+    },
+  },
 })
 
 function getClassicalPose(forme: ClassicalForme, facet: FacetType): Pose {

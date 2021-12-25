@@ -30,6 +30,8 @@ interface PartialOpResult {
   animationData: {
     start: Polyhedron
     endVertices: VertexArg[]
+    startAppearance?: (FaceType | undefined)[]
+    endAppearance?: (FaceType | undefined)[]
   }
 }
 
@@ -118,15 +120,15 @@ function normalizeOpResult(
   original: Forme,
 ): OpResult {
   const { result, animationData } = opResult
-  const { start, endVertices } = animationData
+  const { start, endVertices, startAppearance, endAppearance } = animationData
 
   const end = start.withVertices(endVertices)
   const resultForme =
     result instanceof Polyhedron ? createForme(newSpecs, result) : result
 
   // Populate the how the faces in the start and end vertices should be colored
-  const startColors = getSourceAppearances(start, original)
-  const endColors = getSourceAppearances(end, resultForme)
+  const startColors = startAppearance ?? getSourceAppearances(start, original)
+  const endColors = endAppearance ?? getSourceAppearances(end, resultForme)
 
   return {
     result: resultForme,

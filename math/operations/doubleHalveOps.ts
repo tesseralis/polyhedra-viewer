@@ -7,7 +7,6 @@ import { makeOperation } from "./Operation"
 import { CapstoneForme } from "math/formes"
 import { Edge, Face } from "math/polyhedra"
 import { TwistOpts } from "./operationUtils"
-import { getMorphFunction } from "./morph"
 import { AugmentedPrismForme } from "math/formes/CompositeForme"
 
 // Expand out the faces of primary (pyramid) capstone
@@ -56,7 +55,10 @@ const doubleHalve = makeOpPair<Capstone, TwistOpts, {}>({
   getPose(forme, { left: { twist } }) {
     return getCapstonePose(forme, twist)
   },
-  toLeft: getMorphFunction(endMorphFaces, startMorphFaces),
+  toLeft: {
+    sideFacets: endMorphFaces,
+    intermediateFaces: startMorphFaces,
+  },
 })
 
 // Expand out the faces of an augmented triangular prism into
@@ -88,11 +90,11 @@ const doubleHalveComposite = makeOpPair<Composite>({
       orientation: forme.orientation(),
     }
   },
-  toLeft: getMorphFunction((forme: AugmentedPrismForme) => {
-    // The forme is an (mono-/bi-/tri-)augmented triangular prism.
-    // Return everything *except* the ends of the triangular prism
-    return forme.geom.faces.filter((face) => !forme.isEndFace(face))
-  }),
+  toLeft: {
+    sideFacets(forme: AugmentedPrismForme) {
+      return forme.geom.faces.filter((face) => !forme.isEndFace(face))
+    },
+  },
 })
 
 export const double = makeOperation(

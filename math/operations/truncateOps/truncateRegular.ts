@@ -2,7 +2,6 @@ import { FacetType } from "specs"
 import { ClassicalForme } from "math/formes"
 import { Pose } from "../operationUtils"
 import { makeTruncateTrio } from "./truncateHelpers"
-import { getMorphFunction } from "../morph"
 
 /**
  * Describes the truncation operations on a Platonic solid.
@@ -12,7 +11,7 @@ export default makeTruncateTrio(
   {
     left: {
       operation: "regular",
-      transformer: getMorphFunction((forme) => forme.geom.vertices),
+      transformer: { sideFacets: (forme) => forme.geom.vertices },
     },
     middle: { operation: "truncate" },
     right: {
@@ -20,15 +19,12 @@ export default makeTruncateTrio(
       // The rectified version is the only thing we need to choose an option for
       // when we move out of it
       options: (entry) => ({ facet: entry.facet() }),
-      transformer(start, end) {
-        // Track the facet type that's *opposite* of the intermediate's facet
-        // (i.e. a truncated cube should track the triangular faces)
-        const morphToRectified = getMorphFunction((endForme) =>
-          endForme.facetFaces(
+      transformer: {
+        sideFacets(endForme, start) {
+          return endForme.facetFaces(
             start.specs.facet() === "face" ? "vertex" : "face",
-          ),
-        )
-        return morphToRectified(start, end)
+          )
+        },
       },
     },
   },
