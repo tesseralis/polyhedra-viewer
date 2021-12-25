@@ -265,20 +265,21 @@ class SnubCapstoneForme extends CapstoneForme {
     }
   }
 
-  faceAppearance(face: Face) {
-    const base = this.specs.data.base
-    if (this.isTop(face)) {
-      return CapstoneFace.capTop(base)
-    }
+  // FIXME this breaks "twist"
+  //   faceAppearance(face: Face) {
+  //     const base = this.specs.data.base
+  //     if (this.isTop(face)) {
+  //       return CapstoneFace.capTop(base)
+  //     }
 
-    const endVertices = this.ends().flatMap((end) => end.vertices)
-    return CapstoneFace.capSide(
-      base,
-      face.vertices.map((v) => {
-        return v.inSet(endVertices) ? "top" : "base"
-      }),
-    )
-  }
+  //     const endVertices = this.ends().flatMap((end) => end.vertices)
+  //     return CapstoneFace.capSide(
+  //       base,
+  //       face.vertices.map((v) => {
+  //         return v.inSet(endVertices) ? "top" : "base"
+  //       }),
+  //     )
+  //   }
 }
 
 class MonoCapstoneForme extends CapstoneForme {
