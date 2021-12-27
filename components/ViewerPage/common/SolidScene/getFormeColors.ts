@@ -146,7 +146,8 @@ export function getFaceColor(faceType: FaceType): FaceColor {
             }
           })
         }
-        throw new Error(`Invalid numsides for side face`)
+        return new Color()
+        // throw new Error(`Invalid numsides for side face`)
       }
     }
   }

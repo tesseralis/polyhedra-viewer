@@ -1,9 +1,10 @@
-import { createForme } from "math/formes"
 import { Capstone } from "specs"
 import { makeOpPair } from "../operationPairs"
 import { getGeometry } from "../operationUtils"
 import { rawTruncate } from "./truncateHelpers"
 import { CapstoneForme } from "math/formes"
+import { Face } from "math/polyhedra"
+import { CapstoneFace } from "math/formes/FaceType"
 
 export const rectify = makeOpPair<Capstone>({
   graph: function* () {
@@ -29,8 +30,12 @@ export const rectify = makeOpPair<Capstone>({
       orientation: forme.orientation(),
     }
   },
-  //   toLeft: getMorphFunction(),
-  //   toRight: getMorphFunction(),
+  toLeft: {
+    sideFacets: (forme) => forme.geom.vertices,
+  },
+  toRight: {
+    sideFacets: (forme) => forme.endBoundaries()[1].adjacentFaces(),
+  },
 })
 
 class TruncatedPyramidForme extends CapstoneForme {
@@ -45,5 +50,9 @@ class TruncatedPyramidForme extends CapstoneForme {
 
   *queryBottoms() {
     yield* this.geom.facesWithNumSides(this.specs.data.base * 2)
+  }
+
+  faceAppearance(face: Face) {
+    return CapstoneFace.capTop(this.specs.data.base)
   }
 }

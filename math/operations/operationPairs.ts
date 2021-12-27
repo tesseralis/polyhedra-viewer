@@ -349,6 +349,7 @@ function getMorphedAppearances<F extends Forme>(
     getMorphedVertices(interm, side, morph),
   )
 
+  // console.log(morphedGeom.vertices.map((v) => v?.vec?.toArray()))
   return morphedGeom.faces.map((f) => {
     const defaultValue = interm.faceAppearance(interm.geom.faces[f.index])
     const matchingFacet = faceMapping[f.index]
