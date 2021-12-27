@@ -333,11 +333,12 @@ function getMorphedVertices<F extends Forme>(
 function getMorphedAppearances<F extends Forme>(
   interm: F,
   side: F,
-  {
+  morph: MorphDefinition<F>,
+) {
+  const {
     sideFacets = (f) => f.geom.faces,
     intermediateFaces = (f) => f.geom.faces,
-  }: MorphDefinition<F>,
-) {
+  } = morph
   const facePairs = getFacetPairs(
     intermediateFaces(interm),
     sideFacets(side, interm),
@@ -347,17 +348,21 @@ function getMorphedAppearances<F extends Forme>(
     faceMapping[face.index] = facet
   }
 
-  // FIXME does not work on antiprismatic
-  return interm.geom.faces.map((f) => {
+  // TODO handle normalizing stuff
+  const morphedGeom = interm.geom.withVertices(
+    getMorphedVertices(interm, side, morph),
+  )
+
+  return morphedGeom.faces.map((f) => {
     const matchingFacet = faceMapping[f.index]
     // If this face isn't matched to anything, or is tapered into a vertex, it has no intrinsic appearance
     if (!matchingFacet || matchingFacet instanceof Vertex) {
       // If it doesn't map to anything in the mapping,
       // try to find a face that matches the face's normal *exactly*
+      if (f.edges.filter((e) => e.isValid()).length < 3) return undefined
       const conormalFace = side.geom.faces.find((f2) =>
         vecEquals(f.normal(), f2.normal()),
       )
-      // FIXME increment/decrement antiprism broken
       return conormalFace ? side.faceAppearance(conormalFace) : undefined
     }
     const appearance = side.faceAppearance(matchingFacet)
