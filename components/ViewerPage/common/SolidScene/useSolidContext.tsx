@@ -11,7 +11,7 @@ export default function useSolidContext() {
   const {
     solidData,
     isTransitioning,
-    faceColors = [],
+    appearance = [],
   } = TransitionCtx.useState()
   const { operation, options = {} } = OperationCtx.useState()
 
@@ -39,11 +39,8 @@ export default function useSolidContext() {
 
   // Colors when animation is being applied
   const transitionColors = useMemo(() => {
-    // FIXME use the intermediate's material
-    return (
-      isTransitioning && faceColors.map((color) => ({ color, material: 0 }))
-    )
-  }, [faceColors, isTransitioning])
+    return isTransitioning && appearance
+  }, [appearance, isTransitioning])
   const geom: Polyhedron = polyhedron.geom
 
   // Colors when in operation mode and hit options are being selected

@@ -18,7 +18,9 @@ import { Polyhedron, SolidData } from "math/polyhedra"
 import { AnimationData } from "math/operations"
 import {
   FaceColor,
-  getFaceAppearance,
+  getFaceColor,
+  getFaceMaterial,
+  Appearance,
 } from "components/ViewerPage/common/SolidScene/getFormeColors"
 
 function interpFaceColors(col1: FaceColor, col2: FaceColor, t: number) {
@@ -45,15 +47,15 @@ const defaultState = {
 }
 interface State {
   solidData?: SolidData
-  faceColors?: Color[]
+  appearance?: Appearance[]
   isTransitioning: boolean
 }
 const InterpModel = createHookedContext<State, "set" | "reset">(
   {
     reset: () => () => defaultState,
-    set: (solidData, faceColors) => () => ({
+    set: (solidData, appearance) => () => ({
       solidData,
-      faceColors,
+      appearance,
       isTransitioning: !!solidData,
     }),
   },
@@ -89,13 +91,18 @@ function InnerProvider({ children }: ChildrenProp) {
       // TODO I *think* we have to do this for duals;
       // remove this when we have some way to fill the duals in.
       const startFaceColors = startColors.map((c) =>
-        c ? getFaceAppearance(c) : new Color(),
+        c ? getFaceColor(c) : new Color(),
       )
       const endFaceColors = endColors.map((c) =>
-        c ? getFaceAppearance(c) : new Color(),
+        c ? getFaceColor(c) : new Color(),
       )
 
-      anim.set(start.solidData, startFaceColors)
+      const materials = startColors.map((c) => (c ? getFaceMaterial(c) : 0))
+
+      anim.set(
+        start.solidData,
+        startFaceColors.map((color, i) => ({ color, material: materials[i] })),
+      )
       function lerpColors(t: number) {
         return startFaceColors.map((color, i) =>
           interpFaceColors(color, endFaceColors[i], t),
@@ -119,7 +126,10 @@ function InnerProvider({ children }: ChildrenProp) {
                 new Vector3().lerpVectors(v.vec, endVertices[i], t),
               ),
             },
-            lerpColors(t),
+            lerpColors(t).map((color, i) => ({
+              color,
+              material: materials[i],
+            })),
           )
         },
       )
