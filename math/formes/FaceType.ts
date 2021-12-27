@@ -48,6 +48,7 @@ export const ClassicalFace = {
 interface BaseCapstone {
   type: "capstone"
   base: 2 | PrimaryPolygon
+  faceType: string
 }
 
 interface CapstoneElongation extends BaseCapstone {
@@ -69,11 +70,16 @@ interface CapstoneCapSide extends BaseCapstone {
   sideColors: ("top" | "middle" | "base")[]
 }
 
+interface CapstoneCapSideSecondary extends BaseCapstone {
+  faceType: "secondary"
+}
+
 type CapstoneFaceType =
   | CapstoneElongation
   | CapstonePrismBase
   | CapstoneCapTop
   | CapstoneCapSide
+  | CapstoneCapSideSecondary
 
 export const CapstoneFace = {
   side(base: 2 | PrimaryPolygon, elongation: PrismaticType): CapstoneFaceType {
@@ -100,6 +106,14 @@ export const CapstoneFace = {
       faceType: "side",
       base,
       sideColors,
+    }
+  },
+
+  capSecondary(base: 2 | PrimaryPolygon): CapstoneFaceType {
+    return {
+      type: "capstone",
+      faceType: "secondary",
+      base,
     }
   },
 }

@@ -1,4 +1,4 @@
-import React, { ButtonHTMLAttributes } from "react"
+import { ButtonHTMLAttributes } from "react"
 import { useStyle, scales } from "styles"
 
 import { TransitionCtx, PolyhedronCtx } from "components/ViewerPage/context"

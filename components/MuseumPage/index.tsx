@@ -1,6 +1,6 @@
+import { css } from "@emotion/css"
 import { Canvas } from "@react-three/fiber"
 import { useRouter } from "next/router"
-import { useStyle } from "styles"
 import { tableSections } from "lib/tables"
 import PolyhedronTable from "./PolyhedronTable"
 import { OrthographicCamera, TrackballControls } from "@react-three/drei"
@@ -11,13 +11,14 @@ const subsecSpacing = 25
 // TODO why is this so slow to load??
 export default function MuseumScene() {
   const router = useRouter()
-  const style = useStyle({
-    position: "absolute",
-    inset: 0,
-    backgroundColor: "#111",
-  })
   return (
-    <div {...style()}>
+    <div
+      css={css`
+        position: absolute;
+        inset: 0;
+        background-color: #111;
+      `}
+    >
       <Canvas>
         <OrthographicCamera makeDefault position={[0, 0, 75]}>
           {[]}

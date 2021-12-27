@@ -2,7 +2,6 @@ import { prismaticTypes, Capstone } from "specs"
 import { makeOpPair } from "./operationPairs"
 import { Cap, Face, Edge } from "math/polyhedra"
 import { CapstoneForme } from "math/formes"
-import { getMorphFunction } from "./morph"
 import { makeOperation } from "./Operation"
 
 const incDec = makeOpPair<Capstone>({
@@ -60,7 +59,10 @@ const incDec = makeOpPair<Capstone>({
       orientation: [top, crossAxis],
     }
   },
-  toLeft: getMorphFunction(getEndFacesToMap, getStartFacesToMap),
+  toLeft: {
+    sideFacets: getEndFacesToMap,
+    intermediateFaces: getStartFacesToMap,
+  },
 })
 
 export const increment = makeOperation("increment", incDec.left)

@@ -1,14 +1,12 @@
-import { isMatch, pickBy } from "lodash-es"
+import { isMatch, pickBy, minBy, range } from "lodash-es"
+import { getCyclic } from "lib/utils"
 import { PolyhedronSpecs } from "specs"
-import { VertexArg } from "math/polyhedra"
-import {
-  OpArgs,
-  SolidArgs,
-  GraphEntry as DirectedGraphEntry,
-} from "./Operation"
+import { Face, Vertex } from "math/polyhedra"
+import { OpArgs, GraphEntry as DirectedGraphEntry } from "./Operation"
 import { Pose, alignPolyhedron, getGeometry } from "./operationUtils"
 import BaseForme from "math/formes/BaseForme"
 import { PolyhedronForme as Forme, createForme } from "math/formes"
+import { vecEquals } from "math/geom"
 
 /**
  * Defines a pair of inverse operations based on the given parameters.
@@ -40,20 +38,17 @@ export interface OpPairInput<Specs extends PolyhedronSpecs, L = {}, R = L> {
    * Define how to interpolate the intermediate forme into the left forme.
    * If undefined, the intermediate is assumed to be identical to the left forme.
    */
-  toLeft?(
-    start: Forme<Specs>,
-    end: Forme<Specs>,
-    opts: GraphOpts<L, R>,
-  ): VertexArg[]
+  toLeft?: MorphDefinition<Forme<Specs>>
   /**
    * Define how to interpolate the intermediate forme into the right forme.
    * If undefined, the intermediate is assumed to be identical to the right forme.
    */
-  toRight?(
-    start: Forme<Specs>,
-    end: Forme<Specs>,
-    opts: GraphOpts<L, R>,
-  ): VertexArg[]
+  toRight?: MorphDefinition<Forme<Specs>>
+}
+
+export interface MorphDefinition<F extends Forme> {
+  intermediateFaces?(forme: F): Face[]
+  sideFacets?(forme: F, intermediate: F): (Face | Vertex)[]
 }
 
 export type GraphGenerator<Specs, L, R> = Generator<GraphEntry<Specs, L, R>>
@@ -143,12 +138,22 @@ class OpPair<
   }
 
   apply<S extends Side>(side: S, start: Forme<Specs>, opts: Opts<S, L, R>) {
-    const {
+    let {
       intermediate: getIntermediate,
       getPose,
-      toLeft = defaultGetter,
-      toRight = defaultGetter,
+      toLeft = {},
+      toRight = {},
     } = this.inputs
+
+    // Alternate strategy that keeps things consistent
+    // maybe a possible option?
+    // function getPose(forme: any, options: any, side: any) {
+    //   return {
+    //     ..._getPose(forme, options, side),
+    //     scale: mean(forme.geom.edges.map((e: any) => e.distanceToCenter())),
+    //     origin: forme.geom.centroid(),
+    //   }
+    // }
 
     const specs = start.specs as Specs
     const entry = this.getEntry(side, specs, opts)
@@ -189,17 +194,20 @@ class OpPair<
       intermediate = createForme(middleSolid.specs as Specs, alignedInter)
     }
 
-    // Disambiguate the interpolators to the start and end based on direction
-    const [toStart, toEnd] =
+    const [startMorph, endMorph] =
       side === "left" ? [toLeft, toRight] : [toRight, toLeft]
+
+    // Get the appearances of the intermediate faces
 
     return {
       result: end,
       animationData: {
         start: intermediate.geom.withVertices(
-          toStart(intermediate, start, options),
+          getMorphedVertices(intermediate, start, startMorph),
         ),
-        endVertices: toEnd(intermediate, end, options),
+        endVertices: getMorphedVertices(intermediate, end, endMorph),
+        startAppearance: getMorphedAppearances(intermediate, start, startMorph),
+        endAppearance: getMorphedAppearances(intermediate, end, endMorph),
       },
     }
   }
@@ -294,12 +302,121 @@ export function toDirected<S extends Side, Specs, L, R>(
   }
 }
 
-function defaultGetter<Specs extends PolyhedronSpecs>({
-  geom,
-}: SolidArgs<Specs>) {
-  return geom.vertices
-}
-
 function oppositeSide(side: Side) {
   return side === "left" ? "right" : "left"
+}
+
+function getMorphedVertices<F extends Forme>(
+  interm: F,
+  side: F,
+  {
+    sideFacets = (f) => f.geom.faces,
+    intermediateFaces = (f) => f.geom.faces,
+  }: MorphDefinition<F>,
+) {
+  const facePairs = getFacetPairs(
+    intermediateFaces(interm),
+    sideFacets(side, interm),
+  )
+  const mapping: Vertex[] = []
+  for (const [face, facet] of facePairs) {
+    for (const [v1, v2] of getVertexPairs(face, facet)) {
+      mapping[v1.index] = v2
+    }
+  }
+  const res = interm.geom.vertices.map((v) => {
+    return mapping[v.index]
+  })
+  return res
+}
+
+function getMorphedAppearances<F extends Forme>(
+  interm: F,
+  side: F,
+  morph: MorphDefinition<F>,
+) {
+  const {
+    sideFacets = (f) => f.geom.faces,
+    intermediateFaces = (f) => f.geom.faces,
+  } = morph
+  const facePairs = getFacetPairs(
+    intermediateFaces(interm),
+    sideFacets(side, interm),
+  )
+  const faceMapping: (Face | Vertex)[] = []
+  for (const [face, facet] of facePairs) {
+    faceMapping[face.index] = facet
+  }
+
+  // TODO handle normalizing stuff
+  const morphedGeom = interm.geom.withVertices(
+    getMorphedVertices(interm, side, morph),
+  )
+
+  return morphedGeom.faces.map((f) => {
+    const defaultValue = interm.faceAppearance(interm.geom.faces[f.index])
+    const matchingFacet = faceMapping[f.index]
+    // If this face isn't matched to anything, or is tapered into a vertex, it has no intrinsic appearance
+    if (!matchingFacet || matchingFacet instanceof Vertex) {
+      // If it doesn't map to anything in the mapping,
+      // try to find a face that matches the face's normal *exactly*
+      if (f.edges.filter((e) => e.isValid()).length < 3) return defaultValue
+      const conormalFace = side.geom.faces.find((f2) =>
+        vecEquals(f.normal(), f2.normal()),
+      )
+      return conormalFace ? side.faceAppearance(conormalFace) : defaultValue
+    }
+    const appearance = side.faceAppearance(matchingFacet)
+    if (appearance.type !== "capstone" || appearance.faceType !== "side") {
+      return appearance
+    }
+    // If there are different vertex appearances, map them based on index
+    const offset = getPartnerVertexIndex(f, matchingFacet)
+    return {
+      ...appearance,
+      sideColors: f.vertices.map((v, i) => {
+        return getCyclic(appearance.sideColors, i + offset)
+      }),
+    }
+  })
+}
+
+// Find the faces in the first set that map onto the second set
+function getFacetPairs(start: Face[], end: (Face | Vertex)[]) {
+  return end.map((facet) => {
+    return [findFacePartner(facet, start), facet] as const
+  })
+}
+
+// Find the partner facet
+function findFacePartner(facet: Face | Vertex, candidates: Face[]) {
+  return minBy(candidates, (face2) => {
+    return facet.normal().angleTo(face2.normal())
+  })!
+}
+
+function getVertexPairs(startFace: Face, endFacet: Face | Vertex) {
+  if (endFacet instanceof Vertex) {
+    return startFace.vertices.map((v) => [v, endFacet])
+  }
+  const partnerIndex = getPartnerVertexIndex(startFace, endFacet)
+  return startFace.vertices.map((v, i) => {
+    return [v, getCyclic(endFacet.vertices, i + partnerIndex)] as [
+      Vertex,
+      Vertex,
+    ]
+  })
+}
+
+function getPartnerVertexIndex(f1: Face, f2: Face) {
+  const v0 = f1.vertices[0]
+  // snub vertices aren't aligned, so get the closest one
+  return minBy(range(0, f2.numSides), (i) => {
+    const v = f2.vertices[i]
+    return f1
+      .centroid()
+      .clone()
+      .sub(v0.vec)
+      .angleTo(f2.centroid().clone().sub(v.vec))
+  })!
 }

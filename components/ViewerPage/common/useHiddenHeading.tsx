@@ -1,4 +1,4 @@
-import React, { useRef, useCallback } from "react"
+import { useRef, useCallback } from "react"
 import { SrOnly } from "components/common"
 
 /**

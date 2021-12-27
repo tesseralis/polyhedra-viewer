@@ -1,6 +1,6 @@
 import { useRouter } from "next/router"
 import { capitalize } from "lodash-es"
-import React, { useEffect } from "react"
+import { useState, useEffect } from "react"
 
 import { escape } from "lib/utils"
 import { wrapProviders } from "components/common"
@@ -22,7 +22,7 @@ function InnerViewer({ solid, panel }: InnerProps) {
   const polyhedron = PolyhedronCtx.useState()
   const router = useRouter()
   // Use a buffer variable to keep the two states in sync
-  const [solidSync, setSolidSync] = React.useState(solid)
+  const [solidSync, setSolidSync] = useState(solid)
 
   // When either `solid` (derived from the route) or `polyhedron.name` (derived from operation)
   // chagnes, update the *other* state.

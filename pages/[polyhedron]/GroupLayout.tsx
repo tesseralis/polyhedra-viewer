@@ -2,7 +2,6 @@ import { css } from "@emotion/react"
 import { Canvas } from "@react-three/fiber"
 import { OrthographicCamera } from "@react-three/drei"
 import { useRouter } from "next/router"
-import Markdown from "components/HomePage/Markdown"
 
 export default function GroupLayout({
   position,
@@ -42,7 +41,7 @@ export default function GroupLayout({
           <Canvas>
             <OrthographicCamera makeDefault position={position} zoom={zoom} />
             <directionalLight position={[0, 0.5, 1]} />
-            {/* <TrackballControls enabled noRotate panSpeed={5} /> */}
+            {/* <MapControls /> */}
             <group>{children(router)}</group>
           </Canvas>
         </div>

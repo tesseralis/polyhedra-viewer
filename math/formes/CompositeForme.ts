@@ -153,6 +153,9 @@ export default abstract class CompositeForme extends BaseForme<Composite> {
     } else {
       // augmented cap face
       const cap = find(this.augmentedCaps(), (cap) => face.inSet(cap.faces()))
+      if (face.numSides > 3) {
+        return CapstoneFace.capSecondary(source.data.family)
+      }
       const sideColors = face.vertices.map((v) =>
         v.inSet(cap.innerVertices()) ? "top" : "base",
       )

@@ -1,49 +1,60 @@
 import Link from "next/link"
 
-import { useStyle, fonts, scales, media } from "styles"
-import { link } from "styles/common"
+import { css } from "@emotion/react"
+import { fonts, scales, media } from "styles"
 import { usePageTitle } from "components/common"
 
 function Title() {
-  const css = useStyle({
-    textAlign: "center",
-    fontFamily: fonts.andaleMono,
-    fontSize: scales.font[3],
-    [media.mobile]: {
-      fontSize: scales.font[4],
-    },
-  })
-  return <h1 {...css()}>Uh oh! We don't know about that polyhedron!</h1>
+  return (
+    <h1
+      css={css`
+        color: #999;
+        text-align: center;
+        font-family: ${fonts.andaleMono};
+        font-size: ${scales.font[3]};
+        ${media.mobile} {
+          font-size: ${scales.font[4]};
+        }
+      `}
+    >
+      Uh oh! We don't know about that polyhedron!
+    </h1>
+  )
 }
 
 function BackLink() {
-  const css = useStyle({
-    fontFamily: fonts.andaleMono as any,
-    fontSize: scales.font[4],
-    ...link,
-  } as any)
   return (
     <Link href="/" passHref>
-      <a {...css()}>Go back</a>
+      <a
+        css={css`
+          font-family: ${fonts.andaleMono};
+          font-size: ${scales.font[4]};
+          color: #ccc;
+        `}
+      >
+        Go back
+      </a>
     </Link>
   )
 }
 
 export default function ErrorPage() {
   usePageTitle("Error - Polyhedra Viewer")
-  const css = useStyle({
-    width: "100vw",
-    height: "100vh",
-
-    display: "grid",
-    gridGap: scales.spacing[2],
-    alignContent: "center",
-    justifyContent: "center",
-    justifyItems: "center",
-  })
-
   return (
-    <section {...css()}>
+    <section
+      css={css`
+        width: 100vw;
+        height: 100vh;
+
+        display: grid;
+        gap: ${scales.spacing[2]};
+        align-content: center;
+        justify-content: center;
+        justify-items: center;
+
+        background-color: #111;
+      `}
+    >
       <Title />
       <BackLink />
     </section>

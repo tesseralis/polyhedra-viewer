@@ -1,4 +1,4 @@
-import React, { AnchorHTMLAttributes } from "react"
+import { AnchorHTMLAttributes } from "react"
 
 export default function ExternalLink({
   href,

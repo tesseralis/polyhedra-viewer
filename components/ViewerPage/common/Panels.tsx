@@ -1,4 +1,4 @@
-import React, { ComponentType } from "react"
+import { ComponentType } from "react"
 import InfoPanel from "./InfoPanel"
 import ConfigForm from "./ConfigForm"
 import ListPanel from "./ListPanel"

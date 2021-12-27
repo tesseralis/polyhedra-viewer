@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react"
+import { createContext, useState, useEffect, useContext } from "react"
 import { media } from "styles"
 import { ChildrenProp } from "lib/types"
 
@@ -7,7 +7,7 @@ function getWindowWidth() {
 }
 
 // The reason we use context is so that we only need to bind one listener to the window
-const DeviceContext = React.createContext(media.desktopMinWidth)
+const DeviceContext = createContext(media.desktopMinWidth)
 
 export function DeviceProvider({ children }: ChildrenProp) {
   const [width, setWidth] = useState(getWindowWidth())

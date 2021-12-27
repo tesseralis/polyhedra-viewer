@@ -1,11 +1,11 @@
+import { css } from "@emotion/react"
 import Icon from "@mdi/react"
 
-import { useStyle, scales } from "styles"
+import { scales } from "styles"
 import { SrOnly } from "components/common"
 import { fonts } from "styles"
 
 import { RawSolidData } from "math/polyhedra"
-import { hover } from "styles/common"
 import { mdiDownload } from "@mdi/js"
 
 function formatDecimal(number: number) {
@@ -49,30 +49,32 @@ function DownloadLink({
   name,
 }: typeof fileFormats[0] & Props) {
   const filename = `${name}.${ext}`
-  const blob = new Blob([serializer(solid)], {
-    type: "text/plain;charset=utf-8",
-  })
-  const url = window.URL.createObjectURL(blob)
-
-  const css = useStyle({
-    display: "inline-flex",
-    justifyContent: "center",
-    padding: scales.spacing[2],
-    width: scales.size[4],
-
-    textDecoration: "none",
-    border: "1px #444 solid",
-    color: "#999",
-    fontFamily: fonts.andaleMono,
-    ...hover,
-
-    ":not(:last-child)": {
-      marginRight: scales.spacing[2],
-    },
-  })
+  // FIXME this breaks server-side
+  // const blob = new Blob([serializer(solid)], {
+  //   type: "text/plain;charset=utf-8",
+  // })
+  // const url = window.URL.createObjectURL(blob)
 
   return (
-    <a {...css()} key={ext} download={filename} href={url}>
+    <a
+      download={filename}
+      href="#"
+      css={css`
+        display: inline-flex;
+        justify-content: center;
+        padding: ${scales.spacing[2]};
+        width: ${scales.size[4]};
+
+        text-decoration: none;
+        border: 1px #444 solid;
+        color: #999;
+        font-family: ${fonts.andaleMono};
+
+        :not(:last-child): {
+          margin-right: ${scales.spacing[2]};
+        }
+      `}
+    >
       <SrOnly>Download as</SrOnly>.{ext}{" "}
       <span>
         <Icon path={mdiDownload} size={scales.size[1]} />
@@ -82,15 +84,23 @@ function DownloadLink({
 }
 
 export default function DataDownloader({ solid, name }: Props) {
-  const heading = useStyle({
-    fontFamily: fonts.times,
-    fontSize: scales.font[4],
-    marginBottom: scales.spacing[2],
-  })
   return (
     <div>
-      <h2 {...heading()}>Download model</h2>
-      <div>
+      <h2
+        css={css`
+          font-family: ${fonts.times};
+          font-size: ${scales.font[4]};
+          margin-bottom: ${scales.spacing[2]};
+        `}
+      >
+        Download model
+      </h2>
+      <div
+        css={css`
+          display: flex;
+          gap: 0.5rem;
+        `}
+      >
         {fileFormats.map((format) => (
           <DownloadLink
             key={format.ext}

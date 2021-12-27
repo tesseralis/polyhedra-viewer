@@ -1,4 +1,4 @@
-import React, { memo } from "react"
+import { memo } from "react"
 import { useStyle, media, scales } from "styles"
 import { scroll, paddingHoriz, flexRow } from "styles/common"
 import {

@@ -2,7 +2,6 @@ import { Composite } from "specs"
 import { makeOpPair } from "../operationPairs"
 import { getCentroid } from "math/geom"
 import { find } from "lib/utils"
-import { getMorphFunction } from "../morph"
 
 export default makeOpPair<Composite>({
   graph: function* () {
@@ -50,5 +49,9 @@ export default makeOpPair<Composite>({
       orientation: [cap, crossAxis],
     }
   },
-  toLeft: getMorphFunction((end) => end.geom.vertices),
+  toLeft: {
+    sideFacets(end) {
+      return end.geom.vertices
+    },
+  },
 })

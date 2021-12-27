@@ -6,6 +6,7 @@ import { fromSpecs } from "math/formes"
 
 import { escape } from "lib/utils"
 import { useFrame } from "@react-three/fiber"
+import { Text } from "@react-three/drei"
 // FIXME edit these imports
 import getFormeColors, {
   mixColor,
@@ -37,30 +38,47 @@ function PolyhedronEntry({ entry, position, navigate }: any) {
   const config = ConfigCtx.useState()
   const faceColors = geom.faces.map((face) => {
     let color = getFormeColors(forme, face)
-    // FIXME desaturate if it's a duplicate
-    // if (isDupe) {
-    //   color = mixColor(color, (c) => c.clone().offsetHSL(0, -0.25, -0.1))
-    // }
+    // desaturate if it's a duplicate and decrease opacity
+    if (isDupe) {
+      color = mixColor(color, (c) => c.clone().offsetHSL(0, -0.5, -0.1))
+    }
     if (hovered) {
       color = mixColor(color, (c) => c.clone().offsetHSL(0, 0, 0.2))
     }
     return color
   })
 
+  const textColor = isDupe ? "#444" : "#aaa"
+
   return (
-    <group
-      ref={ref}
-      position={position}
-      scale={isDupe ? [2 / 3, 2 / 3, 2 / 3] : [1, 1, 1]}
-    >
-      <PolyhedronModel
-        onClick={() => navigate.push(`/${escape(entry.name())}`)}
-        onPointerMove={() => setHovered(true)}
-        onPointerOut={() => setHovered(false)}
-        value={geom.solidData}
-        appearance={faceColors}
-        config={pick(config, ["showFaces", "showEdges", "showInnerFaces"])}
-      />
+    <group position={position}>
+      <Text
+        position={[0, -1.125, 0]}
+        fontSize={0.3}
+        maxWidth={2.75}
+        color={textColor}
+        textAlign="center"
+        anchorY="top"
+      >
+        {forme.specs.name()}
+      </Text>
+      {/* TODO duped johnson solids don't have a symbol */}
+      {!isDupe && (
+        <Text color={textColor} fontSize={0.75} position={[-1, -0.5, 1]}>
+          {forme.specs.conwaySymbol()}
+        </Text>
+      )}
+      <group ref={ref}>
+        <PolyhedronModel
+          onClick={() => navigate.push(`/${escape(entry.name())}`)}
+          onPointerMove={() => setHovered(true)}
+          onPointerOut={() => setHovered(false)}
+          value={geom.solidData}
+          appearance={faceColors}
+          config={pick(config, ["showFaces", "showEdges", "showInnerFaces"])}
+          opacity={isDupe ? 0.33 : 1}
+        />
+      </group>
     </group>
   )
 }

@@ -1,4 +1,4 @@
-import React, { useMemo, useReducer, useContext } from "react"
+import { createContext, useMemo, useReducer, useContext } from "react"
 import { isFunction, mapValues } from "lodash-es"
 
 type Args = any[]
@@ -24,9 +24,9 @@ export default function createHookedContext<S, A extends string>(
   const defaultState = isFunction(defaultStateCreator)
     ? defaultStateCreator()
     : defaultStateCreator
-  const StateContext = React.createContext<S>(defaultState)
+  const StateContext = createContext<S>(defaultState)
 
-  const ActionContext = React.createContext<Actions<A>>({} as Actions<A>)
+  const ActionContext = createContext<Actions<A>>({} as Actions<A>)
 
   return {
     Provider({ children, ...props }: PropType) {

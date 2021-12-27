@@ -16,6 +16,7 @@ interface Props {
   value: SolidData
   appearance: Appearance[]
   config: SolidConfig
+  opacity?: number
   onClick?(point: Vector3): void
   onPointerMove?(point: Vector3): void
   onPointerOut?(point: Vector3): void
@@ -43,6 +44,7 @@ function SolidFaces({
   onPointerMove,
   onPointerOut,
   config,
+  opacity = 1,
 }: Props) {
   const { vertices, faces } = value
   const geomRef = useRef<BufferGeometry>()
@@ -53,15 +55,13 @@ function SolidFaces({
     if (geomRef.current) {
       geomRef.current.clearGroups()
       // Disable materials for now since it breaks animation
-      geomRef.current?.addGroup(0, Infinity, 0)
-      // let i = 0
-      // getMaterialsFromFaces(faces, appearance).forEach(
-      //   ({ count, material }) => {
-      //     console.log({ count, material })
-      //     geomRef.current?.addGroup(i, count, material)
-      //     i += count
-      //   },
-      // )
+      let i = 0
+      getMaterialsFromFaces(faces, appearance).forEach(
+        ({ count, material }) => {
+          geomRef.current?.addGroup(i, count, material)
+          i += count
+        },
+      )
     }
   }, [faces, appearance])
 
@@ -115,15 +115,17 @@ function SolidFaces({
           args={[colorArray, 3]}
         />
       </bufferGeometry>
-      {/* <meshPhongMaterial
+      <meshPhongMaterial
         shininess={25}
         attachArray="material"
+        opacity={opacity * 1}
+        transparent={true}
         side={showInnerFaces ? DoubleSide : FrontSide}
         args={[{ vertexColors: true }]}
-      /> */}
+      />
       <meshStandardMaterial
         attachArray="material"
-        // opacity={0.9}
+        opacity={opacity * 0.95}
         transparent={true}
         side={showInnerFaces ? DoubleSide : FrontSide}
         args={[{ vertexColors: true }]}

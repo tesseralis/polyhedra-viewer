@@ -1,6 +1,6 @@
 import { uniq } from "lodash-es"
 
-import React, { memo } from "react"
+import { useEffect, memo } from "react"
 
 import { useStyle, scales } from "styles"
 import { media, fonts } from "styles"
@@ -92,7 +92,7 @@ export default function OpGrid() {
   const { unsetOperation } = OperationCtx.useActions()
   const { isTransitioning } = TransitionCtx.useState()
 
-  React.useEffect(() => {
+  useEffect(() => {
     return () => {
       unsetOperation()
     }

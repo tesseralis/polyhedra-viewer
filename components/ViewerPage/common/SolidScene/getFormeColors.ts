@@ -65,16 +65,19 @@ export function mixColor(appearance: Appearance, mixer: (c: Color) => Color) {
   }
 }
 
-function getFaceMaterial(faceType: FaceType): number {
+export function getFaceMaterial(faceType: FaceType): number {
   if (faceType.type === "classical") {
     return faceType.subtype === "facet" ? 0 : 1
   } else {
-    return faceType.faceType === "elongation" ? 1 : 0
+    return faceType.faceType === "elongation" ||
+      faceType.faceType === "secondary"
+      ? 1
+      : 0
   }
 }
 
 // TODO return materials
-export function getFaceAppearance(faceType: FaceType): FaceColor {
+export function getFaceColor(faceType: FaceType): FaceColor {
   if (faceType.type === "classical") {
     const gyrate = faceType.gyrate
     const scheme = colorScheme[faceType.family]
@@ -95,6 +98,9 @@ export function getFaceAppearance(faceType: FaceType): FaceColor {
       }
       case "top": {
         return scheme.primary.face
+      }
+      case "secondary": {
+        return scheme.edge.prism
       }
       case "side": {
         const sideColors = faceType.sideColors
@@ -149,7 +155,7 @@ export function getFaceAppearance(faceType: FaceType): FaceColor {
 
 export default function getFormeColors(forme: Forme, face: Face): Appearance {
   return {
-    color: getFaceAppearance(forme.faceAppearance(face)),
+    color: getFaceColor(forme.faceAppearance(face)),
     material: getFaceMaterial(forme.faceAppearance(face)),
   }
 }

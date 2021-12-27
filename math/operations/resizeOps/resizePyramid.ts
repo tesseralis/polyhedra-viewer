@@ -3,7 +3,6 @@ import { makeOpPair } from "../operationPairs"
 import { Pose } from "../operationUtils"
 import { Face, Edge } from "math/polyhedra"
 import { CapstoneForme } from "math/formes"
-import { getMorphFunction } from "../morph"
 
 export const expand = makeOpPair<Capstone>({
   graph: function* () {
@@ -18,7 +17,6 @@ export const expand = makeOpPair<Capstone>({
   },
   intermediate: "right",
   getPose,
-  toLeft: getMorphFunction(),
 })
 
 export const snub = makeOpPair<Capstone>({
@@ -35,7 +33,6 @@ export const snub = makeOpPair<Capstone>({
   },
   intermediate: "right",
   getPose,
-  toLeft: getMorphFunction(),
 })
 
 export const twist = makeOpPair<Capstone>({
@@ -56,19 +53,21 @@ export const twist = makeOpPair<Capstone>({
   },
   intermediate: "right",
   getPose,
-  toLeft: getMorphFunction((result) => {
-    // The end result is the gyrobicupola, so only track the triangular faces of the caps.
-    return result.caps().flatMap((cap) => {
-      const items = cap
-        .boundary()
-        .adjacentFaces()
-        .filter((f) => f.numSides === 3)
-      if (!result.specs.isDigonal()) {
-        items.push(cap.topFace())
-      }
-      return items
-    })
-  }),
+  toLeft: {
+    sideFacets(result) {
+      // The end result is the gyrobicupola, so only track the triangular faces of the caps.
+      return result.caps().flatMap((cap) => {
+        const items = cap
+          .boundary()
+          .adjacentFaces()
+          .filter((f) => f.numSides === 3)
+        if (!result.specs.isDigonal()) {
+          items.push(cap.topFace())
+        }
+        return items
+      })
+    },
+  },
 })
 
 export const dual = makeOpPair<Capstone>({
@@ -95,8 +94,6 @@ export const dual = makeOpPair<Capstone>({
     }
     return getPose(forme)
   },
-  toLeft: getMorphFunction(),
-  toRight: getMorphFunction(),
 })
 
 function getPose(forme: CapstoneForme): Pose {
