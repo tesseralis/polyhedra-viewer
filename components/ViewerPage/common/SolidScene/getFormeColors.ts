@@ -96,6 +96,9 @@ export function getFaceAppearance(faceType: FaceType): FaceColor {
       case "top": {
         return scheme.primary.face
       }
+      case "secondary": {
+        return scheme.edge.prism
+      }
       case "side": {
         const sideColors = faceType.sideColors
         const n = sideColors.length

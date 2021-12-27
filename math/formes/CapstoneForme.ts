@@ -239,7 +239,9 @@ export default abstract class CapstoneForme extends BaseForme<Capstone> {
     const sideColors = face.vertices.map((v) =>
       v.inSet(cap.innerVertices()) ? "top" : "base",
     )
-    return CapstoneFace.capSide(base, sideColors)
+    return face.numSides === 3
+      ? CapstoneFace.capSide(base, sideColors)
+      : CapstoneFace.capSecondary(base)
   }
 }
 
