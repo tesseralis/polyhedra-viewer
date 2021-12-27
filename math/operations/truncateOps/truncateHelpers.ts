@@ -1,7 +1,7 @@
 import { PRECISION } from "math/geom"
 import { range, set } from "lodash-es"
-import { find, repeat } from "lib/utils"
-import { Polyhedron, VertexArg } from "math/polyhedra"
+import { find, getCyclic, repeat } from "lib/utils"
+import { Polyhedron, Vertex, VertexArg } from "math/polyhedra"
 import Classical, { Operation as OpName } from "specs/Classical"
 import { MorphDefinition, makeOpPair } from "../operationPairs"
 import { Pose } from "../operationUtils"
@@ -101,33 +101,30 @@ function getTruncateLength(polyhedron: Polyhedron) {
 }
 
 function duplicateVertices(polyhedron: Polyhedron) {
-  const mapping: NestedRecord<number, number, number> = {}
-  const count = polyhedron.getVertex().adjacentFaces().length
+  const vertexMap: Record<number, number[]> = []
+  let newVertices: Vertex[] = []
+  let index = 0
+
   polyhedron.vertices.forEach((v) => {
-    v.adjacentFaces().forEach((face, i) => {
-      set(mapping, [face.index, v.index], i)
-    })
+    const numRepeats = v.adjacentFaces().length
+    newVertices = newVertices.concat(repeat(v, numRepeats))
+    vertexMap[v.index] = range(index, index + numRepeats)
+    index += numRepeats
   })
 
   return polyhedron.withChanges((solid) => {
     return solid
-      .withVertices(
-        polyhedron.vertices.flatMap((v) =>
-          repeat(v.vec, v.adjacentFaces().length),
-        ),
-      )
+      .withVertices(newVertices)
       .mapFaces((face) => {
         return face.vertices.flatMap((v) => {
-          // FIXME oh god this needs to be mapped better
-          const base = count * v.index
-          const j = mapping[face.index][v.index]
-          return [base + ((j + 1) % count), base + j]
+          const faceIndex = v.adjacentFaces().indexOf(face)
+          const dupes = vertexMap[v.index]
+          return [dupes[faceIndex], getCyclic(dupes, faceIndex - 1)]
         })
       })
       .addFaces(
         polyhedron.vertices.map((v) => {
-          const count = v.adjacentFaces().length
-          return range(v.index * count, (v.index + 1) * count)
+          return vertexMap[v.index]
         }),
       )
   })
