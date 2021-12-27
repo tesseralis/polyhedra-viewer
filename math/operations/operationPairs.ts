@@ -164,13 +164,11 @@ class OpPair<
     // Get the aligned version of the end forme
     const endSpecs = entry[oppositeSide(side)]
     const endGeom = getGeometry(endSpecs)
-    const alignedEndGeom = alignPolyhedron(
-      endGeom,
-      // TODO make an ".align()" method on Formes to simplify this
-      getPose(createForme(endSpecs, endGeom), options, oppositeSide(side)),
+    const unalignedEnd = createForme(endSpecs, endGeom)
+    const end = unalignedEnd.align(
+      getPose(unalignedEnd, options, oppositeSide(side)),
       startPose,
-    )
-    const end = createForme(endSpecs, alignedEndGeom)
+    ) as Forme<Specs>
 
     let intermediate: Forme<Specs>
     if (typeof getIntermediate === "string") {
@@ -186,12 +184,10 @@ class OpPair<
           ? inter
           : createForme(inter, getGeometry(inter))
 
-      const alignedInter = alignPolyhedron(
-        middleSolid.geom,
+      intermediate = middleSolid.align(
         getPose(middleSolid, options, "intermediate"),
         startPose,
-      )
-      intermediate = createForme(middleSolid.specs as Specs, alignedInter)
+      ) as Forme<Specs>
     }
 
     const [startMorph, endMorph] =

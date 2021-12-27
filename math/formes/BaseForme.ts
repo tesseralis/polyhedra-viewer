@@ -55,6 +55,14 @@ export default abstract class BaseForme<Specs extends PolyhedronSpecs> {
 
   abstract orientation(): Orientation
 
+  withGeom(geom: Polyhedron): this {
+    return new (this.constructor as any)(this.specs, geom)
+  }
+
+  align(oldPose: Pose, newPose: Pose): this {
+    return this.withGeom(alignPolyhedron(this.geom, oldPose, newPose))
+  }
+
   /**
    * The "center" point of the polyhedron to use in calculating canonical orientation.
    * Defaults to the geometric centroid.
