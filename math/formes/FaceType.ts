@@ -48,6 +48,7 @@ export const ClassicalFace = {
 interface BaseCapstone {
   type: "capstone"
   base: 2 | PrimaryPolygon
+  faceType: string
 }
 
 interface CapstoneElongation extends BaseCapstone {
