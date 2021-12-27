@@ -34,7 +34,10 @@ export const rectify = makeOpPair<Capstone>({
     sideFacets: (forme) => forme.geom.vertices,
   },
   toRight: {
-    sideFacets: (forme) => forme.endBoundaries()[1].adjacentFaces(),
+    sideFacets: (forme) => [
+      forme.ends()[0] as Face,
+      ...forme.endBoundaries()[1].adjacentFaces(),
+    ],
   },
 })
 
