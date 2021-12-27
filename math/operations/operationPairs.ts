@@ -2,16 +2,11 @@ import { isMatch, pickBy, minBy, range } from "lodash-es"
 import { getCyclic } from "lib/utils"
 import { PolyhedronSpecs } from "specs"
 import { Face, Vertex } from "math/polyhedra"
-import {
-  OpArgs,
-  SolidArgs,
-  GraphEntry as DirectedGraphEntry,
-} from "./Operation"
+import { OpArgs, GraphEntry as DirectedGraphEntry } from "./Operation"
 import { Pose, alignPolyhedron, getGeometry } from "./operationUtils"
 import BaseForme from "math/formes/BaseForme"
 import { PolyhedronForme as Forme, createForme } from "math/formes"
-import { start } from "repl"
-// import { getMorphFunction } from "./morph"
+import { vecEquals } from "math/geom"
 
 /**
  * Defines a pair of inverse operations based on the given parameters.
@@ -352,11 +347,18 @@ function getMorphedAppearances<F extends Forme>(
     faceMapping[face.index] = facet
   }
 
+  // FIXME does not work on antiprismatic
   return interm.geom.faces.map((f) => {
     const matchingFacet = faceMapping[f.index]
     // If this face isn't matched to anything, or is tapered into a vertex, it has no intrinsic appearance
     if (!matchingFacet || matchingFacet instanceof Vertex) {
-      return undefined
+      // If it doesn't map to anything in the mapping,
+      // try to find a face that matches the face's normal *exactly*
+      const conormalFace = side.geom.faces.find((f2) =>
+        vecEquals(f.normal(), f2.normal()),
+      )
+      // FIXME increment/decrement antiprism broken
+      return conormalFace ? side.faceAppearance(conormalFace) : undefined
     }
     const appearance = side.faceAppearance(matchingFacet)
     if (appearance.type !== "capstone" || appearance.faceType !== "side") {
