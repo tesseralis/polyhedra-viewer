@@ -354,16 +354,17 @@ function getMorphedAppearances<F extends Forme>(
   )
 
   return morphedGeom.faces.map((f) => {
+    const defaultValue = interm.faceAppearance(interm.geom.faces[f.index])
     const matchingFacet = faceMapping[f.index]
     // If this face isn't matched to anything, or is tapered into a vertex, it has no intrinsic appearance
     if (!matchingFacet || matchingFacet instanceof Vertex) {
       // If it doesn't map to anything in the mapping,
       // try to find a face that matches the face's normal *exactly*
-      if (f.edges.filter((e) => e.isValid()).length < 3) return undefined
+      if (f.edges.filter((e) => e.isValid()).length < 3) return defaultValue
       const conormalFace = side.geom.faces.find((f2) =>
         vecEquals(f.normal(), f2.normal()),
       )
-      return conormalFace ? side.faceAppearance(conormalFace) : undefined
+      return conormalFace ? side.faceAppearance(conormalFace) : defaultValue
     }
     const appearance = side.faceAppearance(matchingFacet)
     if (appearance.type !== "capstone" || appearance.faceType !== "side") {
