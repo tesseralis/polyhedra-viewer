@@ -41,12 +41,6 @@ class TruncatedPyramidForme extends CapstoneForme {
 
   *queryTops() {
     const n = this.geom.largestFace().numSides
-    if (n === 6) {
-      const face = this.geom.largestFace()
-      const opposite = this.geom.faces.find((f) => f.isInverse(face))!
-      yield face
-      yield opposite
-    }
     yield* this.geom.facesWithNumSides(n)
   }
 }
