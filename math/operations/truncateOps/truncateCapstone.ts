@@ -40,7 +40,10 @@ class TruncatedPyramidForme extends CapstoneForme {
   }
 
   *queryTops() {
-    const n = this.geom.largestFace().numSides
-    yield* this.geom.facesWithNumSides(n)
+    yield* this.geom.facesWithNumSides(this.specs.data.base)
+  }
+
+  *queryBottoms() {
+    yield* this.geom.facesWithNumSides(this.specs.data.base * 2)
   }
 }
