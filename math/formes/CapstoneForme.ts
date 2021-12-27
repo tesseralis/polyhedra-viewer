@@ -202,23 +202,6 @@ export default abstract class CapstoneForme extends BaseForme<Capstone> {
     return null
   }
 
-  normalize(): this {
-    const newGeom = this.geom.withFaces(
-      this.geom.faces.map((f) => {
-        if (this.isTop(f)) return f
-        const end = this.containingEnd(f)
-        if (!end) return f
-        if (end instanceof Face) return f
-        const cap = end as Cap
-        const pivotVertex = find(f.vertices, (v) =>
-          v.inSet(cap.innerVertices()),
-        )
-        return pivot(f.vertices, pivotVertex)
-      }),
-    )
-    return CapstoneForme.create(this.specs, newGeom) as any
-  }
-
   faceAppearance(face: Face) {
     const base = this.specs.data.base
     const polygonType = this.specs.data.type
