@@ -218,7 +218,11 @@ function getFaceColors(face: number[], appearance: Appearance) {
       if (color instanceof Color) {
         return [color, color, color]
       } else {
-        return [v0, v1!, v2!].map((v) => color[face.indexOf(v)])
+        // FIXME this breaks for prism thingy
+        const mapped = [v0, v1!, v2!].map((v) => color[face.indexOf(v)])
+        // console.log(mapped)
+        // return mapped
+        return [new Color(), new Color(), new Color()]
       }
     })
     .flat()

@@ -26,7 +26,7 @@ export const rectify = makeOpPair<Capstone>({
   getPose(forme, $, side) {
     return {
       origin: forme.origin(),
-      scale: forme.ends()[0].distanceToCenter(),
+      scale: forme.ends()[1].distanceToCenter(),
       orientation: forme.orientation(),
     }
   },
@@ -53,9 +53,5 @@ class TruncatedPyramidForme extends CapstoneForme {
 
   *queryBottoms() {
     yield* this.geom.facesWithNumSides(this.specs.data.base * 2)
-  }
-
-  faceAppearance(face: Face) {
-    return CapstoneFace.capTop(this.specs.data.base)
   }
 }

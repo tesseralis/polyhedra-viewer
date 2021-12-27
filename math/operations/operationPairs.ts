@@ -193,8 +193,6 @@ class OpPair<
     const [startMorph, endMorph] =
       side === "left" ? [toLeft, toRight] : [toRight, toLeft]
 
-    // Get the appearances of the intermediate faces
-
     return {
       result: end,
       animationData: {
@@ -202,6 +200,7 @@ class OpPair<
           getMorphedVertices(intermediate, start, startMorph),
         ),
         endVertices: getMorphedVertices(intermediate, end, endMorph),
+        // Get the appearances of the intermediate faces
         startAppearance: getMorphedAppearances(intermediate, start, startMorph),
         endAppearance: getMorphedAppearances(intermediate, end, endMorph),
       },
@@ -349,7 +348,6 @@ function getMorphedAppearances<F extends Forme>(
     getMorphedVertices(interm, side, morph),
   )
 
-  // console.log(morphedGeom.vertices.map((v) => v?.vec?.toArray()))
   return morphedGeom.faces.map((f) => {
     const defaultValue = interm.faceAppearance(interm.geom.faces[f.index])
     const matchingFacet = faceMapping[f.index]
