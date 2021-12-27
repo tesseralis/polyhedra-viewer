@@ -1,4 +1,3 @@
-import { find, pivot } from "lib/utils"
 import { once } from "lodash-es"
 import BaseForme from "./BaseForme"
 import { Capstone } from "specs"
@@ -6,7 +5,6 @@ import { Polyhedron, Face, Edge, Cap, FaceLike, Facet } from "math/polyhedra"
 import { getCentroid } from "math/geom"
 import { getGeometry } from "math/operations/operationUtils"
 import { CapstoneFace } from "./FaceType"
-import { repeat } from "lib/utils"
 
 type CapstoneEnd = Facet
 
@@ -200,23 +198,6 @@ export default abstract class CapstoneForme extends BaseForme<Capstone> {
       return "vertex"
     }
     return null
-  }
-
-  normalize(): this {
-    const newGeom = this.geom.withFaces(
-      this.geom.faces.map((f) => {
-        if (this.isTop(f)) return f
-        const end = this.containingEnd(f)
-        if (!end) return f
-        if (end instanceof Face) return f
-        const cap = end as Cap
-        const pivotVertex = find(f.vertices, (v) =>
-          v.inSet(cap.innerVertices()),
-        )
-        return pivot(f.vertices, pivotVertex)
-      }),
-    )
-    return CapstoneForme.create(this.specs, newGeom) as any
   }
 
   faceAppearance(face: Face) {

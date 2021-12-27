@@ -117,21 +117,6 @@ export default abstract class CompositeForme extends BaseForme<Composite> {
     return false
   }
 
-  normalize(): this {
-    const newGeom = this.geom.withFaces(
-      this.geom.faces.map((f) => {
-        if (this.isCapTop(f)) return f
-        const cap = this.augmentedCaps().find((cap) => f.inSet(cap.faces()))
-        if (!cap) return f
-        const pivotVertex = find(f.vertices, (v) =>
-          v.inSet(cap.innerVertices()),
-        )
-        return pivot(f.vertices, pivotVertex)
-      }),
-    )
-    return CompositeForme.create(this.specs, newGeom) as any
-  }
-
   faceAppearance(face: Face): FaceType {
     const source = this.specs.sourceClassical()
     const polygonType = this.specs.sourceClassical().isTruncated()
