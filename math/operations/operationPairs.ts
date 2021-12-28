@@ -379,15 +379,9 @@ function getMatchedAppearance(side: Forme, f: Face, matchingFacet: Face) {
   const offset = getPartnerVertexIndex(f, matchingFacet)
   // special case for truncating pyramids
   if (f.numSides !== appearance.sideColors.length) {
-    console.log(
-      "got mismatched capstone sides:",
-      f.numSides,
-      appearance.sideColors.length,
-    )
     const sideColors = f.vertices.map((v, i) => {
       return getCyclic(appearance.sideColors, Math.floor(i / 2) + offset)
     })
-    console.log(sideColors)
 
     return {
       ...appearance,
