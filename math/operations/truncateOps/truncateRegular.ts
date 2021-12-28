@@ -116,7 +116,7 @@ function getAlternateVertices(forme: ClassicalForme, twist: Twist) {
     const adjFaceTypes = v.adjacentFaces().map((f) => forme.getFacet(f))
     const vertIndex = adjFaceTypes.findIndex((type) => type === "vertex")
     const faceIndex = adjFaceTypes.findIndex((type) => type === "face")
-    return twist === "left"
+    return twist === "right"
       ? vertIndex === (faceIndex + 1) % 3
       : faceIndex === (vertIndex + 1) % 3
   })
