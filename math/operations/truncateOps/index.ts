@@ -23,13 +23,10 @@ export const alternate = new Operation(
   combineOps([capstones.alternate.left]),
 )
 
-export const unalternate = new Operation("alternate", {
-  graph: function* () {},
-  toGraphOpts() {},
-  apply() {
-    throw new Error("Not implemented")
-  },
-})
+export const unalternate = new Operation(
+  "alternate",
+  combineOps([capstones.alternate.right]),
+)
 
 const hitOptArgs: Partial<OpArgs<FacetOpts, Classical>> = {
   hitOption: "facet",

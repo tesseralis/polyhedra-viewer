@@ -7,7 +7,6 @@ import { Pose, alignPolyhedron, getGeometry } from "./operationUtils"
 import BaseForme from "math/formes/BaseForme"
 import { PolyhedronForme as Forme, createForme, FaceType } from "math/formes"
 import { vecEquals } from "math/geom"
-import { Appearance } from "components/ViewerPage/common/SolidScene/getFormeColors"
 
 /**
  * Defines a pair of inverse operations based on the given parameters.
@@ -197,9 +196,11 @@ class OpPair<
     return {
       result: end,
       animationData: {
+        // start: intermediate.geom,
         start: intermediate.geom.withVertices(
           getMorphedVertices(intermediate, start, startMorph),
         ),
+        // endVertices: intermediate.geom.vertices,
         endVertices: getMorphedVertices(intermediate, end, endMorph),
         // Get the appearances of the intermediate faces
         startAppearance: getMorphedAppearances(intermediate, start, startMorph),
@@ -321,7 +322,10 @@ function getMorphedVertices<F extends Forme>(
     }
   }
   const res = interm.geom.vertices.map((v) => {
-    return mapping[v.index]
+    return (
+      mapping[v.index] ??
+      minBy(side.geom.vertices, (v0) => v0.vec.distanceTo(v.vec))
+    )
   })
   return res
 }
@@ -379,10 +383,6 @@ function getMatchedAppearance(side: Forme, f: Face, matchingFacet: Face) {
   const offset = getPartnerVertexIndex(f, matchingFacet)
   // special case for truncating pyramids
   if (f.numSides !== appearance.sideColors.length) {
-    const sideColors = f.vertices.map((v, i) => {
-      return getCyclic(appearance.sideColors, Math.floor(i / 2) + offset)
-    })
-
     return {
       ...appearance,
       sideColors: f.vertices.map((v, i) => {

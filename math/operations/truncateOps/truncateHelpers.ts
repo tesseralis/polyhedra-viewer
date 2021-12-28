@@ -139,7 +139,7 @@ function duplicateVertices(
         })
       })
       .addFaces(
-        polyhedron.vertices.map((v) => {
+        vertices.map((v) => {
           return vertexMap[v.index]
         }),
       )

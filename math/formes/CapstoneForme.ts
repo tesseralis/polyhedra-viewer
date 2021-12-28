@@ -100,7 +100,11 @@ export default abstract class CapstoneForme extends BaseForme<Capstone> {
    */
   endBoundaries(): [FaceLike, FaceLike] {
     return this.ends().map((end) =>
-      end instanceof Cap ? end.boundary() : end,
+      end instanceof Cap
+        ? end.boundary()
+        : end instanceof Edge
+        ? end.asFaceLike()
+        : (end as Face),
     ) as [FaceLike, FaceLike]
   }
 

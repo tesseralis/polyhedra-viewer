@@ -23,27 +23,10 @@ export const rectify = makeOpPair<Capstone>({
       rawTruncate(getGeometry(entry.left)),
     )
   },
-  getPose(forme, $, side) {
-    let orientation
-    const top = forme.endBoundaries()[0]
-    switch (side) {
-      case "left": {
-        orientation = [top, top.vertices[0]]
-        break
-      }
-      case "intermediate": {
-        orientation = [top, top.edges.find((e) => e.twinFace().numSides === 3)]
-        break
-      }
-      case "right": {
-        orientation = [top, top.edges[0]]
-        break
-      }
-    }
+  getPose(forme) {
     return {
       origin: forme.origin(),
-      // Ideally it should be based on inradius, but for some reason it shrinks a ton
-      // scale: forme.ends()[1].distanceToCenter(),
+      // TODO idk what's the best scale
       scale: Math.max(...forme.geom.vertices.map((v) => v.distanceToCenter())),
       orientation: forme.orientation(),
     }
@@ -62,11 +45,18 @@ export const rectify = makeOpPair<Capstone>({
 export const alternate = makeOpPair<Capstone>({
   graph: function* () {
     for (const entry of Capstone.query.where(
-      (c) => c.isPrism() && c.isPrismatic() && c.isSecondary(),
+      (c) => c.isAntiprism() && c.isPrismatic() && c.isPrimary(),
     )) {
+      if (entry.isDigonal()) {
+        yield {
+          left: entry.withData({ elongation: "prism", base: 4 }),
+          right: entry,
+        }
+        continue
+      }
       yield {
-        left: entry,
-        right: entry.withData({ type: "primary", elongation: "antiprism" }),
+        left: entry.withData({ elongation: "prism", type: "secondary" }),
+        right: entry,
       }
     }
   },
@@ -77,11 +67,34 @@ export const alternate = makeOpPair<Capstone>({
       rawTruncate(leftForme.geom, getAlternateVertices(leftForme)),
     )
   },
-  getPose(forme) {
+  getPose(forme, $, side) {
+    const top = forme.endBoundaries()[0]
+    let orientation
+    switch (side) {
+      case "left": {
+        orientation = [top, top.vertices[0]] as const
+        break
+      }
+      case "intermediate": {
+        orientation = [
+          top,
+          top.edges.find((e) => e.twinFace().numSides === 3)!,
+        ] as const
+        break
+      }
+      case "right": {
+        if (forme.specs.isDigonal()) {
+          orientation = [top, top.edges[0].face] as const
+          break
+        }
+        orientation = [top, top.edges[0]] as const
+        break
+      }
+    }
     return {
       origin: forme.origin(),
       scale: Math.max(...forme.geom.vertices.map((v) => v.distanceToCenter())),
-      orientation: forme.orientation(),
+      orientation,
     }
   },
   toLeft: {
@@ -133,7 +146,7 @@ class AlternatePrismForme extends CapstoneForme {
 function getAlternateVertices(forme: CapstoneForme) {
   const [top, bottom] = forme.endBoundaries()
   const oppositeVertex = top.edges[0].prev().v1
-  const offset = bottom.vertices.indexOf(oppositeVertex) % 2 === 0 ? 1 : 0
+  const offset = bottom.vertices.indexOf(oppositeVertex) % 2 === 0 ? 0 : 1
   return [
     ...top.vertices.filter((v, i) => i % 2 === 0),
     ...bottom.vertices.filter((v, i) => i % 2 === offset),
