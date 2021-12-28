@@ -1,7 +1,8 @@
-import { FacetType } from "specs"
-import { ClassicalForme } from "math/formes"
-import { Pose } from "../operationUtils"
+import { Classical, FacetType, twists } from "specs"
+import { ClassicalForme, fromSpecs } from "math/formes"
+import { Pose, TwistOpts } from "../operationUtils"
 import { makeTruncateTrio } from "./truncateHelpers"
+import { makeOpPair } from "../operationPairs"
 
 /**
  * Describes the truncation operations on a Platonic solid.
@@ -29,6 +30,23 @@ export default makeTruncateTrio(
     },
   },
 )
+
+export const alternateBevelled = makeOpPair<Classical, TwistOpts, {}>({
+  graph: function* () {
+    for (const entry of Classical.query.where((e) => e.isBevelled())) {
+      for (const twist of twists) {
+        yield {
+          left: entry,
+          right: entry.withOperation("snub", twist),
+          options: { left: { twist } },
+        }
+      }
+    }
+  },
+  intermediate(entry) {
+    return fromSpecs(entry.left)
+  },
+})
 
 function getRegularPose(
   forme: ClassicalForme,
