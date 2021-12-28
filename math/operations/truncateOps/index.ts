@@ -18,13 +18,10 @@ export const pare = new Operation(
   combineOps([regs.pare.left, ambos.pare.left]),
 )
 
-export const alternate = new Operation("alternate", {
-  graph: function* () {},
-  toGraphOpts() {},
-  apply() {
-    throw new Error("Not implemented")
-  },
-})
+export const alternate = new Operation(
+  "alternate",
+  combineOps([capstones.alternate.left]),
+)
 
 export const unalternate = new Operation("alternate", {
   graph: function* () {},

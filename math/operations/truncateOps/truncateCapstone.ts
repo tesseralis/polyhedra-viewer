@@ -2,7 +2,7 @@ import { Capstone } from "specs"
 import { makeOpPair } from "../operationPairs"
 import { getGeometry } from "../operationUtils"
 import { rawTruncate } from "./truncateHelpers"
-import { CapstoneForme } from "math/formes"
+import { CapstoneForme, fromSpecs } from "math/formes"
 import { Face } from "math/polyhedra"
 import { CapstoneFace } from "math/formes/FaceType"
 
@@ -24,6 +24,22 @@ export const rectify = makeOpPair<Capstone>({
     )
   },
   getPose(forme, $, side) {
+    let orientation
+    const top = forme.endBoundaries()[0]
+    switch (side) {
+      case "left": {
+        orientation = [top, top.vertices[0]]
+        break
+      }
+      case "intermediate": {
+        orientation = [top, top.edges.find((e) => e.twinFace().numSides === 3)]
+        break
+      }
+      case "right": {
+        orientation = [top, top.edges[0]]
+        break
+      }
+    }
     return {
       origin: forme.origin(),
       // Ideally it should be based on inradius, but for some reason it shrinks a ton
@@ -40,6 +56,39 @@ export const rectify = makeOpPair<Capstone>({
       forme.ends()[0] as Face,
       ...forme.endBoundaries()[1].adjacentFaces(),
     ],
+  },
+})
+
+export const alternate = makeOpPair<Capstone>({
+  graph: function* () {
+    for (const entry of Capstone.query.where(
+      (c) => c.isPrism() && c.isPrismatic() && c.isSecondary(),
+    )) {
+      yield {
+        left: entry,
+        right: entry.withData({ type: "primary", elongation: "antiprism" }),
+      }
+    }
+  },
+  intermediate(entry) {
+    const leftForme = fromSpecs(entry.left)
+    return new AlternatePrismForme(
+      entry.left,
+      rawTruncate(leftForme.geom, getAlternateVertices(leftForme)),
+    )
+  },
+  getPose(forme) {
+    return {
+      origin: forme.origin(),
+      scale: Math.max(...forme.geom.vertices.map((v) => v.distanceToCenter())),
+      orientation: forme.orientation(),
+    }
+  },
+  toLeft: {
+    sideFacets: (forme) => getAlternateVertices(forme),
+  },
+  toRight: {
+    sideFacets: (forme) => forme.sideFaces(),
   },
 })
 
@@ -73,4 +122,20 @@ class TruncatedPyramidForme extends CapstoneForme {
       }),
     )
   }
+}
+
+class AlternatePrismForme extends CapstoneForme {
+  *queryTops() {
+    yield* this.geom.facesWithNumSides(this.specs.data.base * 3)
+  }
+}
+
+function getAlternateVertices(forme: CapstoneForme) {
+  const [top, bottom] = forme.endBoundaries()
+  const oppositeVertex = top.edges[0].prev().v1
+  const offset = bottom.vertices.indexOf(oppositeVertex) % 2 === 0 ? 1 : 0
+  return [
+    ...top.vertices.filter((v, i) => i % 2 === 0),
+    ...bottom.vertices.filter((v, i) => i % 2 === offset),
+  ]
 }

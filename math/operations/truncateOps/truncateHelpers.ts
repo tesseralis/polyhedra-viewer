@@ -69,17 +69,27 @@ export function makeTruncateTrio<
   }
 }
 
-// Perform a raw, geometric truncation on the given polyhedral geometry
-export function rawTruncate(polyhedron: Polyhedron) {
+// Perform a raw, geometric truncation on the given vertices
+// of the polyhedral geometry
+export function rawTruncate(
+  polyhedron: Polyhedron,
+  vertices: Vertex[] = polyhedron.vertices,
+) {
   const truncateLength = getTruncateLength(polyhedron)
   const oldSideLength = polyhedron.edgeLength()
   const truncateScale = (oldSideLength - truncateLength) / 2 / oldSideLength
-  const duplicated = duplicateVertices(polyhedron)
+  const duplicated = duplicateVertices(polyhedron, vertices)
   const transform = (v: any) => v
 
   const truncatedVertices = duplicated.vertices.map((vertex) => {
     const adjacentVertices = vertex.adjacentVertices()
     const v = vertex.vec
+    const isDupe = adjacentVertices.some(
+      (v2) => v.distanceTo(v2.vec) < PRECISION,
+    )
+    if (!isDupe) {
+      return v
+    }
     const v1 = find(
       adjacentVertices,
       (adj) => adj.vec.distanceTo(v) > PRECISION,
@@ -100,13 +110,16 @@ function getTruncateLength(polyhedron: Polyhedron) {
   return 2 * face.apothem() * Math.tan(newTheta)
 }
 
-function duplicateVertices(polyhedron: Polyhedron) {
+function duplicateVertices(
+  polyhedron: Polyhedron,
+  vertices: Vertex[] = polyhedron.vertices,
+) {
   const vertexMap: Record<number, number[]> = []
   let newVertices: Vertex[] = []
   let index = 0
 
   polyhedron.vertices.forEach((v) => {
-    const numRepeats = v.adjacentFaces().length
+    const numRepeats = v.inSet(vertices) ? v.adjacentFaces().length : 1
     newVertices = newVertices.concat(repeat(v, numRepeats))
     vertexMap[v.index] = range(index, index + numRepeats)
     index += numRepeats
@@ -119,6 +132,9 @@ function duplicateVertices(polyhedron: Polyhedron) {
         return face.vertices.flatMap((v) => {
           const faceIndex = v.adjacentFaces().indexOf(face)
           const dupes = vertexMap[v.index]
+          if (!v.inSet(vertices)) {
+            return [dupes[0]]
+          }
           return [dupes[faceIndex], getCyclic(dupes, faceIndex - 1)]
         })
       })
