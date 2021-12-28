@@ -54,4 +54,21 @@ class TruncatedPyramidForme extends CapstoneForme {
   *queryBottoms() {
     yield* this.geom.facesWithNumSides(this.specs.data.base * 2)
   }
+
+  faceAppearance(face: Face) {
+    if (this.isEndFace(face)) {
+      return CapstoneFace.prismBase(this.specs.data.base, "primary")
+    }
+    // All untruncated faces are elongations
+    if (face.numSides === 3) {
+      return CapstoneFace.side(this.specs.data.base, "antiprism")
+    }
+    // All other faces are side faces
+    return CapstoneFace.capSide(
+      this.specs.data.base,
+      face.vertices.map((v) => {
+        return "top"
+      }),
+    )
+  }
 }
