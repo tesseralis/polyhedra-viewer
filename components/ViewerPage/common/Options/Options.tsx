@@ -7,6 +7,7 @@ function hasTwist(opName: string) {
     "snub",
     "twist",
     "semisnub",
+    "alternate",
     "gyroelongate",
     "shorten",
     "turn",

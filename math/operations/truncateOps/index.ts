@@ -3,7 +3,7 @@ import { combineOps } from "../operationPairs"
 import Operation, { OpArgs } from "../Operation"
 import { FacetOpts } from "../operationUtils"
 import { Classical } from "specs"
-import regs from "./truncateRegular"
+import regs, { alternateBevelled } from "./truncateRegular"
 import ambos, { semisnubAmbo } from "./truncateAmbo"
 import augTruncate from "./truncateAugmented"
 import * as capstones from "./truncateCapstone"
@@ -20,12 +20,12 @@ export const pare = new Operation(
 
 export const alternate = new Operation(
   "alternate",
-  combineOps([capstones.alternate.left]),
+  combineOps([alternateBevelled.left, capstones.alternate.left]),
 )
 
 export const unalternate = new Operation(
-  "alternate",
-  combineOps([capstones.alternate.right]),
+  "unalternate",
+  combineOps([alternateBevelled.right, capstones.alternate.right]),
 )
 
 const hitOptArgs: Partial<OpArgs<FacetOpts, Classical>> = {
