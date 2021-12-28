@@ -26,7 +26,9 @@ export const rectify = makeOpPair<Capstone>({
   getPose(forme, $, side) {
     return {
       origin: forme.origin(),
-      scale: forme.ends()[1].distanceToCenter(),
+      // Ideally it should be based on inradius, but for some reason it shrinks a ton
+      // scale: forme.ends()[1].distanceToCenter(),
+      scale: Math.max(...forme.geom.vertices.map((v) => v.distanceToCenter())),
       orientation: forme.orientation(),
     }
   },
