@@ -218,9 +218,6 @@ function getFaceColors(face: number[], appearance: Appearance) {
       if (color instanceof Color) {
         return [color, color, color]
       } else {
-        if (color.length < face.length) {
-          return new Color()
-        }
         return [v0, v1!, v2!].map((v) => color[face.indexOf(v)])
       }
     })

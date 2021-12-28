@@ -104,50 +104,19 @@ export function getFaceColor(faceType: FaceType): FaceColor {
       }
       case "side": {
         const sideColors = faceType.sideColors
-        const n = sideColors.length
-        if (n === 3) {
-          return sideColors.map((col) => {
-            switch (col) {
-              case "top":
-                return scheme.primary.face
-              case "middle":
-                return scheme.primary.vertex
-              case "base":
-                // FIXME base this on the inner color
-                return scheme.primary.vertex
-              default:
-                throw new Error(`Impossible`)
-            }
-          })
-        }
-        if (n === 4) {
-          return sideColors.map((col) => {
-            switch (col) {
-              case "top":
-                return scheme.primary.face
-              case "base":
-                return scheme.primary.vertex
-              default:
-                throw new Error(`Square cap face in rotunda?`)
-            }
-          })
-        }
-        if (n === 5) {
-          return sideColors.map((col) => {
-            switch (col) {
-              case "top":
-                return scheme.light.face
-              case "middle":
-                return scheme.primary.face
-              case "base":
-                return scheme.secondary.face
-              default:
-                throw new Error(`blah`)
-            }
-          })
-        }
-        return new Color()
-        // throw new Error(`Invalid numsides for side face`)
+        return sideColors.map((col) => {
+          switch (col) {
+            case "top":
+              return scheme.primary.face
+            case "middle":
+              return scheme.edge.prism
+            case "base":
+              // FIXME base this on the inner color
+              return scheme.primary.vertex
+            default:
+              throw new Error(`Impossible`)
+          }
+        })
       }
     }
   }

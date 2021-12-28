@@ -5,8 +5,9 @@ import { Face, Vertex } from "math/polyhedra"
 import { OpArgs, GraphEntry as DirectedGraphEntry } from "./Operation"
 import { Pose, alignPolyhedron, getGeometry } from "./operationUtils"
 import BaseForme from "math/formes/BaseForme"
-import { PolyhedronForme as Forme, createForme } from "math/formes"
+import { PolyhedronForme as Forme, createForme, FaceType } from "math/formes"
 import { vecEquals } from "math/geom"
+import { Appearance } from "components/ViewerPage/common/SolidScene/getFormeColors"
 
 /**
  * Defines a pair of inverse operations based on the given parameters.
@@ -359,21 +360,48 @@ function getMorphedAppearances<F extends Forme>(
       const conormalFace = side.geom.faces.find((f2) =>
         vecEquals(f.normal(), f2.normal()),
       )
-      return conormalFace ? side.faceAppearance(conormalFace) : defaultValue
+      if (conormalFace) {
+        return getMatchedAppearance(side, f, conormalFace)
+      }
+      return defaultValue
     }
-    const appearance = side.faceAppearance(matchingFacet)
-    if (appearance.type !== "capstone" || appearance.faceType !== "side") {
-      return appearance
-    }
-    // If there are different vertex appearances, map them based on index
-    const offset = getPartnerVertexIndex(f, matchingFacet)
+    return getMatchedAppearance(side, f, matchingFacet)
+  })
+}
+
+// Map an appearance from the side to the intermediate face
+function getMatchedAppearance(side: Forme, f: Face, matchingFacet: Face) {
+  const appearance = side.faceAppearance(matchingFacet)
+  if (appearance.type !== "capstone" || appearance.faceType !== "side") {
+    return appearance
+  }
+  // If there are different vertex appearances, map them based on index
+  const offset = getPartnerVertexIndex(f, matchingFacet)
+  // special case for truncating pyramids
+  if (f.numSides !== appearance.sideColors.length) {
+    console.log(
+      "got mismatched capstone sides:",
+      f.numSides,
+      appearance.sideColors.length,
+    )
+    const sideColors = f.vertices.map((v, i) => {
+      return getCyclic(appearance.sideColors, Math.floor(i / 2) + offset)
+    })
+    console.log(sideColors)
+
     return {
       ...appearance,
       sideColors: f.vertices.map((v, i) => {
-        return getCyclic(appearance.sideColors, i + offset)
+        return getCyclic(appearance.sideColors, Math.floor(i / 2) + offset)
       }),
     }
-  })
+  }
+  return {
+    ...appearance,
+    sideColors: f.vertices.map((v, i) => {
+      return getCyclic(appearance.sideColors, i + offset)
+    }),
+  }
 }
 
 // Find the faces in the first set that map onto the second set
