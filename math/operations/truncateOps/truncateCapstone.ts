@@ -23,7 +23,7 @@ export const semisnub = makeOpPair<Capstone>({
   getPose(forme) {
     return {
       origin: forme.origin(),
-      scale: Math.max(...forme.geom.vertices.map((v) => v.distanceToCenter())),
+      scale: forme.geom.maxRadius(),
       orientation: forme.orientation(),
     }
   },
@@ -50,7 +50,7 @@ export const rectify = makeOpPair<Capstone>({
     return {
       origin: forme.origin(),
       // TODO idk what's the best scale
-      scale: Math.max(...forme.geom.vertices.map((v) => v.distanceToCenter())),
+      scale: forme.geom.maxRadius(),
       orientation: forme.orientation(),
     }
   },
@@ -116,7 +116,7 @@ export const alternate = makeOpPair<Capstone>({
     }
     return {
       origin: forme.origin(),
-      scale: Math.max(...forme.geom.vertices.map((v) => v.distanceToCenter())),
+      scale: forme.geom.maxRadius(),
       orientation,
     }
   },
