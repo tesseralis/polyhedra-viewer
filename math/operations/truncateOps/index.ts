@@ -78,10 +78,10 @@ export const unrectify = new Operation("connect", {
 
 export const semisnub = new Operation(
   "semisnub",
-  combineOps([semisnubAmbo.left]),
+  combineOps([semisnubAmbo.left, capstones.semisnub.left]),
 )
 
 export const unsnub = new Operation("unsnub", {
-  ...combineOps<any>([semisnubAmbo.right]),
+  ...combineOps<any>([semisnubAmbo.right, capstones.semisnub.right]),
   ...hitOptArgs,
 })

@@ -6,6 +6,29 @@ import { CapstoneForme, fromSpecs } from "math/formes"
 import { Face } from "math/polyhedra"
 import { CapstoneFace } from "math/formes/FaceType"
 
+export const semisnub = makeOpPair<Capstone>({
+  graph: function* () {
+    for (const entry of Capstone.query.where((c) => c.isSnub())) {
+      // FIXME enable digonal
+      if (entry.isDigonal()) {
+        continue
+      }
+      yield {
+        left: entry.withData({ elongation: "antiprism" }),
+        right: entry,
+      }
+    }
+  },
+  intermediate: "right",
+  getPose(forme) {
+    return {
+      origin: forme.origin(),
+      scale: Math.max(...forme.geom.vertices.map((v) => v.distanceToCenter())),
+      orientation: forme.orientation(),
+    }
+  },
+})
+
 export const rectify = makeOpPair<Capstone>({
   graph: function* () {
     for (const entry of Capstone.query.where(
