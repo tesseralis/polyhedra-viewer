@@ -193,6 +193,14 @@ export default class Polyhedron {
     )
   }
 
+  /**
+   * Return the maximum distance from a vertex to this polyhedron's centroid.
+   * Useful in creating a reasonable standard scale for polyhedra
+   */
+  maxRadius() {
+    return Math.max(...this.vertices.map((v) => v.distanceToCenter()))
+  }
+
   normalizedVolume() {
     return this.volume() / this.edgeLength() ** 3
   }
