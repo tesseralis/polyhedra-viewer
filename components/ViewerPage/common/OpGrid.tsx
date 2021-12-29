@@ -114,9 +114,7 @@ export default function OpGrid() {
   return (
     <div {...css()}>
       {opList.map((name) => {
-        if (name === ".") {
-          return <div />
-        }
+        if (name === ".") return null
         return <OpButton key={name} name={name} disabled={isTransitioning} />
       })}
     </div>
