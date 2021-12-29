@@ -48,8 +48,8 @@ function SolidFaces({
 }: Props) {
   const { vertices, faces } = value
   const geomRef = useRef<BufferGeometry>()
-  const positionArray = useMemo(() => new Float32Array(1000 * 3), [])
-  const colorArray = useMemo(() => new Float32Array(1000 * 3), [])
+  const positionArray = useMemo(() => new Float32Array(1500 * 3), [])
+  const colorArray = useMemo(() => new Float32Array(1500 * 3), [])
 
   useLayoutEffect(() => {
     if (geomRef.current) {
@@ -138,7 +138,7 @@ function SolidEdges({ value, config }: Props) {
   const geomRef = useRef<BufferGeometry>()
   const { vertices, edges = [] } = value
   const { showEdges } = config
-  const vertexArray = useMemo(() => new Float32Array(500 * 3), [])
+  const vertexArray = useMemo(() => new Float32Array(750 * 3), [])
 
   useFrame(() => {
     const edgeVertices = edges.flatMap((edge) => {
