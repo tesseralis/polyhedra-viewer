@@ -3,7 +3,7 @@ import { getCyclic } from "lib/utils"
 import { PolyhedronSpecs } from "specs"
 import { Face, Vertex } from "math/polyhedra"
 import { OpArgs, GraphEntry as DirectedGraphEntry } from "./Operation"
-import { Pose, alignPolyhedron, getGeometry } from "./operationUtils"
+import { Pose, getGeometry } from "./operationUtils"
 import BaseForme from "math/formes/BaseForme"
 import { PolyhedronForme as Forme, createForme, FaceType } from "math/formes"
 import { vecEquals } from "math/geom"
@@ -48,7 +48,7 @@ export interface OpPairInput<Specs extends PolyhedronSpecs, L = {}, R = L> {
 
 export interface MorphDefinition<F extends Forme> {
   intermediateFaces?(forme: F): Face[]
-  sideFacets?(forme: F, intermediate: F): (Face | Vertex)[]
+  sideFacets?(forme: F, intermediate: F, options: any): (Face | Vertex)[]
 }
 
 export type GraphGenerator<Specs, L, R> = Generator<GraphEntry<Specs, L, R>>
@@ -196,15 +196,25 @@ class OpPair<
     return {
       result: end,
       animationData: {
-        start: intermediate.geom,
-        // start: intermediate.geom.withVertices(
-        //   getMorphedVertices(intermediate, start, startMorph),
-        // ),
-        endVertices: intermediate.geom.vertices,
-        // endVertices: getMorphedVertices(intermediate, end, endMorph),
+        // start: intermediate.geom,
+        start: intermediate.geom.withVertices(
+          getMorphedVertices(intermediate, start, startMorph, options),
+        ),
+        // endVertices: intermediate.geom.vertices,
+        endVertices: getMorphedVertices(intermediate, end, endMorph, options),
         // Get the appearances of the intermediate faces
-        // startAppearance: getMorphedAppearances(intermediate, start, startMorph),
-        // endAppearance: getMorphedAppearances(intermediate, end, endMorph),
+        startAppearance: getMorphedAppearances(
+          intermediate,
+          start,
+          startMorph,
+          options,
+        ),
+        endAppearance: getMorphedAppearances(
+          intermediate,
+          end,
+          endMorph,
+          options,
+        ),
       },
     }
   }
@@ -310,10 +320,11 @@ function getMorphedVertices<F extends Forme>(
     sideFacets = (f) => f.geom.faces,
     intermediateFaces = (f) => f.geom.faces,
   }: MorphDefinition<F>,
+  options: any,
 ) {
   const facePairs = getFacetPairs(
     intermediateFaces(interm),
-    sideFacets(side, interm),
+    sideFacets(side, interm, options),
   )
   const mapping: Vertex[] = []
   for (const [face, facet] of facePairs) {
@@ -334,6 +345,7 @@ function getMorphedAppearances<F extends Forme>(
   interm: F,
   side: F,
   morph: MorphDefinition<F>,
+  options: any,
 ) {
   const {
     sideFacets = (f) => f.geom.faces,
@@ -341,7 +353,7 @@ function getMorphedAppearances<F extends Forme>(
   } = morph
   const facePairs = getFacetPairs(
     intermediateFaces(interm),
-    sideFacets(side, interm),
+    sideFacets(side, interm, options),
   )
   const faceMapping: (Face | Vertex)[] = []
   for (const [face, facet] of facePairs) {
@@ -350,7 +362,7 @@ function getMorphedAppearances<F extends Forme>(
 
   // TODO handle normalizing stuff
   const morphedGeom = interm.geom.withVertices(
-    getMorphedVertices(interm, side, morph),
+    getMorphedVertices(interm, side, morph, options),
   )
 
   return morphedGeom.faces.map((f) => {

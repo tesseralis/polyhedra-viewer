@@ -62,7 +62,8 @@ export const alternateBevelled = makeOpPair<Classical, TwistOpts, {}>({
     }
   },
   toLeft: {
-    sideFacets: (forme) => getAlternateVertices(forme, forme.specs.data.twist!),
+    sideFacets: (forme, _, options) =>
+      getAlternateVertices(forme, options.left.twist),
   },
   toRight: {
     sideFacets: (forme) => forme.edgeFaces(),
