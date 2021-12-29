@@ -6,7 +6,7 @@ import { getCentroid } from "math/geom"
 import { getGeometry } from "math/operations/operationUtils"
 import { CapstoneFace } from "./FaceType"
 
-type CapstoneEnd = Facet
+type CapstoneEnd = Face | Edge | Cap
 
 // TODO add more useful functions here
 export default abstract class CapstoneForme extends BaseForme<Capstone> {
