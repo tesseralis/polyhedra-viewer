@@ -71,38 +71,6 @@ export default abstract class ClassicalForme extends BaseForme<Classical> {
     return [f0, this.adjacentFacetFace(f0, facet)]
   }
 
-  mainFacet() {
-    return this.specs.facet()
-  }
-
-  minorFacet() {
-    return oppositeFacet(this.specs.facet())
-  }
-
-  isMainFacetFace(face: Face) {
-    return this.isFacetFace(face, this.mainFacet())
-  }
-
-  isMinorFacetFace(face: Face) {
-    return this.isFacetFace(face, this.minorFacet())
-  }
-
-  mainFacetFace() {
-    return this.facetFace(this.mainFacet())
-  }
-
-  mainFacetFaces() {
-    return this.facetFaces(this.mainFacet())
-  }
-
-  minorFacetFace() {
-    return this.facetFace(this.minorFacet())
-  }
-
-  minorFacetFaces() {
-    return this.facetFaces(this.minorFacet())
-  }
-
   /** Return the inradius of the given type of face */
   inradius(facet: FacetType) {
     return this.facetFace(facet).distanceToCenter()
