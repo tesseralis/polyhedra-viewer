@@ -1,6 +1,6 @@
 import { find } from "lib/utils"
 import { Vector3 } from "three"
-import { Classical, FacetType, oppositeFacet, oppositeTwist } from "specs"
+import { Classical, FacetType, oppositeTwist } from "specs"
 import { Polyhedron, Face } from "math/polyhedra"
 import { angleBetween } from "math/geom"
 import { getGeometry, oppositeFace } from "math/operations/operationUtils"
