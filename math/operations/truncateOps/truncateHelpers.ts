@@ -1,4 +1,4 @@
-import { PRECISION } from "math/geom"
+import { PRECISION, vecEquals } from "math/geom"
 import { range, set } from "lodash-es"
 import { find, getCyclic, repeat } from "lib/utils"
 import { Polyhedron, Vertex, VertexArg } from "math/polyhedra"
@@ -84,9 +84,7 @@ export function rawTruncate(
   const truncatedVertices = duplicated.vertices.map((vertex) => {
     const adjacentVertices = vertex.adjacentVertices()
     const v = vertex.vec
-    const isDupe = adjacentVertices.some(
-      (v2) => v.distanceTo(v2.vec) < PRECISION,
-    )
+    const isDupe = adjacentVertices.some((v2) => vecEquals(v, v2.vec))
     if (!isDupe) {
       return v
     }
