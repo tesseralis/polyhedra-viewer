@@ -109,14 +109,6 @@ export default abstract class CapstoneForme extends BaseForme<Capstone> {
   }
 
   /**
-   * Return the height of the prismatic (elongation) component of the capstone.
-   */
-  prismaticHeight() {
-    const [top, bot] = this.ends()
-    return top.centroid().distanceTo(bot.centroid())
-  }
-
-  /**
    * A capstone's standard origin point is the midpoint between its top and bottom ends.
    */
   origin() {
@@ -185,6 +177,7 @@ export default abstract class CapstoneForme extends BaseForme<Capstone> {
     return false
   }
 
+  // This is used to calculate face selection state for expansion
   getFacet(face: Face) {
     if (!this.hasFaceFacets()) return super.getFacet(face)
     if (
@@ -252,7 +245,6 @@ class SnubCapstoneForme extends CapstoneForme {
     }
   }
 
-  // FIXME this breaks "twist"
   faceAppearance(face: Face) {
     const base = this.specs.data.base
     if (this.isTop(face)) {
