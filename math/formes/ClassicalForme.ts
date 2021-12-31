@@ -1,11 +1,11 @@
 import { find } from "lib/utils"
-import { Vector3 } from "three"
 import { Classical, FacetType, oppositeTwist } from "specs"
 import { Polyhedron, Face } from "math/polyhedra"
-import { angleBetween } from "math/geom"
+import { floatEquals } from "math/geom"
 import { getGeometry, oppositeFace } from "math/operations/operationUtils"
 import BaseForme from "./BaseForme"
 import { ClassicalFace } from "./FaceType"
+import { Family } from "specs/Classical"
 
 export default abstract class ClassicalForme extends BaseForme<Classical> {
   static create(specs: Classical, geom: Polyhedron) {
@@ -64,11 +64,16 @@ export default abstract class ClassicalForme extends BaseForme<Classical> {
     return super.facetFaces(facet)
   }
 
-  protected abstract adjacentFacetFace(face: Face, facet: FacetType): Face
-
   adjacentFacetFaces(facet: FacetType): [Face, Face] {
     const f0 = this.facetFace(facet)
-    return [f0, this.adjacentFacetFace(f0, facet)]
+    // Use the angle table to find another facet face with the correct incidence angle
+    const f1 = find(this.facetFaces(facet), (other) =>
+      floatEquals(
+        f0.normal().angleTo(other.normal()),
+        adjacentFaceAngles[this.specs.data.family][facet],
+      ),
+    )!
+    return [f0, f1]
   }
 
   /** Return the inradius of the given type of face */
@@ -84,13 +89,6 @@ export default abstract class ClassicalForme extends BaseForme<Classical> {
 
   circumradius() {
     return this.geom.getVertex().distanceToCenter()
-  }
-
-  /**
-   * Return the amount that this forme's faces are twisted
-   */
-  snubAngle(facet: FacetType) {
-    return 0
   }
 
   // @override
@@ -125,11 +123,6 @@ class RegularForme extends ClassicalForme {
     return facet === this.specs.facet() ? this.geom.faces : []
   }
 
-  adjacentFacetFace(face: Face, facet: FacetType) {
-    // NOTE this doesn't account for when the face isn't a facet face
-    return face.adjacentFaces()[0]
-  }
-
   midradius() {
     return this.geom.getEdge().distanceToCenter()
   }
@@ -149,17 +142,6 @@ class TruncatedForme extends ClassicalForme {
   tetrahedralFacetFaces(facet: FacetType) {
     return this.geom.facesWithNumSides(this.specs.facet() === facet ? 6 : 3)
   }
-
-  adjacentFacetFace(face: Face, facet: FacetType) {
-    if (facet === this.specs.facet()) {
-      return find(face.adjacentFaces(), (f) => this.isFacetFace(f, facet))
-    } else {
-      return find(
-        face.adjacentFaces()[0].adjacentFaces(),
-        (f) => f.numSides === face.numSides && !f.equals(face),
-      )
-    }
-  }
 }
 
 class RectifiedForme extends ClassicalForme {
@@ -169,13 +151,6 @@ class RectifiedForme extends ClassicalForme {
       f0 = f0.adjacentFaces()[0]
     }
     return [f0, ...f0.edges.map((e) => e.twin().prev().twinFace())]
-  }
-
-  adjacentFacetFace(face: Face, facet: FacetType) {
-    return find(
-      face.vertices[0].adjacentFaces(),
-      (f) => this.isFacetFace(f, facet) && !f.equals(face),
-    )
   }
 }
 
@@ -194,12 +169,6 @@ class BevelledForme extends ClassicalForme {
       .map((e) => oppositeFace(e))
     return [f0, ...rest]
   }
-
-  adjacentFacetFace(face: Face, facet: FacetType) {
-    return oppositeFace(
-      face.edges.filter((e) => this.isEdgeFace(e.twinFace()))[0],
-    )
-  }
 }
 
 class CantellatedForme extends ClassicalForme {
@@ -215,10 +184,6 @@ class CantellatedForme extends ClassicalForme {
       f0 = f0.edges[0].twin().next().twinFace()
     }
     return [f0, ...f0.edges.map((e) => oppositeFace(e))]
-  }
-
-  adjacentFacetFace(face: Face, facet: FacetType) {
-    return oppositeFace(face.edges[0])
   }
 
   caps() {
@@ -249,27 +214,30 @@ class SnubForme extends ClassicalForme {
     }
     return [f0, ...f0.edges.map((e) => oppositeFace(e, twist))]
   }
+}
 
-  adjacentFacetFace(face: Face, facet: FacetType) {
-    let twist = this.specs.data.twist
-    if (facet === "vertex") twist = oppositeTwist(twist!)
-    return oppositeFace(face.edges[0], twist)
-  }
-
-  snubAngle(facet: FacetType) {
-    const [face0, face1] = this.adjacentFacetFaces(facet)
-
-    // TODO this is fragile and relies on face1 being attached to face0.edges[0]
-    // Calculate the angle between the nearest apothem and the projected center of face1
-    const angle = angleBetween(
-      face0.centroid(),
-      face0.edges[0].midpoint(),
-      face0.plane().projectPoint(face1.centroid(), new Vector3()),
-    )
-
-    const twistSign = this.specs.data.twist === "left" ? -1 : 1
-    // if vertex-solid, reverse the sign
-    const facetSign = facet === "vertex" ? -1 : 1
-    return twistSign * facetSign * angle
-  }
+const { PI, acos, sqrt } = Math
+/**
+ * A table of the angle between adjacent facet faces of different families,
+ * used to calculate adjacent faces for orientation.
+ *
+ * The adjacent face angle is 180deg minus the dihedral angle of the
+ * corresponding Platonic solid.
+ *
+ * The dihedral angles are obtained from the corresponding Wikipedia pages
+ * of the Platonic solids.
+ */
+const adjacentFaceAngles: Record<Family, Record<FacetType, number>> = {
+  3: {
+    face: PI - acos(1 / 3),
+    vertex: PI - acos(1 / 3),
+  },
+  4: {
+    face: PI / 2,
+    vertex: PI - acos(-1 / 3),
+  },
+  5: {
+    face: PI - acos(-1 / sqrt(5)),
+    vertex: PI - acos(-sqrt(5) / 3),
+  },
 }

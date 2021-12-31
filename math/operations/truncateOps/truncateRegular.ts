@@ -82,12 +82,6 @@ function getRegularPose(
 }
 
 class AlternatedBevelledForme extends ClassicalForme {
-  adjacentFacetFace(face: Face, facet: "face" | "vertex") {
-    const edge = face.edges.find((e) => e.twinFace().numSides === 6)!
-    // The alternated edge face has six sides
-    return edge.twin().next().next().next().twinFace()
-  }
-
   protected _getFacet(face: Face) {
     if (face.numSides === this.specs.data.family * 3) {
       return "face"

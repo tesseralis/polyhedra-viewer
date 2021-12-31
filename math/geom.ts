@@ -4,6 +4,10 @@ export const PRECISION_DIGITS = 3
 export const PRECISION = 10 ** -PRECISION_DIGITS
 export const ORIGIN = new Vector3(0, 0)
 
+export function floatEquals(a: number, b: number, precision = PRECISION) {
+  return Math.abs(a - b) < precision
+}
+
 export function vecEquals(v1: Vector3, v2: Vector3) {
   return v1.distanceTo(v2) < PRECISION
 }
