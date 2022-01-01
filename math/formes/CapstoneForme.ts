@@ -38,9 +38,10 @@ export default abstract class CapstoneForme extends BaseForme<Capstone> {
       return [top, top.vertices[0]] as const
     }
     const top = this.endBoundaries()[0]
-    // TODO this should center on a triangular face but it causes a weird import error
-    // return [top, top.edges.find((e) => e.face.numSides === 3)!] as const
-    return [top, top.edges[0]] as const
+    const crossAxis = this.specs.isPrismatic()
+      ? top.edges[0]
+      : top.edges.find((e) => e.face.numSides === 3)!
+    return [top, crossAxis] as const
   }
 
   protected abstract queryTops(): Generator<CapstoneEnd>
