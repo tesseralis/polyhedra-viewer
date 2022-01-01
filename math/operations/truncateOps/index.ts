@@ -64,14 +64,20 @@ export const pinch = new Operation("pinch", {
 
 export const rectify = new Operation(
   "rectify",
-  combineOps([regs.rectify.left, ambos.rectify.left, capstones.rectify.left]),
+  combineOps([
+    regs.rectify.left,
+    ambos.rectify.left,
+    capstones.rectifyPyramid.left,
+    capstones.rectifyAntiprism.left,
+  ]),
 )
 
 export const unrectify = new Operation("connect", {
   ...combineOps<any>([
     regs.rectify.right,
     ambos.rectify.right,
-    capstones.rectify.right,
+    capstones.rectifyPyramid.right,
+    capstones.rectifyAntiprism.right,
   ]),
   ...hitOptArgs,
 })

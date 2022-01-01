@@ -29,7 +29,7 @@ export const semisnub = makeOpPair<Capstone>({
   },
 })
 
-export const rectify = makeOpPair<Capstone>({
+export const rectifyPyramid = makeOpPair<Capstone>({
   graph: function* () {
     for (const entry of Capstone.query.where(
       (c) => c.isPyramid() && c.isMono() && c.isShortened(),
@@ -62,6 +62,53 @@ export const rectify = makeOpPair<Capstone>({
       forme.ends()[0] as Face,
       ...forme.endBoundaries()[1].adjacentFaces(),
     ],
+  },
+})
+
+export const rectifyAntiprism = makeOpPair<Capstone>({
+  graph: function* () {
+    for (const entry of Capstone.query.where(
+      (c) => c.isAntiprism() && c.isPrimary() && c.isPrismatic(),
+    )) {
+      yield {
+        left: entry,
+        right: entry.withData({
+          elongation: "none",
+          type: "secondary",
+          count: 2,
+          gyrate: "gyro",
+        }),
+      }
+    }
+  },
+  intermediate(entry) {
+    return new TruncatedAntiprismForme(
+      entry.left,
+      rawTruncate(getGeometry(entry.left)),
+    )
+  },
+  getPose(forme, $, side) {
+    const top = forme.endBoundaries()[0]
+    const crossAxis =
+      side === "left"
+        ? top.vertices[0]
+        : top.edges.find((e) => e.face.numSides === 4)!
+    return {
+      origin: forme.origin(),
+      scale: forme.geom.maxRadius(),
+      orientation: [top, crossAxis],
+    }
+  },
+  toLeft: {
+    sideFacets: (forme) => forme.geom.vertices,
+  },
+  toRight: {
+    sideFacets: (forme) => {
+      // Return triangular cap side faces
+      return forme
+        .endBoundaries()
+        .flatMap((b) => b.adjacentFaces().filter((f) => f.numSides === 3))
+    },
   },
 })
 
@@ -157,6 +204,12 @@ class TruncatedPyramidForme extends CapstoneForme {
         return "top"
       }),
     )
+  }
+}
+
+class TruncatedAntiprismForme extends CapstoneForme {
+  *queryTops() {
+    yield* this.geom.facesWithNumSides(this.specs.data.base * 2)
   }
 }
 
