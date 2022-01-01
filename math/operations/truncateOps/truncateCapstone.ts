@@ -92,6 +92,8 @@ export const rectifyAntiprism = makeOpPair<Capstone>({
     const crossAxis =
       side === "left"
         ? top.vertices[0]
+        : side === "intermediate"
+        ? top.edges.find((e) => e.twinFace().numSides === 4)!
         : top.edges.find((e) => e.face.numSides === 4)!
     return {
       origin: forme.origin(),
@@ -107,7 +109,7 @@ export const rectifyAntiprism = makeOpPair<Capstone>({
       // Return triangular cap side faces
       return forme
         .endBoundaries()
-        .flatMap((b) => b.adjacentFaces().filter((f) => f.numSides === 3))
+        .flatMap((b) => b.adjacentFaces().filter((f) => f.numSides === 4))
     },
   },
 })
