@@ -140,10 +140,10 @@ export const alternate = makeOpPair<Capstone>({
       (c) => c.isAntiprism() && c.isPrismatic() && c.isPrimary(),
     )) {
       if (entry.isDigonal()) {
-        // yield {
-        //   left: entry.withData({ elongation: "prism", base: 4 }),
-        //   right: entry,
-        // }
+        yield {
+          left: entry.withData({ elongation: "prism", base: 4 }),
+          right: entry,
+        }
         continue
       }
       yield {
@@ -175,10 +175,10 @@ export const alternate = makeOpPair<Capstone>({
         break
       }
       case "right": {
-        // if (forme.specs.isDigonal()) {
-        //   orientation = [top, top.edges[0].face] as const
-        //   break
-        // }
+        if (forme.specs.isDigonal()) {
+          orientation = [top, top.edges[0].face] as const
+          break
+        }
         orientation = [top, top.edges[0]] as const
         break
       }
