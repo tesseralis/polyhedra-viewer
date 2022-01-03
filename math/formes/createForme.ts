@@ -26,9 +26,9 @@ export function fromSpecs<S extends PolyhedronSpecs>(
 ): PolyhedronForme<S> {
   // TODO it's kind of unwieldy to re-orient the polyhedron like this
   const forme = createForme(specs, getGeometry(specs))
-  return forme
+  // return forme
   // FIXME we should orient the polyhedron before returning, but this breaks the tests
-  // return createForme(specs, forme.orient())
+  return createForme(specs, forme.orient())
 }
 
 export function fromName(name: string) {

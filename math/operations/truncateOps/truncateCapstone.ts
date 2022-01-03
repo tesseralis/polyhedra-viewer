@@ -71,9 +71,9 @@ export const rectifyAntiprism = makeOpPair<Capstone>({
       (c) => c.isAntiprism() && c.isPrimary() && c.isPrismatic(),
     )) {
       // FIXME digonal antiprism
-      if (entry.isDigonal()) {
-        continue
-      }
+      // if (entry.isDigonal()) {
+      //   continue
+      // }
       yield {
         left: entry,
         right: entry.withData({

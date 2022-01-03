@@ -39,7 +39,7 @@ export default abstract class CapstoneForme extends BaseForme<Capstone> {
     }
     const top = this.endBoundaries()[0]
     const crossAxis = this.specs.isPrismatic()
-      ? top.edges[0]
+      ? top.edges[0].twinFace()
       : top.edges.find((e) => e.face.numSides === 3)!
     return [top, crossAxis] as const
   }

@@ -169,7 +169,6 @@ class OpPair<
       getPose(unalignedEnd, options, oppositeSide(side)),
       startPose,
     ) as Forme<Specs>
-
     let intermediate: Forme<Specs>
     if (typeof getIntermediate === "string") {
       // If we receive either "left" or "right"
@@ -196,25 +195,25 @@ class OpPair<
     return {
       result: end,
       animationData: {
-        // start: intermediate.geom,
-        start: intermediate.geom.withVertices(
-          getMorphedVertices(intermediate, start, startMorph, options),
-        ),
-        // endVertices: intermediate.geom.vertices,
-        endVertices: getMorphedVertices(intermediate, end, endMorph, options),
+        start: intermediate.geom,
+        // start: intermediate.geom.withVertices(
+        //   getMorphedVertices(intermediate, start, startMorph, options),
+        // ),
+        endVertices: intermediate.geom.vertices,
+        // endVertices: getMorphedVertices(intermediate, end, endMorph, options),
         // Get the appearances of the intermediate faces
-        startAppearance: getMorphedAppearances(
-          intermediate,
-          start,
-          startMorph,
-          options,
-        ),
-        endAppearance: getMorphedAppearances(
-          intermediate,
-          end,
-          endMorph,
-          options,
-        ),
+        // startAppearance: getMorphedAppearances(
+        //   intermediate,
+        //   start,
+        //   startMorph,
+        //   options,
+        // ),
+        // endAppearance: getMorphedAppearances(
+        //   intermediate,
+        //   end,
+        //   endMorph,
+        //   options,
+        // ),
       },
     }
   }
