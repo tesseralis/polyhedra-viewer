@@ -111,6 +111,10 @@ export const rectifyAntiprism = makeOpPair<Capstone>({
         .endBoundaries()
         .flatMap((b) => b.adjacentFaces().filter((f) => f.numSides === 4))
     },
+    // Explicitly specify the intermediate faces because the angles get mapped incorrectly
+    // for pentagonal gyrobicupola
+    intermediateFaces: (forme) =>
+      forme.geom.faces.filter((f) => f.numSides === 4),
   },
 })
 
