@@ -219,7 +219,13 @@ class TruncatedPyramidForme extends CapstoneForme {
 
 class TruncatedAntiprismForme extends CapstoneForme {
   *queryTops() {
-    yield* this.geom.facesWithNumSides(this.specs.data.base * 2)
+    if (this.specs.isDigonal()) {
+      yield* this.geom.edges.filter(
+        (e) => e.face.numSides === 6 && e.twinFace().numSides === 6,
+      )
+    } else {
+      yield* this.geom.facesWithNumSides(this.specs.data.base * 2)
+    }
   }
 }
 
