@@ -70,6 +70,10 @@ export const rectifyAntiprism = makeOpPair<Capstone>({
     for (const entry of Capstone.query.where(
       (c) => c.isAntiprism() && c.isPrimary() && c.isPrismatic(),
     )) {
+      // FIXME digonal antiprism
+      if (entry.isDigonal()) {
+        continue
+      }
       yield {
         left: entry,
         right: entry.withData({
