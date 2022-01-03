@@ -3,7 +3,7 @@ import { angleBetween, getMidpoint } from "math/geom"
 import Facet from "./Facet"
 import type Vertex from "./Vertex"
 import { find } from "lib/utils"
-import { FaceLike } from "."
+import FaceLike from "./FaceLike"
 
 export default class Edge extends Facet {
   v1: Vertex
@@ -90,6 +90,19 @@ export default class Edge extends Facet {
   }
 
   asFaceLike() {
-    return new FaceLike(this.vertices, [this, this.twin()])
+    return new EdgeFaceLike(this)
+  }
+}
+
+class EdgeFaceLike extends FaceLike {
+  edge: Edge
+
+  constructor(edge: Edge) {
+    super(edge.vertices, [edge, edge.twin()])
+    this.edge = edge
+  }
+
+  normal() {
+    return this.edge.normal()
   }
 }

@@ -9,7 +9,7 @@ import { CapstoneFace } from "math/formes/FaceType"
 export const semisnub = makeOpPair<Capstone>({
   graph: function* () {
     for (const entry of Capstone.query.where((c) => c.isSnub())) {
-      // FIXME enable digonal
+      // FIXME digonal
       if (entry.isDigonal()) {
         continue
       }
