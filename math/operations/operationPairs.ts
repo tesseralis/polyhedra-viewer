@@ -195,25 +195,25 @@ class OpPair<
     return {
       result: end,
       animationData: {
-        start: intermediate.geom,
-        // start: intermediate.geom.withVertices(
-        //   getMorphedVertices(intermediate, start, startMorph, options),
-        // ),
-        endVertices: intermediate.geom.vertices,
-        // endVertices: getMorphedVertices(intermediate, end, endMorph, options),
+        // start: intermediate.geom,
+        start: intermediate.geom.withVertices(
+          getMorphedVertices(intermediate, start, startMorph, options),
+        ),
+        // endVertices: intermediate.geom.vertices,
+        endVertices: getMorphedVertices(intermediate, end, endMorph, options),
         // Get the appearances of the intermediate faces
-        // startAppearance: getMorphedAppearances(
-        //   intermediate,
-        //   start,
-        //   startMorph,
-        //   options,
-        // ),
-        // endAppearance: getMorphedAppearances(
-        //   intermediate,
-        //   end,
-        //   endMorph,
-        //   options,
-        // ),
+        startAppearance: getMorphedAppearances(
+          intermediate,
+          start,
+          startMorph,
+          options,
+        ),
+        endAppearance: getMorphedAppearances(
+          intermediate,
+          end,
+          endMorph,
+          options,
+        ),
       },
     }
   }

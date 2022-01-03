@@ -70,10 +70,6 @@ export const rectifyAntiprism = makeOpPair<Capstone>({
     for (const entry of Capstone.query.where(
       (c) => c.isAntiprism() && c.isPrimary() && c.isPrismatic(),
     )) {
-      // FIXME digonal antiprism
-      // if (entry.isDigonal()) {
-      //   continue
-      // }
       yield {
         left: entry,
         right: entry.withData({
@@ -93,12 +89,26 @@ export const rectifyAntiprism = makeOpPair<Capstone>({
   },
   getPose(forme, $, side) {
     const top = forme.endBoundaries()[0]
-    const crossAxis =
-      side === "left"
-        ? top.vertices[0]
-        : side === "intermediate"
-        ? top.edges.find((e) => e.twinFace().numSides === 4)!
-        : top.edges.find((e) => e.face.numSides === 4)!
+    let crossAxis
+    switch (side) {
+      case "left": {
+        crossAxis = top.vertices[0]
+        break
+      }
+      case "intermediate": {
+        if (forme.specs.isDigonal()) {
+          crossAxis = top.vertices[0]
+          break
+        }
+        crossAxis = top.edges.find((e) => e.twinFace().numSides === 4)!
+        break
+      }
+      case "right": {
+        const numSides = forme.specs.isDigonal() ? 3 : 4
+        crossAxis = top.edges.find((e) => e.face.numSides === numSides)!
+        break
+      }
+    }
     return {
       origin: forme.origin(),
       scale: forme.geom.maxRadius(),
@@ -110,15 +120,21 @@ export const rectifyAntiprism = makeOpPair<Capstone>({
   },
   toRight: {
     sideFacets: (forme) => {
+      // The digonal truncated faces are triangular; everything else is square
+      const numSides = forme.specs.isDigonal() ? 3 : 4
       // Return triangular cap side faces
       return forme
         .endBoundaries()
-        .flatMap((b) => b.adjacentFaces().filter((f) => f.numSides === 4))
+        .flatMap((b) =>
+          b.adjacentFaces().filter((f) => f.numSides === numSides),
+        )
     },
     // Explicitly specify the intermediate faces because the angles get mapped incorrectly
     // for pentagonal gyrobicupola
-    intermediateFaces: (forme) =>
-      forme.geom.faces.filter((f) => f.numSides === 4),
+    intermediateFaces: (forme) => {
+      const numSides = forme.specs.isDigonal() ? 3 : 4
+      return forme.geom.faces.filter((f) => f.numSides === numSides)
+    },
   },
 })
 
