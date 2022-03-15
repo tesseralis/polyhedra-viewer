@@ -33,7 +33,7 @@
     "file-saver": "^2.0.2",
     "history": "^5.0.0",
     "jszip": "^3.4.0",
-    "lodash-es": "^4.17.15",
+    "lodash-es": "^4.17.21",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-ga": "^3.0.0",
