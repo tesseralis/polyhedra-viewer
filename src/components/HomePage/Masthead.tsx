@@ -10,6 +10,10 @@ import { flexRow, flexColumn, padding, link } from "styles/common"
 
 const videoHeight = 300
 
+Object.defineProperty(HTMLMediaElement.prototype, 'muted', {
+  set: () => {},
+});
+
 function VideoLink() {
   const css = useStyle({
     ...flexRow(undefined, "center"),
@@ -21,7 +25,7 @@ function VideoLink() {
   return (
     <Link {...css()} to="random">
       <SrOnly>View random polyhedron</SrOnly>
-      <video muted autoPlay playsInline src={video} height={videoHeight} />
+      <video muted={true} autoPlay={true} playsInline={true} src={video} height={videoHeight} />
     </Link>
   )
 }
